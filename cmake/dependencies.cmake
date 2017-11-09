@@ -43,6 +43,7 @@ function(detect_package_versions)
 
     if(box MATCHES "bpi|bananapi")
         set(_openssl_version "1.0.0j")
+        set(_onvif_version "2.1.2-io2-gcc7")
         set(_quazip_version "0.7")
     endif()
 
@@ -216,8 +217,6 @@ function(get_dependencies)
         nx_rdep_add_package(ldpreloadhook-1.0-deb7)
         nx_rdep_add_package(libpixman-0.34.0-deb7)
         nx_rdep_add_package(libcedrus-1.0-deb7)
-
-        nx_rdep_add_package(libstdc++-6.0.19)
 
         nx_rdep_add_package(fontconfig-2.11.0)
         nx_rdep_add_package(additional-fonts)
