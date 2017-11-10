@@ -190,7 +190,7 @@ function(get_dependencies)
         nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
         nx_rdep_add_package(sigar)
 
-        if(targetDevice MATCHES "bpi|bananapi")
+        if(targetDevice MATCHES "bpi|bananapi|rpi")
             nx_rdep_add_package(linux-arm/onvif)
         else()
             nx_rdep_add_package(onvif)
