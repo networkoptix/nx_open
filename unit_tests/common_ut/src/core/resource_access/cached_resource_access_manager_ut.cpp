@@ -730,6 +730,44 @@ TEST_F(QnCachedResourceAccessManagerTest, checkNvrWithoutLicense)
     ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 }
 
+/**
+* Camera with default auth (if can be changed) must not be viewable.
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCamera)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    camera->setCameraCapabilities(Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability);
+
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ExportPermission));
+
+    // Password changed
+    camera->setCameraCapabilities(Qn::SetUserPasswordCapability);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+}
+
+/**
+* Camera with default auth must be viewable if password cannot be changed.
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    camera->setCameraCapabilities(Qn::isDefaultPasswordCapability);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+}
+
 /************************************************************************/
 /* Checking servers access rights                                       */
 /************************************************************************/
