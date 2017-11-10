@@ -1,5 +1,7 @@
 #include "hanwha_time_synchronizer.h"
 
+#if defined(ENABLE_HANWHA)
+
 #include <map>
 #include <QtCore/QTimeZone>
 
@@ -238,3 +240,5 @@ void HanwhaTimeSyncronizer::doRequest(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
