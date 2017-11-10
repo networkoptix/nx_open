@@ -39,7 +39,7 @@
 
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/notifications/notification_widget.h>
-#include <ui/graphics/items/notifications/notification_list_widget.h>
+#include <ui/graphics/items/notifications/legacy_notification_list_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>
@@ -51,6 +51,9 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
+#include <nx/client/desktop/ui/actions/action.h>
+
 #include <health/system_health_helper.h>
 
 #include <utils/common/delayed.h>
@@ -154,6 +157,39 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                 return;
             at_notificationCache_fileDownloaded(filename);
         });
+
+    const auto defaultPasswordWatcher = context->instance<DefaultPasswordCamerasWatcher>();
+    const auto updateDefaultCameraPasswordNotification =
+        [this, defaultPasswordWatcher]()
+        {
+            if (!defaultPasswordWatcher->notificationIsVisible())
+            {
+                cleanUpItem(m_currentDefaultPasswordChangeWidget);
+                m_currentDefaultPasswordChangeWidget = nullptr;
+            }
+            else if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            {
+                NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
+                const auto parametersGetter =
+                    [defaultPasswordWatcher]()
+                    {
+                        return action::Parameters(
+                            defaultPasswordWatcher->camerasWithDefaultPassword())
+                            .withArgument(Qn::ShowSingleCameraRole, true);
+                    };
+
+                m_currentDefaultPasswordChangeWidget =
+                    addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
+                        QnNotificationLevel::Value::ImportantNotification,
+                        tr("Set Passwords"), false);
+            }
+        };
+
+    updateDefaultCameraPasswordNotification();
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::notificationIsVisibleChanged,
+        this, updateDefaultCameraPasswordNotification);
+    connect(context, &QnWorkbenchContext::userChanged,
+        this, updateDefaultCameraPasswordNotification);
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget()
@@ -296,6 +332,45 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
         });
 
     m_customPopupItems.insert(action->getParams().actionId, widget);
+}
+
+QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
+    action::IDType actionId,
+    const ParametersGetter& parametersGetter,
+    QnNotificationLevel::Value notificationLevel,
+    const QString& buttonText,
+    bool closeable)
+{
+    if (m_list->itemCount() >= kMaxNotificationItems)
+        return nullptr;
+
+    const auto action = menu()->action(actionId);
+    if (!action)
+        return nullptr;
+
+    QnNotificationWidget* item = new QnNotificationWidget(m_list);
+    item->setText(action->text());
+    item->setTooltipText(action->toolTip());
+    item->setNotificationLevel(notificationLevel);
+    item->setCloseButtonAvailable(closeable);
+
+    if (!buttonText.isEmpty())
+    {
+        item->addTextButton(action->icon(), buttonText,
+            [this, actionId, parameters = parametersGetter()]()
+            {
+                const auto triggerAction =
+                    [this, actionId, parameters] { menu()->trigger(actionId, parameters); };
+
+                // Action will trigger additional event loop, which will cause problems here.
+                executeDelayedParented(triggerAction, kDefaultDelay, this);
+            });
+    }
+
+    item->addActionButton(qnSkin->icon("events/alert.png"), actionId);
+
+    m_list->addItem(item, !closeable);
+    return item;
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)

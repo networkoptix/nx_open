@@ -1463,8 +1463,8 @@ void MediaServerProcess::at_timer()
         return;
 
     // TODO: #2.4 #GDM This timer make two totally different functions. Split it.
-    qnServerModule->runTimeSettings()->setValue(
-        "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qnServerModule->setLastRunningTime(
+        std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
 
     const auto& resPool = commonModule()->resourcePool();
     QnResourcePtr mServer = resPool->getResourceById(commonModule()->moduleGUID());
@@ -2197,9 +2197,9 @@ void MediaServerProcess::run()
     commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
-    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
+    auto auditManager = std::make_unique<QnMServerAuditManager>(
+        qnServerModule->lastRunningTime(), commonModule());
 
-    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
     std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
         new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
@@ -2298,27 +2298,7 @@ void MediaServerProcess::run()
         authHelper.get(), &QnAuthHelper::emptyDigestDetected,
         this, &MediaServerProcess::at_emptyDigestDetected);
 
-    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
-    authHelper->restrictionList()->allow(lit("?"), nx_http::AuthMethod::noAuth);
-
-    authHelper->restrictionList()->allow(lit("*/api/ping"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/camera_event*"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/showLog*"), nx_http::AuthMethod::urlQueryParam);   //allowed by default for now
-    authHelper->restrictionList()->allow(lit("*/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/gettime"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/getNonce"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
-    authHelper->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
-
-    //by following delegating hls authentication to target server
-    authHelper->restrictionList()->allow(lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth);
+    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
 
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
 
@@ -2795,7 +2775,7 @@ void MediaServerProcess::run()
                 SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
-    m_firstRunningTime = qnServerModule->runTimeSettings()->value("lastRunningTime").toLongLong();
+    m_firstRunningTime = qnServerModule->lastRunningTime().count();
 
     m_crashReporter.reset(new ec2::CrashReporter(commonModule()));
 
@@ -2902,6 +2882,8 @@ void MediaServerProcess::run()
 
     hlsSessionPool.reset();
 
+    // Remove all stream recorders.
+    remoteArchiveSynchronizer.reset();
     recordingManager.reset();
 
     mserverResourceSearcher.reset();
@@ -2928,7 +2910,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -2948,7 +2929,7 @@ void MediaServerProcess::run()
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();
-    qnServerModule->runTimeSettings()->setValue("lastRunningTime", 0);
+    qnServerModule->setLastRunningTime(std::chrono::milliseconds::zero());
 
     authHelper.reset();
     //fileDeletor.reset();

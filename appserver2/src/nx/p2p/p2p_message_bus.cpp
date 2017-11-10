@@ -749,9 +749,9 @@ void MessageBus::commitLazyData()
 void MessageBus::MiscData::update()
 {
     expectedConnections = std::max(1, std::max(owner->m_connections.size(), (int) owner->m_remoteUrls.size()));
-    maxSubscriptionToResubscribe = std::round(std::sqrt(expectedConnections)) * 2;
+    maxSubscriptionToResubscribe = qRound(std::sqrt(expectedConnections)) * 2;
     maxDistanceToUseProxy = std::max(2, int(std::sqrt(std::sqrt(expectedConnections))));
-    newConnectionsAtOnce = std::max(1, int(std::round(std::sqrt(expectedConnections))) / 2);
+    newConnectionsAtOnce = std::max(1, int(qRound(std::sqrt(expectedConnections))) / 2);
 }
 
 void MessageBus::doPeriodicTasksForServer()

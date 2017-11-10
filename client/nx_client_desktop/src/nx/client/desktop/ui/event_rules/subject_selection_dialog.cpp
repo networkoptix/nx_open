@@ -17,7 +17,7 @@
 #include <nx/utils/string.h>
 
 #include <nx/client/desktop/ui/common/item_view_utils.h>
-#include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
+#include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
 namespace nx {
 namespace client {

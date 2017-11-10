@@ -31,7 +31,7 @@ public:
         MaxTimeSpanUnit = Years
     };
     Q_ENUM(TimeSpanUnit)
-    Q_DECLARE_FLAGS(TimeSpanFormat, TimeSpanUnit);
+    Q_DECLARE_FLAGS(TimeSpanFormat, TimeSpanUnit)
 
     enum DigitalSizeUnit
     {
@@ -48,7 +48,7 @@ public:
         MaxDigitalSizeUnit = Peta
     };
     Q_ENUM(DigitalSizeUnit)
-    Q_DECLARE_FLAGS(DigitalSizeFormat, DigitalSizeUnit);
+    Q_DECLARE_FLAGS(DigitalSizeFormat, DigitalSizeUnit)
 
     enum class SuffixFormat
     {
@@ -63,6 +63,7 @@ public:
         Binary
     };
 
+    static const int kAlwaysSuppressSecondUnit = 0;
     static const int kNoSuppressSecondUnit = -1;
     static const int kDefaultSuppressSecondUnitLimit = 3;
 
@@ -79,17 +80,30 @@ public:
         SuffixFormat suffixFormat = SuffixFormat::Short,
         int count = -1);
 
-    static QString digitalSize(qint64 size,
+    /**
+     * Get human representation of digital size in bytes using provided units. Maximum 2 units are
+     * used, e.g. 1315333734400 bytes may be decribed as 1 TB 201 GB.
+     */
+    static QString digitalSize(qint64 bytes,
         DigitalSizeFormat format = FileSize,
         DigitalSizeMultiplier multiplier = DigitalSizeMultiplier::Binary,
         SuffixFormat suffixFormat = SuffixFormat::Short,
         const QString& separator = QLatin1String(" "),
         int suppressSecondUnitLimit = 200);
 
+    /**
+    * Get human representation of digital size in bytes using provided units. Floating point is
+    * used, e.g. 1315333734400 bytes may be decribed as 1.2 TB.
+    */
+    static QString digitalSizePrecise(qint64 bytes,
+        DigitalSizeFormat format = FileSize,
+        DigitalSizeMultiplier multiplier = DigitalSizeMultiplier::Binary,
+        SuffixFormat suffixFormat = SuffixFormat::Short,
+        const QString& decimalSeparator = QLatin1String("."),
+        int precision = 3);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(HumanReadable::TimeSpanFormat);
-
 
 } // namespace core
 } // namespace client

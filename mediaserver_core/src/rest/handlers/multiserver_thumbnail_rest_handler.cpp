@@ -8,10 +8,11 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_history.h>
 
 #include <network/tcp_listener.h>
 
@@ -40,7 +41,19 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     QByteArray& result, QByteArray& contentType,
     const QnRestConnectionProcessor* processor )
 {
-    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(processor->commonModule()->resourcePool(), params);
+    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
+        processor->commonModule()->resourcePool(), params);
+
+    auto requiredPermission = QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch)
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+
+    if (!processor->commonModule()->resourceAccessManager()->hasPermission(
+        processor->accessRights(), request.camera, requiredPermission))
+    {
+        return makeError(nx_http::StatusCode::forbidden, lit("No required permission"),
+            &result, &contentType, request.format, request.extraFormatting);
+    }
+
     const auto ownerPort = processor->owner()->getPort();
     return getScreenshot(processor->commonModule(), request, result, contentType, ownerPort);
 }

@@ -517,10 +517,13 @@ bool HanwhaResource::setRelayOutputState(
             setRelayOutputStateInternal(outputId, state);
         };
 
-    m_timerHolder.addTimer(
-        outputId,
-        resetHandler,
-        std::chrono::milliseconds(autoResetTimeoutMs));
+    if (autoResetTimeoutMs > 0)
+    {
+        m_timerHolder.addTimer(
+            outputId,
+            resetHandler,
+            std::chrono::milliseconds(autoResetTimeoutMs));
+    }
 
     return setRelayOutputStateInternal(outputId, activate);
 }
@@ -570,14 +573,15 @@ bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType 
         || eventType == nx::vms::event::EventType::cameraInputEvent;
 }
 
-QString HanwhaResource::sessionKey(
+SessionContextPtr HanwhaResource::session(
     HanwhaSessionType sessionType,
+    const QnUuid& clientId,
     bool generateNewOne)
 {
     if (const auto context = sharedContext())
-        return m_sharedContext->sessionKey(sessionType, generateNewOne);
+        return m_sharedContext->session(sessionType, clientId, generateNewOne);
 
-    return QString();
+    return SessionContextPtr();
 }
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
@@ -1033,10 +1037,16 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         return CameraDiagnostics::NoErrorResult();
 
     auto possibleValues = autoFocusParameter->possibleValues();
-    if (possibleValues.contains(lit("AutoFocus")))
+    m_focusMode = QString();
+    for (const auto& mode: {lit("SimpleFocus"), lit("AutoFocus")})
     {
-        m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
-        m_ptzTraits.push_back(Ptz::ManualAutoFocusPtzTrait);
+        if (possibleValues.contains(mode))
+        {
+            m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
+            m_ptzTraits.push_back(Ptz::ManualAutoFocusPtzTrait);
+            m_focusMode = mode;
+            break;
+        }
     }
 
     auto maxPresetParameter = m_attributes.attribute<int>(
@@ -2385,19 +2395,19 @@ bool HanwhaResource::executeCommandInternal(
 {
     auto makeRequest =
         [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
-    {
-        if (channel != kHanwhaInvalidChannel)
-            parameters[kHanwhaChannelProperty] = QString::number(channel);
+        {
+            if (channel != kHanwhaInvalidChannel)
+                parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-        HanwhaRequestHelper helper(sharedContext());
-        const auto response = helper.doRequest(
-            info.cgi(),
-            info.submenu(),
-            info.updateAction(),
-            parameters);
+            HanwhaRequestHelper helper(sharedContext());
+            const auto response = helper.doRequest(
+                info.cgi(),
+                info.submenu(),
+                info.updateAction(),
+                parameters);
 
-        return response.isSuccessful();
-    };
+            return response.isSuccessful();
+        };
 
     if (info.shouldAffectAllChannels())
     {
@@ -2521,6 +2531,11 @@ bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool a
 bool HanwhaResource::isNvr() const
 {
     return m_isNvr;
+}
+
+QString HanwhaResource::focusMode() const
+{
+    return m_focusMode;
 }
 
 QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const

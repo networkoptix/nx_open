@@ -76,7 +76,10 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+    SessionContextPtr session(
+        HanwhaSessionType sessionType,
+        const QnUuid& clientId,
+        bool generateNewOne = false);
 
     std::unique_ptr<QnAbstractArchiveDelegate> remoteArchiveDelegate();
 
@@ -109,7 +112,7 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
-
+    QString focusMode() const;
     QString nxProfileName(Qn::ConnectionRole role) const;
 
     static const QString kNormalizedSpeedPtzTrait;
@@ -280,6 +283,7 @@ private:
     HanwhaAttributes m_attributes;
     HanwhaCgiParameters m_cgiParameters;
     bool m_isNvr = false;
+    QString m_focusMode;
 
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;

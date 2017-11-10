@@ -13,6 +13,7 @@
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -69,8 +70,14 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     if (m_hanwhaResource->isNvr())
     {
-        streamUrlString.append(lit("&session=%1")
-            .arg(m_hanwhaResource->sessionKey(m_sessionType)));
+        QnUuid clientId;
+        if (m_sessionType != HanwhaSessionType::live)
+            clientId = m_clientId;
+        m_sessionContext = m_hanwhaResource->session(m_sessionType, clientId);
+        if (m_sessionContext.isNull())
+            return CameraDiagnostics::TooManyOpenedConnectionsResult();
+
+        streamUrlString.append(lit("&session=%1").arg(m_sessionContext->sessionId));
     }
 
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
@@ -89,7 +96,15 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_rtpReader.setRequest(streamUrlString);
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
-    return m_rtpReader.openStream();
+    const auto openResult = m_rtpReader.openStream();
+    NX_VERBOSE(this, lm("RTP open %1 -> %2").args(streamUrlString, openResult.toString(nullptr)));
+    return openResult;
+}
+
+void HanwhaStreamReader::closeStream()
+{
+    base_type::closeStream();
+    m_sessionContext.reset();
 }
 
 HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
@@ -391,6 +406,11 @@ QString HanwhaStreamReader::toHanwhaPlaybackTime(int64_t timestampUsec) const
 void HanwhaStreamReader::setSessionType(HanwhaSessionType value)
 {
     m_sessionType = value;
+}
+
+void HanwhaStreamReader::setClientId(const QnUuid& id)
+{
+    m_clientId = id;
 }
 
 } // namespace plugins

@@ -90,7 +90,7 @@ QStandardItem* newConnectionItem(const QString& text, const nx::utils::Url& url,
         return nullptr;
 
     auto result = new QStandardItem(text);
-    result->setData(url.toQUrl(), Qn::UrlRole);
+    result->setData(qVariantFromValue(url), Qn::UrlRole);
     if (!isValid)
         result->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
 
@@ -325,7 +325,7 @@ void QnLoginDialog::accept()
                     if (!autoLogin)
                         lastUrlForLoginDialog.setPassword(QString());
 
-                    qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog);
+                    qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog.toString());
                     qnSettings->save();
 
                     const bool storePasswordForTile =
@@ -418,7 +418,7 @@ void QnLoginDialog::resetConnectionsModel()
 
     QModelIndex selectedIndex;
 
-    const auto url = qnSettings->lastLocalConnectionUrl();
+    const auto url = nx::utils::Url(qnSettings->lastLocalConnectionUrl());
     m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
         : ::newConnectionItem(defaultLastUsedConnectionName(), url));
@@ -578,7 +578,10 @@ void QnLoginDialog::updateUsability()
 void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index)
 {
     QStandardItem* item = m_connectionsModel->itemFromIndex(index);
-    QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
+    nx::utils::Url url;
+    if (item)
+        url = item->data(Qn::UrlRole).value<nx::utils::Url>();
+
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
     ui->loginLineEdit->setText(url.userName().isEmpty()

@@ -38,7 +38,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 
-#include <ui/workaround/widgets_signals_workaround.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <utils/common/event_processors.h>
 
@@ -49,7 +49,6 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/item_view_auto_hider.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -57,7 +56,8 @@
 
 #include <ui/workaround/hidpi_workarounds.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
+using namespace ui;
 
 namespace
 {
@@ -770,7 +770,7 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record,
             action::CameraSettingsAction,
-            Qn::GeneralSettingsTab);
+            static_cast<int>(CameraSettingsTab::general));
 
     if (isMaximized())
         showNormal();

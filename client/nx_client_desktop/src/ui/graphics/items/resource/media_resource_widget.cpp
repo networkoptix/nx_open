@@ -61,6 +61,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/geometry.h>
@@ -86,7 +87,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
+
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -96,6 +97,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -110,7 +112,8 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 using namespace nx;
-using namespace client::desktop::ui;
+using namespace client::desktop;
+using namespace ui;
 
 namespace {
 
@@ -573,31 +576,64 @@ void QnMediaResourceWidget::initIconButton()
 
 void QnMediaResourceWidget::initStatusOverlayController()
 {
-    if (d->camera)
-    {
-        const auto controller = statusOverlayController();
-        connect(controller, &QnStatusOverlayController::buttonClicked, this,
-            [this](Qn::ResourceOverlayButton button)
-            {
-                switch (button)
-                {
-                    case Qn::ResourceOverlayButton::Diagnostics:
-                        processDiagnosticsRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::EnableLicense:
-                        processEnableLicenseRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::Settings:
-                        processSettingsRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::MoreLicenses:
-                        processMoreLicensesRequest();
-                        break;
-                    default:
-                        break;
-                }
-            });
-    }
+    if (!d->camera)
+         return;
+
+     const auto changeCameraPassword =
+         [this](const QnVirtualCameraResourceList& cameras, bool showSingleCamera)
+         {
+             auto parameters = action::Parameters(cameras);
+             parameters.setArgument(Qn::ShowSingleCameraRole, showSingleCamera);
+             menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
+         };
+
+     const auto controller = statusOverlayController();
+     connect(controller, &QnStatusOverlayController::buttonClicked, this,
+         [this, changeCameraPassword](Qn::ResourceOverlayButton button)
+         {
+             switch (button)
+             {
+                 case Qn::ResourceOverlayButton::Diagnostics:
+                     processDiagnosticsRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::EnableLicense:
+                     processEnableLicenseRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::Settings:
+                     processSettingsRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::MoreLicenses:
+                     processMoreLicensesRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::SetPassword:
+                     changeCameraPassword(QnVirtualCameraResourceList() << d->camera, false);
+                 default:
+                     break;
+             }
+         });
+
+     connect(controller, &QnStatusOverlayController::customButtonClicked, this,
+         [this, changeCameraPassword]()
+         {
+             const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), true);
+         });
+}
+
+QString QnMediaResourceWidget::overlayCustomButtonText(
+    Qn::ResourceStatusOverlay statusOverlay) const
+{
+    if (statusOverlay != Qn::PasswordRequiredOverlay)
+        return QString();
+
+    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        return QString();
+
+    const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
+    return camerasCount > 1
+        ? tr("Set For All %n Cameras", nullptr, camerasCount)
+        : QString();
 }
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
@@ -1498,42 +1534,56 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
+    QnMetaDataV1Ptr motionMetadata;
+
     const auto metadataList = m_renderer->lastFrameMetadata(channel);
     for (const auto& metadata: metadataList)
     {
-        if (options().testFlag(DisplayMotion))
+        if (!metadata)
+            continue;
+
+        switch (metadata->dataType)
         {
-            ensureMotionSelectionCache();
+            case QnAbstractMediaData::DataType::META_V1:
+                motionMetadata = std::dynamic_pointer_cast<QnMetaDataV1>(metadata);
+                break;
 
-            if (metadata && metadata->dataType == QnAbstractMediaData::DataType::META_V1)
+            case QnAbstractMediaData::DataType::GENERIC_METADATA:
             {
-                paintMotionGrid(
-                    painter,
-                    channel,
-                    rect,
-                    std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+                if (nx::client::desktop::ini().enableAnalytics)
+                {
+                    qnMetadataAnalyticsController->gotMetadataPacket(
+                        d->resource,
+                        std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+                }
+                break;
             }
 
-            paintMotionSensitivity(painter, channel, rect);
-
-            /* Motion selection. */
-            if (!m_motionSelection[channel].isEmpty())
-            {
-                QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
-                paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
-            }
-        }
-
-        if (metadata && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
-        {
-            if (nx::client::desktop::ini().enableAnalytics)
-            {
-                qnMetadataAnalyticsController->gotMetadataPacket(
-                    d->resource,
-                    std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
-            }
+            default:
+                break;
         }
     }
+
+    if (options().testFlag(DisplayMotion))
+    {
+        ensureMotionSelectionCache();
+
+        paintMotionGrid(
+            painter,
+            channel,
+            rect,
+            motionMetadata);
+
+        paintMotionSensitivity(painter, channel, rect);
+
+        /* Motion selection. */
+        if (!m_motionSelection[channel].isEmpty())
+        {
+            QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
+            paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
+        }
+    }
+
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 }
@@ -1943,7 +1993,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             ? Qn::ViewLivePermission
             : Qn::ViewFootagePermission;
 
-        if (accessController()->hasPermissions(d->camera, requiredPermission))
+        if (accessController()->hasPermissions(d->resource, requiredPermission))
             result |= Qn::ScreenshotButton;
     }
 
@@ -2034,6 +2084,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isUnauthorized())
         return Qn::UnauthorizedOverlay;
 
+    if (d->camera->needsToChangeDefaultPassword())
+        return Qn::PasswordRequiredOverlay;
+
     if (d->camera)
     {
         const Qn::Permission requiredPermission = d->isPlayingLive()
@@ -2058,6 +2111,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
         if (d->licenseStatus() != QnLicenseUsageStatus::used)
             return Qn::IoModuleDisabledOverlay;
+    }
+
+    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnections)
+    {
+        // Too many opened connections
+        return Qn::TooManyOpenedConnectionsOverlay;
     }
 
     if (d->display()->camDisplay()->isEOFReached())
@@ -2111,6 +2170,12 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 {
     if (!d->camera || !d->camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
+
+    if (statusOverlay == Qn::PasswordRequiredOverlay
+        && context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    {
+        return Qn::ResourceOverlayButton::SetPassword;
+    }
 
     const bool canChangeSettings = accessController()->hasPermissions(d->camera,
         Qn::SavePermission | Qn::WritePermission);
@@ -2430,9 +2495,9 @@ void QnMediaResourceWidget::processSettingsRequest()
     if (!d->camera)
         return;
 
-    int selectedTab = Qn::GeneralSettingsTab;
+    //TODO: #GDM Check if may be provided without static cast.
     menu()->trigger(action::CameraSettingsAction, action::Parameters(d->camera)
-        .withArgument(Qn::FocusTabRole, selectedTab));
+        .withArgument(Qn::FocusTabRole, int(CameraSettingsTab::general)));
 }
 
 void QnMediaResourceWidget::processMoreLicensesRequest()

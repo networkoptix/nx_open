@@ -1,7 +1,7 @@
 import logging
 import datetime
 import requests
-from .server_rest_api import HttpError, CloudRestApi
+from .rest_api import HttpError, CloudRestApi
 from .imap import IMAPConnection
 
 log = logging.getLogger(__name__)
@@ -26,18 +26,24 @@ class ServerBindInfo(object):
         self.system_id = system_id
 
 
-class CloudHost(object):
+class CloudAccount(object):
 
     def __init__(self, name, customization, host, user, password):
         self.name = name
         self.customization = customization
         self.host = host
-        self.user = user
-        self.password = password
         self.rest_api = CloudRestApi('cloud-host:%s' % name, self.url, user, password)
 
     def __repr__(self):
         return '%r @ %r' % (self.name, self.url)
+
+    @property
+    def user(self):
+        return self.rest_api.user
+
+    @property
+    def password(self):
+        return self.rest_api.password
 
     @property
     def url(self):
@@ -90,15 +96,68 @@ class CloudHost(object):
         return ServerBindInfo(response['authKey'], response['id'])
 
 
-def make_test_email(cloud_group, customization):
-    user_name, domain = AUTOTEST_EMAIL_ALIAS.split('@')
-    email = '{}+cloud-account-{}-{}@{}'.format(user_name, cloud_group, customization, domain)
-    return email
+class CloudEmail(object):
 
-def make_test_email_name(cloud_group, customization):
-    first_name = 'Functional AutoTest'
-    last_name = 'for cloud group {}, customization {}'.format(cloud_group, customization)
-    return (first_name, last_name)
+    def __init__(self, cloud_group, customization, account_idx):
+        user_name, domain = AUTOTEST_EMAIL_ALIAS.split('@')
+        params = dict(
+            user_name=user_name,
+            domain=domain,
+            cloud_group=cloud_group,
+            customization=customization,
+            account_idx=account_idx,
+            )
+        self.email = '{user_name}+cloud-account-{cloud_group}-{customization}-{account_idx}@{domain}'.format(**params)
+        self.first_name = 'Functional AutoTest #{account_idx}'.format(**params)
+        self.last_name = 'for cloud group {cloud_group}, customization {customization}'.format(**params)
+
+
+class CloudAccountFactory(object):
+
+    def __init__(self, cloud_group, customization, cloud_host, autotest_email_password):
+        self._cloud_group = cloud_group
+        self._customization = customization
+        self._cloud_host = cloud_host
+        self._autotest_email_password = autotest_email_password
+        self._account_idx = 0
+
+    def __call__(self):
+        self._account_idx += 1
+        return self.create_cloud_account(self._account_idx)
+
+    def create_cloud_account(self, account_idx):
+        cloud_email = CloudEmail(self._cloud_group, self._customization, account_idx)
+        cloud_account = CloudAccount(self._cloud_group, self._customization, self._cloud_host, cloud_email.email, CLOUD_ACCOUNT_PASSWORD)
+        self.ensure_email_exists(cloud_account, cloud_email)
+        return cloud_account
+
+    def ensure_email_exists(self, cloud_account, cloud_email):
+        log.info('Checking cloud account %r', cloud_email.email)
+        try:
+            user_info = cloud_account.get_user_info()
+        except HttpError as x:
+            result_code = x.json.get('resultCode')
+            assert result_code in ['notAuthorized', 'accountNotActivated'], repr(result_code)
+            assert self._autotest_email_password, '--autotest-email-password must be provided to activate %r' % cloud_email.email
+            with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, self._autotest_email_password) as imap_connection:
+                imap_connection.delete_old_activation_messages(cloud_email.email)
+                if result_code == 'notAuthorized':
+                    log.info('Account %r is missing, creating new one', cloud_email.email)
+                    cloud_account.register_user(cloud_email.first_name, cloud_email.last_name)
+                else:
+                    cloud_account.resend_activation_code()
+                code = imap_connection.fetch_activation_code(cloud_account.host, cloud_email.email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
+            cloud_account.activate_user(code)
+            user_info = cloud_account.get_user_info()
+        assert user_info.get('statusCode') == 'activated'
+        if user_info['customization'] != self._customization:
+            log.info('Account %r has wrong customization: %r; updating', cloud_email.email, user_info['customization'])
+            cloud_account.set_user_customization(self._customization)
+            user_info = cloud_account.get_user_info()
+            assert user_info['customization'] == self._customization, repr(user_info)
+        log.info('Email %r for cloud group %r is valid and belongs to customization %r',
+            cloud_email.email, self._cloud_group, self._customization)
+
 
 def resolve_cloud_host_from_registry(cloud_group, customization):
     log.info('Resolving cloud host for cloud group %r, customization %r on %r:', cloud_group, customization, CLOUD_HOST_REGISTRY_URL)
@@ -110,36 +169,3 @@ def resolve_cloud_host_from_registry(cloud_group, customization):
     cloud_host = response.content
     log.info('Resolved cloud host for cloud group %r, customization %r: %r', cloud_group, customization, cloud_host)
     return cloud_host
-
-def create_cloud_host(cloud_group, customization, host, autotest_email_password):
-    cloud_email = make_test_email(cloud_group, customization)
-    cloud_host = CloudHost(cloud_group, customization, host, cloud_email, CLOUD_ACCOUNT_PASSWORD)
-    ensure_email_exists(cloud_group, customization, cloud_host, cloud_email, autotest_email_password)
-    return cloud_host
-
-def ensure_email_exists(cloud_group, customization, cloud_host, cloud_email, autotest_email_password):
-    log.info('Checking cloud account %r', cloud_email)
-    try:
-        user_info = cloud_host.get_user_info()
-    except HttpError as x:
-        result_code = x.json.get('resultCode')
-        assert result_code in ['notAuthorized', 'accountNotActivated'], repr(result_code)
-        assert autotest_email_password, '--autotest-email-password must be provided to activate %r' % cloud_email
-        with IMAPConnection(IMAP_HOST, AUTOTEST_LOGIN_EMAIL, autotest_email_password) as imap_connection:
-            imap_connection.delete_old_activation_messages(cloud_email)
-            if result_code == 'notAuthorized':
-                log.info('Account %r is missing, creating new one', cloud_email)
-                first_name, last_name = make_test_email_name(cloud_group, customization)
-                cloud_host.register_user(first_name, last_name)
-            else:
-                cloud_host.resend_activation_code()
-            code = imap_connection.fetch_activation_code(cloud_host.host, cloud_email, FETCH_ACTIVATION_EMAIL_TIMEOUT)
-        cloud_host.activate_user(code)
-        user_info = cloud_host.get_user_info()
-    assert user_info.get('statusCode') == 'activated'
-    if user_info['customization'] != customization:
-        log.info('Account %r has wrong customization: %r; updating', cloud_email, user_info['customization'])
-        cloud_host.set_user_customization(customization)
-        user_info = cloud_host.get_user_info()
-        assert user_info['customization'] == customization, repr(user_info)
-    log.info('Email %r for cloud group %r is valid and belongs to customization %r', cloud_email, cloud_group, customization)

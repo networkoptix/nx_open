@@ -203,7 +203,8 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         }
         else
         {
-            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams);
+            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams, QnUuid());
+            //< TODO: #dmishin Pass real client id
         }
 
         if (!mediaDataProvider)
@@ -274,7 +275,8 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataPro
 
 AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
     QnSecurityCamResourcePtr cameraResource,
-    const StreamingChunkCacheKey& transcodeParams)
+    const StreamingChunkCacheKey& transcodeParams,
+    const QnUuid& clientId)
 {
     using namespace std::chrono;
 
@@ -295,6 +297,8 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
 
     QnAbstractArchiveStreamReader* archiveReader =
         dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
+    archiveReader->getArchiveDelegate()->setClientId(clientId);
+    archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Archive);
     if (!archiveReader || !archiveReader->open())
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "

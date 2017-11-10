@@ -245,11 +245,12 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
     {
-        HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-        auto response = helper.control(
-            lit("image/focus"),
-            {{lit("Mode"), lit("AutoFocus")}});
+        HanwhaRequestHelper::Parameters paramiters{{lit("Mode"), m_hanwhaResource->focusMode()}};
+        if (m_hanwhaResource->isNvr())
+            paramiters.emplace(lit("Channel"), QString::number(m_hanwhaResource->getChannel()));
 
+        HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+        auto response = helper.control(lit("image/focus"), paramiters);
         return response.isSuccessful();
     }
     
@@ -335,13 +336,13 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
         x1 = QString::number(
             qBound(
                 0,
-                (int)std::round(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+                qRound(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
                 kHanwhaAbsoluteMoveCoefficient));
 
         y1 = QString::number(
             qBound(
                 0,
-                (int)std::round(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+                qRound(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
                 kHanwhaAbsoluteMoveCoefficient));
 
         x2 = x1;

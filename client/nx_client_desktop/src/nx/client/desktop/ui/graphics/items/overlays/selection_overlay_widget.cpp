@@ -15,7 +15,7 @@ namespace {
 
 static constexpr qreal kSelectionOpacity = 0.2;
 
-bool isZoomWindow(QnResourceWidget* widget)
+bool hasFrameDistinctionColor(QnResourceWidget* widget)
 {
     return widget->frameDistinctionColor().isValid();
 }
@@ -60,17 +60,17 @@ QColor SelectionWidget::calculateFrameColor() const
             return qnNxStyle->mainColor(QnNxStyle::Colors::kBrand);
 
         case QnResourceWidget::SelectionState::focused:
-            return isZoomWindow(m_widget)
+            return hasFrameDistinctionColor(m_widget)
                 ? m_widget->frameDistinctionColor().lighter()
                 : qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(4);
 
         case QnResourceWidget::SelectionState::inactiveFocused:
-            return isZoomWindow(m_widget)
+            return hasFrameDistinctionColor(m_widget)
                 ? m_widget->frameDistinctionColor()
                 : qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(3);
 
         default:
-            return isZoomWindow(m_widget)
+            return hasFrameDistinctionColor(m_widget)
                 ? m_widget->frameDistinctionColor()
                 : Qt::transparent;
     }
@@ -92,59 +92,58 @@ void SelectionWidget::paintSelection(QPainter* painter)
 
 void SelectionWidget::paintInnerFrame(QPainter* painter)
 {
-    static const int kInnerBorderWidth = 2;
-
-
-    switch (m_widget->selectionState())
+    // Skip inner frame painting in some states. Zoom windows must always have frame.
+    if (!hasFrameDistinctionColor(m_widget))
     {
-        case QnResourceWidget::SelectionState::invalid:
-        case QnResourceWidget::SelectionState::notSelected:
-        case QnResourceWidget::SelectionState::selected:
+        switch (m_widget->selectionState())
         {
-            // Skipe inner frame painting.
-            if (!isZoomWindow(m_widget))
+            case QnResourceWidget::SelectionState::invalid:
+            case QnResourceWidget::SelectionState::notSelected:
+            case QnResourceWidget::SelectionState::selected:
                 return;
-            break;
+            default:
+                break;
         }
-
-        case QnResourceWidget::SelectionState::inactiveFocused:
-        case QnResourceWidget::SelectionState::focused:
-        case QnResourceWidget::SelectionState::focusedAndSelected:
-            break;
     }
 
-    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity()
-        * m_widget->frameOpacity());
+    static const int kInnerBorderWidth = 2;
+    const auto effectiveOpacity = painter->opacity() * m_widget->frameOpacity();
+    QnScopedPainterOpacityRollback opacityRollback(painter, effectiveOpacity);
     QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
         kInnerBorderWidth, 0);
 }
 
 void SelectionWidget::paintOuterFrame(QPainter* painter)
 {
+    // Skip outer frame painting in some states. Zoom windows must always have frame.
+    if (!hasFrameDistinctionColor(m_widget))
+    {
+        switch (m_widget->selectionState())
+        {
+            case QnResourceWidget::SelectionState::invalid:
+            case QnResourceWidget::SelectionState::notSelected:
+                return;
+            default:
+                break;
+        }
+    }
+
     int mainBorderWidth = 1;
 
+    // Increase border width for focused widgets.
     switch (m_widget->selectionState())
     {
-        case QnResourceWidget::SelectionState::invalid:
-        case QnResourceWidget::SelectionState::notSelected:
-        {
-            // Skipe outer frame painting.
-            if (!isZoomWindow(m_widget))
-                return;
-            break;
-        }
-
         case QnResourceWidget::SelectionState::inactiveFocused:
         case QnResourceWidget::SelectionState::focused:
         case QnResourceWidget::SelectionState::focusedAndSelected:
             mainBorderWidth = 2;
             break;
-        case QnResourceWidget::SelectionState::selected:
+        default:
             break;
     }
 
-    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity()
-        * m_widget->frameOpacity());
+    const auto effectiveOpacity = painter->opacity() * m_widget->frameOpacity();
+    QnScopedPainterOpacityRollback opacityRollback(painter, effectiveOpacity);
 
     // Dark outer border right near the camera.
     static const int kSpacerBorderWidth = 1;

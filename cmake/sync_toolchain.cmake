@@ -1,6 +1,7 @@
 if(targetDevice)
     if(targetDevice MATCHES "bpi|bananapi")
-        nx_rdep_sync_package(bpi/gcc-4.8.3)
+        nx_rdep_sync_package(linux-arm/gcc-7.2.0)
+        set(toolchain_directory "${PACKAGES_DIR}/linux-arm/gcc-7.2.0")
     elseif(targetDevice STREQUAL "rpi")
         nx_rdep_sync_package(rpi/gcc-4.9.4)
     elseif(targetDevice STREQUAL "edge1")

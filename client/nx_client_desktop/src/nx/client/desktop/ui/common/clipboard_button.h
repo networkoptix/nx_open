@@ -23,6 +23,8 @@ public:
         pasteLong //< "Paste from Clipboard"
     };
 
+    explicit ClipboardButton(QWidget* parent = nullptr);
+
     explicit ClipboardButton(StandardType type, QWidget* parent = nullptr);
 
     explicit ClipboardButton(const QString& text, const QString& confirmationText,

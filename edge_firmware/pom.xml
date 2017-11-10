@@ -27,6 +27,7 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/..</root.dir>
+        <toolchain_lib_directory/>
     </properties>
 
     <build>

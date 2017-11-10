@@ -439,17 +439,26 @@ Handle ServerConnection::changeCameraPassword(
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
+    const auto camera = resourcePool()->getResourceById(id);
+    if (!camera || camera->getParentId().isNull())
+        return Handle();
+
     CameraPasswordData data;
     data.cameraId = id.toString();
     data.user = auth.user();
     data.password = auth.password();
-    return executePost(
-        lit("/api/changeCameraPassword"),
-        QnRequestParamList(),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        QJson::serialized(std::move(data)),
-        callback,
-        targetThread);
+
+    QnEmptyRequestData params;
+    params.format = Qn::SerializationFormat::UbjsonFormat;
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::post,
+        prepareUrl(lit("/api/changeCameraPassword"), params.toParams()));
+    request.messageBody = QJson::serialized(std::move(data));
+    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray());
+
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, request.url.toString());
+    return handle;
 }
 
 // --------------------------- private implementation -------------------------------------
@@ -640,11 +649,12 @@ Handle ServerConnection::executeRequest(
                 if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
                 {
                     const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                    auto result = parseMessageBody<ResultType>(format, msgBody, &success);
                     invoke(callback,
                         targetThread,
                         success,
                         id,
-                        parseMessageBody<ResultType>(format, msgBody, &success),
+                        std::move(result),
                         serverId,
                         timer);
                 }

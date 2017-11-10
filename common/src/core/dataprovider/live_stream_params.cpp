@@ -2,6 +2,8 @@
 
 const float QnLiveStreamParams::kFpsNotInitialized = -1.0;
 
+const int QnLiveStreamParams::kMinSecondStreamFps; //< Workaround for GCC 4.8.2 bug.
+
 QnLiveStreamParams::QnLiveStreamParams():
     quality(Qn::QualityNormal),
     secondaryQuality(Qn::SSQualityNotDefined),
