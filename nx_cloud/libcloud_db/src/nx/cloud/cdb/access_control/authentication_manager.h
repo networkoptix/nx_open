@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <random>
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
 
@@ -47,8 +46,6 @@ public:
 private:
     const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
-    std::random_device m_rd;
-    std::uniform_int_distribution<size_t> m_dist;
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
 
     bool validateNonce(const nx_http::StringType& nonce);
