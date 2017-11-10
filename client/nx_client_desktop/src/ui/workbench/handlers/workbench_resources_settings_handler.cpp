@@ -21,6 +21,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <nx/client/desktop/utils/parameter_helper.h>
+
 using namespace nx::client::desktop::ui;
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
@@ -130,8 +132,11 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog,
-        mainWindow());
+    const auto parentWidget =
+        nx::client::desktop::utils::extractParentWidgetFromParams(params, mainWindow());
+
+    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(
+        m_userSettingsDialog, parentWidget);
 
     // Navigating resource tree, we should not take focus. From System Administration - we must.
     bool force = params.argument(Qn::ForceRole, false);

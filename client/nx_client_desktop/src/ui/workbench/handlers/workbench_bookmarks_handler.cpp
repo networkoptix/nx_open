@@ -109,7 +109,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
-            menu()->triggerIfPossible(action::RemoveCameraBookmarkAction,
+            menu()->triggerIfPossible( action::RemoveCameraBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
 
@@ -223,6 +223,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
+    ///FIXME: check parent!
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete bookmark?"), bookmark.name.trimmed(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
@@ -244,6 +245,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
+    /// FIXME: check parent
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete %n bookmarks?", "", bookmarks.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,

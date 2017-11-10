@@ -3,7 +3,8 @@
 /************************************************************************/
 /* QnSessionAwareButtonBoxDialog                             */
 /************************************************************************/
-QnSessionAwareButtonBoxDialog::QnSessionAwareButtonBoxDialog(QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/)
+QnSessionAwareButtonBoxDialog::QnSessionAwareButtonBoxDialog(QWidget *parent /* = NULL*/,
+    Qt::WindowFlags windowFlags /* = 0*/)
     : base_type(parent, windowFlags)
     , QnSessionAwareDelegate(parent)
 {

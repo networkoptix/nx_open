@@ -125,7 +125,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             const auto tour = layoutTourManager()->tour(id);
             if (!tour.name.isEmpty())
             {
-                QnSessionAwareMessageBox messageBox(mainWindow());
+                QnSessionAwareMessageBox messageBox(mainWindow()   );
                 messageBox.setIcon(QnMessageBoxIcon::Question);
                 messageBox.setText(tr("Delete layout tour %1?").arg(tour.name));
                 messageBox.setStandardButtons(QDialogButtonBox::Cancel);

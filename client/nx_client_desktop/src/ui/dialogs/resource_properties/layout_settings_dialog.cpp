@@ -517,7 +517,7 @@ void QnLayoutSettingsDialog::viewFile() {
     if (QDesktopServices::openUrl(QUrl(path)))
         return;
 
-    QnImagePreviewDialog dialog;
+    QnImagePreviewDialog dialog(this);
     dialog.openImage(d->imageSourcePath);
     dialog.exec();
 }

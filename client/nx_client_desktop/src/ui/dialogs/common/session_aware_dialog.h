@@ -59,7 +59,7 @@ class QnSessionAwareButtonBoxDialog: public QnButtonBoxDialog, public QnSessionA
     typedef QnButtonBoxDialog base_type;
 
 public:
-    QnSessionAwareButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnSessionAwareButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags = 0);
 
     virtual bool tryClose(bool force) override;
 

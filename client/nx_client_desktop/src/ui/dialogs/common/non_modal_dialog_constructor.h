@@ -55,7 +55,10 @@ public:
     void disableAutoFocus() { m_autoFocus = false; }
 private:
     /// should be used only from constructor!
-    DialogType createAndInitializeDialog(DialogType& output, const DialogCreationFunc& creator);
+    DialogType createAndInitializeDialog(
+        DialogType& output,
+        const DialogCreationFunc& creator,
+        QWidget* explicitParent = nullptr);
 
 private:
     QRect m_targetGeometry;
@@ -64,8 +67,10 @@ private:
 };
 
 template<typename T>
-QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType& output,
-    const DialogCreationFunc& creator)
+QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(
+    DialogType& output,
+    const DialogCreationFunc& creator,
+    QWidget* explicitParent)
 {
     if (!output)
     {
@@ -75,12 +80,14 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType
     {
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
+        if (explicitParent)
+            output->setParent(explicitParent);
     }
 
     if (nx::utils::AppInfo::isMacOsX())
     {
         // Workaround for bug QTBUG-34767
-        output->setWindowFlags(output->windowFlags() | Qt::WindowStaysOnTopHint);
+        output->setWindowFlags(output->windowFlags());
     }
     return output;
 }
@@ -95,7 +102,7 @@ QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType& dialog,
 
 template<typename T>
 QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType& dialog, QWidget* parent):
-    m_dialog(createAndInitializeDialog(dialog, [parent](){ return (new T(parent));}))
+    m_dialog(createAndInitializeDialog(dialog, [parent](){ return (new T(parent));}, parent))
 {
 }
 

@@ -22,7 +22,7 @@ class QnInputDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    QnInputDialog(QWidget* parent = nullptr);
+    QnInputDialog(QWidget* parent);
     virtual ~QnInputDialog() override;
 
     QString caption() const;

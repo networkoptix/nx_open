@@ -55,6 +55,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     connect(ui->emailInputField, &QnInputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
 
+    NX_EXPECT(parent, "BLA BLA");
     connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
     {
         if (!validMode())
@@ -64,8 +65,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         if (!permissions.testFlag(Qn::WritePasswordPermission))
             return;
 
-        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog());
-        dialog->initializeContext(this);
+        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog(this));
         dialog->setWindowModality(Qt::ApplicationModal);
         if (dialog->exec() != QDialog::Accepted)
             return;

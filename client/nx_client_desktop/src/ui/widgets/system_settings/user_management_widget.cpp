@@ -511,6 +511,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             menu()->trigger(action::UserSettingsAction, action::Parameters(user)
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 .withArgument(Qn::ForceRole, true)
+                .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this))
             );
     }
 }

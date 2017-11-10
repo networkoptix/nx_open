@@ -11,7 +11,7 @@ class AnimationsControlDialog: public QnDialog
 {
     using base_type = QnDialog;
 public:
-    AnimationsControlDialog(QWidget* parent = nullptr);
+    AnimationsControlDialog(QWidget* parent);
 
 };
 

@@ -33,7 +33,7 @@ class QnLoginDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
 
     using base_type = QnButtonBoxDialog;
 public:
-    explicit QnLoginDialog(QWidget *parent = NULL);
+    explicit QnLoginDialog(QWidget *parent);
     virtual ~QnLoginDialog();
 
 public slots:
