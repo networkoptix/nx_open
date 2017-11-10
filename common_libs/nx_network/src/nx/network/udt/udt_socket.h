@@ -20,10 +20,10 @@ template<class SocketType> class AsyncServerSocketHelper;
 
 } // namespace aio
 
-// I put the implementator inside of detail namespace to avoid namespace pollution.
-// The reason is that I see many of the class prefer using Implementator , maybe 
-// we want binary compatible of our source code. Anyway, this is not a bad thing
-// but some sacrifice on inline function.
+  // I put the implementator inside of detail namespace to avoid namespace pollution.
+  // The reason is that I see many of the class prefer using Implementator , maybe
+  // we want binary compatible of our source code. Anyway, this is not a bad thing
+  // but some sacrifice on inline function.
 namespace detail {
 
 class UdtSocketImpl;
@@ -46,10 +46,10 @@ public:
     virtual ~UdtSocket();
 
     /**
-     * Binds UDT socket to an existing UDP socket.
-     * @note This method can be called just after UdtSocket creation.
-     * @note if method have failed UdtSocket instance MUST be destroyed!
-     */
+    * Binds UDT socket to an existing UDP socket.
+    * @note This method can be called just after UdtSocket creation.
+    * @note if method have failed UdtSocket instance MUST be destroyed!
+    */
     bool bindToUdpSocket(UDPSocket&& udpSocket);
 
     // AbstractSocket --------------- interface
@@ -124,9 +124,9 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
 
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
-    virtual int send( const void* buffer, unsigned int bufferLen ) override;
-    //  What's difference between foreign address with peer address 
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
+    //  What's difference between foreign address with peer address
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
@@ -160,8 +160,8 @@ public:
 private:
     bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
     /**
-     * @return false if failed to read socket options.
-     */
+    * @return false if failed to read socket options.
+    */
     bool checkIfRecvModeSwitchIsRequired(int flags, boost::optional<bool>* requiredRecvMode);
     bool setRecvMode(bool isRecvSync);
     int handleRecvResult(int recvResult);
@@ -207,11 +207,11 @@ private:
 class NX_NETWORK_API UdtStatistics
 {
 public:
-    #ifdef __arm__
-        std::atomic<uint32_t> internetBytesTransfered{0};
-    #else
-        std::atomic<uint64_t> internetBytesTransfered{0};
-    #endif
+#ifdef __arm__
+    std::atomic<uint32_t> internetBytesTransfered{ 0 };
+#else
+    std::atomic<uint64_t> internetBytesTransfered{ 0 };
+#endif
 
     static UdtStatistics global;
 };
