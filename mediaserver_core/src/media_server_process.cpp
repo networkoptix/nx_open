@@ -2476,7 +2476,7 @@ void MediaServerProcess::run()
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     auto auditManager = std::make_unique<QnMServerAuditManager>(
-        qnServerModule->lastRunningTime(), commonModule());
+        qnServerModule->lastRunningTimeBeforeRestart(), commonModule());
 
     TimeBasedNonceProvider timeBasedNonceProvider;
     CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);

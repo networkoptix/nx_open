@@ -5,6 +5,8 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/random.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace cloud {
@@ -44,9 +46,7 @@ protected:
 
     void whenInvokedSomeRequest()
     {
-        if (!m_httpServer)
-            initializeHttpServer("/test");
-
+        initializeHttpServerIfNeeded();
         m_client = std::make_unique<ClientImpl>(m_baseUrl);
 
         nx::utils::promise<void> done;
@@ -62,9 +62,31 @@ protected:
         done.get_future().wait();
     }
 
+    void whenInvokeBeginListening()
+    {
+        using namespace std::placeholders;
+
+        initializeHttpServerIfNeeded();
+        m_client = std::make_unique<ClientImpl>(m_baseUrl);
+
+        m_client->beginListening(
+            "peerName",
+            std::bind(&RelayApiClient::saveBeginListeningCompletionResult, this, _1, _2, _3));
+    }
+
     void thenClientUsedRightUrl()
     {
         ASSERT_EQ(api::ResultCode::ok, m_lastResultCode);
+    }
+
+    void thenRequestSucceded()
+    {
+        ASSERT_EQ(ResultCode::ok, m_requestResultQueue.pop());
+    }
+
+    void andBeginListeningResponseIsCorrect()
+    {
+        ASSERT_EQ(m_expectedBeginListeningResponse, m_prevBeginListeningResponse);
     }
 
     void enableAuthentication()
@@ -80,9 +102,29 @@ private:
     QUrl m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
     boost::optional<QAuthenticator> m_authenticator;
+    nx::utils::SyncQueue<ResultCode> m_requestResultQueue;
+    BeginListeningResponse m_expectedBeginListeningResponse;
+    BeginListeningResponse m_prevBeginListeningResponse;
+
+    void saveBeginListeningCompletionResult(
+        ResultCode resultCode,
+        BeginListeningResponse response,
+        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+    {
+        m_requestResultQueue.push(resultCode);
+        m_prevBeginListeningResponse = std::move(response);
+    }
+
+    void initializeHttpServerIfNeeded()
+    {
+        if (!m_httpServer)
+            initializeHttpServer("/test");
+    }
 
     void initializeHttpServer(QString baseUrlPath)
     {
+        using namespace std::placeholders;
+
         if (baseUrlPath.isEmpty())
             baseUrlPath = "/";
 
@@ -92,13 +134,19 @@ private:
             kServerClientSessionsPath,
             {"some_server_name"});
 
-        const auto handlerPath = 
+        const auto handlerPath =
             network::url::normalizePath(lm("%1%2").arg(baseUrlPath).arg(realPath).toQString());
 
         m_httpServer->registerStaticProcessor(
             handlerPath,
             "{\"result\": \"ok\"}",
             "application/json");
+
+        m_httpServer->registerRequestProcessorFunc(
+            network::url::normalizePath(
+                lm("%1/%2").arg(baseUrlPath)
+                    .arg(kServerIncomingConnectionsPath).toQString()),
+            std::bind(&RelayApiClient::beginListeningHandler, this, _1, _2, _3, _4, _5));
 
         ASSERT_TRUE(m_httpServer->bindAndListen());
         m_baseUrl = QUrl(lm("http://%1/%2").arg(m_httpServer->serverAddress()).arg(baseUrlPath));
@@ -112,6 +160,31 @@ private:
             m_baseUrl.setUserName(m_authenticator->user());
             m_baseUrl.setPassword(m_authenticator->password());
         }
+    }
+
+    void beginListeningHandler(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const response,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        m_expectedBeginListeningResponse.preemptiveConnectionCount =
+            nx::utils::random::number<int>(1, 99);
+        if (nx::utils::random::number<int>(0, 1) > 0)
+        {
+            m_expectedBeginListeningResponse.keepAliveOptions = KeepAliveOptions();
+            m_expectedBeginListeningResponse.keepAliveOptions->probeCount =
+                nx::utils::random::number<int>(1, 99);
+            m_expectedBeginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
+                std::chrono::seconds(nx::utils::random::number<int>(1, 99));
+            m_expectedBeginListeningResponse.keepAliveOptions->probeSendPeriod =
+                std::chrono::seconds(nx::utils::random::number<int>(1, 99));
+        }
+
+        serializeToHeaders(&response->headers, m_expectedBeginListeningResponse);
+
+        completionHandler(nx_http::StatusCode::switchingProtocols);
     }
 };
 
@@ -151,6 +224,14 @@ TEST_F(RelayApiClient, uses_authentication)
 
     whenInvokedSomeRequest();
     thenClientUsedRightUrl();
+}
+
+TEST_F(RelayApiClient, begin_listening_response_delivered_properly)
+{
+    whenInvokeBeginListening();
+
+    thenRequestSucceded();
+    andBeginListeningResponseIsCorrect();
 }
 
 } // namespace test
