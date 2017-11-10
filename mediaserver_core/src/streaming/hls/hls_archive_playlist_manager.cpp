@@ -59,13 +59,17 @@ namespace nx_hls
             if( !archiveDelegate->open(m_camResource) )
                 return false;
         }
-
         if( !archiveDelegate->setQuality(
                 m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
                 true,
                 QSize()) )
             return false;
-        m_delegate.reset( new QnThumbnailsArchiveDelegate(archiveDelegate) );
+        archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
+
+        if (archiveDelegate->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanProcessMediaStep))
+            m_delegate = archiveDelegate;
+        else
+            m_delegate.reset(new QnThumbnailsArchiveDelegate(archiveDelegate));
         m_delegate->setRange( m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec );
 
         const QnAbstractMediaDataPtr& nextData = m_delegate->getNextData();

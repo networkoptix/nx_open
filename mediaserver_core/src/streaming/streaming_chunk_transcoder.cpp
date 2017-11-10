@@ -293,7 +293,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
     QnAbstractArchiveStreamReader* archiveReader =
         dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
     archiveReader->getArchiveDelegate()->setClientId(clientId);
-    archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Archive);
+    archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Export);
     if (!archiveReader || !archiveReader->open())
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
