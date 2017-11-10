@@ -57,6 +57,8 @@ public:
 
     static bool isHiDpi();
 
+    static QPixmap colorize(const QPixmap& source, const QColor& color);
+
 private:
     void init(const QStringList& paths);
 

@@ -143,8 +143,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.timestampMs = timestampMs;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
-    eventData.icon = pixmapForAction(action);
-
     eventData.titleColor = QnNotificationLevel::notificationColor(
         QnNotificationLevel::valueOf(action));
 
@@ -259,6 +257,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         }
     }
 
+    eventData.icon = pixmapForAction(action, eventData.titleColor);
+
     if (!q->addEvent(eventData))
         return;
 
@@ -337,9 +337,8 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
 
     eventData.removable = false;
-
-    // TODO: FIXME: #vkutin Restore functionality. This was used for sorting.
-    //widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
+    eventData.titleColor = QnNotificationLevel::notificationColor(
+        QnNotificationLevel::Value::CriticalNotification);
 
     eventData.extraAction = CommandActionPtr(new CommandAction(this));
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge.png"));
@@ -363,7 +362,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 }
 
 QPixmap NotificationListModel::Private::pixmapForAction(
-    const vms::event::AbstractActionPtr& action) const
+    const vms::event::AbstractActionPtr& action, const QColor& color) const
 {
     if (action->actionType() == vms::event::playSoundAction)
         return qnSkin->pixmap("events/sound.png");
@@ -401,7 +400,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         {
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 action->getRuntimeParams().description,
-                QPalette().light().color());
+                color.isValid() ? color : QPalette().light().color());
         }
 
         case vms::event::storageFailureEvent:

@@ -99,13 +99,7 @@ QPixmap QnSoftwareTriggerPixmaps::colorizedPixmap(const QString& name, const QCo
     if (staticCache.find(key, &result))
         return result;
 
-    result = getTriggerPixmap(effectiveName);
-    result.detach();
-
-    QPainter painter(&result);
-    painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-    painter.fillRect(QRect(QPoint(), result.size() / result.devicePixelRatio()), color);
-    painter.end();
+    result = QnSkin::colorize(getTriggerPixmap(effectiveName), color);
 
     staticCache.insert(key, result);
     return result;

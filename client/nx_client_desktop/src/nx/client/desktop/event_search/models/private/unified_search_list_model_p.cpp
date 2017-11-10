@@ -35,6 +35,21 @@ static constexpr auto kUpdateTimerInterval = kEventsUpdatePeriod - std::chrono::
 
 static constexpr auto kEventsQueryTimeout = std::chrono::seconds(15);
 
+static QPixmap bookmarkPixmap(const QColor& color)
+{
+    static QColor bookmarkColor;
+    static QPixmap bookmarkPixmap;
+
+    if (bookmarkColor != color)
+    {
+        bookmarkColor = color;
+        bookmarkPixmap = QnSkin::colorize(
+            qnSkin->pixmap(lit("buttons/acknowledge.png")), bookmarkColor);
+    }
+
+    return bookmarkPixmap;
+}
+
 } // namespace
 
 UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
@@ -220,13 +235,13 @@ void UnifiedSearchListModel::Private::addOrUpdateBookmark(const QnCameraBookmark
     data.title = bookmark.name;
     data.description = bookmark.description;
     data.timestampMs = bookmark.startTimeMs;
-    data.icon = qnSkin->pixmap(lit("buttons/bookmark.png"));
     data.helpId = Qn::Bookmarks_Usage_Help;
     data.previewCamera = m_camera;
     data.previewTimeMs = bookmark.startTimeMs;
-    //data.titleColor;
-    //data.actionId =
-    //data.actionParameters =
+
+    // TODO: #vkutin Make color customized properly. Replace icon with pre-colorized one.
+    data.titleColor = QPalette().linkVisited().color();
+    data.icon = bookmarkPixmap(data.titleColor);
 
     if (!q->updateEvent(data))
         q->addEvent(data);

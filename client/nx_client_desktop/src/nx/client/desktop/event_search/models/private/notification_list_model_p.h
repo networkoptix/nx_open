@@ -32,7 +32,8 @@ private:
         const QnVirtualCameraResourcePtr& camera,
         const nx::vms::event::AbstractActionPtr& action);
 
-    QPixmap pixmapForAction(const vms::event::AbstractActionPtr& action) const;
+    QPixmap pixmapForAction(const vms::event::AbstractActionPtr& action,
+        const QColor& color = QColor()) const;
 
 private:
     NotificationListModel* const q = nullptr;
