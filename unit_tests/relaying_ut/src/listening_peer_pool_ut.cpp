@@ -10,18 +10,62 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/stream_socket_stub.h>
+#include <nx/utils/app_info.h>
+#include <nx/utils/basic_service_settings.h>
 #include <nx/utils/string.h>
+#include <nx/utils/test_support/settings_loader.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relaying/listening_peer_pool.h>
 #include <nx/cloud/relaying/settings.h>
 
-#include "../settings_loader.h"
-
 namespace nx {
 namespace cloud {
 namespace relaying {
 namespace test {
+
+namespace {
+
+class TestModuleSettings:
+    public nx::utils::BasicServiceSettings
+{
+    using base_type = nx::utils::BasicServiceSettings;
+
+public:
+    TestModuleSettings():
+        base_type(
+            nx::utils::AppInfo::organizationName(),
+            "NxCloud",
+            "relaying_ut")
+    {
+    }
+
+    virtual QString dataDir() const override
+    {
+        return QString();
+    }
+
+    virtual utils::log::Settings logging() const override
+    {
+        return utils::log::Settings();
+    }
+
+    const relaying::Settings& relaying() const
+    {
+        return m_relaying;
+    }
+
+protected:
+    virtual void loadSettings() override
+    {
+        m_relaying.load(settings());
+    }
+
+private:
+    relaying::Settings m_relaying;
+};
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
@@ -178,7 +222,7 @@ protected:
     {
         auto streamSocketStub = static_cast<network::test::StreamSocketStub*>(
             m_prevTakeIdleConnectionResult->connection.get());
-        
+
         const auto buffer = streamSocketStub->read();
 
         nx_http::Message message(nx_http::MessageType::request);
@@ -222,7 +266,7 @@ protected:
         ASSERT_TRUE(m_peerConnection->getKeepAlive(&keepAliveOptions));
         ASSERT_TRUE(static_cast<bool>(keepAliveOptions));
         ASSERT_EQ(
-            m_settingsLoader.settings().listeningPeer().tcpKeepAlive,
+            m_settingsLoader.settings().relaying().tcpKeepAlive,
             *keepAliveOptions);
     }
 
@@ -284,7 +328,7 @@ private:
     std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
     boost::optional<TakeIdleConnectionResult> m_prevTakeIdleConnectionResult;
-    relay::SettingsLoader m_settingsLoader;
+    nx::utils::test::SettingsLoader<TestModuleSettings> m_settingsLoader;
     boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
     nx::utils::SyncQueue<std::string> m_peerConnectedEvents;
     nx::utils::SyncQueue<std::string> m_peerDisconnectedEvents;
@@ -305,7 +349,7 @@ private:
 
         m_settingsLoader.load();
         m_pool = std::make_unique<relaying::ListeningPeerPool>(
-            m_settingsLoader.settings().listeningPeer());
+            m_settingsLoader.settings().relaying());
 
         nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
         m_pool->peerConnectedSubscription().subscribe(
