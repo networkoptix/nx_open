@@ -2398,7 +2398,7 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
         serverArchiveIntegrityWatcher,
         &ServerArchiveIntegrityWatcher::fileIntegrityCheckFailed,
         qnEventRuleConnector,
-        &event::EventConnector::at_FileIntegrityCheckFailed);
+        &event::EventConnector::at_fileIntegrityCheckFailed);
 }
 
 void MediaServerProcess::run()
