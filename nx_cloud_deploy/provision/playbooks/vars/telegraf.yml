@@ -8,12 +8,11 @@ telegraf_agent_output:
 telegraf_plugins_default:
   - plugin: cpu
     config:
-      - percpu = true
+      - percpu = false
       - report_active = true
-  - plugin: disk
   - plugin: io
   - plugin: mem
   - plugin: net
+    config:
+      - interfaces = ["{{ ansible_default_ipv4.interface }}"]
   - plugin: system
-  - plugin: swap
-  - plugin: netstat
