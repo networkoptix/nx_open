@@ -1430,7 +1430,7 @@ static const int RTCP_RECEIVER_REPORT = 201;
 static const int RTCP_SOURCE_DESCRIPTION = 202;
 
 QnRtspStatistic QnRtspClient::parseServerRTCPReport(
-    quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
+    const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
     static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
         .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
@@ -1668,6 +1668,28 @@ int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int
     return dataLen;
 }
 
+bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
+{
+    if (size < 4 || data[0] != '$')
+        return false;
+    int rtpChannelNum = data[1];
+    int trackNum = getChannelNum(rtpChannelNum);
+    if (trackNum >= m_sdpTracks.size())
+        return false;
+    QnRtspIoDevice* ioDevice = m_sdpTracks[trackNum]->ioDevice;
+    if (!ioDevice)
+        return false;
+
+    bool gotValue = false;
+    QnRtspStatistic stats = parseServerRTCPReport(data + 4, size - 4, &gotValue);
+    if (gotValue)
+    {
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+            ioDevice->setStatistic(stats);
+    }
+    return true;
+}
+
 // demux text data only
 bool QnRtspClient::readTextResponce(QByteArray& response)
 {
@@ -1697,6 +1719,15 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
             // binary data
             quint8 tmpData[1024*64];
             int bytesRead = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
+
+            int rtpChannelNum = tmpData[1];
+            QnRtspClient::TrackType format = getTrackTypeByRtpChannelNum(rtpChannelNum);
+            if (format == QnRtspClient::TT_VIDEO_RTCP || format == QnRtspClient::TT_AUDIO_RTCP)
+            {
+                if (!processTcpRtcpData(tmpData, bytesRead))
+                    NX_VERBOSE(this, "Can't parse RTCP report while reading text response");
+            }
+
             int oldIgnoreDataSize = ignoreDataSize;
             ignoreDataSize += bytesRead;
             if (oldIgnoreDataSize / 64000 != ignoreDataSize/64000)
