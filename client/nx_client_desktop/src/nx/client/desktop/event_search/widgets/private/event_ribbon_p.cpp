@@ -30,7 +30,9 @@ namespace {
 static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
-static constexpr int kOutside = -10000;
+// Approximate default height of an invisible tile.
+// When tile becomes visible its true height can be computed and used.
+static constexpr int kApproximateTileHeight = 40;
 
 static constexpr int kDefaultThumbnailSize = 224;
 static constexpr int kMultiThumbnailSpacing = 1;
@@ -74,17 +76,8 @@ EventRibbon::Private::Private(EventRibbon* q):
     installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide}, this, updateViewportMargins);
     updateViewportMargins();
 
-    installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest}, this,
-        [this](QObject* /*watched*/, QEvent* event)
-        {
-            if (m_currentWidth != m_viewport->width() || event->type() != QEvent::Resize)
-            {
-                m_currentWidth = m_viewport->width();
-                updateAllPositions();
-            }
-            updateScrollRange();
-            updateView();
-        });
+    installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest},
+        this, &Private::updateView);
 
     connect(m_scrollBar, &QScrollBar::valueChanged, this, &Private::updateView);
 }
@@ -149,21 +142,6 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
             clear(); // Handle as full reset.
             insertNewTiles(0, m_model->rowCount());
         });
-}
-
-void EventRibbon::Private::insertNewTiles(int first, int count)
-{
-    if (!m_model)
-        return;
-
-    for (int i = first; i < first + count; ++i)
-    {
-        const auto index = m_model->index(i);
-        auto tile = createTile(index);
-        NX_EXPECT(tile);
-        if (tile)
-            insertTile(i, tile);
-    }
 }
 
 EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
@@ -237,10 +215,9 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->preview()->loadAsync();
 }
 
-void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)
+void EventRibbon::Private::insertNewTiles(int index, int count)
 {
-    NX_EXPECT(tileWidget);
-    if (!tileWidget)
+    if (!m_model || count == 0)
         return;
 
     if (index < 0 || index > m_tiles.count())
@@ -249,30 +226,40 @@ void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)
         return;
     }
 
-    tileWidget->setParent(m_viewport);
-    tileWidget->setVisible(true);
-
-    tileWidget->setGeometry(0, kOutside, m_currentWidth, calculateHeight(tileWidget));
-    const auto delta = tileWidget->height() + kDefaultTileSpacing;
-
     const auto position = (index > 0)
         ? m_tiles[index - 1].position + m_tiles[index - 1].widget->height() + kDefaultTileSpacing
         : 0;
 
-    for (int i = index; i < m_tiles.count(); ++i)
+    int currentPosition = position;
+    int nextIndex = index;
+
+    for (int i = 0; i < count; ++i)
+    {
+        const auto modelIndex = m_model->index(index + i);
+        auto tile = createTile(modelIndex);
+        NX_ASSERT(tile);
+        if (!tile)
+            continue;
+
+        tile->setVisible(false);
+        tile->resize(qMax(1, m_viewport->width()), kApproximateTileHeight);
+        tile->setParent(m_viewport);
+        m_tiles.insert(nextIndex++, Tile(tile, currentPosition));
+        currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
+    }
+
+    const auto delta = currentPosition - position;
+
+    for (int i = nextIndex; i < m_tiles.count(); ++i)
         m_tiles[i].position += delta;
 
-    m_tiles.insert(index, Tile(tileWidget, position));
-
     m_totalHeight += delta;
-    updateScrollRange();
-
-    // TODO: #vkutin This won't work if entire ribbon is invisible at the moment. Think about it.
-    if (position + delta < m_scrollBar->value())
-        m_scrollBar->setValue(m_scrollBar->value() + delta);
+    q->updateGeometry();
 
     updateView();
-    q->updateGeometry();
+
+    if (position < m_scrollBar->value())
+        m_scrollBar->setValue(m_scrollBar->value() + delta);
 }
 
 void EventRibbon::Private::removeTiles(int first, int count)
@@ -305,18 +292,13 @@ void EventRibbon::Private::removeTiles(int first, int count)
     NX_EXPECT(!newVisible.right);
     m_visible = newVisible.left;
 
-    m_totalHeight -= delta;
-
     for (int i = first; i < m_tiles.count(); ++i)
         m_tiles[i].position -= delta;
 
+    updateView();
+
     if (nextPosition < m_scrollBar->value())
         m_scrollBar->setValue(m_scrollBar->value() - delta);
-
-    updateScrollRange();
-
-    updateView();
-    q->updateGeometry();
 }
 
 void EventRibbon::Private::clear()
@@ -328,24 +310,10 @@ void EventRibbon::Private::clear()
     m_totalHeight = 0;
     m_visible = nx::utils::IntegerRange();
 
-    updateScrollRange();
+    m_scrollBar->setVisible(false);
+    m_scrollBar->setValue(0);
+
     q->updateGeometry();
-}
-
-void EventRibbon::Private::updateAllPositions()
-{
-    // TODO: #vkutin Preserve view?
-    // Not sure it's needed because under normal circumstances tiles can change size
-    // only interactively when they're visible in the viewport,
-    // or when scroll bar shows/hides - but then there's no need to preserve view
-
-    m_totalHeight = 0;
-    for (auto& tile: m_tiles)
-    {
-        tile.widget->resize(m_currentWidth, calculateHeight(tile.widget));
-        tile.position = m_totalHeight;
-        m_totalHeight += tile.widget->height() + kDefaultTileSpacing;
-    }
 }
 
 int EventRibbon::Private::totalHeight() const
@@ -362,7 +330,7 @@ int EventRibbon::Private::calculateHeight(QWidget* widget) const
 {
     NX_EXPECT(widget);
     return widget->hasHeightForWidth()
-        ? widget->heightForWidth(m_currentWidth)
+        ? widget->heightForWidth(m_viewport->width())
         : widget->sizeHint().expandedTo(minimumWidgetSize(widget)).height();
 }
 
@@ -376,35 +344,60 @@ void EventRibbon::Private::updateScrollRange()
 
 void EventRibbon::Private::updateView()
 {
-    if (m_tiles.empty())
-        return;
-
-    const int position = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
-    const int height = m_viewport->height();
-
-    const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), position,
-        [](int left, const Tile& right) { return left < right.position; }) - 1;
-
-    int visibleCount = 0;
-    int currentPosition = first->position - position;
-
-    for (auto iter = first; iter != m_tiles.end() && currentPosition < height; ++iter, ++visibleCount)
+    if (m_tiles.empty() || !q->isVisible())
     {
-        iter->widget->move(0, currentPosition);
-        currentPosition += iter->widget->height() + kDefaultTileSpacing;
+        m_scrollBar->setValue(0);
+        m_scrollBar->setVisible(false);
+        return;
     }
 
-    nx::utils::IntegerRange newVisible(std::distance(m_tiles.cbegin(), first), visibleCount);
+    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+    const int height = m_viewport->height();
 
-    // We cannot hide tiles because their lazy layouts would stop telling us correct size hints.
+    const auto first = std::upper_bound(m_tiles.begin(), m_tiles.end(), base,
+        [](int left, const Tile& right) { return left < right.position; }) - 1;
+
+    auto iter = first;
+    int currentPosition = first->position;
+    const auto positionLimit = base + height;
+
+    while (iter != m_tiles.end() && currentPosition < positionLimit)
+    {
+        iter->position = currentPosition;
+        iter->widget->setVisible(true);
+        iter->widget->setGeometry(0, iter->position - base,
+            m_viewport->width(), calculateHeight(iter->widget));
+        currentPosition += iter->widget->height() + kDefaultTileSpacing;
+        ++iter;
+    }
+
+    const auto visibleCount = std::distance(first, iter);
+
+    while (iter != m_tiles.end())
+    {
+        iter->position = currentPosition;
+        currentPosition += iter->widget->height() + kDefaultTileSpacing;
+        ++iter;
+    }
+
+    if (m_totalHeight != currentPosition)
+    {
+        m_totalHeight = currentPosition;
+        q->updateGeometry();
+    }
+
+    nx::utils::IntegerRange newVisible(std::distance(m_tiles.begin(), first), visibleCount);
+
     for (int i = m_visible.first(); i <= m_visible.last(); ++i)
     {
         if (!newVisible.contains(i))
-            m_tiles[i].widget->move(0, kOutside);
+            m_tiles[i].widget->setVisible(false);
     }
 
     m_visible = newVisible;
     m_viewport->update();
+
+    updateScrollRange();
 }
 
 } // namespace

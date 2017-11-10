@@ -43,12 +43,10 @@ private:
 
     void updateView();
     void updateScrollRange();
-    void updateAllPositions();
 
     int calculateHeight(QWidget* widget) const;
 
-    void insertTile(int index, EventTile* tileWidget);
-    void insertNewTiles(int first, int count);
+    void insertNewTiles(int index, int count);
     void removeTiles(int first, int count);
     void clear();
 
@@ -72,7 +70,6 @@ private:
 
     QList<Tile> m_tiles;
     int m_totalHeight = 0;
-    int m_currentWidth = 0;
 
     nx::utils::IntegerRange m_visible;
 };
