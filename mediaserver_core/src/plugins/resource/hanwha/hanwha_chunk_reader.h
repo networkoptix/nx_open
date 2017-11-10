@@ -71,7 +71,7 @@ private:
     void sendRequest();
     void parseTimeRangeData(const QByteArray& data);
     qint64 latestChunkTimeMs() const;
-    QUrl buildUrl(const QString& path, std::map<QString, QString> parameters) const;
+    nx::utils::Url buildUrl(const QString& path, std::map<QString, QString> parameters) const;
     void prepareHttpClient();
 
 private:

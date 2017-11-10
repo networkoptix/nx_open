@@ -490,13 +490,13 @@ bool HanwhaChunkLoader::hasBounds() const
         && m_isSearchRecordingPeriodRetrievalEnabled;
 }
 
-QUrl HanwhaChunkLoader::buildUrl(
+nx::utils::Url HanwhaChunkLoader::buildUrl(
     const QString& path,
     std::map<QString, QString> parameters) const
 {
     const auto split = path.split(L'/');
     if (split.size() != 3)
-        return QUrl();
+        return nx::utils::Url();
 
     auto url = m_resourceContext->url();
     url.setPath(lit("/stw-cgi/%1.cgi").arg(split[0].trimmed()));
