@@ -75,6 +75,17 @@ struct UdtEpollHandlerHelper
 };
 
 
+static void setLastSystemErrorCodeAppropriately()
+{
+    const auto systemErrorCode =
+        detail::convertToSystemError(UDT::getlasterror().getErrorCode());
+    NX_ASSERT(systemErrorCode != SystemError::noError);
+    SystemError::setLastErrorCode(
+        systemErrorCode == SystemError::noError
+        ? SystemError::invalidData
+        : systemErrorCode);
+}
+
 }// namespace detail
 
  //=================================================================================================
@@ -132,8 +143,7 @@ bool UdtSocket<InterfaceToImplement>::bindToUdpSocket(UDPSocket&& udpSocket)
     // Taking system socket out of udpSocket.
     if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     udpSocket.takeHandle();
@@ -147,8 +157,7 @@ bool UdtSocket<InterfaceToImplement>::bind(const SocketAddress& localAddress)
 
     int ret = UDT::bind(m_impl->udtHandle, addr.ptr.get(), addr.size);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -158,8 +167,7 @@ SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
     SystemSocketAddress addr(m_ipVersion);
     if (UDT::getsockname(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return SocketAddress();
     }
     else
@@ -224,7 +232,7 @@ bool UdtSocket<InterfaceToImplement>::setReuseAddrFlag(bool reuseAddr)
     int reuseAddrInt = reuseAddr ? 1 : 0;
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_REUSEADDR, &reuseAddrInt, sizeof(reuseAddrInt));
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -235,7 +243,7 @@ bool UdtSocket<InterfaceToImplement>::getReuseAddrFlag(bool* val) const
     int len = sizeof(*val);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_REUSEADDR, val, &len);
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -247,12 +255,12 @@ bool UdtSocket<InterfaceToImplement>::setNonBlockingMode(bool val)
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, &value, sizeof(value));
     if (ret != 0)
     {
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &value, sizeof(value));
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -264,10 +272,7 @@ bool UdtSocket<InterfaceToImplement>::getNonBlockingMode(bool* val) const
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, val, &len);
 
     if (ret != 0)
-    {
-        const auto error = UDT::getlasterror();
-        SystemError::setLastErrorCode(detail::convertToSystemError(error.getErrorCode()));
-    }
+        detail::setLastSystemErrorCodeAppropriately();
 
     *val = !*val;
     return ret == 0;
@@ -279,8 +284,7 @@ bool UdtSocket<InterfaceToImplement>::getMtu(unsigned int* mtuValue) const
     int valueLength = sizeof(*mtuValue);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_MSS, mtuValue, &valueLength);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -291,8 +295,7 @@ bool UdtSocket<InterfaceToImplement>::setSendBufferSize(unsigned int buffSize)
     NX_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_SNDBUF, &buffSize, sizeof(buffSize));
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -303,8 +306,7 @@ bool UdtSocket<InterfaceToImplement>::getSendBufferSize(unsigned int* buffSize) 
     int len = sizeof(*buffSize);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDBUF, buffSize, &len);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -315,8 +317,7 @@ bool UdtSocket<InterfaceToImplement>::setRecvBufferSize(unsigned int buffSize)
     NX_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
     int ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVBUF, &buffSize, sizeof(buffSize));
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -327,8 +328,7 @@ bool UdtSocket<InterfaceToImplement>::getRecvBufferSize(unsigned int* buffSize) 
     int len = sizeof(*buffSize);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_RCVBUF, buffSize, &len);
     if (ret != 0)
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -343,8 +343,7 @@ bool UdtSocket<InterfaceToImplement>::setRecvTimeout(unsigned int millis)
     if (ret == 0)
         m_readTimeoutMS = millis;
     else
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -358,7 +357,7 @@ bool UdtSocket<InterfaceToImplement>::getRecvTimeout(unsigned int* millis) const
         m_impl->udtHandle, 0, UDT_RCVTIMEO, &time, &len);
     *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -373,7 +372,7 @@ bool UdtSocket<InterfaceToImplement>::setSendTimeout(unsigned int ms)
     if (ret == 0)
         m_writeTimeoutMS = ms;
     else
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -387,7 +386,7 @@ bool UdtSocket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
         m_impl->udtHandle, 0, UDT_SNDTIMEO, &time, &len);
     *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
 }
 
@@ -455,8 +454,7 @@ bool UdtSocket<InterfaceToImplement>::open()
     m_impl->udtHandle = UDT::socket(m_ipVersion, SOCK_STREAM, 0);
     if (m_impl->udtHandle == UDT::INVALID_SOCK)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
 
@@ -502,8 +500,7 @@ bool UdtSocket<InterfaceToImplement>::open()
             &kUdpRecvBufSize, sizeof(kUdpRecvBufSize)) != 0
         )
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         UDT::close(m_impl->udtHandle);
         return false;
     }
@@ -637,8 +634,7 @@ SocketAddress UdtStreamSocket::getForeignAddress() const
     SystemSocketAddress addr(m_ipVersion);
     if (UDT::getpeername(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return SocketAddress();
     }
     else
@@ -776,7 +772,7 @@ bool UdtStreamSocket::connectToIp(
     if (ret != 0)
     {
         // Error happened
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     m_state = detail::SocketState::connected;
@@ -798,8 +794,7 @@ bool UdtStreamSocket::checkIfRecvModeSwitchIsRequired(
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &currentMode, &len);
     if (ret != 0)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
 
@@ -819,10 +814,7 @@ bool UdtStreamSocket::setRecvMode(bool isRecvSync)
 {
     auto ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &isRecvSync, sizeof(isRecvSync));
     if (ret != 0)
-    {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
-    }
+        detail::setLastSystemErrorCodeAppropriately();
 
     return ret == 0;
 }
@@ -891,8 +883,7 @@ bool UdtStreamServerSocket::listen(int backlog)
     int ret = UDT::listen(m_impl->udtHandle, backlog);
     if (ret != 0)
     {
-        const auto udtError = UDT::getlasterror();
-        SystemError::setLastErrorCode(detail::convertToSystemError(udtError.getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
     else
@@ -1014,9 +1005,7 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
     UDTSOCKET ret = UDT::accept(m_impl->udtHandle, NULL, NULL);
     if (ret == UDT::INVALID_SOCK)
     {
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(
-                UDT::getlasterror().getErrorCode()));
+        detail::setLastSystemErrorCodeAppropriately();
         return nullptr;
     }
 
