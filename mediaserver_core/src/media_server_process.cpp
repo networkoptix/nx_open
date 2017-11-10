@@ -2802,7 +2802,7 @@ void MediaServerProcess::run()
         QCoreApplication::quit();
         return;
     }
-    
+
     if (appServerUrl.scheme().toLower() == lit("file"))
         ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());
 
