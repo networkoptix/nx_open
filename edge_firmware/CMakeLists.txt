@@ -12,7 +12,7 @@ set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})
 set(build.configuration "") #< Used by create_arm_installer.sh as suffix to lib and bin dirs.
 
 set(toolchain_lib_directory)
-if(targetDevice MATCHES "bpi|bananapi")
+if(targetDevice MATCHES "bpi|bananapi|rpi")
     set(toolchain_lib_directory "${toolchain_directory}/arm-unknown-linux-gnueabihf/sysroot/lib")
 endif()
 

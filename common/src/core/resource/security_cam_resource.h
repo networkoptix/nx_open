@@ -331,7 +331,6 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void needsToChangeDefaultPasswordChanged();
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
@@ -342,6 +341,7 @@ signals:
     void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
+    void capabilitiesChanged(const QnResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 

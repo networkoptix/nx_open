@@ -43,7 +43,6 @@ function(detect_package_versions)
 
     if(box MATCHES "bpi|bananapi")
         set(_openssl_version "1.0.0j")
-        set(_onvif_version "2.1.2-io2-gcc7")
         set(_quazip_version "0.7")
     endif()
 
@@ -189,8 +188,13 @@ function(get_dependencies)
     if(haveServer)
         nx_rdep_add_package(any/nx_sdk-1.6.0)
         nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-        nx_rdep_add_package(onvif)
         nx_rdep_add_package(sigar)
+
+        if(targetDevice MATCHES "bpi|bananapi|rpi")
+            nx_rdep_add_package(linux-arm/onvif)
+        else()
+            nx_rdep_add_package(onvif)
+        endif()
 
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
         set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)

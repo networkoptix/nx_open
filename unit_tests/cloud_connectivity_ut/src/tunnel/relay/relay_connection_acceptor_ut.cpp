@@ -20,6 +20,12 @@ using namespace nx::cloud::relay;
 class RelayTest:
     public ::testing::Test
 {
+public:
+    RelayTest()
+    {
+        setKeepAliveReported(true);
+    }
+
 protected:
     enum class ServerType
     {
@@ -50,15 +56,38 @@ protected:
         return m_relayServerUrl;
     }
 
+    api::BeginListeningResponse prevReportedBeginListeningResponse() const
+    {
+        return m_beginListeningResponse;
+    }
+
+    void setKeepAliveReported(bool val)
+    {
+        if (!val)
+        {
+            m_beginListeningResponse.keepAliveOptions.reset();
+        }
+        else
+        {
+            m_beginListeningResponse.keepAliveOptions = KeepAliveOptions();
+            m_beginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
+                std::chrono::seconds(3);
+            m_beginListeningResponse.keepAliveOptions->probeSendPeriod = 
+                std::chrono::seconds(3);
+            m_beginListeningResponse.keepAliveOptions->probeCount = 3;
+        }
+    }
+
 private:
     TestHttpServer m_testHttpServer;
     nx::utils::Url m_relayServerUrl;
+    api::BeginListeningResponse m_beginListeningResponse;
 
     void processIncomingConnection(
         nx_http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
+        nx_http::Request request,
+        nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
@@ -68,6 +97,9 @@ private:
             connection->closeConnection(SystemError::connectionReset);
             return;
         }
+
+        if (request.requestLine.method == nx_http::Method::post)
+            api::serializeToHeaders(&response->headers, m_beginListeningResponse);
 
         nx_http::RequestResult requestResult(
             nx_http::StatusCode::switchingProtocols);
@@ -208,7 +240,7 @@ protected:
 
     void thenRelaySettingsAreAvailable()
     {
-        ASSERT_EQ(m_expectedSettings, m_connection->beginListeningResponse());
+        ASSERT_EQ(prevReportedBeginListeningResponse(), m_connection->beginListeningResponse());
     }
 
     void thenNotificationIsIgnored()
@@ -217,13 +249,28 @@ protected:
         std::this_thread::sleep_for(std::chrono::milliseconds(17));
     }
 
+    void assertKeepAliveIsExpected()
+    {
+        std::unique_ptr<AbstractStreamSocket> connection;
+        m_connection->executeInAioThreadSync(
+            [this, &connection]()
+            {
+                connection = std::move(m_connection->takeSocket());
+                m_connection->pleaseStopSync();
+            });
+
+        boost::optional<KeepAliveOptions> keepAliveOptions;
+        ASSERT_TRUE(connection->getKeepAlive(&keepAliveOptions))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_EQ(prevReportedBeginListeningResponse().keepAliveOptions, keepAliveOptions);
+    }
+
 private:
     utils::SyncQueue<SystemError::ErrorCode> m_connectResult;
     utils::SyncQueue<SystemError::ErrorCode> m_activateConnectionResult;
     std::unique_ptr<AbstractStreamSocket> m_serverConnection;
     SocketAddress m_clientEndpoint;
     nx::Buffer m_openTunnelNotificationBuffer;
-    nx::cloud::relay::api::BeginListeningResponse m_expectedSettings;
     std::unique_ptr<detail::ReverseConnection> m_connection;
 
     virtual void SetUp() override
@@ -315,6 +362,22 @@ TEST_F(
 
     whenWaitingForConnectionActivation();
     thenConnectionIsActivated();
+}
+
+TEST_F(RelayReverseConnection, keep_alive_is_enabled)
+{
+    setKeepAliveReported(true);
+
+    givenEstablishedConnection();
+    assertKeepAliveIsExpected();
+}
+
+TEST_F(RelayReverseConnection, keep_alive_is_not_enabled)
+{
+    setKeepAliveReported(false);
+
+    givenEstablishedConnection();
+    assertKeepAliveIsExpected();
 }
 
 //-------------------------------------------------------------------------------------------------

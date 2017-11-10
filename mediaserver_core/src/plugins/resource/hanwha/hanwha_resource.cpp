@@ -773,10 +773,10 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
     m_attributes = std::move(info->attributes);
 
-    if (auto paramiters = sharedContext()->cgiParamiters())
-        m_cgiParameters = std::move(paramiters.value);
+    if (auto parameters = sharedContext()->cgiParamiters())
+        m_cgiParameters = std::move(parameters.value);
     else
-        return paramiters.diagnostics;
+        return parameters.diagnostics;
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1038,6 +1038,10 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     auto possibleValues = autoFocusParameter->possibleValues();
     m_focusMode = QString();
+    // TODO: Ducumentation says we should check (attributes/Image/Support/SimpleFocus is True)
+    //     and (image/focus/control/Mode contains SimpleFocus).
+    // However 2nd true with 1st false does not seem to be valid behavior, so we do not check
+    // it for now.
     for (const auto& mode: {lit("SimpleFocus"), lit("AutoFocus")})
     {
         if (possibleValues.contains(mode))

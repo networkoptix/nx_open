@@ -94,6 +94,12 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
             SystemError::ErrorCode code,
             std::unique_ptr<AbstractStreamSocket> socket)
         {
+            if (code == SystemError::noError && !socket)
+            {
+                NX_ASSERT(false, lm("null socket with no error from %1").arg(*connection));
+                code = SystemError::invalidData;
+            }
+
             if (code != SystemError::noError)
             {
                 NX_LOGX(lm("tunnel %1 is broken: %2")
@@ -104,10 +110,7 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
                 return;
             }
 
-            NX_ASSERT(socket);
-
             acceptTunnel(connection);
-
             {
                 QnMutexLocker lock(&m_mutex);
                 if (m_acceptedSockets.size() >= m_acceptLimit)

@@ -451,7 +451,7 @@ copyToolchainLibsIfNeeded()
 
     # TODO: Consider unconditionally copying from the compiler artifact. Decision on usage will
     # then be made in install.sh on the box.
-    if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
+    if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ] || [ "$BOX" = "rpi" ]; then
         echo "Copying toolchain libs (libstdc++, libatomic) (Banana Pi)"
         cp -r "$TOOLCHAIN_LIB_DIR/libstdc++.so"* "$LIB_INSTALL_DIR/"
         cp -r "$TOOLCHAIN_LIB_DIR/libatomic.so"* "$LIB_INSTALL_DIR/"

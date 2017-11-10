@@ -50,7 +50,8 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     if (!processor->commonModule()->resourceAccessManager()->hasPermission(
         processor->accessRights(), request.camera, requiredPermission))
     {
-        return makeError(nx_http::StatusCode::forbidden, lit("No required permission"),
+        return makeError(nx_http::StatusCode::forbidden,
+            lit("Access denied: Insufficent access rights"),
             &result, &contentType, request.format, request.extraFormatting);
     }
 
