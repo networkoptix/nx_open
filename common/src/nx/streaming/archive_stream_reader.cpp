@@ -30,7 +30,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_bottomIFrameTime(-1),
     m_primaryVideoIdx(-1),
     m_audioStreamIndex(-1),
-    mFirstTime(true),
+    m_FirstTime(true),
     m_tmpSkipFramesToTime(AV_NOPTS_VALUE),
 //private
     m_selectedAudioChannel(0),
@@ -437,16 +437,16 @@ begin_label:
     if (needToStop())
         return QnAbstractMediaDataPtr();
 
-    if (mFirstTime)
+    if (m_FirstTime)
     {
         // this is here instead if constructor to unload ui thread
         m_BOF = true;
         if (init()) {
-            mFirstTime = false;
+            m_FirstTime = false;
         }
         else {
             if (m_resource->hasFlags(Qn::local))
-                mFirstTime = false; //< Do not try to reopen local file if it can't be opened.
+                m_FirstTime = false; //< Do not try to reopen local file if it can't be opened.
             // If media data can't be opened report 'no data'
             return createEmptyPacket(isReverseMode());
         }
@@ -1236,12 +1236,20 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     }
 }
 
+bool QnArchiveStreamReader::isOpened() const
+{
+    return !m_FirstTime;
+}
 
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
 {
-    QnMutexLocker lock( &m_playbackMaskSync );
-    m_outOfPlaybackMask = false;
-    m_playbackMaskHelper.setPlaybackRange(playbackRange);
+    {
+        QnMutexLocker lock(&m_playbackMaskSync);
+        m_outOfPlaybackMask = false;
+        m_playbackMaskHelper.setPlaybackRange(playbackRange);
+    }
+    if (!playbackRange.isEmpty() && !isOpened())
+        jumpTo(playbackRange.startTimeMs * 1000LL, 0);
 }
 
 QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const
