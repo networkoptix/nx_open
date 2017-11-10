@@ -265,6 +265,9 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    if (m_archiveIntegrityWatcher && time != 0LL)
+        m_archiveIntegrityWatcher->reset();
+
     if (!findStreams())
         return -1;
 
@@ -317,6 +320,12 @@ bool QnAviArchiveDelegate::open(
                     url));
             if(!m_storage)
                 return false;
+        }
+
+        if (!m_storage->isFileExists(url) && m_archiveIntegrityWatcher)
+        {
+            m_archiveIntegrityWatcher->fileMissing(url);
+            return false;
         }
 
         m_formatContext = avformat_alloc_context();

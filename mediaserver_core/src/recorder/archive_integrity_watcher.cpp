@@ -1,5 +1,5 @@
+#include <nx/utils/log/log.h>
 #include "archive_integrity_watcher.h"
-
 #include "storage_manager.h"
 #include "server_stream_recorder.h"
 
@@ -32,6 +32,10 @@ QByteArray IntegrityHashHelper::hashWithSalt(const QByteArray& value)
 // -------------------------------------------------------------------------------------------------
 
 // ServerArchiveIntegrityWatcher -------------------------------------------------------------------
+ServerArchiveIntegrityWatcher::ServerArchiveIntegrityWatcher():
+    m_fired(false)
+{}
+
 bool ServerArchiveIntegrityWatcher::fileRequested(
     const QnAviArchiveMetadata& metadata,
     const QString& fileName)
@@ -39,12 +43,14 @@ bool ServerArchiveIntegrityWatcher::fileRequested(
     if (!checkMetaDataIntegrity(metadata))
     {
         emitSignal(fileName);
+        NX_WARNING(this, lm("File metadata integrity problem: %1").args(fileName));
         return false;
     }
 
     if (!checkFileName(metadata, fileName))
     {
         emitSignal(fileName);
+        NX_WARNING(this, lm("File metadata vs file name integrity problem: %1").args(fileName));
         return false;
     }
 
@@ -53,7 +59,14 @@ bool ServerArchiveIntegrityWatcher::fileRequested(
 
 void ServerArchiveIntegrityWatcher::fileMissing(const QString& fileName)
 {
+    NX_WARNING(this, lm("File is present in the DB but missing in the archive: %1").args(fileName));
     emitSignal(fileName);
+}
+
+void ServerArchiveIntegrityWatcher::reset()
+{
+    m_fired = false;
+    qWarning() << "JUMP";
 }
 
 bool ServerArchiveIntegrityWatcher::checkMetaDataIntegrity(const QnAviArchiveMetadata& metadata)
@@ -71,6 +84,10 @@ bool ServerArchiveIntegrityWatcher::checkFileName(
 
 void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
 {
+    qWarning() << "EMIT";
+    if (m_fired)
+        return;
+
     QnStorageResourcePtr storage = QnStorageManager::getStorageByUrl(
         fileName,
         QnServer::StoragePool::Backup | QnServer::StoragePool::Normal);
@@ -80,6 +97,7 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
         return;
 
     emit fileIntegrityCheckFailed(storage);
+    m_fired = true;
 }
 // -------------------------------------------------------------------------------------------------
 

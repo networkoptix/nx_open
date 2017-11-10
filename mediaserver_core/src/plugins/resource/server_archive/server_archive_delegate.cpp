@@ -246,7 +246,6 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     m_eof = true;
                     return time;
                 } else {
-                    m_archiveIntegrityWatcher->fileMissing(newChunkCatalog->fullFileName(newChunk.toBaseChunk()));
                     ignoreChunks.emplace(newChunk, newChunkCatalog->cameraUniqueId(), 
                                          newChunkCatalog->getRole(), 
                                          newChunkCatalog->getStoragePool() == QnServer::StoragePool::Backup);

@@ -4,6 +4,10 @@
 
 class QnAviArchiveMetadata;
 
+/**
+ * @brief The AbstractArchiveIntegrityWatcher class
+ * Report detected integrity problems. Report is fired only once unless reset() is called
+ */
 class AbstractArchiveIntegrityWatcher
 {
 public:
@@ -19,4 +23,8 @@ public:
      * @brief fileMissing - call this to report that file is missing in the archive
      */
     virtual void fileMissing(const QString& fileName) = 0;
+    /**
+     * @brief reset - resets watcher to the initial state so the problems detected are reported
+     */
+    virtual void reset() = 0;
 };

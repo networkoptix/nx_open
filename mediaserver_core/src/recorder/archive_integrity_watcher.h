@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <nx/streaming/abstract_archive_delegate.h>
 
 
@@ -22,15 +23,20 @@ class ServerArchiveIntegrityWatcher: public QObject, public AbstractArchiveInteg
     Q_OBJECT
 
 public:
+    ServerArchiveIntegrityWatcher();
+
     virtual bool fileRequested(
         const QnAviArchiveMetadata& metadata,
         const QString& fileName) override;
     virtual void fileMissing(const QString& fileName) override;
+    virtual void reset() override;
 
 signals:
     void fileIntegrityCheckFailed(const QnStorageResourcePtr& storage);
 
 private:
+    std::atomic<bool> m_fired;
+
     bool checkMetaDataIntegrity(const QnAviArchiveMetadata& metadata);
     bool checkFileName(const QnAviArchiveMetadata& metadata, const QString& fileName);
     void emitSignal(const QString& fileName);
