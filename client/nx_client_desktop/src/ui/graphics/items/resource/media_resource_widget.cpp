@@ -626,12 +626,16 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (statusOverlay != Qn::PasswordRequiredOverlay)
         return QString();
 
+    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        return QString();
+
     const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
     const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
-    return  camerasCount > 1
+    return camerasCount > 1
         ? tr("Set For All %n Cameras", nullptr, camerasCount)
         : QString();
 }
+
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {
     if (!rule)
@@ -2080,6 +2084,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isUnauthorized())
         return Qn::UnauthorizedOverlay;
 
+    if (d->camera->needsToChangeDefaultPassword())
+        return Qn::PasswordRequiredOverlay;
+
     if (d->camera)
     {
         const Qn::Permission requiredPermission = d->isPlayingLive()
@@ -2163,6 +2170,12 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 {
     if (!d->camera || !d->camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
+
+    if (statusOverlay == Qn::PasswordRequiredOverlay
+        && context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    {
+        return Qn::ResourceOverlayButton::SetPassword;
+    }
 
     const bool canChangeSettings = accessController()->hasPermissions(d->camera,
         Qn::SavePermission | Qn::WritePermission);

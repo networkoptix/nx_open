@@ -18,8 +18,8 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 # Support section
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
-set(supportUrl "")
-set(supportEmail "support@hanwhasecurity.com")
+set(supportUrl "https://hanwha.cloud-demo.hdw.mx/content/support")
+set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail 
     "<table>

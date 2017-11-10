@@ -13,6 +13,7 @@
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -95,7 +96,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_rtpReader.setRequest(streamUrlString);
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
-    return m_rtpReader.openStream();
+    const auto openResult = m_rtpReader.openStream();
+    NX_VERBOSE(this, lm("RTP open %1 -> %2").args(streamUrlString, openResult.toString(nullptr)));
+    return openResult;
 }
 
 void HanwhaStreamReader::closeStream()

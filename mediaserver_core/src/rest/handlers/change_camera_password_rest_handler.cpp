@@ -71,6 +71,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
         result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error");
         return nx_http::StatusCode::ok;
     }
+    camera->reinit();
 
     return nx_http::StatusCode::ok;
 }

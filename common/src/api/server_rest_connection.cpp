@@ -448,10 +448,11 @@ Handle ServerConnection::changeCameraPassword(
     data.user = auth.user();
     data.password = auth.password();
 
-    nx_http::ClientPool::Request request;
-    request.method = nx_http::Method::post;
-    request.url = lit("/api/changeCameraPassword");
-    request.contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    QnEmptyRequestData params;
+    params.format = Qn::SerializationFormat::UbjsonFormat;
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::post,
+        prepareUrl(lit("/api/changeCameraPassword"), params.toParams()));
     request.messageBody = QJson::serialized(std::move(data));
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray());
 

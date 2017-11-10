@@ -488,8 +488,19 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
 
 qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift)
 {
-    auto dateTime = QDateTime::fromString(value, kHanwhaDateTimeFormat);
-    dateTime.setOffsetFromUtc(timeZoneShift.count());
+    QDateTime dateTime;
+    const bool isUtcTime = value.trimmed().endsWith(L'Z');
+
+    if (!isUtcTime)
+    {
+        dateTime = QDateTime::fromString(value, kHanwhaDateTimeFormat);
+        dateTime.setOffsetFromUtc(timeZoneShift.count());
+    }
+    else
+    {
+        dateTime = QDateTime::fromString(value, Qt::ISODate);
+    }
+
     return std::max(0LL, dateTime.toMSecsSinceEpoch());
 }
 

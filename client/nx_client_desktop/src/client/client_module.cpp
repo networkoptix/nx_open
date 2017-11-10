@@ -177,7 +177,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initMetaInfo();
     initApplication();
     initSingletons(startupParams);
-    initRuntimeParams(startupParams);
     initLog(startupParams);
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -306,6 +305,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(translationManager.release());
     commonModule->store(new QnClientRuntimeSettings());
     commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
+
+    initRuntimeParams(startupParams);
 
     /* Shorted initialization if run in self-update mode. */
     if (startupParams.selfUpdateMode)
