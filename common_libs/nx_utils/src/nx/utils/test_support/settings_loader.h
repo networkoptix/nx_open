@@ -34,32 +34,12 @@ public:
             args.push_back(nameAndValue.second.c_str());
         }
 
-        //loadArguments(args);
         m_settings.load((int)args.size(), args.data());
     }
 
 private:
     std::map<std::string, std::string> m_args;
     SettingsType m_settings;
-
-    //void loadArguments(
-    //    const std::vector<const char*>& args,
-    //    std::enable_if<
-    //        std::is_base_of<SettingsType, nx::utils::AbstractServiceSettings>::value
-    //    >::type* = nullptr)
-    //{
-    //    m_settings.load((int)args.size(), args.data());
-    //}
-
-    //void loadArguments(
-    //    const std::vector<const char*>& args,
-    //    std::enable_if<
-    //        !std::is_base_of<SettingsType, nx::utils::AbstractServiceSettings>::value
-    //    >::type* = nullptr)
-    //{
-    //    QnSettings settings;
-    //    m_settings.load((int)args.size(), args.data());
-    //}
 };
 
 } // namespace test
