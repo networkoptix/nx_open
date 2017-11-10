@@ -1686,7 +1686,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Synchronize Streams"))
         .toggledText(ContextMenu::tr("Disable Stream Synchronization"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::syncIsForced());
 
     factory()
         .flags(Slider | TitleBar | Tree)
