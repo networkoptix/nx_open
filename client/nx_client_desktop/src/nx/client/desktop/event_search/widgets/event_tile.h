@@ -65,6 +65,7 @@ public:
     QPixmap icon() const;
     void setIcon(const QPixmap& value);
 
+    // Does not take ownership.
     QnImageProvider* preview() const;
     void setPreview(QnImageProvider* value);
 
