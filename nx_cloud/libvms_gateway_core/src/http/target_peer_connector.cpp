@@ -122,7 +122,9 @@ void TargetPeerConnector::processDirectConnectionResult(
         .args(SystemError::toString(systemErrorCode)));
 
     m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
-    processConnectionResult(systemErrorCode, std::move(m_targetPeerSocket));
+    processConnectionResult(
+        systemErrorCode,
+        systemErrorCode == SystemError::noError ? std::move(m_targetPeerSocket) : nullptr);
 }
 
 void TargetPeerConnector::processConnectionResult(
