@@ -240,6 +240,14 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         return;
 
     NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
+
+    const auto requiredPermission = msecSinceEpoch < 0
+        ? Qn::ViewLivePermission
+        : Qn::ViewFootagePermission;
+
+    if (accessController()->hasPermissions(camera, requiredPermission))
+        return;
+
     QnSingleThumbnailLoader* loader = new QnSingleThumbnailLoader(
         camera,
         msecSinceEpoch,

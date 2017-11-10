@@ -160,7 +160,7 @@ int QnImageRestHandler::executeGet(
         owner->accessRights(), camera, requiredPermission))
     {
         result.append("<root>\n");
-        result.append(lit("No required permission"));
+        result.append(lit("Access denied: Insufficent access rights"));
         result.append("</root>\n");
         return nx_http::StatusCode::forbidden;
     }

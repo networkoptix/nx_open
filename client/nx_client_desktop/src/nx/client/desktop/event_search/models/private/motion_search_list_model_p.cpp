@@ -106,6 +106,7 @@ void MotionSearchListModel::Private::addPeriod(const QnTimePeriod& period, Posit
 
     eventData.helpId = QnBusiness::eventHelpId(vms::event::cameraMotionEvent);
     eventData.timestampMs = period.startTimeMs;
+    eventData.previewTimeMs = eventData.timestampMs;
     eventData.previewCamera = m_camera;
     //eventData.icon = ;
 

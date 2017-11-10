@@ -353,6 +353,9 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 
         connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
+
+        connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
     }
 
     if (isUpdating())
@@ -479,9 +482,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
 
-    bool isLiveAllowed = true;
-    bool isFootageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
-    bool isExportAllowed = hasGlobalPermission(subject, Qn::GlobalExportPermission);
+    bool isLiveAllowed = !camera->needsToChangeDefaultPassword();
+    bool isFootageAllowed = isLiveAllowed
+        && hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
+    bool isExportAllowed = isFootageAllowed
+        && hasGlobalPermission(subject, Qn::GlobalExportPermission);
 
     if (!camera->isLicenseUsed())
     {

@@ -1163,8 +1163,11 @@ void QnResource::pleaseStopAsyncTasks()
     m_appStopping = true;
 }
 
-void QnResource::reinit()
+void QnResource::reinitAsync()
 {
+    if (m_appStopping || hasFlags(Qn::foreigner))
+        return;
+
     setStatus(Qn::Offline);
     QnMutexLocker lock(&m_initAsyncMutex);
     m_lastInitTime = getUsecTimer();

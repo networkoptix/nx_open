@@ -64,7 +64,7 @@ DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
                 return;
 
             updateResource(resource);
-            connect(camera.data(), &QnVirtualCameraResource::needsToChangeDefaultPasswordChanged,
+            connect(camera.data(), &QnVirtualCameraResource::capabilitiesChanged,
                 this, [resource, updateResource]() { updateResource(resource); });
         };
 

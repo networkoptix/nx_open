@@ -88,9 +88,18 @@ api::BeginListeningResponse ReverseConnection::beginListeningResponse() const
 
 std::unique_ptr<AbstractStreamSocket> ReverseConnection::takeSocket()
 {
-    decltype(m_streamSocket) streamSocket;
-    m_streamSocket.swap(streamSocket);
-    return streamSocket;
+    if (m_streamSocket)
+    {
+        decltype(m_streamSocket) streamSocket;
+        m_streamSocket.swap(streamSocket);
+        return streamSocket;
+    }
+    else if (m_httpPipeline)
+    {
+        return m_httpPipeline->takeSocket();
+    }
+
+    return nullptr;
 }
 
 void ReverseConnection::stopWhileInAioThread()
@@ -121,6 +130,16 @@ void ReverseConnection::onConnectDone(
     {
         streamSocket->setRecvTimeout(std::chrono::milliseconds::zero());
         streamSocket->setSendTimeout(std::chrono::milliseconds::zero());
+        if (response.keepAliveOptions)
+        {
+            if (!streamSocket->setKeepAlive(response.keepAliveOptions))
+            {
+                const auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_DEBUG(this, lm("Failed to enable keep alive. %1")
+                    .arg(SystemError::toString(systemErrorCode)));
+            }
+        }
+
         m_httpPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
             this, std::move(streamSocket));
         m_httpPipeline->setMessageHandler(
