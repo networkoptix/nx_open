@@ -11,9 +11,9 @@ QnNovArchiveDelegate::QnNovArchiveDelegate():
 
 }
 
-void QnNovArchiveDelegate::onReverseMode(qint64 /*displayTime*/, bool value)
+void QnNovArchiveDelegate::setSpeed(qint64 /*displayTime*/, double value)
 {
-    m_reverseMode = value;
+    m_reverseMode = value < 0;
 }
 
 bool QnNovArchiveDelegate::open(const QnResourcePtr &resource)

@@ -335,6 +335,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
         connect(m_timeScrollBar, &QnTimeScrollBar::actionTriggered, this,
             [this](int action)
             {
+                // Flag is required to avoid unzoom when moving slider by clicking outside of it.
                 if (action != AbstractGraphicsSlider::SliderMove)
                     m_ignoreScrollBarDblClick = true;
             });
@@ -683,6 +684,11 @@ bool QnWorkbenchNavigator::isRecording() const
     return m_isRecording;
 }
 
+bool QnWorkbenchNavigator::syncIsForced() const
+{
+    return m_syncIsForced;
+}
+
 void QnWorkbenchNavigator::updateFootageState()
 {
     updateHasArchive();
@@ -796,6 +802,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         updateSyncedPeriods();
     updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
     updateLines();
+    updateSyncIsForced();
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
@@ -838,6 +845,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods(); /* Full rebuild on widget removing. */
     updateLines();
+    updateSyncIsForced();
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const
@@ -1899,46 +1907,81 @@ void QnWorkbenchNavigator::updateTimelineRelevancy()
         setLive(true);
 }
 
+void QnWorkbenchNavigator::updateSyncIsForced()
+{
+    // Force sync if there more than 1 channel of recorders on the scene.
+    const auto widgets = m_syncedWidgets;
+    const auto syncIsForced = std::count_if(widgets.cbegin(), widgets.cend(),
+        [](QnMediaResourceWidget* w)
+        {
+            const auto camera = w->resource().dynamicCast<QnSecurityCamResource>();
+            return camera && camera->isDtsBased();
+        }) > 1;
+
+    if (m_syncIsForced == syncIsForced)
+        return;
+
+    m_syncIsForced = syncIsForced;
+
+    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    if (syncIsForced && !streamSynchronizer->isRunning())
+    {
+        if (m_currentWidgetFlags.testFlag(WidgetSupportsSync))
+            streamSynchronizer->setState(m_currentWidget);
+        else
+            streamSynchronizer->start(DATETIME_NOW, 1.0);
+    }
+
+    emit syncIsForcedChanged();
+}
+
 void QnWorkbenchNavigator::updateThumbnailsLoader()
 {
     if (!m_timeSlider)
         return;
 
-    auto canLoadThumbnailsForWidget = [this](QnMediaResourceWidget* widget)
-    {
-        /* Widget must exist. */
-        if (!widget)
-            return false;
+    auto canLoadThumbnailsForWidget =
+        [this](QnMediaResourceWidget* widget)
+        {
+            /* Widget must exist. */
+            if (!widget)
+                return false;
 
-        /* Widget must have associated resource, supported by thumbnails loader. */
-        if (!QnThumbnailsLoader::supportedResource(widget->resource()))
-            return false;
+            /* Widget must have associated resource, supported by thumbnails loader. */
+            if (!QnThumbnailsLoader::supportedResource(widget->resource()))
+                return false;
 
-        /* First frame is not loaded yet, we must know it for setting up correct aspect ratio. */
-        if (!widget->hasAspectRatio())
-            return false;
+            /* First frame is not loaded yet, we must know it for setting up correct aspect ratio. */
+            if (!widget->hasAspectRatio())
+                return false;
 
-        /* Thumbnails for panoramic cameras are disabled for now. */
-        if (widget->channelLayout()->size().width() > 1
-            || widget->channelLayout()->size().height() > 1)
-            return false;
+            /* Thumbnails for panoramic cameras are disabled for now. */
+            if (widget->channelLayout()->size().width() > 1
+                || widget->channelLayout()->size().height() > 1)
+                return false;
 
-        /* Thumbnails for I/O modules and sound files are disabled. */
-        if (!widget->hasVideo())
-            return false;
+            /* Thumbnails for I/O modules and sound files are disabled. */
+            if (!widget->hasVideo())
+                return false;
 
-        /* Further checks must be skipped for local files. */
-        QnAviResourcePtr aviFile = widget->resource().dynamicCast<QnAviResource>();
-        if (aviFile)
+            if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
+            {
+                if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+                    return false;
+            }
+
+            /* Further checks must be skipped for local files. */
+            QnAviResourcePtr aviFile = widget->resource().dynamicCast<QnAviResource>();
+            if (aviFile)
+                return true;
+
+            /* Check if the camera has recorded periods. */
+            auto loader = loaderByWidget(widget, false);
+            if (!loader || loader->periods(Qn::RecordingContent).empty())
+                return false;
+
             return true;
-
-        /* Check if the camera has recorded periods. */
-        auto loader = loaderByWidget(widget, false);
-        if (!loader || loader->periods(Qn::RecordingContent).empty())
-            return false;
-
-        return true;
-    };
+        };
 
     if (!canLoadThumbnailsForWidget(m_currentMediaWidget))
     {
@@ -2228,16 +2271,30 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget)
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         {
             addSyncedWidget(mediaWidget);
-            connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+            connect(mediaWidget, &QnMediaResourceWidget::motionSelectionChanged, this,
+                [this, mediaWidget]
+                {
+                    at_widget_motionSelectionChanged(mediaWidget);
+                });
+
+            connect(mediaWidget, &QnMediaResourceWidget::licenseStatusChanged, this,
+                &QnWorkbenchNavigator::updateThumbnailsLoader);
 
             if (!hasArchive())
                 updateFootageState();
         }
     }
 
-    connect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateThumbnailsLoader()));
-    connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
-    connect(widget->resource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
+    connect(widget, &QnResourceWidget::aspectRatioChanged, this,
+        &QnWorkbenchNavigator::updateThumbnailsLoader);
+    connect(widget, &QnResourceWidget::optionsChanged, this,
+        [this, widget]
+        {
+            at_widget_optionsChanged(widget);
+        });
+
+    connect(widget->resource(), &QnResource::flagsChanged, this,
+        &QnWorkbenchNavigator::at_resource_flagsChanged);
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget)
@@ -2256,22 +2313,12 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     }
 }
 
-void QnWorkbenchNavigator::at_widget_motionSelectionChanged()
-{
-    at_widget_motionSelectionChanged(checked_cast<QnMediaResourceWidget *>(sender()));
-}
-
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnMediaResourceWidget *widget)
 {
     /* We check that the loader can be created (i.e. that the resource is camera)
      * just to feel safe. */
     if (auto loader = loaderByWidget(widget))
         loader->setMotionRegions(widget->motionSelection());
-}
-
-void QnWorkbenchNavigator::at_widget_optionsChanged()
-{
-    at_widget_optionsChanged(checked_cast<QnResourceWidget *>(sender()));
 }
 
 void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget)
@@ -2314,6 +2361,8 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased()
 {
+    // Double-click on slider handle must always unzoom.
+    m_ignoreScrollBarDblClick = false;
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, m_lastAdjustTimelineToPosition);
 }
 

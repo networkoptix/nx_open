@@ -86,10 +86,14 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
-rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread /*= 0*/)
+rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
+    const QnUuid& cameraId,
+    bool start,
+    GetCallback callback,
+    QThread* targetThread /*= 0*/)
 {
     QnRequestParamList params;
-    params.insert(lit("clientId"),      commonModule()->moduleGUID().toString());
+    params.insert(lit("clientId"), sourceId);
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
@@ -431,6 +435,33 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::changeCameraPassword(
+    const QnUuid& id,
+    const QAuthenticator& auth,
+    Result<QnRestResult>::type callback,
+    QThread* targetThread)
+{
+    const auto camera = resourcePool()->getResourceById(id);
+    if (!camera || camera->getParentId().isNull())
+        return Handle();
+
+    CameraPasswordData data;
+    data.cameraId = id.toString();
+    data.user = auth.user();
+    data.password = auth.password();
+
+    QnEmptyRequestData params;
+    params.format = Qn::SerializationFormat::UbjsonFormat;
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::post,
+        prepareUrl(lit("/api/changeCameraPassword"), params.toParams()));
+    request.messageBody = QJson::serialized(std::move(data));
+    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray());
+
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, request.url.toString());
+    return handle;
+}
 
 // --------------------------- private implementation -------------------------------------
 
@@ -620,11 +651,12 @@ Handle ServerConnection::executeRequest(
                 if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
                 {
                     const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                    auto result = parseMessageBody<ResultType>(format, msgBody, &success);
                     invoke(callback,
                         targetThread,
                         success,
                         id,
-                        parseMessageBody<ResultType>(format, msgBody, &success),
+                        std::move(result),
                         serverId,
                         timer);
                 }

@@ -3165,7 +3165,7 @@ to %1</source>
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
         <numerusform>Journal d'événement pour %1 - %n événement trouvé</numerusform>
-        <numerusform>Journal d'événement pour %1  - %n événements trouvés</numerusform>
+        <numerusform>Journal d'événement pour %1 - %n événements trouvés</numerusform>
       </translation>
     </message>
     <message>
@@ -4327,7 +4327,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Désactivé selon l'horaire</translation>
     </message>
   </context>
   <context>
@@ -7256,11 +7256,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Entrer mot de passe...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Mot de passe Administrateur</translation>
     </message>
   </context>
   <context>

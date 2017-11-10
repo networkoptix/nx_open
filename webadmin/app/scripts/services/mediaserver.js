@@ -190,8 +190,8 @@ angular.module('webadminApp')
                     }
                     params.url = url;
                 }
-
-                return $http.get(proxy + '/web/api/getNonce?' + $.param(params));
+                var nonceType = url ? 'getRemoteNonce' : 'getNonce';
+                return $http.get(proxy + '/web/api/' + nonceType + '?' + $.param(params));
             },
             logout:function(){
                 $localStorage.$reset();

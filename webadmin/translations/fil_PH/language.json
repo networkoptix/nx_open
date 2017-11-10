@@ -1,116 +1,143 @@
 {
-  "language_name":"LANGUAGE_NAME",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Visit this link",
-    "openLinkWithTitle":"To {{title}} visit this link"
-  },
-  "setup":{
-    "createAccount":"create account",
-    "errorNoHDD":"This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-    "errorNoNetwork":"This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"Password must be at least 8 characters long",
-    "requiredMessage":"Only latin letters, numbers and keyboard symbols are allowed",
-    "weakMessage":"Password should contain different types of symbols",
-    "strongMessage":"Strong password!",
-    "commonMessage":"This password is in list of most popular passwords"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Server",
-      "system":"System",
-      "device":"Device"
+    "language_name": "Filipino",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Visit this link",
+        "openLinkWithTitle": "To {{title}} visit this link"
     },
-    "confirmRestart":"Restart server?",
-    "couldntCheckInternet":"Could not check cloud connection",
-    "confirmRestoreDefault":"Clear database and settings? This process will take some time and server will be restarted afterwards.",
-    "confirmRestoreDefaultTitle":"Restore factory defaults",
-    "unexpectedError":"Failed: unexpected error has happened",
-    "connnetionError":"Connection error",
-    "wrongPassword":"Wrong password.",
-    "error":"Error: ",
-    "restartNeeded":"Changes saved. Restart server to apply new settings?",
-    "settingsSaved":"Settings saved",
-    "confirmHardwareRestart":"Restart server operation system?",
-    "confirmRestoreSettings":"Restore all server settings? Archive will be saved, but network settings will be reset.",
-    "confirmRestoreSettingsNotNetwork":"Reset server configuration? Archive and network settings will be saved.",
-    "unavailable":"Unavailable",
-    "unsafePortConfirm":"It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
-    "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
-    "confirmDisconnectFromCloudAction":"Disconnect",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"System was connected successfully",
-    "createLocalOwnerTitle":"Create local administrator",
-    "confirmChangePassword":"Change admin password",
-    "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
-    "confirmChangePasswordAction":"Save new password",
-    "nx1ControlHint":"Client application has been started. Use a keyboard/mouse or mobile application to control it."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Health monitoring",
-      "storage":"Storage",
-      "log":"Log"
+    "setup": {
+        "createAccount": "create account",
+        "errorNoHDD": "This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "Password must be at least 8 characters long",
+        "requiredMessage": "Only latin letters, numbers and keyboard symbols are allowed",
+        "weakMessage": "Password should contain different types of symbols",
+        "strongMessage": "Strong password!",
+        "commonMessage": "This password is in list of most popular passwords"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Server",
+            "system": "System",
+            "device": "Device"
+        },
+        "confirmRestart": "Restart server?",
+        "couldntCheckInternet": "Could not check cloud connection",
+        "confirmRestoreDefault": "Clear database and settings? This process will take some time and server will be restarted afterwards.",
+        "confirmRestoreDefaultTitle": "Restore factory defaults",
+        "unexpectedError": "Failed: unexpected error has happened",
+        "connnetionError": "Connection error",
+        "wrongPassword": "Wrong password.",
+        "error": "Error: ",
+        "restartNeeded": "Changes saved. Restart server to apply new settings?",
+        "settingsSaved": "Settings saved",
+        "confirmHardwareRestart": "Restart server operation system?",
+        "confirmRestoreSettings": "Restore all server settings? Archive will be saved, but network settings will be reset.",
+        "confirmRestoreSettingsNotNetwork": "Reset server configuration? Archive and network settings will be saved.",
+        "unavailable": "Unavailable",
+        "unsafePortConfirm": "It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
+        "confirmDisconnectFromCloud": "Disconnect system from {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
+        "confirmDisconnectFromCloudAction": "Disconnect",
+        "disconnectedFromCloudSuccess": "System was disconnected from {{CLOUD_NAME}} successfully",
+        "confirmDisconnectFromSystem": "Detach server from current system",
+        "confirmDisconnectFromSystemAction": "Detach",
+        "disconnectedFromSystemSuccess": "Server was detached from the system successfully",
+        "connectedSuccess": "System was connected successfully",
+        "createLocalOwnerTitle": "Create local administrator",
+        "confirmChangePassword": "Change admin password",
+        "confirmChangePasswordTitle": "Change system password? It will affect user 'admin' and the root password for some servers",
+        "confirmChangePasswordAction": "Save new password",
+        "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Health monitoring",
+            "storage": "Storage",
+            "log": "Log"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "System is unreachable or does not exist.",
+        "incorrectCurrentPassword": "Incorrect current password.",
+        "incorrectRemotePassword": "Login or password are incorrect.",
+        "incompatibleVersion": "System is unreachable, does not exist or has incompatible version.",
+        "wrongUrl": "Unable to connect to the specified server.",
+        "newSystemError": "Cannot merge systems. Remote system is not configured.",
+        "safeMode": "Cannot merge systems. Remote system is in safe mode.",
+        "configError": "Cannot merge systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge systems, because servers are built with different cloud hosts",
+        "licenceError": "Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
+        "connectionFailed": "Connection failed: ",
+        "unknownError": "Unknown error",
+        "mergeFailed": "Merge failed: ",
+        "mergeSucceed": "Merge succeed.",
+        "newSystemDisplayName": "New system",
+        "incompatibleProtocol": "incompatible version",
+        "incompatibleCloudHost": "cloud conflict",
+        "incompatibleCloudState": "cloud connected"
+    },
+    "login": {
+        "incorrectPassword": "Login or password is incorrect"
+    },
+    "navigaion": {
+        "cannotGetUser": "Server failure: cannot retrieve current user data"
+    },
+    "offlineDialog": {
+        "serverOffline": "server is offline"
+    },
+    "restartDialog": {
+        "serverStarting": "server is starting",
+        "serverRestarting": "server is restarting",
+        "serverOffline": "server is offline"
+    },
+    "fileUpload": {
+        "started": "Update successfully started. It will take several minutes",
+        "upToDate": "Update failed. The provided version is already installed.",
+        "invalidFile": "Update failed. Provided file is not a valid update archive.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another system.",
+        "extractionError": "Update failed. Insufficient space to extract archive, check available storage.",
+        "installationError": "Updating failed. Cannot execute installation script.",
+        "selectFiles": "Select files"
+    },
+    "advanced": {
+        "free": "Free",
+        "total": "Total",
+        "occupied": "Occupied",
+        "reserved": "Reserved"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web interface"
+    },
+    "common": {
+        "systemOffline": "System Offline",
+        "cameraLinks": {
+            "copyToClipboard": "copy to clipboard",
+            "highStream": "High stream",
+            "copyDefaultText": "copy",
+            "unknown": "Unknown",
+            "lowStream": "Low stream",
+            "transcoding": "Transcoding",
+            "copyActiveText": "copied to clipboard"
+        },
+        "searchCamPlaceholder": "search",
+        "cameraStates": {
+            "noFormat": "This browser or device does not support video playback from  this camera.",
+            "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
+            "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
+            "unauthorized": "Authentication required",
+            "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead.",
+            "ieNoWebm": "Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+            "flashOrWebmRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
+            "noArmSupport": "This browser or device does not support video playback from ARM-based servers.",
+            "error": "Error",
+            "offline": "Offline",
+            "noData": "No data",
+            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"System is unreachable or does not exist.",
-    "incorrectCurrentPassword":"Incorrect current password.",
-    "incorrectRemotePassword":"Login or password are incorrect.",
-    "incompatibleVersion":"System is unreachable, does not exist or has incompatible version.",
-    "wrongUrl":"Unable to connect to the specified server.",
-    "newSystemError":"Cannot merge systems. Remote system is not configured.",
-    "safeMode":"Cannot merge systems. Remote system is in safe mode.",
-    "configError":"Cannot merge systems. Maybe one of Systems is in safe mode.",
-    "cloudError":"Cannot merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
-    "cloudBothError":"Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
-    "cloudHostConflict":"Cannot merge systems, because servers are built with different cloud hosts",
-    "licenceError":"Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
-    "connectionFailed":"Connection failed: ",
-    "unknownError":"Unknown error",
-    "mergeFailed":"Merge failed: ",
-    "mergeSucceed":"Merge succeed.",
-    "newSystemDisplayName":"New system",
-    "incompatibleProtocol":"incompatible version",
-    "incompatibleCloudHost":"cloud conflict",
-    "incompatibleCloudState":"cloud connected"
-  },
-  "login":{
-    "incorrectPassword":"Login or password is incorrect"
-  },
-  "navigaion":{
-    "cannotGetUser":"Server failure: cannot retrieve current user data"
-  },
-  "offlineDialog":{
-    "serverOffline":"server is offline"
-  },
-  "restartDialog":{
-    "serverStarting":"server is starting",
-    "serverRestarting":"server is restarting",
-    "serverOffline":"server is offline"
-  },
-  "fileUpload":{
-    "started":"Update successfully started. It will take several minutes",
-    "upToDate":"Update failed. The provided version is already installed.",
-    "invalidFile":"Update failed. Provided file is not a valid update archive.",
-    "incompatibleSystem":"Update failed. Provided file is targeted for another system.",
-    "extractionError":"Update failed. Insufficient space to extract archive, check available storage.",
-    "installationError":"Updating failed. Cannot execute installation script.",
-    "selectFiles":"Select files"
-  },
-  "advanced":{
-    "free":"Free",
-    "total":"Total",
-    "occupied":"Occupied",
-    "reserved":"Reserved"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
-  }
 }

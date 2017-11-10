@@ -8,6 +8,7 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <core/resource/resource_fwd.h>
+#include "hanwha_shared_resource_context.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -43,20 +44,20 @@ public:
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
+    static QAuthenticator getDefaultAuth();
 private:
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,
-        const QAuthenticator& auth,
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const;
-    int getChannels(const HanwhaResourcePtr& resource, const QAuthenticator& auth);
 
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
+    HanwhaResult<HanwhaInformation> cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url);
 private:
-
+    QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData
     {
         QString sessionKey;
@@ -71,7 +72,7 @@ private:
 
     // TODO: #dmishin make different session keys for different session types
     // There is only one session key per group now.
-    
+
     mutable QMap<QString, SessionKeyPtr> m_sessionKeys;
     //mutable QMap<QString, QString> m_sessionKeys;
     //mutable QMap<QString, bool> m_groupLocks;

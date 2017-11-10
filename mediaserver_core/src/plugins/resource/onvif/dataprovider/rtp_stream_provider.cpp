@@ -27,7 +27,7 @@ void QnRtpStreamReader::setRequest(const QString& request)
     m_request = request;
 }
 
-QnAbstractMediaDataPtr QnRtpStreamReader::getNextData() 
+QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 {
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
@@ -62,12 +62,12 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraCon
     return m_rtpReader.openStream();
 }
 
-void QnRtpStreamReader::closeStream() 
+void QnRtpStreamReader::closeStream()
 {
     m_rtpReader.closeStream();
 }
 
-bool QnRtpStreamReader::isStreamOpened() const 
+bool QnRtpStreamReader::isStreamOpened() const
 {
     return m_rtpReader.isStreamOpened();
 }

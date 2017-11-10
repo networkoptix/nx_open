@@ -353,7 +353,7 @@ void PtzInstrument::ensureElementsWidget()
         return;
 
     m_elementsWidget = new PtzElementsWidget();
-    display()->setLayer(elementsWidget(), Qn::EffectsLayer);
+    display()->setLayer(elementsWidget(), QnWorkbenchDisplay::EffectsLayer);
 
     if (scene())
         scene()->addItem(elementsWidget());

@@ -115,10 +115,10 @@ public:
     bool isEdge() const;
 
     /** Returns edge, analog or digital class */
-    virtual Qn::LicenseType licenseType() const;
+    Qn::LicenseType licenseType() const;
 
-    /** 
-     * Returns true if all cameras in a same camera group should share 1 license 
+    /**
+     * Returns true if all cameras in a same camera group should share 1 license
      */
     bool isSharingLicenseInGroup() const;
 
@@ -205,6 +205,8 @@ public:
     void setVendor(const QString &value);
 
     bool isGroupPlayOnly() const;
+
+    bool needsToChangeDefaultPassword() const;
 
     //!Implementation of QnMediaResource::toResource
     virtual const QnResource* toResource() const override;
@@ -310,6 +312,16 @@ public:
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
 
+    /**
+     * Update user password at the camera. This function is able to change password for existing user only.
+     */
+    virtual bool setCameraCredentialsSync(
+        const QAuthenticator& auth, QString* outErrorString = nullptr);
+
+    /**
+     * Returns true if camera credential was auto detected by media server.
+     */
+    bool isDefaultAuth() const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -325,8 +337,10 @@ signals:
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
+    void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
+    void capabilitiesChanged(const QnResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -391,6 +405,8 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
+
+    virtual Qn::LicenseType calculateLicenseType() const;
 protected:
 #ifdef ENABLE_DATA_PROVIDERS
     QnAudioTransmitterPtr m_audioTransmitter;
@@ -405,13 +421,13 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    mutable Qn::LicenseType m_cachedLicenseType;
+    CachedValue<Qn::LicenseType> m_cachedLicenseType;
     CachedValue<bool> m_cachedHasDualStreaming2;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
-    mutable CachedValue<bool> m_cachedIsIOModule;
+    CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;

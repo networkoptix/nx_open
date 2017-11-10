@@ -36,40 +36,61 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadata
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+
+// Class name is quite misleading.
+// Actually it is RTCP statistics + NTP time from Onvif extension.
 class QnRtspStatistic
 {
 public:
-    QnRtspStatistic(): timestamp(0), nptTime(0), localtime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
-    bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
+    QnRtspStatistic(): timestamp(0), ntpTime(0), localTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
+    bool isEmpty() const
+    {
+        return timestamp == 0
+            && ntpTime == 0
+            && !ntpOnvifExtensionTime.is_initialized();
+    }
 
     quint32 timestamp;
-    double nptTime;
-    double localtime;
+    double ntpTime;
+    double localTime;
     qint64 receivedPackets;
     qint64 receivedOctets;
     quint32 ssrc;
+    boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
+};
+
+enum class TimePolicy
+{
+    BindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
+    IgnoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
+    ForceLocalTime, //< Use local time only.
+    ForceCameraTime, //< Use camera NPT time only.
+    OnvifExtension //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper
 {
 public:
+
     QnRtspTimeHelper(const QString& resId);
     ~QnRtspTimeHelper();
 
     /*!
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
-    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
-    QString getResID() const { return m_resId; }
+    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
+    QString getResID() const { return m_resourceId; }
 
-    void setTrustToCameraTime(bool value);
-    bool isTrustToCameraTime() const;
+    void setTimePolicy(TimePolicy policy);
+
 private:
-    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch);
     bool isLocalTimeChanged();
     bool isCameraTimeChanged(const QnRtspStatistic& statistics);
     void reset();
 private:
+    quint32 m_prevRtpTime = 0;
+    quint32 m_prevCurrentSeconds = 0;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
     //qint64 m_cameraTimeDrift;
@@ -82,12 +103,12 @@ private:
     };
 
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
-    QString m_resId;
+    QString m_resourceId;
 
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
-    bool m_trustToCameraTime = false;
+    TimePolicy m_timePolicy = TimePolicy::BindCameraTimeToLocalTime;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
@@ -312,7 +333,7 @@ public:
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
-    
+
     void setTrackInfo(const TrackMap& tracks);
 
     AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
@@ -323,6 +344,8 @@ public:
 
     void setDateTimeFormat(const DateTimeFormat& format);
     void setScaleHeaderEnabled(bool value);
+    void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
+
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -357,6 +380,8 @@ private:
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx_http::Request&& request);
     void addCommonHeaders(nx_http::HttpHeaders& headers);
+    void addAdditionalHeaders(const QString& requestName, nx_http::HttpHeaders* outHeaders);
+
     QByteArray nptPosToString(qint64 posUsec) const;
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
@@ -421,6 +446,8 @@ private:
     QByteArray m_serverInfo;
     DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
     bool m_scaleHeaderEnabled = true;
+    using RequestName = QString;
+    QMap<RequestName, nx_http::HttpHeaders> m_additionalHeaders;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

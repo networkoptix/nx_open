@@ -56,6 +56,7 @@
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <nx/vms/utils/platform/autorun.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -208,45 +209,6 @@ private:
     CheckDelegate m_delegate;
 };
 
-class ResourceCondition: public Condition
-{
-public:
-    using CheckDelegate = std::function<bool(const QnResourcePtr& resource)>;
-
-    ResourceCondition(CheckDelegate delegate, MatchMode matchMode):
-        m_delegate(delegate),
-        m_matchMode(matchMode)
-    {
-    }
-
-    ActionVisibility check(const QnResourceList& resources,
-        QnWorkbenchContext* /*context*/)
-    {
-        return GenericCondition::check<QnResourcePtr>(resources, m_matchMode,
-            [this](const QnResourcePtr& resource) { return m_delegate(resource); })
-            ? EnabledAction
-            : InvisibleAction;
-    }
-
-    ActionVisibility check(const QnResourceWidgetList& widgets,
-        QnWorkbenchContext* /*context*/)
-    {
-        return GenericCondition::check<QnResourceWidget*>(widgets, m_matchMode,
-            [this](QnResourceWidget* widget)
-            {
-                if (auto resource = ParameterTypes::resource(widget))
-                    return m_delegate(resource);
-                return false;
-            })
-            ? EnabledAction
-            : InvisibleAction;
-    }
-
-private:
-    CheckDelegate m_delegate;
-    MatchMode m_matchMode;
-};
-
 TimePeriodType periodType(const QnTimePeriod& period)
 {
     if (period.isNull())
@@ -338,6 +300,37 @@ ConditionWrapper operator||(ConditionWrapper&& l, ConditionWrapper&& r)
 ConditionWrapper operator!(ConditionWrapper&& l)
 {
     return ConditionWrapper(new NegativeCondition(std::move(l)));
+}
+
+ResourceCondition::ResourceCondition(ResourceCondition::CheckDelegate delegate,
+    MatchMode matchMode)
+    :
+    m_delegate(delegate),
+    m_matchMode(matchMode)
+{
+}
+
+ActionVisibility ResourceCondition::check(const QnResourceList& resources,
+    QnWorkbenchContext* /*context*/)
+{
+    return GenericCondition::check<QnResourcePtr>(resources, m_matchMode,
+        [this](const QnResourcePtr& resource) { return m_delegate(resource); })
+        ? EnabledAction
+        : InvisibleAction;
+}
+
+ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets,
+    QnWorkbenchContext* /*context*/)
+{
+    return GenericCondition::check<QnResourceWidget*>(widgets, m_matchMode,
+        [this](QnResourceWidget* widget)
+        {
+            if (auto resource = ParameterTypes::resource(widget))
+                return m_delegate(resource);
+            return false;
+        })
+        ? EnabledAction
+        : InvisibleAction;
 }
 
 bool VideoWallReviewModeCondition::isVideoWallReviewMode(QnWorkbenchContext* context) const
@@ -782,6 +775,12 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
     // Export selection
     if (m_centralItemRequired)
     {
+        const auto resource = parameters.resource();
+        if (!resource.dynamicCast<QnMediaResource>())
+            return InvisibleAction;
+
+        if (!context->accessController()->hasPermissions(resource, Qn::ExportPermission))
+            return DisabledAction;
 
         const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
 
@@ -789,7 +788,6 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
         if (containsAvailablePeriods && !context->workbench()->item(Qn::CentralRole))
             return DisabledAction;
 
-        QnResourcePtr resource = parameters.resource();
         if (containsAvailablePeriods && resource && resource->flags().testFlag(Qn::sync))
         {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
@@ -800,8 +798,24 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
     // Export layout
     else
     {
+        const auto resources = ParameterTypes::resources(context->display()->widgets())
+            .filtered<QnMediaResource>();
+
+        if (resources.empty())
+            return InvisibleAction;
+
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
         if (!periods.intersects(period))
+            return DisabledAction;
+
+        const bool allowed = std::any_of(resources.cbegin(), resources.cend(),
+            [context](const QnMediaResourcePtr& resource)
+            {
+                return context->accessController()->hasPermissions(resource->toResourcePtr(),
+                    Qn::ExportPermission);
+            });
+
+        if (!allowed)
             return DisabledAction;
     }
     return EnabledAction;
@@ -978,6 +992,9 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
     if (!widget)
         return InvisibleAction;
 
+    if (!widget->hasVideo())
+        return InvisibleAction;
+
     if (context->display()->zoomTargetWidget(widget))
         return InvisibleAction;
 
@@ -1135,16 +1152,40 @@ ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters
 ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     QnWorkbenchContext* context)
 {
-    QnLayoutResourcePtr layout = context->workbench()->currentLayout()->resource();
+    const auto layout = context->workbench()->currentLayout()->resource();
     if (!layout)
         return InvisibleAction;
 
-    auto layoutItems = parameters.layoutItems();
-    const bool supported = layoutItems.empty()
-        ? isRadassSupported(layout, MatchMode::Any)
-        : isRadassSupported(layoutItems, MatchMode::Any);
+    const auto layoutItems = parameters.layoutItems();
 
-    return supported ? EnabledAction : InvisibleAction;
+    const auto itemIds =
+        [layout, layoutItems]
+        {
+            if (layoutItems.empty())
+                return layout->layoutResourceIds();
+
+            QSet<QnUuid> result;
+            for (const auto idx: layoutItems)
+            {
+                const auto item = idx.layout()->getItem(idx.uuid());
+                // Skip zoom windows.
+                if (!item.zoomTargetUuid.isNull())
+                    continue;
+
+                result.insert(item.resource.id);
+            }
+            return result;
+        }();
+
+    // Filter our non-camera items and I/O modules.
+    const auto cameras = context->resourcePool()->getResources<QnVirtualCameraResource>(itemIds)
+        .filtered([](const QnVirtualCameraResourcePtr& camera) { return camera->hasVideo(nullptr);});
+
+    if (cameras.empty())
+        return InvisibleAction;
+
+    const bool supported = isRadassSupported(cameras, MatchMode::Any);
+    return supported ? EnabledAction : DisabledAction;
 }
 
 PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):
@@ -1451,17 +1492,22 @@ ActionVisibility ResourceStatusCondition::check(const QnResourceList& resources,
     return found ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
+    QnWorkbenchContext* context)
 {
     const auto screenRecordingAction = context->action(action::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
-
-        if (!context->user())
+        const auto user = context->user();
+        if (!user)
             return InvisibleAction;
 
+        const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
+            context->commonModule()->moduleGUID(), user->getId());
+
         /* Do not check real pointer type to speed up check. */
-        QnResourcePtr desktopCamera = context->resourcePool()->getResourceByUniqueId(context->commonModule()->moduleGUID().toString());
+        const auto desktopCamera = context->resourcePool()->getResourceByUniqueId(
+            desktopCameraId);
 #ifdef DESKTOP_CAMERA_DEBUG
         NX_ASSERT(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == commonModule()->remoteGUID()),
             Q_FUNC_INFO,

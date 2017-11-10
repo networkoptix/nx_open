@@ -21,7 +21,10 @@ set(supportPhone "")
 set(licenseEmail "licenses@dwcc.tv")
 # end of Support section
 
-set(defaultWebPages "{\"Home Page\": \"http://dwspectrum.com\"}")
+set(backgroundImage
+    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Fit\"}")
+set(defaultWebPages
+    "{\"Home Page\": \"http://digital-watchdog.com/DW_Spectrum/\"}")
 
 # Custom Installer (if needed). If not leave "default"
 
@@ -78,6 +81,7 @@ set(additionalTranslations
     nl_NL
     pl_PL
     vi_VN
+    th_TH
 )
 
 # Additional Features

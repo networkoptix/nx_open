@@ -1412,7 +1412,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Audit trail afspelen</translation>
+      <translation>Systeemrapportage afspelen</translation>
     </message>
   </context>
   <context>
@@ -2109,11 +2109,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
+      <translation>I/O Module Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Camera ID</translation>
+      <translation>Camera Id</translation>
     </message>
   </context>
   <context>
@@ -3519,7 +3519,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3734,7 +3734,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware ID</translation>
+      <translation>Gelieerd aan Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3819,7 +3819,7 @@ to %1</source>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation>Activeer alstublieft uw (proef)licentie.</translation>
+      <translation>Activeer alstublieft uw (proef) licentie.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
@@ -4010,11 +4010,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware ID %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4045,11 +4045,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande hardware ID aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
+      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande hardware ID aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
+      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
     </message>
   </context>
   <context>
@@ -7144,7 +7144,7 @@ to %1</source>
     </message>
     <message>
       <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Om de video-downscaling te voorkomen, worden *.nov of *.exe formaten aanbevolen voor deze camera.</translation>
+      <translation>Om de video-downscaling te voorkomen, worden NOV of EXE formaten aanbevolen voor deze camera.</translation>
     </message>
     <message>
       <source>Export with transcoding?</source>
@@ -7156,11 +7156,11 @@ to %1</source>
     </message>
     <message>
       <source>EXE format not recommended</source>
-      <translation>*.exe formaat niet aanbevolen</translation>
+      <translation>EXE formaat niet aanbevolen</translation>
     </message>
     <message>
       <source>Export to EXE anyway?</source>
-      <translation>Toch exporteren naar *.exe?</translation>
+      <translation>Toch exporteren naar EXE?</translation>
     </message>
     <message>
       <source>Failed to export Multi-Video</source>
@@ -7204,11 +7204,11 @@ to %1</source>
     </message>
     <message>
       <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Voor het exporteren van een niet-continue opname *.mkv of een ander formaat wordt aanbevolen.</translation>
+      <translation>Voor het exporteren van een niet-continue opname MKV of een ander formaat wordt aanbevolen.</translation>
     </message>
     <message>
       <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>*.exe bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
+      <translation>EXE bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
     </message>
   </context>
   <context>

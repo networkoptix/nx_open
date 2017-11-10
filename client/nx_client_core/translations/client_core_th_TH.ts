@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation>nonce ไม่ถูกต้อง</translation>
+      <translation>Nonce ไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -70,7 +70,7 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก กรุณาติดต่อฝ่ายสนับสนุน.</translation>
+      <translation>ข้อผิดพลาดภายใน %1 โปรดติดต่อทีมสนับสนุน</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
@@ -88,7 +88,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>เจ้าของ: </translation>
+      <translation>เจ้าของ: %1</translation>
     </message>
     <message>
       <source>Your System</source>
@@ -112,7 +112,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>เจ้าของ: </translation>
+      <translation>เจ้าของ: %1</translation>
     </message>
     <message>
       <source>Your System</source>

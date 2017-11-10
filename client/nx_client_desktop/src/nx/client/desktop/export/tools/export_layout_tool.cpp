@@ -68,6 +68,9 @@ struct ExportLayoutTool::Private
     // External file storage.
     QnStorageResourcePtr storage;
 
+    // Whether any archive has been exported.
+    bool exportedAnyData = false;
+
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
         settings(settings),
@@ -348,6 +351,8 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
 bool ExportLayoutTool::start()
 {
+    d->exportedAnyData = false;
+
     if (!prepareStorage())
     {
         d->lastError = ExportProcessError::fileAccess;
@@ -407,7 +412,15 @@ bool ExportLayoutTool::exportNextCamera()
 
     if (d->resources.isEmpty())
     {
-        finishExport(true);
+        if (d->exportedAnyData)
+        {
+            finishExport(true);
+        }
+        else
+        {
+            d->lastError = ExportProcessError::dataNotFound;
+            finishExport(false);
+        }
         return false;
     }
 
@@ -418,31 +431,6 @@ bool ExportLayoutTool::exportNextCamera()
 void ExportLayoutTool::finishExport(bool success)
 {
     d->finishExport();
-
-    //TODO: #GDM restore functionality and move it to handler
-    /*
-    switch (d->settings.mode)
-    {
-        case ExportLayoutSettings::Mode::LocalSave:
-        {
-            // Take resource pool from the original layout.
-            const auto resourcePool = d->settings.layout->resourcePool();
-            NX_ASSERT(resourcePool);
-            if (!resourcePool)
-                return;
-            auto existing = resourcePool->getResourceByUrl(d->settings.filename.completeFileName())
-                .dynamicCast<QnLayoutResource>();
-            // Update existing layout.
-            NX_ASSERT(existing);
-            if (existing)
-            {
-                existing->update(m_layout);
-                snapshotManager()->store(existing);
-            }
-            break;
-        }
-    }
-    */
 
     // TODO: #GDM This is more correct "Save as" handling, but it does not work yet.
     /*
@@ -511,6 +499,15 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     const QString& /*filename*/)
 {
     d->lastError = convertError(status.lastError);
+    if (d->lastError == ExportProcessError::dataNotFound)
+    {
+        d->lastError = ExportProcessError::noError;
+        exportNextCamera();
+        return;
+    }
+
+    d->exportedAnyData = true;
+
     if (d->lastError != ExportProcessError::noError)
     {
         finishExport(false);

@@ -67,8 +67,8 @@
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
-#include <analytics/metadata_analytics_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -76,13 +76,14 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/synctime.h>
 
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
+#include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
+#include <nx/client/desktop/layout_templates/layout_template_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -174,7 +175,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initMetaInfo();
     initApplication();
     initSingletons(startupParams);
-    initRuntimeParams(startupParams);
     initLog(startupParams);
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -304,6 +304,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnClientRuntimeSettings());
     commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
 
+    initRuntimeParams(startupParams);
+
     /* Shorted initialization if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return;
@@ -329,7 +331,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new QnMetadataAnalyticsController());
+    commonModule->store(new nx::client::desktop::MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -341,6 +343,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
+
+    commonModule->store(new ResourceWidgetPixmapCache());
 
     // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
     initLocalInfo(startupParams);
@@ -367,6 +371,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
+    commonModule->store(new LayoutTemplateManager());
+
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
@@ -378,6 +384,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
+    qnRuntime->setProfilerMode(startupParams.profilerMode);
 
     if (!startupParams.engineVersion.isEmpty())
     {

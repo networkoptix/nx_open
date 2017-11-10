@@ -38,7 +38,12 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
     return ! operator == (lhs, rhs);
 }
 
-const UserAccessData kSystemAccess(QnUuid(lit("{BC292159-2BE9-4E84-A242-BC6122B315E4}")), UserAccessData::Access::System);
-const UserAccessData kVideowallUserAccess(QnUuid(lit("{1044D2A5-639D-4C49-963E-C03898D0C113}")), UserAccessData::Access::ReadAllResources);
+const UserAccessData kSystemAccess(
+    QnUuid(lit("{BC292159-2BE9-4E84-A242-BC6122B315E4}")),
+    UserAccessData::Access::System);
+
+const UserAccessData kVideowallUserAccess(
+    QnUuid(lit("{1044D2A5-639D-4C49-963E-C03898D0C113}")),
+    UserAccessData::Access::ReadAllResources);
 
 }

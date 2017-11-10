@@ -3738,7 +3738,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;サーバーが見つかりません></translation>
+      <translation>サーバーが見つかりません</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4248,7 +4248,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（ツアー&quot;%2&quot; が有効）</translation>
+      <translation>%1(ツアー&quot;%2&quot; が有効)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4264,7 +4264,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>トリガ%1（%2）の呼び出しに失敗しました</translation>
+      <translation>トリガ%1(%2)の呼び出しに失敗しました</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -4273,7 +4273,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>スケジュールで無効</translation>
     </message>
   </context>
   <context>

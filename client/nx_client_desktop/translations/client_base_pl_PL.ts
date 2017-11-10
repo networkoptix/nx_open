@@ -2372,7 +2372,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla bieżącej kamery to %1.  Aktualnie wybrano %2.</translation>
+      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla bieżącej kamery to %1. Aktualnie wybrano %2.</translation>
     </message>
     <message>
       <source>Too many motion areas</source>
@@ -2384,7 +2384,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla dowolnego czujnika bieżącej kamery to %1.  Aktualnie wybrano %2.</translation>
+      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla dowolnego czujnika bieżącej kamery to %1. Aktualnie wybrano %2.</translation>
     </message>
   </context>
   <context>
@@ -4342,7 +4342,7 @@ to %1</source>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>NA ŻYWO</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4745,9 +4745,9 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>około %d minutę temu</numerusform>
-        <numerusform>około %d minuty temu</numerusform>
-        <numerusform>około %d minut temu</numerusform>
+        <numerusform>około %n minutę temu</numerusform>
+        <numerusform>około %n minuty temu</numerusform>
+        <numerusform>około %n minut temu</numerusform>
       </translation>
     </message>
     <message>

@@ -11,6 +11,7 @@
 #include <openssl/md5.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 
@@ -19,6 +20,7 @@ namespace cdb {
 namespace api {
 
 namespace {
+
 static const char kSecretNonceKey[] = "neurod.ru";
 static const size_t kCdbNonceSize = 31;
 
@@ -46,6 +48,7 @@ void calcNonceHash(
     MD5_Update(&md5Ctx, kSecretNonceKey, strlen(kSecretNonceKey));
     MD5_Final(reinterpret_cast<unsigned char*>(md5HashBuf), &md5Ctx);
 }
+
 }   // namespace
 
 std::string calcNonceHash(
@@ -70,7 +73,11 @@ std::string generateCloudNonceBase(const std::string& systemId)
     // TODO: #ak Replace with proper vector function when available.
     char randomBytes[kRandomBytesCount+1];
     for (int i = 0; i < kRandomBytesCount; ++i)
-        randomBytes[i] = nx::utils::random::number<int>('a', 'z');
+    {
+        randomBytes[i] = nx::utils::random::number(
+            nx::utils::random::CryptographicRandomDevice::instance(),
+            (int)'a', (int)'z');
+    }
     randomBytes[kRandomBytesCount] = '\0';
 
     QByteArray md5Hash;
@@ -138,7 +145,11 @@ std::string generateNonce(const std::string& cloudNonce)
 
     // Adding trailing random bytes.
     for (; noncePos < nonce.size(); ++noncePos)
-        nonce[noncePos] = nx::utils::random::number<int>('a', 'z');
+    {
+        nonce[noncePos] = nx::utils::random::number(
+            nx::utils::random::CryptographicRandomDevice::instance(),
+            (int)'a', (int)'z');
+    }
 
     return nonce;
 }

@@ -255,18 +255,6 @@
       <translation>ポートt %1 にアクセス可能か確認してください.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>まず、録画をOnにしてデバイス設定で fps を減少します</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>まず、録画をOnにしてカメラ設定で fps を減少します</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>解決しない場合はデバイスの web ページで工場出荷時に戻します</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>カメラはアーカイブから復元されました　カメラを削除して再度登録すると、ライブビデオが表示されます</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>まず、録画をOnにしてデバイス設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>まず、録画をOnにしてカメラ設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
     </message>
   </context>
   <context>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
+      <translation>I/Oモジュール %1 切断</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1288,7 +1288,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

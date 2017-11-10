@@ -23,7 +23,7 @@ public:
     QnPasswordInformation(nx::utils::PasswordStrength strength);
 
     typedef std::function<nx::utils::PasswordStrength(const QString&)> AnalyzeFunction;
-    QnPasswordInformation(const QString& password, AnalyzeFunction passwordAnalyzer = nx::utils::passwordStrength);
+    QnPasswordInformation(const QString& password, AnalyzeFunction passwordAnalyzer);
 
     bool operator == (const QnPasswordInformation& other) const;
     bool operator != (const QnPasswordInformation& other) const;

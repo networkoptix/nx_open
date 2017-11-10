@@ -21,13 +21,13 @@ const int kKeepAliveIntervalMs = 5 * 1000;
 struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
 {
     ClientConnectionInfo(
-        const TCPSocketPtr& socket, 
-        const QString& userName, 
-        const QString& userId)
+        const TCPSocketPtr& socket,
+        const QString& userName,
+        const QString& uniqueId)
         :
         socket(socket),
         userName(userName),
-        userId(userId)
+        uniqueId(uniqueId)
     {
         timer.restart();
     }
@@ -37,7 +37,9 @@ struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
     quint32 cSeq = 0;
     QElapsedTimer timer;
     QString userName;
-    QString userId;
+
+    // Combination of user name and module guid.
+    QString uniqueId;
 };
 
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher(QnCommonModule* commonModule):
@@ -58,7 +60,7 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 void QnDesktopCameraResourceSearcher::registerCamera(
     const QSharedPointer<AbstractStreamSocket>& connection,
     const QString& userName,
-    const QString& userId)
+    const QString& uniqueId)
 {
     connection->setSendTimeout(1);
     QnMutexLocker lock(&m_mutex);
@@ -71,13 +73,13 @@ void QnDesktopCameraResourceSearcher::registerCamera(
             log("cleanup disconnected socket desktop camera", *it);
             it = m_connections.erase(it);
         }
-        else if (it->userId == userId && it->useCount == 0)
+        else if (it->uniqueId == uniqueId && it->useCount == 0)
         {
             log("cleanup connection on new register", *it);
             it->socket->close();
             it = m_connections.erase(it);
         }
-        else if (it->userId == userId)
+        else if (it->uniqueId == uniqueId)
         {
             log("registerCamera skipped while in use", *it);
             return;
@@ -88,9 +90,9 @@ void QnDesktopCameraResourceSearcher::registerCamera(
         }
     }
 
-    NX_ASSERT(!isClientConnectedInternal(userId), Q_FUNC_INFO, "Camera should definitely be disconnected here");
+    NX_ASSERT(!isClientConnectedInternal(uniqueId), Q_FUNC_INFO, "Camera should definitely be disconnected here");
 
-    const ClientConnectionInfo info(connection, userName, userId);
+    const ClientConnectionInfo info(connection, userName, uniqueId);
     m_connections << info;
 
     // Add camera to the pool immediately.
@@ -119,10 +121,10 @@ QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(
 
 bool QnDesktopCameraResourceSearcher::isClientConnectedInternal(const QString& uniqueId) const
 {
-    return std::find_if(m_connections.cbegin(), m_connections.cend(), 
+    return std::find_if(m_connections.cbegin(), m_connections.cend(),
         [&uniqueId](const ClientConnectionInfo& info)
         {
-            return info.userId == uniqueId;
+            return info.uniqueId == uniqueId;
         }) != m_connections.end();
 }
 
@@ -131,26 +133,37 @@ bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraRes
 {
     cleanupConnections();
 
-    const auto userId = camera->getUniqueId();
+    const auto uniqueId = camera->getUniqueId();
     QnMutexLocker lock(&m_mutex);
-    return isClientConnectedInternal(userId);
+    return isClientConnectedInternal(uniqueId);
 }
 
-QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(const ClientConnectionInfo& info) 
+QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(const ClientConnectionInfo& info)
 {
     auto cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
     cam->setModel(lit("virtual desktop camera"));   // TODO: #GDM globalize the constant
     cam->setTypeId(QnResourceTypePool::kDesktopCameraTypeUuid);
-    cam->setPhysicalId(info.userId);
+    cam->setPhysicalId(info.uniqueId);
     return cam;
 }
 
 QnResourceList QnDesktopCameraResourceSearcher::findResources()
 {
-    return QnResourceList();
+    cleanupConnections();
+
+    // We must provide all found cameras to avoid moving them to Offline status.
+    QnResourceList result;
+
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& info: m_connections)
+    {
+        if (const auto camera = cameraFromConnection(info))
+            result << camera;
+    }
+    return result;
 }
 
-QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid& resourceTypeId, 
+QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid& resourceTypeId,
     const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
@@ -204,12 +217,12 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
     }
 }
 
-TCPSocketPtr QnDesktopCameraResourceSearcher::acquireConnection(const QString& userId)
+TCPSocketPtr QnDesktopCameraResourceSearcher::acquireConnection(const QString& uniqueId)
 {
     QnMutexLocker lock(&m_mutex);
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
-        if (it->userId != userId)
+        if (it->uniqueId != uniqueId)
             continue;
         it->useCount++;
         log("acquiring desktop camera connection", *it);
@@ -246,10 +259,10 @@ void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& sock
     }
 }
 
-void QnDesktopCameraResourceSearcher::log(const QByteArray& message, 
+void QnDesktopCameraResourceSearcher::log(const QByteArray& message,
     const ClientConnectionInfo& info) const
 {
-    NX_VERBOSE(this) message << info.userName << info.userId << info.useCount;
+    NX_VERBOSE(this) message << info.userName << info.uniqueId << info.useCount;
 }
 
 #endif //ENABLE_DESKTOP_CAMERA

@@ -2514,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation>Etiqueta de Texto</translation>
+      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>

@@ -4,12 +4,15 @@
 
 #include <core/ptz/ptz_limits.h>
 
-#include <plugins/resource/onvif/onvif_resource.h>
-#include <plugins/resource/hanwha/hanwha_attributes.h>
-#include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
+#include <plugins/resource/hanwha/hanwha_attributes.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
+#include <plugins/resource/hanwha/hanwha_stream_limits.h>
+#include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
+#include <plugins/resource/hanwha/hanwha_archive_delegate.h>
+#include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
 #include <nx/utils/timer_holder.h>
@@ -33,6 +36,8 @@ public:
     virtual ~HanwhaResource() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+
+    virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
 
@@ -68,9 +73,15 @@ public:
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
-    QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(
+        const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    QnSemaphore* requestSemaphore();
+    SessionContextPtr session(
+        HanwhaSessionType sessionType,
+        const QnUuid& clientId,
+        bool generateNewOne = false);
+
+    std::unique_ptr<QnAbstractArchiveDelegate> remoteArchiveDelegate();
 
     bool isVideoSourceActive();
 
@@ -101,9 +112,15 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
-
+    QString focusMode() const;
     QString nxProfileName(Qn::ConnectionRole role) const;
 
+    static const QString kNormalizedSpeedPtzTrait;
+    static const QString kHas3AxisPtz;
+
+    std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
+
+    virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -111,9 +128,8 @@ protected:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
 private:
-    CameraDiagnostics::Result init();
+    CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
-    CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
@@ -152,8 +168,8 @@ private:
     QString defaultValue(const QString& parameter, Qn::ConnectionRole role) const;
 
     QString suggestCodecProfile(
-        AVCodecID codec, 
-        Qn::ConnectionRole role, 
+        AVCodecID codec,
+        Qn::ConnectionRole role,
         const QString& desiredProfile) const;
 
     QSize bestSecondaryResolution(
@@ -177,7 +193,7 @@ private:
         QnCameraAdvancedParameter* inOutParameter,
         const HanwhaAdavancedParameterInfo& info) const;
 
-    using CreateDependencyFunc = 
+    using CreateDependencyFunc =
         std::function<QnCameraAdvancedParameterDependency(
             const HanwhaCodecLimits& codecLimits,
             AVCodecID codec,
@@ -223,6 +239,9 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
+    bool executeCommandInternal(
+        const HanwhaAdavancedParameterInfo& info,
+        const HanwhaRequestHelper::Parameters& parameters);
 
     void initMediaStreamCapabilities();
 
@@ -264,12 +283,16 @@ private:
     HanwhaAttributes m_attributes;
     HanwhaCgiParameters m_cgiParameters;
     bool m_isNvr = false;
+    QString m_focusMode;
 
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;
     std::atomic<bool> m_areInputPortsMonitored{false};
 
     nx::utils::TimerHolder m_timerHolder;
+    std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
+    std::unique_ptr<HanwhaRemoteArchiveManager> m_remoteArchiveManager;
+    std::unique_ptr<HanwhaArchiveDelegate> m_remoteArchiveDelegate;
 };
 
 } // namespace plugins

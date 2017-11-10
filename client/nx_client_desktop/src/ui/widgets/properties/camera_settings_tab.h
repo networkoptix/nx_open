@@ -10,7 +10,7 @@ namespace Qn {
         MotionSettingsTab,
         FisheyeCameraSettingsTab,
         AdvancedCameraSettingsTab,
-        ExpertCameraSettingsTab
+        ExpertCameraSettingsTab,
     };
 
 } // namespace Qn

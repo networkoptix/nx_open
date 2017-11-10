@@ -211,7 +211,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Audit Trail</translation>
+      <translation>Systeemrapportage</translation>
     </message>
     <message>
       <location/>
@@ -727,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation>Input ID</translation>
+      <translation>Input Id</translation>
     </message>
   </context>
   <context>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation>Uitgang ID:</translation>
+      <translation>Uitgang Id:</translation>
     </message>
   </context>
   <context>
@@ -1127,7 +1127,7 @@
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>minuten van inactiviteit</translation>
+      <translation>Minuten van inactiviteit</translation>
     </message>
     <message>
       <location/>
@@ -1393,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation>Gelieerd aan hardware ID:</translation>
+      <translation>Gelieerd aan Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1492,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>Hardware ID</translation>
+      <translation>Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1609,7 +1609,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>Toon het IP adres achter het apparaat</translation>
+      <translation>Toon extra informatie in de boom</translation>
     </message>
     <message>
       <location/>
@@ -2514,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation>Text label</translation>
+      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2532,12 +2532,12 @@
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation>Beveiligde verbinding via TLS</translation>
+      <translation>Beveiligde verbinding via TLS.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation>Beveiligde verbinding via SSL</translation>
+      <translation>Beveiligde verbinding via SSL.</translation>
     </message>
     <message>
       <location/>
@@ -2764,7 +2764,7 @@
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>Audit trail inschakelen</translation>
+      <translation>Systeemrapportage inschakelen</translation>
     </message>
     <message>
       <location/>

@@ -139,6 +139,9 @@ private:
     /** Additional flag, set to true when the process is stopped from outside. */
     bool m_stopped = false;
 
+    // Whether any archive has been exported.
+    bool m_exportedAnyData = false;
+
     QnClientVideoCamera* m_currentCamera = nullptr;
 };
 

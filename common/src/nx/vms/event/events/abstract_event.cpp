@@ -54,7 +54,7 @@ QList<EventType> childEvents(EventType eventType)
             return {
                 cameraDisconnectEvent,
                 networkIssueEvent,
-                cameraIpConflictEvent
+                cameraIpConflictEvent,
             };
 
         // Some critical issue occurred on the server.

@@ -727,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation>입력 ID</translation>
+      <translation>입력 Id</translation>
     </message>
   </context>
   <context>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation>출력 ID :</translation>
+      <translation>출력 Id:</translation>
     </message>
   </context>
   <context>
@@ -1393,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation>하드웨어 ID에 잠김 :</translation>
+      <translation>하드웨어 Id에 잠김:</translation>
     </message>
   </context>
   <context>
@@ -1492,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>하드웨어 ID:</translation>
+      <translation>하드웨어 Id:</translation>
     </message>
   </context>
   <context>
@@ -2205,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>최상 화질및 해상도를  위해서는 강력한 PC 시용를 권합니다.</translation>
+      <translation>최상 화질및 해상도를 위해서는 강력한 PC 시용를 권합니다.</translation>
     </message>
     <message>
       <location/>
@@ -2514,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation>TextLabel</translation>
+      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>

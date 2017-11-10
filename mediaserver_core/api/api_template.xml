@@ -717,6 +717,27 @@
                           Duration of -1 means the last chunk is being recorded now.</caption>
                     </result>
                 </function>
+                <function>
+                    <name>getHardwareIdsOfServers</name>
+                    <description>Return the list of Hardware Ids for each server in the system
+                        which is online at the moment of executing this function.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON with an error code, error message and a list of JSON objects
+                            in "reply" field:</caption>
+                        <params>
+                            <param>
+                                <name>serverId</name>
+                                <description>Id of a server.</description>
+                            </param>
+                            <param>
+                                <name>hardwareIds</name>
+                                <description>All Hardware Ids of the server, as a list of strings.</description>
+                            </param>
+                        </params>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>
@@ -1147,7 +1168,7 @@
                     <result>
                         <caption>JSON with an error code, error message and a list of JSON objects in "reply" field:</caption>
                         <params>
-                            <param>TO
+                            <param>
                                 <name>actionType</name>
                                 <description>Type of the action.</description>
                                 <values>
@@ -2009,7 +2030,7 @@ content type "application/json". Example of such object:
                     <method>GET</method>
                     <params/>
                     <result>
-                      <caption>JSON with a list of the discovered peers</caption>
+                      <caption>JSON with a list of the discovered peers.</caption>
                     </result>
                   </function>
                   <function proprietary="true">
@@ -2610,7 +2631,47 @@ the respective JSON fields can be empty.</description>
                           </param>
                       </params>
                   </result>
-              </function>
+                </function>
+                <function>
+                    <name>getHardwareIds</name>
+                    <description>Return the list of Hardware Ids of the server.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON with an error code, error message and a list of strings in "reply" field.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>changeCameraPassword</name>
+                    <description>
+                    Change password for already existing user on a camera.</description>
+                    <permissions>Administrator.</permissions>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
+                                MAC address (not supported for certain cameras).</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>user</name>
+                            <description>
+                              User name.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>
+                              New password to set.</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON result with error code</caption>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>

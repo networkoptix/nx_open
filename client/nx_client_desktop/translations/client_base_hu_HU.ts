@@ -6033,7 +6033,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>Archív biztonsági mentés befejeződött &lt;/b&gt;%1&lt;/b&gt;-ig</translation>
+      <translation>Archív biztonsági mentés befejeződött &lt;b&gt;%1&lt;/b&gt;-ig</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
@@ -6447,17 +6447,17 @@ to %1</source>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>ó ap</translation>
+      <translation>h ap</translation>
     </message>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>nn</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>HHHH</translation>
+      <translation>MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>

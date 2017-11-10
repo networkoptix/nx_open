@@ -73,12 +73,23 @@ fieldset[disabled] .btn-primary.active {
 #top.navbar-default .navbar-toggle .icon-bar {
     background-color: #98be2f; }
 
-
-
 a{
     color:#A5CE39;
 }
 
 a:visited{
     color:#98BF2F;
+}
+
+.info-icon.active {
+    color: #A5CE39 !important;
+}
+
+.video-settings-button:hover,
+.webclient-panel .dropdown-menu > li > a:hover{
+    background-color: #98be2f !important;
+}
+
+.webclient-panel .dropdown-menu > li > a.active{
+    background-color: #93b82e !important;
 }

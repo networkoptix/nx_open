@@ -61,6 +61,10 @@ public:
 
     QSettings* roSettings() const;
     QSettings* runTimeSettings() const;
+
+    std::chrono::milliseconds lastRunningTime() const;
+    void setLastRunningTime(std::chrono::milliseconds value) const;
+
     MSSettings* settings() const;
     nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::mediaserver::LicenseWatcher* licenseWatcher() const;

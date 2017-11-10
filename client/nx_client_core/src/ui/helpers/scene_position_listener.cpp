@@ -1,6 +1,8 @@
 #include "scene_position_listener.h"
 #include <QtQuick/private/qquickitem_p.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 const QQuickItemPrivate::ChangeTypes kAncestorChangeTypes =
@@ -105,7 +107,7 @@ void QnScenePositionListener::itemChildRemoved(QQuickItem* item, QQuickItem* chi
 
 void QnScenePositionListener::itemDestroyed(QQuickItem* item)
 {
-    Q_ASSERT(m_item == item);
+    NX_ASSERT(m_item == item);
 
     // Remove all injected listeners.
     m_item = nullptr;

@@ -1,7 +1,7 @@
 
 <form class="form-horizontal" novalidate ng-if="!activeGroup.urlPrefix">
     <div class="form-group">
-        <label class="col-sm-2 control-label">{{apiMethod.method}} :</label>
+        <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{activeFunction.url}}</p>
         </div>
@@ -20,7 +20,7 @@
             <div class="help-block" ng-if="param.values && param.values.length>0">
                 <ul>
                     <li ng-repeat="value in param.values">
-                        <b> {{value.name}} </b> <span ng-if="value.description.xml"> : </span>
+                        <b>{{value.name}}</b><span ng-if="value.description.xml">: </span>
                         <span ng-bind-html="value.description.xml"></span>
                     </li>
                 </ul>
@@ -38,7 +38,7 @@
 
 <form class="form-horizontal" novalidate ng-if="activeGroup.urlPrefix">
     <div class="form-group">
-        <label class="col-sm-2 control-label">{{apiMethod.method}} :</label>
+        <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{activeFunction.url}}</p>
         </div>
@@ -81,7 +81,7 @@
                     </span>
                 </div>
                 <p class="help-block" ng-switch-when="timestamp">
-                    <i>타임 스탬프 : {{apiMethod.params[param.name].getTime()}}</i>
+                    <i>타임 스탬프: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
 
                 <input type="text"
@@ -97,7 +97,7 @@
                        typeahead-focus
  class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
-                    <i>선택된 카메라 : {{cameraIds[apiMethod.params[param.name]].name}}</i>
+                    <i>선택된 카메라: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
 
                 <span ng-switch-when="info"></span>
@@ -122,7 +122,7 @@
                 <label>
                     <input type="checkbox" ng-model="apiMethod.addCredentials"> 인증 사용
                 </label>
-                <p class="help-block">URL에 로그인 과 패스워드 추가</p>
+                <p class="help-block">Url에 로그인 과 패스워드 추가</p>
             </div>
         </div>
     </div>
@@ -187,7 +187,7 @@
         <div class="col-sm-10">
             <img style="max-width:100%" ng-src="{{result.image}}">
             <div class="col-sm-10">
-                <p class="help-block">콘텐츠 유형 : {{result.contentType}}</p>
+                <p class="help-block">콘텐츠 유형: {{result.contentType}}</p>
             </div>
         </div>
     </div>

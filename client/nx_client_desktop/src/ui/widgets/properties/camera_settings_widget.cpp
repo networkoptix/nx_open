@@ -111,6 +111,22 @@ void QnCameraSettingsWidget::setCurrentTab(Mode mode, Qn::CameraSettingsTab tab)
     }
 }
 
+void QnCameraSettingsWidget::setLockedMode(bool value)
+{
+    switch (mode())
+    {
+        case SingleMode:
+            m_singleWidget->setLockedMode(value);
+            break;
+        case MultiMode:
+            m_multiWidget->setLockedMode(value);
+            break;
+        default:
+            break;
+    }
+
+}
+
 void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab)
 {
     setCurrentTab(mode(), tab);
@@ -248,7 +264,7 @@ void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled)
             m_singleWidget->setExportScheduleButtonEnabled(enabled);
             break;
         case MultiMode:
-            m_multiWidget->setExportScheduleButtonEnabled(enabled);
+            m_multiWidget->setExportScheduleButtonEnabled(false);
             break;
         default:
             break;

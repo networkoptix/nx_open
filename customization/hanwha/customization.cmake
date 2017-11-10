@@ -2,9 +2,9 @@ set(defaultSkin "dark_orange")
 set(parent.customization "digitalwatchdog")
 
 # Components Namings
-set(display.product.name "WAVE")
+set(display.product.name "Wisenet WAVE")
 set(display.mobile.name "WAVE Mobile")
-set(product.name "WAVE")
+set(product.name "Wisenet WAVE")
 set(product.name.short "hanwha")
 set(product.appName "wave")
 set(company.name "Hanwha")
@@ -18,10 +18,14 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 # Support section
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
-set(supportUrl "")
-set(supportEmail "support@hanwhasecurity.com")
+set(supportUrl "https://wavevms.com/content/support")
+set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail "WAVElicense@hanwha.com")
+set(licenseEmail
+    "<table>
+        <tr><td>US-<a href=\"mailto:WAVElicense@hanwha.com\">support@hanwhasecurity.com</a></td><td></td></tr>
+        <tr><td>Europe-<a href=\"mailto:WAVElicense2@hanwha.com\">eucctv.help@hanwha.com</a></td><td></td></tr>
+    </table>")
 
 set(installer.name "wave")
 set(android.packageName "com.hanwhasecurity.wavemobile")
@@ -85,4 +89,5 @@ set(additionalTranslations
     nl_NL
     pl_PL
     vi_VN
+    th_TH
 )

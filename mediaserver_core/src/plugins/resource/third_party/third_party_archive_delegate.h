@@ -39,7 +39,7 @@ public:
     //!Implementation of QnAbstractArchiveDelegate::getAudioLayout
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
     //!Implementation of QnAbstractArchiveDelegate::onReverseMode
-    virtual void onReverseMode( qint64 displayTime, bool value ) override;
+    virtual void setSpeed( qint64 displayTime, double value ) override;
     //!Implementation of QnAbstractArchiveDelegate::setSingleshotMode
     virtual void setSingleshotMode( bool value ) override;
     //!Implementation of QnAbstractArchiveDelegate::setQuality

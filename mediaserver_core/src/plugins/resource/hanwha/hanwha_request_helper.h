@@ -10,18 +10,20 @@
 #include <plugins/resource/hanwha/hanwha_attributes.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
+#include <plugins/resource/hanwha/hanwha_common.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+class HanwhaSharedResourceContext;
 
 class HanwhaRequestHelper
 {
 public:
     using Parameters = std::map<QString, QString>;
 
-    HanwhaRequestHelper(const HanwhaResourcePtr& resource);
-    HanwhaRequestHelper(const QAuthenticator& auth, const QString& url);
+    HanwhaRequestHelper(const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -59,7 +61,18 @@ public:
         const QString& path,
         const Parameters& parameters = Parameters());
 
+    HanwhaResponse check(
+        const QString& path,
+        const Parameters& parameters = Parameters());
+
     void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
+
+    static QUrl buildRequestUrl(
+        QUrl deviceUrl,
+        const QString& cgi,
+        const QString& submenu,
+        const QString& action,
+        std::map<QString, QString> parameters);
 
 private:
     QUrl buildRequestUrl(
@@ -82,11 +95,13 @@ private:
         const Parameters& parameters,
         const QString& groupBy = QString());
 
+    QUrl makeBypassUrl(const QUrl& url) const;
+
 private:
-    const QAuthenticator m_auth;
-    const QString m_url;
+    const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
+    const QString m_channel;
     bool m_ignoreMutexAnalyzer = false;
-    QnSemaphore* m_requestSemaphore = nullptr;
+    bool m_bypass = false;
 };
 
 } // namespace plugins

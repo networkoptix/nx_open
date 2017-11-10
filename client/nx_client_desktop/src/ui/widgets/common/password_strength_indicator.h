@@ -18,7 +18,9 @@ class QnPasswordStrengthIndicator : public QWidget
     Q_PROPERTY(QMargins textMargins READ textMargins WRITE setTextMargins)
 
 public:
-    explicit QnPasswordStrengthIndicator(QLineEdit* lineEdit);
+    explicit QnPasswordStrengthIndicator(
+        QLineEdit* lineEdit,
+        QnPasswordInformation::AnalyzeFunction analyzeFunction);
     virtual ~QnPasswordStrengthIndicator() override;
 
     const QnPasswordInformation& currentInformation() const;

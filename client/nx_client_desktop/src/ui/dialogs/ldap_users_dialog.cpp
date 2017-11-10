@@ -75,7 +75,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     {
         QnMediaServerResourcePtr server = commonModule()->currentServer();
 
-        Q_ASSERT(server);
+        NX_ASSERT(server);
         if (!server)
         {
             stopTesting(tr("Could not load users."));

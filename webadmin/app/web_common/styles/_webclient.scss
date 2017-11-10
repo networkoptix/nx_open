@@ -98,11 +98,7 @@
         padding-left:15px;
 
         &.active{
-          background-color: $brand_core !important;
           color:$light1;
-        }
-        &:hover{
-          background-color: $light16;
         }
       }
     }
@@ -253,10 +249,6 @@ table.webclient-window>tbody>tr>td{
       float: right;
       width: 44px;
       height: 44px;
-      &.active{
-        color: $blue10 !important;  
-      }
-      
       &:hover, &.active:hover{
         background-color: $additional_light3 !important;  
       }
@@ -480,7 +472,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 112;
+    z-index: 110;
 
     & table{
       font-size: 12px;
@@ -839,7 +831,7 @@ table.webclient-window>tbody>tr>td{
   }
 
   .cameras-panel-toggle{
-    z-index: 10;
+    z-index: 200;
     position: absolute;
     width: 100% !important;
   }
@@ -872,7 +864,6 @@ table.webclient-window>tbody>tr>td{
 
   .stick-to-top{
     height: 60px !important;
-    margin-top: 4px;
   }
 }
 

@@ -270,13 +270,13 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         return; // can't reset right now
     }
 
-    //closeDecoder();
-    //openDecoder();
-    //return;
+    QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
+    m_passedContext = nullptr;
 
-    if (m_passedContext && data->context)
+    if (data->context)
 	{
         m_codec = findCodec(data->context->getCodecId());
+        m_passedContext = avcodec_alloc_context3(nullptr);
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
     }
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
@@ -387,7 +387,11 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (data && m_codecId!= data->compressionType) {
         if (m_codecId != AV_CODEC_ID_NONE && data->context)
+        {
+            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+                return false; //< Can't switch decoder to new codec right now.
             resetDecoder(data);
+        }
         m_codecId = data->compressionType;
     }
 

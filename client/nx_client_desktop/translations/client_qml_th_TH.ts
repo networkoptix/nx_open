@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณ หรือกดปุ่ม "เชื่อมการป้อนเซิร์ฟเวอร์รู้จักอยู่</translation>
+      <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณหรือกดปุ่ม &quot;เชื่อมต่อกับเซิร์ฟเวอร์&quot; เพื่อป้อนที่อยู่เซิร์ฟเวอร์ที่รู้จัก</translation>
     </message>
   </context>
   <context>
@@ -88,15 +88,15 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น ...</translation>
+      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์...</translation>
     </message>
   </context>
 </TS>

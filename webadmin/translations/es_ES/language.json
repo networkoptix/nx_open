@@ -1,116 +1,143 @@
 {
-  "language_name":"Español",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Visitar este enlace",
-    "openLinkWithTitle":"Para {{title}} visitar este enlace"
-  },
-  "setup":{
-    "createAccount":"crear cuenta",
-    "errorNoHDD":"Este dispositivo está diseñado para trabajar con disco duro instalado. <br>Por favor apague el dispositivo e instalar un disco duro.",
-    "errorNoNetwork":"Este dispositivo necesita la conexión de red para trabajar. <br>Por favor lo conecte a la local red ot Internet"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"La contraseña debe tener al menos 8 caracteres",
-    "requiredMessage":"Se permiten sólo letras, números y símbolos de teclado",
-    "weakMessage":"La contraseña debe tener diferentes tipos de símbolos",
-    "strongMessage":"¡Contraseña segura!",
-    "commonMessage":"Esta contraseña está en la lista de las contraseñas más populares"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Servidor",
-      "system":"Sistema",
-      "device":"Dispositivo"
+    "language_name": "Español",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Visitar este enlace",
+        "openLinkWithTitle": "Para {{title}} visitar este enlace"
     },
-    "confirmRestart":"¿Reiniciar el servidor?",
-    "couldntCheckInternet":"No se pudo comprobar conexión de nube",
-    "confirmRestoreDefault":"¿Borrar configuración y base de datos? Este proceso tomará algún tiempo y el servidor se reiniciará luego.",
-    "confirmRestoreDefaultTitle":"Restaurar valores predeterminados de fábrica",
-    "unexpectedError":"Error: error inesperado ha ocurrido",
-    "connnetionError":"Error de conexión",
-    "wrongPassword":"Contraseña incorrecta.",
-    "error":"Error: ",
-    "restartNeeded":"Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
-    "settingsSaved":"Configuraciones guardadas",
-    "confirmHardwareRestart":"¿Reiniciar el sistema operativo de servidor?",
-    "confirmRestoreSettings":"¿Restaurar todas las configuraciones del servidor? Se guardará el archivo, pero se restablecerá la configuración de la red.",
-    "confirmRestoreSettingsNotNetwork":"¿Restablecer la configuración del servidor? Configuración de red y el archivo se guardará.",
-    "unavailable":"No Disponible",
-    "unsafePortConfirm":"No es seguro utilizar puerto número 1025 menos. Servidor podría no ser accesible. ¿Continuar de todos modos?",
-    "confirmDisconnectFromCloud":"Desconecte el sistema de {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
-    "confirmDisconnectFromCloudAction":"Desconectar",
-    "disconnectedFromCloudSuccess":"Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
-    "confirmDisconnectFromSystem":"Separar el servidor del sistema actual",
-    "confirmDisconnectFromSystemAction":"Separar",
-    "disconnectedFromSystemSuccess":"Servidor fue separado del sistema con éxito",
-    "connectedSuccess":"Sistema fue conectado con éxito",
-    "createLocalOwnerTitle":"Crear administrador local",
-    "confirmChangePassword":"Cambiar contraseña de admin",
-    "confirmChangePasswordTitle":"¿Cambiar contraseña del sistema? Afectará a usuario 'admin' y la contraseña de root para algunos servidores",
-    "confirmChangePasswordAction":"Guardar nueva contraseña",
-    "nx1ControlHint":"Aplicación de cliente se ha iniciado. Utilizar un teclado/ratón o una aplicación móvil para controlarla."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Monitoreo de Salud",
-      "storage":"Almacenamiento",
-      "log":"Registro"
+    "setup": {
+        "createAccount": "crear cuenta",
+        "errorNoHDD": "Este dispositivo está diseñado para trabajar con disco duro instalado. <br>Por favor apague el dispositivo e instalar un disco duro.",
+        "errorNoNetwork": "Este dispositivo necesita la conexión de red para trabajar. <br>Por favor lo conecte a la local red ot Internet"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
+        "requiredMessage": "Se permiten sólo letras, números y símbolos de teclado",
+        "weakMessage": "La contraseña debe tener diferentes tipos de símbolos",
+        "strongMessage": "¡Contraseña segura!",
+        "commonMessage": "Esta contraseña está en la lista de las contraseñas más populares"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Servidor",
+            "system": "Sistema",
+            "device": "Dispositivo"
+        },
+        "confirmRestart": "¿Reiniciar el servidor?",
+        "couldntCheckInternet": "No se pudo comprobar conexión de nube",
+        "confirmRestoreDefault": "¿Borrar configuración y base de datos? Este proceso tomará algún tiempo y el servidor se reiniciará luego.",
+        "confirmRestoreDefaultTitle": "Restaurar valores predeterminados de fábrica",
+        "unexpectedError": "Error: error inesperado ha ocurrido",
+        "connnetionError": "Error de conexión",
+        "wrongPassword": "Contraseña incorrecta.",
+        "error": "Error: ",
+        "restartNeeded": "Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
+        "settingsSaved": "Configuraciones guardadas",
+        "confirmHardwareRestart": "¿Reiniciar el sistema operativo de servidor?",
+        "confirmRestoreSettings": "¿Restaurar todas las configuraciones del servidor? Se guardará el archivo, pero se restablecerá la configuración de la red.",
+        "confirmRestoreSettingsNotNetwork": "¿Restablecer la configuración del servidor? Configuración de red y el archivo se guardará.",
+        "unavailable": "No Disponible",
+        "unsafePortConfirm": "No es seguro utilizar puerto número 1025 menos. Servidor podría no ser accesible. ¿Continuar de todos modos?",
+        "confirmDisconnectFromCloud": "Desconecte el sistema de {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
+        "confirmDisconnectFromCloudAction": "Desconectar",
+        "disconnectedFromCloudSuccess": "Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
+        "confirmDisconnectFromSystem": "Separar el servidor del sistema actual",
+        "confirmDisconnectFromSystemAction": "Separar",
+        "disconnectedFromSystemSuccess": "Servidor fue separado del sistema con éxito",
+        "connectedSuccess": "Sistema fue conectado con éxito",
+        "createLocalOwnerTitle": "Crear administrador local",
+        "confirmChangePassword": "Cambiar contraseña de admin",
+        "confirmChangePasswordTitle": "¿Cambiar contraseña del sistema? Afectará a usuario 'admin' y la contraseña de root para algunos servidores",
+        "confirmChangePasswordAction": "Guardar nueva contraseña",
+        "nx1ControlHint": "Aplicación de cliente se ha iniciado. Utilizar un teclado/ratón o una aplicación móvil para controlarla."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Monitoreo de Salud",
+            "storage": "Almacenamiento",
+            "log": "Registro"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Sistema es inaccesible o no existe.",
+        "incorrectCurrentPassword": "Contraseña actual es incorrecto.",
+        "incorrectRemotePassword": "Nombre de usuario o contraseña son incorrectos.",
+        "incompatibleVersion": "Sistema es inalcanzable, no existe o tiene versión incompatible.",
+        "wrongUrl": "No se puede conectar al servidor especificado.",
+        "newSystemError": "No se puede unir sistemas. Sistema remoto no está configurado.",
+        "safeMode": "No se puede unir sistemas. Sistema remoto está en modo seguro.",
+        "configError": "No se puede unir sistemas. Tal vez uno de los sistemas está en modo seguro.",
+        "cloudError": "No se puede combinar sistemas. Sistema dependiente esté conectado a la nube. Es necesario desconectarlo primero.",
+        "cloudBothError": "No se puede combinar sistemas. Ambos sistemas están conectados a la nube. Necesitas desconectarte uno primero.",
+        "cloudHostConflict": "No se puede combinar sistemas, porque los servidores están construidos con hosts diferentes nube",
+        "licenceError": "¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
+        "connectionFailed": "Error de conexión: ",
+        "unknownError": "Error desconocido",
+        "mergeFailed": "Error en la combinación: ",
+        "mergeSucceed": "Unión fue exitosa.",
+        "newSystemDisplayName": "Nuevo sistema",
+        "incompatibleProtocol": "versión incompatible",
+        "incompatibleCloudHost": "conflicto de nube",
+        "incompatibleCloudState": "nube conectada"
+    },
+    "login": {
+        "incorrectPassword": "Nombre de usuario o contraseña es incorrecta"
+    },
+    "navigaion": {
+        "cannotGetUser": "Falla en el servidor: no se puede recuperar datos de usuario actual"
+    },
+    "offlineDialog": {
+        "serverOffline": "servidor está desconectado"
+    },
+    "restartDialog": {
+        "serverStarting": "servidor está empezando",
+        "serverRestarting": "el servidor se está reiniciando",
+        "serverOffline": "servidor está desconectado"
+    },
+    "fileUpload": {
+        "started": "Actualización se inició correctamente. Tardará varios minutos",
+        "upToDate": "Error de actualización. Ya está instalada la versión proporcionada.",
+        "invalidFile": "Error de actualización. Archivo proporcionado no es un archivo de actualización válido.",
+        "incompatibleSystem": "Error de actualización. Archivo proporcionado está dirigido a otro sistema.",
+        "extractionError": "Error de actualización. No hay suficiente espacio para extraer el archivo, revise almacenamiento disponible.",
+        "installationError": "La actualización falló. No puede ejecutar la escritura de instalación.",
+        "selectFiles": "Seleccionar archivos"
+    },
+    "advanced": {
+        "free": "Gratis",
+        "total": "Total",
+        "occupied": "Ocupado",
+        "reserved": "Reservado"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} interfaz web"
+    },
+    "common": {
+        "systemOffline": "Sistema está desconectado",
+        "cameraLinks": {
+            "copyToClipboard": "copiar al portapapeles",
+            "highStream": "Corriente de alta",
+            "copyDefaultText": "copiar",
+            "unknown": "Uesconocido",
+            "lowStream": "Corriente de baja",
+            "transcoding": "Transcodificación",
+            "copyActiveText": "copiado al portapapeles"
+        },
+        "searchCamPlaceholder": "búsqueda",
+        "cameraStates": {
+            "noFormat": "Este navegador o dispositivo no admite la reproducción de vídeo desde esta cámara.",
+            "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
+            "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+            "unauthorized": "Autenticación necesaria",
+            "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar.",
+            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+            "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
+            "noArmSupport": "Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
+            "error": "Error",
+            "offline": "Desconectado",
+            "noData": "No hay datos",
+            "flashRequired": "Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'> Instale Adobe Flash</a> para reproducir el video de servidores basados en ARM."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"Sistema es inaccesible o no existe.",
-    "incorrectCurrentPassword":"Contraseña actual es incorrecto.",
-    "incorrectRemotePassword":"Nombre de usuario o contraseña son incorrectos.",
-    "incompatibleVersion":"Sistema es inalcanzable, no existe o tiene versión incompatible.",
-    "wrongUrl":"No se puede conectar al servidor especificado.",
-    "newSystemError":"No se puede unir sistemas. Sistema remoto no está configurado.",
-    "safeMode":"No se puede unir sistemas. Sistema remoto está en modo seguro.",
-    "configError":"No se puede unir sistemas. Tal vez uno de los sistemas está en modo seguro.",
-    "cloudError":"No se puede combinar sistemas. Sistema dependiente esté conectado a la nube. Es necesario desconectarlo primero.",
-    "cloudBothError":"No se puede combinar sistemas. Ambos sistemas están conectados a la nube. Necesitas desconectarte uno primero.",
-    "cloudHostConflict":"No se puede combinar sistemas, porque los servidores están construidos con hosts diferentes nube",
-    "licenceError":"¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
-    "connectionFailed":"Error de conexión: ",
-    "unknownError":"Error desconocido",
-    "mergeFailed":"Error en la combinación: ",
-    "mergeSucceed":"Unión fue exitosa.",
-    "newSystemDisplayName":"Nuevo sistema",
-    "incompatibleProtocol":"versión incompatible",
-    "incompatibleCloudHost":"conflicto de nube",
-    "incompatibleCloudState":"nube conectada"
-  },
-  "login":{
-    "incorrectPassword":"Nombre de usuario o contraseña es incorrecta"
-  },
-  "navigaion":{
-    "cannotGetUser":"Falla en el servidor: no se puede recuperar datos de usuario actual"
-  },
-  "offlineDialog":{
-    "serverOffline":"servidor está desconectado"
-  },
-  "restartDialog":{
-    "serverStarting":"servidor está empezando",
-    "serverRestarting":"el servidor se está reiniciando",
-    "serverOffline":"servidor está desconectado"
-  },
-  "fileUpload":{
-    "started":"Actualización se inició correctamente. Tardará varios minutos",
-    "upToDate":"Error de actualización. Ya está instalada la versión proporcionada.",
-    "invalidFile":"Error de actualización. Archivo proporcionado no es un archivo de actualización válido.",
-    "incompatibleSystem":"Error de actualización. Archivo proporcionado está dirigido a otro sistema.",
-    "extractionError":"Error de actualización. No hay suficiente espacio para extraer el archivo, revise almacenamiento disponible.",
-    "installationError":"La actualización falló. No puede ejecutar la escritura de instalación.",
-    "selectFiles":"Seleccionar archivos"
-  },
-  "advanced":{
-    "free":"Gratis",
-    "total":"Total",
-    "occupied":"Ocupado",
-    "reserved":"Reservado"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} interfaz web"
-  }
 }

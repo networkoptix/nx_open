@@ -1443,7 +1443,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>Просмотр живого видео</translation>
+      <translation>Просмотр видео в реальном времени</translation>
     </message>
     <message>
       <source>Watching archive</source>
@@ -3415,7 +3415,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Открыть  закладки</translation>
+      <translation>Открыть закладки</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3936,7 +3936,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
@@ -6728,7 +6728,7 @@ to %1</source>
     </message>
     <message>
       <source>View live video</source>
-      <translation>Просмотр живого видео</translation>
+      <translation>Просмотр видео в реальном времени</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
@@ -7091,7 +7091,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n закладку?</numerusform>
         <numerusform>Удалить %n закладки?</numerusform>
         <numerusform>Удалить %n закладок?</numerusform>
@@ -7340,7 +7340,7 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n элемент не сохранен:</numerusform>
         <numerusform>%n элемента не сохранено:</numerusform>
         <numerusform>%n элементов не сохранено:</numerusform>
@@ -7356,7 +7356,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n элемент не удален:</numerusform>
         <numerusform>%n элемента не удалено:</numerusform>
         <numerusform>%n элементов не удалено:</numerusform>
@@ -7527,7 +7527,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемента?</numerusform>
         <numerusform>Удалить %n элементов?</numerusform>
@@ -7547,7 +7547,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n матрицу?</numerusform>
         <numerusform>Удалить %n матрицы?</numerusform>
         <numerusform>Удалить %n матриц?</numerusform>
@@ -7980,7 +7980,7 @@ to %1</source>
     <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation>Перейти к просмотру живого видео</translation>
+      <translation>Перейти к просмотру видео в реальном времени</translation>
     </message>
   </context>
   <context>

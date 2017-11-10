@@ -105,7 +105,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     chunk->openForModification();
 
-    DataSourceContextPtr dataSourceCtx = 
+    DataSourceContextPtr dataSourceCtx =
         prepareDataSourceContext(cameraResource, camera, transcodeParams);
     if (!dataSourceCtx)
     {
@@ -119,7 +119,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
             .arg(transcodeParams.startTimestamp()).arg(transcodeParams.duration()),
             cl_logDEBUG1);
 
-        const quint64 cacheEndTimestamp = 
+        const quint64 cacheEndTimestamp =
             camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
         if (transcodeParams.alias().isEmpty() &&
             transcodeParams.startTimestamp() > cacheEndTimestamp &&
@@ -127,7 +127,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         {
             // Chunk is in the future not futher than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
             // Scheduling transcoding on data availability.
-            std::pair<std::map<int, TranscodeContext>::iterator, bool> p = 
+            std::pair<std::map<int, TranscodeContext>::iterator, bool> p =
                 m_scheduledTranscodings.emplace(newTranscodingId, TranscodeContext());
             NX_ASSERT(p.second);
 
@@ -183,7 +183,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         AbstractOnDemandDataProviderPtr mediaDataProvider;
         if (transcodeParams.live())
         {
-            dataSourceCtx->videoCameraLocker = 
+            dataSourceCtx->videoCameraLocker =
                 qnCameraPool->getVideoCameraLockerByResourceId(cameraResource->getId());
             if (!dataSourceCtx->videoCameraLocker)
             {
@@ -198,12 +198,13 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         }
         else
         {
-            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams);
+            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams, QnUuid());
+            //< TODO: #dmishin Pass real client id
         }
 
         if (!mediaDataProvider)
             return nullptr;
-        
+
         dataSourceCtx->mediaDataProvider = AbstractOnDemandDataProviderPtr(
             new H264Mp4ToAnnexB(mediaDataProvider));
     }
@@ -240,11 +241,11 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataPro
         .arg(transcodeParams.startTimestamp())
         .arg(transcodeParams.duration()), cl_logDEBUG2);
 
-    const quint64 cacheStartTimestamp = 
+    const quint64 cacheStartTimestamp =
         camera->liveCache(transcodeParams.streamQuality())->startTimestamp();
-    const quint64 cacheEndTimestamp = 
+    const quint64 cacheEndTimestamp =
         camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
-    const quint64 actualStartTimestamp = 
+    const quint64 actualStartTimestamp =
         std::max<>(cacheStartTimestamp, transcodeParams.startTimestamp());
     auto mediaDataProvider = AbstractOnDemandDataProviderPtr(
         new LiveMediaCacheReader(
@@ -269,7 +270,8 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataPro
 
 AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
     QnSecurityCamResourcePtr cameraResource,
-    const StreamingChunkCacheKey& transcodeParams)
+    const StreamingChunkCacheKey& transcodeParams,
+    const QnUuid& clientId)
 {
     using namespace std::chrono;
 
@@ -288,8 +290,10 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
         return nullptr;
     }
 
-    QnAbstractArchiveStreamReader* archiveReader = 
+    QnAbstractArchiveStreamReader* archiveReader =
         dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
+    archiveReader->getArchiveDelegate()->setClientId(clientId);
+    archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Archive);
     if (!archiveReader || !archiveReader->open())
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -455,7 +459,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         else
         {
             NX_ASSERT(false);
-            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream. 
+            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream.
                                                 //< This resolution is ignored when TM_DirectStreamCopy is used.
         }
     }

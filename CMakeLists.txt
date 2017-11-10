@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -36,7 +36,7 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 3.1.0)
+project(vms VERSION 3.1.1)
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)

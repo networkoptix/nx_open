@@ -90,29 +90,6 @@ namespace Qn
     Q_DECLARE_OPERATORS_FOR_FLAGS(ItemFlags)
 
     /**
-     * Layer of a graphics item on the scene.
-     *
-     * Workbench display presents convenience functions for moving items between layers
-     * and guarantees that items from the layers with higher numbers are always
-     * displayed on top of those from the layers with lower numbers.
-     */
-    enum ItemLayer
-    {
-        EMappingLayer,              /**< Layer for E-Mapping background. */
-        BackLayer,                  /**< Back layer. */
-        PinnedLayer,                /**< Layer for pinned items. */
-        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
-        UnpinnedLayer,              /**< Layer for unpinned items. */
-        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        ZoomedLayer,                /**< Layer for zoomed items. */
-        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
-        EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
-        MessageBoxLayer,            /**< Layer for graphics text messages. */
-        LayerCount
-    };
-
-    /**
     * Generic enumeration holding different data roles used in Qn classes.
     */
     enum ItemDataRole
@@ -172,6 +149,7 @@ namespace Qn
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
         ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
+        ItemPlaceholderRole,                        /**< Role for item's placeholder pixmap. Value of type QPixmap. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
@@ -185,6 +163,7 @@ namespace Qn
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
 
         ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
+        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -226,6 +205,9 @@ namespace Qn
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
+
+        LayoutTemplateRole,                         /**< Role for layout template. Used in StartAnalyticsAction. */
+
         StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
@@ -288,6 +270,7 @@ namespace Qn
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
+        ShowSingleCameraRole,                       /**< Used for default password dialog. */
         RoleCount
     };
 
@@ -360,6 +343,8 @@ namespace Qn
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
         IoModuleDisabledOverlay,
+        TooManyOpenedConnectionsOverlay,
+        PasswordRequiredOverlay,
 
         OverlayCount
     };
@@ -368,9 +353,10 @@ namespace Qn
     {
         Empty,
         Diagnostics,
-        IoEnable,
+        EnableLicense,
         MoreLicenses,
         Settings,
+        SetPassword
     };
 
     /**

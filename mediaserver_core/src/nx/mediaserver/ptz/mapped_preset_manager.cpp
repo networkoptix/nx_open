@@ -3,6 +3,7 @@
 #include <core/resource/resource.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver {
@@ -73,10 +74,23 @@ void MappedPresetManager::loadMappings()
     m_presetMapping = QJson::deserialized<QnPtzPresetMapping>(
         m_resource->getProperty(kPtzPresetMappingPropertyName).toUtf8(),
         QnPtzPresetMapping());
+
+    m_nxToNativeId.clear();
+    for (const auto devicePresetId: m_presetMapping.keys())
+    {
+        const auto nxPresetId = m_presetMapping[devicePresetId].id;
+        m_nxToNativeId[nxPresetId] = devicePresetId;
+
+        NX_DEBUG(this, lm("Loaded device preset %1 - %2")
+            .args(devicePresetId,  QJson::serialized(m_presetMapping[devicePresetId])));
+    }
 }
 
 void MappedPresetManager::createOrUpdateMapping(const QString& devicePresetId, const QnPtzPreset& nxPreset)
 {
+    NX_DEBUG(this, lm("Update device preset %1 - %2")
+        .args(devicePresetId,  QJson::serialized(nxPreset)));
+
     {
         QnMutexLocker lock(&m_mutex);
         m_presetMapping[devicePresetId] = nxPreset;
@@ -90,6 +104,9 @@ void MappedPresetManager::createOrUpdateMapping(const QString& devicePresetId, c
 
 void MappedPresetManager::removeMapping(const QString& nxPresetId, const QString& nativePresetId)
 {
+    NX_DEBUG(this, lm("Remove device preset %1 - %2")
+        .args(nativePresetId,  QJson::serialized(nxPresetId)));
+
     {
         QnMutexLocker lock(&m_mutex);
         m_presetMapping.remove(nativePresetId);
@@ -123,6 +140,7 @@ void MappedPresetManager::applyMapping(
         else
         {
             outNxPresets->push_back(devicePreset);
+            NX_VERBOSE(this, lm("Camera only preset %1").arg(QJson::serialized(devicePreset)));
         }
     }
 
@@ -131,6 +149,7 @@ void MappedPresetManager::applyMapping(
     {
         if (!currentDevicePresets.contains(itr.key()))
         {
+            NX_DEBUG(this, lm("Remove device preset %1 during mapping apply").arg(itr.key()));
             itr = m_presetMapping.erase(itr);
             hasChanges = true;
         }

@@ -111,7 +111,7 @@ QString QnAppInfo::mediaFolderName()
 
 QString QnAppInfo::licensingEmailAddress()
 {
-    return QStringLiteral("${licenseEmail}");
+    return QStringLiteral(R"(${licenseEmail})");
 }
 
 QString QnAppInfo::companyUrl()

@@ -21,7 +21,7 @@
                             </div>
 
                             <div ng-repeat="group in apiGroups">
-                                <b>{{group.groupName}} <span ng-if="group.urlPrefix">: {{group.urlPrefix}} /</span></b>
+                                <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
@@ -43,13 +43,19 @@
 
                             <div ng-if="!activeFunction">
                                 <div ng-repeat="group in apiGroups">
-                                    <h3>{{group.groupName}} <span ng-if="group.urlPrefix"> : {{group.urlPrefix}} / </span></h3>
+                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary"> 독점적 인 </span> <b ng-if="function.caption"
-                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"> </b> <span ng-if="function.method"> {{function.method}} : </span> <b ng-bind-html="function.url | escape | highlight:searchFunc" > </b></a>
+                                            <span class="label label-danger" ng-if="function.proprietary">독점적 인</span>
+                                            <a ng-click="setActiveFunction(group,function,$event)"
+                                               ng-href="#/developers/api{{function.url}}">
+                                                <b ng-if="function.caption"
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
+                                                <span ng-if="function.method">{{function.method}}:</span>
+                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
+                                            </a>
                                             <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
                                     </ul>
@@ -57,9 +63,10 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {{activeFunction.caption || activeFunction.name}} <small><a ng-click="clearActiveFunction($event)"
+                                    {{activeFunction.caption || activeFunction.name}}
+                                    <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
-                                              href="#/developers/api"> (X) </a></small>
+                                              href="#/developers/api">(X)</a></small>
                                 </h2>
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">독점</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
@@ -73,7 +80,7 @@
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
                                             <div class="label label-danger" ng-if="param.proprietary">독점</div>
-                                            <div class="label label-danger" ng-if="param.optional=='false'">필수</div>
+                                            <div class="label label-danger" ng-if="!param.optional">필수</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">

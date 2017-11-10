@@ -58,9 +58,10 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {{activeFunction.caption || activeFunction.name}} <small><a ng-click="clearActiveFunction($event)"
+                                    {{activeFunction.caption || activeFunction.name}}
+                                    <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
-                                              href="#/developers/api"> (X) </a></small>
+                                              href="#/developers/api">(X)</a></small>
                                 </h2>
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">เป็นเจ้าของ</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
@@ -74,7 +75,7 @@
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
                                             <div class="label label-danger" ng-if="param.proprietary">เป็นเจ้าของ</div>
-                                            <div class="label label-danger" ng-if="param.optional=='false'">จำเป็นต้องระบุ</div>
+                                            <div class="label label-danger" ng-if="!param.optional">จำเป็นต้องระบุ</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">
