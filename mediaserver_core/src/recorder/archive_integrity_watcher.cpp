@@ -66,7 +66,6 @@ void ServerArchiveIntegrityWatcher::fileMissing(const QString& fileName)
 void ServerArchiveIntegrityWatcher::reset()
 {
     m_fired = false;
-    qWarning() << "JUMP";
 }
 
 bool ServerArchiveIntegrityWatcher::checkMetaDataIntegrity(const QnAviArchiveMetadata& metadata)
@@ -84,7 +83,6 @@ bool ServerArchiveIntegrityWatcher::checkFileName(
 
 void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
 {
-    qWarning() << "EMIT";
     if (m_fired)
         return;
 

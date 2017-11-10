@@ -132,7 +132,7 @@ public slots:
 
     void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
-    void atFileIntegrityCheckFailed(const QnResourcePtr& resource);
+    void at_FileIntegrityCheckFailed(const QnResourcePtr& resource);
 
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
         vms::event::EventState eventState, const QnUuid& userId = QnUuid(),
