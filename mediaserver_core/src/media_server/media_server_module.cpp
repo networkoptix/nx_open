@@ -223,9 +223,21 @@ std::chrono::milliseconds QnMediaServerModule::lastRunningTime() const
     return std::chrono::milliseconds(runTimeSettings()->value(kLastRunningTime).toLongLong());
 }
 
+std::chrono::milliseconds QnMediaServerModule::lastRunningTimeBeforeRestart() const
+{
+    if (!m_lastRunningTimeBeforeRestart)
+        m_lastRunningTimeBeforeRestart = lastRunningTime();
+
+    return *m_lastRunningTimeBeforeRestart;
+}
+
 void QnMediaServerModule::setLastRunningTime(std::chrono::milliseconds value) const
 {
+    if (!m_lastRunningTimeBeforeRestart)
+        m_lastRunningTimeBeforeRestart = lastRunningTime();
+
     runTimeSettings()->setValue(kLastRunningTime, (qlonglong) value.count());
+    runTimeSettings()->sync();
 }
 
 nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const

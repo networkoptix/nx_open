@@ -62,6 +62,7 @@ public:
     QSettings* runTimeSettings() const;
 
     std::chrono::milliseconds lastRunningTime() const;
+    std::chrono::milliseconds lastRunningTimeBeforeRestart() const;
     void setLastRunningTime(std::chrono::milliseconds value) const;
 
     MSSettings* settings() const;
@@ -92,6 +93,8 @@ private:
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     QThread* m_metadataManagerPoolThread = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
+
+    mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

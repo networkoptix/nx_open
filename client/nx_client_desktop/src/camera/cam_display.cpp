@@ -554,8 +554,10 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         displayedTime = newDisplayedTime;
                         firstWait = true;
                     }
-                    bool doDelayForAudio = m_playAudio && m_audioDisplay->isPlaying()
-                        && displayedTime > m_audioDisplay->getCurrentTime();
+                    bool doDelayForAudio = m_playAudio
+                        && m_audioDisplay->isPlaying()
+                        && displayedTime > m_audioDisplay->getCurrentTime()
+                        && m_audioDisplay->msInBuffer() > 0;
                     if (ct != DATETIME_NOW && (speedSign *(displayedTime - ct) > 0) || doDelayForAudio)
                     {
                         if (firstWait)

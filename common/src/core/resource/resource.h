@@ -106,7 +106,7 @@ public:
      * Same as initAsync but run initialization always.
      * This call don't check if initAsync was called recently but always add a new task.
      */
-    void reinit();
+    void reinitAsync();
 
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
