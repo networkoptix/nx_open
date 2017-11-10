@@ -51,6 +51,8 @@ private:
     CameraDiagnostics::Result openStreamWithErrChecking(bool forceStreamCtrl);
     virtual bool isCameraControlRequired() const;
 
+    bool processOpenStreamResult();
+
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;

@@ -155,6 +155,9 @@ void QnToolTipSlider::hideToolTip(bool animated)
         killTimer(m_toolTipAutoHideTimerId);
         m_toolTipAutoHideTimerId = 0;
     }
+
+    // Make sure tooltip will be auto-shown when needed.
+    m_toolTipAutoVisible = false;
 }
 
 void QnToolTipSlider::setToolTipEnabled(bool enabled)

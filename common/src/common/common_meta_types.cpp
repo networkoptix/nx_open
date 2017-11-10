@@ -210,6 +210,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
     qRegisterMetaType<nx::utils::Url>();
+    qRegisterMetaTypeStreamOperators<nx::utils::Url>();
+    qRegisterMetaTypeStreamOperators<QList<nx::utils::Url>>();
 
 #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();

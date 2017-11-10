@@ -131,6 +131,8 @@ public:
         const std::chrono::microseconds& startTime,
         const std::chrono::microseconds& endTime);
 
+    void setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler);
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -260,6 +262,8 @@ private:
 
     boost::optional<std::chrono::microseconds> m_startRecordingBound;
     boost::optional<std::chrono::microseconds> m_endRecordingBound;
+
+    std::function<void()> m_endOfRecordingHandler;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

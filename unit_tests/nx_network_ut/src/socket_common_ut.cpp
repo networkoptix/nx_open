@@ -95,7 +95,7 @@ TEST(HostAddress, IpV6FromString)
     in6_addr addr6;
     ASSERT_TRUE(inet_pton(AF_INET6, "fd00::9465:d2ff:fe64:2772", &addr6));
     ASSERT_TRUE(memcmp(&addr6, &addr.ipV6().first.get(), sizeof(in6_addr)) == 0);
-    ASSERT_EQ(1, addr.ipV6().second.get());
+    ASSERT_EQ(1U, addr.ipV6().second.get());
 }
 
 TEST(HostAddress, MappedIpV4AddressIsNotAPureIpV6)

@@ -48,7 +48,8 @@ enum class HanwhaSessionType
     live,
     archive,
     preview,
-    fileExport
+    fileExport,
+    count
 };
 
 //TODO: #dmishin consider using Fusion instead of custom methods.
@@ -67,9 +68,10 @@ static const int kHanwhaDefaultMaxPresetNumber = 1000;
 static const int kHanwhaProfileNameMaxLength = 12;
 
 static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");
 
-const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
-const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
+static const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
+static const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
 
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");

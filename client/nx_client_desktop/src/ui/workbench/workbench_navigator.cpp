@@ -335,6 +335,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
         connect(m_timeScrollBar, &QnTimeScrollBar::actionTriggered, this,
             [this](int action)
             {
+                // Flag is required to avoid unzoom when moving slider by clicking outside of it.
                 if (action != AbstractGraphicsSlider::SliderMove)
                     m_ignoreScrollBarDblClick = true;
             });
@@ -2157,6 +2158,11 @@ QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(const QnMediaR
     return m_cameraDataManager->loader(widget->resource(), createIfNotExists);
 }
 
+QnCameraDataManager* QnWorkbenchNavigator::cameraDataManager() const
+{
+    return m_cameraDataManager;
+}
+
 void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs)
 {
     if (m_currentMediaWidget && m_currentMediaWidget->resource() == resource)
@@ -2375,6 +2381,8 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased()
 {
+    // Double-click on slider handle must always unzoom.
+    m_ignoreScrollBarDblClick = false;
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, m_lastAdjustTimelineToPosition);
 }
 

@@ -17,17 +17,17 @@ public:
         }
 
         Data(
-            int dayOfWeek, 
-            int startTime, 
-            int endTime, 
+            int dayOfWeek,
+            int startTime,
+            int endTime,
             Qn::RecordingType recordType,
-            int beforeThreshold, 
-            int afterThreshold, 
-            Qn::StreamQuality streamQuality, 
-            int fps, 
+            int beforeThreshold,
+            int afterThreshold,
+            Qn::StreamQuality streamQuality,
+            int fps,
             bool recordAudio,
             int bitrateKbps)
-            : 
+            :
             m_dayOfWeek(dayOfWeek),
             m_startTime(startTime),
             m_endTime(endTime),
@@ -91,28 +91,28 @@ public:
     }
 
     QnScheduleTask(
-        QnUuid resourceId, 
-        int dayOfWeek, 
-        int startTime, 
+        QnUuid resourceId,
+        int dayOfWeek,
+        int startTime,
         int endTime,
-        Qn::RecordingType recordType, 
-        int beforeThreshold, 
+        Qn::RecordingType recordType,
+        int beforeThreshold,
         int afterThreshold,
-        Qn::StreamQuality streamQuality, 
+        Qn::StreamQuality streamQuality,
         int fps,
         bool doRecordAudio,
         int bitrateKbps)
-        : 
+        :
         m_resourceId(resourceId),
           m_data(
-              dayOfWeek, 
-              startTime, 
-              endTime, 
-              recordType, 
-              beforeThreshold, 
-              afterThreshold, 
-              streamQuality, 
-              fps, 
+              dayOfWeek,
+              startTime,
+              endTime,
+              recordType,
+              beforeThreshold,
+              afterThreshold,
+              streamQuality,
+              fps,
               doRecordAudio,
               bitrateKbps)
     {}
@@ -174,8 +174,6 @@ private:
     QnUuid m_resourceId;
 
     Data m_data;
-
-    friend class QnCameraScheduleWidget; // TODO: #vasilenko what the hell?
 };
 
 inline bool operator<(qint64 first, const QnScheduleTask &other)

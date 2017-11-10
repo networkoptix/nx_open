@@ -1163,6 +1163,14 @@ void QnResource::pleaseStopAsyncTasks()
     m_appStopping = true;
 }
 
+void QnResource::reinit()
+{
+    setStatus(Qn::Offline);
+    QnMutexLocker lock(&m_initAsyncMutex);
+    m_lastInitTime = getUsecTimer();
+    initResPool()->start(new InitAsyncTask(toSharedPointer(this)));
+}
+
 void QnResource::initAsync(bool optional)
 {
     qint64 t = getUsecTimer();

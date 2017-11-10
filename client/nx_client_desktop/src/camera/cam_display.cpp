@@ -18,6 +18,7 @@
 #include "core/resource/camera_resource.h"
 #include "nx/streaming/media_data_packet.h"
 #include <nx/streaming/config.h>
+#include <nx/fusion//model_functions.h>
 
 #include "nx/streaming/archive_stream_reader.h"
 
@@ -30,7 +31,6 @@
 #include <qt_windows.h>
 #include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
-
 
 Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -1189,10 +1189,21 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     if (metadata)
     {
-        int ch = metadata->channelNumber;
-        m_lastMetadata[ch][metadata->timestamp] << metadata;
-        if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
-            m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
+        if (metadata->metadataType == MetadataType::MediaStreamEvent)
+        {
+            QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
+            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
+                QString::fromLatin1(data));
+
+            m_lastMediaEvent = mediaEvent;
+        }
+        else
+        {
+            int ch = metadata->channelNumber;
+        	m_lastMetadata[ch][metadata->timestamp] << metadata;
+            if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
+                m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
+        }
         return true;
     }
 
@@ -2014,6 +2025,11 @@ qint64 QnCamDisplay::initialLiveBufferMkSecs()
 qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 {
     return qnSettings->maximumLiveBufferMSecs() * 1000ll;
+}
+
+Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
+{
+    return m_lastMediaEvent;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

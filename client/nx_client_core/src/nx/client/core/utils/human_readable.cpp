@@ -16,7 +16,6 @@ template<typename T>
 T minUnit()
 {
     auto metaEnum = QMetaEnum::fromType<T>();
-    const auto count = metaEnum.keyCount();
     return static_cast<T>(metaEnum.value(0));
 }
 
@@ -53,9 +52,9 @@ T smallestUnit(QFlags<T> format)
 
     NX_EXPECT(format.testFlag(result), Q_FUNC_INFO, "Invalid format");
     return result;
-};
+}
 
-//returns a string representation of time in a single time unit
+// Returns a string representation of time in a single time unit
 QString unitString(
     const HumanReadable::TimeSpanUnit unit,
     const HumanReadable::SuffixFormat suffixFormat,
@@ -112,14 +111,14 @@ QString unitString(
     return QString::number(count) + suffix;
 }
 
-template<typename T>
+template<typename Unit, typename Count>
 struct PartDescriptor
 {
-    const T unit;
-    const qint64 size;
-    int count = 0;
+    const Unit unit;
+    const Count size;
+    Count count = 0;
 
-    PartDescriptor(const T unit, const qint64 size):
+    PartDescriptor(const Unit unit, const Count size):
         unit(unit),
         size(size)
     {
@@ -127,8 +126,8 @@ struct PartDescriptor
 };
 
 // Split given value by parts, descripted by units list. Returns true if at least one part was filled.
-template<typename T>
-bool partition(qint64 value, std::vector<PartDescriptor<T>>& units)
+template<typename Unit, typename Count>
+bool partition(qint64 value, std::vector<PartDescriptor<Unit, Count>>& units)
 {
     NX_EXPECT(!units.empty());
     NX_EXPECT(value >= 0);
@@ -140,7 +139,7 @@ bool partition(qint64 value, std::vector<PartDescriptor<T>>& units)
             continue;
 
         descriptor.count = value / descriptor.size;
-        value = value % descriptor.size;
+        value -= descriptor.size * descriptor.count;
 
         NX_EXPECT(descriptor.count > 0);
         hasNonEmptyPart = true;
@@ -150,8 +149,7 @@ bool partition(qint64 value, std::vector<PartDescriptor<T>>& units)
 }
 
 
-using TimeSpanUnitDescriptor = PartDescriptor<HumanReadable::TimeSpanUnit>;
-
+using TimeSpanUnitDescriptor = PartDescriptor<HumanReadable::TimeSpanUnit, qint64>;
 std::vector<TimeSpanUnitDescriptor> timeSpanUnits(HumanReadable::TimeSpanFormat format)
 {
     static constexpr auto kMillisecondSize = 1ll;
@@ -185,11 +183,15 @@ std::vector<TimeSpanUnitDescriptor> timeSpanUnits(HumanReadable::TimeSpanFormat 
     return result;
 }
 
-using DigitalSizeUnitDescriptor = PartDescriptor<HumanReadable::DigitalSizeUnit>;
-std::vector<DigitalSizeUnitDescriptor> digitalSizeUnits(HumanReadable::DigitalSizeFormat format,
+template<typename Count>
+using DigitalSizeUnitDescriptor = PartDescriptor<HumanReadable::DigitalSizeUnit, Count>;
+
+template<typename Count>
+std::vector<DigitalSizeUnitDescriptor<Count>> digitalSizeUnits(
+    HumanReadable::DigitalSizeFormat format,
     const HumanReadable::DigitalSizeMultiplier multiplier)
 {
-    static constexpr auto kByteSize = 1ll;
+    static constexpr Count kByteSize = 1;
 
     static constexpr auto kBinaryMultiplier = 1024;
     static constexpr auto kKibiSize = kByteSize * kBinaryMultiplier;
@@ -207,7 +209,7 @@ std::vector<DigitalSizeUnitDescriptor> digitalSizeUnits(HumanReadable::DigitalSi
 
     const auto isBinary = multiplier == HumanReadable::DigitalSizeMultiplier::Binary;
 
-    std::vector<DigitalSizeUnitDescriptor> result;
+    std::vector<DigitalSizeUnitDescriptor<Count>> result;
     if (format.testFlag(HumanReadable::Peta))
         result.emplace_back(HumanReadable::Peta, isBinary ? kPebiSize : kPetaSize);
     if (format.testFlag(HumanReadable::Tera))
@@ -224,11 +226,11 @@ std::vector<DigitalSizeUnitDescriptor> digitalSizeUnits(HumanReadable::DigitalSi
     return result;
 }
 
-template<typename T>
+template<typename Unit, typename Count>
 QString calculateValueInternal(qint64 sourceValue,
-    QFlags<T> format,
-    std::function<QString(T unit, int num)> toUnitString,
-    std::vector<PartDescriptor<T>> units,
+    QFlags<Unit> format,
+    std::function<QString(Unit unit, Count num)> toUnitString,
+    std::vector<PartDescriptor<Unit, Count>> units,
     const QString& separator,
     int suppressSecondUnitLimit)
 {
@@ -251,7 +253,7 @@ QString calculateValueInternal(qint64 sourceValue,
         return toUnitString(smallest, 0);
 
     const auto primaryDescriptor = std::find_if(units.cbegin(), units.cend(),
-        [](PartDescriptor<T> descriptor)
+        [](PartDescriptor<Unit, Count> descriptor)
         {
             return descriptor.count > 0;
         });
@@ -287,13 +289,13 @@ QString HumanReadable::timeSpan(std::chrono::milliseconds ms,
     int suppressSecondUnitLimit)
 {
     auto toUnitString =
-        [suffixFormat](TimeSpanUnit unit, int num)
+        [suffixFormat](TimeSpanUnit unit, qint64 num)
         {
             return unitString(unit, suffixFormat, num);
         };
     const auto units = timeSpanUnits(format);
 
-    return calculateValueInternal<TimeSpanUnit>(ms.count(),
+    return calculateValueInternal<TimeSpanUnit, qint64>(ms.count(),
         format,
         toUnitString,
         units,
@@ -347,7 +349,7 @@ QString HumanReadable::digitalSizeUnit(DigitalSizeUnit unit, SuffixFormat suffix
     return QString();
 }
 
-QString HumanReadable::digitalSize(qint64 size,
+QString HumanReadable::digitalSize(qint64 bytes,
     DigitalSizeFormat format,
     DigitalSizeMultiplier multiplier,
     SuffixFormat suffixFormat,
@@ -355,7 +357,7 @@ QString HumanReadable::digitalSize(qint64 size,
     int suppressSecondUnitLimit)
 {
     auto toUnitString =
-        [suffixFormat](DigitalSizeUnit unit, int num)
+        [suffixFormat](DigitalSizeUnit unit, qint64 num)
         {
             QString suffix = digitalSizeUnit(unit, suffixFormat, num);
             switch (suffixFormat)
@@ -370,14 +372,49 @@ QString HumanReadable::digitalSize(qint64 size,
 
             return QString::number(num) + suffix;
         };
-    const auto units = digitalSizeUnits(format, multiplier);
+    const auto units = digitalSizeUnits<qint64>(format, multiplier);
 
-    return calculateValueInternal<DigitalSizeUnit>(size,
+    return calculateValueInternal<DigitalSizeUnit, qint64>(bytes,
         format,
         toUnitString,
         units,
         separator,
         suppressSecondUnitLimit);
+}
+
+QString HumanReadable::digitalSizePrecise(qint64 bytes,
+    DigitalSizeFormat format,
+    DigitalSizeMultiplier multiplier,
+    SuffixFormat suffixFormat,
+    const QString& decimalSeparator,
+    int precision)
+{
+    auto toUnitString =
+        [suffixFormat, precision, decimalSeparator](DigitalSizeUnit unit, qreal num)
+        {
+            QString suffix = digitalSizeUnit(unit, suffixFormat, num);
+            switch (suffixFormat)
+            {
+                case SuffixFormat::Long:
+                case SuffixFormat::Full:
+                    suffix = L' ' + suffix;
+                    break;
+                default:
+                    break;
+            }
+
+            return QString::number(num, 'f', precision).replace(L'.', decimalSeparator)
+                + suffix;
+        };
+
+    const auto units = digitalSizeUnits<qreal>(format, multiplier);
+
+    return calculateValueInternal<DigitalSizeUnit, qreal>(bytes,
+        format,
+        toUnitString,
+        units,
+        QString(),
+        kAlwaysSuppressSecondUnit);
 }
 
 } // namespace core

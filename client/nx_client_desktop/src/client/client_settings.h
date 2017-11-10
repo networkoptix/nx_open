@@ -200,7 +200,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
-        QN_DECLARE_RW_PROPERTY(nx::utils::Url,              lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  nx::utils::Url())
+        QN_DECLARE_RW_PROPERTY(QString,                     lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QString())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     locale,                 setLocale,                  LOCALE,                     QnAppInfo::defaultLanguage())
@@ -239,12 +239,14 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
-        QN_DECLARE_RW_PROPERTY(QList<nx::utils::Url>,       knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<nx::utils::Url>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
         QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
+
+        // Was used earlier. Kept to migrate old settings.
+        QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

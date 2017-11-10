@@ -136,7 +136,11 @@ private:
 
     bool isOnvifNtpExtensionId(uint16_t id) const;
 
-    QnRtspStatistic rtspStatistics(int rtpBufferOffset, int rtpPacketSize, int channel);
+    QnRtspStatistic rtspStatistics(
+        int rtpBufferOffset,
+        int rtpPacketSize,
+        int track,
+        int rtpChannel);
 
 private slots:
     void at_packetLost(quint32 prev, quint32 next);

@@ -135,6 +135,8 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    QnCameraDataManager* cameraDataManager() const;
+
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();

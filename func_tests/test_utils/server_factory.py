@@ -12,14 +12,14 @@ class ServerFactory(object):
                  reset_servers,
                  artifact_factory,
                  customization_company_name,
-                 cloud_host_host,
+                 cloud_host,
                  vagrant_box_factory,
                  physical_installation_ctl,
                  ):
         self._reset_servers = reset_servers
         self._artifact_factory = artifact_factory
         self._customization_company_name = customization_company_name
-        self._cloud_host_host = cloud_host_host
+        self._cloud_host = cloud_host
         self._vagrant_box_factory = vagrant_box_factory
         self._physical_installation_ctl = physical_installation_ctl  # PhysicalInstallationCtl or None
         self._allocated_servers = []
@@ -48,7 +48,7 @@ class ServerFactory(object):
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
         else:
-            patch_set_cloud_host = self._cloud_host_host
+            patch_set_cloud_host = self._cloud_host
         server.init(
             must_start=config.start,
             reset=self._reset_servers,
@@ -56,9 +56,9 @@ class ServerFactory(object):
             config_file_params=config.config_file_params,
             )
         if server.is_started() and not server.is_system_set_up() and config.setup:
-            if config.setup_cloud_host:
+            if config.setup_cloud_account:
                 log.info('Setting up server as local system %s:', server)
-                server.setup_cloud_system(config.setup_cloud_host, **config.setup_settings)
+                server.setup_cloud_system(config.setup_cloud_account, **config.setup_settings)
             else:
                 log.info('Setting up server as local system %s:', server)
                 server.setup_local_system(**config.setup_settings)

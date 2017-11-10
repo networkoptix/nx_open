@@ -365,7 +365,7 @@ void EventConnector::at_remoteArchiveSyncProgress(
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
     params.description = lit("Remote archive synchronization progress is %1% for resource %2")
-        .arg(std::round(progress * 100))
+        .arg(qRound(progress * 100))
         .arg(secRes->getUserDefinedName());
 
     action->setRuntimeParams(params);
