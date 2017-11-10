@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "nx/utils/byte_stream/abstract_byte_stream_filter.h"
 #include "line_splitter.h"
@@ -20,7 +20,7 @@ public:
     virtual size_t flush() override;
 
     /**
-     * @return false, if contentType does not specify multipart content.
+     * @return False, if contentType does not specify multipart content.
      * NOTE: After this method has been called, no MultipartContentParser::setBoundary call is needed.
     */
     bool setContentType(const StringType& contentType);
@@ -31,7 +31,7 @@ public:
      */
     const nx_http::HttpHeaders& prevFrameHeaders() const;
     /**
-     * @return true if epilogue has been received.
+     * @return True if epilogue has been received.
      */
     bool eof() const;
 
@@ -42,7 +42,7 @@ private:
         waitingBoundary,
         readingHeaders,
         readingTextData,
-        /** Reading trailing CR of LF before binary data. */
+        /** Reading trailing CR or LF before binary data. */
         depleteLineFeedBeforeBinaryData,
         /** Reading data with Content-Length known. */
         readingSizedBinaryData,

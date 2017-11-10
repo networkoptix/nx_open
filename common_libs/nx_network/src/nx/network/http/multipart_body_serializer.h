@@ -21,7 +21,7 @@ public:
 
     /**
      * Ends current part (if any).
-     * @param headers should not contain Content-Type header since it is inserted with contentType value.
+     * @param headers Should not contain Content-Type header since it is inserted with contentType value.
      */
     void beginPart(
         const StringType& contentType,
@@ -43,7 +43,7 @@ public:
     /** Signal end of multipart body. */
     void writeEpilogue();
     /**
-     * @return true after MultipartBodySerializer::writeEpilogue has been called.
+     * @return True after MultipartBodySerializer::writeEpilogue has been called.
      */
     bool eof() const;
 

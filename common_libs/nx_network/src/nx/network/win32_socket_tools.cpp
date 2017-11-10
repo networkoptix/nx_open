@@ -93,7 +93,7 @@ DWORD readTcpStat(
 
     auto freeLambda = [](void* ptr) { ::free(ptr); };
     std::unique_ptr<TCP_ESTATS_PATH_ROD_v0, decltype(freeLambda)> pathRod(
-        (TCP_ESTATS_PATH_ROD_v0*)malloc(sizeof(TCP_ESTATS_PATH_ROD_v0)), freeLambda);
+        (TCP_ESTATS_PATH_ROD_v0*) malloc(sizeof(TCP_ESTATS_PATH_ROD_v0)), freeLambda);
     if (!pathRod.get())
     {
         wprintf(L"\nOut of memory");
