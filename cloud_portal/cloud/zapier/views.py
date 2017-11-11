@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 
 from django.utils.http import urlencode
 
-from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
+from api.helpers.exceptions import zapier_exceptions, api_success, APINotAuthorisedException
 from api.controllers import cloud_api, cloud_gateway
 
 from models import *
@@ -14,7 +14,6 @@ from cloud import settings
 from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
-CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
 
@@ -38,6 +37,7 @@ def increment_rule(rule):
     rule.save()
 
 
+@zapier_exceptions
 def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
     if rule_type == "Generic Event":
         action_params = json.dumps({"additionalResources": ["{00000000-0000-0000-0000-100000000000}",
@@ -160,20 +160,21 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
     data = cloud_api.System.list(email, password, False)
     zap_list = {'systems': []}
 
     for system in data['systems']:
-        zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
+        if system['stateOfHealth'] == 'online':
+            zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
 
     return api_success(zap_list)
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def zapier_send_generic_event(request):
     user, email, password = authenticate(request)
     system_id = request.data['systemId']
@@ -196,7 +197,7 @@ def zapier_send_generic_event(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def nx_http_action(request):
     caption = request.query_params['caption']
     system_id = request.query_params['system_id']
@@ -216,7 +217,7 @@ def nx_http_action(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def ping(request):
     authenticate(request)
     return Response({'status': 'ok'})
@@ -224,7 +225,7 @@ def ping(request):
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def subscribe_webhook(request):
     user, email, password = authenticate(request)
 
@@ -251,7 +252,7 @@ def subscribe_webhook(request):
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def unsubscribe_webhook(request):
     user, email, password = authenticate(request)
     target = request.data['target_url']
@@ -267,7 +268,7 @@ def unsubscribe_webhook(request):
 
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def test_subscribe(request):
     authenticate(request)
     return Response({'data': [{'caption': 'caption'}]})
