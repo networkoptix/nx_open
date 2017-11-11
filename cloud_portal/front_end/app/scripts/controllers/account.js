@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'account', '$timeout',
-    function ($scope, cloudApi, process, $routeParams, account, $timeout) {
+    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'account', '$timeout', 'systemsProvider',
+    function ($scope, cloudApi, process, $routeParams, account, $timeout, systemsProvider) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -18,6 +18,7 @@ angular.module('cloudApp')
 
         $scope.save = process.init(function() {
             return cloudApi.accountPost($scope.account).then(function(result){
+                systemsProvider.forceUpdateSystems();
                 if(L.language != $scope.account.language){
                     //Need to reload page
                     window.location.reload(true); // reload window to catch new language

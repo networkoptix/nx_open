@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route', '$poll', 'notifyWatcher',
-    function (dialogs, cloudApi, account, $location, $route, $poll, notifyWatcher) {
+    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route', 'systemsProvider',
+    function (dialogs, cloudApi, account, $location, $route, systemsProvider) {
         return {
             restrict: 'E',
             templateUrl: Config.viewsDir + 'components/header.html',
@@ -20,20 +20,14 @@ angular.module('cloudApp')
                     account.logout();
                 };
 
-                scope.$watch(function(){return notifyWatcher.systemToRemove;}, function(systemToRemove){
-                    if(!systemToRemove){
-                        return;
-                    }
-                    var pos = _.findIndex(scope.systems,function(system){
-                        return system.name == systemToRemove;
-                    });
-                    if(pos < 0){
-                        return;
-                    }
-                    scope.systems.splice(pos,1);
-                    updateSystemsHelper();
-                    notifyWatcher.removeSystem(null);
-                }, true);
+                scope.systemsProvider = systemsProvider;
+                scope.$watch('systemsProvider.systems', function(){
+                    scope.systems = scope.systemsProvider.systems;
+                    scope.singleSystem = scope.systems.length == 1;
+                    scope.systemCounter = scope.systems.length;
+                    updateActiveSystem();
+                });
+
 
                 function isActive(val){
                     var currentPath = $location.path();
@@ -42,12 +36,14 @@ angular.module('cloudApp')
                     }
                     return true;
                 };
+
                 scope.active = {};
                 function updateActive(){
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');
                     scope.active.settings = $route.current.params.systemId && !isActive('/view');
                 }
+
                 function updateActiveSystem(){
                     if(!scope.systems){
                         return;
@@ -60,28 +56,9 @@ angular.module('cloudApp')
                     }
                 }
 
-                function updateSystemsHelper(){
-                    scope.singleSystem = scope.systems.length == 1;
-                    scope.systemCounter = scope.systems.length;
-                    updateActiveSystem();
-                }
-                function updateSystems(){
-                    return cloudApi.systems().then(function(result){
-                        scope.systems = cloudApi.sortSystems(result.data);
-                        updateSystemsHelper();
-                    });
-                }
-                function delayedUpdateSystems(){
-                    var pollingSystemsUpdate = $poll(updateSystems,Config.updateInterval);
-
-                    scope.$on('$destroy', function( event ) {
-                        $poll.cancel(pollingSystemsUpdate);
-                    } );
-                }
                 updateActive();
                 account.get().then(function(account){
                     scope.account = account;
-                    updateSystems().then(delayedUpdateSystems);
 
                     $('body').removeClass('loading');
                     $('body').addClass('authorized');
@@ -94,7 +71,7 @@ angular.module('cloudApp')
                 scope.$on('$locationChangeSuccess', function(next, current) {
                     if($route.current.params.systemId){
                         if(!scope.systems){
-                            updateSystems();
+                            scope.systemsProvider.forceUpdateSystems();
                         }else{
                             updateActiveSystem();
                         }

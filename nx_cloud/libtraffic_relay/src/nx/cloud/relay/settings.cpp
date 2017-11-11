@@ -48,13 +48,13 @@ static std::chrono::milliseconds kDefaultInternalTimerPeriod = std::chrono::seco
 
 static const QLatin1String kInactivityPeriodBeforeFirstProbe(
     "listeningPeer/tcpInactivityPeriodBeforeFirstProbe");
-static const std::chrono::seconds kDefaultInactivityPeriodBeforeFirstProbe(30);
+static const std::chrono::seconds kDefaultInactivityPeriodBeforeFirstProbe(60);
 
 static const QLatin1String kProbeSendPeriod("listeningPeer/tcpProbeSendPeriod");
-static const std::chrono::seconds kDefaultProbeSendPeriod(30);
+static const std::chrono::seconds kDefaultProbeSendPeriod(60);
 
 static const QLatin1String kProbeCount("listeningPeer/tcpProbeCount");
-static const int kDefaultProbeCount(2);
+static const int kDefaultProbeCount(3);
 
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
@@ -245,7 +245,7 @@ void Settings::loadCassandraHost()
 
     m_cassandraConnection.host =
         settings().value(kCassandraHost, kDefaultCassandraHost).toString().toStdString();
-    m_cassandraConnection.delayBeforeRetryingInitialConnect = 
+    m_cassandraConnection.delayBeforeRetryingInitialConnect =
         nx::utils::parseTimerDuration(
             settings().value(kDelayBeforeRetryingInitialConnect).toString(),
             kDefaultDelayBeforeRetryingInitialConnect);

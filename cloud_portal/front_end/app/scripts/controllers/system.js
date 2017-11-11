@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-    'account', '$q', 'system', '$poll', 'page', '$timeout', 'notifyWatcher',
+    'account', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider',
     function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-    account, $q, system, $poll, page, $timeout, notifyWatcher) {
+    account, $q, system, $poll, page, $timeout, systemsProvider) {
 
         var systemId = $routeParams.systemId;
 
@@ -75,9 +75,8 @@ angular.module('cloudApp')
         }
 
         function reloadSystems(){
-            cloudApi.systems('clearCache').then(function(){
-               $location.path('/systems');
-            });
+            systemsProvider.forceUpdateSystems();
+            $location.path('/systems');
         }
 
         $scope.disconnect = function(){
@@ -93,7 +92,6 @@ angular.module('cloudApp')
                 // User is not owner. Deleting means he'll lose access to it
                 dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'danger').
                     then(function(){
-                        notifyWatcher.notifySystemChanged($scope.system.info.name);
                         $scope.deletingSystem = process.init(function(){
                             return $scope.system.deleteFromCurrentAccount();
                         },{
@@ -157,6 +155,7 @@ angular.module('cloudApp')
 
         $scope.$watch('system.info.name',function(value){
             page.title(value + ' -');
+            systemsProvider.forceUpdateSystems();
         });
 
         function normalizePermissionString(permissions){
@@ -177,6 +176,7 @@ angular.module('cloudApp')
 
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();
+            dialogs.dismissNotifications();
         });
 
 

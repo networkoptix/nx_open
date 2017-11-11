@@ -52,6 +52,10 @@ angular.module('cloudApp')
                 setContext(null);
             }
 
+            $scope.$on('$destroy', function(){
+                dialogs.dismissNotifications();
+            });
+
             $scope.change = process.init(function(){
                 return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
             },{

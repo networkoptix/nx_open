@@ -366,3 +366,80 @@ def handle_exceptions(func):
                 'errorText': detailed_error
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return handler
+
+
+def zapier_exceptions(func):
+    """
+    Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
+    :param func:
+    :return:
+    """
+
+    def log_error(request, error):
+        page_url = 'unknown'
+        user_name = 'not authorized'
+        request_data = ''
+        ip = 'unknown'
+
+        if isinstance(request, Request):
+            page_url = request.build_absolute_uri()
+            request_data = request.data
+            ip = get_client_ip(request)
+            if not isinstance(request.user, AnonymousUser):
+                user_name = request.user.email
+
+        if isinstance(request_data, QueryDict):
+            request_data = request_data.dict()
+
+        if isinstance(error, APIException):
+            error_text = "{}({})".format(error.error_text, error.error_code)
+            error_formatted = 'Status: {}, Message: {}, Result code: {}, Data: {}'.\
+                              format(error.status_code,
+                                     error.error_text,
+                                     error.error_code,
+                                     json.dumps(error.error_data, indent=4, separators=(',', ': '))
+                                     )
+        else:
+            error_text = 'unknown'
+            error_formatted = 'Unexpected error'
+
+
+        error_formatted = ' {}:{}\n{}({}) at {} Request: {}\n{}\nCall Stack: \n{}'. \
+            format(error.__class__.__name__,
+                   error_text,
+                   user_name,
+                   ip,
+                   page_url,
+                   request_data,
+                   error_formatted,
+                   traceback.format_exc()
+                   ).replace("Traceback", "")  # remove Traceback word from handled exceptions
+
+        logger.log(logging.WARNING, error_formatted)
+        return error_formatted
+
+    def handler(*args, **kwargs):
+        # noinspection PyBroadException
+        try:
+            data = func(*args, **kwargs)
+            if not isinstance(data, Response):
+                return Response(data, status=status.HTTP_200_OK)
+            return data
+
+        except APIException as error:
+            # Do not log not_authorized errors
+            log_error(args[0], error)
+
+            return error.response()
+
+        except Exception as error:
+            detailed_error = log_error(args[0], error)
+
+            if not settings.DEBUG:
+                detailed_error = 'Unexpected error somewhere inside'
+
+            return Response({
+                'resultCode': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                'errorText': "System is offline or unavailable!!!"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return handler

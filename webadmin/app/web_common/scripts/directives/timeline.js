@@ -214,9 +214,24 @@ angular.module('nxCommon')
                     timelineActions.playPause();
                 }
 
+                function centerCurrentTime(){
+                    var sM = scope.scaleManager;
+                    var date = sM.playedPosition;
+                    var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;
+                    var relativeSizeOfTimeLine = (sM.end - sM.visibleEnd) - (sM.start - sM.visibleStart);
+                    timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, true);
+                }
+
                 function timelineClick(mouseX){
                     var date = timelineActions.setClickedCoordinate(mouseX);
+                    var bufferZone = timelineConfig.edgeBufferZone * canvas.width;
                     jumpToPosition(date);
+                    mouseX *= pixelAspectRatio;
+
+                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue()
+                            && (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
+                        centerCurrentTime();
+                    }
                 }
 
                 function jumpToPosition(date){
@@ -393,12 +408,9 @@ angular.module('nxCommon')
                         return;
                     }
 
+                    //scrolls timeline to current time
                     if(mouseOverElements.leftMarker || mouseOverElements.rightMarker){
-                        var sM = scope.scaleManager;
-                        var date = sM.playedPosition;
-                        var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;
-                        var relativeSizeOfTimeLine = (sM.end - sM.visibleEnd) - (sM.start - sM.visibleStart);
-                        timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, true);
+                        centerCurrentTime();
                     }
                 }
                 function viewportClick(event){

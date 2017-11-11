@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process', 'account', '$poll', '$routeParams',
-    function ($scope, cloudApi, $location, urlProtocol, process, account, $poll, $routeParams) {
+    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process',
+                                'account', '$routeParams', 'systemsProvider', 'dialogs',
+    function ($scope, cloudApi, $location, urlProtocol, process, account, $routeParams, systemsProvider, dialogs) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -10,35 +11,26 @@ angular.module('cloudApp')
         });
 
         $scope.showSearch = false;
-        function updateSystems(){
-            return cloudApi.systems().then(function(result){
-                if(result.data.length == 1){
-                    $scope.openSystem(result.data[0]);
-                    return;
-                }
-                $scope.systems = cloudApi.sortSystems(result.data);
-                $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
-                return $scope.systems;
-            });
-        }
-        function delayedUpdateSystems(){
-            var pollingSystemsUpdate = $poll(updateSystems,Config.updateInterval);
 
-            $scope.$on('$destroy', function( event ) {
-                $poll.cancel(pollingSystemsUpdate);
-            } );
-        }
+        $scope.systemsProvider = systemsProvider;
+        $scope.$watch('systemsProvider.systems', function(){
+            $scope.systems = $scope.systemsProvider.systems;
+            $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
+            if($scope.systems.length ==1){
+                $scope.openSystem($scope.systems[0]);
+            }
+        });
 
-        $scope.gettingSystems = process.init(updateSystems,{
+        $scope.gettingSystems = process.init($scope.systemsProvider.forceUpdateSystems,{
             errorPrefix: L.errorCodes.cantGetSystemsListPrefix,
             logoutForbidden: true
-        }).then(delayedUpdateSystems);
+        });
 
         $scope.openSystem = function(system){
             $location.path('/systems/' + system.id);
         };
         $scope.getSystemOwnerName = function(system){
-            return cloudApi.getSystemOwnerName(system);
+            return systemsProvider.getSystemOwnerName(system);
         };
 
         $scope.search = {value:''};
@@ -52,5 +44,9 @@ angular.module('cloudApp')
                     hasMatch(system.name, search) ||
                     hasMatch(system.ownerFullName, search) ||
                     hasMatch(system.ownerAccountEmail, search);
-        }
+        };
+
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
     }]);
