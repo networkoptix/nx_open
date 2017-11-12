@@ -449,11 +449,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,
-    (QnCameraAdvancedParameterCondition::ConditionType::equal, "value")
-    (QnCameraAdvancedParameterCondition::ConditionType::inRange, "valueIn")
-    (QnCameraAdvancedParameterCondition::ConditionType::notInRange, "valueNotIn")
-    (QnCameraAdvancedParameterCondition::ConditionType::present, "present")
-    (QnCameraAdvancedParameterCondition::ConditionType::notPresent, "notPresent")
+    (QnCameraAdvancedParameterCondition::ConditionType::equal, kEqualConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::inRange, kInRangeConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::notInRange, kNotInRangeConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::present, kPresenceConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::notPresent, kLackOfPresenceConditionType)
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, DependencyType,

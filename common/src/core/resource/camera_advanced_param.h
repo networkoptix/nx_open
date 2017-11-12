@@ -44,7 +44,7 @@ struct QnCameraAdvancedParameterCondition
         equal, //< Watched value strictly equals to condition value
         inRange, //< Watched value is in condition value range
         notInRange,
-        present, //< Watched value is present in parameter list
+        present, //< Watched parameter is present in parameter list
         notPresent,
         unknown
     };
