@@ -54,8 +54,6 @@ struct QnCameraAdvancedParameterCondition
     QString value;
 
     bool checkValue(const QString& valueToCheck) const;
-    static ConditionType fromStringToConditionType(const QString& conditionTypeString);
-    static QString fromConditionTypeToString(const ConditionType& conditionType);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition::ConditionType, (lexical))

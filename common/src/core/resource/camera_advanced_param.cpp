@@ -377,44 +377,6 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
     }
 }
 
-ConditionType QnCameraAdvancedParameterCondition::fromStringToConditionType(
-    const QString& conditionTypeString)
-{
-    ConditionType conditionType = ConditionType::unknown;
-
-    if (conditionTypeString == kEqualConditionType)
-        conditionType = ConditionType::equal;
-    else if (conditionTypeString == kInRangeConditionType)
-        conditionType = ConditionType::inRange;
-    else if (conditionTypeString == kNotInRangeConditionType)
-        conditionType = ConditionType::notInRange;
-    else if (conditionTypeString == kPresenceConditionType)
-        conditionType = ConditionType::present;
-    else if (conditionTypeString == kLackOfPresenceConditionType)
-        conditionType = ConditionType::notPresent;
-
-    return conditionType;
-}
-
-QString QnCameraAdvancedParameterCondition::fromConditionTypeToString(const ConditionType& conditionType)
-{
-    switch (conditionType)
-    {
-        case ConditionType::equal:
-            return kEqualConditionType;
-        case ConditionType::inRange:
-            return kInRangeConditionType;
-        case ConditionType::notInRange:
-            return kNotInRangeConditionType;
-        case ConditionType::present:
-            return kPresenceConditionType;
-        case ConditionType::notPresent:
-            return kLackOfPresenceConditionType;
-        default:
-            return QString();
-    }
-}
-
 DependencyType QnCameraAdvancedParameterDependency::fromStringToDependencyType(const QString& dependencyTypeString)
 {
     DependencyType dependencyType = DependencyType::unknown;
