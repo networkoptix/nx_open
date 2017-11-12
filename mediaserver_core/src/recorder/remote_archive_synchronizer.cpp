@@ -23,118 +23,168 @@ namespace mediaserver_core {
 namespace recorder {
 
 using namespace nx::core::resource;
+using Locker = nx::utils::Locker<std::map<QnUuid, RemoteArchiveTaskPtr>>;
 
 RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule),
-    m_terminated(false)
+    m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
 {
     if (!qnGlobalSettings->isEdgeRecordingEnabled())
         return;
 
     NX_LOGX(lit("Creating remote archive synchronizer."), cl_logDEBUG1);
 
-    auto threadCount = maxSynchronizationThreads();
+    const auto threadCount = maxSynchronizationThreads();
     NX_LOGX(
         lit("Setting maximum number of archive synchronization threads to %1")
         .arg(threadCount),
         cl_logDEBUG1);
 
-    m_threadPool.setMaxThreadCount(threadCount);
+    m_workerPool->setMaxTaskCount(threadCount);
+    m_workerPool->setTaskMapAccessor([this](){ return &m_tasks; });
+    m_workerPool->start();
 
     connect(
         commonModule()->resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
-        &RemoteArchiveSynchronizer::at_newResourceAdded);
+        &RemoteArchiveSynchronizer::at_resourceAdded);
+
+    connect(
+        commonModule()->resourcePool(),
+        &QnResourcePool::resourceRemoved,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceRemoved);
 }
 
 RemoteArchiveSynchronizer::~RemoteArchiveSynchronizer()
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_terminated = true;
-    }
-
-    NX_LOGX(lit("Remote archive synchronizer destructor has been called."), cl_logDEBUG1);
-    cancelAllTasks();
-    waitForAllTasks();
+    QnMutexLocker lock(&m_mutex);
+    disconnect(this);
+    m_terminated = true;
+    m_tasks.value.clear();
+    m_workerPool.reset();
 }
 
-void RemoteArchiveSynchronizer::at_newResourceAdded(const QnResourcePtr& resource)
+void RemoteArchiveSynchronizer::at_resourceAdded(const QnResourcePtr& resource)
 {
     QnMutexLocker lock(&m_mutex);
     if (m_terminated)
         return;
 
-    auto securityCameraResource = resource.dynamicCast<QnSecurityCamResource>();
-    if (!securityCameraResource)
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
         return;
 
-    connect(
-        securityCameraResource.data(),
-        &QnResource::initializedChanged,
-        this,
-        &RemoteArchiveSynchronizer::at_resourceInitializationChanged);
+    const auto rawPtr = camera.data();
+
+    NX_VERBOSE(this, lm("Resource %1 has been added, connecting to its signals")
+        .arg(camera->getUserDefinedName()));
 
     connect(
-        securityCameraResource.data(),
+        rawPtr,
+        &QnResource::statusChanged,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceStateChanged);
+
+    connect(
+        rawPtr,
         &QnSecurityCamResource::scheduleDisabledChanged,
         this,
-        &RemoteArchiveSynchronizer::at_resourceInitializationChanged);
+        &RemoteArchiveSynchronizer::at_resourceStateChanged);
 
     connect(
-        securityCameraResource.data(),
+        rawPtr,
         &QnResource::parentIdChanged,
         this,
-        &RemoteArchiveSynchronizer::at_resourceParentIdChanged);
+        &RemoteArchiveSynchronizer::at_resourceStateChanged);
 }
 
-void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourcePtr& resource)
+void RemoteArchiveSynchronizer::at_resourceRemoved(const QnResourcePtr& resource)
 {
-    if (m_terminated || resource->hasFlags(Qn::foreigner))
+    QnMutexLocker lock(&m_mutex);
+    if (m_terminated)
         return;
 
-    auto securityCameraResource = resource.dynamicCast<QnSecurityCamResource>();
-    if (!securityCameraResource)
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
         return;
 
-    auto archiveCanBeSynchronized = securityCameraResource->isInitialized()
-        && securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)
-        && securityCameraResource->isLicenseUsed()
-        && !securityCameraResource->isScheduleDisabled();
+    NX_VERBOSE(this, lm("Resource %1 has been removed, disconnecting from its signals")
+        .arg(camera->getUserDefinedName()));
+
+    const auto rawPtr = camera.data();
+    disconnect(
+        rawPtr,
+        &QnResource::statusChanged,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceStateChanged);
+
+    disconnect(
+        rawPtr,
+        &QnSecurityCamResource::scheduleDisabledChanged,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceStateChanged);
+
+    disconnect(
+        rawPtr,
+        &QnResource::parentIdChanged,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceStateChanged);
+
+    handleResourceTaskUnsafe(camera, /*archiveCanBeSynchronized*/false);
+}
+
+void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& resource)
+{
+    if (m_terminated)
+        return;
+
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
+    const auto status = camera->getStatus();
+    const auto archiveCanBeSynchronized =
+        (status == Qn::Online || status == Qn::Recording)
+        && camera->hasCameraCapabilities(Qn::RemoteArchiveCapability)
+        && camera->isLicenseUsed()
+        && !camera->isScheduleDisabled()
+        && !camera->hasFlags(Qn::foreigner);
 
     if (!archiveCanBeSynchronized)
     {
-        NX_LOGX(lm(
+        NX_DEBUG(this, lm(
             "Archive for resource %1 can not be synchronized. "
-            "Resource is initiliazed: %2, "
-            "Resource has remote archive capability: %3, "
-            "License is used for resource: %4, "
-            "Schedule is enabled for resource: %5")
-                .arg(securityCameraResource->getName())
-                .arg(securityCameraResource->isInitialized())
-                .arg(securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability))
-                .arg(securityCameraResource->isLicenseUsed())
-                .arg(!securityCameraResource->isScheduleDisabled()),
-            cl_logDEBUG1);
-
-        cancelTaskForResource(securityCameraResource->getId());
-        return;
+            "Resource belongs to this server %2"
+            "Resource status: %3, "
+            "Resource has remote archive capability: %4, "
+            "License is used for resource: %5, "
+            "Schedule is enabled for resource: %6")
+                .args(
+                    camera->getUserDefinedName(),
+                    !camera->hasFlags(Qn::foreigner),
+                    status,
+                    camera->hasCameraCapabilities(Qn::RemoteArchiveCapability),
+                    camera->isLicenseUsed(),
+                    !camera->isScheduleDisabled()));
     }
 
+    const auto id = camera->getId();
+    bool needToHandleChanges = true;
     {
         QnMutexLocker lock(&m_mutex);
-        makeAndRunTaskUnsafe(securityCameraResource);
-    }
-}
+        if (m_terminated)
+            return;
 
-void RemoteArchiveSynchronizer::at_resourceParentIdChanged(const QnResourcePtr& resource)
-{
-    NX_LOGX(lm("Resource %1 parent ID has changed to %2")
-        .arg(resource->getName())
-        .arg(resource->getParentId()),
-        cl_logDEBUG1);
-    cancelTaskForResource(resource->getId());
+        if (m_previousStates.find(id) != m_previousStates.cend())
+            needToHandleChanges = m_previousStates.at(id) != archiveCanBeSynchronized;
+
+        m_previousStates[id] = archiveCanBeSynchronized;
+
+        if (needToHandleChanges)
+            handleResourceTaskUnsafe(camera, archiveCanBeSynchronized);
+    }
 }
 
 int RemoteArchiveSynchronizer::maxSynchronizationThreads() const
@@ -152,20 +202,46 @@ int RemoteArchiveSynchronizer::maxSynchronizationThreads() const
     return 1;
 }
 
-void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResourcePtr& resource)
+void RemoteArchiveSynchronizer::handleResourceTaskUnsafe(
+    const QnSecurityCamResourcePtr& resource,
+    bool archiveCanBeSynchronized)
 {
     if (m_terminated)
         return;
 
-    auto id = resource->getId();
+    NX_VERBOSE(this, lm("Remote Archive is going to be synchronized (%1) for resource %2")
+        .args(archiveCanBeSynchronized, resource->getUserDefinedName()));
 
-    const auto manager = resource->remoteArchiveManager();
-    if (!manager)
+    auto id = resource->getId();
+    if (!archiveCanBeSynchronized)
+    {
+        m_workerPool->cancelTask(id);
+        {
+            Locker lock(&m_tasks);
+            m_tasks.value.erase(id);
+        }
+        return;
+    }
+
+    auto task = makeTask(resource);
+    if (!task)
         return;
 
-    const auto capabilities = manager->capabilities();
-    std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> task;
+    {
+        Locker lock(&m_tasks);
+        m_tasks.value[id] = task;
+    }
+}
 
+std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> RemoteArchiveSynchronizer::makeTask(
+    const QnSecurityCamResourcePtr& resource)
+{
+    std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> task;
+    const auto manager = resource->remoteArchiveManager();
+    if (!manager)
+        return task;
+
+    const auto capabilities = manager->capabilities();
     if (capabilities.testFlag(RemoteArchiveCapability::RandomAccessChunkCapability))
     {
         task = std::make_shared<RemoteArchiveStreamSynchronizationTask>(
@@ -179,60 +255,7 @@ void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResource
             resource);
     }
 
-    if (!task)
-        return;
-
-    task->setDoneHandler([this, id]() { removeTaskFromAwaited(id); });
-
-    SynchronizationTaskContext context;
-    context.task = task;
-    context.result = nx::utils::concurrent::run(
-        &m_threadPool,
-        [task]() { task->execute(); });
-
-    m_syncTasks[id] = context;
-}
-
-void RemoteArchiveSynchronizer::removeTaskFromAwaited(const QnUuid& id)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_syncTasks.erase(id);
-}
-
-void RemoteArchiveSynchronizer::cancelTaskForResource(const QnUuid& id)
-{
-    QnMutexLocker lock(&m_mutex);
-    auto itr = m_syncTasks.find(id);
-    if (itr == m_syncTasks.end())
-        return;
-
-    auto context = itr->second;
-    context.task->cancel();
-}
-
-void RemoteArchiveSynchronizer::cancelAllTasks()
-{
-    QnMutexLocker lock(&m_mutex);
-    for (auto& entry: m_syncTasks)
-    {
-        auto context = entry.second;
-        context.task->cancel();
-    }
-}
-
-void RemoteArchiveSynchronizer::waitForAllTasks()
-{
-    decltype(m_syncTasks) copy;
-    {
-        QnMutexLocker lock(&m_mutex);
-        copy = m_syncTasks;
-    }
-
-    for (auto& item: copy)
-    {
-        auto context = item.second;
-        context.result.waitForFinished();
-    }
+    return task;
 }
 
 } // namespace recorder

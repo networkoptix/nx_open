@@ -23,10 +23,13 @@ public:
     }
 
     virtual ~AbstractRemoteArchiveSynchronizationTask() {};
+    virtual QnUuid id() const = 0;
     virtual void setDoneHandler(std::function<void()> handler) = 0;
     virtual void cancel() = 0;
     virtual bool execute() = 0;
 };
+
+using RemoteArchiveTaskPtr = std::shared_ptr<AbstractRemoteArchiveSynchronizationTask>;
 
 } // namespace recorder
 } // namespace mediaserver_core
