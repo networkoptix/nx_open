@@ -524,6 +524,10 @@ void QnNavigationItem::updateSyncButtonState()
     // Call setEnabled last to avoid update from button's action enabled state.
     m_syncButton->setChecked(syncAllowed && streamSynchronizer->isRunning());
     m_syncButton->setEnabled(syncAllowed && !syncForced);
+
+    m_syncButton->setToolTip(syncForced
+        ? tr("NVR channels cannot be played unsyncronously")
+        : action(action::ToggleSyncAction)->toolTip());
 }
 
 void QnNavigationItem::updatePlayButtonChecked()

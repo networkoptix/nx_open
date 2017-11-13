@@ -966,6 +966,16 @@ void initialize(Manager* manager, Action* root)
         );
 
     factory()
+        .flags(Tree)
+        .separator();
+
+    factory(MakeLayoutTourAction)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Make Showreel"))
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
+            && !condition::isSafeMode());
+
+    factory()
         .flags(Scene | Tree)
         .separator();
 
@@ -1537,12 +1547,6 @@ void initialize(Manager* manager, Action* root)
 
     factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
 
-    factory(MakeLayoutTourAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
-            && !condition::isSafeMode());
-
     factory(LayoutTourSettingsAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Settings"))
@@ -1682,7 +1686,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Synchronize Streams"))
         .toggledText(ContextMenu::tr("Disable Stream Synchronization"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::syncIsForced());
 
     factory()
         .flags(Slider | TitleBar | Tree)
