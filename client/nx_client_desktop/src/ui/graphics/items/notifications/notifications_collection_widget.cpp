@@ -367,10 +367,13 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     {
         item->addTextButton(action->icon(),
             buttonText,
-            [this, actionId, parameters = parametersGetter()]()
+            [this, actionId, parametersGetter]()
             {
                 const auto triggerAction =
-                    [this, actionId, parameters] { menu()->trigger(actionId, parameters); };
+                    [this, actionId, parametersGetter]
+                    {
+                        menu()->trigger(actionId, parametersGetter());
+                    };
 
                 // Action will trigger additional event loop, which will cause problems here.
                 executeDelayedParented(triggerAction, kDefaultDelay, this);
