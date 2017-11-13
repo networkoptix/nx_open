@@ -5,6 +5,15 @@
 namespace nx {
 namespace utils {
 
+struct NX_UTILS_API PasswordLimitations
+{
+    /* Minimal length of a password: */
+    static constexpr int kMinimumLength = 8;
+
+    /* Maximal length of a camera password: */
+    static constexpr int kMaximumLengthForCamera = 15;
+};
+
 /** Strength of a password. */
 enum class PasswordStrength
 {
@@ -13,6 +22,7 @@ enum class PasswordStrength
     Common,   /**< password is too commonly used */
     Weak,     /**< password contains too few character categories */
     Short,    /**< password contains too few characters */
+    Long,     /**< password contains too much characters */
     Incorrect /**< password contains invalid characters */
 };
 

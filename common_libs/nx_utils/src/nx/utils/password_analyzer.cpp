@@ -11,9 +11,6 @@
 
 namespace {
 
-/* Minimal length of a password: */
-const int kMinimumLength = 8;
-
 /* Minimal acceptable number of character categories: */
 const int kMinimumCategories = 2;
 
@@ -117,7 +114,7 @@ PasswordStrength passwordStrength(const QString& password)
         categories[category] = 1;
     }
 
-    if (password.length() < kMinimumLength)
+    if (password.length() < PasswordLimitations::kMinimumLength)
         return PasswordStrength::Short;
 
     static const CommonPasswordsDictionary commonPasswords;
@@ -160,8 +157,11 @@ PasswordStrength cameraPasswordStrength(const QString& password)
     }
 
     const auto length = password.length();
-    if (length < kMinimumLength)
+    if (length < PasswordLimitations::kMinimumLength)
         return PasswordStrength::Short;
+
+    if (length > PasswordLimitations::kMaximumLengthForCamera)
+        return PasswordStrength::Long;
 
     static constexpr int kFairPasswordMaxLength = 9;
 

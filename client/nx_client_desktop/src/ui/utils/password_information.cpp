@@ -33,7 +33,15 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::Short:
             m_text = tr("Short");
-            m_hint = tr("Password must be at least 8 characters long.");
+            m_hint = tr("Password must be at least %1 characters long.")
+                .arg(PasswordLimitations::kMinimumLength);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Long:
+            m_text = tr("Long");
+            m_hint = tr("Password must be no longer than %1 characters.")
+                .arg(PasswordLimitations::kMaximumLengthForCamera);
             m_acceptance = Inacceptable;
             break;
 
