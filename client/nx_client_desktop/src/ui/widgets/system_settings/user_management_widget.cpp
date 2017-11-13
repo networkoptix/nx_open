@@ -451,12 +451,14 @@ void QnUserManagementWidget::openLdapSettings()
 
 void QnUserManagementWidget::editRoles()
 {
-    menu()->triggerIfPossible(action::UserRolesAction); // TODO: #vkutin #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::UserRolesAction,
+        action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
 }
 
 void QnUserManagementWidget::createUser()
 {
-    menu()->triggerIfPossible(action::NewUserAction); // TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::NewUserAction,
+        action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
 }
 
 void QnUserManagementWidget::fetchUsers()

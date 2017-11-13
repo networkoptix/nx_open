@@ -10,7 +10,7 @@ namespace client {
 namespace desktop {
 namespace utils {
 
-WidgetPtr extractParentWidgetFromParams(
+WidgetPtr extractParentWidget(
     const nx::client::desktop::ui::action::Parameters& parameters,
     QWidget* defaultValue)
 {

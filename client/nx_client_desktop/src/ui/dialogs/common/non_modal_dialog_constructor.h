@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <nx/utils/app_info.h>
+#include <nx/client/desktop/utils/dialog_utils.h>
+
 class QWidget;
 class QEvent;
 
@@ -81,13 +83,7 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
         if (explicitParent)
-            output->setParent(explicitParent);
-    }
-
-    if (nx::utils::AppInfo::isMacOsX())
-    {
-        // Workaround for bug QTBUG-34767
-        output->setWindowFlags(output->windowFlags());
+            nx::client::desktop::utils::setDialogParent(output, explicitParent);
     }
     return output;
 }
