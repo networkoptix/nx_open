@@ -81,6 +81,11 @@ public:
         relaying::TakeIdleConnectionHandler /*completionHandler*/) override
     {
     }
+
+    virtual relaying::Statistics statistics() const override
+    {
+        return relaying::Statistics();
+    }
 };
 
 } // namespace
