@@ -2,7 +2,6 @@
 
 #if defined( Q_OS_LINUX ) || defined( Q_OS_MAC )
     #include <pwd.h>
-    #include <sys/prctl.h>
     #include <sys/types.h>
     #include <unistd.h>
 
@@ -32,7 +31,7 @@
 namespace nx {
 namespace utils {
 
-const bool CurrentProcess::changeUser( const QString& userName )
+bool CurrentProcess::changeUser( const QString& userName )
 {
     #if defined( Q_OS_LINUX ) || defined( Q_OS_MAC )
         return ::changeUser( getpwnam( userName.toStdString().c_str() ) );
@@ -41,7 +40,7 @@ const bool CurrentProcess::changeUser( const QString& userName )
     #endif
 }
 
-const bool CurrentProcess::changeUser( const uint userId )
+bool CurrentProcess::changeUser( const uint userId )
 {
     #if defined( Q_OS_LINUX ) || defined( Q_OS_MAC )
         return ::changeUser( getpwuid( static_cast< uid_t >( userId ) ) );
