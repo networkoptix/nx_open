@@ -47,6 +47,7 @@ public:
         AuxilaryPtzCapability = 0x01000000,
 
         NativePresetsPtzCapability = 0x08000000,
+        NoNxPresetsPtzCapability = 0x10000000, //<< TODO: remove it. Introduce NativePresets and NxPresets capabilities instead
 
         ContinuousPanTiltCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability,

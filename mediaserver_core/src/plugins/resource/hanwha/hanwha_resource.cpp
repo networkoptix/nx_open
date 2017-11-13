@@ -992,7 +992,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         {
             m_ptzCapabilities |= capability;
             if (capability == Ptz::NativePresetsPtzCapability)
-                m_ptzCapabilities |= Ptz::PresetsPtzCapability;
+                m_ptzCapabilities |= Ptz::PresetsPtzCapability | Ptz::NoNxPresetsPtzCapability;
         }
         else
         {
