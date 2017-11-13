@@ -84,6 +84,9 @@ bool hasConsecutiveSequence(const QString& password,
 namespace nx {
 namespace utils {
 
+const QByteArray PasswordLimitations::kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
+const QByteArray  PasswordLimitations::kCameraAllowedSymbols = "~`!@#$%^*()_-+=|{}[].?/";
+
 PasswordStrength passwordStrength(const QString& password)
 {
 #ifdef ALLOW_ANY_PASSWORD
@@ -93,14 +96,13 @@ PasswordStrength passwordStrength(const QString& password)
     static constexpr bool kAllowSpace = true;
 
     /* Allowed non-unicode special characters for a password: */
-    static const QByteArray kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
 
     std::array<int, CharCategoryLookup::ValidCategoryCount> categories;
     categories.fill(0);
 
     for (QString::ConstIterator ch = password.cbegin(); ch != password.cend(); ++ch)
     {
-        static const CharCategoryLookup categoryLookup(kAllowedSymbols);
+        static const CharCategoryLookup categoryLookup(PasswordLimitations::kAllowedSymbols);
         CharCategoryLookup::Category category = categoryLookup[ch->unicode()];
 
         if (category == CharCategoryLookup::Space)
@@ -135,14 +137,12 @@ PasswordStrength passwordStrength(const QString& password)
 
 PasswordStrength cameraPasswordStrength(const QString& password)
 {
-    static const QByteArray kAllowedSymbols = "~`!@#$%^*()_-+=|{}[].?/";
-
     std::array<int, CharCategoryLookup::ValidCategoryCount> categories;
     categories.fill(0);
 
     for (QString::ConstIterator ch = password.cbegin(); ch != password.cend(); ++ch)
     {
-        static const CharCategoryLookup categoryLookup(kAllowedSymbols);
+        static const CharCategoryLookup categoryLookup(PasswordLimitations::kCameraAllowedSymbols);
         auto category = categoryLookup[ch->unicode()];
 
         if (category == CharCategoryLookup::Space
@@ -153,7 +153,7 @@ PasswordStrength cameraPasswordStrength(const QString& password)
         }
 
         if (category == CharCategoryLookup::Invalid || category == CharCategoryLookup::Space)
-            return PasswordStrength::Incorrect;
+            return PasswordStrength::IncorrectCamera;
 
         categories[category] = 1;
     }

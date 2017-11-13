@@ -65,6 +65,13 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
             m_acceptance = Inacceptable;
             break;
 
+        case PasswordStrength::IncorrectCamera:
+            m_text = tr("Incorrect");
+            m_hint = tr("Only latin letters, numbers and keyboard symbols %1 are allowed.")
+                .arg(QString::fromLatin1(PasswordLimitations::kCameraAllowedSymbols));
+            m_acceptance = Inacceptable;
+            break;
+
         case PasswordStrength::Incorrect:
         default:
             m_text = tr("Incorrect");
