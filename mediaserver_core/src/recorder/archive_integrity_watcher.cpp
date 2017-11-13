@@ -41,6 +41,9 @@ bool ServerArchiveIntegrityWatcher::fileRequested(
     const QnAviArchiveMetadata& metadata,
     const QString& fileName)
 {
+    if (metadata.version != QnAviArchiveMetadata::kIntegrityCheckVersion)
+        return true;
+
     if (!checkMetaDataIntegrity(metadata))
     {
         emitSignal(fileName);

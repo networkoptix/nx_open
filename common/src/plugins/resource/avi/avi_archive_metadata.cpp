@@ -179,7 +179,11 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
 
     const auto metadata = tagValueRaw(context, CustomTag, format);
     QnAviArchiveMetadata result = QJson::deserialized<QnAviArchiveMetadata>(metadata);
+
     if (result.version == kLatestVersion)
+        return result;
+
+    if (result.version == kIntegrityCheckVersion)
         return result;
 
     // For now there are only one version, so no different migration methods are required.
