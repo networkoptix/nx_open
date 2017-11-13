@@ -265,7 +265,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-    if (m_archiveIntegrityWatcher && time != 0LL)
+    if (m_archiveIntegrityWatcher)
         m_archiveIntegrityWatcher->reset();
 
     if (!findStreams())
