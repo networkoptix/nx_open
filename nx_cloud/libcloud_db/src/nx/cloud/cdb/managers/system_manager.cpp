@@ -105,6 +105,15 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::removeResourceParam);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::setResourceParam);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::removeUser);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::saveUser);
+
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
 
     m_startedAsyncCallsCounter.wait();

@@ -127,13 +127,15 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     TransactionDataSource dataSource,
     TransactionProcessedHandler completionHandler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     auto it = m_transactionProcessors.find(transactionHeader.command);
     if (transactionHeader.command == ::ec2::ApiCommand::updatePersistentSequence)
         return; // TODO: #ak Do something.
-    if (it == m_transactionProcessors.end())
+    if (it == m_transactionProcessors.end() || it->second->markedForRemoval)
     {
-        NX_LOGX(lm("Received unsupported transaction %1")
-            .arg(::ec2::ApiCommand::toString(transactionHeader.command)), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Received unsupported transaction %1")
+            .arg(::ec2::ApiCommand::toString(transactionHeader.command)));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -143,12 +145,22 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         return;
     }
 
+    ++it->second->usageCount;
+
+    lock.unlock();
+
     // TODO: should we always call completionHandler in the same thread?
-    return it->second->processTransaction(
+    return it->second->processor->processTransaction(
         std::move(transportHeader),
         std::move(transactionHeader),
         std::move(dataSource),
-        std::move(completionHandler));
+        [it, completionHandler = std::move(completionHandler)](
+            api::ResultCode resultCode)
+        {
+            --it->second->usageCount;
+            it->second->usageCountDecreased.wakeAll();
+            completionHandler(resultCode);
+        });
 }
 
 } // namespace ec2

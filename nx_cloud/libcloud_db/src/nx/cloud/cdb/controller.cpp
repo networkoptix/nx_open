@@ -75,6 +75,9 @@ Controller::Controller(const conf::Settings& settings):
 
 Controller::~Controller()
 {
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::saveSystemMergeHistoryRecord);
+
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 }
