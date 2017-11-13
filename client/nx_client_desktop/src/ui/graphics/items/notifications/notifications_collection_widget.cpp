@@ -731,7 +731,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         {
             QnUuid resourceId;
             const auto runtimeParameters = action->getRuntimeParams();
-            if (isRemoteArchiveMessage(message) && !runtimeParameters.metadata.cameraRefs.empty())
+            if (!runtimeParameters.metadata.cameraRefs.empty())
                 resourceId = runtimeParameters.metadata.cameraRefs[0];
             else
                 resourceId = runtimeParameters.eventResourceId;
