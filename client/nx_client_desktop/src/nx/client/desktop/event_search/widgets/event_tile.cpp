@@ -221,7 +221,7 @@ void EventTile::paintEvent(QPaintEvent* /*event*/)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(palette().window());
+    painter.setBrush(palette().brush(backgroundRole()));
     painter.drawRoundedRect(rect(), kRoundingRadius, kRoundingRadius);
 }
 
@@ -237,6 +237,11 @@ bool EventTile::event(QEvent* event)
         case QEvent::Leave:
         case QEvent::HoverLeave:
             handleHoverChanged(false);
+            break;
+
+        case QEvent::MouseMove:
+        case QEvent::HoverMove:
+            updateBackgroundRole(!m_closeButton->underMouse());
             break;
 
         case QEvent::MouseButtonPress:
@@ -260,6 +265,12 @@ void EventTile::handleHoverChanged(bool hovered)
     const auto showCloseButton = hovered & m_closeable;
     ui->timestampLabel->setHidden(showCloseButton);
     m_closeButton->setVisible(showCloseButton);
+    updateBackgroundRole(hovered && !m_closeButton->underMouse());
+}
+
+void EventTile::updateBackgroundRole(bool hovered)
+{
+    setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
 }
 
 } // namespace

@@ -86,6 +86,7 @@ protected:
 
 private:
     void handleHoverChanged(bool hovered);
+    void updateBackgroundRole(bool hovered);
 
 private:
     QScopedPointer<Ui::EventTile> ui;

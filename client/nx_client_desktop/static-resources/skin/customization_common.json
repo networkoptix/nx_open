@@ -873,7 +873,8 @@
     "nx::client::desktop::EventTile": {
         "palette": {
             "default": {
-                "window": "dark9"
+                "window": "dark9",
+                "midlight": "dark10"
             }
         }
     },
