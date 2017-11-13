@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 
 from django.utils.http import urlencode
 
-from api.helpers.exceptions import zapier_exceptions, api_success, APINotAuthorisedException
+from api.helpers.exceptions import api_success, APINotAuthorisedException, APIException, log_error
 from api.controllers import cloud_api, cloud_gateway
 
 from models import *
@@ -16,6 +16,39 @@ sanitizer = Sanitizer()
 
 CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
+import logging
+logger = logging.getLogger(__name__)
+
+def zapier_exceptions(func):
+    """
+    Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
+    :param func:
+    :return:
+    """
+
+    def handler(*args, **kwargs):
+        # noinspection PyBroadException
+        try:
+            data = func(*args, **kwargs)
+            if not isinstance(data, Response):
+                return Response(data, status=status.HTTP_200_OK)
+            return data
+
+        except APIException as error:
+            # Do not log not_authorized errors
+            log_error(args[0], error, logging.WARNING)
+
+            return error.response()
+
+        except Exception as error:
+            log_error(args[0], error, logging.WARNING)
+
+            return Response({
+                'resultCode': status.HTTP_503_SERVICE_UNAVAILABLE,
+                'errorText': "System unavailable or offline"
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    return handler
 
 def authenticate(request):
     user, email, password = None, None, None
