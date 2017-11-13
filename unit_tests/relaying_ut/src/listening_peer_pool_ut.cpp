@@ -113,6 +113,7 @@ protected:
         m_peerConnection = connection.get();
         m_peerConnections.push_back(connection.get());
         pool().addConnection(peerName, std::move(connection));
+        ++m_connectionsEstablishedCount;
     }
 
     void givenConnectionFromPeer()
@@ -314,6 +315,11 @@ protected:
         m_connectionPostDelay = postDelay;
     }
 
+    int connectionsEstablishedCount() const
+    {
+        return m_connectionsEstablishedCount;
+    }
+
 private:
     struct TakeIdleConnectionResult
     {
@@ -333,6 +339,7 @@ private:
     nx::utils::SyncQueue<std::string> m_peerConnectedEvents;
     nx::utils::SyncQueue<std::string> m_peerDisconnectedEvents;
     relaying::ClientInfo m_clientInfo;
+    int m_connectionsEstablishedCount = 0;
 
     void onTakeIdleConnectionCompletion(
         relay::api::ResultCode resultCode,
@@ -556,6 +563,17 @@ protected:
             pool().findListeningPeerByDomain(m_peerNames[0]));
     }
 
+    void assertStatisticsIsExpected()
+    {
+        const Statistics statistics = pool().statistics();
+        ASSERT_EQ(m_peerNames.size(), statistics.listeningServerCount);
+        ASSERT_EQ(connectionsEstablishedCount(), statistics.connectionsCount);
+        ASSERT_EQ(
+            connectionsEstablishedCount() / m_peerNames.size(),
+            statistics.connectionsAveragePerServerCount);
+        ASSERT_GT(statistics.connectionsAcceptedPerMinute, 0);
+    }
+
     const std::string& domainName() const
     {
         return m_domainName;
@@ -590,6 +608,13 @@ TEST_F(ListeningPeerPoolFindPeerByParentDomainName, find_peer_by_prefix)
     givenMultipleConnectionsFromPeersOfTheSameDomain();
     assertPeerIsFoundByDomainNamePrefix();
     assertPeerIsFoundByFullName();
+}
+
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, statistics)
+{
+    givenMultipleConnectionsFromPeersOfTheSameDomain();
+
+    assertStatisticsIsExpected();
 }
 
 } // namespace test

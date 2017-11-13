@@ -69,8 +69,12 @@ void ListeningPeerPool::addConnection(
     auto connectionContext = std::make_unique<ConnectionContext>();
     connectionContext->connection = std::move(connection);
 
+    m_statisticsCalculator.connectionAccepted();
+
     if (someoneIsWaitingForPeerConnection(peerContext))
     {
+        m_statisticsCalculator.connectionUsed();
+
         provideConnectionToTheClient(
             lock,
             peerName,
@@ -178,6 +182,8 @@ void ListeningPeerPool::takeIdleConnection(
     auto connectionContext = std::move(peerContext.connections.front());
     peerContext.connections.pop_front();
 
+    m_statisticsCalculator.connectionUsed();
+
     if (peerContext.connections.empty())
         startPeerExpirationTimer(lock, peerContextIter->first, &peerContext);
 
@@ -185,6 +191,12 @@ void ListeningPeerPool::takeIdleConnection(
         clientInfo,
         std::move(connectionContext),
         std::move(completionHandler));
+}
+
+Statistics ListeningPeerPool::statistics() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_statisticsCalculator.calculateStatistics(static_cast<int>(m_peers.size()));
 }
 
 nx::utils::Subscription<std::string>& ListeningPeerPool::peerConnectedSubscription()
@@ -359,6 +371,9 @@ void ListeningPeerPool::closeConnection(
     {
         NX_ASSERT((*connectionContextIter)->connection->isInSelfAioThread());
         peerContext.connections.erase(connectionContextIter);
+
+        m_statisticsCalculator.connectionClosed();
+
         if (peerContext.connections.empty())
             startPeerExpirationTimer(lock, peerName, &peerContext);
     }
