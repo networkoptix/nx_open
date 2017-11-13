@@ -80,4 +80,8 @@ angular.module('cloudApp')
         $scope.close = function(){
             dialogs.closeMe($scope);
         }
+
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
     }]);

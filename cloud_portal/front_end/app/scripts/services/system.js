@@ -3,7 +3,8 @@
 // Special service for operating with systems at high-level
 
 angular.module('cloudApp')
-    .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', function (cloudApi, systemAPI, $q, uuid2, $log) {
+    .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', 'systemsProvider',
+    function (cloudApi, systemAPI, $q, uuid2, $log, systemsProvider) {
 
         var systems = {};
 
@@ -80,8 +81,8 @@ angular.module('cloudApp')
         };
         system.prototype.getInfoAndPermissions = function(){
             var self = this;
-            return cloudApi.system(self.id).then(function(result){
-                var error = false
+            return systemsProvider.getSystem(self.id).then(function(result){
+                var error = false;
                 if (error = cloudApi.checkResponseHasError(result)){
                     return $q.reject(error);
                 }

@@ -13,11 +13,15 @@ function NativePlayer(){
 }
 
 NativePlayer.prototype.play = function(){
-    this.video.play().then().catch(function(){});
+    if(this.video){
+        this.video.play().then().catch(function(){});
+    }
 };
 
 NativePlayer.prototype.pause = function(){
-    return this.video.pause();
+    if(this.video){
+        return this.video.pause();
+    }
 };
 
 NativePlayer.prototype.addEventListener = function(event,handler){
