@@ -7,8 +7,6 @@ namespace nx {
 namespace mediaserver {
 
 
-std::chrono::milliseconds kMinTimeoutBetweenResets{100};
-
 // IntegrityHashHelper -----------------------------------------------------------------------------
 const QByteArray IntegrityHashHelper::kIntegrityHashSalt = "408422e1-1b4c-498c-b45a-43ef7723c6e5";
 
@@ -36,8 +34,7 @@ QByteArray IntegrityHashHelper::hashWithSalt(const QByteArray& value)
 
 // ServerArchiveIntegrityWatcher -------------------------------------------------------------------
 ServerArchiveIntegrityWatcher::ServerArchiveIntegrityWatcher():
-    m_fired(false),
-    m_lastFireTime(std::chrono::steady_clock::time_point::min())
+    m_fired(false)
 {}
 
 bool ServerArchiveIntegrityWatcher::fileRequested(
@@ -69,22 +66,7 @@ void ServerArchiveIntegrityWatcher::fileMissing(const QString& fileName)
 
 void ServerArchiveIntegrityWatcher::reset()
 {
-    using namespace std::chrono;
-
-    auto now = std::chrono::steady_clock::now();
-    if (tooEarlyToReset(now))
-        return;
-
     m_fired = false;
-    m_lastFireTime = now;
-}
-
-bool ServerArchiveIntegrityWatcher::tooEarlyToReset(std::chrono::steady_clock::time_point now) const
-{
-    if (m_lastFireTime == std::chrono::steady_clock::time_point::min())
-        return false;
-
-    return now - m_lastFireTime < kMinTimeoutBetweenResets;
 }
 
 bool ServerArchiveIntegrityWatcher::checkMetaDataIntegrity(const QnAviArchiveMetadata& metadata)

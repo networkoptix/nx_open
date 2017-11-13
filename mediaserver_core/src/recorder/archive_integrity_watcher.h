@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <chrono>
 #include <nx/streaming/abstract_archive_delegate.h>
 
 
@@ -37,12 +36,10 @@ signals:
 
 private:
     std::atomic<bool> m_fired;
-    std::chrono::steady_clock::time_point m_lastFireTime;
 
     bool checkMetaDataIntegrity(const QnAviArchiveMetadata& metadata);
     bool checkFileName(const QnAviArchiveMetadata& metadata, const QString& fileName);
     void emitSignal(const QString& fileName);
-    bool tooEarlyToReset(std::chrono::steady_clock::time_point now) const;
 };
 
 } // namespace mediaserver_core
