@@ -6,6 +6,12 @@ namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
+namespace {
+
+static const std::chrono::milliseconds kGrabTasksCycleDuration(5000);
+
+} // namespace
+
 RemoteArchiveWorkerPool::~RemoteArchiveWorkerPool()
 {
     decltype(m_workers) workers;
@@ -69,7 +75,7 @@ nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
             cleanUpUnsafe();
             processTasksUnsafe();
         },
-        std::chrono::milliseconds(5000));
+        kGrabTasksCycleDuration);
 }
 
 void RemoteArchiveWorkerPool::processTasksUnsafe()
@@ -116,12 +122,9 @@ void RemoteArchiveWorkerPool::cleanUpUnsafe()
     for (auto itr = m_workers.begin(); itr != m_workers.end();)
     {
         if (!itr->second->isRunning())
-        {
             itr = m_workers.erase(itr);
-            continue;
-        }
-
-        ++itr;
+        else
+            ++itr;
     }
 }
 
