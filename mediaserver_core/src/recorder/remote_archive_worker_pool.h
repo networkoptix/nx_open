@@ -23,7 +23,7 @@ public:
     void cancelTask(const QnUuid& taskId);
 
     // Should be called before start
-    void setMaxTaskCount(int maxTask);
+    void setMaxTaskCount(int maxTaskCount);
 
     // Should be called before start
     void setTaskMapAccessor(std::function<LockableTaskMap*()> taskMapAccessor);
@@ -31,14 +31,14 @@ public:
 private:
     nx::utils::TimerId scheduleTaskGrabbing();
     void processTasksUnsafe();
-    void setTaskUnsafe(RemoteArchiveWorker* worker, RemoteArchiveTaskPtr task);
+    void cleanUpUnsafe();
 
 private:
     mutable QnMutex m_mutex;
+    int m_maxTaskCount = 0;
     std::atomic<bool> m_terminated{false};
-    std::set<QnUuid> m_currentTasks;
     nx::utils::TimerId m_timerId = 0;
-    std::vector<std::unique_ptr<RemoteArchiveWorker>> m_workers;
+    std::map<QnUuid, std::unique_ptr<RemoteArchiveWorker>> m_workers;
     std::function<LockableTaskMap*()> m_taskMapAccessor;
 };
 

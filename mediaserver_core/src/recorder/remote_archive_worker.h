@@ -15,27 +15,17 @@ class RemoteArchiveWorker: public QnLongRunnable
     using base_class = QnLongRunnable;
 
 public:
-    RemoteArchiveWorker() = default;
-    virtual ~RemoteArchiveWorker();
+    RemoteArchiveWorker(RemoteArchiveTaskPtr task);
 
     virtual void run() override;
 
     virtual void pleaseStop() override;
 
-    void setTask(const RemoteArchiveTaskPtr& task);
-
-    void cancel();
-
-    QnUuid taskId() const;
-
     void setTaskDoneHandler(RemoteArchiveTaskDoneHandler taskDoneHandler);
 
 private:
-    mutable QnMutex m_mutex;
-    mutable QnWaitCondition m_wait;
     RemoteArchiveTaskPtr m_task;
     RemoteArchiveTaskDoneHandler m_taskDoneHandler;
-    std::atomic<bool> m_terminated{false};
 };
 
 

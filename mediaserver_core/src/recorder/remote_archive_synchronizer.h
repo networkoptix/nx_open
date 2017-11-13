@@ -28,7 +28,7 @@ class RemoteArchiveSynchronizer:
     public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
-
+    using TaskMap = nx::utils::Lockable<std::map<QnUuid, RemoteArchiveTaskPtr>>;
 public:
     RemoteArchiveSynchronizer(QnMediaServerModule* serverModule);
     virtual ~RemoteArchiveSynchronizer();
@@ -49,7 +49,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    nx::utils::Lockable<std::map<QnUuid, RemoteArchiveTaskPtr>> m_tasks;
+    std::unique_ptr<TaskMap> m_tasks;
     std::map<QnUuid, bool> m_previousStates;
     std::unique_ptr<RemoteArchiveWorkerPool> m_workerPool;
     std::atomic<bool> m_terminated{false};

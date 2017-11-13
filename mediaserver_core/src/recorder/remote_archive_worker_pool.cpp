@@ -8,52 +8,45 @@ namespace recorder {
 
 RemoteArchiveWorkerPool::~RemoteArchiveWorkerPool()
 {
+    decltype(m_workers) workers;
     {
         QnMutexLocker lock(&m_mutex);
         m_terminated = true;
+        workers.swap(m_workers);
     }
 
     nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_timerId);
 
-    for (auto& worker: m_workers)
+    for (auto& entry: workers)
+    {
+        auto& worker = entry.second;
         worker->pleaseStop();
+    }
 
-    for (auto& worker: m_workers)
+    for (auto& entry: workers)
+    {
+        auto& worker = entry.second;
         worker->wait();
+    }
 }
 
 void RemoteArchiveWorkerPool::start()
 {
     QnMutexLocker lock(&m_mutex);
-    m_currentTasks.clear();
-    for (auto& worker: m_workers)
-    {
-        worker = std::make_unique<RemoteArchiveWorker>();
-        worker->setTaskDoneHandler(
-            [this](const QnUuid& taskId)
-            {
-                QnMutexLocker lock(&m_mutex);
-                m_currentTasks.erase(taskId);
-            });
-        worker->start();
-    }
-
     m_timerId = scheduleTaskGrabbing();
 }
 
 void RemoteArchiveWorkerPool::cancelTask(const QnUuid& taskId)
 {
     QnMutexLocker lock(&m_mutex);
-    for (auto& worker: m_workers)
-    {
-        if (worker->taskId() == taskId)
-            worker->cancel();
-    }
+    const auto itr = m_workers.find(taskId);
+    if (itr != m_workers.cend())
+        itr->second->pleaseStop();
 }
 
-void RemoteArchiveWorkerPool::setMaxTaskCount(int maxTask)
+void RemoteArchiveWorkerPool::setMaxTaskCount(int maxTaskCount)
 {
-    m_workers.resize(maxTask);
+    m_maxTaskCount = maxTaskCount;
 }
 
 void RemoteArchiveWorkerPool::setTaskMapAccessor(std::function<LockableTaskMap*()> accessor)
@@ -73,6 +66,7 @@ nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
             if (timerId != m_timerId)
                 return;
 
+            cleanUpUnsafe();
             processTasksUnsafe();
         },
         std::chrono::milliseconds(5000));
@@ -80,7 +74,7 @@ nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
 
 void RemoteArchiveWorkerPool::processTasksUnsafe()
 {
-    if (m_currentTasks.size() >= m_workers.size())
+    if (m_workers.size() >= m_maxTaskCount)
     {
         m_timerId = scheduleTaskGrabbing(); //< All workers are busy
         return;
@@ -99,45 +93,42 @@ void RemoteArchiveWorkerPool::processTasksUnsafe()
         return;
     }
 
-    nx::utils::Locker<TaskMap> locker(lockableTaskMap);
-    auto& taskMap = lockableTaskMap->value;
-
-    for (auto itr = taskMap.begin(); itr != taskMap.end();)
+    auto lockedMap = lockableTaskMap->lock();
+    for (auto itr = lockedMap->begin(); itr != lockedMap->end();)
     {
         auto taskId = itr->first;
-        if (m_currentTasks.find(taskId) != m_currentTasks.cend())
+        if (m_workers.find(taskId) != m_workers.cend())
         {
             // There is already running task with such Id. Ignore it.
             ++itr;
             continue;
         }
 
-        for (auto& worker : m_workers)
-        {
-            if (worker->taskId() == QnUuid()) //< Free worker.
-            {
-                setTaskUnsafe(worker.get(), itr->second);
-                itr = taskMap.erase(itr);
-                break;
-            }
-        }
+        auto worker = std::make_unique<RemoteArchiveWorker>(itr->second);
+        m_workers[itr->first] = std::move(worker);
+        m_workers[itr->first]->start();
 
-        if (m_currentTasks.size() >= m_workers.size())
+        itr = lockedMap->erase(itr);
+
+        if (m_workers.size() >= m_maxTaskCount)
             break;
     }
 
     m_timerId = scheduleTaskGrabbing();
 }
 
-void RemoteArchiveWorkerPool::setTaskUnsafe(
-    RemoteArchiveWorker* worker,
-    RemoteArchiveTaskPtr task)
+void RemoteArchiveWorkerPool::cleanUpUnsafe()
 {
-    if (m_terminated)
-        return;
+    for (auto itr = m_workers.begin(); itr != m_workers.end();)
+    {
+        if (!itr->second->isRunning())
+        {
+            itr = m_workers.erase(itr);
+            continue;
+        }
 
-    m_currentTasks.insert(task->id());
-    worker->setTask(task);
+        ++itr;
+    }
 }
 
 } // namespace recorder
