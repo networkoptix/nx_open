@@ -23,25 +23,29 @@ class LilinRemoteArchiveManager:
 {
     Q_OBJECT;
 
-    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveEntry;
+    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveChunk;
     using BufferType = nx::core::resource::BufferType;
 
 public:
 
     explicit LilinRemoteArchiveManager(LilinResource* resource);
-    virtual ~LilinRemoteArchiveManager() override;
+    virtual ~LilinRemoteArchiveManager() = default;
 
-    // Implementation of AbstractRemoteArchiveManager::listAvailableArchiveEntries 
     virtual bool listAvailableArchiveEntries(
         std::vector<RemoteArchiveEntry>* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
-    // Implementation of AbstractRemoteArchiveManager::fetchArchiveEntries
+    virtual void setOnAvailabaleEntriesUpdatedCallback(
+        std::function<void(const std::vector<RemoteArchiveEntry>&)> callback) override;
+
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate() override;
+
     virtual bool fetchArchiveEntry(const QString& entryId, BufferType* outBuffer) override;
 
-    // Implementation of AbstractRemoteArchiveManager::removeArchiveEntry
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) override;
+
+    virtual nx::core::resource::RemoteArchiveCapabilities capabilities() const override;
 
 private:
 
