@@ -6,6 +6,10 @@
     #include <sys/types.h>
     #include <unistd.h>
 
+    #if defined( Q_OS_LINUX )
+        #include <sys/prctl.h>
+    #endif
+
     static bool changeUser( struct passwd* pwd )
     {
         if( !pwd ||
@@ -16,8 +20,11 @@
             return false;
         }
 
-        // Allow core dump creation.
-        prctl(PR_SET_DUMPABLE, 1);
+        #if defined( Q_OS_LINUX )
+            // Allow core dump creation.
+            prctl( PR_SET_DUMPABLE, 1 );
+        #endif
+
         return true;
     }
 #endif
