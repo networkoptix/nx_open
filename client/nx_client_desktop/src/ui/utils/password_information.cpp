@@ -45,6 +45,20 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
             m_acceptance = Inacceptable;
             break;
 
+        case PasswordStrength::Conseq:
+            m_text = tr("Weak");
+            m_hint = tr("Password should not contain %1 or more consecutive characters together.")
+                .arg(PasswordLimitations::kConsecutiveCharactersLimit);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Repeat:
+            m_text = tr("Weak");
+            m_hint = tr("Password should not contain %1 or more repeating characters.")
+                .arg(PasswordLimitations::kRepeatingCharactersLimit);
+            m_acceptance = Inacceptable;
+            break;
+
         case PasswordStrength::Common:
             m_text = tr("Common");
             m_hint = tr("This password is in list of the most popular passwords.");

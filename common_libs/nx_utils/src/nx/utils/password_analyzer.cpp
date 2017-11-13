@@ -26,7 +26,8 @@ int differentSign(int left, int right)
     return sign(left) != sign(right);
 }
 
-bool hasRepeatingSymbols(const QString& password, int maxCount = 4)
+bool hasRepeatingSymbols(const QString& password,
+    int maxCount = nx::utils::PasswordLimitations::kRepeatingCharactersLimit)
 {
     const auto count = password.count();
     if (!maxCount || count < maxCount || count <= 1)
@@ -50,7 +51,8 @@ bool hasRepeatingSymbols(const QString& password, int maxCount = 4)
     return false;
 }
 
-bool hasConsecutiveSequance(const QString& password, int maxCount = 4)
+bool hasConsecutiveSequence(const QString& password,
+    int maxCount = nx::utils::PasswordLimitations::kConsecutiveCharactersLimit)
 {
     const auto count = password.count();
     if (!maxCount || count < maxCount || count <= 1)
@@ -178,8 +180,11 @@ PasswordStrength cameraPasswordStrength(const QString& password)
         return PasswordStrength::Weak;
     }
 
-    if (hasConsecutiveSequance(password) || hasRepeatingSymbols(password))
-        return PasswordStrength::Weak;
+    if (hasConsecutiveSequence(password))
+        return PasswordStrength::Conseq;
+
+    if (hasRepeatingSymbols(password))
+        return PasswordStrength::Repeat;
 
     return fairPasswordCategory ? PasswordStrength::Fair : PasswordStrength::Good;
 }
