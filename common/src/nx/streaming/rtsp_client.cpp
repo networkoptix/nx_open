@@ -876,7 +876,7 @@ bool QnRtspClient::isOpened() const
 
 unsigned int QnRtspClient::sessionTimeoutMs()
 {
-    return 0;
+    return m_TimeOut;
 }
 
 const QByteArray& QnRtspClient::getSdp() const
@@ -2064,46 +2064,64 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
     addAuth( &request );
     addAdditionAttrs( &request );
 
+    NX_VERBOSE(this, lm("Send: %1").arg(request.requestLine.toString()));
     for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
     {
         QByteArray requestBuf;
         request.serialize( &requestBuf );
         if( m_tcpSock->send(requestBuf.constData(), requestBuf.size()) <= 0 )
+        {
+            NX_VERBOSE(this, lm("Failed to send request: %2").args(SystemError::getLastOSErrorText()));
             return false;
+        }
+
 #ifdef _DUMP_STREAM
         m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
 #endif
 
         if( !readTextResponce(responseBuf) )
+        {
+            NX_VERBOSE(this, lm("Failed to read response"));
             return false;
+        }
 
         nx_rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
+        {
+            NX_VERBOSE(this, lm("Failed to parse response"));
             return false;
-        m_responseCode = response.statusLine.statusCode;
+        }
 
+        m_responseCode = response.statusLine.statusCode;
         switch( response.statusLine.statusCode )
         {
             case nx_http::StatusCode::unauthorized:
             case nx_http::StatusCode::proxyAuthenticationRequired:
                 if( prevStatusCode == response.statusLine.statusCode )
-                    return false;   //already tried authentication and have been rejected
+                {
+                    NX_VERBOSE(this, lm("Already tried authentication and have been rejected"));
+                    return false;
+                }
+
                 prevStatusCode = response.statusLine.statusCode;
                 break;
 
             default:
                 m_serverInfo = nx_http::getHeaderValue(response.headers, nx_http::header::Server::NAME);
+                NX_VERBOSE(this, lm("Response: %1").arg(response.statusLine.toString()));
                 return true;
         }
 
-        if( QnClientAuthHelper::authenticate(
-                m_auth,
-                response,
-                &request,
-                &m_rtspAuthCtx ) != Qn::Auth_OK)
+        const auto authResult = QnClientAuthHelper::authenticate(
+            m_auth, response, &request, &m_rtspAuthCtx);
+        if (authResult != Qn::Auth_OK)
+        {
+            NX_VERBOSE(this, lm("Authentification failed: %1").arg(authResult));
             return false;
+        }
     }
 
+    NX_VERBOSE(this, lm("Response after last retry: %1").arg(prevStatusCode));
     return false;
 }
 
