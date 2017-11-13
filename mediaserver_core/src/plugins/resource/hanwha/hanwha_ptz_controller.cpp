@@ -245,12 +245,12 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
     {
-        HanwhaRequestHelper::Parameters paramiters{{lit("Mode"), m_hanwhaResource->focusMode()}};
+        HanwhaRequestHelper::Parameters parameters{{lit("Mode"), m_hanwhaResource->focusMode()}};
         if (m_hanwhaResource->isNvr())
-            paramiters.emplace(lit("Channel"), QString::number(m_hanwhaResource->getChannel()));
+            parameters.emplace(lit("Channel"), QString::number(m_hanwhaResource->getChannel()));
 
         HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-        auto response = helper.control(lit("image/focus"), paramiters);
+        auto response = helper.control(lit("image/focus"), parameters);
         return response.isSuccessful();
     }
     

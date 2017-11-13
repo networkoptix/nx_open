@@ -27,7 +27,7 @@ std::unique_ptr<Client> ClientFactory::create(
     return std::make_unique<ClientImpl>(baseUrl);
 }
 
-ClientFactory::CustomFactoryFunc 
+ClientFactory::CustomFactoryFunc
     ClientFactory::setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc)
 {
     CustomFactoryFunc oldFunc;
@@ -95,7 +95,7 @@ void ClientImpl::startSession(
             CreateClientSessionResponse response)
         {
             response.actualRelayUrl = contentLocationUrl;
-            // Removing request path from the end of response.actualRelayUrl 
+            // Removing request path from the end of response.actualRelayUrl
             // so that we have basic relay url.
             NX_ASSERT(
                 response.actualRelayUrl.find(requestPath.toStdString()) != std::string::npos);
@@ -157,7 +157,7 @@ void ClientImpl::issueUpgradeRequest(
     std::initializer_list<RequestPathArgument> requestPathArguments,
     CompletionHandler completionHandler)
 {
-    using ResponseOrVoid = 
+    using ResponseOrVoid =
         typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type;
 
     auto httpClient = prepareHttpRequest<Request, ResponseOrVoid>(
@@ -196,7 +196,7 @@ void ClientImpl::issueRequest(
         std::move(requestPathArguments));
 
     post(
-        [this, httpClient = std::move(httpClient), 
+        [this, httpClient = std::move(httpClient),
             completionHandler = std::move(completionHandler)]() mutable
         {
             executeRequest<Response>(
@@ -271,7 +271,7 @@ void ClientImpl::executeRequest(
                 const nx_http::Response* httpResponse,
                 Response response) mutable
         {
-            auto contentLocationUrl = 
+            auto contentLocationUrl =
                 httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
@@ -294,7 +294,7 @@ ResultCode ClientImpl::toUpgradeResultCode(
     if (resultCode == api::ResultCode::ok)
     {
         // Server did not upgrade connection, but reported OK. It is unexpected...
-        return api::ResultCode::unknownError; 
+        return api::ResultCode::unknownError;
     }
     return resultCode;
 }
