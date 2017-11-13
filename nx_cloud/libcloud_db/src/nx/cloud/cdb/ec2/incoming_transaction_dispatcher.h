@@ -114,8 +114,10 @@ private:
     {
         std::unique_ptr<AbstractTransactionProcessor> processor;
         bool markedForRemoval = false;
-        std::atomic<int> usageCount = 0;
+        std::atomic<int> usageCount;
         QnWaitCondition usageCountDecreased;
+
+        TransactionProcessorContext(): usageCount(0) {}
     };
 
     using TransactionProcessors =
