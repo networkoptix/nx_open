@@ -105,7 +105,6 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
     if (m_fired)
         return;
 
-    qWarning() << "REPORT";
     QnStorageResourcePtr storage = QnStorageManager::getStorageByUrl(
         fileName,
         QnServer::StoragePool::Backup | QnServer::StoragePool::Normal);
