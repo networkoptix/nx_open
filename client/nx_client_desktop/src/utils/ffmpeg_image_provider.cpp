@@ -39,7 +39,7 @@ void QnFfmpegImageProvider::doLoadAsync()
 {
 
     QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());
-    if (!archiveDelegate->open(m_resource, nullptr))
+    if (!archiveDelegate->open(m_resource, nullptr /*archiveInterityWatcher*/))
         return;
 
     /* This is required to correctly get file duration. */

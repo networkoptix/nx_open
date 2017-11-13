@@ -1207,7 +1207,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         channeljumpToUnsync(newTime, 0, skipTime);
         if (useMutex)
             m_jumpMtx.unlock();
-        m_archiveIntegrityWatcher->reset();
+
+        if (m_archiveIntegrityWatcher)
+            m_archiveIntegrityWatcher->reset();
     }
 
     //start(QThread::HighPriority);

@@ -90,7 +90,7 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
     {
         if (m_currentPositionUsec != AV_NOPTS_VALUE)
             m_streamReader->setPositionUsec(m_currentPositionUsec);
-        if (!open(m_streamReader->m_resource, nullptr))
+        if (!open(m_streamReader->m_resource, nullptr /*archiveInterityWatcher*/))
         {
             if (m_errorHandler)
                 m_errorHandler(lit("Can not open stream."));
@@ -182,7 +182,7 @@ void HanwhaArchiveDelegate::setSpeed(qint64 displayTime, double value)
         rtspClient.sendPlay(AV_NOPTS_VALUE /*startTime*/, AV_NOPTS_VALUE /*endTime */, value);
 
     if (!m_streamReader->isStreamOpened())
-        open(m_streamReader->m_resource, nullptr);
+        open(m_streamReader->m_resource, nullptr /*archiveInterityWatcher*/);
 }
 
 void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)

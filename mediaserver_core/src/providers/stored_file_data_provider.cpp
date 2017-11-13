@@ -65,7 +65,7 @@ void QnStoredFileDataProvider::at_fileLoaded(const QByteArray& fileData, bool st
     QnAviArchiveDelegatePtr mediaFileReader(new QnAviArchiveDelegate());
     mediaFileReader->setStorage(m_storage);
 
-    if (!mediaFileReader->open(m_resource, nullptr))
+    if (!mediaFileReader->open(m_resource, nullptr /*archiveInterityWatcher*/))
         return;
 
     m_provider = mediaFileReader;

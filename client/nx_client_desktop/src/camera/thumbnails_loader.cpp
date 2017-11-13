@@ -436,7 +436,7 @@ void QnThumbnailsLoader::process() {
     else if (aviFile) {
         QnAviArchiveDelegatePtr aviDelegate = QnAviArchiveDelegatePtr(aviFile->createArchiveDelegate());
         QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(aviDelegate));
-        if (thumbnailDelegate->open(m_resource->toResourcePtr(), nullptr))
+        if (thumbnailDelegate->open(m_resource->toResourcePtr(), nullptr /*archiveInterityWatcher*/))
             delegates << thumbnailDelegate;
     }
 
