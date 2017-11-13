@@ -599,6 +599,12 @@ void initialize(Manager* manager, Action* root)
     factory(HideCloudPromoAction)
         .flags(NoTarget);
 
+    factory(ChangeDefaultCameraPasswordAction)
+        .flags(SingleTarget | MultiTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("Some cameras require passwords to be set"));
+
     factory(OpenCloudRegisterUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Create Account..."));

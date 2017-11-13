@@ -28,15 +28,18 @@ namespace
 
 class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 {
-    QnPasswordStrengthIndicatorPrivate(QnPasswordStrengthIndicator* q, QLineEdit* lineEdit) :
+    QnPasswordStrengthIndicatorPrivate(
+        QnPasswordStrengthIndicator* q,
+        QLineEdit* lineEdit,
+        QnPasswordInformation::AnalyzeFunction analyzeFunction) :
         lineEdit(lineEdit),
-        currentInformation(lineEdit->text()),
+        currentInformation(lineEdit->text(), analyzeFunction),
         q_ptr(q)
     {
         connect(lineEdit, &QLineEdit::textChanged, q,
-            [this](const QString& text)
+            [this, analyzeFunction](const QString& text)
             {
-                QnPasswordInformation newInformation(text);
+                QnPasswordInformation newInformation(text, analyzeFunction);
                 if (newInformation != currentInformation)
                 {
                     currentInformation = newInformation;
@@ -81,9 +84,11 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 * QnPasswordStrengthIndicator
 */
 
-QnPasswordStrengthIndicator::QnPasswordStrengthIndicator(QLineEdit* lineEdit):
+QnPasswordStrengthIndicator::QnPasswordStrengthIndicator(
+    QLineEdit* lineEdit,
+    QnPasswordInformation::AnalyzeFunction analyzeFunction):
     base_type(),
-    d_ptr(new QnPasswordStrengthIndicatorPrivate(this, lineEdit))
+    d_ptr(new QnPasswordStrengthIndicatorPrivate(this, lineEdit, analyzeFunction))
 {
     QFont textFont = font();
     textFont.setPixelSize(10);

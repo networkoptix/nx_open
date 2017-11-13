@@ -93,8 +93,21 @@ public:
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
     void blockingInit();
-    // TODO: comment
+
+    /**
+     * Initialize camera sync. This function can omit initialization if recently call was failed.
+     * It init camera not often then some time period.
+     * @param optional - if false and no thread in ThreadPool left then return immediately.
+     * if true and no thread in ThreadPool left then add new thread to ThreadPool queue.
+     */
     void initAsync(bool optional);
+
+    /**
+     * Same as initAsync but run initialization always.
+     * This call don't check if initAsync was called recently but always add a new task.
+     */
+    void reinitAsync();
+
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;

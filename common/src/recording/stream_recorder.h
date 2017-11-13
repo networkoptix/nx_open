@@ -211,6 +211,8 @@ protected:
     qint64 m_startDateTime;
     int m_currentTimeZone;
     std::vector<StreamRecorderContext> m_recordingContextVector;
+    boost::optional<std::chrono::microseconds> m_startRecordingBound;
+    boost::optional<std::chrono::microseconds> m_endRecordingBound;
 
 private:
     bool m_waitEOF;
@@ -260,9 +262,6 @@ private:
     bool m_disableRegisterFile;
     MotionHandler m_motionHandler;
     int64_t m_lastFileSize = 0;
-
-    boost::optional<std::chrono::microseconds> m_startRecordingBound;
-    boost::optional<std::chrono::microseconds> m_endRecordingBound;
 
     std::function<void()> m_endOfRecordingHandler;
 };

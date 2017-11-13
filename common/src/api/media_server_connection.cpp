@@ -98,7 +98,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (Restart, "restart")
     (ConfigureObject, "configure")
     (PingSystemObject, "pingSystem")
-    (GetNonceObject, "getNonce")
+    (GetNonceObject, "getRemoteNonce")
     (RecordingStatsObject, "recStats")
     (AuditLogObject, "auditLog")
     (MergeSystemsObject, "mergeSystems")

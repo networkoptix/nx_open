@@ -39,6 +39,9 @@ public:
     void setReadOnly(bool readOnly);
 
     void setExportScheduleButtonEnabled(bool enabled);
+
+    void setLockedMode(bool locked);
+
 signals:
     void hasChangesChanged();
 
@@ -73,4 +76,5 @@ private:
     bool m_updating;
 
     QString m_alertText;
+    bool m_lockedMode = false;
 };

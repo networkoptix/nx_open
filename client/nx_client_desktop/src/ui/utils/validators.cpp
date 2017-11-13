@@ -92,6 +92,24 @@ namespace Qn {
         };
     }
 
+    TextValidateFunction validatorsConcatenator(const ValidatorsList& validators)
+    {
+        return [validators](const QString& text)
+        {
+
+            auto result = kValidResult;
+            for (const auto& validator: validators)
+            {
+                const auto tmpResult = validator(text);
+                if (tmpResult.state == QValidator::Invalid)
+                    return tmpResult;
+                if (tmpResult.state < result.state)
+                    result = tmpResult;
+            }
+            return result;
+        };
+    }
+
     TextValidateFunction defaultIntValidator(int minValue, int maxValue, const QString& errorMessage)
     {
         return [minValue, maxValue, errorMessage](const QString& text)

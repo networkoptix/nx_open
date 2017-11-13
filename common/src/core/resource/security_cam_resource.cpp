@@ -113,6 +113,13 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         this, &QnSecurityCamResource::at_motionRegionChanged,
         Qt::DirectConnection);
 
+    connect(this, &QnNetworkResource::propertyChanged, this,
+        [this](const QnResourcePtr& /*resource*/, const QString& key)
+        {
+            if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
+                emit capabilitiesChanged(toSharedPointer());
+        });
+
     QnMediaResource::initMediaResource();
 }
 
@@ -143,6 +150,12 @@ bool QnSecurityCamResource::removeProperty(const QString& key)
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(Qn::kGroupPlayParamName);
+}
+
+bool QnSecurityCamResource::needsToChangeDefaultPassword() const
+{
+    return isDefaultAuth()
+        && hasCameraCapabilities(Qn::SetUserPasswordCapability);
 }
 
 const QnResource* QnSecurityCamResource::toResource() const {

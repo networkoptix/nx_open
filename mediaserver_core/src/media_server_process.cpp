@@ -2490,7 +2490,7 @@ void MediaServerProcess::run()
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     auto auditManager = std::make_unique<QnMServerAuditManager>(
-        qnServerModule->lastRunningTime(), commonModule());
+        qnServerModule->lastRunningTimeBeforeRestart(), commonModule());
 
     TimeBasedNonceProvider timeBasedNonceProvider;
     CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);
@@ -3154,6 +3154,8 @@ void MediaServerProcess::run()
 
     hlsSessionPool.reset();
 
+    // Remove all stream recorders.
+    remoteArchiveSynchronizer.reset();
     recordingManager.reset();
 
     mserverResourceSearcher.reset();
@@ -3180,7 +3182,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();

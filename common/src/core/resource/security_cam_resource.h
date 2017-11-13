@@ -206,6 +206,8 @@ public:
 
     bool isGroupPlayOnly() const;
 
+    bool needsToChangeDefaultPassword() const;
+
     //!Implementation of QnMediaResource::toResource
     virtual const QnResource* toResource() const override;
     //!Implementation of QnMediaResource::toResource
@@ -338,6 +340,7 @@ signals:
     void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
+    void capabilitiesChanged(const QnResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 

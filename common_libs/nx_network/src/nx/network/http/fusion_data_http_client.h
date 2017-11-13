@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <functional>
 
@@ -25,6 +25,17 @@ void serializeToUrl(const InputData& data, QUrl* const url)
     url->setQuery(urlQuery);
 }
 
+/**
+ * Default overload for types that do not support this.
+ */
+template<typename T>
+bool deserializeFromHeaders(
+    const nx_http::HttpHeaders& /*from*/,
+    T* /*what*/)
+{
+    return false;
+}
+
 template<typename OutputData>
 void processHttpResponse(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> handler,
@@ -34,21 +45,28 @@ void processHttpResponse(
 {
     if (errCode != SystemError::noError ||
         !response ||
-        (response->statusLine.statusCode / 100) != (nx_http::StatusCode::ok / 100))
+        !nx_http::StatusCode::isSuccessCode(response->statusLine.statusCode))
     {
-        handler(
-            errCode,
-            response,
-            OutputData());
+        handler(errCode, response, OutputData());
         return;
     }
 
-    bool success = false;
-    OutputData outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
-    if (!success)
+    OutputData outputData;
+
+    if (!msgBody.isEmpty())
     {
-        handler(SystemError::invalidData, response, OutputData());
-        return;
+        bool success = false;
+        outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
+        if (!success)
+        {
+            handler(SystemError::invalidData, response, OutputData());
+            return;
+        }
+    }
+    else
+    {
+        // Trying to read response data from HTTP headers.
+        deserializeFromHeaders(response->headers, &outputData);
     }
 
     handler(SystemError::noError, response, std::move(outputData));
@@ -240,7 +258,7 @@ private:
     }
 };
 
-/** 
+/**
  * Specialization for void output data.
  */
 template<typename InputData>

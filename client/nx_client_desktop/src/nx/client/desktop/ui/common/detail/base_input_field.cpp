@@ -42,11 +42,13 @@ public:
     void setIntermediateResult();
 
     void updateStateWhileActive();
+    void updateVisualStateDelayed();
 
 public:
     BaseInputField* parent;
     QLabel* title;
     QnWordWrappedLabel* hint;
+    QString customHintText;
     QWidget* input;
     QPalette defaultPalette;
 
@@ -56,9 +58,6 @@ public:
     const BaseInputField::AccessorPtr textAccessor;
     const BaseInputField::AccessorPtr readOnlyAccessor;
     const BaseInputField::AccessorPtr placeholderAccessor;
-
-private:
-    void updateVisualStateDelayed();
 
 private:
     Qn::ValidationResult lastResult;
@@ -111,7 +110,7 @@ void BaseInputFieldPrivate::updateVisualStateDelayed()
     const auto updateFunction =
         [this]()
         {
-            setHintText(lastResult.errorMessage);
+            setHintText(customHintText.isEmpty() ? lastResult.errorMessage : customHintText);
 
             QPalette palette = defaultPalette;
             if (lastResult.state == QValidator::Invalid)
@@ -120,7 +119,7 @@ void BaseInputFieldPrivate::updateVisualStateDelayed()
             if (useWarningStyleForControl)
                 input->setPalette(palette);
 
-            hint->setPalette(palette);
+            hint->setPalette(customHintText.isEmpty() ? palette : defaultPalette);
         };
     executeDelayedParented(updateFunction, 0, this);
 }
@@ -299,16 +298,11 @@ void BaseInputField::setTitle(const QString& value)
     d->title->setVisible(!value.isEmpty());
 }
 
-QString BaseInputField::hint() const
-{
-    Q_D(const BaseInputField);
-    return d->hint->text();
-}
-
-void BaseInputField::setHint(const QString& value)
+void BaseInputField::setCustomHint(const QString& hint)
 {
     Q_D(BaseInputField);
-    d->setHintText(value);
+    d->customHintText = hint;
+    d->updateVisualStateDelayed();
 }
 
 QString BaseInputField::text() const

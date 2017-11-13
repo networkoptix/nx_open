@@ -234,6 +234,14 @@ void HanwhaArchiveDelegate::setOverlappedId(int overlappedId)
     m_streamReader->setOverlappedId(overlappedId);
 }
 
+bool HanwhaArchiveDelegate::setQuality(
+    MediaQuality /*quality*/,
+    bool /*fastSwitch*/,
+    const QSize& /*resolution*/)
+{
+    return true;
+}
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx

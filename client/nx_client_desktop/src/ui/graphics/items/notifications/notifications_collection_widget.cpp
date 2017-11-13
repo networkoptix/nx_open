@@ -51,6 +51,9 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
+#include <nx/client/desktop/ui/actions/action.h>
+
 #include <health/system_health_helper.h>
 
 #include <utils/common/delayed.h>
@@ -154,6 +157,39 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                 return;
             at_notificationCache_fileDownloaded(filename);
         });
+
+    const auto defaultPasswordWatcher = context->instance<DefaultPasswordCamerasWatcher>();
+    const auto updateDefaultCameraPasswordNotification =
+        [this, defaultPasswordWatcher]()
+        {
+            if (!defaultPasswordWatcher->notificationIsVisible())
+            {
+                cleanUpItem(m_currentDefaultPasswordChangeWidget);
+                m_currentDefaultPasswordChangeWidget = nullptr;
+            }
+            else if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            {
+                NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
+                const auto parametersGetter =
+                    [defaultPasswordWatcher]()
+                    {
+                        return action::Parameters(
+                            defaultPasswordWatcher->camerasWithDefaultPassword())
+                            .withArgument(Qn::ShowSingleCameraRole, true);
+                    };
+
+                m_currentDefaultPasswordChangeWidget =
+                    addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
+                        QnNotificationLevel::Value::ImportantNotification,
+                        tr("Set Passwords"), false);
+            }
+        };
+
+    updateDefaultCameraPasswordNotification();
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::notificationIsVisibleChanged,
+        this, updateDefaultCameraPasswordNotification);
+    connect(context, &QnWorkbenchContext::userChanged,
+        this, updateDefaultCameraPasswordNotification);
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget()
@@ -204,6 +240,14 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         return;
 
     NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
+
+    const auto requiredPermission = msecSinceEpoch < 0
+        ? Qn::ViewLivePermission
+        : Qn::ViewFootagePermission;
+
+    if (accessController()->hasPermissions(camera, requiredPermission))
+        return;
+
     QnSingleThumbnailLoader* loader = new QnSingleThumbnailLoader(
         camera,
         msecSinceEpoch,
@@ -296,6 +340,45 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
         });
 
     m_customPopupItems.insert(action->getParams().actionId, widget);
+}
+
+QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
+    action::IDType actionId,
+    const ParametersGetter& parametersGetter,
+    QnNotificationLevel::Value notificationLevel,
+    const QString& buttonText,
+    bool closeable)
+{
+    if (m_list->itemCount() >= kMaxNotificationItems)
+        return nullptr;
+
+    const auto action = menu()->action(actionId);
+    if (!action)
+        return nullptr;
+
+    QnNotificationWidget* item = new QnNotificationWidget(m_list);
+    item->setText(action->text());
+    item->setTooltipText(action->toolTip());
+    item->setNotificationLevel(notificationLevel);
+    item->setCloseButtonAvailable(closeable);
+
+    if (!buttonText.isEmpty())
+    {
+        item->addTextButton(action->icon(), buttonText,
+            [this, actionId, parameters = parametersGetter()]()
+            {
+                const auto triggerAction =
+                    [this, actionId, parameters] { menu()->trigger(actionId, parameters); };
+
+                // Action will trigger additional event loop, which will cause problems here.
+                executeDelayedParented(triggerAction, kDefaultDelay, this);
+            });
+    }
+
+    item->addActionButton(qnSkin->icon("events/alert.png"), actionId);
+
+    m_list->addItem(item, !closeable);
+    return item;
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
@@ -646,7 +729,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         action = params.value<vms::event::AbstractActionPtr>();
         if (action)
         {
-            auto resourceId = action->getRuntimeParams().eventResourceId;
+            QnUuid resourceId;
+            const auto runtimeParameters = action->getRuntimeParams();
+            if (!runtimeParameters.metadata.cameraRefs.empty())
+                resourceId = runtimeParameters.metadata.cameraRefs[0];
+            else
+                resourceId = runtimeParameters.eventResourceId;
+
             resource = resourcePool()->getResourceById(resourceId);
         }
     }

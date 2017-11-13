@@ -208,15 +208,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     return result;
 }
 
-void QnMulticodecRtpReader::processTcpRtcp(QnRtspIoDevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity)
+void QnMulticodecRtpReader::processTcpRtcp(quint8* buffer, int bufferSize, int bufferCapacity)
 {
-    bool gotValue = false;
-    QnRtspStatistic stats = m_RtpSession.parseServerRTCPReport(buffer+4, bufferSize-4, &gotValue);
-    if (gotValue) {
-        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
-            ioDevice->setStatistic(stats);
-    }
-
+    if (!m_RtpSession.processTcpRtcpData(buffer, bufferSize))
+        NX_VERBOSE(this, "Can't parse RTCP report");
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {
@@ -287,10 +282,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             break; // error
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
-        int channelNum = m_RtpSession.getChannelNum(rtpChannelNum);
-        auto parser = m_tracks[channelNum].parser;
-        QnRtspIoDevice* ioDevice = m_tracks[channelNum].ioDevice;
-        if (m_tracks.size() < channelNum || !parser)
+        int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
+        auto parser = m_tracks[trackNum].parser;
+        QnRtspIoDevice* ioDevice = m_tracks[trackNum].ioDevice;
+        if (m_tracks.size() < trackNum || !parser)
             continue;
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
@@ -300,7 +295,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
             const auto length = readed - kInterleavedRtpOverTcpPrefixLength;
 
-            const auto rtcpStaticstics = rtspStatistics(offset, length, rtpChannelNum);
+            const auto rtcpStaticstics = rtspStatistics(offset, length, trackNum, rtpChannelNum);
 
             if (!parser->processData(
                 (quint8*)m_demuxedData[rtpChannelNum]->data(),
@@ -323,7 +318,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else if (format == QnRtspClient::TT_VIDEO_RTCP || format == QnRtspClient::TT_AUDIO_RTCP)
         {
-            processTcpRtcp(ioDevice, (quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
+            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
             m_demuxedData[rtpChannelNum]->clear();
         }
         else {
@@ -401,6 +396,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 const auto statistics = rtspStatistics(
                     rtpBuffer - bufferBase,
                     bytesRead,
+                    rtpChannelNum,
                     rtpChannelNum);
 
                 if (!track.parser->processData(
@@ -840,18 +836,19 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
     int rtpBufferOffset,
     int rtpPacketSize,
-    int channel)
+    int track,
+    int rtpChannel)
 {
-    if (m_tracks.size() - 1 < channel)
+    if (m_tracks.size() - 1 < track)
         return QnRtspStatistic();
 
-    auto ioDevice = m_tracks[channel].ioDevice;
+    auto ioDevice = m_tracks[track].ioDevice;
     if (!ioDevice)
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
     const auto extensionNtpTime = parseOnvifNtpExtensionTime(
-        (quint8*)m_demuxedData[channel]->data() + rtpBufferOffset,
+        (quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset,
         rtpPacketSize);
 
     if (extensionNtpTime.is_initialized())

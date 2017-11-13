@@ -6,17 +6,12 @@
 #include "utils/common/synctime.h"
 #include <nx/utils/log/assert.h>
 
-namespace
-{
-}
-
 QnAuditRecord filteredRecord(QnAuditRecord record)
 {
     if (!record.isLoginType())
         record.authSession.userAgent.clear(); // optimization. It used for login type only
     return record;
 }
-
 
 QnMServerAuditManager::QnMServerAuditManager(
     std::chrono::milliseconds lastRunningTime, QObject* parent)
@@ -28,21 +23,15 @@ QnMServerAuditManager::QnMServerAuditManager(
     qnServerDb->closeUnclosedAuditRecords((int) maxTime.count());
 
     m_internalId = qnServerDb->auditRecordMaxId();
-    connect (&m_timer, &QTimer::timeout, this,
-        [this]()
-        {
-            decltype(m_recordsToAdd) records;
-            {
-                QnMutexLocker lock(&m_mutex);
-                if (m_recordsToAdd.empty())
-                    return;
-
-                std::swap(records, m_recordsToAdd);
-            }
-            if (!qnServerDb->addAuditRecords(records))
-                qWarning() << "Failed to add" << records.size() << "audit trail records";
-        });
+    connect(&m_timer, &QTimer::timeout, this, [this]() { flushRecords(); });
     m_timer.start(1000 * 5);
+}
+
+QnMServerAuditManager::~QnMServerAuditManager()
+{
+    m_timer.stop();
+    flushRecords();
+    qnServerDb->closeUnclosedAuditRecords((int) (qnSyncTime->currentMSecsSinceEpoch() / 1000));
 }
 
 int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
@@ -70,4 +59,19 @@ int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAud
     QnMutexLocker lock(&m_mutex);
     m_recordsToAdd[internalId] = filteredRecord(record);
     return internalId;
+}
+
+void QnMServerAuditManager::flushRecords()
+{
+    decltype(m_recordsToAdd) records;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_recordsToAdd.empty())
+            return;
+
+        std::swap(records, m_recordsToAdd);
+    }
+
+    if (!qnServerDb->addAuditRecords(records))
+        qWarning() << "Failed to add" << records.size() << "audit trail records";
 }

@@ -43,7 +43,7 @@ int QnGetNonceRestHandler::executeGet(
     {
         if (m_remotePath.isEmpty())
         {
-            result.setError(QnRestResult::InvalidParameter, "Paramiter url is forbidden");
+            result.setError(QnRestResult::InvalidParameter, "Parameter url is forbidden");
             return nx_http::StatusCode::forbidden;
         }
 
