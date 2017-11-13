@@ -178,8 +178,8 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     if (result.offset < 0)
         return result; //< Error: negative offset.
 
-    const auto payloadPosition = result.offset + result.payloadData.size();
-    if (payloadPosition < 0 || payloadPosition > result.messageSize)
+    const auto payloadEndPosition = result.offset + result.payloadData.size();
+    if (payloadEndPosition < 0 || payloadEndPosition > result.messageSize)
         return result; // Error: position overflow.
 
     *ok = true;
