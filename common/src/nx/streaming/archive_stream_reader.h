@@ -124,7 +124,7 @@ protected:
     int m_freq;
     int m_channels;
 
-    bool m_FirstTime;
+    bool m_firstTime;
 
     volatile bool m_wakeup;
     qint64 m_tmpSkipFramesToTime;

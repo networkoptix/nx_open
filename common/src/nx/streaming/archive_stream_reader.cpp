@@ -30,7 +30,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_bottomIFrameTime(-1),
     m_primaryVideoIdx(-1),
     m_audioStreamIndex(-1),
-    m_FirstTime(true),
+    m_firstTime(true),
     m_tmpSkipFramesToTime(AV_NOPTS_VALUE),
 //private
     m_selectedAudioChannel(0),
@@ -437,16 +437,16 @@ begin_label:
     if (needToStop())
         return QnAbstractMediaDataPtr();
 
-    if (m_FirstTime)
+    if (m_firstTime)
     {
         // this is here instead if constructor to unload ui thread
         m_BOF = true;
         if (init()) {
-            m_FirstTime = false;
+            m_firstTime = false;
         }
         else {
             if (m_resource->hasFlags(Qn::local))
-                m_FirstTime = false; //< Do not try to reopen local file if it can't be opened.
+                m_firstTime = false; //< Do not try to reopen local file if it can't be opened.
             // If media data can't be opened report 'no data'
             return createEmptyPacket(isReverseMode());
         }
@@ -1238,7 +1238,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
 
 bool QnArchiveStreamReader::isOpened() const
 {
-    return !m_FirstTime;
+    return !m_firstTime;
 }
 
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
