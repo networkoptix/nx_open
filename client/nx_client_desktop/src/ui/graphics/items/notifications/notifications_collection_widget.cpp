@@ -178,10 +178,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                             .withArgument(Qn::ShowSingleCameraRole, true);
                     };
 
-                m_currentDefaultPasswordChangeWidget =
-                    addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
-                        QnNotificationLevel::Value::ImportantNotification,
-                        tr("Set Passwords"), false);
+                m_currentDefaultPasswordChangeWidget = addCustomPopup(
+                    action::ChangeDefaultCameraPasswordAction,
+                    parametersGetter,
+                    QnNotificationLevel::Value::ImportantNotification,
+                    tr("Set Passwords"),
+                    false);
             }
         };
 
@@ -356,15 +358,15 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     if (!action)
         return nullptr;
 
-    QnNotificationWidget* item = new QnNotificationWidget(m_list);
+    auto item = new QnNotificationWidget(m_list);
     item->setText(action->text());
-    item->setTooltipText(action->toolTip());
     item->setNotificationLevel(notificationLevel);
     item->setCloseButtonAvailable(closeable);
 
     if (!buttonText.isEmpty())
     {
-        item->addTextButton(action->icon(), buttonText,
+        item->addTextButton(action->icon(),
+            buttonText,
             [this, actionId, parameters = parametersGetter()]()
             {
                 const auto triggerAction =
