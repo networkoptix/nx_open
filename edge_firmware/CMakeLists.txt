@@ -14,6 +14,8 @@ set(build.configuration "") #< Used by create_arm_installer.sh as suffix to lib 
 set(toolchain_lib_directory)
 if(arch STREQUAL "arm")
     set(toolchain_lib_directory "${toolchain_directory}/arm-unknown-linux-gnueabihf/sysroot/lib")
+elseif(arch STREQUAL "aarch64")
+    set(toolchain_lib_directory "${toolchain_directory}/aarch64-unknown-linux-gnu/sysroot/lib")
 endif()
 
 set(conf_file maven/filter-resources/create_arm_installer.conf)
