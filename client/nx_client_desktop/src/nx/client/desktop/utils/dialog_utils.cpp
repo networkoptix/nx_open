@@ -11,8 +11,8 @@ void setDialogParent(QDialog* dialog, QWidget* parent)
     // as widget on the parent
     const auto flags = dialog->windowFlags();
     dialog->setParent(nullptr); // Workaround for QTBUG-34767. In some cases we have to reset
-                                  // parent and specifiy the new one, overwise window order
-                                  // will be wrong
+                                // parent and specifiy the new one, overwise window order
+                                // will be wrong
     dialog->setParent(parent);
     dialog->setWindowFlags(flags);
 }
@@ -21,5 +21,3 @@ void setDialogParent(QDialog* dialog, QWidget* parent)
 } // namespace desktop
 } // namespace client
 } // namespace nx
-
-
