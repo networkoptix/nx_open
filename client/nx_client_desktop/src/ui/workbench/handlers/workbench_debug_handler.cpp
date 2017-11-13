@@ -125,6 +125,29 @@ public:
                 dialog->show();
             });
 
+        addButton(lit("Toggle default password"),
+            [this]
+            {
+                const auto cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
+                if (cameras.empty())
+                    return;
+
+                const auto caps = Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability;
+
+                const bool isDefaultPassword = cameras.first()->needsToChangeDefaultPassword();
+
+                for (const auto& camera: cameras)
+                {
+                    // Toggle current option.
+                    if (isDefaultPassword)
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() & ~caps);
+                    else
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() | caps);
+                    camera->saveParamsAsync();
+                }
+
+            });
+
         addButton(lit("Palette"), [this]
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
