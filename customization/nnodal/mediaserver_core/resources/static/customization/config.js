@@ -26,5 +26,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'nvision';
 Config.cloud.productName = 'nvision Cloud';
-
+Config.defaultLanguage = 'en_US';
 Config.supportedLanguages = ['en_US', 'zh_CN', 'zh_TW'];
