@@ -74,12 +74,6 @@ nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
 
 void RemoteArchiveWorkerPool::processTasksUnsafe()
 {
-    if (m_workers.size() >= m_maxTaskCount)
-    {
-        m_timerId = scheduleTaskGrabbing(); //< All workers are busy
-        return;
-    }
-
     if (!m_taskMapAccessor)
     {
         NX_ASSERT(false, lit("No task map accessor. Pool is useless"));
@@ -96,6 +90,9 @@ void RemoteArchiveWorkerPool::processTasksUnsafe()
     auto lockedMap = lockableTaskMap->lock();
     for (auto itr = lockedMap->begin(); itr != lockedMap->end();)
     {
+        if (m_workers.size() >= m_maxTaskCount)
+            break;
+
         auto taskId = itr->first;
         if (m_workers.find(taskId) != m_workers.cend())
         {
@@ -109,9 +106,6 @@ void RemoteArchiveWorkerPool::processTasksUnsafe()
         m_workers[itr->first]->start();
 
         itr = lockedMap->erase(itr);
-
-        if (m_workers.size() >= m_maxTaskCount)
-            break;
     }
 
     m_timerId = scheduleTaskGrabbing();
