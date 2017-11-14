@@ -57,7 +57,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using CrossNatConnectorFactoryFunction = 
+using CrossNatConnectorFactoryFunction =
     std::unique_ptr<AbstractCrossNatConnector>(const AddressEntry&);
 
 class NX_NETWORK_API CrossNatConnectorFactory:

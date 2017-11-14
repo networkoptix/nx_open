@@ -6,12 +6,14 @@ namespace nx {
 namespace cloud {
 namespace relaying {
 
-struct Statistics
+struct NX_RELAYING_API Statistics
 {
     int listeningServerCount = 0;
     int connectionsCount = 0;
     int connectionsAveragePerServerCount = 0;
     int connectionsAcceptedPerMinute = 0;
+
+    bool operator==(const Statistics& right) const;
 };
 
 #define Statistics_relaying_Fields (listeningServerCount)(connectionsCount) \

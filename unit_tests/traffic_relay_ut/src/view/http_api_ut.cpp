@@ -1,5 +1,7 @@
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
@@ -8,6 +10,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/random.h>
 
 #include <nx/cloud/relay/controller/connect_session_manager.h>
 #include <nx/cloud/relay/controller/statistics_provider.h>
@@ -211,14 +214,49 @@ TEST_F(HttpApiOpenConnectionToTheTargetHost, request_is_delivered)
 //-------------------------------------------------------------------------------------------------
 // HttpApiStatistics
 
+namespace {
+
+class StatisticsProviderStub:
+    public controller::AbstractStatisticsProvider
+{
+public:
+    virtual controller::Statistics getAllStatistics() const override
+    {
+        return m_statistics;
+    }
+
+    void setStatistics(controller::Statistics statistics)
+    {
+        m_statistics = statistics;
+    }
+
+private:
+    controller::Statistics m_statistics;
+};
+
+} // namespace
+
 class HttpApiStatistics:
     public HttpApi
 {
 public:
+    HttpApiStatistics()
+    {
+        m_statisticsProviderFactoryBak =
+            controller::StatisticsProviderFactory::instance().setCustomFunc(
+                std::bind(&HttpApiStatistics::createStatisticsProviderStub, this));
+    }
+
     ~HttpApiStatistics()
     {
         if (m_httpClient)
             m_httpClient->pleaseStopSync();
+
+        if (m_statisticsProviderFactoryBak)
+        {
+            controller::StatisticsProviderFactory::instance().setCustomFunc(
+                std::move(*m_statisticsProviderFactoryBak));
+        }
     }
 
 protected:
@@ -236,8 +274,8 @@ protected:
 
     void andExpectedStatisticsIsProvided()
     {
-        /*const auto prevStatistics =*/ m_receivedStatistics.pop();
-        // TODO
+        const auto prevStatistics = m_receivedStatistics.pop();
+        ASSERT_EQ(m_expectedStatistics, prevStatistics);
     }
 
 private:
@@ -246,6 +284,28 @@ private:
 
     std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
     nx::utils::SyncQueue<nx::cloud::relay::controller::Statistics> m_receivedStatistics;
+    boost::optional<controller::StatisticsProviderFactory::Function>
+        m_statisticsProviderFactoryBak;
+    controller::Statistics m_expectedStatistics;
+
+    std::unique_ptr<controller::AbstractStatisticsProvider> createStatisticsProviderStub()
+    {
+        auto result = std::make_unique<StatisticsProviderStub>();
+        m_expectedStatistics = generateRandomStatistics();
+        result->setStatistics(m_expectedStatistics);
+        return std::move(result);
+    }
+
+    controller::Statistics generateRandomStatistics()
+    {
+        controller::Statistics statistics;
+        statistics.relaying.connectionsAcceptedPerMinute =
+            nx::utils::random::number<>(1, 20);
+        statistics.relaying.connectionsCount = nx::utils::random::number<>(1, 20);
+        statistics.relaying.connectionsAveragePerServerCount = nx::utils::random::number<>(1, 20);
+        statistics.relaying.listeningServerCount = nx::utils::random::number<>(1, 20);
+        return statistics;
+    }
 
     void saveStatisticsRequestResult(
         SystemError::ErrorCode /*systemErrorCode*/,
