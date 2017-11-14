@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from account_backend import AccountManager
 from django.utils.deprecation import CallableFalse, CallableTrue
-from django.template.defaultfilters import truncatechars
+from django.utils.html import format_html
 
 
 class Account(PermissionsMixin):
@@ -45,13 +45,13 @@ class Account(PermissionsMixin):
         return CallableFalse
 
     def short_email(self):
-        return truncatechars(self.email, 25)
+        return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)
 
     def short_first_name(self):
-        return truncatechars(self.first_name, 10)
+        return format_html("<div class='truncate-name'><span>{}</span></div>", self.first_name)
 
     def short_last_name(self):
-        return truncatechars(self.last_name, 10)
+        return format_html("<div class='truncate-name'><span>{}</span></div>", self.last_name)
 
     short_email.short_description = "email"
     short_first_name.short_description = "first name"
