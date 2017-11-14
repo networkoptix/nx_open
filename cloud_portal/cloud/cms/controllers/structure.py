@@ -86,7 +86,7 @@ def update_from_object(cms_structure):
                     label, name, value, description = record
             else:
                 name = record['name']
-                value = record['value']
+                value = record['value'] if 'value' in record else ""
                 label = record['label'] if 'label' in record else ""
                 old_name = record['old_name'] if 'old_name' in record else None
                 description = record['description'] if 'description' in record else None
