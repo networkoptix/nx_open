@@ -34,7 +34,7 @@ public:
     inline Value* operator->() { return m_value; }
     inline const Value* operator->() const { return m_value; }
     inline Locker& operator*() { return *m_value; }
-    inline const Locker& operator*() const { return m_value; }
+    inline const Locker& operator*() const { return *m_value; }
 
 private:
     mutable QnMutex* m_mutex;
