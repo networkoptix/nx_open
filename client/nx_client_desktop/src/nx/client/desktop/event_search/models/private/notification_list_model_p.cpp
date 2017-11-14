@@ -52,6 +52,17 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         this, &Private::removeNotification);
 
     connect(q, &EventListModel::modelReset, this, [this]() { m_uuidHashes.clear(); });
+
+    connect(q, &EventListModel::rowsAboutToBeRemoved, this,
+        [this](const QModelIndex& /*parent*/, int first, int last)
+        {
+            for (int row = first; row <= last; ++row)
+            {
+                const auto& event = this->q->getEvent(row);
+                const auto extraData = Private::extraData(event);
+                m_uuidHashes[extraData.first][extraData.second].remove(event.id);
+            }
+        });
 }
 
 NotificationListModel::Private::~Private()
@@ -63,12 +74,6 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 {
     NX_ASSERT(event.extraData.canConvert<ExtraData>(), Q_FUNC_INFO);
     return event.extraData.value<ExtraData>();
-}
-
-void NotificationListModel::Private::beforeRemove(const EventData& event)
-{
-    const auto extraData = Private::extraData(event);
-    m_uuidHashes[extraData.first][extraData.second].remove(event.id);
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)

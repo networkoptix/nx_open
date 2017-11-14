@@ -24,7 +24,6 @@ public:
     explicit Private(SystemHealthListModel* q);
     virtual ~Private() override;
 
-    void beforeRemove(const EventData& event);
     int eventPriority(const EventData& event) const;
 
     using ExtraData = QPair<QnSystemHealth::MessageType, QnResourcePtr>;

@@ -23,7 +23,6 @@ namespace desktop {
 class EventTile: public Customized<QWidget>
 {
     Q_OBJECT
-    Q_PROPERTY(QnUuid id READ id)
     Q_PROPERTY(bool closeable READ closeable WRITE setCloseable)
     Q_PROPERTY(QString title READ title WRITE setTitle)
     Q_PROPERTY(QColor titleColor READ titleColor WRITE setTitleColor)
@@ -34,9 +33,8 @@ class EventTile: public Customized<QWidget>
     using base_type = Customized<QWidget>;
 
 public:
-    explicit EventTile(const QnUuid& id, QWidget* parent = nullptr);
+    explicit EventTile(QWidget* parent = nullptr);
     explicit EventTile(
-        const QnUuid& id,
         const QString& title,
         const QPixmap& icon,
         const QString& timestamp = QString(),
@@ -44,8 +42,6 @@ public:
         QWidget* parent = nullptr);
 
     virtual ~EventTile() override;
-
-    QnUuid id() const;
 
     bool closeable() const;
     void setCloseable(bool value);
@@ -91,7 +87,6 @@ private:
 private:
     QScopedPointer<Ui::EventTile> ui;
     QPushButton* const m_closeButton = nullptr;
-    QnUuid m_id;
     bool m_closeable = false;
     CommandActionPtr m_action; //< Button action.
 };

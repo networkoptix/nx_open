@@ -22,8 +22,6 @@ public:
     using ExtraData = QPair<QnUuid /*ruleId*/, QnResourcePtr>;
     static ExtraData extraData(const EventData& event);
 
-    void beforeRemove(const EventData& event);
-
 private:
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);

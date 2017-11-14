@@ -52,9 +52,8 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    void defaultAction(const QnUuid& id);
-    void closeAction(const QnUuid& id);
-    void linkAction(const QnUuid& id, const QString& link);
+    virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
     void clear();
 
@@ -76,17 +75,11 @@ protected:
     bool removeEvent(const QnUuid& id);
 
     QModelIndex indexOf(const QnUuid& id) const;
-    EventData getEvent(const QModelIndex& index) const;
+    EventData getEvent(int row) const;
 
     virtual QString timestampText(qint64 timestampMs) const;
 
-    virtual void triggerDefaultAction(const EventData& event);
-    virtual void triggerCloseAction(const EventData& event);
-    virtual void triggerLinkAction(const EventData& event, const QString& link);
-
     virtual int eventPriority(const EventData& event) const;
-
-    virtual void beforeRemove(const EventData& event);
 
     void finishFetch(); //< Just emits fetchFinished signal.
 

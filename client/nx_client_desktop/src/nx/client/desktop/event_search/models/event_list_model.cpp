@@ -105,21 +105,14 @@ bool EventListModel::updateEvent(const EventData& event)
     return d->updateEvent(event);
 }
 
-bool EventListModel::removeEvent(const QnUuid& id)
-{
-    return d->removeEvent(id);
-}
-
 QModelIndex EventListModel::indexOf(const QnUuid& id) const
 {
     return index(d->indexOf(id));
 }
 
-EventListModel::EventData EventListModel::getEvent(const QModelIndex& index) const
+EventListModel::EventData EventListModel::getEvent(int row) const
 {
-    return index.model() == this && index.isValid()
-        ? d->getEvent(index.row())
-        : EventData();
+    return d->getEvent(row);
 }
 
 void EventListModel::clear()
@@ -139,46 +132,44 @@ QString EventListModel::timestampText(qint64 timestampMs) const
     return dateTime.time().toString(Qt::DefaultLocaleShortDate);
 }
 
-void EventListModel::defaultAction(const QnUuid& id)
+bool EventListModel::removeEvent(const QnUuid& id)
 {
-    d->defaultAction(id);
+    return d->removeEvent(id);
 }
 
-void EventListModel::closeAction(const QnUuid& id)
+bool EventListModel::removeRows(int row, int count, const QModelIndex& parent)
 {
-    d->closeAction(id);
+    if (parent.isValid() || row < 0 || count < 0 || row + count > rowCount())
+        return false;
+
+    d->removeEvents(row, count);
+    return true;
 }
 
-void EventListModel::linkAction(const QnUuid& id, const QString& link)
+bool EventListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
 {
-    d->linkAction(id, link);
-}
+    if (!index.isValid() || index.model() != this)
+        return false;
 
-void EventListModel::triggerDefaultAction(const EventData& event)
-{
-    if (event.actionId != ui::action::NoAction)
-        menu()->triggerIfPossible(event.actionId, event.actionParameters);
-}
+    switch (role)
+    {
+        case Qn::DefaultTriggerRole:
+        case Qn::ActivateLinkRole:
+        {
+            const auto& event = getEvent(index.row());
+            if (event.actionId != ui::action::NoAction)
+                menu()->triggerIfPossible(event.actionId, event.actionParameters);
+            return true;
+        }
 
-void EventListModel::triggerCloseAction(const EventData& event)
-{
-    NX_ASSERT(event.removable, Q_FUNC_INFO, "Event is not closeable");
-    if (event.removable)
-        removeEvent(event.id);
-}
-
-void EventListModel::triggerLinkAction(const EventData& event, const QString& link)
-{
-    triggerDefaultAction(event);
+        default:
+            return false;
+    }
 }
 
 int EventListModel::eventPriority(const EventData& /*event*/) const
 {
     return 0;
-}
-
-void EventListModel::beforeRemove(const EventData& /*event*/)
-{
 }
 
 bool EventListModel::canFetchMore(const QModelIndex& /*parent*/) const

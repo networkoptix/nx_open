@@ -76,17 +76,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    const auto handleActions =
-        [this](EventRibbon* ribbon, EventListModel* model)
-        {
-            connect(ribbon, &EventRibbon::clicked, model,
-                &EventListModel::defaultAction, Qt::QueuedConnection);
-            connect(ribbon, &EventRibbon::closeRequested, model,
-                &EventListModel::closeAction, Qt::QueuedConnection);
-            connect(ribbon, &EventRibbon::linkActivated, model,
-                &EventListModel::linkAction, Qt::QueuedConnection);
-        };
-
     auto sortModel = new SystemHealthSortFilterModel(this);
     auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);
     sortModel->setSourceModel(m_systemHealthModel);
@@ -95,10 +84,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     m_eventRibbon->setModel(new ConcatenationListModel(
         {systemHealthListModel, m_notificationsModel}, this));
-
-    // Each model will react only to ids of its own items.
-    handleActions(m_eventRibbon, m_systemHealthModel);
-    handleActions(m_eventRibbon, m_notificationsModel);
 }
 
 NotificationListWidget::Private::~Private()

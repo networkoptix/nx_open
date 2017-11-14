@@ -18,7 +18,7 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 20;
+static constexpr int kFetchBatchSize = 1000;
 
 } // namespace
 
@@ -137,14 +137,14 @@ void MotionSearchListModel::Private::fetchMore()
 qint64 MotionSearchListModel::Private::firstTimeMs() const
 {
     return q->rowCount() > 0
-        ? q->getEvent(q->index(q->rowCount() - 1)).timestampMs
+        ? q->getEvent(q->rowCount() - 1).timestampMs
         : std::numeric_limits<qint64>::max();
 }
 
 qint64 MotionSearchListModel::Private::lastTimeMs() const
 {
     return q->rowCount() > 0
-        ? q->getEvent(q->index(0)).timestampMs
+        ? q->getEvent(0).timestampMs
         : 0;
 }
 

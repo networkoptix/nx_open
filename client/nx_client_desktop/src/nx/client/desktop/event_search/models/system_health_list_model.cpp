@@ -17,26 +17,35 @@ SystemHealthListModel::~SystemHealthListModel()
 {
 }
 
-void SystemHealthListModel::triggerDefaultAction(const EventData& event)
+bool SystemHealthListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    base_type::triggerDefaultAction(event);
+    const auto result = base_type::setData(index, value, role);
+    if (role != Qn::DefaultTriggerRole || !result)
+        return result;
 
-    if (Private::extraData(event).first == QnSystemHealth::CloudPromo)
-        menu()->trigger(ui::action::HideCloudPromoAction);
-}
-
-void SystemHealthListModel::triggerCloseAction(const EventData& event)
-{
+    const auto& event = getEvent(index.row());
     if (Private::extraData(event).first == QnSystemHealth::CloudPromo)
         menu()->trigger(ui::action::HideCloudPromoAction);
 
-    base_type::triggerCloseAction(event);
+    return result;
 }
 
-void SystemHealthListModel::beforeRemove(const EventData& event)
+bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& parent)
 {
-    base_type::beforeRemove(event);
-    d->beforeRemove(event);
+    if (parent.isValid() || row < 0 || count < 0 || row + count > rowCount())
+        return false;
+
+    for (int i = 0; i <= count; ++i)
+    {
+        const auto& event = getEvent(row + i);
+        if (Private::extraData(event).first == QnSystemHealth::CloudPromo)
+        {
+            menu()->trigger(ui::action::HideCloudPromoAction);
+            break;
+        }
+    }
+
+    return base_type::removeRows(row, count);
 }
 
 int SystemHealthListModel::eventPriority(const EventData& event) const

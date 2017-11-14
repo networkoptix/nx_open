@@ -56,11 +56,6 @@ void EventSearchWidgetPrivateBase::connectEventRibbonToModel(
     else
         ribbon->setModel(model);
 
-    connect(ribbon, &EventRibbon::clicked, model,
-        &EventListModel::defaultAction, Qt::QueuedConnection);
-    connect(ribbon, &EventRibbon::linkActivated, model,
-        &EventListModel::linkAction, Qt::QueuedConnection);
-
     const auto fetchMoreIfNeeded =
         [ribbon, model]()
         {

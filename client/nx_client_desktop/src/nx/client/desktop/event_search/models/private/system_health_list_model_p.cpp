@@ -52,6 +52,16 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
             for (auto& hash: m_uuidHashes)
                 hash.clear();
         });
+
+    connect(q, &EventListModel::rowsAboutToBeRemoved, this,
+        [this](const QModelIndex& /*parent*/, int first, int last)
+        {
+            for (int row = first; row <= last; ++row)
+            {
+                const auto extraData = Private::extraData(this->q->getEvent(row));
+                m_uuidHashes[extraData.first].remove(extraData.second);
+            }
+        });
 }
 
 SystemHealthListModel::Private::~Private()
@@ -63,12 +73,6 @@ SystemHealthListModel::Private::ExtraData SystemHealthListModel::Private::extraD
 {
     NX_ASSERT(event.extraData.canConvert<ExtraData>(), Q_FUNC_INFO);
     return event.extraData.value<ExtraData>();
-}
-
-void SystemHealthListModel::Private::beforeRemove(const EventData& event)
-{
-    const auto extraData = Private::extraData(event);
-    m_uuidHashes[extraData.first].remove(extraData.second);
 }
 
 int SystemHealthListModel::Private::eventPriority(const EventData& event) const

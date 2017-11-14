@@ -17,12 +17,10 @@ public:
     explicit SystemHealthListModel(QObject* parent = nullptr);
     virtual ~SystemHealthListModel() override;
 
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+    virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+
 protected:
-    virtual void triggerDefaultAction(const EventData& event) override;
-    virtual void triggerCloseAction(const EventData& event) override;
-
-    virtual void beforeRemove(const EventData& event) override;
-
     virtual int eventPriority(const EventData& event) const override;
 
 private:

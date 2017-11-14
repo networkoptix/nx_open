@@ -26,8 +26,8 @@ public:
     bool addFront(const EventData& data);
     bool addBack(const EventData& data);
 
-    // Events can be removed from any place of the list.
     bool removeEvent(const QnUuid& id);
+    void removeEvents(int first, int count);
 
     // Event index lookup by id. Logarithmic complexity.
     int indexOf(const QnUuid& id) const;
@@ -37,10 +37,6 @@ public:
     const EventData& getEvent(int index) const;
 
     bool isValid(const QModelIndex& index) const;
-
-    void defaultAction(const QnUuid& id);
-    void closeAction(const QnUuid& id);
-    void linkAction(const QnUuid& id, const QString& link);
 
     QnVirtualCameraResourcePtr previewCamera(const EventData& event) const;
     QnVirtualCameraResourceList accessibleCameras(const EventData& event) const;

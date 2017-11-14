@@ -30,11 +30,10 @@ static constexpr int kDescriptionFontWeight = QFont::Normal;
 
 } // namespace
 
-EventTile::EventTile(const QnUuid& id, QWidget* parent):
+EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this)),
-    m_id(id)
+    m_closeButton(new QPushButton(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
@@ -93,14 +92,13 @@ EventTile::EventTile(const QnUuid& id, QWidget* parent):
 }
 
 EventTile::EventTile(
-    const QnUuid& id,
     const QString& title,
     const QPixmap& icon,
     const QString& timestamp,
     const QString& description,
     QWidget* parent)
     :
-    EventTile(id, parent)
+    EventTile(parent)
 {
     setTitle(title);
     setIcon(icon);
@@ -110,11 +108,6 @@ EventTile::EventTile(
 
 EventTile::~EventTile()
 {
-}
-
-QnUuid EventTile::id() const
-{
-    return m_id;
 }
 
 bool EventTile::closeable() const
