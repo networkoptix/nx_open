@@ -236,7 +236,7 @@ protected:
 
     void andExpectedStatisticsIsProvided()
     {
-        const auto prevStatistics = m_receivedStatistics.pop();
+        /*const auto prevStatistics =*/ m_receivedStatistics.pop();
         // TODO
     }
 
