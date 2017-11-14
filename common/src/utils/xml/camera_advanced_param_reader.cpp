@@ -395,7 +395,9 @@ bool QnCameraAdvacedParamsXmlParser::parseConditionString(
         ? split[1].trimmed()
         : QString();
 
-    condition.type = QnCameraAdvancedParameterCondition::fromStringToConditionType(condTypeStr);
+    condition.type = QnLexical::deserialized(
+        condTypeStr,
+        QnCameraAdvancedParameterCondition::ConditionType::unknown);
 
     if (condition.type == QnCameraAdvancedParameterCondition::ConditionType::unknown)
         return false;

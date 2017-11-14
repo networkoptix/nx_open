@@ -57,6 +57,11 @@ bool RemoteArchiveSynchronizationTask::execute()
     return synchronizeArchive(m_resource);
 }
 
+QnUuid RemoteArchiveSynchronizationTask::id() const
+{
+    return m_resource->getId();
+}
+
 bool RemoteArchiveSynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& resource)
 {
     NX_LOGX(lit("Starting archive synchronization."), cl_logINFO);

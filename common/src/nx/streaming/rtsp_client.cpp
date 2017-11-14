@@ -876,7 +876,7 @@ bool QnRtspClient::isOpened() const
 
 unsigned int QnRtspClient::sessionTimeoutMs()
 {
-    return 0;
+    return m_TimeOut;
 }
 
 const QByteArray& QnRtspClient::getSdp() const
@@ -1430,7 +1430,7 @@ static const int RTCP_RECEIVER_REPORT = 201;
 static const int RTCP_SOURCE_DESCRIPTION = 202;
 
 QnRtspStatistic QnRtspClient::parseServerRTCPReport(
-    quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
+    const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
     static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
         .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
@@ -1668,6 +1668,28 @@ int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int
     return dataLen;
 }
 
+bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
+{
+    if (size < 4 || data[0] != '$')
+        return false;
+    int rtpChannelNum = data[1];
+    int trackNum = getChannelNum(rtpChannelNum);
+    if (trackNum >= m_sdpTracks.size())
+        return false;
+    QnRtspIoDevice* ioDevice = m_sdpTracks[trackNum]->ioDevice;
+    if (!ioDevice)
+        return false;
+
+    bool gotValue = false;
+    QnRtspStatistic stats = parseServerRTCPReport(data + 4, size - 4, &gotValue);
+    if (gotValue)
+    {
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+            ioDevice->setStatistic(stats);
+    }
+    return true;
+}
+
 // demux text data only
 bool QnRtspClient::readTextResponce(QByteArray& response)
 {
@@ -1697,6 +1719,15 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
             // binary data
             quint8 tmpData[1024*64];
             int bytesRead = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
+
+            int rtpChannelNum = tmpData[1];
+            QnRtspClient::TrackType format = getTrackTypeByRtpChannelNum(rtpChannelNum);
+            if (format == QnRtspClient::TT_VIDEO_RTCP || format == QnRtspClient::TT_AUDIO_RTCP)
+            {
+                if (!processTcpRtcpData(tmpData, bytesRead))
+                    NX_VERBOSE(this, "Can't parse RTCP report while reading text response");
+            }
+
             int oldIgnoreDataSize = ignoreDataSize;
             ignoreDataSize += bytesRead;
             if (oldIgnoreDataSize / 64000 != ignoreDataSize/64000)
@@ -2033,46 +2064,64 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
     addAuth( &request );
     addAdditionAttrs( &request );
 
+    NX_VERBOSE(this, lm("Send: %1").arg(request.requestLine.toString()));
     for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
     {
         QByteArray requestBuf;
         request.serialize( &requestBuf );
         if( m_tcpSock->send(requestBuf.constData(), requestBuf.size()) <= 0 )
+        {
+            NX_VERBOSE(this, lm("Failed to send request: %2").args(SystemError::getLastOSErrorText()));
             return false;
+        }
+
 #ifdef _DUMP_STREAM
         m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
 #endif
 
         if( !readTextResponce(responseBuf) )
+        {
+            NX_VERBOSE(this, lm("Failed to read response"));
             return false;
+        }
 
         nx_rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
+        {
+            NX_VERBOSE(this, lm("Failed to parse response"));
             return false;
-        m_responseCode = response.statusLine.statusCode;
+        }
 
+        m_responseCode = response.statusLine.statusCode;
         switch( response.statusLine.statusCode )
         {
             case nx_http::StatusCode::unauthorized:
             case nx_http::StatusCode::proxyAuthenticationRequired:
                 if( prevStatusCode == response.statusLine.statusCode )
-                    return false;   //already tried authentication and have been rejected
+                {
+                    NX_VERBOSE(this, lm("Already tried authentication and have been rejected"));
+                    return false;
+                }
+
                 prevStatusCode = response.statusLine.statusCode;
                 break;
 
             default:
                 m_serverInfo = nx_http::getHeaderValue(response.headers, nx_http::header::Server::NAME);
+                NX_VERBOSE(this, lm("Response: %1").arg(response.statusLine.toString()));
                 return true;
         }
 
-        if( QnClientAuthHelper::authenticate(
-                m_auth,
-                response,
-                &request,
-                &m_rtspAuthCtx ) != Qn::Auth_OK)
+        const auto authResult = QnClientAuthHelper::authenticate(
+            m_auth, response, &request, &m_rtspAuthCtx);
+        if (authResult != Qn::Auth_OK)
+        {
+            NX_VERBOSE(this, lm("Authentification failed: %1").arg(authResult));
             return false;
+        }
     }
 
+    NX_VERBOSE(this, lm("Response after last retry: %1").arg(prevStatusCode));
     return false;
 }
 
