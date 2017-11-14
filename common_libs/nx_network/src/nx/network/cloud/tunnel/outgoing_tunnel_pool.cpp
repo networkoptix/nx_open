@@ -105,13 +105,18 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
 
     QnMutexLocker lock(&m_mutex);
 
-    if (s_isIgnoringOwnPeerIdChange)
-        return;
-    NX_ASSERT(!m_isOwnPeerIdAssigned, "Own peer id is not supposed to be changed");
-
-    m_isOwnPeerIdAssigned = true;
-    m_ownPeerId = QString(id).toUtf8();
-    NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
+    if (m_isOwnPeerIdAssigned)
+    {
+        if (s_isIgnoringOwnPeerIdChange)
+            return;
+        NX_ASSERT(false, "Own peer id is not supposed to be changed");
+    }
+    else
+    {
+        m_isOwnPeerIdAssigned = true;
+        m_ownPeerId = QString(id).toUtf8();
+        NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
+    }
 }
 
 void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const String& name, const QnUuid& uuid)
