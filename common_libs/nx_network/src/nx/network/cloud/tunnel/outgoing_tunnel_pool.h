@@ -59,7 +59,7 @@ public:
 
     // TODO: Remove this function when SocketGlobals are not dependent on cloud any more.
     /** Unit test usage only! */
-    static void allowOwnPeerIdChange();
+    static void ignoreOwnPeerIdChange();
 
 private:
     struct TunnelContext
@@ -90,7 +90,7 @@ private:
     void onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr);
     void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    static bool s_isOwnPeerIdChangeAllowed;
+    static bool s_isIgnoringOwnPeerIdChange;
 };
 
 } // namespace cloud

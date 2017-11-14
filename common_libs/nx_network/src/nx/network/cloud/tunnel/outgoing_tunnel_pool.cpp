@@ -104,8 +104,10 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     const auto id = lm("%1_%2_%3").args(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(s_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,
-        "Own peer id is not supposed to be changed");
+
+    if (s_isIgnoringOwnPeerIdChange)
+        return;
+    NX_ASSERT(!m_isOwnPeerIdAssigned, "Own peer id is not supposed to be changed");
 
     m_isOwnPeerIdAssigned = true;
     m_ownPeerId = QString(id).toUtf8();
@@ -129,9 +131,9 @@ OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClos
     return m_onTunnelClosedSubscription;
 }
 
-void OutgoingTunnelPool::allowOwnPeerIdChange()
+void OutgoingTunnelPool::ignoreOwnPeerIdChange()
 {
-    s_isOwnPeerIdChangeAllowed = true;
+    s_isIgnoringOwnPeerIdChange = true;
 }
 
 OutgoingTunnelPool::TunnelContext&
@@ -231,7 +233,7 @@ void OutgoingTunnelPool::tunnelsStopped(
         });
 }
 
-bool OutgoingTunnelPool::s_isOwnPeerIdChangeAllowed(false);
+bool OutgoingTunnelPool::s_isIgnoringOwnPeerIdChange(false);
 
 } // namespace cloud
 } // namespace network
