@@ -249,7 +249,8 @@ private:
 
     QnCachingCameraDataLoaderPtr loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
-    bool hasWidgetWithCamera(const QnSecurityCamResourcePtr &camera) const;
+    bool hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const;
+    bool hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const;
     void updateHistoryForCamera(QnSecurityCamResourcePtr camera);
     void updateSliderBookmarks();
 

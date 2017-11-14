@@ -105,7 +105,7 @@ Qn::Permission requiredPermission(PlaybackMode mode)
         default:
             break;
     }
-    return Qn::ViewContentPermission;
+    return Qn::ViewLivePermission;
 }
 
 } // namespace

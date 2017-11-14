@@ -630,37 +630,31 @@ void QnCameraScheduleWidget::updateFromResources()
     else
     {
         bool isScheduleEqual = true;
+        bool isFpsValid = true;
         QList<QnScheduleTask::Data> scheduleTasksData;
-        for (const auto& scheduleTask : m_cameras.front()->getScheduleTasks())
+        for (const auto& scheduleTask: m_cameras.front()->getScheduleTasks())
             scheduleTasksData << scheduleTask.getData();
 
-        for (const auto &camera : m_cameras)
+        for (const auto& camera : m_cameras)
         {
             QList<QnScheduleTask::Data> cameraScheduleTasksData;
             for (const auto& scheduleTask : camera->getScheduleTasks())
             {
                 cameraScheduleTasksData << scheduleTask.getData();
 
-                bool fpsValid = true;
                 switch (scheduleTask.getRecordingType())
                 {
                     case Qn::RT_Never:
                         continue;
                     case Qn::RT_MotionAndLowQuality:
-                        fpsValid = scheduleTask.getFps() <= m_maxDualStreamingFps;
+                        isFpsValid &= scheduleTask.getFps() <= m_maxDualStreamingFps;
                         break;
                     case Qn::RT_Always:
                     case Qn::RT_MotionOnly:
-                        fpsValid = scheduleTask.getFps() <= m_maxFps;
+                        isFpsValid &= scheduleTask.getFps() <= m_maxFps;
                         break;
                     default:
                         break;
-                }
-
-                if (!fpsValid)
-                {
-                    isScheduleEqual = false;
-                    break;
                 }
             }
 
@@ -675,7 +669,7 @@ void QnCameraScheduleWidget::updateFromResources()
             setScheduleTasks(m_cameras.front()->getScheduleTasks());
         else
             setScheduleTasks(QnScheduleTaskList());
-        ui->gridWidget->setActive(isScheduleEqual);
+        ui->gridWidget->setActive(isScheduleEqual && isFpsValid);
     }
 
     int currentMaxFps = getGridMaxFps();

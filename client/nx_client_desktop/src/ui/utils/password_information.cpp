@@ -33,13 +33,42 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::Short:
             m_text = tr("Short");
-            m_hint = tr("Password must be at least 8 characters long.");
+            m_hint = tr("Password must be at least %1 characters long.")
+                .arg(PasswordLimitations::kMinimumLength);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Long:
+            m_text = tr("Long");
+            m_hint = tr("Password must be no longer than %1 characters.")
+                .arg(PasswordLimitations::kMaximumLengthForCamera);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Conseq:
+            m_text = tr("Weak");
+            m_hint = tr("Password should not contain %1 or more consecutive characters together.")
+                .arg(PasswordLimitations::kConsecutiveCharactersLimit);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::Repeat:
+            m_text = tr("Weak");
+            m_hint = tr("Password should not contain %1 or more repeating characters.")
+                .arg(PasswordLimitations::kRepeatingCharactersLimit);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Common:
             m_text = tr("Common");
             m_hint = tr("This password is in list of the most popular passwords.");
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::IncorrectCamera:
+            m_text = tr("Incorrect");
+            m_hint = tr("Only latin letters, numbers and keyboard symbols %1 are allowed.")
+                .arg(QString::fromLatin1(PasswordLimitations::kCameraAllowedSymbols));
             m_acceptance = Inacceptable;
             break;
 

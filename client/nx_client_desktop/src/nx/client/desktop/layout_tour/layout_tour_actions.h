@@ -17,19 +17,19 @@ class LayoutTourTextFactory: public TextFactory
 public:
     explicit LayoutTourTextFactory(QObject* parent = nullptr);
 
-    virtual QString text(const Parameters& parameters, 
+    virtual QString text(const Parameters& parameters,
         QnWorkbenchContext* context) const override;
 };
 
 namespace condition
 {
-    
+
 /** Layout tour is running. */
 ConditionWrapper tourIsRunning();
 
 /** Layout tour is running. */
 ConditionWrapper canStartTour();
-    
+
 } // namespace condition
 
 } // namespace action
