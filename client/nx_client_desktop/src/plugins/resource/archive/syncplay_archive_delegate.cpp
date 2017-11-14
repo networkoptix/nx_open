@@ -24,7 +24,7 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
 bool QnSyncPlayArchiveDelegate::open(const QnResourcePtr &resource,
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
-    return m_ownerDelegate->open(resource, std::move(archiveIntegrityWatcher));
+    return m_ownerDelegate->open(resource, archiveIntegrityWatcher);
 }
 
 void QnSyncPlayArchiveDelegate::close()

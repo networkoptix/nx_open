@@ -777,9 +777,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 && m_dstVideoCodec != mediaData->compressionType);
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
-
-        // Always save with latest version.
-        context.metadata.version = QnAviArchiveMetadata::kLatestVersion;
+        context.metadata.version = QnAviArchiveMetadata::kVersionBeforeTheIntegrityCheck;
 
         if (!isTranscode)
         {

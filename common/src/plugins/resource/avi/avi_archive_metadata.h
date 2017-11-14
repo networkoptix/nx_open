@@ -26,7 +26,7 @@ struct QnAviArchiveMetadata
     /** This version is set if no metadata is found. */
     static const int kDefaultVersion = 0;
 
-    static const int kLatestVersion = 1;
+    static const int kVersionBeforeTheIntegrityCheck = 1;
     static const int kIntegrityCheckVersion = 2;
 
     int version = kDefaultVersion;

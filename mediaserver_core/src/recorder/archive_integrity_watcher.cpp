@@ -41,7 +41,7 @@ bool ServerArchiveIntegrityWatcher::fileRequested(
     const QnAviArchiveMetadata& metadata,
     const QString& fileName)
 {
-    if (metadata.version != QnAviArchiveMetadata::kIntegrityCheckVersion)
+    if (metadata.version < QnAviArchiveMetadata::kIntegrityCheckVersion)
         return true;
 
     if (!checkMetaDataIntegrity(metadata))
@@ -90,6 +90,7 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
     if (m_fired)
         return;
 
+    m_fired = true;
     QnStorageResourcePtr storage = QnStorageManager::getStorageByUrl(
         fileName,
         QnServer::StoragePool::Backup | QnServer::StoragePool::Normal);
@@ -99,7 +100,6 @@ void ServerArchiveIntegrityWatcher::emitSignal(const QString& fileName)
         return;
 
     emit fileIntegrityCheckFailed(storage);
-    m_fired = true;
 }
 // -------------------------------------------------------------------------------------------------
 
