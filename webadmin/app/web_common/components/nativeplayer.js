@@ -17,7 +17,7 @@ NativePlayer.prototype.play = function(){
 };
 
 NativePlayer.prototype.pause = function(){
-    this.video.pause().then(),catch(function(){});
+    this.video.pause();
 };
 
 NativePlayer.prototype.addEventListener = function(event,handler){
