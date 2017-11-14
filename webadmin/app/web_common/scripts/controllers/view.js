@@ -333,8 +333,32 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
-                screenfull.request($('.videowindow').get(0));
+                screenfull.request($('.view-panel').get(0));
             }
+        };
+
+        if ($scope.enableFullScreen) {
+            screenfull.onchange(function(){
+                $scope.isFullscreen = screenfull.isFullscreen;
+            });
+        }
+
+        switch(window.jscd.browser){
+            case "Safari":
+            case "Microsoft Internet Explorer":
+            case "Microsoft Edge":
+                $scope.enableFullscreenNotification = true;
+                break;
+            default:
+                $scope.enableFullscreenNotification = false;
+        }
+
+        $scope.closeFullscreen = function(){
+            screenfull.exit();
+        }
+
+        $scope.showCamerasPanel = function(){
+            $scope.showCameraPanel=true;
         };
 
         document.addEventListener('MSFullscreenChange',function(){ // IE only

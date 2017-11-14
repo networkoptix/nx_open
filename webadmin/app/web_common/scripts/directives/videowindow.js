@@ -456,26 +456,6 @@ angular.module('nxCommon')
                     }
                 };
 
-                if (screenfull.enabled) {
-                    screenfull.onchange(function(){
-                        scope.isFullscreen = screenfull.isFullscreen;
-                    });
-                }
-
-                switch(window.jscd.browser){
-                    case "Safari":
-                    case "Microsoft Internet Explorer":
-                    case "Microsoft Edge":
-                        scope.enableFullscreenNotification = true;
-                        break;
-                    default:
-                        scope.enableFullscreenNotification = false;
-                }
-
-                scope.closeFullscreen = function(){
-                    screenfull.exit();
-                }
-
                 var $videowindow = $('.videowindow');
                 var $window = $(window);
 

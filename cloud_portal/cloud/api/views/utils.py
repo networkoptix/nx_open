@@ -90,7 +90,7 @@ def downloads(request):
 
         # Fallback section for old structure and old versions
         if not latest_version or latest_version.startswith('2'):
-            if latest_version.startswith('2'):
+            if latest_version and latest_version.startswith('2'):
                 logger.error('No 3.0 downloadable release for customization: ' + customization +
                              '. Ask Boris to fix that')
             else:

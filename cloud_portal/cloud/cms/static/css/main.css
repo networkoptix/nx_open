@@ -60,3 +60,17 @@ img.preview-image{
 .optional-image{
     opacity: 0.5;
 }
+
+.truncate-email{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 125px;
+}
+
+.truncate-name{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 95px;
+}
