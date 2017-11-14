@@ -1,15 +1,17 @@
-#include "hanwha_attributes_parser.h"
+#include "attributes_parser.h"
 
 #include <iostream>
 
 #include <nx/utils/literal.h>
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
 namespace {
 
+// TODO: Decide on these unused constants.
 static const QString kChannelParameter = lit("Channel.#.EventType");
 static const QString kAlarmInputParameter = lit("AlarmInput");
 static const QString kAlarmOutputParameter = lit("AlarmOutput");
@@ -17,10 +19,10 @@ static const QString kSystemEventParameter = lit("SystemEvent");
 
 } // namespace
 
-bool HanwhaAttributesParser::parseCgi(const QString& content)
+bool AttributesParser::parseCgi(const QString& content)
 {
     QXmlStreamReader reader(content);
-    
+
     if (!readCgi(reader))
         return false;
 
@@ -29,19 +31,19 @@ bool HanwhaAttributesParser::parseCgi(const QString& content)
 
     if (!readMonitorAction(reader))
         return false;
-    
+
     if (!readChannelEvents(reader))
         return false;
 
     return true;
 }
 
-std::vector<QString> HanwhaAttributesParser::supportedEvents() const
+std::vector<QString> AttributesParser::supportedEvents() const
 {
     return m_supportedEvents;
 }
 
-bool HanwhaAttributesParser::readCgi(QXmlStreamReader& reader)
+bool AttributesParser::readCgi(QXmlStreamReader& reader)
 {
     if (!reader.readNextStartElement())
         return false;
@@ -51,7 +53,7 @@ bool HanwhaAttributesParser::readCgi(QXmlStreamReader& reader)
 
     if (reader.name() != "cgi")
         return false;
-    
+
     while (reader.readNextStartElement())
     {
         if (reader.name() == "submenu" && (reader.attributes().value("name") == "eventstatus"))
@@ -63,7 +65,7 @@ bool HanwhaAttributesParser::readCgi(QXmlStreamReader& reader)
     return false;
 }
 
-bool HanwhaAttributesParser::readSubMenu(QXmlStreamReader& reader)
+bool AttributesParser::readSubMenu(QXmlStreamReader& reader)
 {
     while (reader.readNextStartElement())
     {
@@ -76,7 +78,7 @@ bool HanwhaAttributesParser::readSubMenu(QXmlStreamReader& reader)
     return false;
 }
 
-bool HanwhaAttributesParser::readMonitorAction(QXmlStreamReader& reader)
+bool AttributesParser::readMonitorAction(QXmlStreamReader& reader)
 {
     while (reader.readNextStartElement())
     {
@@ -89,7 +91,7 @@ bool HanwhaAttributesParser::readMonitorAction(QXmlStreamReader& reader)
     return false;
 }
 
-bool HanwhaAttributesParser::readChannelEvents(QXmlStreamReader& reader)
+bool AttributesParser::readChannelEvents(QXmlStreamReader& reader)
 {
     bool entryNodesHaveBeenReached = false;
     while (reader.readNextStartElement())
@@ -108,7 +110,7 @@ bool HanwhaAttributesParser::readChannelEvents(QXmlStreamReader& reader)
     return entryNodesHaveBeenReached;
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
-

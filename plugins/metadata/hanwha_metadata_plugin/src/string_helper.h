@@ -1,20 +1,19 @@
 #pragma once
 
-#include <QtCore/QString>
-#include <QtCore/QFlags>
-
 #include <unordered_map>
+
+#include <QtCore/QString>
 
 #include <boost/optional/optional.hpp>
 
-#include <hanwha_common.h>
-#include <plugins/plugin_api.h>
+#include "common.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
-class HanwhaStringHelper
+class StringHelper
 {
 public:
     static QString buildCaption(
@@ -47,6 +46,7 @@ private:
     }
 };
 
+} // namespace hanwha
 } // namespace nx
-} // namespace mediaserver
-} // namespace plugins
+} // namespace mediaserver_plugins
+} // namespace metadata

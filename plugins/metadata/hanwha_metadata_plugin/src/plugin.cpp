@@ -1,54 +1,55 @@
-﻿#include "hanwha_metadata_plugin.h"
-#include "hanwha_metadata_manager.h"
-#include "hanwha_common.h"
-#include "hanwha_attributes_parser.h"
-#include "hanwha_string_helper.h"
+﻿#include "plugin.h"
 
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
-#include <plugins/resource/hanwha/hanwha_request_helper.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
 
+#include "manager.h"
+#include "common.h"
+#include "attributes_parser.h"
+#include "string_helper.h"
+
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
 namespace {
 
-const char* kPluginName = "Hanwha metadata plugin";
-const QString kSamsungTechwinVendor = lit("samsung");
-const QString kHanwhaTechwinVendor = lit("hanwha");
+static const char* const kPluginName = "Hanwha metadata plugin";
+static const QString kSamsungTechwinVendor = lit("samsung");
+static const QString kHanwhaTechwinVendor = lit("hanwha");
 
-const QString kVideoAnalytics = lit("VideoAnalytics");
-const QString kAudioAnalytics = lit("AudioAnalytics");
+static const QString kVideoAnalytics = lit("VideoAnalytics");
+static const QString kAudioAnalytics = lit("AudioAnalytics");
 
-const std::chrono::milliseconds kAttributesTimeout(4000);
-const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
+// TODO: Decide on these unused constants.
+static const std::chrono::milliseconds kAttributesTimeout{4000};
+static const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
 
 } // namespace
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
-using namespace nx::mediaserver_core::plugins;
 
-HanwhaMetadataPlugin::SharedResources::SharedResources(
+Plugin::SharedResources::SharedResources(
     const QString& sharedId,
     const Hanwha::DriverManifest& driverManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth)
     :
-    monitor(std::make_unique<HanwhaMetadataMonitor>(driverManifest, url, auth)),
-    sharedContext(std::make_shared<HanwhaSharedResourceContext>(sharedId))
+    monitor(std::make_unique<MetadataMonitor>(driverManifest, url, auth)),
+    sharedContext(std::make_shared<mediaserver_core::plugins::HanwhaSharedResourceContext>(
+        sharedId))
 {
     sharedContext->setRecourceAccess(url, auth);
 }
 
-HanwhaMetadataPlugin::HanwhaMetadataPlugin()
+Plugin::Plugin()
 {
     QFile f(":manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -56,7 +57,7 @@ HanwhaMetadataPlugin::HanwhaMetadataPlugin()
     m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
 }
 
-void* HanwhaMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataPlugin)
     {
@@ -90,33 +91,33 @@ void* HanwhaMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* HanwhaMetadataPlugin::name() const
+const char* Plugin::name() const
 {
     return kPluginName;
 }
 
-void HanwhaMetadataPlugin::setSettings(const nxpl::Setting* settings, int count)
+void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // Do nothing.
 }
 
-void HanwhaMetadataPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 {
     // Do nothing.
 }
 
-void HanwhaMetadataPlugin::setLocale(const char* locale)
+void Plugin::setLocale(const char* /*locale*/)
 {
     // Do nothing.
 }
 
-AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
+AbstractMetadataManager* Plugin::managerForResource(
     const ResourceInfo& resourceInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(resourceInfo.vendor).toLower();
+    const QString vendor = QString(resourceInfo.vendor).toLower();
 
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
@@ -131,7 +132,7 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     nx::api::AnalyticsDeviceManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
-    auto manager = new HanwhaMetadataManager(this);
+    auto manager = new Manager(this);
     manager->setResourceInfo(resourceInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
@@ -139,42 +140,42 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     return manager;
 }
 
-AbstractSerializer* HanwhaMetadataPlugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
+AbstractSerializer* Plugin::serializerForType(
+    const nxpl::NX_GUID& /*typeGuid*/,
     Error* outError)
 {
     *outError = Error::typeIsNotSupported;
     return nullptr;
 }
 
-const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
+const char* Plugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
     return m_manifest.constData();
 }
 
-boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
+boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
     const ResourceInfo& resourceInfo)
 {
     using namespace nx::mediaserver_core::plugins;
 
     auto sharedRes = sharedResources(resourceInfo);
 
-    const auto cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    const auto& cgiParameters = sharedRes->sharedContext->cgiParamiters();
     if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 
-    const auto eventStatuses = sharedRes->sharedContext->eventStatuses();
+    const auto& eventStatuses = sharedRes->sharedContext->eventStatuses();
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
     return eventsFromParameters(cgiParameters.value, eventStatuses.value, resourceInfo.channel);
 }
 
-boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
+boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
     const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
-    int channel)
+    int channel) const
 {
     if (!parameters.isValid())
         return boost::none;
@@ -187,19 +188,17 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 
     QList<QnUuid> result;
 
-    auto supportedEvents = supportedEventsParameter->possibleValues();
+    const auto& supportedEvents = supportedEventsParameter->possibleValues();
     for (const auto& eventName: supportedEvents)
     {
-        bool gotValidParameter = false;
-
         auto guid = m_driverManifest.eventTypeByInternalName(eventName);
         if (!guid.isNull())
             result.push_back(guid);
 
         if (eventName == kVideoAnalytics || eventName == kAudioAnalytics)
         {
-            const auto parameters = eventStatuses.response();
-            for (const auto& entry : parameters)
+            const auto& responseParameters = eventStatuses.response();
+            for (const auto& entry: responseParameters)
             {
                 const auto& fullEventName = entry.first;
                 const bool isAnalyticsEvent = fullEventName.startsWith(
@@ -210,7 +209,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
                 if (isAnalyticsEvent)
                 {
                     guid = m_driverManifest.eventTypeByInternalName(
-                        eventName + (".") + fullEventName.split(L'.').last());
+                        eventName + "." + fullEventName.split(L'.').last());
 
                     if (!guid.isNull())
                         result.push_back(guid);
@@ -222,12 +221,12 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     return result;
 }
 
-const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
+const Hanwha::DriverManifest& Plugin::driverManifest() const
 {
     return m_driverManifest;
 }
 
-HanwhaMetadataMonitor* HanwhaMetadataPlugin::monitor(
+MetadataMonitor* Plugin::monitor(
     const QString& sharedId,
     const nx::utils::Url& url,
     const QAuthenticator& auth)
@@ -254,7 +253,7 @@ HanwhaMetadataMonitor* HanwhaMetadataPlugin::monitor(
     return monitorCounter->monitor.get();
 }
 
-void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
+void Plugin::managerStoppedToUseMonitor(const QString& sharedId)
 {
     QnMutexLocker lock(&m_mutex);
     auto sharedResources = m_sharedResources.value(sharedId);
@@ -268,7 +267,7 @@ void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
         m_sharedResources[sharedId]->monitor->stopMonitoring();
 }
 
-void HanwhaMetadataPlugin::managerIsAboutToBeDestroyed(const QString& sharedId)
+void Plugin::managerIsAboutToBeDestroyed(const QString& sharedId)
 {
     QnMutexLocker lock(&m_mutex);
     auto sharedResources = m_sharedResources.value(sharedId);
@@ -281,7 +280,7 @@ void HanwhaMetadataPlugin::managerIsAboutToBeDestroyed(const QString& sharedId)
         m_sharedResources.remove(sharedId);
 }
 
-std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sharedResources(
+std::shared_ptr<Plugin::SharedResources> Plugin::sharedResources(
     const nx::sdk::ResourceInfo& resourceInfo)
 {
     const nx::utils::Url url(resourceInfo.url);
@@ -306,15 +305,16 @@ std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sha
     return sharedResourcesItr.value();
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
 
 extern "C" {
 
-    NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
-    {
-        return new nx::mediaserver::plugins::HanwhaMetadataPlugin();
-    }
+NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
+{
+    return new nx::mediaserver_plugins::metadata::hanwha::Plugin();
+}
 
 } // extern "C"

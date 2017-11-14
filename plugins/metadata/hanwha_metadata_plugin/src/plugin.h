@@ -1,13 +1,8 @@
 #pragma once
 
-#include "hanwha_common.h"
-#include "hanwha_metadata_monitor.h"
-
 #include <QtCore/QByteArray>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
-
-#include <vector>
 
 #include <boost/optional/optional.hpp>
 
@@ -17,16 +12,19 @@
 #include <plugins/resource/hanwha/hanwha_response.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 
+#include "common.h"
+#include "metadata_monitor.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
-class HanwhaMetadataPlugin:
+class Plugin:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
-    HanwhaMetadataPlugin();
+    Plugin();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -51,7 +49,7 @@ public:
 
     const Hanwha::DriverManifest& driverManifest() const;
 
-    HanwhaMetadataMonitor* monitor(
+    MetadataMonitor* monitor(
         const QString& sharedId,
         const nx::utils::Url& url,
         const QAuthenticator& auth);
@@ -63,7 +61,7 @@ public:
 private:
     struct SharedResources
     {
-        std::unique_ptr<HanwhaMetadataMonitor> monitor;
+        std::unique_ptr<MetadataMonitor> monitor;
         std::shared_ptr<nx::mediaserver_core::plugins::HanwhaSharedResourceContext> sharedContext;
         std::atomic<int> monitorUsageCounter{0};
         std::atomic<int> managerCounter{0};
@@ -82,7 +80,7 @@ private:
     boost::optional<QList<QnUuid>> eventsFromParameters(
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
         const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
-        int channel);
+        int channel) const;
 
     std::shared_ptr<SharedResources> sharedResources(
         const nx::sdk::ResourceInfo& resourceInfo);
@@ -94,6 +92,7 @@ private:
     QMap<QString, std::shared_ptr<SharedResources>> m_sharedResources;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

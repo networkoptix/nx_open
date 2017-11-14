@@ -1,26 +1,28 @@
-#include "hanwha_metadata_monitor.h"
-#include "hanwha_bytestream_filter.h"
+#include "metadata_monitor.h"
 
 #include <chrono>
-#include <iostream>
 
 #include <nx/utils/std/cpp14.h>
 
+#include "bytestream_filter.h"
+
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
 namespace {
-    const QString kMonitorUrlTemplate(
-        "http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
-    const int kDefaultHttpPort = 80;
+static const QString kMonitorUrlTemplate =
+    lit("http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
-    const std::chrono::minutes kKeepAliveTimeout(7);
+static const int kDefaultHttpPort = 80;
+
+static const std::chrono::minutes kKeepAliveTimeout{7};
+
 } // namespace
 
-
-HanwhaMetadataMonitor::HanwhaMetadataMonitor(
+MetadataMonitor::MetadataMonitor(
     const Hanwha::DriverManifest& manifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth)
@@ -29,15 +31,14 @@ HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     m_url(buildMonitoringUrl(url)),
     m_auth(auth)
 {
-
 }
 
-HanwhaMetadataMonitor::~HanwhaMetadataMonitor()
+MetadataMonitor::~MetadataMonitor()
 {
     stopMonitoring();
 }
 
-void HanwhaMetadataMonitor::startMonitoring()
+void MetadataMonitor::startMonitoring()
 {
     QnMutexLocker lock(&m_mutex);
     if (m_started)
@@ -48,7 +49,7 @@ void HanwhaMetadataMonitor::startMonitoring()
     initMonitorUnsafe();
 }
 
-void HanwhaMetadataMonitor::stopMonitoring()
+void MetadataMonitor::stopMonitoring()
 {
     nx_http::AsyncHttpClientPtr httpClient;
     {
@@ -62,48 +63,48 @@ void HanwhaMetadataMonitor::stopMonitoring()
         httpClient->pleaseStopSync(false);
 }
 
-void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
+void MetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
 {
     QnMutexLocker lock(&m_mutex);
     m_handlers[handlerId] = handler;
 }
 
-void HanwhaMetadataMonitor::removeHandler(const QString& handlerId)
+void MetadataMonitor::removeHandler(const QString& handlerId)
 {
     QnMutexLocker lock(&m_mutex);
     m_handlers.remove(handlerId);
 }
 
-void HanwhaMetadataMonitor::clearHandlers()
+void MetadataMonitor::clearHandlers()
 {
     QnMutexLocker lock(&m_mutex);
     m_handlers.clear();
 }
 
-utils::Url HanwhaMetadataMonitor::buildMonitoringUrl(const utils::Url &url) const
+/*static*/ nx::utils::Url MetadataMonitor::buildMonitoringUrl(const nx::utils::Url &url)
 {
     return nx::utils::Url(kMonitorUrlTemplate
         .arg(url.host())
         .arg(url.port(kDefaultHttpPort)));
 }
 
-void HanwhaMetadataMonitor::initMonitorUnsafe()
+void MetadataMonitor::initMonitorUnsafe()
 {
     auto httpClient = nx_http::AsyncHttpClient::create();
 
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
-        this, &HanwhaMetadataMonitor::at_responseReceived,
+        this, &MetadataMonitor::at_responseReceived,
         Qt::DirectConnection);
 
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
-        this, &HanwhaMetadataMonitor::at_someBytesAvailable,
+        this, &MetadataMonitor::at_someBytesAvailable,
         Qt::DirectConnection);
 
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
-        this, &HanwhaMetadataMonitor::at_connectionClosed,
+        this, &MetadataMonitor::at_connectionClosed,
         Qt::DirectConnection);
 
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
@@ -113,34 +114,34 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
         std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
 
     auto handler =
-        [this](const HanwhaEventList& events)
+        [this](const EventList& events)
         {
             QnMutexLocker lock(&m_mutex);
-            for (const auto handler: m_handlers)
+            for (const auto& handler: m_handlers)
                 handler(events);
         };
 
     m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
     m_contentParser->setForceParseAsBinary(true);
-    m_contentParser->setNextFilter(std::make_shared<HanwhaBytestreamFilter>(m_manifest, handler));
+    m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, handler));
 
     httpClient->doGet(m_url);
 
     m_httpClient = httpClient;
 }
 
-void HanwhaMetadataMonitor::at_responseReceived(nx_http::AsyncHttpClientPtr httpClient)
+void MetadataMonitor::at_responseReceived(nx_http::AsyncHttpClientPtr httpClient)
 {
     m_contentParser->setContentType(httpClient->contentType());
 }
 
-void HanwhaMetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient)
+void MetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient)
 {
     const auto& buffer = httpClient->fetchMessageBodyBuffer();
     m_contentParser->processData(buffer);
 }
 
-void HanwhaMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient)
+void MetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr /*httpClient*/)
 {
     QnMutexLocker lock(&m_mutex);
     if (!m_started)
@@ -149,6 +150,7 @@ void HanwhaMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr http
     initMonitorUnsafe();
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

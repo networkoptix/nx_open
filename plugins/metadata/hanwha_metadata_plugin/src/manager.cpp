@@ -1,33 +1,35 @@
-#include "hanwha_common.h"
-#include "hanwha_metadata_manager.h"
-#include "hanwha_attributes_parser.h"
-
-#include <QtCore/QUrl>
+#include "manager.h"
 
 #include <chrono>
 
+#include <QtCore/QUrl>
+
+#include <nx/kit/debug.h>
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 
+#include "common.h"
+
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-HanwhaMetadataManager::HanwhaMetadataManager(HanwhaMetadataPlugin* plugin):
+Manager::Manager(Plugin* plugin):
     m_plugin(plugin)
 {
 }
 
-HanwhaMetadataManager::~HanwhaMetadataManager()
+Manager::~Manager()
 {
     stopFetchingMetadata();
     m_plugin->managerIsAboutToBeDestroyed(m_sharedId);
 }
 
-void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataManager)
     {
@@ -43,16 +45,16 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nx::sdk::Error HanwhaMetadataManager::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+nx::sdk::Error Manager::setHandler(AbstractMetadataHandler* handler)
 {
     m_handler = handler;
     return Error::noError;
 }
 
-Error HanwhaMetadataManager::startFetchingMetadata()
+Error Manager::startFetchingMetadata()
 {
-    auto monitorHandler =
-        [this](const HanwhaEventList& events)
+    const auto monitorHandler =
+        [this](const EventList& events)
         {
             using namespace std::chrono;
             auto packet = new CommonEventsMetadataPacket();
@@ -63,11 +65,11 @@ Error HanwhaMetadataManager::startFetchingMetadata()
                     return;
 
                 auto event = new CommonDetectedEvent();
-                std::cout
-                    << "---------------- (Metadata manager handler) Got event: "
-                    << hanwhaEvent.caption.toStdString() << " "
-                    << hanwhaEvent.description.toStdString() << " "
-                    << "Channel " << m_channel << std::endl;
+                NX_PRINT
+                    << "Got event: caption ["
+                    << hanwhaEvent.caption.toStdString() << "], description ["
+                    << hanwhaEvent.description.toStdString() << "], "
+                    << "channel " << m_channel;
 
                 event->setEventTypeId(hanwhaEvent.typeId);
                 event->setCaption(hanwhaEvent.caption.toStdString());
@@ -83,7 +85,7 @@ Error HanwhaMetadataManager::startFetchingMetadata()
                 packet->addItem(event);
             }
 
-            std::cout << std::endl << std::endl;
+            NX_PRINT;
             m_handler->handleMetadata(Error::noError, packet);
         };
 
@@ -98,7 +100,7 @@ Error HanwhaMetadataManager::startFetchingMetadata()
     return Error::noError;
 }
 
-Error HanwhaMetadataManager::stopFetchingMetadata()
+Error Manager::stopFetchingMetadata()
 {
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
@@ -113,7 +115,7 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(Error* error) const
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -125,7 +127,7 @@ const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
     return m_deviceManifest.constData();
 }
 
-void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void Manager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
 {
     m_url = resourceInfo.url;
     m_model = resourceInfo.model;
@@ -137,21 +139,22 @@ void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourc
     m_channel = resourceInfo.channel;
 }
 
-void HanwhaMetadataManager::setDeviceManifest(const QByteArray& manifest)
+void Manager::setDeviceManifest(const QByteArray& manifest)
 {
     m_deviceManifest = manifest;
 }
 
-void HanwhaMetadataManager::setDriverManifest(const Hanwha::DriverManifest& manifest)
+void Manager::setDriverManifest(const Hanwha::DriverManifest& manifest)
 {
     m_driverManifest = manifest;
 }
 
-void HanwhaMetadataManager::setMonitor(HanwhaMetadataMonitor* monitor)
+void Manager::setMonitor(MetadataMonitor* monitor)
 {
     m_monitor = monitor;
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

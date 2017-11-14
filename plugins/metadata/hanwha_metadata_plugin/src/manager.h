@@ -1,36 +1,35 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QUrl>
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
-
-#include <nx/utils/thread/mutex.h>
-
-#include <hanwha_metadata_monitor.h>
-#include <hanwha_metadata_plugin.h>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
-namespace nx {
-namespace mediaserver {
-namespace plugins {
+#include "plugin.h"
+#include "metadata_monitor.h"
 
-class HanwhaMetadataManager:
+namespace nx {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
+
+class Manager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
-
 {
-    Q_OBJECT;
-public:
-    HanwhaMetadataManager(HanwhaMetadataPlugin* plugin);
+    Q_OBJECT
 
-    virtual ~HanwhaMetadataManager();
+public:
+    Manager(Plugin* plugin);
+
+    virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nx::sdk::Error setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+    virtual nx::sdk::Error setHandler(
+        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
     virtual nx::sdk::Error startFetchingMetadata() override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
@@ -41,7 +40,7 @@ public:
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hanwha::DriverManifest& manifest);
 
-    void setMonitor(HanwhaMetadataMonitor* monitor);
+    void setMonitor(MetadataMonitor* monitor);
 
 private:
     Hanwha::DriverManifest m_driverManifest;
@@ -53,13 +52,14 @@ private:
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;
-    int m_channel;
+    int m_channel = 0;
 
-    HanwhaMetadataPlugin* m_plugin = nullptr;
-    HanwhaMetadataMonitor* m_monitor = nullptr;
+    Plugin* m_plugin = nullptr;
+    MetadataMonitor* m_monitor = nullptr;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

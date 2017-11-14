@@ -1,22 +1,23 @@
 #pragma once
 
+#include <map>
+#include <vector>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
-#include <map>
-#include <vector>
-
-#include <hanwha_common.h>
-
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 
-namespace nx {
-namespace mediaserver {
-namespace plugins {
+#include "common.h"
 
-class HanwhaMetadataMonitor: public QObject
+namespace nx {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
+
+class MetadataMonitor: public QObject
 {
     Q_OBJECT;
     using MetadataType = QString;
@@ -24,13 +25,14 @@ class HanwhaMetadataMonitor: public QObject
     using MultipartContentParserPtr = std::unique_ptr<nx_http::MultipartContentParser>;
 
 public:
-    using Handler = std::function<void(const HanwhaEventList&)>;
+    using Handler = std::function<void(const EventList&)>;
 
-    HanwhaMetadataMonitor(
+    MetadataMonitor(
         const Hanwha::DriverManifest& manifest,
         const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth);
-    virtual ~HanwhaMetadataMonitor();
+
+    virtual ~MetadataMonitor();
 
     void startMonitoring();
     void stopMonitoring();
@@ -40,7 +42,7 @@ public:
     void clearHandlers();
 
 private:
-    nx::utils::Url buildMonitoringUrl(const nx::utils::Url& url) const;
+    static nx::utils::Url buildMonitoringUrl(const nx::utils::Url& url);
     void initMonitorUnsafe();
 
 private:
@@ -59,6 +61,7 @@ private:
     bool m_started = false;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

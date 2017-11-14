@@ -1,12 +1,14 @@
-#include "hanwha_bytestream_filter.h"
-#include "hanwha_common.h"
-#include "hanwha_string_helper.h"
+#include "bytestream_filter.h"
 
 #include <iostream>
 
+#include "common.h"
+#include "string_helper.h"
+
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
 namespace {
 
@@ -18,21 +20,20 @@ static const QString kInactive = lit("false");
 
 } // namespace
 
-HanwhaBytestreamFilter::HanwhaBytestreamFilter(
+BytestreamFilter::BytestreamFilter(
     const Hanwha::DriverManifest& manifest,
-    HanwhaBytestreamFilter::Handler handler)
+    Handler handler)
     :
     m_manifest(manifest),
     m_handler(handler)
 {
 }
 
-HanwhaBytestreamFilter::~HanwhaBytestreamFilter()
+BytestreamFilter::~BytestreamFilter()
 {
-
 }
 
-bool HanwhaBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
+bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
     NX_ASSERT(m_handler, lit("No handler is set."));
     if (!m_handler)
@@ -42,10 +43,10 @@ bool HanwhaBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     return true;
 }
 
-std::vector<HanwhaEvent> HanwhaBytestreamFilter::parseMetadataState(
+std::vector<Event> BytestreamFilter::parseMetadataState(
     const QnByteArrayConstRef& buffer) const
 {
-    std::vector<HanwhaEvent> result;
+    std::vector<Event> result;
     auto split = buffer.split(L'\n');
 
     for (const auto& entry: split)
@@ -67,7 +68,7 @@ std::vector<HanwhaEvent> HanwhaBytestreamFilter::parseMetadataState(
     return result;
 }
 
-boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
+boost::optional<Event> BytestreamFilter::createEvent(
     const QString& eventSource,
     const QString& eventState) const
 {
@@ -75,15 +76,15 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
     if (eventTypeId.isNull())
         return boost::none;
 
-    HanwhaEvent event;
+    Event event;
     event.typeId = nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122());
     event.channel = eventChannel(eventSource);
     event.region = eventRegion(eventSource);
     event.isActive = isEventActive(eventState);
     event.itemType = eventItemType(eventSource, eventState);
     event.fullEventName = eventSource;
-    
-    event.caption = HanwhaStringHelper::buildCaption(
+
+    event.caption = StringHelper::buildCaption(
         m_manifest,
         eventTypeId,
         event.channel,
@@ -91,7 +92,7 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
         event.itemType,
         event.isActive);
 
-    event.description = HanwhaStringHelper::buildDescription(
+    event.description = StringHelper::buildDescription(
         m_manifest,
         eventTypeId,
         event.channel,
@@ -102,7 +103,7 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
     return event;
 }
 
-boost::optional<int> HanwhaBytestreamFilter::eventChannel(const QString& eventSource) const
+/*static*/ boost::optional<int> BytestreamFilter::eventChannel(const QString& eventSource)
 {
     auto split = eventSource.split(L'.');
     if (split.size() < 2)
@@ -120,7 +121,7 @@ boost::optional<int> HanwhaBytestreamFilter::eventChannel(const QString& eventSo
     return channel;
 }
 
-boost::optional<int> HanwhaBytestreamFilter::eventRegion(const QString& eventSource) const
+/*static*/ boost::optional<int> BytestreamFilter::eventRegion(const QString& eventSource)
 {
     auto split = eventSource.split(L'.');
     auto splitSize = split.size();
@@ -145,19 +146,19 @@ boost::optional<int> HanwhaBytestreamFilter::eventRegion(const QString& eventSou
     return boost::none;
 }
 
-bool HanwhaBytestreamFilter::isEventActive(const QString& eventSourceState) const
+/*static*/ bool BytestreamFilter::isEventActive(const QString& eventSourceState)
 {
     qDebug() << "eventSourceState" << eventSourceState << (eventSourceState.toLower() == kActive);
     return eventSourceState == kActive;
 }
 
-Hanwha::EventItemType HanwhaBytestreamFilter::eventItemType(
-    const QString& eventSource,
-    const QString& eventState) const
+/*static*/ Hanwha::EventItemType BytestreamFilter::eventItemType(
+    const QString& eventSource, const QString& eventState)
 {
     return Hanwha::EventItemType::none;
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

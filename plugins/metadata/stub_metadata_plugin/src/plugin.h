@@ -4,17 +4,17 @@
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace stub {
 
-class StubMetadataPlugin:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual const char* name() const override;
-    
+
     virtual void setSettings( const nxpl::Setting* settings, int count ) override;
 
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
@@ -32,6 +32,7 @@ public:
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace stub
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

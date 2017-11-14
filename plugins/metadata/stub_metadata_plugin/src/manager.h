@@ -9,16 +9,16 @@
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace stub {
 
-class StubMetadataManager:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
+class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
 {
 public:
-    StubMetadataManager();
+    Manager();
 
-    virtual ~StubMetadataManager();
+    virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -33,6 +33,7 @@ public:
         nx::sdk::Error* error) const override;
 
     virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
+
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
@@ -52,6 +53,7 @@ private:
     nxpl::NX_GUID m_objectTypeId;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace stub
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

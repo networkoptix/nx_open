@@ -1,15 +1,16 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QString>
 #include <QtCore/QXmlStreamReader>
 
-#include <vector>
-
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
-class HanwhaAttributesParser
+class AttributesParser
 {
 public:
     bool parseCgi(const QString& content);
@@ -19,10 +20,12 @@ public:
     bool readSubMenu(QXmlStreamReader& reader);
     bool readMonitorAction(QXmlStreamReader& reader);
     bool readChannelEvents(QXmlStreamReader& reader);
+
 private:
     std::vector<QString> m_supportedEvents;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

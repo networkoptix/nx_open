@@ -1,14 +1,18 @@
-#include "hanwha_common.h"
+#include "common.h"
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlag)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventTypeFlags)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventItemType)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha,
+    EventTypeFlag)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha,
+    EventTypeFlags)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha,
+    EventItemType)
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
 QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEventName) const
 {
@@ -18,7 +22,7 @@ QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEv
 
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        const auto possibleInternalNames = eventDescriptor.internalName.split(L',');
+        const auto& possibleInternalNames = eventDescriptor.internalName.split(L',');
         for (const auto& name: possibleInternalNames)
         {
             if (internalEventName.contains(name))
@@ -51,9 +55,13 @@ const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const
     return defaultEventDescriptor;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::EventDescriptor, (json), EventDescriptor_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::DriverManifest, (json), DriverManifest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventDescriptor,
+    (json), EventDescriptor_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha::DriverManifest,
+    (json), DriverManifest_Fields)
 
-} // plugins
-} // mediaserver
-} // nx
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
+} // namespace nx

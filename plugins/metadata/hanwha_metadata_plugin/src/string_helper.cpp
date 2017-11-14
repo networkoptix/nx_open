@@ -1,39 +1,36 @@
-#include "hanwha_string_helper.h"
-#include "hanwha_common.h"
+#include "string_helper.h"
 
-#include <nx/utils/literal.h>
-#include <nx/utils/std/hashes.h>
-
-#include <plugins/plugin_tools.h>
 #include <nx/fusion/serialization/lexical_enum.h>
-#include <nx/utils/thread/mutex.h>
+
+#include "common.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace hanwha {
 
-QString HanwhaStringHelper::buildCaption(
+QString StringHelper::buildCaption(
     const Hanwha::DriverManifest& manifest,
     const QnUuid& eventTypeId,
-    boost::optional<int> eventChannel,
-    boost::optional<int> eventRegion,
-    Hanwha::EventItemType eventItemType,
-    bool isActive)
+    boost::optional<int> /*eventChannel*/,
+    boost::optional<int> /*eventRegion*/,
+    Hanwha::EventItemType /*eventItemType*/,
+    bool /*isActive*/)
 {
-    const auto descriptor = manifest.eventDescriptorById(eventTypeId);
+    const auto& descriptor = manifest.eventDescriptorById(eventTypeId);
     return descriptor.eventName.value;
 }
 
-QString HanwhaStringHelper::buildDescription(
+QString StringHelper::buildDescription(
     const Hanwha::DriverManifest& manifest,
     const QnUuid& eventTypeId,
-    boost::optional<int> eventChannel,
+    boost::optional<int> /*eventChannel*/,
     boost::optional<int> eventRegion,
     Hanwha::EventItemType eventItemType,
     bool isActive)
 {
-    const auto descriptor = manifest.eventDescriptorById(eventTypeId);
-    auto description = descriptor.description;
+    const auto& descriptor = manifest.eventDescriptorById(eventTypeId);
+    QString description = descriptor.description;
     if (description.isEmpty())
         return QString();
 
@@ -46,7 +43,7 @@ QString HanwhaStringHelper::buildDescription(
 
     if (descriptor.flags.testFlag(Hanwha::EventTypeFlag::regionDependent))
     {
-        auto regionStr = descriptor.regionDescription.arg(eventRegion ? *eventRegion : 0);
+        const auto& regionStr = descriptor.regionDescription.arg(eventRegion ? *eventRegion : 0);
         description = description.arg(regionStr);
     }
 
@@ -56,6 +53,7 @@ QString HanwhaStringHelper::buildDescription(
     return description;
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace hanwha
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

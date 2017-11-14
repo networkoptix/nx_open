@@ -1,4 +1,4 @@
-#include "stub_metadata_manager.h"
+#include "manager.h"
 
 #include <iostream>
 #include <chrono>
@@ -9,10 +9,12 @@
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
+#include <nx/kit/debug.h>
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace stub {
 
 namespace {
 
@@ -27,13 +29,13 @@ static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-StubMetadataManager::StubMetadataManager():
+Manager::Manager():
     m_eventTypeId(kLineCrossingEventGuid)
 {
-    std::cout << "Creating metadata manager! " << (uintptr_t)this << std::endl;
+    NX_PRINT << "Creating metadata manager " << (uintptr_t) this;
 }
 
-void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataManager)
     {
@@ -55,14 +57,14 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error StubMetadataManager::setHandler(AbstractMetadataHandler* handler)
+Error Manager::setHandler(AbstractMetadataHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     return Error::noError;
 }
 
-Error StubMetadataManager::startFetchingMetadata()
+Error Manager::startFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -83,19 +85,19 @@ Error StubMetadataManager::startFetchingMetadata()
     return Error::noError;
 }
 
-nx::sdk::Error StubMetadataManager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
+nx::sdk::Error Manager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
 {
     m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
     return Error::noError;
 }
 
-Error StubMetadataManager::stopFetchingMetadata()
+Error Manager::stopFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return stopFetchingMetadataUnsafe();
 }
 
-const char* StubMetadataManager::capabilitiesManifest(Error* error) const
+const char* Manager::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
@@ -109,13 +111,13 @@ const char* StubMetadataManager::capabilitiesManifest(Error* error) const
     )json";
 }
 
-StubMetadataManager::~StubMetadataManager()
+Manager::~Manager()
 {
     stopFetchingMetadata();
-    std::cout << "Destroying metadata manager!" << (uintptr_t)this;
+    NX_PRINT << "Destroying metadata manager " << (uintptr_t) this;
 }
 
-Error StubMetadataManager::stopFetchingMetadataUnsafe()
+Error Manager::stopFetchingMetadataUnsafe()
 {
     m_stopping = true; //< looks bad
     if (m_thread)
@@ -128,7 +130,7 @@ Error StubMetadataManager::stopFetchingMetadataUnsafe()
     return Error::noError;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
+AbstractMetadataPacket* Manager::cookSomeEvents()
 {
     ++m_counter;
     if (m_counter > 1)
@@ -144,7 +146,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     auto detectedEvent = new CommonDetectedEvent();
     detectedEvent->setCaption("Line crossing (caption)");
     detectedEvent->setDescription("Line crossing (description)");
-    detectedEvent->setAuxilaryData(R"json({"auxilaryData": "someJson"})json");
+    detectedEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
     detectedEvent->setIsActive(m_counter == 1);
     detectedEvent->setEventTypeId(m_eventTypeId);
 
@@ -154,7 +156,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     return eventPacket;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(
+AbstractMetadataPacket* Manager::cookSomeObjects(
     nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
     nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
@@ -167,7 +169,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(
         {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
     detectedObject->setId(objectId);
-    detectedObject->setAuxilaryData(R"json( {"auxilaryData": "someJson2"} )json");
+    detectedObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
     detectedObject->setEventTypeId(m_objectTypeId);
 
     double dt = m_counterObjects++ / 32.0;
@@ -183,13 +185,14 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(
     return eventPacket;
 }
 
-int64_t StubMetadataManager::usSinceEpoch() const
+int64_t Manager::usSinceEpoch() const
 {
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace stub
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
