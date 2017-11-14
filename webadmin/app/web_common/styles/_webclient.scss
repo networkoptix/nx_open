@@ -695,9 +695,13 @@ table.webclient-window>tbody>tr>td{
     width: 100%;
     z-index: 2;  /* Used to bring the close-fullscreen button above the player. */
   }
-  &:hover .close-fullscreen-icon {
+  &:hover .stick-to-top{
     display: block;
   }
+}
+
+.hide-fullscreen{
+  display: none;
 }
 
 .fullscreen{
