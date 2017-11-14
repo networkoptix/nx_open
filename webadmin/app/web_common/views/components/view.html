@@ -29,7 +29,7 @@
             </td>
             <td width="100%">
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
-                    <div class="view-panel" ng-class="{'no-archive': !canViewArchive, fullscreen: isFullscreen}">
+                    <div class="view-panel" ng-class="{'no-archive': !canViewArchive, 'fullscreen': isFullscreen}">
                         <div class="fullscreen-hoverarea" ng-mouseover="showTop=true"></div>
                         <div class="stick-to-top top-gradient" ng-if="!isFullscreen || showTop">
                             <div class="webclient-panel webclient-bottom-border">
@@ -71,7 +71,7 @@
                                     </span>
                                 </div>
                                 <div class="hide-excess-text video-title">
-                                    <span class="visible-xs" ng-click="showCameraPanel=true"
+                                    <span class="visible-xs" ng-click="showCamerasPanel()"
                                           ng-class="{'back-button': !showCameraPanel}">
                                         <span class="glyphicon glyphicon-arrow-left"></span>
                                     </span>

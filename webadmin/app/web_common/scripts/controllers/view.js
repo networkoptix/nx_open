@@ -357,6 +357,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             screenfull.exit();
         }
 
+        $scope.showCamerasPanel = function(){
+            $scope.showCameraPanel=true;
+        };
+
         document.addEventListener('MSFullscreenChange',function(){ // IE only
             $('.videowindow').toggleClass('fullscreen');
         });
