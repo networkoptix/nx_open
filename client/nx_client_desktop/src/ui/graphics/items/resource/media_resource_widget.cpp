@@ -2246,6 +2246,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
         suspendHomePtzController();
     }
     updateCompositeOverlayMode();
+    updateIconButton();
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
