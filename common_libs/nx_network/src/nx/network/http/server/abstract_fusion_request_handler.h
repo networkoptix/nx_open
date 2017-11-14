@@ -2,14 +2,14 @@
 
 #include "detail/abstract_fusion_request_handler_detail.h"
 
-#include "../http_types.h" 
+#include "../http_types.h"
 
 namespace nx_http {
 
 /**
  * HTTP server request handler which deserializes input/serializes output data using fusion.
  * Reads format query parameter from incoming request and deserializes request/serializes response accordingly.
- * @note Input or Output can be void. If Input is void, 
+ * @note Input or Output can be void. If Input is void,
  *   AbstractFusionRequestHandler::processRequest does not have inputData argument.
  *   If Output is void, AbstractFusionRequestHandler::requestCompleted does not have outputData argument.
  * @note GET request input data is always deserialized from url query.

@@ -1,16 +1,10 @@
-/**********************************************************
-* Nov 20, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "fusion_request_result.h"
 
 #include <nx/fusion/model_functions.h>
 
 namespace nx_http {
 
-FusionRequestResult::FusionRequestResult()
-:
+FusionRequestResult::FusionRequestResult():
     errorClass(FusionRequestErrorClass::noError),
     resultCode(QnLexical::serialized(FusionRequestErrorDetail::ok)),
     errorDetail(static_cast<int>(FusionRequestErrorDetail::ok))
