@@ -29,8 +29,9 @@
             </td>
             <td width="100%">
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
-                    <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
-                        <div class="stick-to-top top-gradient">
+                    <div class="view-panel" ng-class="{'no-archive': !canViewArchive, fullscreen: isFullscreen}">
+                        <div class="fullscreen-hoverarea" ng-mouseover="showTop=true"></div>
+                        <div class="stick-to-top top-gradient" ng-if="!isFullscreen || showTop">
                             <div class="webclient-panel webclient-bottom-border">
                                 <div class="pull-right" >
                                     <div class="video-title-buffer">&nbsp;</div>
@@ -60,8 +61,13 @@
                                             </li>
                                         </ul>
                                     </div>
-                                    <span class="video-icon" ng-if="enableFullScreen" ng-click="fullScreen()">
+                                    <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
+                                          ng-click="fullScreen()">
                                         <span class="glyphicon glyphicon-fullscreen"></span>
+                                    </span>
+                                    <span ng-if="isFullscreen" class="video-icon"
+                                          ng-click="closeFullscreen()">
+                                        <span class="glyphicon glyphicon-close-fullscreen"></span>
                                     </span>
                                 </div>
                                 <div class="hide-excess-text video-title">
@@ -76,8 +82,10 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="float-size">
+                        <div class="float-size" ng-mouseover="showTop=false">
+                            <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
+                                <span>Press ESC to exit fullscreen</span>
+                            </div>
                             <camera-links ng-if="cameraLinks.enabled"
                                           system="systemAPI" position="positionProvider.playedPosition"
                                           live-mode="positionProvider.liveMode" active-camera="activeCamera"
@@ -96,7 +104,7 @@
                             </videowindow>
                         </div>
 
-                        <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">
+                        <div class="stick-to-bottom" ng-class="{invisible:!activeCamera || isFullscreen}">
                             <timeline
                                     can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
                                     records-provider="activeVideoRecords"
