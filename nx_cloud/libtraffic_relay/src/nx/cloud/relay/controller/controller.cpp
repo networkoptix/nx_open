@@ -24,7 +24,7 @@ Controller::Controller(
     m_listeningPeerManager(
         relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
-    m_statisticsProvider(std::make_unique<controller::StatisticsProvider>(
+    m_statisticsProvider(controller::StatisticsProviderFactory::instance().create(
         model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
@@ -47,12 +47,12 @@ relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
     return *m_listeningPeerManager;
 }
 
-controller::StatisticsProvider& Controller::statisticsProvider()
+controller::AbstractStatisticsProvider& Controller::statisticsProvider()
 {
     return *m_statisticsProvider;
 }
 
-const controller::StatisticsProvider& Controller::statisticsProvider() const
+const controller::AbstractStatisticsProvider& Controller::statisticsProvider() const
 {
     return *m_statisticsProvider;
 }

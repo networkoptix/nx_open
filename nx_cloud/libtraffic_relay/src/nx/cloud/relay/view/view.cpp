@@ -110,8 +110,8 @@ void View::registerStatisticsApiHandlers()
         api::kRelayStatisticsMetricsPath,
         nx_http::Method::get,
         std::bind(
-            &controller::StatisticsProvider::getAllStatistics,
-            m_controller->statisticsProvider()));
+            &controller::AbstractStatisticsProvider::getAllStatistics,
+            &m_controller->statisticsProvider()));
 }
 
 void View::registerCompatibilityHandlers()
