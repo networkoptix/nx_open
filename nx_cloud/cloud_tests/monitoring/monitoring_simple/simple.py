@@ -227,7 +227,7 @@ class CloudSession(object):
 
         client = docker.client.from_env()
         output = client.containers.run(
-            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command)
+            '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:3.1.0.13200', command, remove=True)
         assert b'HTTP/1.1 200 OK' in output, 'Received invalid output from cloud connect'
 
 
