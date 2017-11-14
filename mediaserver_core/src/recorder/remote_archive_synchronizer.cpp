@@ -23,7 +23,6 @@ namespace mediaserver_core {
 namespace recorder {
 
 using namespace nx::core::resource;
-using Locker = nx::utils::Locker<std::map<QnUuid, RemoteArchiveTaskPtr>>;
 
 RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule),

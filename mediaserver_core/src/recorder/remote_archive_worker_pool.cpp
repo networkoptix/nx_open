@@ -55,9 +55,10 @@ void RemoteArchiveWorkerPool::setMaxTaskCount(int maxTaskCount)
     m_maxTaskCount = maxTaskCount;
 }
 
-void RemoteArchiveWorkerPool::setTaskMapAccessor(std::function<LockableTaskMap*()> accessor)
+void RemoteArchiveWorkerPool::setTaskMapAccessor(
+    nx::utils::MoveOnlyFunc<LockableTaskMap*()> accessor)
 {
-    m_taskMapAccessor = accessor;
+    m_taskMapAccessor = std::move(accessor);
 }
 
 nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
