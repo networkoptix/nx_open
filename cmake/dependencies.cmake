@@ -8,7 +8,6 @@ function(nx_detect_package_versions)
     _set_version(openssl "1.0.2e")
     _set_version(ffmpeg "3.1.1")
     _set_version(quazip "0.7.1")
-    _set_version(onvif "2.1.2-io2")
     _set_version(sigar "1.7")
     _set_version(openldap "2.4.42")
     _set_version(sasl2 "2.1.26")
@@ -80,7 +79,6 @@ function(nx_detect_package_versions)
         openssl
         ffmpeg
         quazip
-        onvif
         sigar
         openldap
         sasl2
@@ -196,7 +194,6 @@ function(nx_get_dependencies)
     if(haveServer)
         nx_rdep_add_package(any/nx_sdk-1.6.0)
         nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-        nx_rdep_add_package(onvif)
         nx_rdep_add_package(sigar)
 
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
