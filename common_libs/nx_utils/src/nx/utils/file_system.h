@@ -90,6 +90,8 @@ bool NX_UTILS_API isUsb(const QString& devName);
 
 #endif
 
+bool isSafeRelativePath(const QString& path);
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx
