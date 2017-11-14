@@ -886,19 +886,18 @@
                     dataType="Button"
                     writeCmd="control"
                     description="Fits the focus automatically"
-                    aux="support=Image/SimpleFocus;shouldAffectAllChannels=true"/>
+                    aux="support=Image/SimpleFocus"/>
             <param id="image/focus/Mode=Reset"
                     name="Initialize Focus"
                     dataType="Button"
                     writeCmd="control"
                     description="Restores the focus adjustment to the default flange back position"
-                    aux="support=Image/ResetFocus;shouldAffectAllChannels=true"/>
+                    aux="support=Image/ResetFocus"/>
             <param id="image/focus/Mode=AutoFocus"
                     name="Simple Focus"
                     dataType="Button"
                     writeCmd="control"
-                    description="Fits the focus automatically"
-                    aux="shouldAffectAllChannels=true">
+                    description="Fits the focus automatically">
                 <dependencies>
                     <dependencies-show>
                         <conditional-show>
@@ -913,8 +912,7 @@
                     name="Initialize Focus"
                     dataType="Button"
                     writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"
-                    aux="shouldAffectAllChannels=true">
+                    description="Restores the focus adjustment to the default flange back position">
                 <dependencies>
                     <dependencies-show>
                         <conditional-show>

@@ -123,7 +123,7 @@ private:
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(
-        QnRtspIoDevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
+        quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
     QnRtspClient::TransportType getRtpTransport() const;

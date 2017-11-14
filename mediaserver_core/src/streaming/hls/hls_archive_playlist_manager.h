@@ -59,7 +59,7 @@ namespace nx_hls
         qint64 m_prevChunkEndTimestamp;
         bool m_eof;
         int m_chunkMediaSequence;
-        std::unique_ptr<QnThumbnailsArchiveDelegate> m_delegate;
+        QnAbstractArchiveDelegatePtr m_delegate;
         QElapsedTimer m_playlistUpdateTimer;
         qint64 m_timerCorrection;
         bool m_initialPlaylistCreated;

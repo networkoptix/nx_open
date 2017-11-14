@@ -8,81 +8,94 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
-    Connective<QObject>(parent),
-    base_type(parent)
+struct DefaultPasswordCamerasWatcher::Private
 {
-    const auto setNotificationVisible =
-        [this](bool value)
-        {
-            if (m_notificationIsVisible == value)
-                return;
+    explicit Private(DefaultPasswordCamerasWatcher* owner):
+        q(owner)
+    {
+    }
 
-            m_notificationIsVisible = value;
-            emit notificationIsVisibleChanged();
-        };
+    void handleCameraChanged(const QnVirtualCameraResourcePtr& camera)
+    {
+        if (camera->needsToChangeDefaultPassword())
+            camerasWithDefaultPassword.insert(camera);
+        else
+            camerasWithDefaultPassword.remove(camera);
+        updateNotificationVisible();
+    }
 
-    const auto resourceRemovedHandler =
-        [this, setNotificationVisible](const QnResourcePtr& resource)
-        {
-            const auto resourceId = resource->getId().toQUuid();
-            if (m_camerasWithDefaultPassword.remove(resourceId))
-            {
-                if (m_camerasWithDefaultPassword.isEmpty())
-                    setNotificationVisible(false);
-                emit camerasWithDefaultPasswordChanged();
-            }
-        };
+    void updateNotificationVisible()
+    {
+        setNotificationVisible(!camerasWithDefaultPassword.empty());
+    }
 
-    const auto updateResource=
-        [this, resourceRemovedHandler, setNotificationVisible](const QnResourcePtr& resource)
-        {
-            const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-            if (!camera)
-                return;
+    void setNotificationVisible(bool value)
+    {
+        if (notificationIsVisible == value)
+            return;
 
-            if (!camera->needsToChangeDefaultPassword())
-            {
-                resourceRemovedHandler(resource);
-                return;
-            }
+        notificationIsVisible = value;
+        emit q->notificationIsVisibleChanged();
+    }
 
-            const QUuid resourceId = resource->getId().toQUuid();
-            if (m_camerasWithDefaultPassword.contains(resourceId))
-                return;
+    DefaultPasswordCamerasWatcher* const q;
+    bool notificationIsVisible = false;
+    QSet<QnVirtualCameraResourcePtr> camerasWithDefaultPassword;
+};
 
-            m_camerasWithDefaultPassword.insert(resourceId, camera);
-            setNotificationVisible(true);
-            emit camerasWithDefaultPasswordChanged();
-        };
 
-    const auto resourceAddedHandler =
-        [this, updateResource](const QnResourcePtr& resource)
-        {
-            const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-            if (!camera)
-                return;
+DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
+    d(new Private(this))
+{
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        &DefaultPasswordCamerasWatcher::handleResourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        &DefaultPasswordCamerasWatcher::handleResourceRemoved);
 
-            updateResource(resource);
-            connect(camera.data(), &QnVirtualCameraResource::capabilitiesChanged,
-                this, [resource, updateResource]() { updateResource(resource); });
-        };
+    for (const auto& resource: resourcePool()->getResources())
+        handleResourceAdded(resource);
+}
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, resourceAddedHandler);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, resourceRemovedHandler);
-
-    for (const auto& resource: resourcePool()->getResources<QnVirtualCameraResource>())
-        updateResource(resource);
+DefaultPasswordCamerasWatcher::~DefaultPasswordCamerasWatcher()
+{
 }
 
 bool DefaultPasswordCamerasWatcher::notificationIsVisible() const
 {
-    return m_notificationIsVisible;
+    return d->notificationIsVisible;
 }
 
 QnVirtualCameraResourceList DefaultPasswordCamerasWatcher::camerasWithDefaultPassword() const
 {
-    return m_camerasWithDefaultPassword.values();
+    return d->camerasWithDefaultPassword.values();
+}
+
+void DefaultPasswordCamerasWatcher::handleResourceAdded(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this,
+        [this, camera](const QnResourcePtr& resource)
+        {
+            d->handleCameraChanged(camera);
+        });
+
+    d->handleCameraChanged(camera);
+}
+
+void DefaultPasswordCamerasWatcher::handleResourceRemoved(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    camera->disconnect(this);
+    if (d->camerasWithDefaultPassword.remove(camera))
+        d->updateNotificationVisible();
 }
 
 } // namespace desktop

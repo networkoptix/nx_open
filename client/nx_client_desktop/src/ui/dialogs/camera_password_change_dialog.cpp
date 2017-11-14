@@ -1,6 +1,8 @@
 #include "camera_password_change_dialog.h"
 #include "ui_camera_password_change_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <ui/common/aligner.h>
@@ -65,10 +67,11 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
 
     ui->passwordEdit->setValidator(Qn::validatorsConcatenator(
         { Qn::defaultPasswordValidator(false), makeNonCameraUserNameValidator(cameras) }));
+    setupPasswordField(*ui->passwordEdit);
+
     ui->confirmPasswordEdit->setValidator(Qn::defaultConfirmationValidator(
         [this](){ return ui->passwordEdit->text(); }, tr("Passwords do not match.")));
-    setupPasswordField(*ui->passwordEdit);
-    setupPasswordField(*ui->confirmPasswordEdit);
+    ui->confirmPasswordEdit->setEchoMode(QLineEdit::Password);
 
     const auto updateHint =
         [this]()
@@ -107,6 +110,7 @@ QString QnCameraPasswordChangeDialog::password() const
 
 void QnCameraPasswordChangeDialog::accept()
 {
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
     bool validFields = ui->confirmPasswordEdit->validate();
     validFields &= ui->passwordEdit->validate();
     if (validFields)

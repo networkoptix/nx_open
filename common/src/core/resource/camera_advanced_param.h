@@ -44,7 +44,7 @@ struct QnCameraAdvancedParameterCondition
         equal, //< Watched value strictly equals to condition value
         inRange, //< Watched value is in condition value range
         notInRange,
-        present, //< Watched value is present in parameter list
+        present, //< Watched parameter is present in parameter list
         notPresent,
         unknown
     };
@@ -54,8 +54,6 @@ struct QnCameraAdvancedParameterCondition
     QString value;
 
     bool checkValue(const QString& valueToCheck) const;
-    static ConditionType fromStringToConditionType(const QString& conditionTypeString);
-    static QString fromConditionTypeToString(const ConditionType& conditionType);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition::ConditionType, (lexical))

@@ -31,7 +31,7 @@ static QDateTime kMinDateTime = QDateTime::fromString(
     kDateTimeFormat);
 
 static QDateTime kMaxDateTime = QDateTime::fromString(
-    lit("2038-01-01 00:00:00"),
+    lit("2037-12-31 00:00:00"),
     kDateTimeFormat);
 
 HanwhaChunkLoader::HanwhaChunkLoader():

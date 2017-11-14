@@ -51,26 +51,29 @@ Qn::ConnectionRole fromString<Qn::ConnectionRole>(const QString& str)
     return Qn::ConnectionRole::CR_Default;
 }
 
-} // namespace nx
+} // namespace
+
+const std::map<QString, QString HanwhaAdavancedParameterInfo::*>
+HanwhaAdavancedParameterInfo::m_stringAuxes = {
+    {kSupportAux, &HanwhaAdavancedParameterInfo::m_supportAttribute},
+    {kRangeAux, &HanwhaAdavancedParameterInfo::m_rangeParameter},
+    {kResourceProperty, &HanwhaAdavancedParameterInfo::m_resourceProperty},
+    {kSortingAux, &HanwhaAdavancedParameterInfo::m_sorting},
+    {kGroupAux, &HanwhaAdavancedParameterInfo::m_group},
+    {kGropupIncludeAux, &HanwhaAdavancedParameterInfo::m_groupIncludeCondition},
+    {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group}
+};
+
+const std::map<QString, bool HanwhaAdavancedParameterInfo::*>
+HanwhaAdavancedParameterInfo::m_boolAuxes = {
+    {kSpecificAux, &HanwhaAdavancedParameterInfo::m_isSpecific},
+    {kNoChannelAux, &HanwhaAdavancedParameterInfo::m_channelIndependent},
+    {kCodecAux, &HanwhaAdavancedParameterInfo::m_isCodecDependent},
+    {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels}
+};
 
 HanwhaAdavancedParameterInfo::HanwhaAdavancedParameterInfo(
     const QnCameraAdvancedParameter& parameter)
-    :
-    m_stringAuxes({
-        {kSupportAux, &m_supportAttribute},
-        {kRangeAux, &m_rangeParameter},
-        {kResourceProperty, &m_resourceProperty},
-        {kSortingAux, &m_sorting},
-        {kGroupAux, &m_group},
-        {kGropupIncludeAux, &m_groupIncludeCondition},
-        {kGroupLeadAux, &m_group}
-    }),
-    m_boolAuxes({
-        {kSpecificAux, &m_isSpecific},
-        {kNoChannelAux, &m_channelIndependent},
-        {kCodecAux, &m_isCodecDependent},
-        {kShouldAffectAllChannels, &m_shouldAffectAllChannels}
-    })
 {
     parseParameter(parameter);
 }
@@ -226,10 +229,10 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
         const auto auxValue = split[1].trimmed();
 
         if (m_stringAuxes.find(auxName) != m_stringAuxes.cend())
-            *m_stringAuxes.at(auxName) = auxValue;
+            this->*m_stringAuxes.at(auxName) = auxValue;
 
         if (m_boolAuxes.find(auxName) != m_boolAuxes.cend())
-            *m_boolAuxes.at(auxName) = fromString<bool>(auxValue);
+            this->*m_boolAuxes.at(auxName) = fromString<bool>(auxValue);
 
         if (auxName == kProfileAux)
             m_profile = fromString<Qn::ConnectionRole>(auxValue);
