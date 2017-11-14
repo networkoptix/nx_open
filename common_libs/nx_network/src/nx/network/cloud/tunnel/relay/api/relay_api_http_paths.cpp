@@ -12,6 +12,9 @@ const char* const kServerClientSessionsPath = "/relay/server/{serverPeerName}/cl
 const char* const kClientSessionConnectionsPath = "/relay/client_session/{sessionId}/connections/";
 const char* const kRelayClientPathPrefix = "/relay/client/";
 
+const char* const kRelayStatisticsMetricsPath = "/relay/statistics/metrics/";
+const char* const kRelayStatisticsSpecificMetricPath = "/relay/statistics/metrics/{metric}";
+
 } // namespace api
 } // namespace relay
 } // namespace cloud

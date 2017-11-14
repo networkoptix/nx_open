@@ -4,11 +4,13 @@
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
+#include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/statistics_provider.h>
 #include <nx/cloud/relaying/listening_peer_manager.h>
 
 #include "connect_session_manager_mock.h"
@@ -37,17 +39,19 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
-        {
-            m_relayClient = api::ClientFactory::create(
-                nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
-                    .setPort(moduleInstance()->httpEndpoints()[0].port));
-        }
+            m_relayClient = api::ClientFactory::create(basicUrl());
         return *m_relayClient;
     }
 
     void onRequestCompletion(api::ResultCode resultCode)
     {
         m_apiResponse.push(resultCode);
+    }
+
+    nx::utils::Url basicUrl() const
+    {
+        return nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
+            .setPort(moduleInstance()->httpEndpoints()[0].port).toUrl();
     }
 
 private:
@@ -88,14 +92,14 @@ private:
             std::move(m_connectionSessionManagerFactoryFuncBak));
     }
 
-    std::unique_ptr<controller::AbstractConnectSessionManager> 
+    std::unique_ptr<controller::AbstractConnectSessionManager>
         createConnectSessionManager(
             const conf::Settings& /*settings*/,
             model::ClientSessionPool* /*clientSessionPool*/,
             relaying::ListeningPeerPool* /*listeningPeerPool*/,
             controller::AbstractTrafficRelay* /*trafficRelay*/)
     {
-        auto connectSessionManager = 
+        auto connectSessionManager =
             std::make_unique<ConnectSessionManagerMock>(
                 &m_receivedCreateClientSessionRequests,
                 &m_receivedConnectToPeerRequests);
@@ -202,6 +206,67 @@ TEST_F(HttpApiOpenConnectionToTheTargetHost, request_is_delivered)
     whenIssuedApiRequest();
     thenRequestSucceeded();
     thenRequestHasBeenDeliveredToTheManager();
+}
+
+//-------------------------------------------------------------------------------------------------
+// HttpApiStatistics
+
+class HttpApiStatistics:
+    public HttpApi
+{
+public:
+    ~HttpApiStatistics()
+    {
+        if (m_httpClient)
+            m_httpClient->pleaseStopSync();
+    }
+
+protected:
+    void whenRequestStatistics()
+    {
+        using namespace std::placeholders;
+
+        m_httpClient = std::make_unique<GetStatisticsHttpClient>(
+            nx::network::url::Builder(basicUrl())
+                .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
+            nx_http::AuthInfo());
+        m_httpClient->execute(
+            std::bind(&HttpApiStatistics::saveStatisticsRequestResult, this, _1, _2, _3));
+    }
+
+    void andExpectedStatisticsIsProvided()
+    {
+        const auto prevStatistics = m_receivedStatistics.pop();
+        // TODO
+    }
+
+private:
+    using GetStatisticsHttpClient =
+        nx_http::FusionDataHttpClient<void, nx::cloud::relay::controller::Statistics>;
+
+    std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
+    nx::utils::SyncQueue<nx::cloud::relay::controller::Statistics> m_receivedStatistics;
+
+    void saveStatisticsRequestResult(
+        SystemError::ErrorCode /*systemErrorCode*/,
+        const nx_http::Response* response,
+        nx::cloud::relay::controller::Statistics statistics)
+    {
+        onRequestCompletion(
+            response
+            ? api::fromHttpStatusCode(static_cast<nx_http::StatusCode::Value>(
+                response->statusLine.statusCode))
+            : api::ResultCode::networkError);
+        m_receivedStatistics.push(std::move(statistics));
+    }
+};
+
+TEST_F(HttpApiStatistics, statistics_provided)
+{
+    whenRequestStatistics();
+
+    thenRequestSucceeded();
+    andExpectedStatisticsIsProvided();
 }
 
 } // namespace test
