@@ -2,13 +2,11 @@
 
 #include <nx/network/stun/extension/stun_extension_types.h>
 
-
 namespace nx {
 namespace hpm {
 namespace api {
 
-ResolveDomainRequest::ResolveDomainRequest(nx::String domainName_)
-:
+ResolveDomainRequest::ResolveDomainRequest(nx::String domainName_):
     StunRequestData(kMethod),
     domainName(std::move(domainName_))
 {
@@ -24,9 +22,9 @@ bool ResolveDomainRequest::parseAttributes(const nx::stun::Message& message)
     return readStringAttributeValue<stun::extension::attrs::HostName>(message, &domainName);
 }
 
+//-------------------------------------------------------------------------------------------------
 
-ResolveDomainResponse::ResolveDomainResponse(std::vector<nx::String> hostNames_)
-:
+ResolveDomainResponse::ResolveDomainResponse(std::vector<nx::String> hostNames_):
     StunResponseData(kMethod),
     hostNames(std::move(hostNames_))
 {

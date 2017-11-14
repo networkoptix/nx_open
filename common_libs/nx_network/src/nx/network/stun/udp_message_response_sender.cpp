@@ -14,10 +14,6 @@ UDPMessageResponseSender::UDPMessageResponseSender(
 {
 }
 
-UDPMessageResponseSender::~UDPMessageResponseSender()
-{
-}
-
 void UDPMessageResponseSender::sendMessage(
     nx::stun::Message message,
     std::function<void(SystemError::ErrorCode)> handler)

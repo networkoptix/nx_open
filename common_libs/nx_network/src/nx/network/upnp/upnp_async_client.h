@@ -30,7 +30,7 @@ public:
         std::map<QString, QString> params;
 
         //! @returns wether message represents normal resquest/response or error
-        //! @note in case of error @var action and @var service are empty
+        //! NOTE: in case of error @var action and @var service are empty
         bool isOk() const;
 
         //! @returns value or empty string

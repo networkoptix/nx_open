@@ -9,7 +9,7 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-using EndpointVerificatorFactoryFunction = 
+using EndpointVerificatorFactoryFunction =
     std::unique_ptr<AbstractEndpointVerificator>(const nx::String& /*connectSessionId*/);
 
 class NX_NETWORK_API EndpointVerificatorFactory:

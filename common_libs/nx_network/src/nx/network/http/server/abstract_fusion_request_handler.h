@@ -9,11 +9,11 @@ namespace nx_http {
 /**
  * HTTP server request handler which deserializes input/serializes output data using fusion.
  * Reads format query parameter from incoming request and deserializes request/serializes response accordingly.
- * @note Input or Output can be void. If Input is void,
+ * NOTE: Input or Output can be void. If Input is void,
  *   AbstractFusionRequestHandler::processRequest does not have inputData argument.
  *   If Output is void, AbstractFusionRequestHandler::requestCompleted does not have outputData argument.
- * @note GET request input data is always deserialized from url query.
- * @note POST request output data is ignored.
+ * NOTE: GET request input data is always deserialized from url query.
+ * NOTE: POST request output data is ignored.
  */
 template<typename Input = void, typename Output = void>
 class AbstractFusionRequestHandler:
@@ -26,8 +26,8 @@ public:
     /**
      * Here actual HTTP request implementation resides.
      * On request processing completion requestCompleted(FusionRequestResult, Output) MUST be invoked.
-     * @note If Input is void, then this method does not have inputData argument.
-     * @note If Output is void, then requestCompleted(FusionRequestResult).
+     * NOTE: If Input is void, then this method does not have inputData argument.
+     * NOTE: If Output is void, then requestCompleted(FusionRequestResult).
      */
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,

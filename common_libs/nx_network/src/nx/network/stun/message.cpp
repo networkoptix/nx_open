@@ -39,7 +39,7 @@ Header::Header(Header&& right)
     transactionId(std::move(right.transactionId))
 {
 }
-         
+
 Header::Header( MessageClass messageClass_ , int method_)
     : messageClass( messageClass_ )
     , method( method_ )

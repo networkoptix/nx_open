@@ -8,9 +8,9 @@ namespace db {
 
 /**
  * Updates are executed in order they have been added to DbStructureUpdater instance.
- * @note Database is not created, it MUST already exist.
- * @note This class methods are not thread-safe.
- * @note Always updates internal auxiliary schema first.
+ * NOTE: Database is not created, it MUST already exist.
+ * NOTE: This class methods are not thread-safe.
+ * NOTE: Always updates internal auxiliary schema first.
  */
 class NX_UTILS_API DbStructureUpdater
 {

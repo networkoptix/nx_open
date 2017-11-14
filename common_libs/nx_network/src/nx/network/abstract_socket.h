@@ -185,7 +185,7 @@ public:
 
     /**
      * Binds current socket to specified AIOThread.
-     * @note Internal NX_ASSERT(false) in case if socket can not be bound to
+     * NOTE: Internal NX_ASSERT(false) in case if socket can not be bound to
      *   specified tread (e.g. it's already bound to different thread or
      *   certaind thread type is not the same).
      */

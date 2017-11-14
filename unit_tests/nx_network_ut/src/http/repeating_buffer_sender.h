@@ -17,7 +17,7 @@ class RepeatingBufferSender
 public:
     RepeatingBufferSender(const nx_http::StringType& mimeType, nx::Buffer buffer);
 
-    //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
+    //!Implementation of nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,

@@ -16,8 +16,8 @@ namespace cloud {
 enum class AddressType
 {
     unknown,
-    direct, //!< Address for direct simple connection
-    cloud, //!< Address that requires mediator (e.g. hole punching)
+    direct, /**< Address for direct simple connection. */
+    cloud, /**< Address that requires mediator (e.g. hole punching). */
 };
 
 QString toString(const AddressType& type);
@@ -87,16 +87,16 @@ public:
     //!Add new peer address
     /*!
         Peer addresses are resolved from time to time in the following way:\n
-        - custom NX resolve request is sent if \a nxApiPort attribute is provided.
-            If peer responds and reports same name as \a peerName than address
+        - custom NX resolve request is sent if nxApiPort attribute is provided.
+            If peer responds and reports same name as peerName than address
             considered "resolved"
         - if host does not respond to custom NX resolve request or no
-            \a nxApiPort attribute, than ping is used from time to time
+            nxApiPort attribute, than ping is used from time to time
         - resolved address is "resolved" for only some period of time
 
-        \param attributes Attributes refer to \a hostAddress not \a peerName
+        \param attributes Attributes refer to hostAddress not peerName
 
-        \note Peer can have multiple addresses
+        NOTE: Peer can have multiple addresses
     */
     void addFixedAddress(
         const HostAddress& hostName, const SocketAddress& endpoint);
@@ -109,7 +109,7 @@ public:
     /*!
         \example resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
 
-        \note \a handler might be called within this function in case if
+        NOTE: handler might be called within this function in case if
             values are avaliable from cache
      */
     void resolveDomain(
@@ -121,15 +121,15 @@ public:
 
     //!Resolves hostName like DNS server does
     /*!
-        \a handler is called with complete address list includung:
+        handler is called with complete address list includung:
             - addresses reported by \fn addPeerAddress
             - resolve result from \class DnsResolver
             - resolve result from \class MediatorAddressResolver (TODO :)
 
-        \note \a handler might be called within this function in case if
+        NOTE: handler might be called within this function in case if
             values are avaliable from cache
 
-        \a natTraversal defines if mediator should be used for address resolution
+        natTraversal defines if mediator should be used for address resolution
     */
     void resolveAsync(
         const HostAddress& hostName,
@@ -145,7 +145,7 @@ public:
 
     //!Cancels request
     /*!
-        if \a handler not provided the method will block until actual
+        if handler not provided the method will block until actual
         cancelation is done
     */
     void cancel(

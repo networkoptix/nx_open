@@ -61,7 +61,7 @@ public:
      * If scheduled request has not received DB connection during this timeout
      * it will be cancelled with DBResult::cancelled error code.
      * By default it is one minute.
-     * @note Set to zero to disable this timeout.
+     * NOTE: Set to zero to disable this timeout.
      */
     std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection;
     int maxErrorsInARowBeforeClosingConnection;

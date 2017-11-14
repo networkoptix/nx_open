@@ -952,7 +952,7 @@ public:
     bool isServerSide;
     quint8 extraBuffer[32];
     int extraBufferLen;
-    //!Socket works as regular socket (without encryption until this flag is set to \a true)
+    //!Socket works as regular socket (without encryption until this flag is set to true)
     bool encryptionEnabled;
     std::atomic<bool> nonBlockingMode;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
@@ -1485,7 +1485,7 @@ static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType event
         socket->isSendInProgress = false;
     if (eventType == aio::etRead || eventType == aio::etNone)
         socket->isRecvInProgress = false;
-    
+
     if (socket->asyncSslHelper)
         socket->asyncSslHelper->clear();
 }

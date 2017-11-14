@@ -10,8 +10,8 @@ class AbstractConnectionAcceptor:
     public AbstractStreamSocketAcceptor
 {
 public:
-    /** 
-     * @return Ready-to-use connection from internal listen queue. 
+    /**
+     * @return Ready-to-use connection from internal listen queue.
      *   nullptr if no connections available.
      */
     virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() = 0;

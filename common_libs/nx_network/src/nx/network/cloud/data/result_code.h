@@ -37,5 +37,8 @@ QString NX_NETWORK_API toString(ResultCode code);
 } // namespace hpm
 } // namespace nx
 
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+/**
+ * Not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec.
+ */
+
 void NX_NETWORK_API serialize(const nx::hpm::api::ResultCode&, QString*);

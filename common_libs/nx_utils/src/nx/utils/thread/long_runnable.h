@@ -37,11 +37,11 @@ public:
 
     //!Returns thread id, corresponding to this object
     /*!
-        This id is remembered in \a QnLongRunnable::initSystemThreadId
+        This id is remembered in QnLongRunnable::initSystemThreadId
     */
     uintptr_t systemThreadId() const;
 
-    //!Returns thread id of current thread. On unix uses \a gettid function instead of pthread_self. It allows to find thread in gdb
+    //!Returns thread id of current thread. On unix uses gettid function instead of pthread_self. It allows to find thread in gdb
     static uintptr_t currentThreadSystemId();
 
 public slots:

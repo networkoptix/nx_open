@@ -43,7 +43,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 } // namespace AuthMethod
 
 /**
- * @note By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall
+ * NOTE: By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall
  * authorization methods are allowed fo every url.
  */
 class NX_NETWORK_API AuthMethodRestrictionList

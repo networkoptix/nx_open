@@ -26,7 +26,7 @@ public:
     virtual nx_http::StringType mimeType() const override;
     //!Implementation of nx_http::AbstractMsgBodySource::contentLength
     virtual boost::optional<uint64_t> contentLength() const override;
-    /** Provides \a buffer forever */
+    /** Provides buffer forever */
     virtual void readAsync(
         nx::utils::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx_http::BufferType)

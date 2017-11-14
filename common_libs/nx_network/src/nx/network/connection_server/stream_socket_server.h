@@ -132,11 +132,11 @@ private:
     typename Connection::MessageType m_message;
 };
 
-// TODO: #ak It seems to make sense to decouple 
+// TODO: #ak It seems to make sense to decouple
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 
 /**
- * Listens local tcp address, accepts incoming connections 
+ * Listens local tcp address, accepts incoming connections
  *   and forwards them to the specified handler.
  */
 template<class CustomServerType, class ConnectionType>

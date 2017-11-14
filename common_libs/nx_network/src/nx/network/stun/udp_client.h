@@ -26,11 +26,11 @@ typedef nx::network::UnreliableMessagePipelineEventHandler<Message>
 /**
  * STUN protocol UDP client.
  * Conforms to [rfc5389, 7.2.1]
- * @note Supports pipelining
- * @note UdpClient object can be safely deleted within request completion handler 
+ * NOTE: Supports pipelining
+ * NOTE: UdpClient object can be safely deleted within request completion handler
  *     (more generally, within internal socket's aio thread).
        To delete it in another thread, cancel I/O with UdpClient::pleaseStop call
- * @note Notifies everyone who is waiting for response by reporting 
+ * NOTE: Notifies everyone who is waiting for response by reporting
  *     SystemError::interrupted before destruction.
  */
 class NX_NETWORK_API UdpClient:
@@ -56,7 +56,7 @@ public:
 
     /**
      * @param request MUST contain unique transactionId
-     * @param completionHandler response is valid only if errorCode is 
+     * @param completionHandler response is valid only if errorCode is
      *     SystemError::noError. MUST not be NULL
      */
     void sendRequestTo(
@@ -74,7 +74,7 @@ public:
     /**
      * Move ownership of socket to the caller.
      * UdpClient is in undefined state after this call and MUST be freed
-     * @note Can be called within send/recv completion handler 
+     * NOTE: Can be called within send/recv completion handler
      *     (more specifically, within socket's aio thread) only!
      */
     std::unique_ptr<network::UDPSocket> takeSocket();
@@ -112,7 +112,7 @@ private:
         int redirectCount;
 
         RequestContext();
-        
+
         RequestContext(RequestContext&&) = default;
         RequestContext& operator=(RequestContext&&) = default;
     };

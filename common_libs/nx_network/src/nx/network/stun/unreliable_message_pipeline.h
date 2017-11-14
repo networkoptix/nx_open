@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <deque>
@@ -45,7 +40,7 @@ public:
     /**
      * Move ownership of socket to the caller.
      * UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
-     * @note Can be called within send/recv completion handler only
+     * NOTE: Can be called within send/recv completion handler only
      *     (more specifically, within socket's aio thread)!
      */
     std::unique_ptr<network::UDPSocket> takeSocket();
@@ -124,8 +119,8 @@ public:
  * Pipeline for transferring messages over unreliable transport (datagram socket).
  * This is a helper class for implementing UDP server/client of message-orientied protocol.
  * Received messages are delivered to UnreliableMessagePipelineEventHandler<MessageType> instance.
- * @note All events are delivered within internal socket's aio thread
- * @note UnreliableMessagePipeline object can be safely freed within any event handler
+ * NOTE: All events are delivered within internal socket's aio thread
+ * NOTE: UnreliableMessagePipeline object can be safely freed within any event handler
  *     (more generally, within internal socket's aio thread).
        To delete it in another thread, cancel I/O with UnreliableMessagePipeline::pleaseStop call
  */
@@ -171,7 +166,7 @@ public:
         serializedMessage.reserve(nx::network::kTypicalMtuSize);
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
-        if (messageSerializer.serialize(&serializedMessage, &bytesWritten) != 
+        if (messageSerializer.serialize(&serializedMessage, &bytesWritten) !=
             nx::network::server::SerializerState::done)
         {
             NX_ASSERT(false);

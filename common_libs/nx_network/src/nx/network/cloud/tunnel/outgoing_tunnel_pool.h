@@ -34,7 +34,7 @@ public:
      * Establish new connection for user needs.
      * @param timeout Zero means no timeout.
      * @param socketAttributes Attribute values to apply to a newly-created socket.
-     * @note This method can be called from different threads simultaneously.
+     * NOTE: This method can be called from different threads simultaneously.
      */
     void establishNewConnection(
         const AddressEntry& targetHostAddress,

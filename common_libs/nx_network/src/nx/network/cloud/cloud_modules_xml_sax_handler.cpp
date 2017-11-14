@@ -1,21 +1,11 @@
-/**********************************************************
-* Sep 8, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cloud_modules_xml_sax_handler.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-CloudModulesXmlHandler::CloudModulesXmlHandler()
-:
+CloudModulesXmlHandler::CloudModulesXmlHandler():
     m_state(init)
-{
-}
-
-CloudModulesXmlHandler::~CloudModulesXmlHandler()
 {
 }
 
@@ -67,9 +57,10 @@ bool CloudModulesXmlHandler::characters(const QString& ch)
     return true;
 }
 
-bool CloudModulesXmlHandler::endElement(const QString& /*namespaceURI*/,
-                                        const QString& /*localName*/,
-                                        const QString& /*qName*/)
+bool CloudModulesXmlHandler::endElement(
+    const QString& /*namespaceURI*/,
+    const QString& /*localName*/,
+    const QString& /*qName*/)
 {
     switch (m_state)
     {

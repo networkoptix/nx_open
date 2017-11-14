@@ -34,7 +34,7 @@ constexpr static const std::chrono::milliseconds
     kDirectTcpConnectStartDelayDefault = std::chrono::milliseconds::zero();
 
 /**
- * @note All fields are optional for backward compatibility.
+ * NOTE: All fields are optional for backward compatibility.
  */
 class NX_NETWORK_API ConnectionParameters:
     public StunMessageAttributesData

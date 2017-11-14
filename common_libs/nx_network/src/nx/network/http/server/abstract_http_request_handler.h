@@ -33,7 +33,7 @@ typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 
 /**
  * Base class for all HTTP request processors
- * @note Class methods are not thread-safe
+ * NOTE: Class methods are not thread-safe
  */
 class NX_NETWORK_API AbstractHttpRequestHandler
 {

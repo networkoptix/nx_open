@@ -22,7 +22,7 @@ public:
     /**
     * Establishes connection to DB.
     * This method MUST be called after class instantiation
-    * @note Method is needed because we do not use exceptions
+    * NOTE: Method is needed because we do not use exceptions
     */
     bool open();
 

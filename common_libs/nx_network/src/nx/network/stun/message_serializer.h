@@ -87,15 +87,15 @@ private:
         const attrs::BufferedValue&,
         std::size_t* value);
 
-    /** 
+    /**
      * This function will do minimum checking for the message object.
      */
     bool checkMessageIntegrity();
 
     /**
-     * This helper function ensure that while we traveling the attributes of a message, 
-     * the MessageIntegrity and the FingerPrint will be ensured to exist at last. 
-     * The RFC doesn't restrict the order of the attributes, but I guess the unorder_map is OK here, 
+     * This helper function ensure that while we traveling the attributes of a message,
+     * the MessageIntegrity and the FingerPrint will be ensured to exist at last.
+     * The RFC doesn't restrict the order of the attributes, but I guess the unorder_map is OK here,
      * as long as we ensure the MessageIntegrity and FingerPrint message order.
      */
     bool travelAllAttributes(const std::function<bool(const attrs::Attribute*)>&);

@@ -18,7 +18,7 @@ public:
 
     /**
      * Handler will be called as soon as there is some data ready to recv.
-     * @note: is not thread safe (conflicts with recv and recvAsync)
+     * NOTE:: is not thread safe (conflicts with recv and recvAsync)
      */
     void catchRecvEvent(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
@@ -27,7 +27,7 @@ public:
     /**
      * Injects data to internal buffer if we need to pass socket to another processor but read
      * more we could process ourserve.
-     * @note: does not affect catchRecvEvent and is not thread safe (conflicts with recv and recvAsync)
+     * NOTE:: does not affect catchRecvEvent and is not thread safe (conflicts with recv and recvAsync)
      */
     void injectRecvData(Buffer buffer, Inject injectType = Inject::only);
 

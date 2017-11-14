@@ -40,6 +40,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 } // namespace cloud
 } // namespace nx
 
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+/**
+ * Not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec.
+ */
+
 NX_NETWORK_API void serialize(const nx::cloud::relay::api::ResultCode&, QString*);
 NX_NETWORK_API bool deserialize(const QString&, nx::cloud::relay::api::ResultCode*);

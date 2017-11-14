@@ -70,7 +70,7 @@ NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysError
 
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
- * @note Not using QHostAddress because QHostAddress can trigger dns name
+ * NOTE: Not using QHostAddress because QHostAddress can trigger dns name
  * lookup which depends on Qt sockets which we do not want to use.
  */
 class NX_NETWORK_API HostAddress

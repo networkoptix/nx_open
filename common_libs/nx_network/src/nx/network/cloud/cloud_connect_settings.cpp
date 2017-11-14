@@ -1,10 +1,4 @@
-/**********************************************************
-* Jun 2, 2016
-* akolesnikov
-***********************************************************/
-
 #include "cloud_connect_settings.h"
-
 
 namespace nx {
 namespace network {
@@ -22,6 +16,6 @@ boost::optional<QString> CloudConnectSettings::originatingHostAddressReplacement
     return m_originatingHostAddressReplacement;
 }
 
-}   // namespace cloud
-}   // namespace network
-}   // namespace nx
+} // namespace cloud
+} // namespace network
+} // namespace nx

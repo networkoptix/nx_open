@@ -52,7 +52,7 @@ public:
     CloudModuleUrlFetcher(const QString& moduleName);
 
     /**
-     * Retrieves endpoint if unknown. 
+     * Retrieves endpoint if unknown.
      * If endpoint is known, then calls handler directly from this method.
      */
     void get(nx_http::AuthInfo auth, Handler handler);

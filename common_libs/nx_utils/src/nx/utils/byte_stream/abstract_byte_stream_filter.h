@@ -11,7 +11,7 @@ namespace bstream {
 /**
  * Interface for class doing something with byte stream.
  * Filter which passes result stream to nextFilter
- * @note Implementation is allowed to cache some data, but it SHOULD always minimize such caching.
+ * NOTE: Implementation is allowed to cache some data, but it SHOULD always minimize such caching.
  */
 class NX_UTILS_API AbstractByteStreamFilter
 {
@@ -52,7 +52,7 @@ NX_UTILS_API AbstractByteStreamFilterPtr last(
 
 /**
  * Inserts element what at position pointed to by _where (_where will be placed after what).
- * @note if _where could not be found in the chain, NX_ASSERT will trigger
+ * NOTE: if _where could not be found in the chain, NX_ASSERT will trigger
  * @return beginning of the new filter chain (it can change if _where equals to beginPtr).
  */
 NX_UTILS_API AbstractByteStreamFilterPtr insert(

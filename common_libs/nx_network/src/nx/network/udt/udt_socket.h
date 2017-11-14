@@ -47,8 +47,8 @@ public:
 
     /**
     * Binds UDT socket to an existing UDP socket.
-    * @note This method can be called just after UdtSocket creation.
-    * @note if method have failed UdtSocket instance MUST be destroyed!
+    * NOTE: This method can be called just after UdtSocket creation.
+    * NOTE: if method have failed UdtSocket instance MUST be destroyed!
     */
     bool bindToUdpSocket(UDPSocket&& udpSocket);
 
@@ -193,7 +193,7 @@ public:
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
-    /** This method is for use by \a AsyncServerSocketHelper only. It just calls system call \a accept */
+    /** This method is for use by AsyncServerSocketHelper only. It just calls system call accept */
     AbstractStreamSocket* systemAccept();
 
 private:

@@ -8,7 +8,7 @@ namespace nx {
 namespace network {
 
 /**
- * Base for some class that wants to extend socket functionality a bit 
+ * Base for some class that wants to extend socket functionality a bit
  * and delegate rest of API calls to existing implementation.
  */
 template<typename SocketInterfaceToImplement>
