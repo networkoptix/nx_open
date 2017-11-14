@@ -12,7 +12,7 @@ from urllib.parse import quote
 from requests.auth import HTTPDigestAuth
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.DEBUG)
 logging.getLogger("botocore").setLevel(logging.WARNING)
 logging.getLogger("boto3").setLevel(logging.WARNING)
 
