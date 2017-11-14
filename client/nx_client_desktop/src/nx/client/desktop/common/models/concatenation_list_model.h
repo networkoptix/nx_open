@@ -46,6 +46,10 @@ public:
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    // All source models must support removeRows as unconditional removal of requested range,
+    //    otherwise partial removal might happen.
+    virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+
 private:
     void sourceModelAboutToBeReset();
     void sourceModelReset();
