@@ -478,7 +478,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     QnFfmpegInitializer ffmpegHolder;
 
     QnServerArchiveDelegate archiveDelegate;
-    archiveDelegate.open(cameraResource, nullptr /*archiveInterityWatcher*/);
+    archiveDelegate.open(cameraResource, /*archiveIntegrityWatcher*/ nullptr);
     archiveDelegate.setQuality(MEDIA_Quality_High, true, QSize());
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();

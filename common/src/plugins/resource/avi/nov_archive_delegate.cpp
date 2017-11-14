@@ -26,7 +26,7 @@ bool QnNovArchiveDelegate::open(const QnResourcePtr &resource,
     if (layoutFile)
         m_chunks = layoutFile->getTimePeriods(resource);
 
-    return QnAviArchiveDelegate::open(resource, nullptr /*archiveInterityWatcher*/);
+    return QnAviArchiveDelegate::open(resource, /*archiveIntegrityWatcher*/ nullptr);
 }
 
 qint64 QnNovArchiveDelegate::seek(qint64 time, bool findIFrame)

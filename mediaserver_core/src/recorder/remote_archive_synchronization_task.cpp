@@ -384,7 +384,7 @@ bool RemoteArchiveSynchronizationTask::convertAndWriteBuffer(
     std::shared_ptr<QnAviArchiveDelegate> reader(archiveDelegate);
 
     reader->setStorage(storage);
-    if (!reader->open(storageResource, nullptr /*archiveInterityWatcher*/))
+    if (!reader->open(storageResource, /*archiveIntegrityWatcher*/ nullptr))
         return false;
 
     reader->setAudioChannel(0);
