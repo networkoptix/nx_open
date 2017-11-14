@@ -154,6 +154,9 @@
                 <File Id="nx_network.dll" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="4" />
             </Component>
             <Component>
+                <File Id="vms_gateway_core.dll" Name="vms_gateway_core.dll" Source="$(var.SourceDir)/vms_gateway_core.dll" DiskId="4" />
+            </Component>
+            <Component>
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
             </Component>
             <Component>
