@@ -51,9 +51,6 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
-     delete m_cameraSettingsDialog.data();
-     delete m_serverSettingsDialog.data();
-     delete m_userSettingsDialog.data();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
@@ -63,7 +60,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (cameras.isEmpty())
         return;
 
-    const auto parent = nx::client::desktop::utils::extractParentWidget(parameters, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindow());
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(
         m_cameraSettingsDialog, parent);
     dialogConstructor.disableAutoFocus();
@@ -100,7 +97,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    const auto parent = nx::client::desktop::utils::extractParentWidget(params, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindow());
     QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(
         m_serverSettingsDialog, parent);
 
@@ -118,12 +115,12 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
     const auto params = menu()->currentParameters(sender());
-    const auto parent = nx::client::desktop::utils::extractParentWidget(params, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindow());
 
     if (!m_userSettingsDialog)
         m_userSettingsDialog = new QnUserSettingsDialog(parent);
     else
-        nx::client::desktop::utils::setDialogParent(m_userSettingsDialog, parent);
+        nx::utils::setDialogParent(m_userSettingsDialog, parent);
 
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
@@ -144,7 +141,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    const auto parent = nx::client::desktop::utils::extractParentWidget(params, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindow());
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(
         m_userSettingsDialog, parent);
 
@@ -162,7 +159,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    const auto parent = nx::client::desktop::utils::extractParentWidget(parameters, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindow());
 
     QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 

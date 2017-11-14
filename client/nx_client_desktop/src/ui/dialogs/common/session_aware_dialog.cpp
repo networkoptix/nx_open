@@ -3,9 +3,10 @@
 /************************************************************************/
 /* QnSessionAwareButtonBoxDialog                             */
 /************************************************************************/
-QnSessionAwareButtonBoxDialog::QnSessionAwareButtonBoxDialog(QWidget *parent /* = NULL*/,
+QnSessionAwareButtonBoxDialog::QnSessionAwareButtonBoxDialog(QWidget *parent,
     Qt::WindowFlags windowFlags /* = 0*/)
-    : base_type(parent, windowFlags)
+    :
+    base_type(parent, windowFlags)
     , QnSessionAwareDelegate(parent)
 {
 }
@@ -25,8 +26,10 @@ void QnSessionAwareButtonBoxDialog::forcedUpdate() {
 /************************************************************************/
 /* QnSessionAwareTabbedDialog                                */
 /************************************************************************/
-QnSessionAwareTabbedDialog::QnSessionAwareTabbedDialog( QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/ )
-    : base_type(parent, windowFlags)
+QnSessionAwareTabbedDialog::QnSessionAwareTabbedDialog(QWidget *parent,
+    Qt::WindowFlags windowFlags /* = 0*/ )
+    :
+    base_type(parent, windowFlags)
     , QnSessionAwareDelegate(parent)
 {}
 

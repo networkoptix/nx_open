@@ -55,7 +55,6 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     connect(ui->emailInputField, &QnInputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
 
-    NX_EXPECT(parent, "BLA BLA");
     connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
     {
         if (!validMode())

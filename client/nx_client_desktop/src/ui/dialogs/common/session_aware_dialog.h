@@ -80,7 +80,7 @@ class QnSessionAwareTabbedDialog: public QnGenericTabbedDialog, public QnSession
     typedef QnGenericTabbedDialog base_type;
 
 public:
-    QnSessionAwareTabbedDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnSessionAwareTabbedDialog(QWidget *parent, Qt::WindowFlags windowFlags = 0);
 
     virtual bool tryClose(bool force) override;
 
