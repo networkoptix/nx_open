@@ -2,6 +2,7 @@
 
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <test_support/peer_wrapper.h>
 
@@ -9,10 +10,14 @@ namespace ec2 {
 namespace test {
 
 class MiscManager:
+    public nx::utils::test::TestWithTemporaryDirectory,
     public ::testing::Test
 {
+    using base_type = nx::utils::test::TestWithTemporaryDirectory;
+
 public:
     MiscManager():
+        base_type("MiscManager", nx::utils::TestOptions::temporaryDirectoryPath()),
         m_appserver2(nx::utils::TestOptions::temporaryDirectoryPath())
     {
     }
