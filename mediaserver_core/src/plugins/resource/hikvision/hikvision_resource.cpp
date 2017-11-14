@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/url/url_builder.h>
 
 namespace {
 
@@ -51,6 +52,8 @@ HikvisionResource::~HikvisionResource()
 
 CameraDiagnostics::Result HikvisionResource::initInternal()
 {
+    tryToEnableOnvifSupport(getDeviceOnvifUrl(), getAuth());
+
     auto result = QnPlOnvifResource::initInternal();
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
         return result;
@@ -110,16 +113,20 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     return CameraDiagnostics::NoErrorResult();
 }
 
+static std::unique_ptr<nx_http::HttpClient> makeHttpClient(const QAuthenticator& authenticator)
+{
+    std::unique_ptr<nx_http::HttpClient> client(new nx_http::HttpClient);
+    client->setResponseReadTimeoutMs((unsigned int) kRequestTimeout.count());
+    client->setSendTimeoutMs((unsigned int) kRequestTimeout.count());
+    client->setMessageBodyReadTimeoutMs((unsigned int) kRequestTimeout.count());
+    client->setUserName(authenticator.user());
+    client->setUserPassword(authenticator.password());
+    return client;
+}
+
 std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
 {
-    std::unique_ptr<nx_http::HttpClient> httpClient(new nx_http::HttpClient);
-    httpClient->setResponseReadTimeoutMs(kRequestTimeout.count());
-    httpClient->setSendTimeoutMs(kRequestTimeout.count());
-    httpClient->setMessageBodyReadTimeoutMs(kRequestTimeout.count());
-    httpClient->setUserName(getAuth().user());
-    httpClient->setUserPassword(getAuth().password());
-
-    return std::move(httpClient);
+    return makeHttpClient(getAuth());
 }
 
 CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
@@ -254,6 +261,99 @@ bool HikvisionResource::findDefaultPtzProfileToken()
             return true;
         }
     }
+    return false;
+}
+
+static const auto kIntegratePath = lit("/ISAPI/System/Network/Integrate");
+static const auto kOnvifTag = lit("ONVIF");
+static const auto kEnableTag = lit("enable");
+static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
+<?xml version:"1.0" encoding="UTF-8"?>
+<Integrate>
+    <ONVIF><enable>true</enable><certificateType/></ONVIF>
+</Integrate>
+)xml").trimmed();
+
+static const auto kSetOnvifUserPath = lit("/ISAPI/Security/ONVIF/users/1");
+static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
+<?xml version:"1.0" encoding="UTF-8"?>
+<User>
+    <id>1</id>
+    <userName>%1</userName>
+    <password>%2</password>
+    <userType>administrator</userType>
+</User>
+)xml").trimmed();
+
+bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator)
+{
+    const auto client = makeHttpClient(authenticator);
+    if (!client->doGet(nx::network::url::Builder(url).setPath(kIntegratePath))
+        || !isResponseOK(client.get()))
+    {
+        NX_VERBOSE(typeid(HikvisionResource), lm("Unable to send request %2").arg(client->url()));
+        return false;
+    }
+
+    const auto responseBody = client->fetchEntireMessageBody();
+    QDomDocument intergrateDocument;
+    QString errorMessage;
+    if (!intergrateDocument.setContent(responseBody, &errorMessage))
+    {
+        NX_VERBOSE(typeid(HikvisionResource), lm("Unable to parse response from %1: %2")
+            .args(client->url(), errorMessage));
+        return false;
+    }
+
+    const auto onvifElement = intergrateDocument.documentElement().firstChildElement(kOnvifTag);
+    if (onvifElement.isNull())
+    {
+        NX_DEBUG(typeid(HikvisionResource), lm("Tag %1 is not found on %2")
+            .args(kOnvifTag, client->url()));
+        return false;
+    }
+
+    const auto enabledElement = onvifElement.firstChildElement(kEnableTag);
+    if (onvifElement.isNull())
+    {
+        NX_DEBUG(typeid(HikvisionResource), lm("Tag %1 is not found on %2")
+            .args(kOnvifTag, client->url()));
+        return false;
+    }
+
+    const auto onvifEnabled = enabledElement.text();
+    if (onvifEnabled == lit("false"))
+    {
+        // Enable ONVIF support, usernameand and password should be set automatically.
+        const auto result = client->doPut(
+            nx::network::url::Builder(url).setPath(kIntegratePath), "application/xml",
+            kEnableOnvifXml.toUtf8())
+                && isResponseOK(client.get());
+
+        onvifEnabled == lit("true");
+        NX_DEBUG(typeid(HikvisionResource), lm("Enable ONVIF result=%1 on %2")
+            .args(result, client->url()));
+    }
+    else
+    {
+        NX_VERBOSE(typeid(HikvisionResource), lm("ONVIF is already enabled on %1")
+            .args(client->url()));
+    }
+
+    if (onvifEnabled == lit("true"))
+    {
+        // Make sure onvif user/password is the same as main credentials.
+        const auto result = client->doPut(
+            nx::network::url::Builder(url).setPath(kSetOnvifUserPath), "application/xml",
+            kSetOnvifUserXml.arg(authenticator.user(), authenticator.password()).toUtf8())
+                && isResponseOK(client.get());
+
+        NX_DEBUG(typeid(HikvisionResource), lm("Set ONVIF credentials result=%1 on %2")
+            .args(result, client->url()));
+        return result;
+    }
+
+    NX_DEBUG(typeid(HikvisionResource), lm("Unexpected ONVIF value: %1").arg(onvifEnabled));
     return false;
 }
 

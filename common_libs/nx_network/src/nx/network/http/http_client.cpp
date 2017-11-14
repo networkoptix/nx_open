@@ -138,6 +138,15 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     return result;
 }
 
+BufferType HttpClient::fetchEntireMessageBody()
+{
+    QByteArray buffer;
+    if (!eof())
+        buffer += fetchMessageBodyBuffer();
+
+    return buffer;
+}
+
 void HttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
 {
     m_additionalHeaders.emplace_back(key, value);
