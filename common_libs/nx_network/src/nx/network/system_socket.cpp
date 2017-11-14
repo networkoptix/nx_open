@@ -1119,8 +1119,8 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
         ka.keepalivetime = intDuration<milliseconds>(info->inactivityPeriodBeforeFirstProbe);
         ka.keepaliveinterval = intDuration<milliseconds>(info->probeSendPeriod);
 
-        // the value can not be changed, 0 means default
-        info->probeCount = 0;
+        // The value can not be changed, 0 means default.
+        info->probeCount = 10; //< Value cannot be changed on mswin.
     }
 
     DWORD length = sizeof(ka);

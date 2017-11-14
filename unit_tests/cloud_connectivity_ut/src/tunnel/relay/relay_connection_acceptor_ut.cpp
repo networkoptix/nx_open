@@ -262,7 +262,17 @@ protected:
         boost::optional<KeepAliveOptions> keepAliveOptions;
         ASSERT_TRUE(connection->getKeepAlive(&keepAliveOptions))
             << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_EQ(lastReportedBeginListeningResponse().keepAliveOptions, keepAliveOptions);
+
+        auto expectedKeepAliveOptions =
+            lastReportedBeginListeningResponse().keepAliveOptions;
+        if (expectedKeepAliveOptions)
+            expectedKeepAliveOptions->resetUnsupportedFieldsToSystemDefault();
+
+        ASSERT_EQ(
+            static_cast<bool>(expectedKeepAliveOptions),
+            static_cast<bool>(keepAliveOptions));
+        if (keepAliveOptions)
+            ASSERT_EQ(*expectedKeepAliveOptions, *keepAliveOptions);
     }
 
 private:

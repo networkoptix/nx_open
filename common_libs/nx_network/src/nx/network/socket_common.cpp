@@ -424,3 +424,64 @@ QString SocketAddress::trimIpV6(const QString& ip)
 
     return ip;
 }
+
+//-------------------------------------------------------------------------------------------------
+
+KeepAliveOptions::KeepAliveOptions(
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe,
+    std::chrono::seconds probeSendPeriod,
+    size_t probeCount)
+    :
+    inactivityPeriodBeforeFirstProbe(inactivityPeriodBeforeFirstProbe),
+    probeSendPeriod(probeSendPeriod),
+    probeCount(probeCount)
+{
+}
+
+bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
+{
+    return inactivityPeriodBeforeFirstProbe == rhs.inactivityPeriodBeforeFirstProbe
+        && probeSendPeriod == rhs.probeSendPeriod
+        && probeCount == rhs.probeCount;
+}
+
+std::chrono::seconds KeepAliveOptions::maxDelay() const
+{
+    return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
+}
+
+QString KeepAliveOptions::toString() const
+{
+    // TODO: Use JSON serrialization instead?
+    return lm("{ %1, %2, %3 }").arg(inactivityPeriodBeforeFirstProbe.count())
+        .arg(probeSendPeriod.count()).arg(probeCount);
+}
+
+void KeepAliveOptions::resetUnsupportedFieldsToSystemDefault()
+{
+    #if defined(_WIN32)
+        probeCount = 10;
+    #elif defined(__APPLE__)
+        probeSendPeriod = std::chrono::seconds::zero();
+        probeCount = 0;
+    #endif // _WIN32
+}
+
+boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
+{
+    QStringRef stringRef(&string);
+    if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
+        stringRef = stringRef.mid(1, stringRef.length() - 2);
+
+    const auto split = stringRef.split(QLatin1String(","));
+    if (split.size() != 3)
+        return boost::none;
+
+    KeepAliveOptions options;
+    options.inactivityPeriodBeforeFirstProbe =
+        std::chrono::seconds((size_t)split[0].trimmed().toUInt());
+    options.probeSendPeriod =
+        std::chrono::seconds((size_t)split[1].trimmed().toUInt());
+    options.probeCount = (size_t)split[2].trimmed().toUInt();
+    return options;
+}

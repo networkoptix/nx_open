@@ -13,8 +13,9 @@
     #include <arpa/inet.h>
 #endif
 
+#include <chrono>
+#include <cstdint>
 #include <string>
-#include <stdint.h>
 
 #include <QtCore/QtEndian>
 #include <QtCore/QHash>
@@ -183,6 +184,32 @@ template <> struct hash<SocketAddress>
 };
 
 } // namespace std
+
+struct NX_NETWORK_API KeepAliveOptions
+{
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe;
+    std::chrono::seconds probeSendPeriod;
+    /**
+    * The number of unacknowledged probes to send before considering the connection dead and
+    * notifying the application layer.
+    */
+    size_t probeCount;
+
+    KeepAliveOptions(
+        std::chrono::seconds inactivityPeriodBeforeFirstProbe = std::chrono::seconds::zero(),
+        std::chrono::seconds probeSendPeriod = std::chrono::seconds::zero(),
+        size_t probeCount = 0);
+
+    bool operator==(const KeepAliveOptions& rhs) const;
+
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
+    QString toString() const;
+
+    void resetUnsupportedFieldsToSystemDefault();
+
+    static boost::optional<KeepAliveOptions> fromString(const QString& string);
+};
 
 inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
 inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
