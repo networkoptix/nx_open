@@ -13,7 +13,7 @@ function NativePlayer(){
 }
 
 NativePlayer.prototype.play = function(){
-    this.video.play().then().catch(function(){});
+    this.video.play().catch(function(){});
 };
 
 NativePlayer.prototype.pause = function(){
