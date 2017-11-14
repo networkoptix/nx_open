@@ -62,7 +62,7 @@ RemoteArchiveSynchronizer::~RemoteArchiveSynchronizer()
     QnMutexLocker lock(&m_mutex);
     disconnect(this);
     m_terminated = true;
-    { m_tasks->lock()->clear(); }
+    m_tasks->lock()->clear();
     m_workerPool.reset();
 }
 
@@ -114,7 +114,7 @@ void RemoteArchiveSynchronizer::at_resourceRemoved(const QnResourcePtr& resource
         .arg(camera->getUserDefinedName()));
 
     disconnect(camera.data(), nullptr, this, nullptr);
-    handleResourceTaskUnsafe(camera, /*archiveCanBeSynchronized*/false);
+    handleResourceTaskUnsafe(camera, /*canArchiveBeSynchronized*/false);
 }
 
 void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& resource)
@@ -127,14 +127,14 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
         return;
 
     const auto status = camera->getStatus();
-    const auto archiveCanBeSynchronized =
+    const auto canArchiveBeSynchronized =
         (status == Qn::Online || status == Qn::Recording)
         && camera->hasCameraCapabilities(Qn::RemoteArchiveCapability)
         && camera->isLicenseUsed()
         && !camera->isScheduleDisabled()
         && !camera->hasFlags(Qn::foreigner);
 
-    if (!archiveCanBeSynchronized)
+    if (!canArchiveBeSynchronized)
     {
         NX_DEBUG(this, lm(
             "Archive for resource %1 can not be synchronized. "
@@ -160,12 +160,12 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
             return;
 
         if (m_previousStates.find(id) != m_previousStates.cend())
-            needToHandleChanges = m_previousStates.at(id) != archiveCanBeSynchronized;
+            needToHandleChanges = m_previousStates.at(id) != canArchiveBeSynchronized;
 
-        m_previousStates[id] = archiveCanBeSynchronized;
+        m_previousStates[id] = canArchiveBeSynchronized;
 
         if (needToHandleChanges)
-            handleResourceTaskUnsafe(camera, archiveCanBeSynchronized);
+            handleResourceTaskUnsafe(camera, canArchiveBeSynchronized);
     }
 }
 
@@ -198,7 +198,7 @@ void RemoteArchiveSynchronizer::handleResourceTaskUnsafe(
     if (!archiveCanBeSynchronized)
     {
         m_workerPool->cancelTask(id);
-        { m_tasks->lock()->erase(id); }
+        m_tasks->lock()->erase(id);
         return;
     }
 
@@ -206,7 +206,7 @@ void RemoteArchiveSynchronizer::handleResourceTaskUnsafe(
     if (!task)
         return;
 
-    { m_tasks->lock()->emplace(id, task); }
+    m_tasks->lock()->emplace(id, task);
 }
 
 std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> RemoteArchiveSynchronizer::makeTask(
