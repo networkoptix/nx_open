@@ -75,6 +75,13 @@ namespace
 
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
+
+    const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
+    const bool kEnableEdgeRecordingDefault(true);
+
+    const QString kMaxRemoteArchiveSynchronizationThreads(
+        lit("maxRemoteArchiveSynchronizationThreads"));
+    const int kMaxRemoteArchiveSynchronizationThreadsDefault(-1);
 }
 
 using namespace nx::settings_names;
@@ -275,8 +282,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         true,
         this);
     timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
-    
-    m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = 
+
+    m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
             kMaxDifferenceBetweenSynchronizedAndInternetTime,
             duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndInternetDefault).count(),
@@ -394,6 +401,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kCloudConnectRelayingEnabledDefault,
         this);
 
+    m_edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kEnableEdgeRecording,
+        kEnableEdgeRecordingDefault,
+        this);
+
+    m_maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRemoteArchiveSynchronizationThreads,
+        kMaxRemoteArchiveSynchronizationThreadsDefault,
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
@@ -439,6 +456,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_rtpFrameTimeoutMs
         << m_cloudConnectUdpHolePunchingEnabledAdaptor
         << m_cloudConnectRelayingEnabledAdaptor
+        << m_edgeRecordingEnabledAdaptor
+        << m_maxRemoteArchiveSynchronizationThreads
         ;
 
     return result;
@@ -1010,6 +1029,26 @@ int QnGlobalSettings::maxRecorderQueueSizeBytes() const
 int QnGlobalSettings::maxRecorderQueueSizePackets() const
 {
     return m_maxRecorderQueueSizePackets->value();
+}
+
+bool QnGlobalSettings::isEdgeRecordingEnabled() const
+{
+    return m_edgeRecordingEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setEdgeRecordingEnabled(bool enabled)
+{
+    m_edgeRecordingEnabledAdaptor->setValue(enabled);
+}
+
+int QnGlobalSettings::maxRemoteArchiveSynchronizationThreads() const
+{
+    return m_maxRemoteArchiveSynchronizationThreads->value();
+}
+
+void QnGlobalSettings::setMaxRemoteArchiveSynchronizationThreads(int newValue)
+{
+    m_maxRemoteArchiveSynchronizationThreads->setValue(newValue);
 }
 
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const

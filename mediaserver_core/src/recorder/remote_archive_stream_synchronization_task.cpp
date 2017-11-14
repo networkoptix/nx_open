@@ -5,7 +5,6 @@
 #include <recorder/storage_manager.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/elapsed_timer.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/mediaserver/event/event_connector.h>
 
