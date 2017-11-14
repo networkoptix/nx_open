@@ -67,7 +67,7 @@ void OutgoingTunnelPool::establishNewConnection(
 
     auto& tunnelContext = getTunnel(targetHostAddress);
     tunnelContext.handlers.push_back(std::move(handler));
-    
+
     tunnelContext.tunnel->establishNewConnection(
         std::move(timeout),
         std::move(socketAttributes),
@@ -112,11 +112,16 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
 }
 
-void OutgoingTunnelPool::clearOwnPeerId()
+void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const String& name, const QnUuid& uuid)
 {
     QnMutexLocker lock(&m_mutex);
-    m_isOwnPeerIdAssigned = false;
-    m_ownPeerId.clear();
+
+    if (m_isOwnPeerIdAssigned &&
+        m_ownPeerId.startsWith(lm("%1_%2").args(name, uuid.toSimpleString()).toUtf8()))
+    {
+        m_isOwnPeerIdAssigned = false;
+        m_ownPeerId.clear();
+    }
 }
 
 OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClosedSubscription()
@@ -129,7 +134,7 @@ void OutgoingTunnelPool::allowOwnPeerIdChange()
     s_isOwnPeerIdChangeAllowed = true;
 }
 
-OutgoingTunnelPool::TunnelContext& 
+OutgoingTunnelPool::TunnelContext&
     OutgoingTunnelPool::getTunnel(const AddressEntry& targetHostAddress)
 {
     const auto iterAndInsertionResult = m_pool.emplace(
