@@ -1,19 +1,14 @@
-#include "plugin.h"
-#include "plugin.h"
-
-#include <plugins/plugin_tools.h>
-
-#include "manager.h"
+#include "tegra_video_metadata_plugin.h"
+#include "tegra_video_metadata_manager.h"
 
 namespace nx {
-namespace mediaserver_plugins {
-namespace metadata {
-namespace tegra_video {
+namespace mediaserver {
+namespace plugins {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* TegraVideoMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataPlugin)
     {
@@ -47,73 +42,72 @@ void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* Plugin::name() const
+const char* TegraVideoMetadataPlugin::name() const
 {
     return "Tegra Video metadata plugin";
 }
 
-void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void TegraVideoMetadataPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // Do nothing.
 }
 
-void Plugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
+void TegraVideoMetadataPlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 {
     // Do nothing.
 }
 
-void Plugin::setLocale(const char* /*locale*/)
+void TegraVideoMetadataPlugin::setLocale(const char* /*locale*/)
 {
     // Do nothing.
 }
 
-AbstractMetadataManager* Plugin::managerForResource(
+AbstractMetadataManager* TegraVideoMetadataPlugin::managerForResource(
     const ResourceInfo& resourceInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    auto manager = new Manager();
+    auto manager = new TegraVideoMetadataManager();
     manager->addRef();
 
     return manager;
 }
 
-AbstractSerializer* Plugin::serializerForType(
+AbstractSerializer* TegraVideoMetadataPlugin::serializerForType(
     const nxpl::NX_GUID& /*typeGuid*/,
     Error* /*outError*/)
 {
     return nullptr;
 }
 
-const char* Plugin::capabilitiesManifest(Error* error) const
+const char* TegraVideoMetadataPlugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
     return R"json(
-        {
-            "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
-            "driverName": {
-                "value": "Tegra Video Driver",
-                "localization": {
-                    "ru_RU": "Tegra Video driver (translated to Russian)"
-                }
-            },
-            "options": "needDeepCopyForMediaFrame"
-        }
+    {
+        "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
+        "driverName": {
+            "value": "Tegra Video Driver",
+            "localization": {
+                "ru_RU": "Tegra Video driver (translated to Russian)"
+            }
+        },
+        "options": "needDeepCopyForMediaFrame"
+    }
     )json";
 }
 
-} // namespace tegra_video
-} // namespace metadata
-} // namespace mediaserver_plugins
+} // namespace plugins
+} // namespace mediaserver
 } // namespace nx
 
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 {
-    return new nx::mediaserver_plugins::metadata::tegra_video::Plugin();
+    return new nx::mediaserver::plugins::TegraVideoMetadataPlugin();
 }
 
 } // extern "C"

@@ -133,7 +133,6 @@ function(get_dependencies)
 
     if(box STREQUAL "tx1")
         nx_rdep_add_package(sysroot)
-        nx_rdep_add_package(tegra_video)
     endif()
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")

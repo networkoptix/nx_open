@@ -4,11 +4,11 @@
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 
 namespace nx {
-namespace mediaserver_plugins {
-namespace metadata {
-namespace tegra_video {
+namespace mediaserver {
+namespace plugins {
 
-class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
+class TegraVideoMetadataPlugin:
+    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
@@ -32,7 +32,6 @@ public:
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 };
 
-} // namespace tegra_video
-} // namespace metadata
-} // namespace mediaserver_plugins
+} // namespace plugins
+} // namespace mediaserver
 } // namespace nx

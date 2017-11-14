@@ -1,11 +1,8 @@
-#include "manager.h"
+#include "tegra_video_metadata_manager.h"
 
 #include <iostream>
 #include <chrono>
 #include <math.h>
-
-#define NX_PRINT_PREFIX "tegra_video::Manager"
-#include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
@@ -13,12 +10,9 @@
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
-#include "tegra_video_metadata_plugin_ini.h"
-
 namespace nx {
-namespace mediaserver_plugins {
-namespace metadata {
-namespace tegra_video {
+namespace mediaserver {
+namespace plugins {
 
 namespace {
 
@@ -33,19 +27,14 @@ static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager():
+TegraVideoMetadataManager::TegraVideoMetadataManager():
     m_eventTypeId(kLineCrossingEventGuid)
 {
-    NX_OUTPUT << "Manager() BEGIN";
-#if 0
-    m_tegraVideo.reset(TegraVideo::create());
-#endif // 0
-    NX_OUTPUT << "Manager() END";
+    std::cout << "Creating metadata manager! " << (uintptr_t)this << std::endl;
 }
 
-void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* TegraVideoMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
-    NX_OUTPUT << "queryInterface()";
     if (interfaceId == IID_MetadataManager)
     {
         addRef();
@@ -66,14 +55,14 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error Manager::setHandler(AbstractMetadataHandler* handler)
+Error TegraVideoMetadataManager::setHandler(AbstractMetadataHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     return Error::noError;
 }
 
-Error Manager::startFetchingMetadata()
+Error TegraVideoMetadataManager::startFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -90,40 +79,24 @@ Error Manager::startFetchingMetadata()
         };
 
     m_thread.reset(new std::thread(metadataDigger));
-#if 0
-    TegraVideo::Params params;
-    params.deployFile = ini().deployFile;
-    params.modelFile = ini().modelFile;
-    params.cacheFile = ini().cacheFile;
-    params.netWidth = ini().netWidth;
-    params.netHeight = ini().netHeight;
 
-    if (!m_tegraVideo->start(params))
-        return Error::unknownError;
-#endif // 0
     return Error::noError;
 }
 
-Error Manager::putData(
-    AbstractDataPacket* dataPacket)
+nx::sdk::Error TegraVideoMetadataManager::putData(
+    nx::sdk::metadata::AbstractDataPacket* dataPacket)
 {
-#if 0
-    const auto metadata = pushFrameAndGetRects(dataPacket);
-    if (metadata != nullptr)
-        m_handler->handleMetadata(Error::noError, metadata);
-#else // 0
-    m_handler->handleMetadata(Error::noError, pushFrameAndGetRects(dataPacket));
-#endif // 0
+    m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
     return Error::noError;
 }
 
-Error Manager::stopFetchingMetadata()
+Error TegraVideoMetadataManager::stopFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return stopFetchingMetadataUnsafe();
 }
 
-const char* Manager::capabilitiesManifest(Error* error) const
+const char* TegraVideoMetadataManager::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
@@ -137,13 +110,14 @@ const char* Manager::capabilitiesManifest(Error* error) const
     )manifest";
 }
 
-Manager::~Manager()
+TegraVideoMetadataManager::~TegraVideoMetadataManager()
 {
     stopFetchingMetadata();
     std::cout << "Destroying metadata manager!" << (uintptr_t)this;
 }
 
-Error Manager::stopFetchingMetadataUnsafe()
+
+Error TegraVideoMetadataManager::stopFetchingMetadataUnsafe()
 {
     m_stopping = true; //< looks bad
     if (m_thread)
@@ -152,14 +126,11 @@ Error Manager::stopFetchingMetadataUnsafe()
         m_thread.reset();
     }
     m_stopping = false;
-#if 0
-    if (!m_tegraVideo->stop())
-        return Error::unknownError;
-#endif // 0
+
     return Error::noError;
 }
 
-AbstractMetadataPacket* Manager::cookSomeEvents()
+AbstractMetadataPacket* TegraVideoMetadataManager::cookSomeEvents()
 {
     ++m_counter;
     if (m_counter > 1)
@@ -185,73 +156,9 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
     return eventPacket;
 }
 
-AbstractMetadataPacket* Manager::pushFrameAndGetRects(
+AbstractMetadataPacket* TegraVideoMetadataManager::cookSomeObjects(
     nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
-#if 0
-    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
-        (CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
-    if (!videoPacket)
-        return nullptr;
-
-    TegraVideo::CompressedFrame compressedFrame;
-    compressedFrame.dataSize = videoPacket->dataSize();
-    compressedFrame.data = (const uint8_t*) videoPacket->data();
-    compressedFrame.ptsUs = videoPacket->timestampUsec();
-
-    if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
-    {
-        NX_PRINT << "ERROR: TegraVideo::pushCompressedFrame() failed";
-        return nullptr;
-    }
-
-    if (!m_tegraVideo->hasMetadata())
-        return nullptr;
-
-    static constexpr int kMaxRects = 1000;
-    std::vector<TegraVideo::Rect> rects;
-    rects.resize(kMaxRects);
-
-    int64_t ptsUs = -1;
-    int rectsCount = -1;
-    if (!m_tegraVideo->pullRectsForFrame(&rects.front(), rects.size(), &rectsCount, &ptsUs))
-    {
-        NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
-        return nullptr;
-    }
-
-    if (rectsCount <= 0)
-        return nullptr;
-
-    auto eventPacket = new CommonObjectsMetadataPacket();
-    eventPacket->setTimestampUsec(ptsUs);
-    eventPacket->setDurationUsec(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
-
-    rects.resize(rectsCount);
-    NX_OUTPUT << "Got " << rectsCount << " rects for PTS " << ptsUs;
-    for (const auto rect: rects)
-    {
-        auto detectedObject = new CommonDetectedObject();
-        static const nxpl::NX_GUID objectId =
-            {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
-
-        detectedObject->setId(objectId);
-////    detectedObject->setAuxilaryData(R"json( {"auxilaryData": "someJson2"} )json");
-        detectedObject->setEventTypeId(m_objectTypeId);
-
-        // ATTENTION: Here we use videoPacket frame size to calculate 0..1 coords, but this is a
-        // size of the incoming frame, not the one for which rects were extracted.
-        detectedObject->setBoundingBox(Rect(
-            rect.x / videoPacket->width(),
-            rect.y / videoPacket->height(),
-            rect.width / videoPacket->width(),
-            rect.height / videoPacket->height()));
-
-        eventPacket->addItem(detectedObject);
-    }
-
-    return eventPacket;
-#else // 0
     nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
         (CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
     if (!videoPacket)
@@ -276,17 +183,15 @@ AbstractMetadataPacket* Manager::pushFrameAndGetRects(
     eventPacket->setDurationUsec(1000000LL * 10);
     eventPacket->addItem(detectedObject);
     return eventPacket;
-#endif // 0
 }
 
-int64_t Manager::usSinceEpoch() const
+int64_t TegraVideoMetadataManager::usSinceEpoch() const
 {
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
 }
 
-} // namespace tegra_video
-} // namespace metadata
-} // namespace mediaserver_plugins
+} // namespace plugins
+} // namespace mediaserver
 } // namespace nx
