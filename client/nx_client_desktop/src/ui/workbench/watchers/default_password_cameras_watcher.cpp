@@ -10,7 +10,7 @@ namespace desktop {
 
 struct DefaultPasswordCamerasWatcher::Private
 {
-    DefaultPasswordCamerasWatcher::Private(DefaultPasswordCamerasWatcher* owner):
+    Private(DefaultPasswordCamerasWatcher* owner):
         q(owner)
     {
     }
