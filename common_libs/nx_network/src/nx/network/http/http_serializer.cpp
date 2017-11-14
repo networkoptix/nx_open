@@ -6,7 +6,7 @@ void MessageSerializer::setMessage(const Message* message)
 {
     m_message = message;
 }
-        
+
 nx::network::server::SerializerState MessageSerializer::serialize(
     nx::Buffer* const buffer,
     size_t* bytesWritten)

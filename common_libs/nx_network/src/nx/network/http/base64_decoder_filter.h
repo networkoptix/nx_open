@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
