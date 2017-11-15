@@ -100,7 +100,7 @@ private:
      * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
      */
     ::ec2::QnTranState m_tranStateToSynchronizeTo;
-    /** 
+    /**
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
     ::ec2::QnTranState m_remotePeerTranState;

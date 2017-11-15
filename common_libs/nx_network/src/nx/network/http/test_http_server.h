@@ -37,7 +37,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using ContentProviderFactoryFunction = 
+using ContentProviderFactoryFunction =
     nx::utils::MoveOnlyFunc<std::unique_ptr<nx_http::AbstractMsgBodySource>()>;
 
 class NX_NETWORK_API TestHttpServer

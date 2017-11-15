@@ -172,7 +172,7 @@ int Appserver2Process::exec()
 
     if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
         cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
-    
+
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
         QHostAddress::Any,

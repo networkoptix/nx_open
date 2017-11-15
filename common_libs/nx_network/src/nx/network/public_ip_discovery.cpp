@@ -111,7 +111,7 @@ void PublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClien
     const QRegExp ipRegExpr(kIpRegExprValue);
 
     /* Check if reply contents contain any ip address. */
-    QByteArray response = 
+    QByteArray response =
         QByteArray(" ") + httpClient->fetchMessageBodyBuffer() + QByteArray(" ");
     const int ipPos = ipRegExpr.indexIn(QString::fromUtf8(response));
     if (ipPos < 0)

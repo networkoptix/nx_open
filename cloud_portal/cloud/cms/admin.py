@@ -43,7 +43,7 @@ class ProductAdmin(CMSAdmin):
     list_display_links = ('name',)
 
     def context_actions(self, obj):
-        return format_html('<button class="btn"><a href="{}">settings</a></button>',
+        return format_html('<button class="btn btn-sm btn-info"><a href="{}">settings</a></button>',
                            reverse('product_settings', args=[obj.id]))
 
     context_actions.short_description = 'Admin Options'
@@ -61,7 +61,7 @@ class ContextAdmin(CMSAdmin):
     search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
-        return format_html('<button class="btn"><a href="{}">edit content</a></button>',
+        return format_html('<button class="btn btn-sm btn-info"><a href="{}">edit content</a></button>',
                            reverse('page_editor', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
@@ -96,10 +96,10 @@ admin.site.register(Customization, CustomizationAdmin)
 
 
 class DataRecordAdmin(CMSAdmin):
-    list_display = ('customization', 'language',
+    list_display = ('customization', 'language', 'context',
                     'data_structure', 'short_description', 'version')
-    list_filter = ('data_structure', 'customization', 'language')
-    search_fields = ('data_structure__name', 'customization__name',
+    list_filter = ('data_structure__context', 'data_structure', 'customization', 'language')
+    search_fields = ('data_structure__context__name', 'data_structure__name', 'customization__name',
                      'data_structure__description', 'value', 'language__code')
 
 admin.site.register(DataRecord, DataRecordAdmin)
@@ -113,7 +113,7 @@ class ContentVersionAdmin(CMSAdmin):
     list_display_links = ('id', )
 
     def content_version_actions(self, obj):
-        return format_html('<button class="btn"> <a href="{}">review version</a></button>',
+        return format_html('<button class="btn btn-sm btn-info"> <a href="{}">review version</a></button>',
                            reverse('version', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization

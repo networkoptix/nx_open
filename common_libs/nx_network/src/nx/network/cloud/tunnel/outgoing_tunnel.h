@@ -34,7 +34,7 @@ public:
      * Establish new connection.
      * @param timeout Zero means no timeout.
      * @param socketAttributes attribute values to apply to a newly-created socket.
-     * @note This method is re-enterable. So, it can be called in different threads simultaneously.
+     * NOTE: This method is re-enterable. So, it can be called in different threads simultaneously.
      */
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
@@ -45,11 +45,11 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * @note OutgoingTunnel instance can be safely freed only after 
- *       OutgoingTunnel::pleaseStop completion. It is allowed 
+ * NOTE: OutgoingTunnel instance can be safely freed only after
+ *       OutgoingTunnel::pleaseStop completion. It is allowed
  *       to free object in "on closed" handler itself.
  *       It is needed to guarantee that all clients receive response.
- * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call
+ * NOTE: Calling party MUST not use object after OutgoingTunnel::pleaseStop call
  */
 class NX_NETWORK_API OutgoingTunnel:
     public AbstractOutgoingTunnel
@@ -73,7 +73,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     /**
-     * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call.
+     * NOTE: Calling party MUST not use object after OutgoingTunnel::pleaseStop call.
      */
     virtual void stopWhileInAioThread() override;
 

@@ -22,6 +22,8 @@ bool BindRequest::parseAttributes(const nx::stun::Message& message)
         message, &publicEndpoints);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 BindResponse::BindResponse():
     StunResponseData(kMethod)
 {

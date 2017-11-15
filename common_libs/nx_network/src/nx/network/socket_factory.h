@@ -53,7 +53,7 @@ public:
 
     /**
      * Enforces factory to produce certain sockets
-     * @note DEBUG use ONLY!
+     * NOTE: DEBUG use ONLY!
      */
     static void enforceStreamSocketType(SocketType type);
     static void enforceStreamSocketType(QString type);

@@ -2942,7 +2942,8 @@ void MediaServerProcess::run()
 
     performActionsOnExit();
 
-    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
+    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerIdIfEqual(
+        "ms", commonModule()->moduleGUID());
 
     m_autoRequestForwarder.reset();
 

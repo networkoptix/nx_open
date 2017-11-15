@@ -206,7 +206,7 @@ nx_http::AsyncHttpClientPtr FcResourceSearcher::createHttpClient() const
     nx_http::AuthInfo authInfo;
 
     authInfo.user.username = kFlirDefaultUsername;
-    authInfo.user.authToken.setPassword(kFlirDefaultPassword);
+    authInfo.user.authToken.setPassword(kFlirDefaultPassword.toUtf8());
 
     auto httpClientPtr = nx_http::AsyncHttpClient::create();
     httpClientPtr->setSendTimeoutMs(kDeviceInfoRequestTimeout.count());
@@ -345,6 +345,6 @@ void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
 
 } // namespace flir
 } // namespace plugins
-} // namespace nx 
+} // namespace nx
 
 #endif // defined(ENABLE_FLIR)

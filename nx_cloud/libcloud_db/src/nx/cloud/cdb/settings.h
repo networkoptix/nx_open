@@ -70,7 +70,7 @@ class EventManager
 {
 public:
     /**
-     * If haven't heard anything from mediaserver during this timeout 
+     * If haven't heard anything from mediaserver during this timeout
      * then closing event stream for mediaserver to send another request.
      */
     std::chrono::seconds mediaServerConnectionIdlePeriod;
@@ -103,6 +103,9 @@ class VmsGateway
 {
 public:
     std::string url;
+    std::chrono::milliseconds requestTimeout;
+
+    VmsGateway();
 };
 
 /**
@@ -125,7 +128,7 @@ public:
 
     /** List of local endpoints to bind to. By default, 0.0.0.0:3346. */
     std::list<SocketAddress> endpointsToListen() const;
-    
+
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;

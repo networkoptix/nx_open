@@ -11,7 +11,7 @@
 namespace nx_http {
 
 /**
- * This class is to manage all modifications to HTTP request/response.
+ * Reponsible for modifying HTTP request.
  */
 class NX_NETWORK_API HttpModManager:
     public QObject
@@ -33,7 +33,8 @@ public:
      */
     void addUrlRewriteExact(const QString& originalPath, const QString& effectivePath);
     /**
-     * Register functor that will receive every incoming request before any processing and have a chance to modify it.
+     * Register functor that will receive every incoming request
+     * before any processing and have a chance to modify it.
      */
     void addCustomRequestMod(std::function<void(Request*)> requestMod);
 

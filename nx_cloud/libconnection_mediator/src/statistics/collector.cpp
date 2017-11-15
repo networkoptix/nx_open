@@ -25,6 +25,9 @@ void Collector::saveConnectSessionStatistics(ConnectSession data)
 {
     using namespace std::placeholders;
 
+    if (!m_settings.enabled)
+        return;
+
     m_sqlQueryExecutor->executeUpdate(
         std::bind(&dao::AbstractDataObject::save, m_dataObject.get(), _1, std::move(data)),
         [locker = m_startedAsyncCallsCounter.getScopedIncrement()](

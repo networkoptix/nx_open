@@ -21,7 +21,7 @@
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
                        required
-                       name="firstName" autocomplete="off" autofocus>
+ name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
                 <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required.</span>
@@ -32,7 +32,7 @@
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
                        required
-                       name="lastName" autocomplete="off">
+ name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
                 <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required.</span>
@@ -43,7 +43,7 @@
             <div class="col-sm-4">
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
-                       ng-change="hideAlreadyExists()">
+ ng-change="hideAlreadyExists()">
 
                 <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>

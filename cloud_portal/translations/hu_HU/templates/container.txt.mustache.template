@@ -1,0 +1,8 @@
+{{#systemName}}
+Rendszer: {{systemName}} {{systemSignature}}
+{{/systemName}}
+
+{{>body}}
+
+{{companyUrl}}
+Támogatás: {{supportLink}}

@@ -10,6 +10,7 @@
 #include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
+#include <nx/utils/test_support/settings_loader.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/relaying/listening_peer_manager.h>
@@ -19,8 +20,6 @@
 #include <nx/cloud/relay/model/client_session_pool.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/settings.h>
-
-#include "../settings_loader.h"
 
 namespace nx {
 namespace cloud {
@@ -422,7 +421,7 @@ private:
     nx::network::test::StreamSocketStub* m_lastClientConnection = nullptr;
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
     SocketAddress m_clientEndpoint;
-    SettingsLoader m_settingsLoader;
+    nx::utils::test::SettingsLoader<conf::Settings> m_settingsLoader;
 
     void onBeginListeningCompletion(
         api::ResultCode resultCode,

@@ -409,8 +409,14 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     }
 
     int on = 1;
+
     if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
         return false;
+
+#if !defined(Q_OS_WIN)
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
+        return false;
+#endif
 
     if (m_ipVersion == AF_INET6
         && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)))
@@ -1113,8 +1119,8 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
         ka.keepalivetime = intDuration<milliseconds>(info->inactivityPeriodBeforeFirstProbe);
         ka.keepaliveinterval = intDuration<milliseconds>(info->probeSendPeriod);
 
-        // the value can not be changed, 0 means default
-        info->probeCount = 0;
+        // The value can not be changed, 0 means default.
+        info->probeCount = 10; //< Value cannot be changed on mswin.
     }
 
     DWORD length = sizeof(ka);
@@ -1502,7 +1508,7 @@ UDPSocket::UDPSocket(int ipVersion):
         //error
     }
 
-    // Made with an assumption that SO_LINGER may cause ::close system call to block 
+    // Made with an assumption that SO_LINGER may cause ::close system call to block
     // on win32 with some network drivers when network inteface fails.
     struct linger lingerOptions;
     memset(&lingerOptions, 0, sizeof(lingerOptions));

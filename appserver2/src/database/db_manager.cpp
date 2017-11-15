@@ -3138,6 +3138,27 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscDa
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQueryNoLock(
+    const QByteArray& /*dummy*/,
+    ApiSystemMergeHistoryRecordList& systemMergeHistory)
+{
+    QSqlQuery fetchMergeHistoryQuery(m_sdb);
+    fetchMergeHistoryQuery.prepare(R"sql(
+        SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId, 
+            merged_system_cloud_id AS mergedSystemCloudId, username, signature
+        FROM system_merge_history
+        )sql");
+    if (!fetchMergeHistoryQuery.exec())
+    {
+        NX_WARNING(this, lm("Error selecting system_merge_history. %1")
+            .args(fetchMergeHistoryQuery.lastError().text()));
+        return ErrorCode::dbError;
+    }
+    QnSql::fetch_many(fetchMergeHistoryQuery, &systemMergeHistory);
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data)
 {
     return readSettings(data);
@@ -4219,6 +4240,29 @@ ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license, QSqlDatabase
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMiscData>& tran)
 {
     return saveMiscParam(tran.params);
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(
+    const QnTransaction<ApiSystemMergeHistoryRecord>& tran)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare(R"sql(
+        INSERT INTO system_merge_history(
+            id, timestamp, merged_system_local_id, 
+            merged_system_cloud_id, username, signature)
+        VALUES (
+            :id, :timestamp, :mergedSystemLocalId, 
+            :mergedSystemCloudId, :username, :signature)
+        )sql");
+    QnSql::bind(tran.params, &insQuery);
+    if (!insQuery.exec())
+    {
+        NX_WARNING(this, lm("Error inserting record to system_merge_history. %1")
+            .args(insQuery.lastError().text()));
+        return ErrorCode::dbError;
+    }
+    
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)

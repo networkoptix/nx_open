@@ -92,6 +92,9 @@ const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disab
 // VmsGateway
 const QLatin1String kVmsGatewayUrl("vmsGateway/url");
 
+const QLatin1String kVmsGatewayRequestTimeout("vmsGateway/requestTimeout");
+const std::chrono::milliseconds kDefaultVmsGatewayRequestTimeout(std::chrono::seconds(21));
+
 } // namespace
 
 
@@ -137,6 +140,11 @@ ModuleFinder::ModuleFinder():
 Http::Http():
     tcpBacklogSize(kDefaultTcpBacklogSize),
     connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)
+{
+}
+
+VmsGateway::VmsGateway():
+    requestTimeout(kDefaultVmsGatewayRequestTimeout)
 {
 }
 
@@ -353,6 +361,11 @@ void Settings::loadSettings()
 
     //vmsGateway
     m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();
+
+    m_vmsGateway.requestTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kVmsGatewayRequestTimeout).toString(),
+            kDefaultVmsGatewayRequestTimeout);
 }
 
 } // namespace conf

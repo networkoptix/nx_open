@@ -83,7 +83,8 @@ public:
 
     /**
      * Adds Authorization header to request, if corresponding data can be found in cache.
-     * @return true if necessary information has been found in cache and added to request. false otherwise.
+     * @return True if necessary information has been found in cache and added to request.
+     *   False otherwise.
      */
     bool addAuthorizationHeader(
         const nx::utils::Url& url,
@@ -91,7 +92,7 @@ public:
         AuthInfoCache::AuthorizationCacheItem* const authzData);
 
     /**
-     * @param url This argument is required since request->requestLine.url can contain only path.
+     * @param url Required since request->requestLine.url can contain only path.
      */
     static bool addAuthorizationHeader(
         const nx::utils::Url& url,

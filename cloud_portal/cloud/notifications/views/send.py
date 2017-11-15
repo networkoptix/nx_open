@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
+from api.models import Account
 from notifications import api, models
 from django.core.exceptions import ValidationError
 
@@ -41,6 +42,8 @@ def send_notification(request):
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
 
+        user_account = Account.objects.get(email=request.data['user_email'])
+        request.data['message']['fullName'] = user_account.get_full_name()
         api.send(request.data['user_email'],
                  request.data['type'],
                  request.data['message'],

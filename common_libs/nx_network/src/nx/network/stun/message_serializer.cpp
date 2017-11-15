@@ -201,7 +201,7 @@ nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_
     Q_UNUSED(attribute);
     boost::crc_32_type crc32;
     // The RFC says that we MUST set the length field in header correctly so it means
-    // The length should cover the CRC32 attributes, the length is 4+4 = 8, and the 
+    // The length should cover the CRC32 attributes, the length is 4+4 = 8, and the
     // buffer currently only contains the header for Fingerprint but not the value,so
     // we need to fix the length in the buffer here.
     buffer->WriteMessageLength(static_cast<std::uint16_t>(buffer->size() + 4));
@@ -253,11 +253,11 @@ nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_
         return nx::network::server::SerializerState::needMoreBufferSpace;
     if (attribute.getBuffer().size() == 0)
     {
-        // This is an empty reason phase 
+        // This is an empty reason phase
         *value = buffer->position() - cur_pos;
         return nx::network::server::SerializerState::done;
     }
-    // UTF8 string 
+    // UTF8 string
     nx::Buffer utf8_bytes = attribute.getBuffer();
     if (buffer->WriteBytes(utf8_bytes.constData(), utf8_bytes.size()) == NULL)
         return nx::network::server::SerializerState::needMoreBufferSpace;
@@ -311,7 +311,7 @@ nx::network::server::SerializerState MessageSerializer::serializeAttributes(
         {
             return false;
         }
-        // Checking for really large message may round our body size 
+        // Checking for really large message may round our body size
         std::size_t padding_attribute_value_size = calculatePaddingSize(attribute_value_size);
         NX_ASSERT(padding_attribute_value_size + 4 + *length <= std::numeric_limits<std::uint16_t>::max());
         qToBigEndian(static_cast<std::uint16_t>(attribute_value_size), reinterpret_cast<uchar*>(attribute_len));
@@ -324,7 +324,7 @@ nx::network::server::SerializerState MessageSerializer::serializeAttributes(
 bool MessageSerializer::checkMessageIntegrity()
 {
     // We just do some manually testing for the message validation and all the rules for
-    // testing is based on the RFC. 
+    // testing is based on the RFC.
     // 1. Header
     // Checking the method and it only has 12 bits in the message
     if (m_message->header.method <0 || m_message->header.method >= 1 << 12)
@@ -387,7 +387,7 @@ nx::network::server::SerializerState MessageSerializer::serialize(
         std::uint16_t length = 0;
         if (serializeAttributes(&buffer, &length) == nx::network::server::SerializerState::needMoreBufferSpace)
             continue;
-        // setting the header value 
+        // setting the header value
         buffer.WriteMessageLength(length);
         m_initialized = false;
         *bytesWritten = user_buffer->size() - *bytesWritten;

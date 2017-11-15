@@ -1,17 +1,10 @@
-/**********************************************************
-* Jan 18, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connection_ack_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-ConnectionAckRequest::ConnectionAckRequest()
-:
+ConnectionAckRequest::ConnectionAckRequest():
     StunRequestData(kMethod),
     connectionMethods(0),
     cloudConnectVersion(kCurrentCloudConnectVersion)
@@ -43,6 +36,6 @@ bool ConnectionAckRequest::parseAttributes(const nx::stun::Message& message)
         readAttributeValue<stun::extension::attrs::UdtHpEndpointList>(message, &udpEndpointList);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

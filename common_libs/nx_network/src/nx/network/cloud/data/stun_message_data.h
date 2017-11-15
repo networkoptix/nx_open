@@ -116,7 +116,7 @@ protected:
     }
 
     /** read attribute value as a std::chrono::duration.
-        \note Currently, maximum value of period is limited to max value of int
+        NOTE: Currently, maximum value of period is limited to max value of int
     */
     template<typename Rep, typename Period>
     bool readAttributeValue(
@@ -200,9 +200,8 @@ private:
     nx::String m_text;
 };
 
-/** base class for data structure which uses only STUN message attributes */
-class NX_NETWORK_API StunMessageAttributesData
-:
+/** Base class for data structure which uses only STUN message attributes. */
+class NX_NETWORK_API StunMessageAttributesData:
     public StunMessageParseHelper
 {
 public:
@@ -219,46 +218,46 @@ class NX_NETWORK_API StunRequestData
 public:
     StunRequestData(int method);
 
-    /** fills in all message header and calls \a StunRequestData::serializeAttributes */
+    /** Fills in all message header and calls StunRequestData::serializeAttributes. */
     void serialize(nx::stun::Message* const message);
-    /** validates message header and calls \a StunRequestData::parseAttributes */
+    /** Validates message header and calls StunRequestData::parseAttributes. */
     bool parse(const nx::stun::Message& message);
 
 private:
     int m_method;
 };
 
-class NX_NETWORK_API StunResponseData
-:
+class NX_NETWORK_API StunResponseData:
     public StunMessageAttributesData
 {
 public:
     StunResponseData(int method);
 
-    /** fills in all message header and calls \a StunResponseData::serializeAttributes.
-        \note Sets \a messageClass to \a successResponse
-        \warning Does not add tansactionId since it MUST match one in request
-    */
+    /**
+     * Fills in all message header and calls StunResponseData::serializeAttributes.
+     * NOTE: Sets messageClass to successResponse.
+     * WARNING: Does not add tansactionId since it MUST match one in request.
+     */
     void serialize(nx::stun::Message* const message);
-    /** validates message header and calls \a StunResponseData::parseAttributes */
+    /** Validates message header and calls StunResponseData::parseAttributes. */
     bool parse(const nx::stun::Message& message);
 
 private:
     int m_method;
 };
 
-class NX_NETWORK_API StunIndicationData
-:
+class NX_NETWORK_API StunIndicationData:
     public StunMessageAttributesData
 {
 public:
     StunIndicationData(int method);
 
-    /** fills in all message header and calls \a StunResponseData::serializeAttributes.
-        \note Sets \a messageClass to \a indication
-    */
+    /**
+     * Fills in all message header and calls StunResponseData::serializeAttributes.
+     * NOTE: Sets messageClass to indication.
+     */
     void serialize(nx::stun::Message* const message);
-    /** validates message header and calls \a StunResponseData::parseAttributes */
+    /** Validates message header and calls StunResponseData::parseAttributes. */
     bool parse(const nx::stun::Message& message);
 
 private:

@@ -61,56 +61,201 @@ public:
     TestStreamSocketDelegate* socket() { return dynamic_cast<TestStreamSocketDelegate*>(WebSocket::socket()); }
 };
 
+// ConnectedSocketsSupplier ------------------------------------------------------------------------
+class ConnectedSocketsSupplier
+{
+public:
+    ConnectedSocketsSupplier();
+    bool connectSockets();
+    std::unique_ptr<AbstractStreamSocket> clientSocket();
+    std::unique_ptr<AbstractStreamSocket> serverSocket();
+    std::string lastError();
+private:
+    std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
+    std::unique_ptr<TestStreamSocketDelegate> m_clientSocket;
+    std::unique_ptr<TestStreamSocketDelegate> m_acceptedClientSocket;
+    std::string m_lastError;
+    nx::utils::promise<std::string> m_connectedPromise;
+    nx::utils::future<std::string> m_connectedFuture;
+
+    template<typename F>
+    bool checkedCall(F f, const std::string& errorString);
+    bool initAcceptor();
+    bool initClientSocket();
+    bool ok() const;
+    void onAccept(
+        SystemError::ErrorCode ecode,
+        std::unique_ptr<AbstractStreamSocket> acceptedSocket);
+    bool connect();
+};
+
+ConnectedSocketsSupplier::ConnectedSocketsSupplier():
+    m_connectedFuture(m_connectedPromise.get_future())
+{
+    if(!initAcceptor())
+        return;
+
+    initClientSocket();
+}
+
+bool ConnectedSocketsSupplier::initAcceptor()
+{
+    if (!checkedCall(
+            [this]()
+            {
+                return (bool) (m_acceptor = std::unique_ptr<AbstractStreamServerSocket>(
+                    SocketFactory::createStreamServerSocket()));
+            },
+            "SocketFactory::createStreamServerSocket"))
+    {
+        return false;
+    }
+
+    if (!checkedCall(
+            [this]() { return m_acceptor->setNonBlockingMode(true); },
+            "acceptor::setNonBlockingMode"))
+    {
+        return false;
+    }
+
+    if (!checkedCall(
+            [this]() { return m_acceptor->bind(SocketAddress::anyPrivateAddress); },
+            "acceptor::bind"))
+    {
+        return false;
+    }
+
+    return checkedCall(
+            [this]() { return m_acceptor->listen(); },
+            "acceptor::listen");
+}
+
+bool ConnectedSocketsSupplier::initClientSocket()
+{
+    if (!checkedCall(
+            [this]()
+            {
+                return (bool) (m_clientSocket = std::make_unique<TestStreamSocketDelegate>(
+                    SocketFactory::createStreamSocket().release()));
+            },
+            "SocketFactory::createStreamSocket"))
+    {
+        return false;
+    }
+
+    return checkedCall(
+            [this]() { return m_clientSocket->setNonBlockingMode(true); },
+            "clientSocket::setNonBlockingMode");
+}
+
+template<typename F>
+bool ConnectedSocketsSupplier::checkedCall(F f, const std::string& errorString)
+{
+    if (f())
+        return true;
+
+    m_lastError = errorString + " failed";
+    return false;
+}
+
+
+bool ConnectedSocketsSupplier::connectSockets()
+{
+    if (!ok())
+        return false;
+
+    using namespace std::placeholders;
+    m_acceptor->acceptAsync(std::bind(&ConnectedSocketsSupplier::onAccept, this, _1, _2));
+
+    return connect();
+}
+
+bool ConnectedSocketsSupplier::connect()
+{
+    while (!m_clientSocket->connect(m_acceptor->getLocalAddress()))
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    m_lastError = m_connectedFuture.get();
+    m_acceptor->pleaseStopSync();
+
+    if (!ok())
+        return false;
+
+    return true;
+}
+
+void ConnectedSocketsSupplier::onAccept(
+    SystemError::ErrorCode ecode,
+    std::unique_ptr<AbstractStreamSocket> acceptedSocket)
+{
+    if (SystemError::noError != ecode)
+    {
+        m_connectedPromise.set_value("OnAccept error: " + std::to_string((int) ecode));
+        return;
+    }
+
+    if (!acceptedSocket->setNonBlockingMode(true))
+    {
+        m_connectedPromise.set_value("OnAccept: acceptedSocket::setNonBlockingMode failed");
+        return;
+    }
+
+    m_acceptedClientSocket = std::unique_ptr<TestStreamSocketDelegate>(
+        new TestStreamSocketDelegate(acceptedSocket.release()));
+    m_connectedPromise.set_value(std::string());
+}
+
+bool ConnectedSocketsSupplier::ok() const
+{
+    return m_lastError.empty();
+}
+
+std::unique_ptr<AbstractStreamSocket> ConnectedSocketsSupplier::clientSocket()
+{
+    return std::move(m_clientSocket);
+}
+
+std::unique_ptr<AbstractStreamSocket> ConnectedSocketsSupplier::serverSocket()
+{
+    return std::move(m_acceptedClientSocket);
+}
+
+std::string ConnectedSocketsSupplier::lastError()
+{
+    return m_lastError;
+}
+// -------------------------------------------------------------------------------------------------
+
 class WebSocket : public ::testing::Test
 {
 protected:
     WebSocket():
         clientSendBuf("hello"),
         m_clientSocketDestroyed(false),
-        m_serverSocketDestroyed(false)
+        m_serverSocketDestroyed(false),
+        readyFuture(readyPromise.get_future())
     {}
 
     virtual void SetUp() override
     {
-        std::unique_ptr<AbstractStreamServerSocket> acceptor = SocketFactory::createStreamServerSocket();
-        ASSERT_TRUE(acceptor->setNonBlockingMode(true));
-        ASSERT_TRUE(acceptor->bind(SocketAddress::anyPrivateAddress));
-        ASSERT_TRUE(acceptor->listen());
-
-        m_clientSocket = std::unique_ptr<TestStreamSocketDelegate>(
-            new TestStreamSocketDelegate(SocketFactory::createStreamSocket().release()));
-        m_clientSocket->setNonBlockingMode(true);
-
-        startFuture = startPromise.get_future();
-        auto localAddress = acceptor->getLocalAddress();
-        acceptor->acceptAsync(
-            [this](
-                SystemError::ErrorCode ecode,
-                std::unique_ptr<AbstractStreamSocket> acceptedSocket)
-            {
-                ASSERT_EQ(SystemError::noError, ecode);
-                ASSERT_TRUE(acceptedSocket->setNonBlockingMode(true));
-
-                m_acceptedClientSocket = std::unique_ptr<TestStreamSocketDelegate>(
-                    new TestStreamSocketDelegate(acceptedSocket.release()));
-                startPromise.set_value();
-            });
-
-        while (!m_clientSocket->connect(localAddress))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-        startFuture.wait();
-        acceptor->cancelIOSync();
-        readyFuture = readyPromise.get_future();
+        ASSERT_TRUE(m_socketsSupplier.connectSockets()) << m_socketsSupplier.lastError();
     }
 
     void givenServerClientWebSockets(std::chrono::milliseconds clientTimeout,
         std::chrono::milliseconds serverTimeout)
     {
-        clientWebSocket.reset(new TestWebSocket(std::move(m_clientSocket), clientSendMode,
-            clientReceiveMode));
-        serverWebSocket.reset(new TestWebSocket(std::move(m_acceptedClientSocket),
-            serverSendMode, serverReceiveMode, serverRole));
+        clientWebSocket.reset(
+            new TestWebSocket(
+                m_socketsSupplier.clientSocket(),
+                clientSendMode,
+                clientReceiveMode));
+
+        serverWebSocket.reset(
+            new TestWebSocket(
+                m_socketsSupplier.serverSocket(),
+                serverSendMode,
+                serverReceiveMode,
+                serverRole));
 
         clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
         clientWebSocket->setAliveTimeout(clientTimeout);
@@ -374,6 +519,8 @@ protected:
     int doneCount = 0;
     std::chrono::milliseconds kPingTimeout{100000};
 
+    ConnectedSocketsSupplier m_socketsSupplier;
+
     nx::Buffer clientSendBuf;
     nx::Buffer clientReadBuf;
     SendMode clientSendMode;
@@ -389,8 +536,6 @@ protected:
     std::function<void(SystemError::ErrorCode, size_t)> serverSendCb;
     std::function<void(SystemError::ErrorCode, size_t)> serverReadCb;
 
-    std::unique_ptr<TestStreamSocketDelegate> m_clientSocket;
-    std::unique_ptr<TestStreamSocketDelegate> m_acceptedClientSocket;
     std::atomic<bool> m_clientSocketDestroyed;
     std::atomic<bool> m_serverSocketDestroyed;
 

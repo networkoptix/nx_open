@@ -19,7 +19,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 
+#include "detail/statistics_calculator.h"
 #include "settings.h"
+#include "statistics.h"
 
 namespace nx {
 namespace cloud {
@@ -70,6 +72,8 @@ public:
         const ClientInfo& clientInfo,
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler) = 0;
+
+    virtual Statistics statistics() const = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -98,6 +102,8 @@ public:
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler) override;
 
+    virtual Statistics statistics() const override;
+
     nx::utils::Subscription<std::string /*peer full name*/>& peerConnectedSubscription();
     nx::utils::Subscription<std::string /*peer full name*/>& peerDisconnectedSubscription();
 
@@ -105,10 +111,10 @@ private:
     /**
      * Peer becomes "disconnected" when there are no idle connections.
      */
-    using DisconnectedPeerExpirationTimers = 
+    using DisconnectedPeerExpirationTimers =
         std::multimap<std::chrono::steady_clock::time_point, std::string>;
 
-    using TakeIdleConnectionRequestTimers = 
+    using TakeIdleConnectionRequestTimers =
         std::multimap<std::chrono::steady_clock::time_point, std::string>;
 
     struct ConnectionContext
@@ -124,7 +130,7 @@ private:
         TakeIdleConnectionHandler handler;
         TakeIdleConnectionRequestTimers::iterator expirationTimerIter;
     };
-    
+
     struct PeerContext
     {
         std::deque<std::unique_ptr<ConnectionContext>> connections;
@@ -147,6 +153,7 @@ private:
     nx::utils::Subscription<std::string> m_peerConnectedSubscription;
     nx::utils::Subscription<std::string> m_peerDisconnectedSubscription;
     std::deque<nx::utils::MoveOnlyFunc<void()>> m_scheduledEvents;
+    detail::StatisticsCalculator m_statisticsCalculator;
 
     bool someoneIsWaitingForPeerConnection(const PeerContext& peerContext) const;
     void provideConnectionToTheClient(
@@ -224,6 +231,6 @@ private:
         const Settings& settings);
 };
 
-} // namespace relay
+} // namespace relaying
 } // namespace cloud
 } // namespace nx

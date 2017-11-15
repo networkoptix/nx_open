@@ -1,19 +1,13 @@
-/**********************************************************
-* Aug 18, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "managers_types.h"
 
 #include <nx/fusion/model_functions.h>
 
-
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult( nx::utils::db::DBResult dbResult )
+api::ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult)
 {
-    switch( dbResult )
+    switch (dbResult)
     {
         case nx::utils::db::DBResult::ok:
             return api::ResultCode::ok;
@@ -34,6 +28,9 @@ api::ResultCode dbResultToApiResult( nx::utils::db::DBResult dbResult )
 
         case nx::utils::db::DBResult::uniqueConstraintViolation:
             return api::ResultCode::alreadyExists;
+
+        case nx::utils::db::DBResult::logicError:
+            return api::ResultCode::unknownError;
     }
 
     return api::ResultCode::dbError;

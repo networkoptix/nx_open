@@ -107,7 +107,7 @@ public:
             pathMatchContext.defaultFactory = std::move(factoryFunc);
             return true;
         }
-        
+
         return pathMatchContext.pathToFactory.add(path.toUtf8(), std::move(factoryFunc));
     }
 

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -39,7 +39,7 @@ public:
 
     CloudServerSocket(
         hpm::api::AbstractMediatorConnector* mediatorConnector,
-        nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
+        nx::network::RetryPolicy mediatorRegistrationRetryPolicy
             = nx::network::RetryPolicy());
 
     ~CloudServerSocket();
@@ -133,7 +133,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using CustomAcceptorFactoryFunction = 
+using CustomAcceptorFactoryFunction =
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
         const nx::hpm::api::SystemCredentials&,
         const hpm::api::ListenResponse&);

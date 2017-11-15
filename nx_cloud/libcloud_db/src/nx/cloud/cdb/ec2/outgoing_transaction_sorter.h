@@ -18,7 +18,7 @@ namespace ec2 {
 class AbstractOutgoingTransactionDispatcher;
 
 /**
- * Postpones outgoing transaction delivery to ensure transactions are sent with 
+ * Postpones outgoing transaction delivery to ensure transactions are sent with
  *     monotonically increasing sequence.
  */
 class OutgoingTransactionSorter
@@ -34,8 +34,8 @@ public:
     ~OutgoingTransactionSorter();
 
     /**
-     * This optional method can be called prior to adding transaction to ensure 
-     * that transactionSequence is used in sort order calculations even before 
+     * This optional method can be called prior to adding transaction to ensure
+     * that transactionSequence is used in sort order calculations even before
      * actual OutgoingTransactionSorter::addTransaction call.
      */
     void registerTransactionSequence(

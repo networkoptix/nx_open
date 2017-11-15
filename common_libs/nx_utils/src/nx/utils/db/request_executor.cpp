@@ -44,7 +44,7 @@ DBResult BaseExecutor::execute(QSqlDatabase* const connection)
 
     m_queryStatistics.result = executeQuery(connection);
 
-    m_queryStatistics.executionDuration = 
+    m_queryStatistics.executionDuration =
         duration_cast<milliseconds>(nx::utils::monotonicTime() - executionStartTime);
     return *m_queryStatistics.result;
 }

@@ -18,7 +18,7 @@ namespace cloud {
 
 /**
  * Creates outgoing specialized AbstractTunnelConnection.
- * @note Methods of this class are not thread-safe.
+ * NOTE: Methods of this class are not thread-safe.
  */
 class NX_NETWORK_API AbstractTunnelConnector:
     public aio::BasicPollable
@@ -35,7 +35,7 @@ public:
     virtual int getPriority() const = 0;
     /**
      * Establishes connection to the target host.
-     * It is allowed to pipeline this method calls. 
+     * It is allowed to pipeline this method calls.
      * But these calls MUST be synchronized by caller.
      * @param timeout 0 means no timeout.
      * @param handler AbstractTunnelConnector can be safely freed within this handler.

@@ -129,7 +129,7 @@ bool TestHttpServer::registerContentProvider(
     const QString& httpPath,
     ContentProviderFactoryFunction contentProviderFactory)
 {
-    auto contentProviderFactoryShared = 
+    auto contentProviderFactoryShared =
         std::make_shared<ContentProviderFactoryFunction>(std::move(contentProviderFactory));
 
     return registerRequestProcessorFunc(

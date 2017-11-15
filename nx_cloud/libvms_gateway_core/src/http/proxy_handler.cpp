@@ -16,6 +16,17 @@ namespace gateway {
 
 constexpr const int kSocketTimeoutMs = 29*1000;
 
+ProxyHandler::TargetHost::TargetHost(
+    nx_http::StatusCode::Value status,
+    SocketAddress target)
+    :
+    status(status),
+    target(std::move(target))
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
@@ -80,7 +91,7 @@ void ProxyHandler::sendResponse(
     nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
-TargetHost ProxyHandler::cutTargetFromRequest(
+ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
     const nx_http::HttpServerConnection& connection,
     nx_http::Request* const request)
 {
@@ -130,7 +141,7 @@ TargetHost ProxyHandler::cutTargetFromRequest(
     return m_targetHost;
 }
 
-TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
+ProxyHandler::TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
 {
     if (!m_settings.http().allowTargetEndpointInUrl)
     {
@@ -155,7 +166,7 @@ TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
     return {nx_http::StatusCode::ok, std::move(targetEndpoint)};
 }
 
-TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
+ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
 {
     // Parse path, expected format: /target[/some/longer/url].
     const auto path = request->requestLine.url.path();
@@ -260,7 +271,7 @@ void ProxyHandler::onConnected(
         .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(),
             m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
 
-    m_requestProxyWorker = std::make_unique<ProxyWorker>(
+    m_requestProxyWorker = std::make_unique<nx_http::server::proxy::ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,

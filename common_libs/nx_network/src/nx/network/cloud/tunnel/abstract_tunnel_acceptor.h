@@ -27,7 +27,7 @@ public:
     /**
      * Common connection info setters.
      */
-    
+
     void setConnectionInfo(String connectionId, String remotePeerId);
     void setMediatorConnection(hpm::api::MediatorServerTcpConnection* connection);
 

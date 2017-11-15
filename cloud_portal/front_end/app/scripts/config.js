@@ -211,7 +211,9 @@ var Config = {
         updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-        staticResources: "static/web_common/"
+        staticResources: "static/web_common/",
+        maxCrashCount: 2,
+        nativeTimeout: 60 * 1000 //60s
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
@@ -220,4 +222,5 @@ var Config = {
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
     },
+    responseOk: 'ok'
 };

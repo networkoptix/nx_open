@@ -1,23 +1,18 @@
-/**********************************************************
-* Oct 7, 2015
-* akolesnikov
-***********************************************************/
-
 #include "random_online_endpoint_selector.h"
 
 #include <nx/utils/scope_guard.h>
 
-
 namespace {
-    const unsigned int CONNECT_TIMEOUT_MS = 14384;
-}
+
+static const unsigned int CONNECT_TIMEOUT_MS = 14384;
+
+} // namespace
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-RandomOnlineEndpointSelector::RandomOnlineEndpointSelector()
-:
+RandomOnlineEndpointSelector::RandomOnlineEndpointSelector():
     m_endpointResolved(false),
     m_socketsStillConnecting(0)
 {
@@ -46,7 +41,7 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
 
     using namespace std::placeholders;
     //trying to establish connection to any endpoint and return first one that works
-    for (auto& endpoint: endpoints)
+    for (auto& endpoint : endpoints)
     {
         auto sock = SocketFactory::createStreamSocket(
             false, NatTraversalSupport::disabled);
@@ -76,7 +71,7 @@ void RandomOnlineEndpointSelector::done(
     SystemError::ErrorCode osErrorCode,
     SocketAddress endpoint)
 {
-    auto scopedGuard = makeScopeGuard([sock, this](){
+    auto scopedGuard = makeScopeGuard([sock, this]() {
         QnMutexLocker lk(&m_mutex);
         m_sockets.erase(sock);
     });

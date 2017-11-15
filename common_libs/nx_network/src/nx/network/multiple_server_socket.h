@@ -69,7 +69,7 @@ public:
 
     /**
      * These methods can be called concurrently with MultipleServerSocket::accept.
-     * @note Blocks until completion.
+     * NOTE: Blocks until completion.
      */
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
     void removeSocket(size_t pos);

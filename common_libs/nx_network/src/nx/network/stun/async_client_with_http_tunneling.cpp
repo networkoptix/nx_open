@@ -16,7 +16,7 @@ AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     bindToAioThread(getAioThread());
 }
 
-void AsyncClientWithHttpTunneling::bindToAioThread( 
+void AsyncClientWithHttpTunneling::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -204,7 +204,7 @@ void AsyncClientWithHttpTunneling::connectInternal(
 {
     NX_ASSERT(isInSelfAioThread());
 
-    auto onConnected = 
+    auto onConnected =
         [this, handler = std::move(handler)](SystemError::ErrorCode sysErrorCode)
         {
             if (sysErrorCode == SystemError::noError)
@@ -212,12 +212,12 @@ void AsyncClientWithHttpTunneling::connectInternal(
             handler(sysErrorCode);
         };
 
-    if (m_url.scheme() == nx_http::kUrlSchemeName || 
+    if (m_url.scheme() == nx_http::kUrlSchemeName ||
         m_url.scheme() == nx_http::kSecureUrlSchemeName)
     {
         openHttpTunnel(lock, m_url, std::move(onConnected));
     }
-    else if (m_url.scheme() == nx::stun::kUrlSchemeName || 
+    else if (m_url.scheme() == nx::stun::kUrlSchemeName ||
         m_url.scheme() == nx::stun::kSecureUrlSchemeName)
     {
         createStunClient(lock, nullptr);

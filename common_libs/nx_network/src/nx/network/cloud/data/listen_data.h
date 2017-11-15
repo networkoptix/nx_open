@@ -42,7 +42,7 @@ public:
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
     CloudConnectOptions cloudConnectOptions;
     /**
-     * This field left for compatibility between internal 3.1 builds. 
+     * This field left for compatibility between internal 3.1 builds.
      * TODO: #ak Remove in 3.2.
      */
     boost::optional<nx::String> trafficRelayUrl;

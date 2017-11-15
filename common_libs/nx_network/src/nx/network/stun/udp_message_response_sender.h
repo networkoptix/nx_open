@@ -20,7 +20,7 @@ public:
     UDPMessageResponseSender(
         UdpServer* udpServer,
         SocketAddress sourceAddress);
-    virtual ~UDPMessageResponseSender();
+    virtual ~UDPMessageResponseSender() = default;
 
     virtual void sendMessage(
         nx::stun::Message message,

@@ -1,20 +1,16 @@
-/**********************************************************
-* Jan 20, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <boost/optional.hpp>
 
 #include "nx/network/buffer.h"
 
-
 namespace nx {
 namespace hpm {
 namespace api {
 
-/** Authorization credentials for \class MediatorServerTcpConnection */
+/**
+ * Authorization credentials for MediatorServerTcpConnection.
+ */
 struct SystemCredentials
 {
     String systemId;
@@ -33,7 +29,7 @@ struct SystemCredentials
     {
     }
 
-    bool operator ==(const SystemCredentials& rhs) const
+    bool operator==(const SystemCredentials& rhs) const
     {
         return serverId == rhs.serverId && systemId == rhs.systemId && key == rhs.key;
     }

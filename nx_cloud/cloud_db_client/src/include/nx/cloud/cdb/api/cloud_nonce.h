@@ -15,7 +15,7 @@ std::string calcNonceHash(
     uint32_t timestamp);
 
 /**
- * Prepares nonce base to be used by anyone who wants to provide cloud 
+ * Prepares nonce base to be used by anyone who wants to provide cloud
  * account credentials authentication (e.g. mediaserver).
  */
 std::string generateCloudNonceBase(const std::string& systemId);
@@ -38,6 +38,10 @@ bool isValidCloudNonceBase(
  * Generates random nonce based on value returned by generateCloudNonce.
  */
 std::string generateNonce(const std::string& cloudNonce);
+
+bool isNonceValidForSystem(
+    const std::string& nonce,
+    const std::string& systemId);
 
 } // namespace api
 } // namespace cdb

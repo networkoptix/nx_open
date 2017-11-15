@@ -41,8 +41,10 @@ static int stringLength(const QByteArray& array)
     int size = array.size();
     const char* data = array.constData();
     for (int position = 0; position < size; ++position)
+    {
         if (data[position] == 0)
             return position;
+    }
     return size;
 }
 

@@ -26,7 +26,7 @@ inline int runTest(
             auto sgGuard = std::make_unique<SocketGlobalsHolder>(socketGlobalsFlags);
             SocketGlobals::applyArguments(args);
             SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
-            cloud::OutgoingTunnelPool::allowOwnPeerIdChange();
+            cloud::OutgoingTunnelPool::ignoreOwnPeerIdChange();
 
             utils::test::DeinitFunctions deinitFunctions;
             if (extraInit)

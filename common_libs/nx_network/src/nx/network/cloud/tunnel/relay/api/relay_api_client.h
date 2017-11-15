@@ -27,7 +27,7 @@ using BeginListeningHandler =
 using StartClientConnectSessionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
 
-using OpenRelayConnectionHandler = 
+using OpenRelayConnectionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
 class NX_NETWORK_API Client:
@@ -38,7 +38,7 @@ public:
         const nx::String& peerName,
         BeginListeningHandler completionHandler) = 0;
     /**
-     * @param desiredSessionId Can be empty. 
+     * @param desiredSessionId Can be empty.
      *   In this case server will generate unique session id itself.
      */
     virtual void startSession(
@@ -63,7 +63,7 @@ public:
 class NX_NETWORK_API ClientFactory
 {
 public:
-    using CustomFactoryFunc = 
+    using CustomFactoryFunc =
         nx::utils::MoveOnlyFunc<std::unique_ptr<Client>(const nx::utils::Url&)>;
 
     static std::unique_ptr<Client> create(const nx::utils::Url& baseUrl);

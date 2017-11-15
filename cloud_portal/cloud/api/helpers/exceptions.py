@@ -117,6 +117,8 @@ class APIException(Exception):
             }, status=self.status_code)
 
     def log_level(self):
+        if isinstance(self.error_code, basestring):
+            return logging.ERROR
         return self.error_code.log_level()
 
 
@@ -271,75 +273,78 @@ def get_client_ip(request):
     return ip
 
 
+def clean_passwords(dictionary):
+    if isinstance(dictionary, dict):
+        if 'password' in dictionary:
+            dictionary['password'] = '*****'
+        if 'new_password' in dictionary:
+            dictionary['new_password'] = '****'
+        if 'old_password' in dictionary:
+            dictionary['old_password'] = '***'
+
+
+def log_error(request, error, log_level):
+    page_url = 'unknown'
+    user_name = 'not authorized'
+    request_data = ''
+    ip = 'unknown'
+
+    if isinstance(request, Request):
+        page_url = request.build_absolute_uri()
+        request_data = request.data
+        ip = get_client_ip(request)
+        if not isinstance(request.user, AnonymousUser):
+            user_name = request.user.email
+
+    if isinstance(request_data, QueryDict):
+        request_data = request_data.dict()
+
+    if isinstance(error, APIException):
+        error_text = "{}({})".format(error.error_text, error.error_code)
+        if error.error_data:
+            clean_passwords(error.error_data)
+        error_formatted = 'Status: {}, Message: {}, Result code: {}, Data: {}'.\
+                          format(error.status_code,
+                                 error.error_text,
+                                 error.error_code,
+                                 json.dumps(error.error_data, indent=4, separators=(',', ': '))
+                                 )
+    else:
+        error_text = 'unknown'
+        error_formatted = 'Unexpected error'
+
+    clean_passwords(request_data)
+
+    if log_level == logging.INFO:
+        error_formatted = ' {}:{} ({} at {}) Request: {}'. \
+            format(error.__class__.__name__,
+                   error_text,
+                   user_name,
+                   page_url,
+                   request_data
+                   )
+    else:
+        error_formatted = ' {}:{}\n{}({}) at {} Request: {}\n{}\nCall Stack: \n{}'. \
+            format(error.__class__.__name__,
+                   error_text,
+                   user_name,
+                   ip,
+                   page_url,
+                   request_data,
+                   error_formatted,
+                   traceback.format_exc()
+                   ).replace("Traceback", "")  # remove Traceback word from handled exceptions
+
+    logger.log(log_level, error_formatted)
+    return error_formatted
+
+
 def handle_exceptions(func):
     """
     Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
     :param func:
     :return:
     """
-    def clean_passwords(dictionary):
-        if isinstance(dictionary, dict):
-            if 'password' in dictionary:
-                dictionary['password'] = '*****'
-            if 'new_password' in dictionary:
-                dictionary['new_password'] = '****'
-            if 'old_password' in dictionary:
-                dictionary['old_password'] = '***'
-
-    def log_error(request, error, log_level):
-        page_url = 'unknown'
-        user_name = 'not authorized'
-        request_data = ''
-        ip = 'unknown'
-
-        if isinstance(request, Request):
-            page_url = request.build_absolute_uri()
-            request_data = request.data
-            ip = get_client_ip(request)
-            if not isinstance(request.user, AnonymousUser):
-                user_name = request.user.email
-
-        if isinstance(request_data, QueryDict):
-            request_data = request_data.dict()
-
-        if isinstance(error, APIException):
-            error_text = "{}({})".format(error.error_text, error.error_code)
-            if error.error_data:
-                clean_passwords(error.error_data)
-            error_formatted = 'Status: {}, Message: {}, Result code: {}, Data: {}'.\
-                              format(error.status_code,
-                                     error.error_text,
-                                     error.error_code,
-                                     json.dumps(error.error_data, indent=4, separators=(',', ': '))
-                                     )
-        else:
-            error_text = 'unknown'
-            error_formatted = 'Unexpected error'
-
-        clean_passwords(request_data)
-
-        if log_level == logging.INFO:
-            error_formatted = ' {}:{} ({} at {}) Request: {}'. \
-                format(error.__class__.__name__,
-                       error_text,
-                       user_name,
-                       page_url,
-                       request_data
-                       )
-        else:
-            error_formatted = ' {}:{}\n{}({}) at {} Request: {}\n{}\nCall Stack: \n{}'. \
-                format(error.__class__.__name__,
-                       error_text,
-                       user_name,
-                       ip,
-                       page_url,
-                       request_data,
-                       error_formatted,
-                       traceback.format_exc()
-                       ).replace("Traceback", "")  # remove Traceback word from handled exceptions
-
-        logger.log(log_level, error_formatted)
-        return error_formatted
 
     def handler(*args, **kwargs):
         # noinspection PyBroadException

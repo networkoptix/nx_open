@@ -1,9 +1,11 @@
 #include "websocket_transaction_transport.h"
+
 #include <nx_ec/data/api_peer_data.h>
+#include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
+
 #include "compatible_ec2_protocol_version.h"
 #include "transaction_log.h"
-#include <nx/p2p/p2p_serialization.h>
 
 namespace nx {
 namespace cdb {

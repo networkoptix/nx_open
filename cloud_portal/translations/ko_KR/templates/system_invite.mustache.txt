@@ -5,7 +5,7 @@
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-{{PRODUCT_NAME}}에 가입하도록 초대되었습니다.
+{{PRODUCT_NAME}} 에 가입하도록 초대되었습니다.
 {{message.system_name}} 시스템이 공유되었습니다.
 {{/message.sharer_name}}
 

@@ -99,7 +99,7 @@ void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
 
     decltype(m_tunnelConnection) tunnelConnection;
     tunnelConnection.swap(m_tunnelConnection);
-    
+
     decltype(m_onTunnelClosedHandler) onTunnelClosedHandler;
     onTunnelClosedHandler.swap(m_onTunnelClosedHandler);
 

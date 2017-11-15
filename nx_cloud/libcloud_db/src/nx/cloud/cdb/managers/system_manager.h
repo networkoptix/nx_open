@@ -63,10 +63,19 @@ public:
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
 
+    virtual nx::utils::db::DBResult fetchSystemById(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        data::SystemData* const system) = 0;
+
     virtual nx::utils::db::DBResult updateSystemStatus(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) = 0;
+
+    virtual nx::utils::db::DBResult markSystemForDeletion(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& systemId) = 0;
 };
 
 /**
@@ -155,10 +164,19 @@ public:
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
 
+    virtual nx::utils::db::DBResult fetchSystemById(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        data::SystemData* const system) override;
+
     virtual nx::utils::db::DBResult updateSystemStatus(
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) override;
+
+    virtual nx::utils::db::DBResult markSystemForDeletion(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& systemId) override;
 
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
@@ -285,16 +303,7 @@ private:
         InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
-    nx::utils::db::DBResult markSystemAsDeleted(
-        nx::utils::db::QueryContext* const queryContext,
-        const std::string& systemId);
-    void systemMarkedAsDeleted(
-        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
-        std::string systemId,
-        std::function<void(api::ResultCode)> completionHandler);
-    void markSystemAsDeletedInCache(const std::string& systemId);
+    void markSystemForDeletionInCache(const std::string& systemId);
 
     nx::utils::db::DBResult deleteSystemFromDB(
         nx::utils::db::QueryContext* const queryContext,
@@ -347,7 +356,7 @@ private:
 
     /**
      * TODO: #ak Having both requestResources and filter looks overabundant.
-     * @return boost::none is returned in case if distinct filter has been specified 
+     * @return boost::none is returned in case if distinct filter has been specified
      *   and system was not found with this filter.
      */
     boost::optional<std::vector<api::SystemDataEx>> selectSystemsFromCacheByFilter(
@@ -449,10 +458,6 @@ private:
 
     nx::utils::db::DBResult fillCache();
     template<typename Func> nx::utils::db::DBResult doBlockingDbQuery(Func func);
-    nx::utils::db::DBResult fetchSystemById(
-        nx::utils::db::QueryContext* queryContext,
-        const std::string& systemId,
-        data::SystemData* const system);
     nx::utils::db::DBResult fetchSystemToAccountBinder(
         nx::utils::db::QueryContext* queryContext);
 

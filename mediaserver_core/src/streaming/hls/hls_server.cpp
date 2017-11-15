@@ -1053,7 +1053,7 @@ namespace nx_hls
             if (startDatetimeIter != requestParams.end())
             {
                 // Converting startDatetime to startTimestamp.
-                // This is secondary functionality, not used by this 
+                // This is secondary functionality, not used by this
                 //   HLS implementation (since all chunks are referenced by npt timestamps).
                 result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
             }

@@ -1,5 +1,7 @@
 #include "merge_test_fixture.h"
 
+#include <stdexcept>
+
 #include <nx/utils/test_support/test_options.h>
 
 namespace ec2 {
@@ -78,6 +80,22 @@ void SystemMergeFixture::thenAllServersSynchronizedData()
         if (PeerWrapper::areAllPeersHaveSameTransactionLog(m_servers))
             break;
 
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+ApiSystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHistoryIsAdded()
+{
+    ApiSystemMergeHistoryRecordList mergeHistory;
+    for (;;)
+    {
+        const auto errorCode =
+            peer(0).ecConnection()->getMiscManager(Qn::kSystemAccess)->
+                getSystemMergeHistorySync(&mergeHistory);
+        if (errorCode != ErrorCode::ok)
+            throw std::runtime_error(toString(errorCode).toStdString());
+        if (!mergeHistory.empty())
+            return mergeHistory;
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

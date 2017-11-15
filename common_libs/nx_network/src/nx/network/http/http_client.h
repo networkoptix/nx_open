@@ -16,7 +16,7 @@ namespace nx_http {
 /**
  * Synchronous http client.
  * This is a synchronous wrapper on top of AsyncHttpClient.
- * @note This class is not thread-safe.
+ * NOTE: This class is not thread-safe.
  * WARNING: Message body is read asynchronously to some internal buffer.
  */
 class NX_NETWORK_API HttpClient:

@@ -355,7 +355,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
     }
 
     m_contentDecoder.reset();
-    HttpHeaders::const_iterator contentEncodingIter = 
+    HttpHeaders::const_iterator contentEncodingIter =
         m_httpMessage.headers().find(nx_http::StringType("Content-Encoding"));
     if (contentEncodingIter != m_httpMessage.headers().end() &&
         contentEncodingIter->second != "identity")
@@ -376,7 +376,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     // Analyzing message headers to find out if there should be message body
     //   and filling in m_contentLength.
-    HttpHeaders::const_iterator transferEncodingIter = 
+    HttpHeaders::const_iterator transferEncodingIter =
         m_httpMessage.headers().find(nx_http::StringType("Transfer-Encoding"));
     if (transferEncodingIter != m_httpMessage.headers().end())
     {
@@ -392,7 +392,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     m_isChunkedTransfer = false;
 
-    HttpHeaders::const_iterator contentLengthIter = 
+    HttpHeaders::const_iterator contentLengthIter =
         m_httpMessage.headers().find(nx_http::StringType("Content-Length"));
     if (contentLengthIter != m_httpMessage.headers().end())
         m_contentLength = contentLengthIter->second.toULongLong();
@@ -401,7 +401,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
     auto connectionHeaderIter = m_httpMessage.headers().find("Connection");
     auto contentTypeHeaderIter = m_httpMessage.headers().find("Content-Type");
 
-    if (!m_contentLength && 
+    if (!m_contentLength &&
         contentTypeHeaderIter == m_httpMessage.headers().end() &&
         connectionHeaderIter != m_httpMessage.headers().end() &&
         connectionHeaderIter->second.toLower() == "upgrade")
@@ -582,7 +582,7 @@ unsigned int HttpStreamReader::hexCharToInt(BufferType::value_type ch)
     return 0;
 }
 
-std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> 
+std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter>
     HttpStreamReader::createContentDecoder(
         const nx_http::StringType& encodingName)
 {

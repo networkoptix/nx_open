@@ -24,6 +24,7 @@
 #include "http/connect_handler.h"
 #include "http/http_api_path.h"
 #include "http/proxy_handler.h"
+#include "http/url_rewriter.h"
 #include "libvms_gateway_core_app_info.h"
 #include "stree/cdb_ns.h"
 
@@ -56,6 +57,16 @@ VmsGatewayProcess::~VmsGatewayProcess()
 const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
 {
     return m_httpEndpoints;
+}
+
+relaying::RelayEngine& VmsGatewayProcess::relayEngine()
+{
+    return *m_relayEngine;
+}
+
+const relaying::RelayEngine& VmsGatewayProcess::relayEngine() const
+{
+    return *m_relayEngine;
 }
 
 void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
@@ -109,7 +120,10 @@ int VmsGatewayProcess::serviceMain(
         relaying::RelayEngine relayEngine(
             settings.listeningPeer(),
             &httpMessageDispatcher);
+        m_relayEngine = &relayEngine;
 
+        nx_http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
+            std::make_unique<UrlRewriter>());
         registerApiHandlers(
             settings,
             m_runTimeOptions,
@@ -119,7 +133,7 @@ int VmsGatewayProcess::serviceMain(
         if (settings.http().sslSupport)
         {
             network::ssl::Engine::useOrCreateCertificate(
-                settings.http().sslCertPath, 
+                settings.http().sslCertPath,
                 nx::utils::AppInfo::productName().toUtf8(),
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
@@ -170,7 +184,7 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 
     m_endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-            [](const nx::String& connectSessionId) 
+            [](const nx::String& connectSessionId)
                 -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
             {
                 return std::make_unique<CloudMediaServerEndpointVerificator>(

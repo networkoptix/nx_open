@@ -65,7 +65,7 @@ void OutgoingTunnelConnection::establishNewConnection(
             m_activeRequests.back()->completionHandler = std::move(handler);
             m_activeRequests.back()->timer.bindToAioThread(getAioThread());
             auto requestIter = --m_activeRequests.end();
-        
+
             std::unique_ptr<nx::cloud::relay::api::Client> relayClient;
             if (m_relayApiClient)
             {
@@ -81,7 +81,7 @@ void OutgoingTunnelConnection::establishNewConnection(
                 m_relaySessionId,
                 std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
                     _1, _2, requestIter));
-            
+
             if (timeout > std::chrono::milliseconds::zero())
             {
                 m_activeRequests.back()->timer.start(

@@ -162,7 +162,7 @@ void Settings::loadCassandraHost()
 
     m_cassandraConnection.host =
         settings().value(kCassandraHost, kDefaultCassandraHost).toString().toStdString();
-    m_cassandraConnection.delayBeforeRetryingInitialConnect = 
+    m_cassandraConnection.delayBeforeRetryingInitialConnect =
         nx::utils::parseTimerDuration(
             settings().value(kDelayBeforeRetryingInitialConnect).toString(),
             kDefaultDelayBeforeRetryingInitialConnect);

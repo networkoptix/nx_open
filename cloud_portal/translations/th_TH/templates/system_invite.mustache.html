@@ -1,12 +1,12 @@
 <h1>ยินดีต้อนรับสู่ {{PRODUCT_NAME}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </ 0> เชิญคุณเข้าร่วม <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </ 1>
-และแชร์ระบบ {{message.system_name}} กับคุณ</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> เชิญคุณเข้าร่วม <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
+และแชร์ระบบ {{message.system_name}} กับคุณю</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>คุณได้รับเชิญให้เข้าร่วม <a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </ 0>
+<p>คุณได้รับเชิญให้เข้าร่วม <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
 ระบบ {{message.system_name}} ถูกแชร์กับคุณ</p>
 {{/message.sharer_name}}
 

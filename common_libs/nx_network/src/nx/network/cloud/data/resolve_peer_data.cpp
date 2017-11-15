@@ -6,8 +6,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
-:
+ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName):
     StunRequestData(kMethod),
     hostName(std::move(_hostName))
 {

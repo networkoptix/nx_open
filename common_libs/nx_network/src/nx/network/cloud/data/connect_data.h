@@ -33,8 +33,8 @@ public:
     ConnectionMethods connectionMethods;
     /** If port is zero then mediator uses source port */
     std::list<SocketAddress> udpEndpointList;
-    /** if \a true, mediator does not report Connect request source address to the server peer.
-        Only addresses found in \a udpEndpointList are reported
+    /** if true, mediator does not report Connect request source address to the server peer.
+        Only addresses found in udpEndpointList are reported
     */
     bool ignoreSourceAddress;
     CloudConnectVersion cloudConnectVersion;
@@ -56,7 +56,7 @@ public:
     /** Optional for backward compatibility. */
     boost::optional<nx::String> trafficRelayUrl;
     /**
-     * May differ from ConnectRequest::destinationHostName 
+     * May differ from ConnectRequest::destinationHostName
      * if connect by domain name (e.g., cloud system id) has been requested.
      */
     nx::String destinationHostFullName;

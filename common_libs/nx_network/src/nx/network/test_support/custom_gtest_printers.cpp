@@ -7,6 +7,11 @@ void PrintTo(const HostAddress& val, ::std::ostream* os)
     *os << val.toString().toStdString();
 }
 
+void PrintTo(const KeepAliveOptions& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
+}
+
 void PrintTo(const SocketAddress& val, ::std::ostream* os)
 {
     *os << val.toString().toStdString();

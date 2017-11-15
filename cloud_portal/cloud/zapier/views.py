@@ -1,25 +1,54 @@
-import django, requests, json, base64
+import django, json, base64, urllib, uuid
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
-from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
-
-from requests.auth import HTTPDigestAuth
 from django.utils.http import urlencode
 
-from rest_hooks.signals import raw_hook_event
+from api.helpers.exceptions import api_success, APINotAuthorisedException, APIException, log_error
+from api.controllers import cloud_api, cloud_gateway
 
 from models import *
 from cloud import settings
-import urllib
 from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
-#Correct urls
-CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
+import logging
+logger = logging.getLogger(__name__)
+
+def zapier_exceptions(func):
+    """
+    Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
+    :param func:
+    :return:
+    """
+
+    def handler(*args, **kwargs):
+        # noinspection PyBroadException
+        try:
+            data = func(*args, **kwargs)
+            if not isinstance(data, Response):
+                return Response(data, status=status.HTTP_200_OK)
+            return data
+
+        except APIException as error:
+            # Do not log not_authorized errors
+            log_error(args[0], error, logging.WARNING)
+
+            return error.response()
+
+        except Exception as error:
+            log_error(args[0], error, logging.WARNING)
+
+            return Response({
+                'resultCode': status.HTTP_503_SERVICE_UNAVAILABLE,
+                'errorText': "System unavailable or offline"
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    return handler
 
 def authenticate(request):
     user, email, password = None, None, None
@@ -41,8 +70,8 @@ def increment_rule(rule):
     rule.save()
 
 
+@zapier_exceptions
 def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
-
     if rule_type == "Generic Event":
         action_params = json.dumps({"additionalResources": ["{00000000-0000-0000-0000-100000000000}",
                                                 "{00000000-0000-0000-0000-100000000001}"],
@@ -102,7 +131,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
                                       "description": "_bell_on",
                                       "eventTimestampUsec": "0",
                                       "eventType": "undefinedEvent",
-                                      "inputPortId": "921d6e67-a9c3-4b2e-b1c8-1162b4a7cd01",
+                                      "inputPortId": str(uuid.uuid4()),
                                       "metadata": {
                                           "allUsers": False,
                                           "instigators": ["{00000000-0000-0000-0000-100000000000}",
@@ -129,11 +158,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
     else:
         return
 
-    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL, system_id)
-
-    r = requests.post(url, json=data, auth=HTTPDigestAuth(email, password))
-    if r.status_code != 200:
-        return Response({'message': "There was an error making the rule"}, status=r.status_code)
+    cloud_gateway.post(system_id, "ec2/saveEventRule", data, email, password)
 
 
 def make_or_increment_rule(action, email, system_id, caption, password=None,
@@ -168,27 +193,21 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
-    request = CLOUD_DB_URL + "/system/get"
-    r = requests.get(request, params={"customization": settings.CUSTOMIZATION}, auth=HTTPDigestAuth(email, password))
-
-    if r.status_code != 200:
-        Response({'message': "Error getting systems for user"}, status=r.status_code)
-
-    data = r.json()
-
+    data = cloud_api.System.list(email, password, False)
     zap_list = {'systems': []}
 
     for system in data['systems']:
-        zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
+        if system['stateOfHealth'] == 'online':
+            zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
 
     return api_success(zap_list)
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def zapier_send_generic_event(request):
     user, email, password = authenticate(request)
     system_id = request.data['systemId']
@@ -205,20 +224,13 @@ def zapier_send_generic_event(request):
     make_or_increment_rule('Generic Event', email, system_id, caption,
                            password=password, description=description, source=source)
 
-    url = "{}/gateway/{}/api/createEvent?{}"\
-        .format(CLOUD_INSTANCE_URL, system_id, urllib.urlencode(query_params).replace('+', '%20'))
-
-    r = requests.get(url, data=None, auth=HTTPDigestAuth(email, password))
-
-    if r.status_code != 200:
-        Response({'message': "Error sending generic event to system"}, status=r.status_code)
-
-    return r.json()
+    url = "api/createEvent?{}".format(urllib.urlencode(query_params).replace('+', "%20"))
+    return cloud_gateway.get(system_id, url, email, password)
 
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def nx_http_action(request):
     caption = request.query_params['caption']
     system_id = request.query_params['system_id']
@@ -238,7 +250,7 @@ def nx_http_action(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def ping(request):
     authenticate(request)
     return Response({'status': 'ok'})
@@ -246,7 +258,7 @@ def ping(request):
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def subscribe_webhook(request):
     user, email, password = authenticate(request)
 
@@ -273,7 +285,7 @@ def subscribe_webhook(request):
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def unsubscribe_webhook(request):
     user, email, password = authenticate(request)
     target = request.data['target_url']
@@ -289,7 +301,7 @@ def unsubscribe_webhook(request):
 
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
+@zapier_exceptions
 def test_subscribe(request):
     authenticate(request)
     return Response({'data': [{'caption': 'caption'}]})

@@ -10,7 +10,7 @@ static const size_t USEC_PER_MS = 1000;
 /**
  * Poll implementation based on select call. Useful on winxp.
  * @param nfds Number of elements in fdarray
- * @param timeout If greater than zero - the time, in milliseconds, to wait. 
+ * @param timeout If greater than zero - the time, in milliseconds, to wait.
  *   Zero - return immediately. Less than zero - wait indefinitely.
  * @return
  * - Zero - no sockets were in the queried state before the timer expired

@@ -9,8 +9,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API ConnectionRequestedEvent
-:
+class NX_NETWORK_API ConnectionRequestedEvent:
     public StunIndicationData
 {
 public:
@@ -19,9 +18,11 @@ public:
 
     nx::String connectSessionId;
     nx::String originatingPeerID;
-    std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
+    /** Peer UDP addresses. */
+    std::list<SocketAddress> udpEndpointList;
     std::list<SocketAddress> tcpReverseEndpointList;
-    ConnectionMethods connectionMethods;        ///< All requestd connection types
+    /** All requests connection types. */
+    ConnectionMethods connectionMethods;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
     bool isPersistent;

@@ -52,11 +52,11 @@ TransactionTransport::TransactionTransport(
 {
     using namespace std::placeholders;
 
-    m_commonTransportHeaderOfRemoteTransaction.connectionId = 
+    m_commonTransportHeaderOfRemoteTransaction.connectionId =
         connectionRequestAttributes.connectionId;
     m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
-    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = 
+    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender =
         connectionRequestAttributes.remotePeer.id;
 
     bindToAioThread(aioThread);
@@ -79,7 +79,7 @@ TransactionTransport::TransactionTransport(
     if (m_baseTransactionTransport.remotePeerSupportsKeepAlive())
     {
         m_inactivityTimer->start(
-            m_baseTransactionTransport.connectionKeepAliveTimeout() 
+            m_baseTransactionTransport.connectionKeepAliveTimeout()
                 * m_baseTransactionTransport.keepAliveProbeCount(),
             std::bind(&TransactionTransport::onInactivityTimeout, this));
     }
@@ -129,12 +129,12 @@ void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handle
     m_gotTransactionEventHandler = std::move(handler);
 }
 
-QnUuid TransactionTransport::connectionGuid() const 
+QnUuid TransactionTransport::connectionGuid() const
 {
     return m_baseTransactionTransport.connectionGuid();
 }
 
-const TransactionTransportHeader& 
+const TransactionTransportHeader&
     TransactionTransport::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransportHeaderOfRemoteTransaction;
@@ -464,7 +464,7 @@ void TransactionTransport::restartInactivityTimer()
 
     m_inactivityTimer->cancelSync();
     m_inactivityTimer->start(
-        m_baseTransactionTransport.connectionKeepAliveTimeout() 
+        m_baseTransactionTransport.connectionKeepAliveTimeout()
             * m_baseTransactionTransport.keepAliveProbeCount(),
         std::bind(&TransactionTransport::onInactivityTimeout, this));
 }

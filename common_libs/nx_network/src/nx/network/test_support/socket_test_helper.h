@@ -44,7 +44,7 @@ public:
     static constexpr size_t kReadBufferSize = 4 * 1024;
 
     /*!
-        \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
+        \param handler to be called on connection closure or after bytesToSendThrough bytes have been sent
     */
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> connection,
@@ -52,7 +52,7 @@ public:
         size_t trafficLimit,
         TestTransmissionMode transmissionMode);
     /*!
-        \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
+        \param handler to be called on connection closure or after bytesToSendThrough bytes have been sent
     */
     TestConnection(
         const SocketAddress& remoteAddress,
@@ -157,7 +157,7 @@ public:
 
 //!Server that listenes randome tcp-port, accepts connections, reads every connection and sends specified bytes number through every connection
 /*!
-    \note This class is not thread-safe
+    NOTE: This class is not thread-safe
 */
 class NX_NETWORK_API RandomDataTcpServer:
     public QnStoppableAsync,
@@ -169,7 +169,7 @@ public:
         size_t trafficLimit,
         TestTransmissionMode transmissionMode,
         bool doNotBind = false);
-    /** In this mode it sends \a dataToSend through connection and closes connection */
+    /** In this mode it sends dataToSend through connection and closes connection */
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
 
@@ -205,7 +205,7 @@ private:
 
 //!Establishes numerous connections to specified address, reads all connections (ignoring data) and sends random data back
 /*!
-    \note This class is not thread-safe
+    NOTE: This class is not thread-safe
 */
 class NX_NETWORK_API ConnectionsGenerator
 :

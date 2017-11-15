@@ -100,7 +100,7 @@ private:
                 return false;
             *millis = tv.tv_sec*1000 + tv.tv_usec/1000;
         #endif
-        
+
         return true;
     }
 };
@@ -126,7 +126,7 @@ TEST_F(TcpSocket, KeepAliveOptions )
     #elif defined( Q_OS_WIN )
         EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
         EXPECT_EQ( result->probeSendPeriod.count(), 1 );
-        EXPECT_EQ( result->probeCount, 0U ); // means default
+        EXPECT_EQ( result->probeCount, 10U ); // means default
     #elif defined( Q_OS_MACX )
         EXPECT_EQ( result->inactivityPeriodBeforeFirstProbe.count(), 5 );
         EXPECT_EQ( result->probeSendPeriod.count(), 0 ); // means default

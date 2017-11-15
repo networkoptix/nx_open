@@ -78,7 +78,7 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 bool ReverseConnectionHolder::isActive() const
 {
     const auto expirationTime = m_prevConnectionTime + s_connectionLessHolderExpirationTimeout;
-    return 
+    return
         m_socketCount > 0 ||
         (std::chrono::steady_clock::now() < expirationTime);
 }

@@ -123,7 +123,7 @@ public:
      *   (successfully executed request and received message body,
      *   received response with error code, connection terminated unexpectedly).
      * To get result code use method response().
-     * @note Some message body can still be stored in internal buffer.
+     * NOTE: Some message body can still be stored in internal buffer.
      *   To read it, call AsyncClient::fetchMessageBodyBuffer.
      */
     void setOnDone(nx::utils::MoveOnlyFunc<void()> handler);
@@ -199,7 +199,7 @@ public:
 
     /**
      * Returns current message body buffer, clearing it.
-     * @note This method is thread-safe and can be called in any thread.
+     * NOTE: This method is thread-safe and can be called in any thread.
      */
     BufferType fetchMessageBodyBuffer();
     const nx::utils::Url& url() const;
@@ -228,7 +228,7 @@ public:
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
-    /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
+    /** If set to true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
 
     /** Set socket connect/send timeout. */
@@ -249,7 +249,7 @@ public:
     const std::unique_ptr<AbstractStreamSocket>& socket();
     /**
      * Returns socket in non-blocking mode.
-     * @note Can be called within object's aio thread only.
+     * NOTE: Can be called within object's aio thread only.
      */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
@@ -261,7 +261,7 @@ public:
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
-     * @note May be invoked within someMessageBodyAvailable handler only.
+     * NOTE: May be invoked within someMessageBodyAvailable handler only.
      * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();

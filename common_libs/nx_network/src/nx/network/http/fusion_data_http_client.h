@@ -204,7 +204,7 @@ private:
  * HTTP client that uses fusion to serialize/deserialize input/output data.
  * If output data is expected, then only GET request can be used.
  * Input data in this case is serialized to the url by calling serializeToUrlQuery(InputData, QUrlQuery*).
- * @note Reports SystemError::invalidData on failure to parse response.
+ * NOTE: Reports SystemError::invalidData on failure to parse response.
  */
 template<typename InputData, typename OutputData>
 class FusionDataHttpClient:

@@ -83,10 +83,15 @@ angular.module('nxCommon')
             var findMediaStream = function(param){
                 return param.name === 'mediaStreams';
             };
+
+            var findIoConfigCapability = function(param){
+                return param.name === 'ioConfigCapability';
+            }
             
             function cameraFilter(camera){
                 // Filter desktop cameras here
-                if(camera.typeId === self.desktopCameraTypeId){ // Hide desctop cameras
+                // Hide desktop cameras and ioDevices
+                if(camera.typeId === self.desktopCameraTypeId || _.find(camera.addParams, findIoConfigCapability)){
                     return false;
                 }
 

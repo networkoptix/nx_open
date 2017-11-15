@@ -5,6 +5,7 @@
 #include <nx/network/socket_common.h>
 
 NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
+NX_NETWORK_API void PrintTo(const KeepAliveOptions& val, ::std::ostream* os);
 NX_NETWORK_API void PrintTo(const SocketAddress& val, ::std::ostream* os);
 
 namespace nx {

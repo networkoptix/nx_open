@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 12, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
@@ -47,7 +42,7 @@ public:
 /**
  * Creates connections (UDT) after UDP hole punching has been successfully done.
  * Also, makes some efforts to keep UDP hole opened.
- * @note OutgoingTunnelConnection instance 
+ * NOTE: OutgoingTunnelConnection instance
  *     can be safely freed while in aio thread (e.g., in any handler).
  */
 class NX_NETWORK_API OutgoingTunnelConnection:
@@ -59,7 +54,7 @@ class NX_NETWORK_API OutgoingTunnelConnection:
             nx::stun::MessageSerializer>>
 {
 public:
-    /** 
+    /**
      * @param connectionId unique id of connection established.
      * @param udtConnection already established connection to the target host.
      */

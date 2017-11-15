@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 12, 2016
-* akolesnikov
-***********************************************************/
-
 #include "outgoing_tunnel_connection.h"
 
 #include <nx/network/aio/aio_service.h>
@@ -57,14 +52,14 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
 
 OutgoingTunnelConnection::~OutgoingTunnelConnection()
 {
-    //all internal sockets live in same aio thread, 
+    //all internal sockets live in same aio thread,
         //so it is allowed to free OutgoingTunnelConnection while in aio thread
     stopWhileInAioThread();
 }
 
 void OutgoingTunnelConnection::stopWhileInAioThread()
 {
-    //caller MUST guarantee that no calls to establishNewConnection can follow 
+    //caller MUST guarantee that no calls to establishNewConnection can follow
     //and establishNewConnection has returned
     m_pleaseStopHasBeenCalled = true;
 
@@ -130,8 +125,8 @@ void OutgoingTunnelConnection::establishNewConnection(
             std::move(newConnection),
             std::move(handler),
             socketAttributes.aioThread ? *socketAttributes.aioThread : nullptr});
-    
-    //has to start connect and timer atomically, 
+
+    //has to start connect and timer atomically,
         //but this can be done from socket's aio thread only
         //So, switching to newConnection's aio thread
     connectionPtr->post(
@@ -205,7 +200,7 @@ void OutgoingTunnelConnection::onConnectCompleted(
         .arg(m_connectionId).arg(SystemError::toString(errorCode)),
         cl_logDEBUG2);
 
-    //called from \a connectionPtr completion handler
+    //called from connectionPtr completion handler
 
     //ensuring connectionPtr can be safely freed in any thread
     connectionPtr->post(

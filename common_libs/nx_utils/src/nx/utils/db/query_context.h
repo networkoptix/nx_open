@@ -18,7 +18,7 @@ public:
     const QSqlDatabase* connection() const;
 
     /**
-     * @return Can be \a null.
+     * @return Can be null.
      */
     Transaction* transaction();
     const Transaction* transaction() const;

@@ -135,7 +135,7 @@ private:
             {"some_server_name"});
 
         const auto handlerPath =
-            network::url::normalizePath(lm("%1%2").arg(baseUrlPath).arg(realPath).toQString());
+            network::url::normalizePath(lm("%1%2").args(baseUrlPath, realPath).toQString());
 
         m_httpServer->registerStaticProcessor(
             handlerPath,
@@ -144,8 +144,7 @@ private:
 
         m_httpServer->registerRequestProcessorFunc(
             network::url::normalizePath(
-                lm("%1/%2").arg(baseUrlPath)
-                    .arg(kServerIncomingConnectionsPath).toQString()),
+                lm("%1/%2").args(baseUrlPath, kServerIncomingConnectionsPath).toQString()),
             std::bind(&RelayApiClient::beginListeningHandler, this, _1, _2, _3, _4, _5));
 
         ASSERT_TRUE(m_httpServer->bindAndListen());

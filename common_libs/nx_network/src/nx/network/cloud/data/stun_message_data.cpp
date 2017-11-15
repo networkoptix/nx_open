@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
 #include "stun_message_data.h"
-
 
 namespace nx {
 namespace hpm {
@@ -29,8 +23,7 @@ StunMessageAttributesData::~StunMessageAttributesData()
 
 /** StunRequestData */
 
-StunRequestData::StunRequestData(int method)
-:
+StunRequestData::StunRequestData(int method):
     m_method(method)
 {
 }
@@ -54,8 +47,7 @@ bool StunRequestData::parse(const nx::stun::Message& message)
 
 /** StunResponseData */
 
-StunResponseData::StunResponseData(int method)
-:
+StunResponseData::StunResponseData(int method):
     m_method(method)
 {
 }
@@ -78,8 +70,7 @@ bool StunResponseData::parse(const nx::stun::Message& message)
 
 /** StunIndicationData */
 
-StunIndicationData::StunIndicationData(int method)
-:
+StunIndicationData::StunIndicationData(int method):
     m_method(method)
 {
 }

@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
@@ -127,7 +122,7 @@ void TunnelConnector::messageReceived(
 
 void TunnelConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 {
-    //if error happens when sending connect result report, 
+    //if error happens when sending connect result report,
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
@@ -172,7 +167,7 @@ void TunnelConnector::onUdtConnectionEstablished(
             errorCode);
         return;
     }
-    
+
     //success!
     NX_LOGX(lm("cross-nat %1. Udp hole punching to %2 is a success!")
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
@@ -266,7 +261,7 @@ std::unique_ptr<RendezvousConnectorWithVerification>
         rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
             m_connectSessionId,
             std::move(endpoint),
-            std::move(m_udpSocket));  //moving system socket handler from m_mediatorUdpClient to udt connection
+            std::move(m_udpSocket)); //< Moving system socket handler from m_mediatorUdpClient to udt connection.
         m_udpSocket.reset();
     }
     else
