@@ -243,7 +243,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
 
     NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
 
-    const auto requiredPermission = msecSinceEpoch < 0
+    const auto requiredPermission = msecSinceEpoch == QnThumbnailRequestData::kLatestThumbnail
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
@@ -268,7 +268,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     const QnVirtualCameraResourceList& cameraList,
     qint64 msecSinceEpoch)
 {
-    const auto requiredPermission = msecSinceEpoch < 0
+    const auto requiredPermission = msecSinceEpoch == QnThumbnailRequestData::kLatestThumbnail
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
