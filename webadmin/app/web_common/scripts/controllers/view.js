@@ -81,40 +81,16 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.hasMobileApp = !!found;
         }
 
-        var supportsHls = browserSupports('hls',true,true),
-            supportsWebm = browserSupports('webm', true, true);
-        function browserSupports(type, maybe, native){
-            var v = document.createElement('video');
-            if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
-                return true;//Native support
-            }
-            if(maybe){
-                if(type === 'hls' && window.jscd.os !== 'Android' ){
-                    return true; // Requires flash, but may be played
-                }
-                if(type === 'webm' && window.jscd.browser === 'Microsoft Internet Explorer' ){
-                    return true; // Requires plugin, but may be played
-                }
-            }
-            if(type === 'hls' && !native){
-                return !!window.jscd.flashVersion ; // flash hls support
-            }
-            return false;
-        }
         function cameraSupports(type){
             if(!$scope.activeCamera){
-                return null;
+                return false;
+            }
+            if(type == 'preview'){
+                return true;
             }
             return _.find($scope.activeCamera.mediaStreams,function(stream){
                 return stream.transports.indexOf(type)>0;
             });
-        }
-
-        function formatSupported(type, nativeOnly){
-            if(type == 'preview'){
-                return true;
-            }
-            return cameraSupports(type) && browserSupports(type, true, nativeOnly);
         }
 
         function largeResolution (resolution){
@@ -130,7 +106,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
         function updateAvailableResolutions() {
             if($scope.player == null){
-                $scope.player = supportsHls ? 'hls' : supportsWebm ? 'webm' : null;
+                $scope.availableResolutions = [L.common.resolution.auto];
+                return;
             }
             if(!$scope.activeCamera){
                 $scope.activeResolution = 'Auto';
@@ -168,15 +145,11 @@ angular.module('nxCommon').controller('ViewCtrl',
                         console.error("no suitable streams from this camera");
                     }
                 }
+                $scope.availableResolutions.sort();
             }
             else
             {
                 $scope.availableResolutions = transcodingResolutions;
-            }
-
-            //if there are 4 or more available resolutions then it is webm otherwise its hls
-            if($scope.player != "webm"){
-                $scope.availableResolutions.sort();
             }
 
             if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
@@ -202,11 +175,15 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.switchPlaying(true);
             }
         };
-
+        var playerReadyTimeout = null;
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
+            if( playerReadyTimeout ){
+                $timeout.cancel(playerReadyTimeout);
+                playerReadyTimeout = null;
+            }
             if(API) {
-                $timeout(function(){
+                playerReadyTimeout = $timeout(function(){
                     $scope.switchPlaying($scope.positionProvider.playing);
                     if($scope.playerAPI){
                         $scope.playerAPI.volume($scope.volumeLevel);
@@ -258,7 +235,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' },
                 { src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt, type: mimeTypes.jpeg, transport:'preview'}
             ],function(src){
-                return formatSupported(src.transport,false);
+                return cameraSupports(src.transport) != null;
             });
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
@@ -389,6 +366,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.activeCamera){
                 return;
             }
+            $scope.player = null;
             $scope.storage.cameraId  = $scope.activeCamera.id;
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
