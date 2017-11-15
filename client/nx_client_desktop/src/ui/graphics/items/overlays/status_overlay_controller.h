@@ -62,8 +62,8 @@ private:
 
     void onStatusOverlayChanged(bool animated);
 
-    QnStatusOverlayWidget::Controls errorVisibleItems();
-    QnStatusOverlayWidget::Controls normalVisibleItems();
+    QnStatusOverlayWidget::Controls errorVisibleItems() const;
+    QnStatusOverlayWidget::Controls normalVisibleItems() const;
 
     void updateErrorState();
 
