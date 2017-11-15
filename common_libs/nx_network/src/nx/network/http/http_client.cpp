@@ -141,7 +141,7 @@ BufferType HttpClient::fetchMessageBodyBuffer()
 BufferType HttpClient::fetchEntireMessageBody()
 {
     QByteArray buffer;
-    if (!eof())
+    while (!eof())
         buffer += fetchMessageBodyBuffer();
 
     return buffer;
