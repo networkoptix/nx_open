@@ -8,17 +8,19 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
 
-namespace nx {
-namespace mediaserver {
-namespace plugins {
+#include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
 
-class TegraVideoMetadataManager:
+namespace nx {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace tegra_video {
+
+class Manager:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
 {
 public:
-    TegraVideoMetadataManager();
-
-    virtual ~TegraVideoMetadataManager();
+    Manager();
+    virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -33,10 +35,11 @@ public:
         nx::sdk::Error* error) const override;
 
     virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
+
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
-    nx::sdk::metadata::AbstractMetadataPacket* cookSomeObjects(
+    nx::sdk::metadata::AbstractMetadataPacket* pushFrameAndGetRects(
         nx::sdk::metadata::AbstractDataPacket* mediaPacket);
 
     int64_t usSinceEpoch() const;
@@ -50,8 +53,11 @@ private:
     int m_counterObjects = 0;
     nxpl::NX_GUID m_eventTypeId;
     nxpl::NX_GUID m_objectTypeId;
+
+    std::unique_ptr<TegraVideo> m_tegraVideo;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // namespace tegra_video
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
