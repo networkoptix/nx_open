@@ -87,7 +87,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     if (m_hanwhaResource->isNvr() && getRole() == Qn::CR_Archive)
     {
         m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
-        m_rtpReader.setOnSocketReadTimeoutCallback(std::bind(&HanwhaStreamReader::createEmptyPacket, this));
+        m_rtpReader.setOnSocketReadTimeoutCallback([this]() { return createEmptyPacket(); });
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
@@ -429,7 +429,7 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();
     qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsedMs() * speed;
-    const bool searchForward = speed >= 0;
+    const bool isForwardSearch = speed >= 0;
     const auto chunks = context->chunks(m_hanwhaResource->getChannel());
     if (chunks.containTime(currentTimeMs))
     {
@@ -438,15 +438,15 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     }
     else
     {
-        auto itr = chunks.findNearestPeriod(currentTimeMs, searchForward);
+        auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
         if (itr == chunks.end())
-            currentTimeMs = searchForward ? DATETIME_NOW : 0;
+            currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
         else
-            currentTimeMs = searchForward ? itr->startTimeMs : itr->endTimeMs();
+            currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
     }
 
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
-    rez->timestamp = currentTimeMs * 1000LL;
+    rez->timestamp = currentTimeMs * 1000;
     if (speed < 0)
         rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
     return rez;

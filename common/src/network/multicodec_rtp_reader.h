@@ -105,9 +105,10 @@ public:
     void setRtpFrameTimeoutMs(int value);
 
     /**
-     * Call this function each time if socket read timeout occurs.
+     * This callback is called every time socket read timeout happens.
      * Connection may be closed on socket read error, media frame timeout
      * or by RTSP session timeout (usually 1 minute).
+     * If callback returns valid packet it is returned from getNextDataTcp, otherwise timeout is skipped.
      */
     void setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback);
 signals:
