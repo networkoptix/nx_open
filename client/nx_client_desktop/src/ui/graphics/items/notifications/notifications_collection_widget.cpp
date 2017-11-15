@@ -89,42 +89,52 @@ const char* kItemTimeStampPropertyName = "_qn_itemTimeStamp";
 
 } //anonymous namespace
 
-QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
+QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent,
+    Qt::WindowFlags flags,
+    QnWorkbenchContext* context)
+    :
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
     m_headerWidget(new GraphicsWidget(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    auto newButton = [this, maxIconSize](action::IDType actionId, int helpTopicId)
-    {
-        QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
-        button->setDefaultAction(action(actionId));
-        button->setFixedSize(button->defaultAction()->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr,
+        nullptr);
 
-        if (helpTopicId != Qn::Empty_Help)
-            setHelpTopic(button, helpTopicId);
-
-        connect(this->context(), &QnWorkbenchContext::userChanged, this, [this, button, actionId]
+    auto newButton =
+        [this, maxIconSize](action::IDType actionId, int helpTopicId = Qn::Empty_Help)
         {
+            QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
+            button->setDefaultAction(action(actionId));
+            button->setFixedSize(button->defaultAction()->icon().actualSize(
+                QSize(maxIconSize, maxIconSize)));
+
+            if (helpTopicId != Qn::Empty_Help)
+                setHelpTopic(button, helpTopicId);
+
+            connect(this->context(), &QnWorkbenchContext::userChanged, this,
+                [this, button, actionId]
+                {
+                    button->setVisible(this->menu()->canTrigger(actionId));
+                });
             button->setVisible(this->menu()->canTrigger(actionId));
-        });
-        button->setVisible(this->menu()->canTrigger(actionId));
 
-        const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"), QnLexical::serialized(actionId));
-        this->context()->statisticsModule()->registerButton(statAlias, button);
+            const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"),
+                QnLexical::serialized(actionId));
+            this->context()->statisticsModule()->registerButton(statAlias, button);
 
-        return button;
-    };
+            return button;
+        };
 
     QGraphicsLinearLayout* controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
     controlsLayout->setContentsMargins(2.0, 1.0, 2.0, 0.0);
     controlsLayout->addStretch();
 
-    controlsLayout->addItem(newButton(action::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));
-    controlsLayout->addItem(newButton(action::BusinessEventsAction, -1));
-    controlsLayout->addItem(newButton(action::PreferencesNotificationTabAction, -1));
+    controlsLayout->addItem(newButton(action::OpenBusinessLogAction,
+        Qn::MainWindow_Notifications_EventLog_Help));
+    controlsLayout->addItem(newButton(action::BusinessEventsAction));
+    controlsLayout->addItem(newButton(action::PreferencesNotificationTabAction));
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
