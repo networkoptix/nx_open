@@ -187,6 +187,7 @@ private:
     void serviceModeInit();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
+    void connectArchiveIntegrityWatcher();
 
 private:
     int m_argc;

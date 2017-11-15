@@ -8,6 +8,7 @@
 #include "core/resource/media_resource.h"
 #include "utils/common/sleep.h"
 #include <nx/streaming/video_data_packet.h>
+#include "abstract_archive_integrity_watcher.h"
 
 QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev),
@@ -68,9 +69,10 @@ void QnAbstractArchiveStreamReader::setCycleMode(bool value)
     m_cycleMode = value;
 }
 
-bool QnAbstractArchiveStreamReader::open()
+bool QnAbstractArchiveStreamReader::open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
-    return m_delegate && m_delegate->open(m_resource);
+    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
+    return m_delegate && m_delegate->open(m_resource, archiveIntegrityWatcher);
 }
 
 void QnAbstractArchiveStreamReader::jumpToPreviousFrame(qint64 usec)

@@ -23,7 +23,9 @@ public:
     virtual ~ThirdPartyArchiveDelegate();
 
     //!Implementation of QnAbstractArchiveDelegate::open
-    virtual bool open(const QnResourcePtr &resource ) override;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     //!Implementation of QnAbstractArchiveDelegate::close
     virtual void close() override;
     //!Implementation of QnAbstractArchiveDelegate::startTime

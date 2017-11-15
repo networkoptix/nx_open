@@ -708,7 +708,7 @@ void QnProgressiveDownloadingConsumer::run()
                         archive = new QnServerArchiveDelegate(); // default value
                 }
                 if (archive) {
-                    archive->open(resource);
+                    archive->open(resource, qnServerModule->archiveIntegrityWatcher());
                     archive->seek( timeUSec, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
                     int counter = 0;
@@ -752,7 +752,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
-            d->archiveDP->open();
+            d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
             d->archiveDP->jumpTo( timeUSec, timeUSec );
 
             if (!endPosition.isEmpty())
