@@ -72,7 +72,7 @@ protected:
             m_beginListeningResponse.keepAliveOptions = KeepAliveOptions();
             m_beginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
                 std::chrono::seconds(3);
-            m_beginListeningResponse.keepAliveOptions->probeSendPeriod = 
+            m_beginListeningResponse.keepAliveOptions->probeSendPeriod =
                 std::chrono::seconds(3);
             m_beginListeningResponse.keepAliveOptions->probeCount = 3;
         }
@@ -262,7 +262,16 @@ protected:
         boost::optional<KeepAliveOptions> keepAliveOptions;
         ASSERT_TRUE(connection->getKeepAlive(&keepAliveOptions))
             << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_EQ(prevReportedBeginListeningResponse().keepAliveOptions, keepAliveOptions);
+        ASSERT_EQ(
+            static_cast<bool>(prevReportedBeginListeningResponse().keepAliveOptions),
+            static_cast<bool>(keepAliveOptions));
+        if (keepAliveOptions)
+        {
+            ASSERT_EQ(
+                prevReportedBeginListeningResponse()
+                    .keepAliveOptions->inactivityPeriodBeforeFirstProbe,
+                keepAliveOptions->inactivityPeriodBeforeFirstProbe);
+        }
     }
 
 private:
