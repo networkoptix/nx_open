@@ -18,6 +18,7 @@
 
 // TODO: #GDM use forward declaration
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/utils/elapsed_timer.h>
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
@@ -271,6 +272,7 @@ protected:
     bool m_liveMaxLenReached;
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
+    nx::utils::ElapsedTimer m_lastMediaEventTimeout;
 };
 
 #endif //QN_CAM_DISPLAY_H
