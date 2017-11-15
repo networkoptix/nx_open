@@ -734,7 +734,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         action = params.value<vms::event::AbstractActionPtr>();
         if (action)
         {
-            auto resourceId = action->getRuntimeParams().eventResourceId;
+            QnUuid resourceId;
+            const auto runtimeParameters = action->getRuntimeParams();
+            if (!runtimeParameters.metadata.cameraRefs.empty())
+                resourceId = runtimeParameters.metadata.cameraRefs[0];
+            else
+                resourceId = runtimeParameters.eventResourceId;
+
             resource = resourcePool()->getResourceById(resourceId);
         }
     }

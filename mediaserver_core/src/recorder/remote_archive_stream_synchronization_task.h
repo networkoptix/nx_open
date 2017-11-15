@@ -28,6 +28,7 @@ public:
     virtual void setDoneHandler(std::function<void()> handler) override;
     virtual void cancel() override;
     virtual bool execute() override;
+    virtual QnUuid id() const override;
 
 private:
     bool synchronizeArchive();
@@ -49,6 +50,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
+    mutable QnWaitCondition m_wait;
     QnSecurityCamResourcePtr m_resource;
     std::atomic<bool> m_canceled{false};
     std::function<void()> m_doneHandler;

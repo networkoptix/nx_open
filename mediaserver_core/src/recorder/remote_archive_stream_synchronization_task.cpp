@@ -5,11 +5,13 @@
 #include <recorder/storage_manager.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/mediaserver/event/event_connector.h>
 
 #include <utils/common/util.h>
 #include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -19,6 +21,9 @@ namespace {
 
 static const std::chrono::milliseconds kDetalizationLevel(1);
 static const std::chrono::milliseconds kMinChunkDuration(1000);
+static const int kNumberOfSynchronizationCycles = 2;
+static const std::chrono::milliseconds kWaitBeforeSynchronize(20000);
+static const std::chrono::milliseconds kWaitBeforeLoadNextChunk(3000);
 
 } // namespace
 
@@ -39,6 +44,10 @@ void RemoteArchiveStreamSynchronizationTask::setDoneHandler(std::function<void()
 void RemoteArchiveStreamSynchronizationTask::cancel()
 {
     QnMutexLocker lock(&m_mutex);
+
+    NX_VERBOSE(this, lm("Resource: %1. Synchronization task has been canceled")
+        .arg(m_resource->getUserDefinedName()));
+
     m_canceled = true;
 
     if (m_archiveReader)
@@ -46,11 +55,37 @@ void RemoteArchiveStreamSynchronizationTask::cancel()
 
     if (m_recorder)
         m_recorder->pleaseStop();
+
+    m_wait.wakeAll();
 }
 
 bool RemoteArchiveStreamSynchronizationTask::execute()
 {
-    return synchronizeArchive();
+    qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
+    bool result = true;
+    for (auto i = 0; i < kNumberOfSynchronizationCycles; ++i)
+    {
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_wait.wait(&m_mutex, kWaitBeforeSynchronize.count());
+        }
+
+        if (m_canceled)
+        {
+            result = false;
+            break;
+        }
+
+        result &= synchronizeArchive();
+    }
+
+    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
+    return result;
+}
+
+QnUuid RemoteArchiveStreamSynchronizationTask::id() const
+{
+    return m_resource->getId();
 }
 
 bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
@@ -58,7 +93,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
     NX_INFO(
         this,
         lm("Starting archive synchronization. Resource: %1 %2")
-            .args(m_resource->getName(), m_resource->getUniqueId()));
+            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
 
     auto manager = m_resource->remoteArchiveManager();
     if (!manager)
@@ -66,7 +101,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
         NX_ERROR(
             this,
             lm("Resource %1 %2 has no remote archive manager")
-                .args(m_resource->getName(), m_resource->getUniqueId()));
+                .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
 
         return false;
     }
@@ -78,7 +113,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
         NX_ERROR(
             this,
             lm("Can not fetch chunks from camera %1 %2")
-                .args(m_resource->getName(), m_resource->getUniqueId()));
+                .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
 
         return false;
     }
@@ -116,7 +151,6 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
         lm("Total remote archive length to synchronize: %1")
             .arg(m_totalDuration.count()));
 
-    qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
     for (const auto& timePeriod: deviceTimePeriods)
     {
         if (m_canceled)
@@ -124,12 +158,17 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
 
         if (timePeriod.durationMs >= kMinChunkDuration.count())
         {
-            QnSleep::msleep(3000); //< Without that sleep Hanwha cameras fail and go offline.
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_wait.wait(&m_mutex, kWaitBeforeLoadNextChunk.count());
+                if (m_canceled)
+                    return false;
+            }
+
             writeTimePeriodToArchive(timePeriod);
         }
     }
 
-    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
     return true;
 }
 
@@ -151,7 +190,17 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
         resetArchiveReaderUnsafe(startTime, endTime);
     }
 
-    NX_ASSERT(m_recorder && m_archiveReader);
+    NX_DEBUG(
+        this,
+        lm("Resource %1 .Starting to write remote time period (%2ms - %3ms),"
+            " period duration %4ms")
+            .args(
+                m_resource->getUserDefinedName(),
+                startTime.count(),
+                endTime.count(),
+                (endTime - startTime).count()));
+
+    NX_ASSERT(m_recorder && m_archiveReader, lit("Recorder and reader should exist"));
     if (!m_recorder || !m_archiveReader)
         return false;
 
@@ -160,8 +209,6 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
 
     m_recorder->wait();
     m_archiveReader->wait();
-
-    m_importedDuration += std::chrono::milliseconds(timePeriod.durationMs);
 
     return true;
 }
@@ -239,6 +286,19 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
             std::chrono::milliseconds duration)
         {
             m_importedDuration += duration;
+
+
+            NX_VERBOSE(
+                this,
+                lm("Resource %1. File has been written. Duration: %1ms,"
+                    "Current duration of imported remote archive: %2ms,"
+                    "Total duration to import: %3ms")
+                    .args(
+                        m_resource->getUserDefinedName(),
+                        duration.count(),
+                        m_importedDuration.count(),
+                        m_totalDuration.count()));
+
             if (needToReportProgress())
             {
                 auto progress = (double)m_importedDuration.count() / m_totalDuration.count();
