@@ -24,7 +24,7 @@ namespace {
 static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 static const int kNvrSocketReadTimeoutMs = 500;
-static const int kTimeoutToExtrapolateTimeMs = 1000 * 3;
+static const std::chrono::milliseconds kTimeoutToExtrapolateTimeMs(1000 * 3);
 
 } // namespace
 
@@ -428,7 +428,7 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
 
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();
-    qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsed() * speed;
+    qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsedMs() * speed;
     const bool searchForward = speed >= 0;
     const auto chunks = context->chunks(m_hanwhaResource->getChannel());
     if (chunks.containTime(currentTimeMs))

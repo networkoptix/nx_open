@@ -276,8 +276,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 m_gotData = false;
         }
 
-        int readed = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
-        if (readed == -1 &&
+        int bytesRead = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
+        if (bytesRead < 0 &&
             SystemError::getLastOSErrorCode() == SystemError::timedOut &&
             m_rtcpReportTimer.elapsed() < m_RtpSession.sessionTimeoutMs() &&
             m_onSocketReadTimeoutCallback)
@@ -289,7 +289,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 continue;
         }
 
-        if (readed < 1)
+        if (bytesRead < 1)
             break; // error
         m_RtpSession.sendKeepAliveIfNeeded();
 
@@ -300,12 +300,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         if (m_tracks.size() < trackNum || !parser)
             continue;
 
-        int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
+        int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - bytesRead;
 
         if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO)
         {
             const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
-            const auto length = readed - kInterleavedRtpOverTcpPrefixLength;
+            const auto length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
 
             const auto rtcpStaticstics = rtspStatistics(offset, length, trackNum, rtpChannelNum);
 
@@ -330,7 +330,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else if (format == QnRtspClient::TT_VIDEO_RTCP || format == QnRtspClient::TT_AUDIO_RTCP)
         {
-            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
+            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), bytesRead, m_demuxedData[rtpChannelNum]->capacity());
             m_demuxedData[rtpChannelNum]->clear();
         }
         else {
@@ -879,7 +879,7 @@ bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
 
 void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback)
 {
-    m_onSocketReadTimeoutCallback = callback;
+    m_onSocketReadTimeoutCallback = std::move(callback);
 }
 
 void QnMulticodecRtpReader::setRtpFrameTimeoutMs(int value)

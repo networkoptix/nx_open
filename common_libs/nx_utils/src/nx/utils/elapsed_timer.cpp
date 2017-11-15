@@ -23,5 +23,20 @@ void ElapsedTimer::invalidate()
     m_timer.invalidate();
 }
 
+bool ElapsedTimer::isValid() const
+{
+    return m_timer.isValid();
+}
+
+std::chrono::milliseconds ElapsedTimer::elapsed() const
+{
+    return std::chrono::milliseconds(m_timer.elapsed());
+}
+
+qint64 ElapsedTimer::elapsedMs() const
+{
+    return m_timer.elapsed();
+}
+
 } // namespace utils
 } // namespace nx

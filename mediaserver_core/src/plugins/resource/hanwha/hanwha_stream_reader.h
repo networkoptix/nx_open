@@ -67,7 +67,7 @@ private:
     int64_t m_endTimeUsec = 0;
     int m_overlappedId = 0;
     qint64 m_lastTimestampUsec = AV_NOPTS_VALUE;
-    QElapsedTimer m_timeSinceLastFrame;
+    nx::utils::ElapsedTimer m_timeSinceLastFrame;
 };
 
 } // namespace plugins

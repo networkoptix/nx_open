@@ -47,7 +47,7 @@ class QnMulticodecRtpReader:
     Q_OBJECT
 
 public:
-    using OnSocketReadTimeoutCallback = std::function<QnAbstractMediaDataPtr()>;
+    using OnSocketReadTimeoutCallback = nx::utils::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
 
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
