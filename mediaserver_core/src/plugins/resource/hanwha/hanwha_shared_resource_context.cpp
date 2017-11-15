@@ -121,6 +121,7 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
         if (hasVideoArchive && !m_chunkLoader)
         {
             m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
+            m_timeSynchronizer->setTimeSynchronizationEnabled(false);
             m_timeSynchronizer->setTimeZoneShiftHandler(
                 [this](std::chrono::seconds timeZoneShift)
                 {
