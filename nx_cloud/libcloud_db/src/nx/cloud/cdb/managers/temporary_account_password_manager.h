@@ -79,7 +79,7 @@ public:
     virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) = 0;
-    
+
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail) = 0;
 
@@ -179,7 +179,7 @@ private:
     nx::utils::db::DBResult deleteTempPassword(
         nx::utils::db::QueryContext* const queryContext,
         std::string tempPasswordID);
-   
+
     boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
         const QnMutexLockerBase& lk,
         const std::string& username,

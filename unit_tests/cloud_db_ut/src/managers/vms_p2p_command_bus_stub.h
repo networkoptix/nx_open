@@ -8,9 +8,9 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-using OnSaveResourceAttribute = 
+using OnSaveResourceAttribute =
     nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(
-        const std::string& /*systemId*/, 
+        const std::string& /*systemId*/,
         ::ec2::ApiResourceParamWithRefData)>;
 
 class VmsP2pCommandBusStub:

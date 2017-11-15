@@ -324,7 +324,7 @@ private:
         transaction.persistentInfo.dbID = m_otherPeerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
         transaction.persistentInfo.sequence = m_otherPeerSequence++;
-        transaction.persistentInfo.timestamp = 
+        transaction.persistentInfo.timestamp =
             m_initialTransaction
             ? m_initialTransaction->persistentInfo.timestamp + timestampDiff
             : transactionLog()->generateTransactionTimestamp(m_systemId.c_str()) + timestampDiff;
@@ -548,7 +548,7 @@ private:
         m_sharing.accountId = m_accountToShareWith.id;
         m_sharing.accountEmail = m_accountToShareWith.email;
         m_sharing.accessRole = api::SystemAccessRole::advancedViewer;
-        m_sharing.vmsUserId = 
+        m_sharing.vmsUserId =
             guidFromArbitraryData(m_sharing.accountEmail).toSimpleString().toStdString();
     }
 

@@ -240,7 +240,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
 
 nx::Buffer AuthenticationManager::generateNonce()
 {
-    const auto nonce = 
+    const auto nonce =
         nx::utils::random::number<nx::utils::random::CryptographicRandomDevice, uint64_t>(
             nx::utils::random::CryptographicRandomDevice::instance())
         | nx::utils::timeSinceEpoch().count();

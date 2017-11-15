@@ -18,7 +18,7 @@ nx::utils::db::DBResult AccountDataObject::insert(
 {
     QSqlQuery insertAccountQuery(*queryContext->connection());
     insertAccountQuery.prepare(R"sql(
-        INSERT INTO account (id, email, password_ha1, password_ha1_sha256, 
+        INSERT INTO account (id, email, password_ha1, password_ha1_sha256,
             full_name, customization, status_code, registration_time_utc)
         VALUES  (:id, :email, :passwordHa1, :passwordHa1Sha256,
             :fullName, :customization, :statusCode, :registrationTime)
@@ -42,8 +42,8 @@ nx::utils::db::DBResult AccountDataObject::update(
 {
     QSqlQuery updateAccountQuery(*queryContext->connection());
     updateAccountQuery.prepare(R"sql(
-        UPDATE account 
-        SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256, 
+        UPDATE account
+        SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256,
             full_name=:fullName, customization=:customization, status_code=:statusCode
         WHERE id=:id AND email=:email
         )sql");
@@ -101,9 +101,9 @@ nx::utils::db::DBResult AccountDataObject::fetchAccounts(
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(R"sql(
-        SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256, 
-            full_name as fullName, customization, status_code as statusCode, 
-            registration_time_utc as registrationTime, activation_time_utc as activationTime 
+        SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256,
+            full_name as fullName, customization, status_code as statusCode,
+            registration_time_utc as registrationTime, activation_time_utc as activationTime
         FROM account
         )sql");
     if (!readAccountsQuery.exec())
@@ -156,8 +156,8 @@ boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmai
     nx::utils::db::SqlQuery fetchActivationCodesQuery(*queryContext->connection());
     fetchActivationCodesQuery.setForwardOnly(true);
     fetchActivationCodesQuery.prepare(R"sql(
-        SELECT verification_code 
-        FROM email_verification 
+        SELECT verification_code
+        FROM email_verification
         WHERE account_id=(SELECT id FROM account WHERE email=?)
         )sql");
     fetchActivationCodesQuery.bindValue(
@@ -188,8 +188,8 @@ nx::utils::db::DBResult AccountDataObject::getAccountEmailByVerificationCode(
     QSqlQuery getAccountByVerificationCode(*queryContext->connection());
     getAccountByVerificationCode.setForwardOnly(true);
     getAccountByVerificationCode.prepare(R"sql(
-        SELECT a.email 
-        FROM email_verification ev, account a 
+        SELECT a.email
+        FROM email_verification ev, account a
         WHERE ev.account_id = a.id AND ev.verification_code LIKE :code
         )sql");
     QnSql::bind(verificationCode, &getAccountByVerificationCode);

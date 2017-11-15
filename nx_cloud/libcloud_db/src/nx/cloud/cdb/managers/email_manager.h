@@ -54,7 +54,7 @@ private:
         ::ec2::ApiEmailData email;
         std::function<void( bool )> completionHandler;
     };
-    
+
     const conf::Settings& m_settings;
     bool m_terminated;
     mutable QnMutex m_mutex;

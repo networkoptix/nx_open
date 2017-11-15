@@ -187,7 +187,7 @@ private:
         authInfo.records[0].expirationTime =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         authInfo.records[0].nonce = nx::utils::generateRandomName(7).toStdString();
-        authInfo.records[0].intermediateResponse = 
+        authInfo.records[0].intermediateResponse =
             nx::utils::generateRandomName(14).toStdString();
         return authInfo;
     }

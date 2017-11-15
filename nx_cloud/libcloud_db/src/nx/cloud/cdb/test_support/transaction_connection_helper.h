@@ -60,7 +60,7 @@ public:
         KeepAlivePolicy keepAlivePolicy,
         int protocolVersion,
         const QnUuid& peerId = QnUuid());
-    
+
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
         ConnectionId connectionId,

@@ -698,7 +698,7 @@ UPDATE system_to_account SET is_enabled = 1 WHERE is_enabled IS NULL;
 static const char kRestoreSystemToAccountReferenceUniquenessSqlite[] =
 R"sql(
 
-DELETE FROM system_to_account WHERE rowid NOT IN 
+DELETE FROM system_to_account WHERE rowid NOT IN
 (SELECT MAX(rowid) FROM system_to_account GROUP BY account_id, system_id);
 
 CREATE UNIQUE INDEX system_to_account_primary
@@ -734,7 +734,7 @@ CREATE table system_to_account_temp_id_to_keep (id INTEGER);
 
 INSERT INTO system_to_account_temp_id_to_keep (SELECT MAX(s1.id) FROM system_to_account_temp s1 GROUP BY s1.account_id, s1.system_id);
 
-DELETE FROM system_to_account_temp WHERE id NOT IN 
+DELETE FROM system_to_account_temp WHERE id NOT IN
 (SELECT id FROM system_to_account_temp_id_to_keep);
 
 DELETE FROM system_to_account;

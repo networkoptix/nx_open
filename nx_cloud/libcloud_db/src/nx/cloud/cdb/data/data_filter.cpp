@@ -57,7 +57,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter)
     const auto queryItems = urlQuery.queryItems();
     for (const auto& item: queryItems)
     {
-        const auto resDescription = 
+        const auto resDescription =
             StreeManager::instance()->resourceNameSet().findResourceByName(item.first);
         if (resDescription.id == nx::utils::stree::INVALID_RES_ID)
             continue;

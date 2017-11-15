@@ -30,7 +30,7 @@ public:
     {
         CdbFunctionalTest::SetUp();
         ASSERT_TRUE(startAndWaitUntilStarted());
-    
+
         auto owner = addActivatedAccount2();
         m_registeredAccounts.emplace(owner.email, owner);
     }
@@ -90,7 +90,7 @@ protected:
     api::SystemData fetchSystem(std::string systemId)
     {
         const auto account = m_registeredAccounts.begin()->second;
-        
+
         api::SystemDataEx system;
         auto resultCode = getSystem(
             account.email,
@@ -124,7 +124,7 @@ private:
     struct Field
     {
         Name name;
-        Value value; 
+        Value value;
     };
 
     template<typename Name, typename Value>
@@ -386,7 +386,7 @@ protected:
 
     void thenSystemsOfRequestedCustomizationHaveBeenReturned()
     {
-        const auto expectedSystemsRange = 
+        const auto expectedSystemsRange =
             m_systemByCustomization.equal_range(m_requestedCustomization);
         for (auto expectedSystemIter = expectedSystemsRange.first;
             expectedSystemIter != expectedSystemsRange.second;
@@ -603,7 +603,7 @@ TEST_F(FtSystemActivation, system_activation_is_persistent)
 TEST_F(FtSystemActivation, system_activation_is_saved_to_db_after_db_error)
 {
     systemDao().failEveryActivateSystemRequest();
-    
+
     givenNotActivatedSystem();
     whenIssuedRequestUsingSystemCredentials();
     assertDaoHasFailedActivateSystemRequest();
@@ -674,7 +674,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
         for (int i = 0; i < 3; ++i)
         {
             api::NonceData nonceData;
-            const auto timePassedSinceSystemRemoval = 
+            const auto timePassedSinceSystemRemoval =
                 std::chrono::steady_clock::now() - timeJustBeforeSystemRemoval;
             ASSERT_EQ(
                 timePassedSinceSystemRemoval < kSystemGoneForeverPeriod
@@ -1146,7 +1146,7 @@ TEST_F(FtSystemSortingOrder, unknown_system)
 
 TEST_F(FtSystem, update)
 {
-    constexpr const char kOpaqueValue[] = 
+    constexpr const char kOpaqueValue[] =
         "SELECT * FROM account WHERE email like 'test@example.com'\r\n "
         "OR email like '\\slashed_test@example.com'\n";
 
@@ -1208,7 +1208,7 @@ protected:
         m_system = givenSystem();
         m_registrationTimeValidRange.second = nx::utils::utcTime();
     }
-    
+
     void assertRegistrationTimestampIsValid()
     {
         using namespace std::chrono;
@@ -1221,7 +1221,7 @@ protected:
             nx::utils::floor<milliseconds>(system.registrationTime),
             nx::utils::floor<milliseconds>(m_registrationTimeValidRange.second));
     }
-    
+
 private:
     std::pair<
         std::chrono::system_clock::time_point,
