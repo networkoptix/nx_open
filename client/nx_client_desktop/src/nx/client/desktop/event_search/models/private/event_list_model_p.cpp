@@ -139,12 +139,6 @@ int EventListModel::Private::indexOf(const QnUuid& id) const
         : -1;
 }
 
-bool EventListModel::Private::isValid(const QModelIndex& index) const
-{
-    return index.model() == q && !index.parent().isValid() && index.column() == 0
-        && index.row() >= 0 && index.row() < count();
-}
-
 QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventData& event) const
 {
     if (event.previewCamera.isNull()

@@ -33,7 +33,7 @@ NotificationListModel::~NotificationListModel()
 bool NotificationListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     const auto result = base_type::setData(index, value, role);
-    if (role != Qn::DefaultTriggerRole || !result)
+    if (role != Qn::DefaultNotificationRole || !result)
         return result;
 
     const auto& event = getEvent(index.row());

@@ -264,18 +264,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     eventData.icon = pixmapForAction(action, eventData.titleColor);
 
+    if (eventData.removable && action->actionType() != vms::event::playSoundAction)
+        eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
+
     if (!q->addEvent(eventData))
         return;
 
     if (!actionHasId)
         m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
-
-    const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
-    if (!isPlaySoundAction && eventData.removable)
-    {
-        executeDelayedParented([this, id = eventData.id]() { q->removeEvent(id); },
-            std::chrono::milliseconds(kDisplayTimeout).count(), this);
-    }
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)

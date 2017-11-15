@@ -9,7 +9,7 @@
 #include <utils/common/event_processors.h>
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
-#include <nx/client/desktop/event_search/models/event_list_model.h>
+#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 
 namespace nx {
@@ -48,7 +48,7 @@ EventSearchWidgetPrivateBase::~EventSearchWidgetPrivateBase()
 
 void EventSearchWidgetPrivateBase::connectEventRibbonToModel(
     EventRibbon* ribbon,
-    EventListModel* model,
+    AbstractEventListModel* model,
     QAbstractProxyModel* proxyModel)
 {
     if (proxyModel)
@@ -79,7 +79,7 @@ void EventSearchWidgetPrivateBase::connectEventRibbonToModel(
     }
 
     connect(ribbon->scrollBar(), &QScrollBar::valueChanged, this, fetchMoreIfNeeded);
-    connect(model, &EventListModel::fetchFinished, this, fetchMoreIfNeeded);
+    connect(model, &AbstractEventListModel::fetchFinished, this, fetchMoreIfNeeded);
     installEventHandler(ribbon, QEvent::Show, this, fetchMoreIfNeeded);
 }
 

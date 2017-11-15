@@ -2,6 +2,7 @@
 #include "ui_event_tile.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QTimer>
 
 #include <QtGui/QPainter>
 #include <QtGui/QDesktopServices>
@@ -11,6 +12,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace client {
@@ -259,11 +261,59 @@ void EventTile::handleHoverChanged(bool hovered)
     ui->timestampLabel->setHidden(showCloseButton);
     m_closeButton->setVisible(showCloseButton);
     updateBackgroundRole(hovered && !m_closeButton->underMouse());
+
+    if (m_autoCloseTimer)
+    {
+        if (hovered)
+            m_autoCloseTimer->stop();
+        else
+            m_autoCloseTimer->start();
+    }
 }
 
 void EventTile::updateBackgroundRole(bool hovered)
 {
     setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
+}
+
+bool EventTile::hasAutoClose() const
+{
+    return closeable() && m_autoCloseTimer;
+}
+
+int EventTile::autoCloseTimeMs() const
+{
+    return hasAutoClose() ? m_autoCloseTimer->interval() : -1;
+}
+
+int EventTile::autoCloseRemainingMs() const
+{
+    return hasAutoClose() ? m_autoCloseTimer->remainingTime() : -1;
+}
+
+void EventTile::setAutoCloseTimeMs(int value)
+{
+    if (value <= 0)
+    {
+        if (!m_autoCloseTimer)
+            return;
+
+        m_autoCloseTimer->deleteLater();
+        m_autoCloseTimer = nullptr;
+        return;
+    }
+
+    const auto autoClose =
+        [this]()
+        {
+            if (closeable())
+                emit closeRequested();
+        };
+
+    if (m_autoCloseTimer)
+        m_autoCloseTimer->setInterval(value);
+    else
+        m_autoCloseTimer = executeDelayedParented(autoClose, value, this);
 }
 
 } // namespace

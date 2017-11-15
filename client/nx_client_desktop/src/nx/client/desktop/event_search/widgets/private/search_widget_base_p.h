@@ -11,7 +11,7 @@ namespace client {
 namespace desktop {
 
 class EventRibbon;
-class EventListModel;
+class AbstractEventListModel;
 
 namespace detail {
 
@@ -28,7 +28,7 @@ public:
 protected:
     void connectEventRibbonToModel(
         EventRibbon* ribbon,
-        EventListModel* model,
+        AbstractEventListModel* model,
         QAbstractProxyModel* proxyModel = nullptr);
 
 protected:

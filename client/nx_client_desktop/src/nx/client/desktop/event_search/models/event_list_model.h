@@ -1,15 +1,14 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-#include <QtCore/QAbstractListModel>
 #include <QtGui/QPixmap>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/common/utils/command_action.h>
+#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
@@ -17,12 +16,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EventListModel:
-    public ScopedModelOperations<QAbstractListModel>,
-    public QnWorkbenchContextAware
+class EventListModel: public AbstractEventListModel
 {
     Q_OBJECT
-    using base_type = ScopedModelOperations<QAbstractListModel>;
+    using base_type = AbstractEventListModel;
 
 public:
     struct EventData
@@ -35,6 +32,7 @@ public:
         QPixmap icon;
         QColor titleColor;
         bool removable = false;
+        int lifetimeMs = -1;
         int helpId = -1;
         QnVirtualCameraResourcePtr previewCamera;
         QnVirtualCameraResourceList cameras;
@@ -53,15 +51,10 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value,
+        int role = Qn::DefaultNotificationRole) override;
 
     void clear();
-
-    virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
-    virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
-
-signals:
-    void fetchFinished(QPrivateSignal);
 
 protected:
     enum class Position
@@ -76,12 +69,6 @@ protected:
 
     QModelIndex indexOf(const QnUuid& id) const;
     EventData getEvent(int row) const;
-
-    virtual QString timestampText(qint64 timestampMs) const;
-
-    virtual int eventPriority(const EventData& event) const;
-
-    void finishFetch(); //< Just emits fetchFinished signal.
 
 private:
     class Private;

@@ -68,6 +68,11 @@ public:
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
 
+    bool hasAutoClose() const;
+    int autoCloseTimeMs() const;
+    int autoCloseRemainingMs() const;
+    void setAutoCloseTimeMs(int value);
+
 signals:
     void clicked();
 
@@ -89,6 +94,7 @@ private:
     QPushButton* const m_closeButton = nullptr;
     bool m_closeable = false;
     CommandActionPtr m_action; //< Button action.
+    QTimer* m_autoCloseTimer = nullptr;
 };
 
 } // namespace

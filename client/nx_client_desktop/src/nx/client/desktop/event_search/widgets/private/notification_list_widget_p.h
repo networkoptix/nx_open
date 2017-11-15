@@ -17,6 +17,7 @@ namespace desktop {
 
 class EventTile;
 class EventRibbon;
+class AbstractEventListModel;
 
 class NotificationListWidget::Private:
     public QObject,
@@ -34,8 +35,8 @@ private:
 private:
     NotificationListWidget* q = nullptr;
     EventRibbon* const m_eventRibbon = nullptr;
-    EventListModel* m_systemHealthModel = nullptr;
-    EventListModel* m_notificationsModel = nullptr;
+    AbstractEventListModel* m_systemHealthModel = nullptr;
+    AbstractEventListModel* m_notificationsModel = nullptr;
 };
 
 } // namespace

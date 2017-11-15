@@ -13,7 +13,6 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <utils/common/delayed.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -24,67 +23,175 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-
-const auto kDisplayTimeout = std::chrono::milliseconds(12500);
-
-} // namespace
-
 using namespace ui;
 
-SystemHealthListModel::Private::Private(SystemHealthListModel* q):
+//-------------------------------------------------------------------------------------------------
+// SystemHealthListModel::Private::Item
+
+SystemHealthListModel::Private::Item::Item(
+    QnSystemHealth::MessageType message,
+    const QnResourcePtr& resource)
+    :
+    message(message),
+    resource(resource)
+{
+}
+
+SystemHealthListModel::Private::Item::operator QnSystemHealth::MessageType() const
+{
+    return message;
+}
+
+bool SystemHealthListModel::Private::Item::operator==(const Item& other) const
+{
+    return message == other.message && resource == other.resource;
+}
+
+bool SystemHealthListModel::Private::Item::operator!=(const Item& other) const
+{
+    return !(*this == other);
+}
+
+bool SystemHealthListModel::Private::Item::operator<(const Item& other) const
+{
+    return message != other.message
+        ? message < other.message
+        : resource < other.resource;
+}
+
+//-------------------------------------------------------------------------------------------------
+// SystemHealthListModel::Private
+
+SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(commonModule())),
-    m_uuidHashes()
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     const auto handler = context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler, &QnWorkbenchNotificationsHandler::cleared, q, &EventListModel::clear);
+    connect(handler, &QnWorkbenchNotificationsHandler::cleared, this, &Private::clear);
     connect(handler, &QnWorkbenchNotificationsHandler::systemHealthEventAdded,
         this, &Private::addSystemHealthEvent);
     connect(handler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
         this, &Private::removeSystemHealthEvent);
-
-    connect(q, &EventListModel::modelReset, this,
-        [this]()
-        {
-            for (auto& hash: m_uuidHashes)
-                hash.clear();
-        });
-
-    connect(q, &EventListModel::rowsAboutToBeRemoved, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
-        {
-            for (int row = first; row <= last; ++row)
-            {
-                const auto extraData = Private::extraData(this->q->getEvent(row));
-                m_uuidHashes[extraData.first].remove(extraData.second);
-            }
-        });
 }
 
 SystemHealthListModel::Private::~Private()
 {
 }
 
-SystemHealthListModel::Private::ExtraData SystemHealthListModel::Private::extraData(
-    const EventData& event)
+int SystemHealthListModel::Private::count() const
 {
-    NX_ASSERT(event.extraData.canConvert<ExtraData>(), Q_FUNC_INFO);
-    return event.extraData.value<ExtraData>();
+    return int(m_items.size());
 }
 
-int SystemHealthListModel::Private::eventPriority(const EventData& event) const
+QnSystemHealth::MessageType SystemHealthListModel::Private::message(int index) const
 {
-    const auto extraData = Private::extraData(event);
-    switch (extraData.first)
+    return m_items[index].message;
+}
+
+QnResourcePtr SystemHealthListModel::Private::resource(int index) const
+{
+    return m_items[index].resource;
+}
+
+QString SystemHealthListModel::Private::text(int index) const
+{
+    const auto& item = m_items[index];
+    return QnSystemHealthStringsHelper::messageText(item.message,
+        QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+}
+
+QString SystemHealthListModel::Private::toolTip(int index) const
+{
+    const auto& item = m_items[index];
+    return QnSystemHealthStringsHelper::messageTooltip(item.message,
+        QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+}
+
+QPixmap SystemHealthListModel::Private::pixmap(int index) const
+{
+    return pixmap(m_items[index].message);
+}
+
+QColor SystemHealthListModel::Private::color(int index) const
+{
+    return QnNotificationLevel::notificationColor(
+        QnNotificationLevel::valueOf(m_items[index].message));
+}
+
+int SystemHealthListModel::Private::helpId(int index) const
+{
+    return QnBusiness::healthHelpId(m_items[index].message);
+}
+
+int SystemHealthListModel::Private::priority(int index) const
+{
+    return priority(m_items[index].message);
+}
+
+bool SystemHealthListModel::Private::locked(int index) const
+{
+    return QnSystemHealth::isMessageLocked(m_items[index].message);
+}
+
+action::IDType SystemHealthListModel::Private::action(int index) const
+{
+    switch (m_items[index].message)
     {
+        case QnSystemHealth::EmailIsEmpty:
+            return action::UserSettingsAction;
+
+        case QnSystemHealth::NoLicenses:
+            return action::PreferencesLicensesTabAction;
+
+        case QnSystemHealth::SmtpIsNotSet:
+            return action::PreferencesSmtpTabAction;
+
+        case QnSystemHealth::UsersEmailIsEmpty:
+            return action::UserSettingsAction;
+
+        case QnSystemHealth::EmailSendError:
+            return action::PreferencesSmtpTabAction;
+            break;
+
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
+        case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveRebuildCanceled:
+            return action::ServerSettingsAction;
+
         case QnSystemHealth::CloudPromo:
-            return int(QnNotificationLevel::Value::LevelCount); //< The highest.
+            return action::PreferencesCloudTabAction;
 
         default:
-            return int(QnNotificationLevel::valueOf(extraData.first));
+            return action::NoAction;
+    }
+}
+
+action::Parameters SystemHealthListModel::Private::parameters(int index) const
+{
+    switch (m_items[index].message)
+    {
+        case QnSystemHealth::EmailIsEmpty:
+            return action::Parameters(context()->user())
+                .withArgument(Qn::FocusElementRole, lit("email"))
+                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
+
+        case QnSystemHealth::UsersEmailIsEmpty:
+            return action::Parameters(m_items[index].resource)
+                .withArgument(Qn::FocusElementRole, lit("email"))
+                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
+
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
+        case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveRebuildCanceled:
+            return action::Parameters(m_items[index].resource)
+                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
+
+        default:
+            return action::Parameters();
     }
 }
 
@@ -108,101 +215,15 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
     }
 
     // TODO: #vkutin We may want multiple resource aggregation as one event.
-    if (m_uuidHashes[message].contains(resource))
-        return;
+    Item item(message, resource);
+    auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
+    if (position != m_items.end() && *position == item)
+        return; //< Already exists.
 
-    const auto resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    const auto messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
-    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
-    if (messageText.isEmpty())
-        return;
+    const auto index = std::distance(m_items.begin(), position);
 
-    EventData eventData;
-    eventData.id = QnUuid::createUuid();
-    eventData.title = messageText;
-    eventData.toolTip = QnSystemHealthStringsHelper::messageTooltip(message, resourceName);
-    eventData.helpId = QnBusiness::healthHelpId(message);
-    eventData.removable = true;
-    eventData.extraData = qVariantFromValue(ExtraData(message, resource));
-
-    eventData.titleColor = QnNotificationLevel::notificationColor(
-        QnNotificationLevel::valueOf(message));
-
-    switch (message)
-    {
-        case QnSystemHealth::EmailIsEmpty:
-            eventData.icon = qnSkin->pixmap("events/email.png");
-            eventData.actionId = action::UserSettingsAction;
-            eventData.actionParameters = action::Parameters(context()->user())
-                .withArgument(Qn::FocusElementRole, lit("email"))
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
-            break;
-
-        case QnSystemHealth::NoLicenses:
-            eventData.icon = qnSkin->pixmap("events/license.png");
-            eventData.actionId = action::PreferencesLicensesTabAction;
-            break;
-
-        case QnSystemHealth::SmtpIsNotSet:
-            eventData.icon = qnSkin->pixmap("events/email.png");
-            eventData.actionId = action::PreferencesSmtpTabAction;
-            break;
-
-        case QnSystemHealth::UsersEmailIsEmpty:
-            eventData.icon = qnSkin->pixmap("events/email.png");
-            eventData.actionId = action::UserSettingsAction;
-            eventData.actionParameters = action::Parameters(resource)
-                .withArgument(Qn::FocusElementRole, lit("email"))
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
-            break;
-
-        case QnSystemHealth::SystemIsReadOnly:
-            eventData.icon = qnSkin->pixmap("tree/system.png");
-            break;
-
-        case QnSystemHealth::EmailSendError:
-            eventData.icon = qnSkin->pixmap("events/email.png");
-            eventData.actionId = action::PreferencesSmtpTabAction;
-            break;
-
-        case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
-        case QnSystemHealth::ArchiveRebuildFinished:
-        case QnSystemHealth::ArchiveRebuildCanceled:
-            eventData.icon = qnSkin->pixmap("events/storage.png");
-            eventData.actionId = action::ServerSettingsAction;
-            action::Parameters(resource)
-                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
-            break;
-
-        case QnSystemHealth::CloudPromo:
-        {
-            eventData.icon = qnSkin->pixmap("cloud/cloud_20.png");
-            eventData.actionId = action::PreferencesCloudTabAction;
-            break;
-        }
-
-        case QnSystemHealth::RemoteArchiveSyncStarted:
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-        case QnSystemHealth::RemoteArchiveSyncError:
-        case QnSystemHealth::RemoteArchiveSyncProgress:
-            break;
-
-        default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
-            break;
-    }
-
-    if (!q->addEvent(eventData))
-        return;
-
-    m_uuidHashes[message][resource] = eventData.id;
-
-    if (!QnSystemHealth::isMessageLocked(message))
-    {
-        executeDelayedParented([this, id = eventData.id]() { q->removeEvent(id); },
-            std::chrono::milliseconds(kDisplayTimeout).count(), this);
-    }
+    ScopedInsertRows insertRows(q, QModelIndex(), index, index);
+    m_items.insert(position, item);
 }
 
 void SystemHealthListModel::Private::removeSystemHealthEvent(
@@ -213,17 +234,82 @@ void SystemHealthListModel::Private::removeSystemHealthEvent(
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
 
-    const auto& uuidHash = m_uuidHashes[message];
-
     if (resource)
     {
-        if (uuidHash.contains(resource))
-            q->removeEvent(uuidHash.value(resource));
+        const Item item(message, resource);
+        const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
+        if (position != m_items.cend() && *position == item)
+            q->removeRows(std::distance(m_items.cbegin(), position), 1);
     }
     else
     {
-        for (const auto& id: uuidHash.values()) //< Must iterate a copy of the list.
-            q->removeEvent(id);
+        const auto range = std::equal_range(m_items.cbegin(), m_items.cend(), message);
+        const auto count = std::distance(range.first, range.second);
+        if (count > 0)
+            q->removeRows(std::distance(m_items.cbegin(), range.first), count);
+    }
+}
+
+void SystemHealthListModel::Private::clear()
+{
+    if (m_items.empty())
+        return;
+
+    ScopedReset reset(q);
+    m_items.clear();
+}
+
+void SystemHealthListModel::Private::remove(int first, int count)
+{
+    ScopedRemoveRows removeRows(q, QModelIndex(), first, first + count - 1);
+    m_items.erase(m_items.begin() + first, m_items.begin() + (first + count));
+}
+
+int SystemHealthListModel::Private::priority(QnSystemHealth::MessageType message)
+{
+    switch (message)
+    {
+        case QnSystemHealth::CloudPromo:
+            return int(QnNotificationLevel::Value::LevelCount); //< The highest.
+
+        default:
+            return int(QnNotificationLevel::valueOf(message));
+    }
+}
+
+QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType message)
+{
+    switch (message)
+    {
+        case QnSystemHealth::EmailIsEmpty:
+            return qnSkin->pixmap("events/email.png");
+
+        case QnSystemHealth::NoLicenses:
+            return qnSkin->pixmap("events/license.png");
+
+        case QnSystemHealth::SmtpIsNotSet:
+            return qnSkin->pixmap("events/email.png");
+
+        case QnSystemHealth::UsersEmailIsEmpty:
+            return qnSkin->pixmap("events/email.png");
+
+        case QnSystemHealth::SystemIsReadOnly:
+            return qnSkin->pixmap("tree/system.png");
+
+        case QnSystemHealth::EmailSendError:
+            return qnSkin->pixmap("events/email.png");
+
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
+        case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveRebuildCanceled:
+            return qnSkin->pixmap("events/storage.png");
+
+        case QnSystemHealth::CloudPromo:
+            return qnSkin->pixmap("cloud/cloud_20.png");
+
+        default:
+            return QPixmap();
     }
 }
 

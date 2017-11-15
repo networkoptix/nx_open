@@ -36,8 +36,6 @@ public:
 
     const EventData& getEvent(int index) const;
 
-    bool isValid(const QModelIndex& index) const;
-
     QnVirtualCameraResourcePtr previewCamera(const EventData& event) const;
     QnVirtualCameraResourceList accessibleCameras(const EventData& event) const;
 

@@ -169,7 +169,7 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
         {
             const auto tile = static_cast<EventTile*>(sender());
             if (m_model)
-                m_model->setData(m_model->index(indexOf(tile)), QVariant(), Qn::DefaultTriggerRole);
+                m_model->setData(m_model->index(indexOf(tile)), QVariant(), Qn::DefaultNotificationRole);
         });
 
     return tile;
@@ -185,6 +185,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
+    tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
