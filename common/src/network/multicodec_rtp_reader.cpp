@@ -112,7 +112,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
             Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
         if (ignoreCameraTimeIfBigJitter)
-            m_timeHelper.setTimePolicy(TimePolicy::IgnoreCameraTimeIfBigJitter);
+            m_timeHelper.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
     }
 }
 
@@ -790,7 +790,7 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
 
 void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
 {
-    m_timeHelper.setTimePolicy(TimePolicy::ForceCameraTime);
+    m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
 }
 
 void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)

@@ -92,11 +92,11 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     }
 
     if (m_hanwhaResource->isNvr())
-        m_rtpReader.setTimePolicy(TimePolicy::ForceCameraTime);
+        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
     else if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(TimePolicy::OnvifExtension);
+        m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
     else
-        m_rtpReader.setTimePolicy(TimePolicy::IgnoreCameraTimeIfBigJitter);
+        m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
 
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx_http::HttpHeader("Rate-Control", "no"));
