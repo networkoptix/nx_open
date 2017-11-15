@@ -25,7 +25,7 @@ public:
     HanwhaTimeSyncronizer& operator=(HanwhaTimeSyncronizer&&) = delete;
 
     void start(HanwhaSharedResourceContext* resourceConext);
-
+    void setTimeSynchronizationEnabled(bool enabled);
     using TimeZoneShiftHandler = utils::MoveOnlyFunc<void(std::chrono::seconds)>;
     void setTimeZoneShiftHandler(TimeZoneShiftHandler handler);
 
@@ -48,6 +48,7 @@ private:
     std::list<utils::promise<void>*> m_startPromises;
     TimeZoneShiftHandler m_timeZoneHandler;
     std::chrono::seconds m_timeZoneShift{0};
+    std::atomic<bool> m_timeSynchronizationEnabled{false};
 };
 
 } // namespace plugins
