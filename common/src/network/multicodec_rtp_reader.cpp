@@ -277,9 +277,21 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
 
         int readed = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
-        m_RtpSession.sendKeepAliveIfNeeded();
+        if (readed == -1 &&
+            SystemError::getLastOSErrorCode() == SystemError::timedOut &&
+            m_rtcpReportTimer.elapsed() < m_RtpSession.sessionTimeoutMs() &&
+            m_onSocketReadTimeoutCallback)
+        {
+            auto data = m_onSocketReadTimeoutCallback();
+            if (data)
+                return data;
+            else
+                continue;
+        }
+
         if (readed < 1)
             break; // error
+        m_RtpSession.sendKeepAliveIfNeeded();
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
@@ -863,6 +875,16 @@ bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
 {
     return id == kOnvifNtpExtensionId
         || id == kOnvifNtpExtensionAltId;
+}
+
+void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback)
+{
+    m_onSocketReadTimeoutCallback = callback;
+}
+
+void QnMulticodecRtpReader::setRtpFrameTimeoutMs(int value)
+{
+    m_rtpFrameTimeoutMs = value;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

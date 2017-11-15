@@ -47,6 +47,8 @@ class QnMulticodecRtpReader:
     Q_OBJECT
 
 public:
+    using OnSocketReadTimeoutCallback = std::function<QnAbstractMediaDataPtr()>;
+
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
         std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
@@ -100,6 +102,14 @@ public:
     void setTimePolicy(TimePolicy timePolicy);
 
     void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
+    void setRtpFrameTimeoutMs(int value);
+
+    /**
+     * Call this function each time if socket read timeout occurs.
+     * Connection may be closed on socket read error, media frame timeout
+     * or by RTSP session timeout (usually 1 minute).
+     */
+    void setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback);
 signals:
     void networkIssue(
         const QnResourcePtr&,
@@ -175,6 +185,7 @@ private:
     int m_rtpFrameTimeoutMs{0};
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime;
+    OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)
