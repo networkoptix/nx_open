@@ -399,6 +399,33 @@ TEST_F(CopyTest, simpleOverlap)
     ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
 }
 
+static void isSafeRelativePathTest(bool expectedResult, const char* path)
+{
+    EXPECT_EQ(expectedResult, file_system::isSafeRelativePath(path)) << path;
+}
+
+TEST(FileSystem, isSafeRelativePath)
+{
+    isSafeRelativePathTest(true, "tmp/file");
+    isSafeRelativePathTest(false, "/tmp/file");
+    isSafeRelativePathTest(false, "../tmp/file");
+
+    isSafeRelativePathTest(true, "filename");
+    isSafeRelativePathTest(false, "file*name");
+    isSafeRelativePathTest(false, "filename?");
+    isSafeRelativePathTest(false, "[filename]");
+
+    isSafeRelativePathTest(true, "package-name-version_3.1.2-x.deb");
+    isSafeRelativePathTest(false, "--package-name-version_3.1.2-x.deb");
+    isSafeRelativePathTest(false, "~/package-name-version_3.1.2-x.deb");
+
+    isSafeRelativePathTest(true, "directory/windows-installer-3.1.2.msi");
+    isSafeRelativePathTest(false, "c:/directory/windows-installer-3.1.2.msi");
+
+    isSafeRelativePathTest(true, "directory\\windows-installer-3.1.2.msi");
+    isSafeRelativePathTest(false, "D:\\directory\\windows-installer-3.1.2.msi");
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx

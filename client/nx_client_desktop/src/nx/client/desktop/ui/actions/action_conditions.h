@@ -633,6 +633,9 @@ ConditionWrapper hasArgumentOfType(int key)
 /** Check if the resource is Entropix camera. */
 ConditionWrapper isEntropixCamera();
 
+/** Playback sync is forced. */
+ConditionWrapper syncIsForced();
+
 } // namespace condition
 
 } // namespace action

@@ -37,5 +37,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'Qulu';
 Config.cloud.productName = 'Qloud';
-
+Config.defaultLanguage = 'en_GB';
 Config.supportedLanguages = ['en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'hu_HU', 'nl_NL'];

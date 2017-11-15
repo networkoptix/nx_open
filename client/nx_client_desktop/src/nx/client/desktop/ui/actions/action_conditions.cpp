@@ -1768,6 +1768,15 @@ ConditionWrapper isEntropixCamera()
         });
 }
 
+ConditionWrapper syncIsForced()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->navigator()->syncIsForced();
+        });
+}
+
 } // namespace condition
 
 

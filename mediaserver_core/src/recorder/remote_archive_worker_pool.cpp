@@ -6,6 +6,12 @@ namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
+namespace {
+
+static const std::chrono::milliseconds kGrabTasksCycleDuration(5000);
+
+} // namespace
+
 RemoteArchiveWorkerPool::~RemoteArchiveWorkerPool()
 {
     decltype(m_workers) workers;
@@ -49,9 +55,10 @@ void RemoteArchiveWorkerPool::setMaxTaskCount(int maxTaskCount)
     m_maxTaskCount = maxTaskCount;
 }
 
-void RemoteArchiveWorkerPool::setTaskMapAccessor(std::function<LockableTaskMap*()> accessor)
+void RemoteArchiveWorkerPool::setTaskMapAccessor(
+    nx::utils::MoveOnlyFunc<LockableTaskMap*()> accessor)
 {
-    m_taskMapAccessor = accessor;
+    m_taskMapAccessor = std::move(accessor);
 }
 
 nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
@@ -69,17 +76,11 @@ nx::utils::TimerId RemoteArchiveWorkerPool::scheduleTaskGrabbing()
             cleanUpUnsafe();
             processTasksUnsafe();
         },
-        std::chrono::milliseconds(5000));
+        kGrabTasksCycleDuration);
 }
 
 void RemoteArchiveWorkerPool::processTasksUnsafe()
 {
-    if (m_workers.size() >= m_maxTaskCount)
-    {
-        m_timerId = scheduleTaskGrabbing(); //< All workers are busy
-        return;
-    }
-
     if (!m_taskMapAccessor)
     {
         NX_ASSERT(false, lit("No task map accessor. Pool is useless"));
@@ -96,6 +97,9 @@ void RemoteArchiveWorkerPool::processTasksUnsafe()
     auto lockedMap = lockableTaskMap->lock();
     for (auto itr = lockedMap->begin(); itr != lockedMap->end();)
     {
+        if (m_workers.size() >= m_maxTaskCount)
+            break;
+
         auto taskId = itr->first;
         if (m_workers.find(taskId) != m_workers.cend())
         {
@@ -109,9 +113,6 @@ void RemoteArchiveWorkerPool::processTasksUnsafe()
         m_workers[itr->first]->start();
 
         itr = lockedMap->erase(itr);
-
-        if (m_workers.size() >= m_maxTaskCount)
-            break;
     }
 
     m_timerId = scheduleTaskGrabbing();
@@ -122,12 +123,9 @@ void RemoteArchiveWorkerPool::cleanUpUnsafe()
     for (auto itr = m_workers.begin(); itr != m_workers.end();)
     {
         if (!itr->second->isRunning())
-        {
             itr = m_workers.erase(itr);
-            continue;
-        }
-
-        ++itr;
+        else
+            ++itr;
     }
 }
 

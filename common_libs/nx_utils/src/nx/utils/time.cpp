@@ -192,6 +192,12 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
     return true;
 }
 
+NX_UTILS_API QDateTime fromOffsetSinceEpoch(const nanoseconds& offset)
+{
+    return QDateTime::fromMSecsSinceEpoch(
+        duration_cast<milliseconds>(offset).count());
+}
+
 namespace test {
 
 void ScopedTimeShift::shiftCurrentTime(ClockType clockType, milliseconds diff)
