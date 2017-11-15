@@ -41,12 +41,6 @@ public:
     const QnMediaStreamStatistics* getStatistics(int channel = 0);
     QnCamDisplay* getCamDisplay();
 
-    qint64 getCurrentTime() const;
-
-    void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
-
-
-
     /*
     * Export motion stream to separate file
     */
@@ -83,7 +77,6 @@ private:
     QnCamDisplay m_camdispay;   // TODO: #GDM refactor to scoped pointer
     QPointer<QnAbstractMediaStreamDataProvider> m_reader;   // TODO: #GDM refactor to unique pointer or 'owner' template
 
-    QnlTimeSource* m_extTimeSrc;    // TODO: #GDM refactor to weak pointer
     QPointer<QnStreamRecorder> m_exportRecorder;
     QPointer<QnAbstractMediaStreamDataProvider> m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];

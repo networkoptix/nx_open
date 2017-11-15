@@ -1,6 +1,7 @@
 #ifndef ABSTRACT_ARCHIVE_DELEGATE_H
 #define ABSTRACT_ARCHIVE_DELEGATE_H
 
+#include <memory>
 #include <QtGui/QRegion>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
@@ -12,6 +13,8 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <motion/abstract_motion_archive.h>
 #include <nx/utils/uuid.h>
+
+#include "abstract_archive_integrity_watcher.h"
 
 enum class PlaybackMode
 {
@@ -59,7 +62,9 @@ public:
     QnAbstractArchiveDelegate(): m_flags(0) {}
     virtual ~QnAbstractArchiveDelegate() {}
 
-    virtual bool open(const QnResourcePtr &resource) = 0;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() const = 0;
     virtual qint64 endTime() const = 0;

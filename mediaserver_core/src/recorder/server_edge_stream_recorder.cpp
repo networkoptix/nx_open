@@ -1,6 +1,7 @@
 #include "server_edge_stream_recorder.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 
 QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
     const QnResourcePtr &dev,
@@ -52,6 +53,8 @@ void QnServerEdgeStreamRecorder::fileFinished(
     qint64 fileSize,
     qint64 /*startTimeMs*/)
 {
+    using namespace std::chrono;
+
     if (m_lastfileStartedInfo.isValid)
     {
         base_type::fileStarted(
@@ -68,6 +71,14 @@ void QnServerEdgeStreamRecorder::fileFinished(
             fileSize,
             m_lastfileStartedInfo.startTimeMs);
 
+        const auto startRecordingBound = m_startRecordingBound == boost::none
+            ? std::chrono::microseconds::zero()
+            : m_startRecordingBound.get();
+
+        const auto endRecordingBound = m_endRecordingBound == boost::none
+            ? std::chrono::microseconds::zero()
+            : m_endRecordingBound.get();
+
         NX_VERBOSE(this, lm(
             "File has been written. "
             "Start time: %1 (%2ms). "
@@ -75,15 +86,17 @@ void QnServerEdgeStreamRecorder::fileFinished(
             "Duration: %5ms. "
             "Recording bounds: %6 (%7ms) - %8 (%9ms). ")
                 .args(
-                    QDateTime::fromMSecsSinceEpoch(m_lastfileStartedInfo.startTimeMs),
+                    nx::utils::fromOffsetSinceEpoch(
+                        milliseconds(m_lastfileStartedInfo.startTimeMs)),
                     m_lastfileStartedInfo.startTimeMs,
-                    QDateTime::fromMSecsSinceEpoch(m_lastfileStartedInfo.startTimeMs + durationMs),
+                    nx::utils::fromOffsetSinceEpoch(
+                        milliseconds(m_lastfileStartedInfo.startTimeMs + durationMs)),
                     m_lastfileStartedInfo.startTimeMs + durationMs,
                     durationMs,
-                    QDateTime::fromMSecsSinceEpoch(m_startRecordingBound->count() / 1000),
-                    m_startRecordingBound->count() / 1000,
-                    QDateTime::fromMSecsSinceEpoch(m_endRecordingBound->count() / 1000),
-                    m_endRecordingBound->count() / 1000));
+                    nx::utils::fromOffsetSinceEpoch(startRecordingBound),
+                    duration_cast<milliseconds>(startRecordingBound).count(),
+                    nx::utils::fromOffsetSinceEpoch(endRecordingBound),
+                    duration_cast<milliseconds>(endRecordingBound).count()));
 
         if (m_fileWrittenHandler)
         {

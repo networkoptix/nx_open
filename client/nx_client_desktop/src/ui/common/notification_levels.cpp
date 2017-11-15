@@ -95,6 +95,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
 
         /* Red notifications */
         case QnSystemHealth::EmailSendError:
+        case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::StoragesAreFull:
             return QnNotificationLevel::Value::CriticalNotification;
 

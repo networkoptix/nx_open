@@ -14,7 +14,9 @@ public:
     virtual ~QnVMax480ArchiveDelegate();
 
 
-    virtual bool open(const QnResourcePtr &resource)override;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* /*archiveIntegrityWatcher*/)override;
     virtual void close()override;
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;

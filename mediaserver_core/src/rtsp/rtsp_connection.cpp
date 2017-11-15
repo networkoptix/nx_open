@@ -615,7 +615,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     Q_D(QnRtspConnectionProcessor);
 
     if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
-        d->archiveDP->open();
+        d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
 
     QByteArray range = getRangeStr();
     if (!range.isEmpty())
@@ -732,7 +732,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
 
     // 2. find packet inside archive
     QnServerArchiveDelegate archive;
-    if (!archive.open(getResource()->toResourcePtr()))
+    if (!archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
         return rez;
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
@@ -761,7 +761,7 @@ QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audio
     {
         layout = d->mediaRes->getAudioLayout(d->liveDpHi.data()); //< Layout from live video.
     }
-    else if (archive.open(getResource()->toResourcePtr()))
+    else if (archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
     {
         archive.seek(d->startTime, /*findIFrame*/ true);
         layout = archive.getAudioLayout(); //< Current position in archive.

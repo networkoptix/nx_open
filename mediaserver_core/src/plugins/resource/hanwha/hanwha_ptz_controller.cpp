@@ -127,11 +127,11 @@ bool HanwhaPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
 bool HanwhaPtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
 {
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.control(
+    const auto response = helper.control(
         lit("ptzcontrol/areazoom"),
         makeViewPortParameters(aspectRatio, viewport));
 
-    return false;
+    return response.isSuccessful();
 }
 
 bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const

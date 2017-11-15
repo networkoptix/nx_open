@@ -20,7 +20,9 @@ public:
 
     //virtual void setSendMotion(bool value) override;
 
-    virtual bool open(const QnResourcePtr &resource);
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     bool isOpened() const;
     virtual void close();
     virtual qint64 startTime() const;
@@ -93,6 +95,8 @@ private:
     QnServer::ChunksCatalog m_lastChunkQuality;
     QnServer::StoragePool m_currentChunkStoragePool;
     QnServer::StoragePool m_newQualityChunkStoragePool;
+
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

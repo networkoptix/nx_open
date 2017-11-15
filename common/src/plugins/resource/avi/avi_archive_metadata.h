@@ -26,7 +26,8 @@ struct QnAviArchiveMetadata
     /** This version is set if no metadata is found. */
     static const int kDefaultVersion = 0;
 
-    static const int kLatestVersion = 1;
+    static const int kVersionBeforeTheIntegrityCheck = 1;
+    static const int kIntegrityCheckVersion = 2;
 
     int version = kDefaultVersion;
     QByteArray signature;
@@ -36,11 +37,12 @@ struct QnAviArchiveMetadata
     QSize videoLayoutSize;
     QnMediaDewarpingParams dewarpingParams;
     qreal overridenAr = 0.0;
+    QByteArray integrityHash;
 
     static QnAviArchiveMetadata loadFromFile(const AVFormatContext* context);
     bool saveToFile(AVFormatContext* context, Format format);
 };
 #define QnAviArchiveMetadata_Fields (version)(signature)(timeZoneOffset)(startTimeMs) \
-    (videoLayoutChannels)(videoLayoutSize)(dewarpingParams)(overridenAr)
+    (videoLayoutChannels)(videoLayoutSize)(dewarpingParams)(overridenAr)(integrityHash)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnAviArchiveMetadata, (json)(metatype))

@@ -18,7 +18,9 @@ public:
     QnSyncPlayArchiveDelegate(QnAbstractArchiveStreamReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();
 
-    virtual bool open(const QnResourcePtr &resource);
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close();
     virtual void beforeClose();
     virtual qint64 startTime() const;

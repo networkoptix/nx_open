@@ -26,6 +26,7 @@ enum MessageType
     ArchiveRebuildFinished,
     ArchiveRebuildCanceled,
     ArchiveFastScanFinished,
+    ArchiveIntegrityFailed,
 
     RemoteArchiveSyncStarted,
     RemoteArchiveSyncFinished,

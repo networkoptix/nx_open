@@ -443,6 +443,30 @@ bool isUsb(const QString& devName)
 
 #endif
 
+bool isRelativePathSafe(const QString& path)
+{
+    if (path.contains(lit("..")))
+        return false; //< May be a path traversal attempt.
+
+    if (path.startsWith('/'))
+        return false; //< UNIX root.
+
+    if (path.contains('*') || path.contains('?') || path.contains('[') || path.contains(']'))
+        return false; //< UNIX shell wildcards.
+
+    if (path.startsWith('-') || path.startsWith('~'))
+        return false; //< UNIX shell special characters.
+
+    if (path.size() > 1 && path[1] == ':')
+        return false; //< Windows mount point.
+
+    if (path.startsWith('\\'))
+        return false; //< Windows SMB drive.
+
+    // TODO: It makes sense to add some more security cheks e.g. symlinks, etc.
+    return true;
+}
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx

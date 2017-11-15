@@ -15,6 +15,7 @@ class MSSettings;
 class PluginManager;
 class CommonPluginContainer;
 class QThread;
+class AbstractArchiveIntegrityWatcher;
 
 namespace nx { 
 namespace mediaserver {
@@ -72,6 +73,7 @@ public:
     nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
+    AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
 
 private:
     QnCommonModule* m_commonModule;
@@ -93,7 +95,7 @@ private:
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     QThread* m_metadataManagerPoolThread = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
-
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
 };
 
