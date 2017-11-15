@@ -143,7 +143,7 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     updateVisibleItems();
 }
 
-QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
+QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems() const
 {
     const auto overlay = statusOverlay();
 
@@ -164,7 +164,7 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
     return result;
 }
 
-QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems()
+QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() const
 {
     switch (statusOverlay())
     {
