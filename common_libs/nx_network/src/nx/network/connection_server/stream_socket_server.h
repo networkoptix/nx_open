@@ -218,7 +218,7 @@ public:
     Statistics statistics() const
     {
         return m_statisticsCalculator.statistics(
-            static_cast<int>(connectionCount()));
+            static_cast<int>(this->connectionCount()));
     }
 
 protected:
