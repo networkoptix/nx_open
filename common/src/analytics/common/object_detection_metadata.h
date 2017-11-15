@@ -25,20 +25,22 @@ bool operator< (const Attribute& f, const Attribute& s);
 
 struct DetectedObject
 {
+    QnUuid objectTypeId;
     QnUuid objectId;
     QRectF boundingBox;
     std::vector<Attribute> labels;
 };
-#define DetectedObject_Fields (objectId)(boundingBox)(labels)
+#define DetectedObject_Fields (objectTypeId)(objectId)(boundingBox)(labels)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 struct DetectionMetadataPacket
 {
+    QnUuid deviceId;
     qint64 timestampUsec = 0;
     qint64 durationUsec = 0;
     std::vector<DetectedObject> objects;
 };
-#define DetectionMetadataPacket_Fields (timestampUsec)(durationUsec)(objects)
+#define DetectionMetadataPacket_Fields (deviceId)(timestampUsec)(durationUsec)(objects)
 QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
 
 #define QN_OBJECT_DETECTION_TYPES \
