@@ -37,11 +37,9 @@ boost::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
-cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
-    const std::string& domainName,
-    const std::string& relayHost)
+cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(const std::string& domainName)
 {
-    m_relayTest->peerAdded(domainName, relayHost);
+    m_relayTest->peerAdded(domainName);
     return cf::make_ready_future(true);
 }
 

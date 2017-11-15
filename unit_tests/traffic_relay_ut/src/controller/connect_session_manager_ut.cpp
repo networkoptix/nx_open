@@ -44,9 +44,7 @@ public:
         return cf::make_ready_future(std::string());
     }
 
-    virtual cf::future<bool> addPeer(
-        const std::string& /*domainName*/,
-        const std::string& /*relayHost*/) override
+    virtual cf::future<bool> addPeer(const std::string& /*domainName*/) override
     {
         return cf::make_ready_future(true);
     }
@@ -55,6 +53,8 @@ public:
     {
         return cf::make_ready_future(true);
     }
+
+    virtual void setNodeId(const std::string& /*nodeId*/) {}
 };
 
 class TrafficRelayStub:
