@@ -23,9 +23,11 @@ class QnArchiveSyncPlayWrapper;
 class QnWorkbenchRenderWatcher;
 
 
-struct QnStreamSynchronizationState {
-    QnStreamSynchronizationState(): started(false), time(AV_NOPTS_VALUE), speed(0.0) {}
-    QnStreamSynchronizationState(bool started, qint64 time, qreal speed): started(started), time(time), speed(speed) {}
+struct QnStreamSynchronizationState
+{
+    QnStreamSynchronizationState();
+    QnStreamSynchronizationState(bool started, qint64 time, qreal speed);
+    static QnStreamSynchronizationState live();
 
     bool started;
     qint64 time;

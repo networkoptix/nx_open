@@ -831,6 +831,13 @@ void ActionHandler::at_openInLayoutAction_triggered()
             data.flags = Qn::PendingGeometryAdjustment;
             itemDataByUuid[oldUuid] = data;
 
+            // Do not save position and state for cameras which footage we cannot see.
+            if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
+            {
+                if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+                    continue;
+            }
+
             for (const auto extraItemRole: kExtraItemRoles)
             {
                 const auto value =
@@ -982,12 +989,24 @@ void ActionHandler::at_openInNewTabAction_triggered()
     }
     else
     {
-        // Called from the current layout
-        auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        // Action is called from the current layout context menu.
+
+        const auto widgets = parameters.widgets();
+        const bool hasViewFootagePermission = std::any_of(widgets.cbegin(), widgets.cend(),
+            [this](const QnResourceWidget* widget)
+            {
+                const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+                return camera
+                    && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+            });
+
+        const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        const auto state = hasViewFootagePermission
+            ? streamSynchronizer->state()
+            : QnStreamSynchronizationState::live();
 
         action::Parameters params;
-        params.setArgument(Qn::LayoutSyncStateRole, streamSynchronizer->state());
-
+        params.setArgument(Qn::LayoutSyncStateRole, state);
         menu()->trigger(action::OpenNewTabAction, params);
     }
 

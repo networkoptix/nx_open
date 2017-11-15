@@ -85,7 +85,7 @@ namespace nx {
 namespace utils {
 
 const QByteArray PasswordLimitations::kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
-const QByteArray  PasswordLimitations::kCameraAllowedSymbols = "~`!@#$%^*()_-+=|{}[].?/";
+const QByteArray PasswordLimitations::kCameraAllowedSymbols = "~`!@#$%^*()_-+=|{}[].?/";
 
 PasswordStrength passwordStrength(const QString& password)
 {
