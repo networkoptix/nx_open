@@ -265,8 +265,6 @@ bool HikvisionResource::findDefaultPtzProfileToken()
 }
 
 static const auto kIntegratePath = lit("/ISAPI/System/Network/Integrate");
-static const auto kOnvifTag = lit("ONVIF");
-static const auto kEnableTag = lit("enable");
 static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <Integrate>
@@ -274,87 +272,146 @@ static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
 </Integrate>
 )xml").trimmed();
 
-static const auto kSetOnvifUserPath = lit("/ISAPI/Security/ONVIF/users/1");
+static const auto kSetOnvifUserPath = lit("/ISAPI/Security/ONVIF/users/");
 static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <User>
-    <id>1</id>
-    <userName>%1</userName>
-    <password>%2</password>
+    <id>%1</id>
+    <userName>%2</userName>
+    <password>%3</password>
     <userType>administrator</userType>
 </User>
 )xml").trimmed();
 
-bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator)
+// TODO: Move out into separate file.
+class HikvisionRequestHelper
 {
-    const auto client = makeHttpClient(authenticator);
-    if (!client->doGet(nx::network::url::Builder(url).setPath(kIntegratePath))
-        || !isResponseOK(client.get()))
+public:
+    HikvisionRequestHelper(const QUrl& url, const QAuthenticator& authenticator):
+        m_url(url),
+        m_client(makeHttpClient(authenticator))
     {
-        NX_VERBOSE(typeid(HikvisionResource), lm("Unable to send request %2").arg(client->url()));
-        return false;
     }
 
-    const auto responseBody = client->fetchEntireMessageBody();
-    QDomDocument intergrateDocument;
-    QString errorMessage;
-    if (!intergrateDocument.setContent(responseBody, &errorMessage))
+    boost::optional<QDomDocument> getXml(const QString& path)
     {
-        NX_VERBOSE(typeid(HikvisionResource), lm("Unable to parse response from %1: %2")
-            .args(client->url(), errorMessage));
-        return false;
+        if (!m_client->doGet(nx::network::url::Builder(m_url).setPath(path))
+            || !isResponseOK(m_client.get()))
+        {
+            NX_VERBOSE(this, lm("Unable to send request %2").arg(m_client->url()));
+            return boost::none;
+        }
+
+        QDomDocument document;
+        QString error;
+        if (!document.setContent(m_client->fetchEntireMessageBody(), &error))
+        {
+            NX_VERBOSE(this, lm("Unable to parse response from %1: %2").args(m_client->url(), error));
+            return boost::none;
+        }
+
+        return document;
     }
 
-    const auto onvifElement = intergrateDocument.documentElement().firstChildElement(kOnvifTag);
-    if (onvifElement.isNull())
+    boost::optional<bool> isOnvifSupported()
     {
-        NX_DEBUG(typeid(HikvisionResource), lm("Tag %1 is not found on %2")
-            .args(kOnvifTag, client->url()));
-        return false;
+        const auto document = getXml(kIntegratePath);
+        if (!document)
+            return boost::none;
+
+        const auto value = document->documentElement()
+            .firstChildElement(lit("ONVIF")).firstChildElement(lit("enable")).text();
+
+        if (value == lit("true"))
+            return true;
+
+        if (value == lit("false"))
+            return false;
+
+        NX_DEBUG(this, lm("Unexpect ONVIF.enable value '%1' on %2").args(value, m_client->url()));
+        return boost::none;
     }
 
-    const auto enabledElement = onvifElement.firstChildElement(kEnableTag);
-    if (onvifElement.isNull())
+    bool enableOnvif()
     {
-        NX_DEBUG(typeid(HikvisionResource), lm("Tag %1 is not found on %2")
-            .args(kOnvifTag, client->url()));
-        return false;
-    }
+        const auto result = m_client->doPut(
+            nx::network::url::Builder(m_url).setPath(kIntegratePath),
+            "application/xml", kEnableOnvifXml.toUtf8())
+                && isResponseOK(m_client.get());
 
-    const auto onvifEnabled = enabledElement.text();
-    if (onvifEnabled == lit("false"))
-    {
-        // Enable ONVIF support, usernameand and password should be set automatically.
-        const auto result = client->doPut(
-            nx::network::url::Builder(url).setPath(kIntegratePath), "application/xml",
-            kEnableOnvifXml.toUtf8())
-                && isResponseOK(client.get());
-
-        onvifEnabled == lit("true");
-        NX_DEBUG(typeid(HikvisionResource), lm("Enable ONVIF result=%1 on %2")
-            .args(result, client->url()));
-    }
-    else
-    {
-        NX_VERBOSE(typeid(HikvisionResource), lm("ONVIF is already enabled on %1")
-            .args(client->url()));
-    }
-
-    if (onvifEnabled == lit("true"))
-    {
-        // Make sure onvif user/password is the same as main credentials.
-        const auto result = client->doPut(
-            nx::network::url::Builder(url).setPath(kSetOnvifUserPath), "application/xml",
-            kSetOnvifUserXml.arg(authenticator.user(), authenticator.password()).toUtf8())
-                && isResponseOK(client.get());
-
-        NX_DEBUG(typeid(HikvisionResource), lm("Set ONVIF credentials result=%1 on %2")
-            .args(result, client->url()));
+        NX_DEBUG(this, lm("Enable ONVIF result=%1 on %2").args(result, m_client->url()));
         return result;
     }
 
-    NX_DEBUG(typeid(HikvisionResource), lm("Unexpected ONVIF value: %1").arg(onvifEnabled));
-    return false;
+    boost::optional<std::map<int, QString>> getOnvifUsers()
+    {
+        const auto document = getXml(kSetOnvifUserPath);
+        if (!document)
+            return boost::none;
+
+        std::map<int, QString> users;
+        const auto nodeList = document->documentElement().elementsByTagName(lit("User"));
+        for (int nodeIndex = 0; nodeIndex < nodeList.size(); ++nodeIndex)
+        {
+            const auto element = nodeList.at(nodeIndex).toElement();
+            const auto value =
+                [&](const QString& s) { return element.elementsByTagName(s).at(0).toElement().text(); };
+
+            bool isOk = false;
+            users.emplace(value(lit("id")).toInt(&isOk), value(lit("userName")));
+            if (!isOk || users.rbegin()->second.isEmpty())
+            {
+                NX_VERBOSE(this, lm("Unable to parse users from %1").arg(m_client->url()));
+                return boost::none;
+            }
+        }
+
+        NX_VERBOSE(this, lm("ONVIF users %1 on %2").container(users).arg(m_client->url()));
+        return users;
+    }
+
+    bool setOnvifCredentials(int userId, const QString& login, const QString& password)
+    {
+        const auto userNumber = QString::number(userId);
+        const auto result = m_client->doPut(
+            nx::network::url::Builder(m_url).setPath(kSetOnvifUserPath + userNumber),
+            "application/xml", kSetOnvifUserXml.arg(userNumber, login, password).toUtf8())
+                && isResponseOK(m_client.get());
+
+        NX_DEBUG(this, lm("Set ONVIF credentials result=%1 on %2").args(result, m_client->url()));
+        return result;
+    }
+
+private:
+    const QUrl& m_url;
+    const std::unique_ptr<nx_http::HttpClient> m_client;
+};
+
+bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator)
+{
+    HikvisionRequestHelper requestHelper(url, authenticator);
+    const auto isOnvifSupported = requestHelper.isOnvifSupported();
+    if (!isOnvifSupported)
+        return false;
+
+    if (*isOnvifSupported == false)
+    {
+        if (!requestHelper.enableOnvif())
+            return false;
+    }
+
+    const auto users = requestHelper.getOnvifUsers();
+    if (!users)
+        return false;
+
+    const auto existingUser = std::find_if(users->begin(), users->end(),
+        [&](const std::pair<int, QString>& u) { return u.second == authenticator.user(); });
+
+    return requestHelper.setOnvifCredentials(
+        (existingUser != users->end())
+            ? existingUser->first //< Override user permissions and password.
+            : (users->empty() ? 1 : users->rbegin()->first + 1), //< New user.
+        authenticator.user(), authenticator.password());
 }
 
 } // namespace plugins
