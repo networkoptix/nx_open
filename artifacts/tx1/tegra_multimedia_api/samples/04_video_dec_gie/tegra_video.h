@@ -32,6 +32,8 @@ public:
 
     virtual bool start(const Params& params) = 0;
 
+    virtual bool stop() = 0;
+
     /** Input data for the decoder, a single frame. */
     struct CompressedFrame
     {

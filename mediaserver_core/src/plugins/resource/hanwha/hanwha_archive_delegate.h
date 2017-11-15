@@ -39,7 +39,10 @@ public:
 
     void setRateControlEnabled(bool enabled);
     void setOverlappedId(int overlappedId);
-
+    virtual bool setQuality(
+        MediaQuality /*quality*/,
+        bool /*fastSwitch*/,
+        const QSize& /*resolution*/) override;
 
 private:
     bool isForwardDirection() const;

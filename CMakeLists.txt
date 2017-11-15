@@ -159,6 +159,8 @@ if(WINDOWS)
     endif()
 endif()
 
+add_subdirectory(dependencies)
+
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 

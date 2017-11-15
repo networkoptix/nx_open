@@ -2084,11 +2084,11 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isUnauthorized())
         return Qn::UnauthorizedOverlay;
 
-    if (d->camera->needsToChangeDefaultPassword())
-        return Qn::PasswordRequiredOverlay;
-
     if (d->camera)
     {
+        if (d->camera->needsToChangeDefaultPassword())
+            return Qn::PasswordRequiredOverlay;
+
         const Qn::Permission requiredPermission = d->isPlayingLive()
             ? Qn::ViewLivePermission
             : Qn::ViewFootagePermission;
@@ -2277,6 +2277,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
         suspendHomePtzController();
     }
     updateCompositeOverlayMode();
+    updateIconButton();
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()

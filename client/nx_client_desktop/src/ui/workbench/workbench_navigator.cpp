@@ -701,8 +701,7 @@ void QnWorkbenchNavigator::updateHasArchive()
         && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
             [this](const QnMediaResourcePtr& resource)
             {
-                auto camera = resource.dynamicCast<QnSecurityCamResource>();
-                return camera && !cameraHistoryPool()->getCameraFootageData(camera, true).empty();
+                return hasArchiveForCamera(resource.dynamicCast<QnSecurityCamResource>());
             });
 
     if (m_hasArchive == newValue)
@@ -1642,6 +1641,11 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             m_sliderWindowInvalid = false;
         }
 
+        if (auto camera = m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>())
+        {
+            if (camera->isDtsBased())
+                updateHasArchive();
+        }
         updateTimelineRelevancy();
     }
 }
@@ -2161,6 +2165,34 @@ QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(const QnMediaR
 QnCameraDataManager* QnWorkbenchNavigator::cameraDataManager() const
 {
     return m_cameraDataManager;
+}
+
+bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const
+{
+    if (!camera)
+        return false;
+
+    auto footageServers = cameraHistoryPool()->getCameraFootageData(camera, true);
+    if (footageServers.empty())
+        return false;
+
+    if (camera->isDtsBased())
+    {
+        auto widget = std::find_if(m_syncedWidgets.cbegin(), m_syncedWidgets.cend(),
+            [camera](QnMediaResourceWidget* widget)
+            {
+                return widget->resource() == camera;
+            });
+
+        NX_ASSERT(widget != m_syncedWidgets.cend());
+        if (widget == m_syncedWidgets.cend())
+            return false;
+
+        const auto startTime = (*widget)->display()->archiveReader()->startTime();
+        return startTime != DATETIME_NOW;
+    }
+
+    return true;
 }
 
 void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs)

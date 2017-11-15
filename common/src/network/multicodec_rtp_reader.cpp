@@ -208,15 +208,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     return result;
 }
 
-void QnMulticodecRtpReader::processTcpRtcp(QnRtspIoDevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity)
+void QnMulticodecRtpReader::processTcpRtcp(quint8* buffer, int bufferSize, int bufferCapacity)
 {
-    bool gotValue = false;
-    QnRtspStatistic stats = m_RtpSession.parseServerRTCPReport(buffer+4, bufferSize-4, &gotValue);
-    if (gotValue) {
-        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
-            ioDevice->setStatistic(stats);
-    }
-
+    if (!m_RtpSession.processTcpRtcpData(buffer, bufferSize))
+        NX_VERBOSE(this, "Can't parse RTCP report");
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {
@@ -323,7 +318,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else if (format == QnRtspClient::TT_VIDEO_RTCP || format == QnRtspClient::TT_AUDIO_RTCP)
         {
-            processTcpRtcp(ioDevice, (quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
+            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
             m_demuxedData[rtpChannelNum]->clear();
         }
         else {

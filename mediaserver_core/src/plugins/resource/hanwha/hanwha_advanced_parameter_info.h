@@ -71,8 +71,8 @@ private:
     QString m_parameterName;
     QString m_parameterValue;
 
-    const std::map<QString, QString*> m_stringAuxes;
-    const std::map<QString, bool*> m_boolAuxes;
+    static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
+    static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;
 };
 
 } // namespace plugins

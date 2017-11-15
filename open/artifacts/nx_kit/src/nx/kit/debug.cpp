@@ -132,8 +132,6 @@ std::string printPrefix(const char* file)
 //-------------------------------------------------------------------------------------------------
 // Print info
 
-namespace detail {
-
 std::string toString(std::string s)
 {
     return toString(s.c_str());
@@ -179,6 +177,8 @@ std::string toString(const void* ptr)
         return "null";
     return format("%p", ptr);
 }
+
+namespace detail {
 
 /**
  * @param bytesPerLine Used to calculate space padding, 0 means no padding.

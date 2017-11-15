@@ -7,7 +7,7 @@
  */
 struct VideoDecGieIniConfig: public nx::kit::IniConfig
 {
-    VideoDecGieIniConfig(): nx::kit::IniConfig("video_dec_gie") { reload(); }
+    VideoDecGieIniConfig(): nx::kit::IniConfig("video_dec_gie.ini") { reload(); }
 
     NX_INI_STRING(
         "/opt/networkoptix/mediaserver/bin/nvidia_models/pednet.prototxt",

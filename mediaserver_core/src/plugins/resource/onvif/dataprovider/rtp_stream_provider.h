@@ -29,7 +29,7 @@ protected:
 private:
     QString m_request;
     RtpTransport::Value m_rtpTransport;
-
+    size_t m_dataPassed = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -28,6 +28,7 @@ public:
     virtual void setDoneHandler(std::function<void()> handler) override;
     virtual void cancel() override;
     virtual bool execute() override;
+    virtual QnUuid id() const override;
 
 private:
     bool synchronizeArchive(const QnSecurityCamResourcePtr& resource);

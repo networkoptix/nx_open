@@ -1,11 +1,14 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.9.0)
 project(tegra_video)
 
-# ATTENTION: This cmake file is not intended for building but rather just for IDE convenience.
+# ATTENTION: This cmake file is not intended for building the real libtegra_video.so, which is
+# to be built via make on a physical Tegra device - it allows only to build a stub version of
+# libtegra_video.so and run those unit tests (on a PC) which do not depend on NVidia libraries.
+# Sources of the real libtegra_video.so implementation are included here for IDE convenience.
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNX_KIT_API= -DTEGRA_VIDEO_API=")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNX_KIT_API= -DTEGRA_VIDEO_API= -DTEGRA_VIDEO_STUB_ONLY=")
 
 set(NX_KIT_DIR "../../../open/artifacts/nx_kit/src")
 set(NX_KIT_SRC_DIR "${NX_KIT_DIR}/nx/kit")
@@ -18,24 +21,44 @@ include_directories(
     ../../../open/artifacts/nx_kit/src
 )
 
-set(SOURCE_FILES
+set(TEGRA_VIDEO_STUB_SOURCE_FILES
     ${NX_KIT_SRC_DIR}/debug.h
     ${NX_KIT_SRC_DIR}/debug.cpp
     ${NX_KIT_SRC_DIR}/ini_config.h
     ${NX_KIT_SRC_DIR}/ini_config.cpp
+    samples/04_video_dec_gie/tegra_video_ini.h
+    samples/04_video_dec_gie/tegra_video.h
+    samples/04_video_dec_gie/tegra_video.cpp
+    samples/04_video_dec_gie/tegra_video_stub.cpp
+)
+
+set(TEGRA_VIDEO_STUB_UT_SOURCE_FILES
+    ${TEGRA_VIDEO_STUB_SOURCE_FILES}
+    ${NX_KIT_SRC_DIR}/test.h
+    ${NX_KIT_SRC_DIR}/test.cpp
+    samples/04_video_dec_gie/tegra_video_stub_ut.cpp
+)
+
+set(NET_DIMENSIONS_UT_SOURCE_FILES
+    ${NX_KIT_SRC_DIR}/debug.h
+    ${NX_KIT_SRC_DIR}/debug.cpp
+    ${NX_KIT_SRC_DIR}/test.h
+    ${NX_KIT_SRC_DIR}/test.cpp
+    samples/04_video_dec_gie/net_dimensions.h
+    samples/04_video_dec_gie/net_dimensions.cpp
+    samples/04_video_dec_gie/net_dimensions_ut.cpp
+)
+
+set(SOURCE_FILES
+    ${TEGRA_VIDEO_STUB_SOURCE_FILES}
+    ${TEGRA_VIDEO_STUB_UT_SOURCE_FILES}
+    ${NET_DIMENSIONS_UT_SOURCE_FILES}
     samples/04_video_dec_gie/video_dec_gie.h
     samples/04_video_dec_gie/video_dec_gie_csvparser.cpp
     samples/04_video_dec_gie/video_dec_gie_main.cpp
     samples/04_video_dec_gie/video_dec_gie_main.h
     samples/04_video_dec_gie/video_dec_gie_ini.h
-    samples/04_video_dec_gie/tegra_video_ini.h
-    samples/04_video_dec_gie/tegra_video.h
-    samples/04_video_dec_gie/tegra_video.cpp
     samples/04_video_dec_gie/tegra_video_impl.cpp
-    samples/04_video_dec_gie/tegra_video_stub.cpp
-    samples/04_video_dec_gie/net_dimensions.h
-    samples/04_video_dec_gie/net_dimensions.cpp
-    samples/04_video_dec_gie/net_dimensions_ut.cpp
     samples/04_video_dec_gie/main_tv.h
     samples/04_video_dec_gie/main_tv.cpp
     include/Argus/Ext/BayerAverageMap.h
@@ -128,4 +151,19 @@ set(SOURCE_FILES
     samples/common/classes/NvVideoEncoder.cpp
 )
 
-add_executable(tegra_video ${SOURCE_FILES})
+# The real libtegravideo.so is excluded here because it should be built on a Tegra device.
+add_executable(tegra_video EXCLUDE_FROM_ALL ${SOURCE_FILES})
+
+add_library(tegra_video_stub ${TEGRA_VIDEO_STUB_SOURCE_FILES})
+
+add_executable(net_dimensions_ut ${NET_DIMENSIONS_UT_SOURCE_FILES})
+
+add_executable(tegra_video_stub_ut ${TEGRA_VIDEO_STUB_UT_SOURCE_FILES})
+
+add_custom_target(run_tests
+    DEPENDS
+        tegra_video_stub_ut
+        net_dimensions_ut
+    COMMAND
+        ./net_dimensions_ut && echo "" && ./tegra_video_stub_ut
+)

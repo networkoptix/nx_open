@@ -26,5 +26,5 @@ Config.helpLinks.push({
 Config.allowDebugMode = false;
 Config.productName = 'Sentry Matrix';
 Config.cloud.productName = 'Sentry Cloud';
-
+Config.defaultLanguage = 'en_US';
 Config.supportedLanguages = ['en_US', 'zh_CN'];

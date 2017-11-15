@@ -7,7 +7,7 @@
  */
 struct TegraVideoIniConfig: public nx::kit::IniConfig
 {
-    TegraVideoIniConfig(): nx::kit::IniConfig("tegra_video") { reload(); }
+    TegraVideoIniConfig(): nx::kit::IniConfig("tegra_video.ini") { reload(); }
 
     NX_INI_FLAG(0, disable, "Use stub implementation which does not use NVidia-specific hw.");
 

@@ -78,7 +78,8 @@ static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilities =
         Ptz::Capability::AbsolutePanCapability |
         Ptz::Capability::AbsoluteTiltCapability |
         Ptz::Capability::AbsoluteZoomCapability) },
-    {lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability)},
+    // Native Home command is not implemented yet
+    //{lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability)},
     {
         lit("DigitalPTZ"),
         PtzDescriptor(
@@ -101,7 +102,8 @@ static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilities =
     { lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability) },
     { lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
     { lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
-    { lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability) },
+    // Native Home command is not implemented yet
+    //{ lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability) },
     {
         lit("DigitalPTZ"),
         PtzDescriptor(
@@ -990,7 +992,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         {
             m_ptzCapabilities |= capability;
             if (capability == Ptz::NativePresetsPtzCapability)
-                m_ptzCapabilities |= Ptz::PresetsPtzCapability;
+                m_ptzCapabilities |= Ptz::PresetsPtzCapability | Ptz::NoNxPresetsPtzCapability;
         }
         else
         {
