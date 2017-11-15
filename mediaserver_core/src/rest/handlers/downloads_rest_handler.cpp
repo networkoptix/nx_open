@@ -388,7 +388,7 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
-    if (!nx::utils::file_system::isSafeRelativePath(request.fileName))
+    if (!nx::utils::file_system::isRelativePathSafe(request.fileName))
     {
         return helper.makeError(
             nx_http::StatusCode::badRequest,

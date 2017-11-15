@@ -399,31 +399,31 @@ TEST_F(CopyTest, simpleOverlap)
     ASSERT_EQ(result.code, file_system::Result::sourceAndTargetAreSame);
 }
 
-static void isSafeRelativePathTest(bool expectedResult, const char* path)
+static void isRelativePathSafeTest(bool expectedResult, const char* path)
 {
-    EXPECT_EQ(expectedResult, file_system::isSafeRelativePath(path)) << path;
+    EXPECT_EQ(expectedResult, file_system::isRelativePathSafe(path)) << path;
 }
 
-TEST(FileSystem, isSafeRelativePath)
+TEST(FileSystem, isRelativePathSafe)
 {
-    isSafeRelativePathTest(true, "tmp/file");
-    isSafeRelativePathTest(false, "/tmp/file");
-    isSafeRelativePathTest(false, "../tmp/file");
+    isRelativePathSafeTest(true, "tmp/file");
+    isRelativePathSafeTest(false, "/tmp/file");
+    isRelativePathSafeTest(false, "../tmp/file");
 
-    isSafeRelativePathTest(true, "filename");
-    isSafeRelativePathTest(false, "file*name");
-    isSafeRelativePathTest(false, "filename?");
-    isSafeRelativePathTest(false, "[filename]");
+    isRelativePathSafeTest(true, "filename");
+    isRelativePathSafeTest(false, "file*name");
+    isRelativePathSafeTest(false, "filename?");
+    isRelativePathSafeTest(false, "[filename]");
 
-    isSafeRelativePathTest(true, "package-name-version_3.1.2-x.deb");
-    isSafeRelativePathTest(false, "--package-name-version_3.1.2-x.deb");
-    isSafeRelativePathTest(false, "~/package-name-version_3.1.2-x.deb");
+    isRelativePathSafeTest(true, "package-name-version_3.1.2-x.deb");
+    isRelativePathSafeTest(false, "--package-name-version_3.1.2-x.deb");
+    isRelativePathSafeTest(false, "~/package-name-version_3.1.2-x.deb");
 
-    isSafeRelativePathTest(true, "directory/windows-installer-3.1.2.msi");
-    isSafeRelativePathTest(false, "c:/directory/windows-installer-3.1.2.msi");
+    isRelativePathSafeTest(true, "directory/windows-installer-3.1.2.msi");
+    isRelativePathSafeTest(false, "c:/directory/windows-installer-3.1.2.msi");
 
-    isSafeRelativePathTest(true, "directory\\windows-installer-3.1.2.msi");
-    isSafeRelativePathTest(false, "D:\\directory\\windows-installer-3.1.2.msi");
+    isRelativePathSafeTest(true, "directory\\windows-installer-3.1.2.msi");
+    isRelativePathSafeTest(false, "D:\\directory\\windows-installer-3.1.2.msi");
 }
 
 } // namespace test

@@ -12,7 +12,7 @@ namespace
 
 int QnExecScript::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    if (!nx::utils::file_system::isSafeRelativePath(path)) {
+    if (!nx::utils::file_system::isRelativePathSafe(path)) {
         result.setError(QnRestResult::InvalidParameter, "Path contains forbidden characters");
         return nx_http::StatusCode::ok;
     }
