@@ -51,9 +51,10 @@ bool Controller::discoverPublicAddress()
         return false;
 
     SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
+    m_model->remoteRelayPeerPool().setNodeId(publicSocketAddress.toStdString());
 
     nx::utils::SubscriptionId subscriptionId;
-    subscribeForPeerConnected(&subscriptionId, publicSocketAddress.toStdString());
+    subscribeForPeerConnected(&subscriptionId);
     m_listeningPeerPoolSubscriptions.push_back(subscriptionId);
 
     subscribeForPeerDisconnected(&subscriptionId);
@@ -62,14 +63,12 @@ bool Controller::discoverPublicAddress()
     return true;
 }
 
-void Controller::subscribeForPeerConnected(
-    nx::utils::SubscriptionId* subscriptionId,
-    std::string publicAddress)
+void Controller::subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId)
 {
     m_model->listeningPeerPool().peerConnectedSubscription().subscribe(
-        [this, publicAddress = std::move(publicAddress)](std::string peer)
+        [this](std::string peer)
         {
-            m_model->remoteRelayPeerPool().addPeer(peer, publicAddress)
+            m_model->remoteRelayPeerPool().addPeer(peer)
                 .then(
                     [this, peer](cf::future<bool> addPeerFuture)
                     {

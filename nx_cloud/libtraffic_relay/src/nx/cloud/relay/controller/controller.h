@@ -38,10 +38,7 @@ private:
     const conf::Settings* m_settings;
     std::vector<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 
-    void subscribeForPeerConnected(
-        nx::utils::SubscriptionId* subscriptionId,
-        std::string publicAddress);
-
+    void subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId);
     void subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId);
 };
 
