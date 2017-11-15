@@ -68,7 +68,7 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
     if (m_hevcSupported)
         return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
-    
+
     return base_type::createLiveDataProvider();
 }
 
@@ -166,7 +166,7 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
     nx::utils::Url requestUrl(getUrl());
     requestUrl.setPath(lit("/ISAPI/System/TwoWayAudio/channels"));
     requestUrl.setHost(getHostAddress());
-    requestUrl.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    requestUrl.setPort(nx::utils::Url(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
 
     if (!httpClient->doGet(requestUrl) || !isResponseOK(httpClient.get()))
     {
@@ -287,7 +287,7 @@ static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 class HikvisionRequestHelper
 {
 public:
-    HikvisionRequestHelper(const QUrl& url, const QAuthenticator& authenticator):
+    HikvisionRequestHelper(const nx::utils::Url& url, const QAuthenticator& authenticator):
         m_url(url),
         m_client(makeHttpClient(authenticator))
     {
@@ -383,11 +383,11 @@ public:
     }
 
 private:
-    const QUrl& m_url;
+    const nx::utils::Url& m_url;
     const std::unique_ptr<nx_http::HttpClient> m_client;
 };
 
-bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator)
+bool HikvisionResource::tryToEnableOnvifSupport(const nx::utils::Url& url, const QAuthenticator& authenticator)
 {
     HikvisionRequestHelper requestHelper(url, authenticator);
     const auto isOnvifSupported = requestHelper.isOnvifSupported();
