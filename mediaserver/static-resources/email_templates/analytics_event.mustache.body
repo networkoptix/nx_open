@@ -17,15 +17,28 @@
     </div>
 {{/screenshot}}
 
+{{#count}}
+
 <div class="date">
     Trigger has been activated {{count}} times, first:<br/>
     <b>{{timestampDate}} {{timestampTime}}</b>
-
-    {{#urlint}}
-        <p><a href="{{urlint}}">Play archive from the local network</a></p>
-    {{/urlint}}
-
-    {{#urlext}}
-        <p><a href="{{urlext}}">Play archive from the web</a></p>
-    {{/urlext}}
 </div>
+
+{{/count}}
+
+{{^count}}
+
+<div class="date">
+    Trigger has been activated at:<br/>
+    <b>{{timestampDate}} {{timestampTime}}</b>
+</div>
+
+{{/count}}
+
+{{#urlint}}
+    <p><a href="{{urlint}}">Play archive from the local network</a></p>
+{{/urlint}}
+
+{{#urlext}}
+    <p><a href="{{urlext}}">Play archive from the web</a></p>
+{{/urlext}}

@@ -58,38 +58,35 @@ QnMaskedProxyWidget* makeMaskedProxy(
 
 void setupButton(QPushButton& button)
 {
-    static const auto kDefaultButtonHeight = 28.0;
-
     button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    button.setFixedHeight(kDefaultButtonHeight);
 
-    static const auto kButtonName = lit("itemStateExtraActionButton");
+    static const auto kButtonName = lit("itemStateActionButton");
     button.setObjectName(kButtonName);
 
-    static const auto kStyleSheetTemplate = lit(
-        "QPushButton#%1"
-        "{"
-        "    color: %2;"
-        "    background-color: %4;"
-        "    border-style: solid;"
-        "    border-radius: 2px;"
-        "    font: 500 13px;"
-        "    padding-left: 16px;"
-        "    padding-right: 16px;"
-        "    min-height: 32px;"
-        "    max-height: 32px;"
-        "}"
-        "QPushButton#%1:hover"
-        "{"
-        "    color: %3;"
-        "    background-color: %5;"
-        "}"
-        "QPushButton#%1:pressed"
-        "{"
-        "    color: %2;"
-        "    background-color: %6;"
-        "}"
-        );
+    static const auto kStyleSheetTemplateRaw = R"(
+        QPushButton#%1
+        {
+            color: %2;
+            background-color: %4;
+            border-style: solid;
+            border-radius: 2px;
+            font: 500 13px;
+            padding-left: 16px;
+            padding-right: 16px;
+            min-height: 32px;
+            max-height: 32px;
+        }
+        QPushButton#%1:hover
+        {
+            color: %3;
+            background-color: %5;
+        }
+        QPushButton#%1:pressed
+        {
+            color: %2;
+            background-color: %6;
+        }
+    )";
 
     static const auto kBaseColor = QColor(qnNxStyle->mainColor(
         QnNxStyle::Colors::kContrast).darker(4));
@@ -101,6 +98,7 @@ void setupButton(QPushButton& button)
     static const auto kHovered = toTransparent(kBaseColor, 0.2).name(QColor::HexArgb);
     static const auto kPressed = toTransparent(kBaseColor, 0.15).name(QColor::HexArgb);
 
+    static const QString kStyleSheetTemplate(QString::fromLatin1(kStyleSheetTemplateRaw));
     const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName,
         kTextColor, kHoveredTextColor, kBackground, kHovered, kPressed);
 
@@ -109,36 +107,33 @@ void setupButton(QPushButton& button)
 
 void setupCustomButton(QPushButton& button)
 {
-    static const auto kDefaultButtonHeight = 28.0;
-
     button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    button.setFixedHeight(kDefaultButtonHeight);
 
     static const auto kButtonName = lit("itemStateExtraActionButton");
     button.setObjectName(kButtonName);
 
-    static const auto kStyleSheetTemplate = lit(
-        "QPushButton#%1"
-        "{"
-        "    color: %2;"
-        "    background-color: \"transparent\";"
-        "    border-style: solid;"
-        "    border-radius: 2px;"
-        "    font: 500 13px;"
-        "    padding-left: 16px;"
-        "    padding-right: 16px;"
-        "    min-height: 32px;"
-        "    max-height: 32px;"
-        "}"
-        "QPushButton#%1:hover"
-        "{"
-        "    color: %3;"
-        "}"
-        "QPushButton#%1:pressed"
-        "{"
-        "    color: %2;"
-        "}"
-        );
+    static const auto kStyleSheetTemplateRaw = R"(
+        QPushButton#%1
+        {
+            color: %2;
+            background-color: transparent;
+            border-style: solid;
+            border-radius: 2px;
+            font: 500 13px;
+            padding-left: 16px;
+            padding-right: 16px;
+            min-height: 32px;
+            max-height: 32px;
+        }
+        QPushButton#%1:hover
+        {
+            color: %3;
+        }
+        QPushButton#%1:pressed
+        {
+            color: %2;
+        }
+        )";
 
     static const auto kBaseColor = QColor(qnNxStyle->mainColor(
         QnNxStyle::Colors::kContrast).darker(4));
@@ -146,6 +141,7 @@ void setupCustomButton(QPushButton& button)
     static const auto kTextColor = toTransparent(kBaseColor, 0.6).name(QColor::HexArgb);
     static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
 
+    static const QString kStyleSheetTemplate(QString::fromLatin1(kStyleSheetTemplateRaw));
     const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName, kTextColor, kHoveredTextColor);
 
     button.setStyleSheet(kStyleSheet);

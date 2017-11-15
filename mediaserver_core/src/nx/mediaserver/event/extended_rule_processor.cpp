@@ -762,6 +762,10 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     contextMap[tpSource] = helper.getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(params);
 
+    const auto aggregationCount = action->getAggregationCount();
+    if (aggregationCount > 1)
+        contextMap[tpCount] = QString::number(aggregationCount);
+
     switch (eventType)
     {
         case vms::event::cameraMotionEvent:
@@ -792,11 +796,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 ? helper.defaultSoftwareTriggerName()
                 : params.caption;
 
-            const auto aggregationCount = action->getAggregationCount();
-
-            if (aggregationCount > 1)
-                contextMap[tpCount] = QString::number(aggregationCount);
-
             contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
@@ -816,12 +815,6 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         case vms::event::analyticsSdkEvent:
         {
             contextMap[tpAnalyticsSdkEventType] = helper.getAnalyticsSdkEventName(params);
-
-            const auto aggregationCount = action->getAggregationCount();
-
-            if (aggregationCount > 1)
-                contextMap[tpCount] = QString::number(aggregationCount);
-
             contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
             contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
