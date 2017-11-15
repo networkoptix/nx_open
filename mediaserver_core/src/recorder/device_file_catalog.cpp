@@ -332,7 +332,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
         QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
         avi->setStorage(storage);
         avi->setFastStreamFind(true);
-        if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE)
+        if (avi->open(res, /*archiveIntegrityWatcher*/ nullptr) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE)
         {
             qint64 startTimeMs = avi->startTime()/1000;
             qint64 endTimeMs = avi->endTime()/1000;

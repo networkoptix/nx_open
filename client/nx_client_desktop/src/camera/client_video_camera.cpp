@@ -22,7 +22,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
     m_resource(resource),
     m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
     m_reader(reader),
-    m_extTimeSrc(NULL),
     m_exportRecorder(nullptr),
     m_exportReader(nullptr),
     m_displayStarted(false)
@@ -65,14 +64,6 @@ QnClientVideoCamera::~QnClientVideoCamera()
 
 QnMediaResourcePtr QnClientVideoCamera::resource() {
     return m_resource;
-}
-
-qint64 QnClientVideoCamera::getCurrentTime() const
-{
-    if (m_extTimeSrc && m_extTimeSrc->isEnabled())
-        return m_extTimeSrc->getDisplayedTime();
-    else
-        return m_camdispay.getDisplayedTime();
 }
 
 /*

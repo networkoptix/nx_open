@@ -7,6 +7,7 @@
 
 class QnTimePeriod;
 class QnTimePeriodList;
+class AbstractArchiveIntegrityWatcher;
 
 class QnAbstractArchiveStreamReader: public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
 {
@@ -25,7 +26,7 @@ public:
 
 
     // Manual open. Open will be called automatically on first data access
-    bool open();
+    bool open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher);
 
     virtual bool isSkippingFrames() const = 0;
 
@@ -118,6 +119,7 @@ signals:
     void prevFrameOccured();
     void skipFramesTo(qint64 mksec);
 protected:
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
     bool m_cycleMode;
     qint64 m_needToSleep;
     QnAbstractArchiveDelegate* m_delegate;

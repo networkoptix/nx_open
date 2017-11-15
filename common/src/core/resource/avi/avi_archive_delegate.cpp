@@ -289,7 +289,7 @@ bool QnAviArchiveDelegate::reopen()
     auto storage = m_storage;
     close();
     m_storage = storage;
-    if (!open(m_resource))
+    if (!open(m_resource, m_archiveIntegrityWatcher))
         return false;
     if (!findStreams())
         return false;
@@ -297,10 +297,13 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
-bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
+bool QnAviArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher *archiveIntegrityWatcher)
 {
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
+    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
     m_resource = resource;
     if (m_formatContext == nullptr)
     {
@@ -314,6 +317,12 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
                     url));
             if(!m_storage)
                 return false;
+        }
+
+        if (!m_storage->isFileExists(url) && m_archiveIntegrityWatcher)
+        {
+            m_archiveIntegrityWatcher->fileMissing(url);
+            return false;
         }
 
         m_formatContext = avformat_alloc_context();
@@ -341,7 +350,13 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
             return false;
         }
 
-        initMetadata();
+        if (!initMetadata())
+        {
+            close();
+            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
+            return false;
+        }
+
         getVideoLayout();
     }
     m_resource->setStatus(Qn::Online);
@@ -536,16 +551,18 @@ void QnAviArchiveDelegate::initLayoutStreams()
     }
 }
 
-void QnAviArchiveDelegate::initMetadata()
+bool QnAviArchiveDelegate::initMetadata()
 {
     auto aviRes = m_resource.dynamicCast<QnAviResource>();
     if (aviRes && aviRes->hasAviMetadata())
     {
         m_metadata = aviRes->aviMetadata();
-        return;
+        return true;
     }
 
     m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
+    if (m_archiveIntegrityWatcher && !m_archiveIntegrityWatcher->fileRequested(m_metadata, m_resource->getUrl()))
+        return false;
 
     if (aviRes)
     {
@@ -553,6 +570,8 @@ void QnAviArchiveDelegate::initMetadata()
         if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
             aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
     }
+
+    return true;
 }
 
 qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)

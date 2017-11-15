@@ -33,6 +33,8 @@ public:
     Locker& operator=(const Locker& other) = delete;
     inline Value* operator->() { return m_value; }
     inline const Value* operator->() const { return m_value; }
+    inline Locker& operator*() { return *m_value; }
+    inline const Locker& operator*() const { return *m_value; }
 
 private:
     mutable QnMutex* m_mutex;
@@ -48,7 +50,7 @@ struct Lockable
     };
 
 private:
-    mutable QnMutex m_mutex;
+    QnMutex m_mutex;
     Value m_value;
 };
 

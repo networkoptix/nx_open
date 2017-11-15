@@ -6,6 +6,7 @@
 #include <recorder/abstract_remote_archive_synchronization_task.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/lockable.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -22,11 +23,11 @@ public:
     void start();
     void cancelTask(const QnUuid& taskId);
 
-    // Should be called before start
+    // Should be called before start.
     void setMaxTaskCount(int maxTaskCount);
 
-    // Should be called before start
-    void setTaskMapAccessor(std::function<LockableTaskMap*()> taskMapAccessor);
+    // Should be called before start.
+    void setTaskMapAccessor(nx::utils::MoveOnlyFunc<LockableTaskMap*()> taskMapAccessor);
 
 private:
     nx::utils::TimerId scheduleTaskGrabbing();
@@ -39,7 +40,7 @@ private:
     std::atomic<bool> m_terminated{false};
     nx::utils::TimerId m_timerId = 0;
     std::map<QnUuid, std::unique_ptr<RemoteArchiveWorker>> m_workers;
-    std::function<LockableTaskMap*()> m_taskMapAccessor;
+    nx::utils::MoveOnlyFunc<LockableTaskMap*()> m_taskMapAccessor;
 };
 
 } // namespace recorder

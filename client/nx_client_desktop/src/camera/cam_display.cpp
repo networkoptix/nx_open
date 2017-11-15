@@ -37,6 +37,7 @@ static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000 * 1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer
 static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
+static const std::chrono::milliseconds kMediaMessageDelay(1500);
 
 static void updateActivity()
 {
@@ -1198,6 +1199,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 QString::fromLatin1(data));
 
             m_lastMediaEvent = mediaEvent;
+            m_lastMediaEventTimeout.restart();
         }
         else
         {
@@ -1362,7 +1364,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (m_emptyPacketCounter >= 3 || isFillerPacket)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !isFillerPacket) {
+            if (m_extTimeSrc &&
+                !isLive &&
+                isVideoCamera &&
+                !m_eofSignalSended &&
+                !isFillerPacket &&
+                (!m_lastMediaEventTimeout.isValid() ||
+                  m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay)))
+            {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }

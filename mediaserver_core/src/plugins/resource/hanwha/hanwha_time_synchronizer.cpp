@@ -82,6 +82,11 @@ void HanwhaTimeSyncronizer::start(HanwhaSharedResourceContext* resourceConext)
     promise.get_future().wait();
 }
 
+void HanwhaTimeSyncronizer::setTimeSynchronizationEnabled(bool enabled)
+{
+    m_timeSynchronizationEnabled = enabled;
+}
+
 void HanwhaTimeSyncronizer::setTimeZoneShiftHandler(TimeZoneShiftHandler handler)
 {
     m_timer.post(
@@ -119,6 +124,9 @@ void HanwhaTimeSyncronizer::verifyDateTime()
                 // We do not know time zone, so we use UTC to compare with real UTC time.
                 updateTimeZoneShift(std::chrono::seconds(utcDateTime.secsTo(localDateTime)));
 
+                if (!m_timeSynchronizationEnabled)
+                    return retryVerificationIn(kResyncInterval);
+
                 const auto serverDateTime = qnSyncTime->currentDateTime();
                 const auto timeDiffSecs = std::abs((int) utcDateTime.secsTo(serverDateTime));
                 if (timeDiffSecs > kAcceptableTimeDiffSecs)
@@ -128,7 +136,6 @@ void HanwhaTimeSyncronizer::verifyDateTime()
 
                     return setDateTime(serverDateTime);
                 }
-
                 // TODO: Uncomment in case we need to synchronize time zone as well.
                 // if (response.getOrThrow("POSIXTimeZone") != getPosixTimeZone(dateTime.timeZone()))
                 // {

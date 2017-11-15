@@ -132,6 +132,8 @@ public slots:
 
     void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
+    void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
+
     bool createEventFromParams(const nx::vms::event::EventParameters& params,
         vms::event::EventState eventState, const QnUuid& userId = QnUuid(),
         QString* errorMessage = nullptr);

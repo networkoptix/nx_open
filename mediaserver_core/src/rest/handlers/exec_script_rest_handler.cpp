@@ -3,7 +3,7 @@
 #include <QFileInfo>
 #include "media_server/serverutil.h"
 #include <QProcess>
-#include <rest/helpers/request_helpers.h>
+#include <nx/utils/file_system.h>
 
 namespace
 {
@@ -12,7 +12,7 @@ namespace
 
 int QnExecScript::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    if (!verifySimpleRelativePath(path)) {
+    if (!nx::utils::file_system::isRelativePathSafe(path)) {
         result.setError(QnRestResult::InvalidParameter, "Path contains forbidden characters");
         return nx_http::StatusCode::ok;
     }

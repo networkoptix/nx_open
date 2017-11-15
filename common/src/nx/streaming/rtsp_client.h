@@ -61,11 +61,11 @@ public:
 
 enum class TimePolicy
 {
-    BindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
-    IgnoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
-    ForceLocalTime, //< Use local time only.
-    ForceCameraTime, //< Use camera NPT time only.
-    OnvifExtension //< Use timestamps from Onvif streaming spec extension.
+    bindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
+    ignoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
+    forceLocalTime, //< Use local time only.
+    forceCameraTime, //< Use camera NPT time only.
+    onvifExtension, //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper
@@ -108,7 +108,7 @@ private:
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
-    TimePolicy m_timePolicy = TimePolicy::BindCameraTimeToLocalTime;
+    TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);

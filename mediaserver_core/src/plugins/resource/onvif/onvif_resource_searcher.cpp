@@ -24,6 +24,8 @@
 #include <onvif/soapStub.h>
 #include "gsoap_async_call_wrapper.h"
 
+#include <plugins/resource/hikvision/hikvision_resource.h>
+
 namespace {
 
 /*
@@ -173,6 +175,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
     QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
+
+    // TODO: Move out to some helper class, to remove direct link to hikvision.
+    nx::mediaserver_core::plugins::HikvisionResource::tryToEnableOnvifSupport(deviceUrl, auth);
 
     // optimization. do not pull resource every time if resource already in pool
     if (rpResource)
