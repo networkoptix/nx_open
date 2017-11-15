@@ -188,7 +188,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                     if($scope.playerAPI){
                         $scope.playerAPI.volume($scope.volumeLevel);
                     }
-                }, 100);
+                }, Config.webclient.playerReadyTimeout);
             }
         };
 
