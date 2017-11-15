@@ -1,9 +1,10 @@
 #include "dialog_utils.h"
 
 namespace nx {
-namespace utils {
+namespace client {
+namespace desktop {
 
-void setDialogParent(QDialog* dialog, QWidget* parent)
+void DialogUtils::setDialogParent(QDialog* dialog, QWidget* parent)
 {
     // We have to keep flags for dialogs if we don't want to place it
     // as widget on the parent
@@ -15,5 +16,6 @@ void setDialogParent(QDialog* dialog, QWidget* parent)
     dialog->setWindowFlags(flags);
 }
 
-} // namespace utils
+} // namespace desktop
+} // namespace client
 } // namespace nx

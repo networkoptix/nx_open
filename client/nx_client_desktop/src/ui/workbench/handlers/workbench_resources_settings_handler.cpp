@@ -24,6 +24,7 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
@@ -120,7 +121,7 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     if (!m_userSettingsDialog)
         m_userSettingsDialog = new QnUserSettingsDialog(parent);
     else
-        nx::utils::setDialogParent(m_userSettingsDialog, parent);
+        DialogUtils::setDialogParent(m_userSettingsDialog, parent);
 
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);

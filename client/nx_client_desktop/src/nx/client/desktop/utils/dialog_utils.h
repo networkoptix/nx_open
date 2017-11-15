@@ -4,11 +4,17 @@ class QDialog;
 class QWidget;
 
 namespace nx {
-namespace utils {
+namespace client {
+namespace desktop {
 
-/** Sets parent for dialog and preservs window flags. Overwise, dialog will be placed as widget */
-void setDialogParent(QDialog* dialog, QWidget* parent);
+class DialogUtils
+{
+public:
+    /** Sets parent for dialog and preservs window flags. Overwise, dialog will be placed as widget */
+    static void setDialogParent(QDialog* dialog, QWidget* parent);
+};
 
-} // namespace utils
+} // namespace desktop
+} // namespace client
 } // namespace nx
 

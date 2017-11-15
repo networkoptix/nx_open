@@ -83,7 +83,7 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
         if (explicitParent)
-            nx::utils::setDialogParent(output, explicitParent);
+            nx::client::desktop::DialogUtils::setDialogParent(output, explicitParent);
     }
     return output;
 }
