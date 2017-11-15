@@ -122,12 +122,9 @@ void HanwhaTimeSyncronizer::verifyDateTime()
                 // We do not know time zone, so we use UTC to compare with real UTC time.
                 updateTimeZoneShift(std::chrono::seconds(utcDateTime.secsTo(localDateTime)));
 
-                if (!m_timeSynchronizationEnabled)
-                    return retryVerificationIn(kResyncInterval);
-
                 const auto serverDateTime = qnSyncTime->currentDateTime();
                 const auto timeDiffSecs = std::abs((int) utcDateTime.secsTo(serverDateTime));
-                if (timeDiffSecs > kAcceptableTimeDiffSecs)
+                if (timeDiffSecs > kAcceptableTimeDiffSecs && m_timeSynchronizationEnabled)
                 {
                     NX_DEBUG(this, lm("Camera has %1 time which is %2 seconds different")
                         .args(utcDateTime, utcDateTime.secsTo(serverDateTime)));
