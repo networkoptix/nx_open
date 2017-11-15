@@ -50,6 +50,14 @@ struct SecondStreamMode
     }
 };
 
+// Native ptz presets can be disabled if they are supported and nx presets are supported too.
+bool canDisableNativePresets(const QnVirtualCameraResourcePtr& camera)
+{
+    const auto caps = camera->getPtzCapabilities();
+    return caps.testFlag(Ptz::NativePresetsPtzCapability)
+        && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
+}
+
 } // namespace
 
 QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
@@ -262,11 +270,12 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             }
         }
 
-        if (camera->getPtzCapabilities() & Ptz::NativePresetsPtzCapability)
+        if (canDisableNativePresets(camera))
+        {
             ++supportedNativePtzCount;
-
-        if (!camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty())
-            ++disabledNativePtzCount;
+            if (!camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty())
+                ++disabledNativePtzCount;
+        }
 
         camCnt++;
     }
@@ -473,12 +482,11 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
             }
         }
 
-        if (disableNativePtz != Qt::PartiallyChecked
-            && (camera->getPtzCapabilities() & Ptz::NativePresetsPtzCapability))
+        if (disableNativePtz != Qt::PartiallyChecked && canDisableNativePresets(camera))
         {
-                camera->setProperty(
-                    Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
-                    (disableNativePtz == Qt::Checked) ? lit("true") : QString());
+            camera->setProperty(
+                Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
+                (disableNativePtz == Qt::Checked) ? lit("true") : QString());
         }
     }
 }
