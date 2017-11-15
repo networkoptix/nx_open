@@ -19,7 +19,7 @@ namespace api {
 
 /**
  * Provides access to mediator functions to be used by servers.
- * @note All server requests MUST be authorized by cloudSystemId and cloudAuthenticationKey.
+ * NOTE: All server requests MUST be authorized by cloudSystemId and cloudAuthenticationKey.
  */
 template<class NetworkClientType>
 class MediatorServerConnection:
@@ -50,7 +50,7 @@ public:
     }
 
     /**
-     * Reports to mediator that local server is available on \a addresses.
+     * Reports to mediator that local server is available on addresses.
      */
     void bind(
         nx::hpm::api::BindRequest requestData,

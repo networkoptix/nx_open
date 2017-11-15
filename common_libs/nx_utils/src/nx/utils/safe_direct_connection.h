@@ -26,7 +26,7 @@ namespace Qn
 
     //!Class that want to receive signals directly, MUST inherit this type
     /*!
-        \warning Implementation MUST call \a EnableSafeDirectConnection::directDisconnectAll before object destruction
+        \warning Implementation MUST call EnableSafeDirectConnection::directDisconnectAll before object destruction
     */
     class NX_UTILS_API EnableSafeDirectConnection
     {
@@ -41,7 +41,7 @@ namespace Qn
         EnableSafeDirectConnection();
         virtual ~EnableSafeDirectConnection();
 
-        //!Disconnects from all directly-connected slot connected with \a directConnect
+        //!Disconnects from all directly-connected slot connected with directConnect
         void directDisconnectAll();
         //!Using integer sequence as a unique object id since pointer can be reused immediately after its free
         ID uniqueObjectSequence() const;
@@ -52,7 +52,7 @@ namespace Qn
     };
 
     /*!
-        All signals, connected with \a Qn::safe_direct_connect, are delivered 
+        All signals, connected with Qn::safe_direct_connect, are delivered 
         through global instance of this class
     */
     class NX_UTILS_API SafeDirectConnectionGlobalHelper
@@ -93,17 +93,17 @@ namespace Qn
             directConnectInternal( sender, signalPtr, receiver, slotFunc );
         }
 
-        //!Safely disconnects \a receiver from all signals
+        //!Safely disconnects receiver from all signals
         /*!
-            \note Blocks till currently executed slots return
+            NOTE: Blocks till currently executed slots return
         */
         void directDisconnectAll( const EnableSafeDirectConnection* receiver );
-        //!Returns \a true if receiver is still connected to some signal
+        //!Returns true if receiver is still connected to some signal
         bool isConnected( const EnableSafeDirectConnection* receiver ) const;
 
         /*!
-            \note By using \a std::shared_ptr we ensure that \a SafeDirectConnectionGlobalHelper instance
-                is destroyed not earlier then last \a EnableSafeDirectConnection instance
+            NOTE: By using std::shared_ptr we ensure that SafeDirectConnectionGlobalHelper instance
+                is destroyed not earlier then last EnableSafeDirectConnection instance
         */
         static std::shared_ptr<SafeDirectConnectionGlobalHelper> instance();
 
@@ -158,7 +158,7 @@ namespace Qn
 
     //!MUST be used instead of QObject::connect with Qt::DirectConnection specified to guarantee thread-safety while disconnecting
     /*!
-        \note overload for slot as a member function
+        NOTE: overload for slot as a member function
     */
     template<
         typename SenderType, typename SignalType,
@@ -172,9 +172,9 @@ namespace Qn
             sender, signalFunc, receiver, slotFunc );
     }
 
-    //!Safely disconnects \a receiver from all signals
+    //!Safely disconnects receiver from all signals
     /*!
-        \note Blocks till currently executed slots return
+        NOTE: Blocks till currently executed slots return
     */
     void NX_UTILS_API directDisconnectAll( const EnableSafeDirectConnection* receiver );
 

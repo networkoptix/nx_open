@@ -5,7 +5,7 @@
 namespace nx {
 namespace utils {
 namespace db {
-    
+
 QueryExecutionInfo::QueryExecutionInfo():
     waitForExecutionDuration(std::chrono::milliseconds::zero())
 {
@@ -78,7 +78,7 @@ void StatisticsCollector::clearStatistics()
     m_currentStatistics.statisticalPeriod = m_period;
     m_requestExecutionTimesCalculationContext =
         DurationStatisticsCalculationContext(&m_currentStatistics.requestExecutionTimes);
-    m_waitingForExecutionTimesCalculationContext = 
+    m_waitingForExecutionTimesCalculationContext =
         DurationStatisticsCalculationContext(&m_currentStatistics.waitingForExecutionTimes);
 }
 

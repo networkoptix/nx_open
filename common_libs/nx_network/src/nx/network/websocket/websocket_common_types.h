@@ -51,7 +51,7 @@ enum class SendMode
 
     /**
      * Wrap buffer passed to sendAsync() in a complete websocket frame.
-     * @note Call setIsLastFrame() to mark final frame in the message.
+     * NOTE: Call setIsLastFrame() to mark final frame in the message.
      */
     multiFrameMessage
 };

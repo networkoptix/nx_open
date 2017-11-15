@@ -55,8 +55,8 @@ public:
 private:
     nx::cdb::CdbLauncher m_cdb;
     MediaServerLauncher m_mediaServerLauncher;
-    const std::pair<QString, QString> m_defaultOwnerCredentials;
-    std::pair<QString, QString> m_ownerCredentials;
+    const std::pair<QString, nx::String> m_defaultOwnerCredentials;
+    std::pair<QString, nx::String> m_ownerCredentials;
     nx::cdb::api::SystemData m_cloudSystem;
     nx::cdb::api::SystemSharingEx m_systemOwnerInfo;
     nx::cdb::AccountWithPassword m_ownerAccount;

@@ -55,11 +55,9 @@ angular.module('cloudApp')
             cacheReceived = {};
         }
 
-        var getSystems = cacheGet(apiBase + '/systems');
-
         return {
             checkResponseHasError:function(data){
-                if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
+                if(data && data.data && data.data.resultCode && data.data.resultCode != Config.responseOk){
                     return data;
                 }
                 return false;
@@ -129,50 +127,11 @@ angular.module('cloudApp')
             authKey:function(){
                 return $http.post(apiBase + '/account/authKey');
             },
-            systems: getSystems,
-            getSystemOwnerName: function(system, currentUserEmail, forOrder) {
-                if(system.ownerAccountEmail == currentUserEmail ){
-                    if(forOrder){
-                        return '!!!!!!!'; // Force my systems to be first
-                    }
-                    return L.system.yourSystem;
-                }
-
-                if(system.ownerFullName && system.ownerFullName.trim() != ''){
-                    return system.ownerFullName;
-                }
-
-                return system.ownerAccountEmail;
-            },
-            sortSystems: function (systems, currentUserEmail){
-                var self = this;
-                // Alphabet sorting
-                var preSort =  _.sortBy(systems,function(system){
-                    return self.getSystemOwnerName(system, currentUserEmail, true);
-                });
-                // Sort by usage frequency is more important than Alphabet
-                return _.sortBy(preSort,function(system){
-                    return -system.usageFrequency;
-                });
-            },
-
-            system: function(systemId){
-                function requestSystem(){
+            systems: function(systemId){
+                if(systemId){
                     return $http.get(apiBase + '/systems/' + systemId);
                 }
-
-                return getSystems().then(function(systemsCache){
-                    //Search our system in cache
-                    var system = _.find(systemsCache.data,function(system){
-                        return system.id == systemId;
-                    });
-
-                    if(system) { // Cache success
-                        return {data:[system]};
-                    }else{ // Cache miss
-                        return requestSystem();
-                    }
-                },requestSystem); // Total cache miss
+                return $http.get(apiBase + '/systems');
             },
             renameSystem:function(systemId,systemName){
                 var self = this;

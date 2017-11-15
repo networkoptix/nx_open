@@ -21,11 +21,11 @@ enum class AuthTokenType
 class NX_NETWORK_API AuthToken
 {
 public:
-    QString value;
+    nx::String value;
     AuthTokenType type = AuthTokenType::none;
 
-    void setPassword(const QString& password);
-    void setHa1(const QString& ha1);
+    void setPassword(const nx::String& password);
+    void setHa1(const nx::String& ha1);
     bool empty() const;
 };
 
@@ -33,14 +33,14 @@ class NX_NETWORK_API PasswordAuthToken:
     public AuthToken
 {
 public:
-    PasswordAuthToken(const QString& password);
+    PasswordAuthToken(const nx::String& password);
 };
 
 class NX_NETWORK_API Ha1AuthToken:
     public AuthToken
 {
 public:
-    Ha1AuthToken(const QString& ha1);
+    Ha1AuthToken(const nx::String& ha1);
 };
 
 class NX_NETWORK_API Credentials
@@ -131,7 +131,7 @@ bool NX_NETWORK_API validateAuthorization(
 
 /**
  * @param ha1 That's what calcHa1 has returned.
- * WARNING: ha1.size() + 1 + nonce.size() MUST be divisible by 64! 
+ * WARNING: ha1.size() + 1 + nonce.size() MUST be divisible by 64!
  *   This is requirement of MD5 algorithm.
  */
 BufferType NX_NETWORK_API calcIntermediateResponse(

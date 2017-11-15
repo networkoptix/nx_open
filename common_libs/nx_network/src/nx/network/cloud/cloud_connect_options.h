@@ -26,6 +26,10 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(CloudConnectOptions)
 } // namespace nx
 
 // QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::hpm::api::CloudConnectOptions), (lexical))
-// Cannot use QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES macro here since NX_NETWORK_API is needed.
+
+/**
+ * Cannot use QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES macro here since NX_NETWORK_API is needed.
+ */
+
 void NX_NETWORK_API serialize(const nx::hpm::api::CloudConnectOptions&, QString*);
 bool NX_NETWORK_API deserialize(const QString&, nx::hpm::api::CloudConnectOptions*);

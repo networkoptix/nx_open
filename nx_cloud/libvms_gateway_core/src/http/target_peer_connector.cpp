@@ -43,7 +43,7 @@ void TargetPeerConnector::connectAsync(ConnectHandler handler)
                     *m_timeout,
                     std::bind(&TargetPeerConnector::interruptByTimeout, this));
             }
-        
+
             m_completionHandler = std::move(handler);
 
             if (m_listeningPeerPool)
@@ -122,7 +122,9 @@ void TargetPeerConnector::processDirectConnectionResult(
         .args(SystemError::toString(systemErrorCode)));
 
     m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
-    processConnectionResult(systemErrorCode, std::move(m_targetPeerSocket));
+    processConnectionResult(
+        systemErrorCode,
+        systemErrorCode == SystemError::noError ? std::move(m_targetPeerSocket) : nullptr);
 }
 
 void TargetPeerConnector::processConnectionResult(

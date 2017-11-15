@@ -1,19 +1,15 @@
-
 #include "ping_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-PingRequest::PingRequest()
-:
+PingRequest::PingRequest():
     PingRequest(std::list<SocketAddress>())
 {
 }
 
-PingRequest::PingRequest(std::list<SocketAddress> _endpoints)
-:
+PingRequest::PingRequest(std::list<SocketAddress> _endpoints):
     StunRequestData(kMethod),
     endpoints(std::move(_endpoints))
 {
@@ -31,9 +27,9 @@ bool PingRequest::parseAttributes(const nx::stun::Message& message)
         message, &endpoints);
 }
 
+//-------------------------------------------------------------------------------------------------
 
-PingResponse::PingResponse()
-:
+PingResponse::PingResponse():
     StunResponseData(kMethod)
 {
 }

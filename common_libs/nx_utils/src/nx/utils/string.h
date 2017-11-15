@@ -26,14 +26,14 @@ std::string stringFormat(const std::string& format, Args... args)
 * \param string                        String to perform replacement on.
 * \param symbols                       Symbols that are to be replaced.
 * \param replacement                   Character to use as a replacement.
-* \returns                             String with all characters from \a symbols replaced with \a replacement.
+* \returns                             String with all characters from symbols replaced with replacement.
 */
 NX_UTILS_API QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement);
 
 /**
 * \param string                        String to perform replacement on.
 * \param replacement                   Character to use as a replacement.
-* \returns                             String with all non-filename characters replaces with \a replacement.
+* \returns                             String with all non-filename characters replaces with replacement.
 */
 inline QString replaceNonFileNameCharacters(const QString &string, const QChar &replacement)
 {
@@ -53,7 +53,7 @@ inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
 \param dateTime Can be one of following:\n
 - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
 - date in ISO format (YYYY-MM-DDTHH:mm:ss)
-- special value "now". In this case \a DATETIME_NOW is returned
+- special value "now". In this case DATETIME_NOW is returned
 - negative value. In this case value returned "as is"
 \return usec since epoch
 */
@@ -63,7 +63,7 @@ NX_UTILS_API qint64 parseDateTime( const QString& dateTimeStr );
 \param dateTime Can be one of following:\n
 - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
 - date in ISO format (YYYY-MM-DDTHH:mm:ss)
-- special value "now". In this case \a DATETIME_NOW is returned
+- special value "now". In this case DATETIME_NOW is returned
 - negative value. In this case value returned "as is"
 \return msec since epoch
 */
@@ -93,14 +93,14 @@ NX_UTILS_API QString elideString(const QString &source, int maxLength, const QSt
 //!Generates random string containing only letters and digits
 NX_UTILS_API QByteArray generateRandomName(int length);
 
-/** Converts \a bytes to human-readable string like 10M or 67K.
+/** Converts bytes to human-readable string like 10M or 67K.
  * Rounds value to floor with the given float precision.
 */
 NX_UTILS_API QString bytesToString(uint64_t bytes, int precision = 4);
 
 /** Converts bytes number string (e.g., 64K) to integer.
 K, M, G suffix are supported.
-@return On failure returns 0 and (if not null) sets \a *ok to \a false
+@return On failure returns 0 and (if not null) sets *ok to false
 */
 NX_UTILS_API uint64_t stringToBytes(const QString& str, bool* isOk = nullptr);
 NX_UTILS_API uint64_t stringToBytes(const QString& str, uint64_t defaultValue);
@@ -135,7 +135,7 @@ NX_UTILS_API void serializeNameValuePairs(
  */
 NX_UTILS_API QString removeMnemonics(QString text);
 
-//!Splits \a data by \a delimiter not closed within quotes
+//!Splits data by delimiter not closed within quotes
 /*!
     E.g.:
     \code

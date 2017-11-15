@@ -13,7 +13,9 @@
     #include <arpa/inet.h>
 #endif
 
-#include <stdint.h>
+#include <chrono>
+#include <cstdint>
+#include <string>
 
 #include <QtCore/QtEndian>
 #include <QtCore/QHash>
@@ -68,7 +70,7 @@ NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysError
 
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
- * @note Not using QHostAddress because QHostAddress can trigger dns name 
+ * NOTE: Not using QHostAddress because QHostAddress can trigger dns name
  * lookup which depends on Qt sockets which we do not want to use.
  */
 class NX_NETWORK_API HostAddress
@@ -76,11 +78,12 @@ class NX_NETWORK_API HostAddress
 public:
     HostAddress(const in_addr& addr);
     HostAddress(
-        const in6_addr& addr = in6addr_any, 
+        const in6_addr& addr = in6addr_any,
         boost::optional<uint32_t> scopeId = boost::none);
 
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
+    HostAddress(const std::string& addrStr);
 
     ~HostAddress();
 
@@ -114,7 +117,7 @@ public:
 
     static boost::optional<QString> ipToString(const in_addr& addr);
     static boost::optional<QString> ipToString(
-        const in6_addr& addr, 
+        const in6_addr& addr,
         boost::optional<uint32_t> scopeId);
 
     static boost::optional<in_addr> ipV4from(const QString& ip);
@@ -181,6 +184,32 @@ template <> struct hash<SocketAddress>
 };
 
 } // namespace std
+
+struct NX_NETWORK_API KeepAliveOptions
+{
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe;
+    std::chrono::seconds probeSendPeriod;
+    /**
+    * The number of unacknowledged probes to send before considering the connection dead and
+    * notifying the application layer.
+    */
+    size_t probeCount;
+
+    KeepAliveOptions(
+        std::chrono::seconds inactivityPeriodBeforeFirstProbe = std::chrono::seconds::zero(),
+        std::chrono::seconds probeSendPeriod = std::chrono::seconds::zero(),
+        size_t probeCount = 0);
+
+    bool operator==(const KeepAliveOptions& rhs) const;
+
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
+    QString toString() const;
+
+    void resetUnsupportedFieldsToSystemDefault();
+
+    static boost::optional<KeepAliveOptions> fromString(const QString& string);
+};
 
 inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
 inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }

@@ -49,7 +49,6 @@ protected:
         std::function<bool(const Appserver2Ptr&)> condition,
         std::chrono::milliseconds timeout);
 protected:
-    QnStaticCommonModule staticCommon;
     std::vector<Appserver2Ptr> m_servers;
     static int m_instanceCounter;
 };

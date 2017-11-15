@@ -41,12 +41,16 @@ private:
     QnCommonModule* m_commonModule;
     QString m_dataDirectory;
     QnAuthSession m_authSession;
+    QnModuleInformation m_localModuleInformation;
     QnModuleInformationWithAddresses m_remoteModuleInformation;
     bool m_dbBackupEnabled = false;
+    nx::String m_cloudAuthKey;
 
     bool validateInputData(
         const MergeSystemData& data,
         QnJsonRestResult* result);
+
+    void saveBackupOfSomeLocalData();
 
     nx_http::StatusCode::Value checkWhetherMergeIsPossible(
         const MergeSystemData& data,
@@ -95,6 +99,8 @@ private:
         const nx::utils::Url &url,
         const QString& authenticationKey,
         QnModuleInformationWithAddresses* moduleInformation);
+
+    bool addMergeHistoryRecord(const MergeSystemData& data);
 };
 
 } // namespace utils

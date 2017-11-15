@@ -115,6 +115,10 @@ public:
         const QnUuid& resourceId,
         ec2::ApiResourceParamDataList* result);
 
+    void ec2GetSystemMergeHistory(
+        std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler);
+    ec2::ErrorCode ec2GetSystemMergeHistory(ec2::ApiSystemMergeHistoryRecordList* result);
+
     /**
      * NOTE: Can only be called within request completion handler. 
      *   Otherwise, result is not defined.

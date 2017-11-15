@@ -28,7 +28,7 @@ public:
     virtual nx::network::TransportProtocol transportProtocol() const = 0;
     virtual SocketAddress getSourceAddress() const = 0;
     /**
-     * @note AbstractServerConnection::sendMessage does nothing after handler has been invoked.
+     * NOTE: AbstractServerConnection::sendMessage does nothing after handler has been invoked.
      */
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     virtual AbstractCommunicatingSocket* socket() = 0;

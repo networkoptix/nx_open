@@ -4,6 +4,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
+#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
 
@@ -24,7 +27,7 @@ class CloudMerge:
 public:
     static void SetUpTestCase()
     {
-        s_staticCommonModule = 
+        s_staticCommonModule =
             std::make_unique<QnStaticCommonModule>(Qn::PeerType::PT_Server);
     }
 
@@ -37,7 +40,7 @@ protected:
     void givenTwoCloudSystemsWithTheSameOwner()
     {
         ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(2));
-       
+
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
         {
             ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[0]));
@@ -87,9 +90,38 @@ protected:
         }
     }
 
+    void waitForEverySystemToGoOnline()
+    {
+        for (;;)
+        {
+            std::vector<nx::cdb::api::SystemDataEx> systems;
+            ASSERT_EQ(
+                nx::cdb::api::ResultCode::ok,
+                m_cdb.getSystems(m_cloudAccounts[0].email, m_cloudAccounts[0].password, &systems));
+            ASSERT_GT(systems.size(), 0U);
+            bool everySystemIsOnline = true;
+            for (const auto& system: systems)
+                everySystemIsOnline &= system.stateOfHealth == nx::cdb::api::SystemHealth::online;
+
+            if (everySystemIsOnline)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
     void whenMergeSystems()
     {
         m_systemMergeFixture.whenMergeSystems();
+    }
+
+    void whenMergeSystemsWithCloudDbRequest()
+    {
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            m_cdb.mergeSystems(
+                m_cloudAccounts[0],
+                m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
+                m_systemMergeFixture.peer(1).getCloudCredentials().systemId.toStdString()));
     }
 
     void whenGoneOffline()
@@ -101,25 +133,29 @@ protected:
     {
         ASSERT_EQ(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
     }
-    
+
     void andAllServersAreInterconnected()
     {
         m_systemMergeFixture.thenAllServersAreInterconnected();
     }
-    
+
     void andAllServersSynchronizedData()
     {
         m_systemMergeFixture.thenAllServersSynchronizedData();
     }
 
-    //void thenSystemsMerged()
-    //{
-    //    const auto cloudSystemCredentials = 
-    //        m_systemMergeFixture.peer(0).getCloudCredentials();
-    //    thenSystemDataIsSynchronizedToCloud(cloudSystemCredentials);
-    //    waitUntilAllCloudCredentialsAreNotValidExcept(cloudSystemCredentials);
-    //    thenCloudCredentialsAreValid(cloudSystemCredentials);
-    //}
+    void andMergeHistoryRecordIsAdded()
+    {
+        const ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory =
+            m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
+        ASSERT_GE(systemMergeHistory.size(), 1U);
+        ASSERT_TRUE(systemMergeHistory[0].verify(m_systemCloudCredentials.back().key));
+    }
+
+    void thenMergedSystemDisappearedFromCloud()
+    {
+        waitUntilAllCloudCredentialsAreNotValidExcept(m_systemCloudCredentials[0]);
+    }
 
     void thenCloudCredentialsAreValid(
         const nx::hpm::api::SystemCredentials& cloudCredentials)
@@ -215,16 +251,31 @@ protected:
         ASSERT_NE(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
     }
 
+    void thenMergeFullyCompleted()
+    {
+        thenMergeSucceded();
+        andAllServersAreInterconnected();
+        andAllServersSynchronizedData();
+        andMergeHistoryRecordIsAdded();
+    }
+
 private:
     nx::cdb::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
+    TestHttpServer m_httpProxy;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 
     virtual void SetUp() override
     {
+        ASSERT_TRUE(m_httpProxy.bindAndListen());
+
+        m_cdb.addArg(
+            "-vmsGateway/url",
+            lm("http://%1/{targetSystemId}").arg(m_httpProxy.serverAddress()).toStdString().c_str());
+
         ASSERT_TRUE(m_cdb.startAndWaitUntilStarted());
 
         m_cloudAccounts.push_back(m_cdb.addActivatedAccount2());
@@ -244,10 +295,26 @@ private:
         const nx::cdb::AccountWithPassword& ownerAccount)
     {
         const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
-        return peerWrapper.saveCloudSystemCredentials(
+        if (!peerWrapper.saveCloudSystemCredentials(
+                system.id,
+                system.authKey,
+                ownerAccount.email))
+        {
+            return false;
+        }
+
+        if (!m_httpProxy.registerRedirectHandler(
+                lm("/%1/api/mergeSystems").args(system.id),
+                nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                    .setEndpoint(peerWrapper.endpoint()).setPath("/api/mergeSystems")))
+        {
+            return false;
+        }
+
+        nx::network::SocketGlobals::addressResolver().addFixedAddress(
             system.id,
-            system.authKey,
-            ownerAccount.email);
+            peerWrapper.endpoint());
+        return true;
     }
 };
 
@@ -260,9 +327,18 @@ TEST_F(CloudMerge, cloud_systems_with_the_same_owner_can_be_merged)
 
     whenMergeSystems();
 
-    thenMergeSucceded();
-    andAllServersAreInterconnected();
-    andAllServersSynchronizedData();
+    thenMergeFullyCompleted();
+}
+
+TEST_F(CloudMerge, merging_cloud_systems_through_cloud_db)
+{
+    givenTwoCloudSystemsWithTheSameOwner();
+    addRandomCloudUserToEachSystem();
+    waitForEverySystemToGoOnline();
+
+    whenMergeSystemsWithCloudDbRequest();
+
+    thenMergeFullyCompleted();
 }
 
 TEST_F(CloudMerge, cloud_systems_with_different_owners_cannot_be_merged)
@@ -270,6 +346,13 @@ TEST_F(CloudMerge, cloud_systems_with_different_owners_cannot_be_merged)
     givenTwoCloudSystemsWithDifferentOwners();
     whenMergeSystems();
     thenMergeFails();
+}
+
+TEST_F(CloudMerge, merged_system_removed_in_cloud_after_merge)
+{
+    givenTwoCloudSystemsWithTheSameOwner();
+    whenMergeSystems();
+    thenMergedSystemDisappearedFromCloud();
 }
 
 } // namespace test

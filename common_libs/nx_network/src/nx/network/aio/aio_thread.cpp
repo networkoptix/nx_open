@@ -211,7 +211,7 @@ void AIOThread::run()
 
         m_taskQueue->processingPostedCalls = 0;
 
-        //processing tasks that have been added from within \a processPostedCalls() call
+        //processing tasks that have been added from within processPostedCalls() call
         m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
 
         qint64 curClock = m_taskQueue->getSystemTimerVal();

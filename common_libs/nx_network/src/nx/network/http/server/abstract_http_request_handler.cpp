@@ -95,7 +95,7 @@ void AbstractHttpRequestHandler::requestDone(RequestResult requestResult)
     m_responseMsg.response->statusLine.reasonPhrase =
         StatusCode::toString(requestResult.statusCode);
 
-    // This object is allowed to be removed within m_completionHandler, 
+    // This object is allowed to be removed within m_completionHandler,
     //  so creating local data.
     auto completionHandlerLocal = std::move(m_completionHandler);
     auto responseMsgLocal = std::move(m_responseMsg);

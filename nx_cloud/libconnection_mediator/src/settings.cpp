@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -88,7 +83,7 @@ constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
     nx::hpm::api::kUdpTunnelKeepAliveIntervalDefault;
 
 const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
-constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
+constexpr const int kDefaultUdpTunnelKeepAliveRetries =
     nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 
 const QLatin1String kTunnelInactivityTimeout("cloudConnect/tunnelInactivityTimeout");
@@ -100,7 +95,7 @@ constexpr const std::chrono::seconds kDefaultConnectionAckAwaitTimeout =
     std::chrono::seconds(7);
 
 const QLatin1String kConnectionResultWaitTimeout("cloudConnect/connectionResultWaitTimeout");
-constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout = 
+constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout =
     std::chrono::seconds(15);
 
 const QLatin1String kMaxRelayInstanceSearchTime("cloudConnect/maxRelayInstanceSearchTime");
@@ -142,7 +137,7 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 const QLatin1String kTrafficRelayUrl("trafficRelay/url");
 
-} // namespace 
+} // namespace
 
 namespace nx {
 namespace hpm {

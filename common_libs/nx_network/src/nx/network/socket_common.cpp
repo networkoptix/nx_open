@@ -38,12 +38,17 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 }
 
 HostAddress::HostAddress(const QString& addrStr):
-    m_string( addrStr )
+    m_string(addrStr)
 {
 }
 
 HostAddress::HostAddress(const char* addrStr):
     HostAddress(QString::fromLatin1(addrStr))
+{
+}
+
+HostAddress::HostAddress(const std::string& addrStr):
+    HostAddress(addrStr.c_str())
 {
 }
 
@@ -266,8 +271,8 @@ HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
     if (inet_pton(AF_INET6, ipString.toLatin1().data(), &addr6))
     {
         result.first = addr6;
-        result.second = scopeId == std::numeric_limits<uint32_t>::max() 
-            ? boost::none 
+        result.second = scopeId == std::numeric_limits<uint32_t>::max()
+            ? boost::none
             : boost::optional<uint32_t>(scopeId);
         return result;
     }
@@ -418,4 +423,65 @@ QString SocketAddress::trimIpV6(const QString& ip)
         return ip.mid(1, ip.length() - 2);
 
     return ip;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+KeepAliveOptions::KeepAliveOptions(
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe,
+    std::chrono::seconds probeSendPeriod,
+    size_t probeCount)
+    :
+    inactivityPeriodBeforeFirstProbe(inactivityPeriodBeforeFirstProbe),
+    probeSendPeriod(probeSendPeriod),
+    probeCount(probeCount)
+{
+}
+
+bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
+{
+    return inactivityPeriodBeforeFirstProbe == rhs.inactivityPeriodBeforeFirstProbe
+        && probeSendPeriod == rhs.probeSendPeriod
+        && probeCount == rhs.probeCount;
+}
+
+std::chrono::seconds KeepAliveOptions::maxDelay() const
+{
+    return inactivityPeriodBeforeFirstProbe + probeSendPeriod * probeCount;
+}
+
+QString KeepAliveOptions::toString() const
+{
+    // TODO: Use JSON serrialization instead?
+    return lm("{ %1, %2, %3 }").arg(inactivityPeriodBeforeFirstProbe.count())
+        .arg(probeSendPeriod.count()).arg(probeCount);
+}
+
+void KeepAliveOptions::resetUnsupportedFieldsToSystemDefault()
+{
+    #if defined(_WIN32)
+        probeCount = 10;
+    #elif defined(__APPLE__)
+        probeSendPeriod = std::chrono::seconds::zero();
+        probeCount = 0;
+    #endif // _WIN32
+}
+
+boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
+{
+    QStringRef stringRef(&string);
+    if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
+        stringRef = stringRef.mid(1, stringRef.length() - 2);
+
+    const auto split = stringRef.split(QLatin1String(","));
+    if (split.size() != 3)
+        return boost::none;
+
+    KeepAliveOptions options;
+    options.inactivityPeriodBeforeFirstProbe =
+        std::chrono::seconds((size_t)split[0].trimmed().toUInt());
+    options.probeSendPeriod =
+        std::chrono::seconds((size_t)split[1].trimmed().toUInt());
+    options.probeCount = (size_t)split[2].trimmed().toUInt();
+    return options;
 }

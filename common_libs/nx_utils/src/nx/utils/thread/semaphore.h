@@ -7,7 +7,7 @@
 class QnSemaphorePrivate;
 
 /*!
-    \note Need own semaphore to add it to deadlock detection logic someday...
+    NOTE: Need own semaphore to add it to deadlock detection logic someday...
 */
 class NX_UTILS_API QnSemaphore {
 public:

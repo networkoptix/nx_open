@@ -236,6 +236,7 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
 
         ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
+        ErrorCode doQueryNoLock(const QByteArray& /*dummy*/, ApiSystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
@@ -357,6 +358,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemMergeHistoryRecord>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);

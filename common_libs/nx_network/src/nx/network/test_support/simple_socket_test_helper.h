@@ -640,7 +640,7 @@ void socketTransferFragmentation(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    // On localhost TCP connection small packets usually transferred entirely, 
+    // On localhost TCP connection small packets usually transferred entirely,
     // so that we expect the same behavior for all our stream sockets.
     static const Buffer kMessage = utils::random::generate(100);
     static const size_t kTestRuns = utils::TestOptions::applyLoadMode<size_t>(5);
@@ -697,7 +697,7 @@ void socketMultiConnect(
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
     decltype(serverMaker()) server;
 
-    std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor = 
+    std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor =
         [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
         {
             acceptResults.push(code);
@@ -784,8 +784,9 @@ void socketErrorHandling(
     ASSERT_EQ(SystemError::noError, SystemError::getLastOSErrorCode());
 
     SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_FALSE(client->bind(server->getLocalAddress()));
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::addrInUse);
+
+    ASSERT_TRUE(client->bind(server->getLocalAddress()));
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 
     // Sounds wierd but linux ::listen sometimes returns true...
     //

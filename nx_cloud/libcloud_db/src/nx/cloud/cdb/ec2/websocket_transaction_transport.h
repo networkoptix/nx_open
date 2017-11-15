@@ -4,12 +4,14 @@
 
 #include <nx/network/websocket/websocket.h>
 
-#include "abstract_transaction_transport.h"
-#include <nx/p2p/p2p_connection_base.h>
 #include <nx/cloud/cdb/api/result_code.h>
-#include "dao/abstract_transaction_data_object.h"
+#include <nx/p2p/p2p_connection_base.h>
 #include <nx/p2p/connection_context.h>
+
 #include <nx_ec/data/api_tran_state_data.h>
+
+#include "abstract_transaction_transport.h"
+#include "dao/abstract_transaction_data_object.h"
 #include "transaction_log_reader.h"
 
 namespace nx {
@@ -43,10 +45,11 @@ public:
 
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
 protected:
     virtual void setState(State state) override;
-
     virtual void stopWhileInAioThread() override;
+
 private:
     int highestProtocolVersionCompatibleWithRemotePeer() const;
     void onGotMessage(
@@ -58,6 +61,7 @@ private:
         std::vector<dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo);
     void readTransactions();
+
 private:
     TransactionTransportHeader m_commonTransactionHeader;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;

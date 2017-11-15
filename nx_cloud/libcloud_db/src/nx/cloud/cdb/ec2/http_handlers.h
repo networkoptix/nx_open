@@ -6,13 +6,11 @@ namespace nx {
 namespace cdb {
 
 template<typename Func>
-class CustomHttpHandler
-    :
+class CustomHttpHandler:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
-    CustomHttpHandler(Func func)
-    :
+    CustomHttpHandler(Func func):
         m_func(std::move(func))
     {
     }

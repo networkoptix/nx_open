@@ -59,7 +59,8 @@ bool MultipartContentParser::processData(const QnByteArrayConstRef& data)
             case readingSizedBinaryData:
             {
                 NX_ASSERT(m_contentLength != (unsigned int)-1);
-                const size_t bytesToRead = std::min<size_t>(m_contentLength - m_currentFrame.size(), data.size() - offset);
+                const size_t bytesToRead =
+                    std::min<size_t>(m_contentLength - m_currentFrame.size(), data.size() - offset);
                 m_currentFrame += data.mid(offset, bytesToRead);
                 offset += bytesToRead;
                 if ((size_t)m_currentFrame.size() == m_contentLength)
@@ -87,7 +88,7 @@ bool MultipartContentParser::processData(const QnByteArrayConstRef& data)
     }
 
     if (m_state == eofReached)
-        return m_nextFilter->processData(nx_http::BufferType());    //< Reporting eof with empty part.
+        return m_nextFilter->processData(nx_http::BufferType()); //< Reporting eof with empty part.
 
     return true;
 }
@@ -105,7 +106,7 @@ size_t MultipartContentParser::flush()
             {
                 processLine(lineBuffer);
                 if (m_state == eofReached)
-                    return m_nextFilter->processData(nx_http::BufferType());    //< Reporting eof with empty part.
+                    return m_nextFilter->processData(nx_http::BufferType()); //< Reporting eof with empty part.
             }
             break;
         }
@@ -130,23 +131,29 @@ bool MultipartContentParser::setContentType(const StringType& contentType)
     static const char multipartContentType[] = "multipart/";
 
     // Analyzing response headers (if needed).
-    const nx_http::StringType::value_type* sepPos = std::find(contentType.constData(), contentType.constData() + contentType.size(), ';');
+    const nx_http::StringType::value_type* sepPos =
+        std::find(contentType.constData(), contentType.constData() + contentType.size(), ';');
     if (sepPos == contentType.constData() + contentType.size())
         return false;   //< Unexpected content type.
 
-    if (nx_http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType) - 1) != multipartContentType)
-        return false;   //< Unexpected content type.
+    if (nx_http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType) - 1)
+        != multipartContentType)
+    {
+        return false; //< Unexpected content type.
+    }
 
+    // Searching first not-space.
     const nx_http::StringType::value_type* boundaryStart = std::find_if(
         sepPos + 1,
         contentType.constData() + contentType.size(),
-        std::not1(std::bind1st(std::equal_to<nx_http::StringType::value_type>(), ' ')));   //searching first non-space
+        std::not1(std::bind1st(std::equal_to<nx_http::StringType::value_type>(), ' ')));
     if (boundaryStart == contentType.constData() + contentType.size())
     {
         // Failed to read boundary marker.
         return false;
     }
-    if (!nx_http::ConstBufferRefType(contentType, boundaryStart - contentType.constData()).startsWith("boundary="))
+    if (!nx_http::ConstBufferRefType(contentType, boundaryStart - contentType.constData())
+            .startsWith("boundary="))
     {
         // Failed to read boundary marker.
         return false;
@@ -159,7 +166,7 @@ bool MultipartContentParser::setContentType(const StringType& contentType)
 
 void MultipartContentParser::setBoundary(const StringType& boundary)
 {
-    // Boundary can contain starting -- (depends on implementation. e.g. axis P1344 does so).
+    // Boundary can contain starting "--" depending on implementation.
     m_boundary = boundary.startsWith("--") ? boundary.mid(2, boundary.size() - 2) : boundary;
     // Dropping starting and trailing quotes.
     while (!m_boundary.isEmpty() && m_boundary[0] == '"')
@@ -170,7 +177,8 @@ void MultipartContentParser::setBoundary(const StringType& boundary)
     m_startBoundaryForUnsizedBinaryParsing = "\r\n" + m_startBoundaryLine + "\r\n";
     m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF = "\r\n" + m_startBoundaryLine;
     m_endBoundaryLine = "--" + m_boundary + "--" /*"\r\n"*/;
-    m_endBoundaryForUnsizedBinaryParsing = m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF + "--";
+    m_endBoundaryForUnsizedBinaryParsing =
+        m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF + "--";
 }
 
 const nx_http::HttpHeaders& MultipartContentParser::prevFrameHeaders() const
@@ -208,18 +216,18 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
         {
             if (lineBuffer.isEmpty())
             {
-                //m_state = m_contentLength == (unsigned int)-1 ? readingTextData : readingBinaryData;
                 const auto contentLengthIter = m_currentFrameHeaders.find("Content-Length");
                 if (contentLengthIter != m_currentFrameHeaders.end())
                 {
-                    //Content-Length known
+                    // Content-Length is known.
                     m_contentLength = contentLengthIter->second.toUInt();
                     m_state = depleteLineFeedBeforeBinaryData;
                     m_nextState = readingSizedBinaryData;
                 }
                 else
                 {
-                    const nx_http::StringType& contentType = nx_http::getHeaderValue(m_currentFrameHeaders, "Content-Type");
+                    const nx_http::StringType& contentType =
+                        nx_http::getHeaderValue(m_currentFrameHeaders, "Content-Type");
                     bool isTextData = !m_forceParseAsBinary
                         && (contentType == "application/text" || contentType == "text/plain");
 
@@ -237,7 +245,7 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
             }
             QnByteArrayConstRef headerName;
             QnByteArrayConstRef headerValue;
-            nx_http::parseHeader(&headerName, &headerValue, lineBuffer);  //ignoring result
+            nx_http::parseHeader(&headerName, &headerValue, lineBuffer); //< Ignoring result.
             m_currentFrameHeaders.emplace(headerName, headerValue);
             break;
         }
@@ -269,7 +277,7 @@ bool MultipartContentParser::readUnsizedBinaryData(
                     *offset = data.size();
                     return true;
                 }
-                //saving data up to found \r
+                // Saving data up to last found \r.
                 m_currentFrame += data.mid(0, slashRPos);
                 *offset = slashRPos;
                 m_chunkParseState = checkingForBoundaryAfterEndOfLine;
@@ -277,7 +285,7 @@ bool MultipartContentParser::readUnsizedBinaryData(
                 m_supposedBoundary += '\r';
                 data.pop_front();
                 *offset += 1;
-                //*offset points to \r
+                // *offset points to \r.
                 continue;
             }
 
@@ -285,16 +293,18 @@ bool MultipartContentParser::readUnsizedBinaryData(
             {
                 if (!m_supposedBoundary.isEmpty())
                 {
-                    //if we are here, then m_supposedBoundary does not contain full boundary yet
+                    // If we are here, then m_supposedBoundary does not contain full boundary yet.
 
-                    //saving supposed boundary in local buffer
-                    const size_t bytesNeeded = m_startBoundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
+                    // Saving supposed boundary in local buffer.
+                    const size_t bytesNeeded =
+                        m_startBoundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
                     const int slashRPos = data.indexOf('\r');
                     if ((slashRPos != -1) &&
                         (static_cast<size_t>(slashRPos) < bytesNeeded) &&
-                        !((m_supposedBoundary + data.mid(0, slashRPos)).startsWith(m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF)))
+                        !((m_supposedBoundary + data.mid(0, slashRPos))
+                            .startsWith(m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF)))
                     {
-                        //boundary not found, resetting boundary check
+                        // Boundary was not found, resetting boundary check.
                         m_currentFrame += m_supposedBoundary;
                         m_supposedBoundary.clear();
                         m_chunkParseState = waitingEndOfLine;
@@ -310,11 +320,12 @@ bool MultipartContentParser::readUnsizedBinaryData(
                 }
 
                 QnByteArrayConstRef supposedBoundary;
-                if (m_supposedBoundary.size() == m_startBoundaryForUnsizedBinaryParsing.size())  //supposed boundary is in m_supposedBoundary buffer
+                if (m_supposedBoundary.size() == m_startBoundaryForUnsizedBinaryParsing.size()) //< Supposed boundary is in m_supposedBoundary buffer.
                 {
                     supposedBoundary = QnByteArrayConstRef(m_supposedBoundary);
                 }
-                else if (m_supposedBoundary.isEmpty() && (data.size() >= (size_t)m_startBoundaryForUnsizedBinaryParsing.size()))   //supposed boundary is in the source data
+                else if (m_supposedBoundary.isEmpty() &&
+                    (data.size() >= (size_t)m_startBoundaryForUnsizedBinaryParsing.size())) //< Supposed boundary is in the source data.
                 {
                     supposedBoundary = data.mid(0, m_startBoundaryForUnsizedBinaryParsing.size());
                     *offset += m_startBoundaryForUnsizedBinaryParsing.size();
@@ -337,7 +348,9 @@ bool MultipartContentParser::readUnsizedBinaryData(
                         return false;
                     m_currentFrame.clear();
 
-                    m_state = supposedBoundary == m_endBoundaryForUnsizedBinaryParsing ? eofReached : readingHeaders;
+                    m_state = supposedBoundary == m_endBoundaryForUnsizedBinaryParsing
+                        ? eofReached
+                        : readingHeaders;
                     m_currentFrameHeaders.clear();
                 }
                 else

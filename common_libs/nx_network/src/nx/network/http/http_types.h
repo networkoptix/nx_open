@@ -74,8 +74,8 @@ struct NX_NETWORK_API ci_less:
 };
 
 /** HTTP header container.
- * WARNING: This is multimap(!) to allow same header be present multiple times in a 
- * single http message. 
+ * WARNING: This is multimap(!) to allow same header be present multiple times in a
+ * single http message.
  * To insert or replace use nx_http::insertOrReplaceHeader
  */
 using HttpHeaders = std::multimap<StringType, StringType, ci_less>;
@@ -516,7 +516,7 @@ public:
 
     void parse(const nx_http::StringType& str);
     /**
-     * @return true if encodingName is present in header and 
+     * @return true if encodingName is present in header and
      *   returns corresponding qvalue in *q (if not null).
      */
     bool encodingIsAllowed(const nx_http::StringType& encodingName, double* q = nullptr) const;
@@ -698,7 +698,7 @@ public:
      */
     int parse(const ConstBufferRefType& buf);
     /**
-     * @return bytes written to dstBuffer. -1 in case of serialize error. 
+     * @return bytes written to dstBuffer. -1 in case of serialize error.
      *   In this case contents of dstBuffer are undefined.
      */
     int serialize(BufferType* const dstBuffer) const;

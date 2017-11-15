@@ -53,7 +53,7 @@ CrossNatConnector::CrossNatConnector(
         SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
     m_done(false)
 {
-    m_mediatorUdpClient = 
+    m_mediatorUdpClient =
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorUdpEndpoint);
     m_mediatorUdpClient->bindToAioThread(getAioThread());
 
@@ -64,7 +64,7 @@ CrossNatConnector::CrossNatConnector(
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
-    
+
     m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
     if (m_cloudConnectorExecutor)
@@ -131,9 +131,9 @@ void CrossNatConnector::messageReceived(
     //here we can receive response to connect result report. We just don't need it
 }
 
-void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/) 
+void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 {
-    //if error happens when sending connect result report, 
+    //if error happens when sending connect result report,
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }

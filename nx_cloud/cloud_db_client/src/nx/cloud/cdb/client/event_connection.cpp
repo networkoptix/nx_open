@@ -40,13 +40,13 @@ EventConnection::EventConnection(
 void EventConnection::setCredentials(const std::string& login, const std::string& password)
 {
     m_auth.user.username = QString::fromStdString(login);
-    m_auth.user.authToken.setPassword(QString::fromStdString(password));
+    m_auth.user.authToken.setPassword(password.c_str());
 }
 
 void EventConnection::setProxyCredentials(const std::string& login, const std::string& password)
 {
     m_auth.proxyUser.username = QString::fromStdString(login);
-    m_auth.proxyUser.authToken.setPassword(QString::fromStdString(password));
+    m_auth.proxyUser.authToken.setPassword(password.c_str());
 }
 
 void EventConnection::setProxyVia(

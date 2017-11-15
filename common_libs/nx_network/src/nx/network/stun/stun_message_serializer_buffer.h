@@ -15,14 +15,14 @@ public:
     void* WriteIPV6Address(const std::uint16_t* value);
     void* WriteByte(char byte);
     /**
-     * @return NULL if not enough space in internal buffer. 
+     * @return NULL if not enough space in internal buffer.
      *     Otherwise, pointer to the beginning of data written.
      */
     void* WriteBytes(const char* bytes, std::size_t length);
     void* Poke(std::size_t size);
     std::size_t position() const;
     std::size_t size() const;
-    // Use this function to set up the message length position 
+    // Use this function to set up the message length position
     std::uint16_t* WriteMessageLength();
     std::uint16_t* WriteMessageLength(std::uint16_t length);
     const nx::Buffer* buffer() const;

@@ -16,7 +16,7 @@ class MessageDispatcher;
 
 /**
  * Receives STUN message over udp, forwards them to dispatcher, sends response message.
- * @note Class methods are not thread-safe.
+ * NOTE: Class methods are not thread-safe.
  */
 class NX_NETWORK_API UdpServer:
     public network::aio::BasicPollable,

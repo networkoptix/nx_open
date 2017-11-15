@@ -57,6 +57,6 @@ private:
 
     bool launchHostCheck();
 
-    private slots:
+private slots:
     void onDone(nx_http::AsyncHttpClientPtr);
 };

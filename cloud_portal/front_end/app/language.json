@@ -6,7 +6,7 @@
     "okButton": "Ok",
     "cancelButton": "Cancel",
     "loginTitle": "Log in to %PRODUCT_NAME%",
-    "loginButton":"Log in",
+    "loginButton": "Log in",
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue",
     "logoutAuthorisedLogoutButton": "Log Out"
@@ -173,12 +173,12 @@
     "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {
-      "accountSavedSuccess": "Your account is successfully saved",
-      "activationLinkSent": "Activation Link Sent",
-      "passwordChangedSuccess": "Your account is successfully saved",
-      "changePassword": "Change Password",
-      "newPasswordLabel":"New password",
-      "saveChanges":"Save"
+    "accountSavedSuccess": "Your account is successfully saved",
+    "activationLinkSent": "Activation Link Sent",
+    "passwordChangedSuccess": "Your account is successfully saved",
+    "changePassword": "Change Password",
+    "newPasswordLabel": "New password",
+    "saveChanges": "Save"
   },
   "downloads": {
     "noClientDetectedTitle": "Install %VMS_NAME% to view your System",
@@ -188,7 +188,7 @@
         "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link":"%ANDROID_APPLICATION_LINK%"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -220,18 +220,18 @@
       "servertool": "Configuration tool"
     }
   },
-  "activeActions":{
+  "activeActions": {
     "sendConfirm": "Resend activation link",
     "resetPassword": "Reset Password",
     "setNewPassword": "Save password",
     "setNewPasswordLabel": "New password"
   },
-  "regActions":{
-    "passwordLabel":"Password",
+  "regActions": {
+    "passwordLabel": "Password",
     "createAccount": "Create Account"
   },
-  "header":{
-    "allSystems":"All Systems",
-    "systems":"Systems"
+  "header": {
+    "allSystems": "All Systems",
+    "systems": "Systems"
   }
 }

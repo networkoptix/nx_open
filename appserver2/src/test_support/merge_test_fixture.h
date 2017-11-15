@@ -30,6 +30,8 @@ public:
     void thenAllServersAreInterconnected();
     void thenAllServersSynchronizedData();
 
+    ApiSystemMergeHistoryRecordList waitUntilMergeHistoryIsAdded();
+
     QnRestResult::Error prevMergeResult() const;
 
 private:

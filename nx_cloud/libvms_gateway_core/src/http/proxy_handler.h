@@ -1,8 +1,8 @@
 #pragma once
 
 #include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/server/proxy/proxy_worker.h>
 
-#include "proxy_worker.h"
 #include "settings.h"
 #include "target_peer_connector.h"
 
@@ -18,7 +18,7 @@ class RunTimeOptions;
 
 class ProxyHandler:
     public nx_http::AbstractHttpRequestHandler,
-    public AbstractResponseSender
+    public nx_http::server::proxy::AbstractResponseSender
 {
 public:
     ProxyHandler(
@@ -38,13 +38,23 @@ public:
         boost::optional<nx_http::Response> response) override;
 
 private:
+    struct TargetHost
+    {
+        nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
+        SocketAddress target;
+        conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
+
+        TargetHost() = default;
+        TargetHost(nx_http::StatusCode::Value status, SocketAddress target = {});
+    };
+
     const conf::Settings& m_settings;
     const conf::RunTimeOptions& m_runTimeOptions;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
 
     nx_http::Request m_request;
     nx_http::RequestProcessedHandler m_requestCompletionHandler;
-    std::unique_ptr<ProxyWorker> m_requestProxyWorker;
+    std::unique_ptr<nx_http::server::proxy::ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
     bool m_sslConnectionRequired = false;
     std::unique_ptr<TargetPeerConnector> m_targetPeerConnector;

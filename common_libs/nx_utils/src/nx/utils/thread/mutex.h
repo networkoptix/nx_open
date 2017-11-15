@@ -94,7 +94,7 @@ public:
 
 typedef QMutex QnMutex;
 
-/** Adding this class since \a QMutexLocker does not have move operations */
+/** Adding this class since QMutexLocker does not have move operations */
 class QnMutexLocker
 {
 public:

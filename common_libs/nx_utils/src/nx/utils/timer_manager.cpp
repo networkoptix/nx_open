@@ -227,7 +227,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerID)
         return;
 
     QnMutexLocker lk(&m_mtx);
-    //having locked \a m_mtx we garantee, that execution of timer timerID will not start
+    //having locked m_mtx we garantee, that execution of timer timerID will not start
 
     if (QThread::currentThread() != this)
     {

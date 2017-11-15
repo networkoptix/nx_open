@@ -33,7 +33,7 @@ bool ConnectRequest::parseAttributes(const nx::stun::Message& message)
 
     if (!readEnumAttributeValue(message, attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
-    
+
     return
         readStringAttributeValue<attrs::HostName>(message, &destinationHostName) &&
         readStringAttributeValue<attrs::PeerId>(message, &originatingPeerId) &&
@@ -78,7 +78,7 @@ bool ConnectResponse::parseAttributes(const nx::stun::Message& message)
 
     readStringAttributeValue<attrs::HostName>(message, &destinationHostFullName);
 
-    return 
+    return
         readAttributeValue<attrs::PublicEndpointList>(message, &forwardedTcpEndpointList) &&
         readAttributeValue<attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
         params.parseAttributes(message);

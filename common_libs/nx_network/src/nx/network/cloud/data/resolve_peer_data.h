@@ -13,8 +13,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API ResolvePeerRequest
-:
+class NX_NETWORK_API ResolvePeerRequest:
     public StunRequestData
 {
 public:
@@ -27,9 +26,8 @@ public:
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
- 
-class NX_NETWORK_API ResolvePeerResponse
-:
+
+class NX_NETWORK_API ResolvePeerResponse:
     public StunResponseData
 {
 public:

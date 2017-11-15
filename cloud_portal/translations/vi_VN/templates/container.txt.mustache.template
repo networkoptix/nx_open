@@ -1,0 +1,8 @@
+{{#systemName}}
+Hệ thống: {{systemName}} {{systemSignature}}
+{{/systemName}}
+
+{{>body}}
+
+{{companyUrl}}
+Hỗ trợ: {{supportLink}}

@@ -12,10 +12,10 @@ namespace server {
 
 //!Dispatches STUN protocol messages to corresponding processor
 /*!
-    \param ProcessorDictionaryType Maps \a key_type to \a MessageProcessorType
+    \param ProcessorDictionaryType Maps key_type to MessageProcessorType
 
-    \note This class methods are not thread-safe
-    \note Message processing function MUST be non-blocking
+    NOTE: This class methods are not thread-safe
+    NOTE: Message processing function MUST be non-blocking
 */
 template<
     class ConnectionType,
@@ -33,10 +33,10 @@ public:
 
     //!Message processor functor type
     /*!
-        \note It is guaranteed that connection cannot be freed while in processor function. But, it can be closed at any moment after return of processor.
-            To receive connection close event use \a BaseServerConnection::registerCloseHandler.
+        NOTE: It is guaranteed that connection cannot be freed while in processor function. But, it can be closed at any moment after return of processor.
+            To receive connection close event use BaseServerConnection::registerCloseHandler.
             If handler has to save connection for later use (e.g., handler uses some async fsm) than it is strongly recommended to save weak pointer to connection, 
-            not strong one! And register connection closure handler with \a BaseServerConnection::registerCloseHandler
+            not strong one! And register connection closure handler with BaseServerConnection::registerCloseHandler
     */
     typedef std::function<bool(
             const connection_type&,
@@ -44,10 +44,10 @@ public:
             CompletionFuncType )
         > MessageProcessorType;
 
-    //!Implementation of \a QnStoppableAsync::pleaseStop
+    //!Implementation of QnStoppableAsync::pleaseStop
     /*!
-        Stop dispatching requests. \a StunRequestDispatcher::dispatchRequest returns \a false if dispatcher has been stopped
-        \note request dispatching cannot be resumed after it has been stopped
+        Stop dispatching requests. StunRequestDispatcher::dispatchRequest returns false if dispatcher has been stopped
+        NOTE: request dispatching cannot be resumed after it has been stopped
     */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> /*completionHandler*/) override
     {
@@ -56,9 +56,9 @@ public:
 
     /*!
         \param messageProcessor Ownership of this object is not passed
-        \note All processors MUST be registered before connection processing is started, since this class methods are not thread-safe
-        \return \a true if \a requestProcessor has been registered, \a false otherwise
-        \note Message processing function MUST be non-blocking
+        NOTE: All processors MUST be registered before connection processing is started, since this class methods are not thread-safe
+        \return true if requestProcessor has been registered, false otherwise
+        NOTE: Message processing function MUST be non-blocking
     */
     bool registerRequestProcessor( typename ProcessorDictionaryType::key_type method, MessageProcessorType&& messageProcessor )
     {
@@ -67,7 +67,7 @@ public:
     //!Pass message to corresponding processor
     /*!
         \param message This object is not moved in case of failure to find processor
-        \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
+        \return true if request processing passed to corresponding processor and async processing has been started, false otherwise
     */
     template<class CompletionFuncRefType>
     bool dispatchRequest(

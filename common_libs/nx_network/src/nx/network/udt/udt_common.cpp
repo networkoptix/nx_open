@@ -1,12 +1,6 @@
-/**********************************************************
-* Nov 25, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "udt_socket.h"
 
 #include <udt/udt.h>
-
 
 namespace nx {
 namespace network {
@@ -91,6 +85,6 @@ SystemError::ErrorCode convertToSystemError(int udtErrorCode)
         return SystemError::ioError;
 }
 
-}   //detail
-}   //network
-}   //nx
+} // namespace detail
+} // namespace network
+} // namespace nx

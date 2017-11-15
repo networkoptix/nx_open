@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 19, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/stun/extension/stun_extension_types.h>
@@ -10,7 +5,6 @@
 #include <nx/utils/move_only_func.h>
 
 #include "data/result_code.h"
-
 
 namespace nx {
 namespace hpm {
@@ -80,7 +74,7 @@ protected:
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
-            const auto* resultCodeHeader = 
+            const auto* resultCodeHeader =
                 message.getAttribute<nx::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
@@ -155,7 +149,7 @@ protected:
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
-            const auto* resultCodeHeader = 
+            const auto* resultCodeHeader =
                 message.getAttribute<nx::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();

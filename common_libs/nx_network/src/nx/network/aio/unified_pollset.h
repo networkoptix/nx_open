@@ -87,7 +87,7 @@ public:
     bool isValid() const;
 
     /**
-     * Interrupts \a poll method, blocked in other thread.
+     * Interrupts poll method, blocked in other thread.
      * This is the only method which is allowed to be called from different thread.
      * poll, called after interrupt, will return immediately. 
      * But, it is unspecified whether it will return 
@@ -99,12 +99,12 @@ public:
      * Add socket to set.
      * @param userData This value is associated with pair (socket, eventType)
      * @return true, if socket added to set
-     * @note This method does not check, whether socket is already in pollset.
-     * @note Ivalidates all iterators.
+     * NOTE: This method does not check, whether socket is already in pollset.
+     * NOTE: Ivalidates all iterators.
      */
     bool add(Pollable* const sock, EventType eventType, void* userData = NULL);
     /**
-     * @note Ivalidates all iterators to the left of removed element. 
+     * NOTE: Ivalidates all iterators to the left of removed element. 
      * So, it is ok to iterate signalled sockets and remove current element.
      * Subsequent iterator increment operation will perform safely.
      */
@@ -113,9 +113,9 @@ public:
     /**
      * @param millisToWait if 0, method returns immediatly (useful to test socket state).
      * @return -1 on error, 0 if timeout has expired, > 0 - number of socket whose state has been changed
-     * @note If multiple event occured on same socket each event 
+     * NOTE: If multiple event occured on same socket each event 
      * will be present as a single element when iterating.
-     * @note Invalidates iterators.
+     * NOTE: Invalidates iterators.
      */
     int poll(int millisToWait = kInfiniteTimeout);
     int poll(std::chrono::milliseconds timeout) { return poll(timeout.count()); }

@@ -348,7 +348,7 @@ private:
         QnTranState newSubscription,
         bool addImplicitData);
 
-    private slots:
+private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);
     void at_allDataSent(QWeakPointer<ConnectionBase> connection);

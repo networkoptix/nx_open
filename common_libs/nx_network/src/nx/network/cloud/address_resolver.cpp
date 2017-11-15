@@ -29,8 +29,7 @@ QString toString(const AddressType& type)
     return lit("undefined=%1").arg(static_cast<int>(type));
 }
 
-TypedAddress::TypedAddress(HostAddress address_, AddressType type_)
-:
+TypedAddress::TypedAddress(HostAddress address_, AddressType type_):
     address(std::move(address_)),
     type(std::move(type_))
 {
@@ -41,9 +40,9 @@ QString TypedAddress::toString() const
     return lm("%1(%2)").args(address, type);
 }
 
-AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
-    : type(type_)
-    , value(value_)
+AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_):
+    type(type_),
+    value(value_)
 {
 }
 
@@ -71,26 +70,26 @@ QString AddressAttribute::toString() const
     return lit("undefined=%1").arg(static_cast<int>(type));
 }
 
-AddressEntry::AddressEntry(AddressType type_, HostAddress host_)
-    : type(type_)
-    , host(std::move(host_))
+AddressEntry::AddressEntry(AddressType type_, HostAddress host_):
+    type(type_),
+    host(std::move(host_))
 {
 }
 
-AddressEntry::AddressEntry(const SocketAddress& address)
-    : type(AddressType::direct)
-    , host(address.address)
+AddressEntry::AddressEntry(const SocketAddress& address):
+    type(AddressType::direct),
+    host(address.address)
 {
     attributes.push_back(AddressAttribute(
         AddressAttributeType::port, address.port));
 }
 
-bool AddressEntry::operator ==(const AddressEntry& rhs) const
+bool AddressEntry::operator==(const AddressEntry& rhs) const
 {
     return type == rhs.type && host == rhs.host && attributes == rhs.attributes;
 }
 
-bool AddressEntry::operator <(const AddressEntry& rhs) const
+bool AddressEntry::operator<(const AddressEntry& rhs) const
 {
     return type < rhs.type && host < rhs.host && attributes < rhs.attributes;
 }
@@ -315,7 +314,7 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
     int ipVersion)
 {
     utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
-    auto handler = 
+    auto handler =
         [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
         {
             promise.set_value({code, std::move(entries)});
@@ -487,15 +486,12 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
     if (domain.indexOf(lit(".")) != -1)
         return; // only top level domains might be fast resolved
 
-    const bool hasFound = iterateSubdomains(
+    iterateSubdomains(
         domain, [&](HaInfoIterator other)
         {
             info->second.fixedEntries = other->second.fixedEntries;
             return true; // just resolve to first avaliable
         });
-
-    if (!hasFound)
-        info->second.fixedEntries.clear();
 }
 
 void AddressResolver::dnsResolve(

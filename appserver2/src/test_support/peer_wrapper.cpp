@@ -1,5 +1,7 @@
 #include "peer_wrapper.h"
 
+#include <api/auth_util.h>
+
 #include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
@@ -7,7 +9,7 @@ namespace test {
 
 //namespace {
 
-// TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient. 
+// TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient.
 // Though, it requires some refactoring: moving ec2::ApiTransactionDataList out of appserver2.
 class MediaServerClientEx:
     public MediaServerClient
@@ -67,7 +69,7 @@ bool PeerWrapper::configureAsLocalSystem()
 {
     auto mediaServerClient = prepareMediaServerClient();
 
-    const QString password = nx::utils::generateRandomName(7);
+    const auto password = nx::utils::generateRandomName(7);
 
     SetupLocalSystemData request;
     request.systemName = nx::utils::generateRandomName(7);
@@ -113,9 +115,23 @@ QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
     mergeSystemData.takeRemoteSettings = true;
     mergeSystemData.mergeOneServer = false;
     mergeSystemData.ignoreIncompatible = false;
-    const auto nonce = nx::utils::generateRandomName(7);
-    mergeSystemData.getKey = buildAuthKey("/api/mergeSystems", m_ownerCredentials, nonce);
-    mergeSystemData.postKey = buildAuthKey("/api/mergeSystems", m_ownerCredentials, nonce);
+
+    AuthKey authKey;
+    authKey.username = m_ownerCredentials.username.toUtf8();
+    authKey.nonce = nx::utils::generateRandomName(7);
+
+    authKey.calcResponse(
+        m_ownerCredentials.authToken,
+        nx_http::Method::get,
+        "/api/mergeSystems");
+    mergeSystemData.getKey = authKey.toString();
+
+    authKey.calcResponse(
+        m_ownerCredentials.authToken,
+        nx_http::Method::post,
+        "/api/mergeSystems");
+    mergeSystemData.postKey = authKey.toString();
+
     mergeSystemData.url = nx::network::url::Builder()
         .setScheme(nx_http::kUrlSchemeName)
         .setEndpoint(remotePeer.endpoint()).toString();
@@ -140,6 +156,11 @@ SocketAddress PeerWrapper::endpoint() const
     return m_process.moduleInstance()->endpoint();
 }
 
+ec2::AbstractECConnection* PeerWrapper::ecConnection()
+{
+    return m_process.moduleInstance()->ecConnection();
+}
+
 nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
 {
     return m_cloudCredentials;
@@ -148,6 +169,11 @@ nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
 std::unique_ptr<MediaServerClient> PeerWrapper::mediaServerClient() const
 {
     return prepareMediaServerClient();
+}
+
+nx::utils::test::ModuleLauncher<Appserver2ProcessPublic>& PeerWrapper::process()
+{
+    return m_process;
 }
 
 bool PeerWrapper::areAllPeersHaveSameTransactionLog(
@@ -191,14 +217,14 @@ bool PeerWrapper::arePeersInterconnected(
     const std::vector<std::unique_ptr<PeerWrapper>>& peers)
 {
     // For now just checking that each peer is connected to every other.
-    
+
     std::vector<QnUuid> peerIds;
     for (const auto& peer: peers)
         peerIds.push_back(peer->id());
 
     for (const auto& peer: peers)
     {
-        const auto connectedPeers = 
+        const auto connectedPeers =
             peer->m_process.moduleInstance()->impl()->commonModule()->
                 ec2Connection()->messageBus()->directlyConnectedServerPeers();
 
@@ -206,7 +232,7 @@ bool PeerWrapper::arePeersInterconnected(
         {
             if (peerId == peer->id())
                 continue;
-            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) == 
+            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) ==
                     connectedPeers.end())
             {
                 return false;
@@ -225,20 +251,6 @@ std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() con
     mediaServerClient->setUserCredentials(m_ownerCredentials);
     mediaServerClient->setRequestTimeout(std::chrono::minutes(1));
     return mediaServerClient;
-}
-
-QString PeerWrapper::buildAuthKey(
-    const nx::String& url,
-    const nx_http::Credentials& credentials,
-    const nx::String& nonce)
-{
-    const auto ha1 = nx_http::calcHa1(
-        credentials.username,
-        nx::network::AppInfo::realm(),
-        credentials.authToken.value);
-    const auto ha2 = nx_http::calcHa2(nx_http::Method::get, url);
-    const auto response = nx_http::calcResponse(ha1, nonce, ha2);
-    return lm("%1:%2:%3").args(credentials.username, nonce, response).toUtf8().toBase64();
 }
 
 } // namespace test

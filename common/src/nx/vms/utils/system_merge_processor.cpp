@@ -64,6 +64,8 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
 
     const nx::utils::Url url(data.url);
 
+    saveBackupOfSomeLocalData();
+
     // Get module information to get system name.
     auto statusCode = fetchModuleInformation(url, data.getKey, &m_remoteModuleInformation);
     if (!nx_http::StatusCode::isSuccessCode(statusCode))
@@ -81,7 +83,20 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     if (statusCode != nx_http::StatusCode::ok)
         return statusCode;
 
-    return mergeSystems(accessRights, data, result);
+    statusCode = mergeSystems(accessRights, data, result);
+    if (statusCode != nx_http::StatusCode::ok)
+        return statusCode;
+
+    if (!addMergeHistoryRecord(data))
+        return nx_http::StatusCode::internalServerError;
+
+    return nx_http::StatusCode::ok;
+}
+
+void SystemMergeProcessor::saveBackupOfSomeLocalData()
+{
+    m_localModuleInformation = m_commonModule->moduleInformation();
+    m_cloudAuthKey = m_commonModule->globalSettings()->cloudAuthKey().toUtf8();
 }
 
 const QnModuleInformationWithAddresses& SystemMergeProcessor::remoteModuleInformation() const
@@ -495,7 +510,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
 
     // put current server info to a foreign system to allow authorization via server key
     {
-        QnMediaServerResourcePtr mServer = 
+        QnMediaServerResourcePtr mServer =
             m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
                 m_commonModule->moduleGUID());
         if (!mServer)
@@ -582,7 +597,9 @@ bool SystemMergeProcessor::executeRequest(
     return QJson::deserialize(response, &result);
 }
 
-void SystemMergeProcessor::addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey)
+void SystemMergeProcessor::addAuthToRequest(
+    nx::utils::Url& request,
+    const QString& remoteAuthKey)
 {
     QUrlQuery query(request.query());
     query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
@@ -628,6 +645,37 @@ nx_http::StatusCode::Value SystemMergeProcessor::fetchModuleInformation(
     *moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
     return nx_http::StatusCode::ok;
+}
+
+bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
+{
+    const auto& mergedSystemModuleInformation = data.takeRemoteSettings
+        ? m_localModuleInformation
+        : static_cast<const QnModuleInformation&>(m_remoteModuleInformation);
+
+    ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+    mergeHistoryRecord.timestamp = QDateTime::currentMSecsSinceEpoch();
+    mergeHistoryRecord.mergedSystemLocalId =
+        mergedSystemModuleInformation.localSystemId.toSimpleByteArray();
+    mergeHistoryRecord.username = m_authSession.userName;
+    if (!mergedSystemModuleInformation.cloudSystemId.isEmpty())
+    {
+        mergeHistoryRecord.mergedSystemCloudId =
+            mergedSystemModuleInformation.cloudSystemId.toUtf8();
+        if (mergedSystemModuleInformation.cloudSystemId == m_localModuleInformation.cloudSystemId)
+            mergeHistoryRecord.sign(m_cloudAuthKey);
+    }
+
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
+    const auto errorCode = miscManager->saveSystemMergeHistoryRecord(mergeHistoryRecord);
+    if (errorCode != ::ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, lm("Failed to save merge history record. %1")
+            .arg(::ec2::toString(errorCode)));
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace utils

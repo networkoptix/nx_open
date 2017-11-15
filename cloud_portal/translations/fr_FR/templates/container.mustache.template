@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body bgcolor="#F5F7F8" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
+    <style>
+    {{>style_css}}
+    </style>
+
+    <table class="container" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8"><!-- background-color -->
+        <tbody>
+        <tr>
+            <td class="side-spacer"></td>
+            <td class="header">
+                {{#systemName}}
+                <div class="system-info">
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td><img class="icon" src="cid:home"></td>
+                            <td><div class="name">{{systemName}}</div>
+                                {{#systemSignature}}<div class="hint">{{systemSignature}}</div>{{/systemSignature}}</td>
+                        </tr>
+                        {{#cloud}}
+                        <tr class="cloud-info">
+                            <td><img class="icon" src="cid:home"></td>
+                            <td><div class="name">{{cloud.ownerName}}</div>
+                                <div class="hint">{{cloud.ownerEmail}}</div></td>
+                        </tr>
+                        {{/cloud}}
+                        </tbody>
+                    </table>
+                </div>
+                {{/systemName}}
+                {{^system}}
+                    <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
+                {{/system}}
+            </td>
+            <td class="side-spacer"></td>
+        </tr>
+
+        <tr>
+            <td class="side-spacer"></td>
+            <td class="content" bgcolor="white" width="800">
+                {{>body}}
+            </td>
+            <td class="side-spacer"></td>
+        </tr>
+
+        <tr>
+            <td class="side-spacer"></td>
+            <td class="footer">
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <tbody>
+                    <tr>
+                        {{#system}}
+                            <td class="right-border">
+                                <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
+                            </td>
+                            <td class="left-border right-border">
+                                <b>Site Web</b><br>
+                                <a href="{{companyUrl}}">{{companyUrl}}</a>
+                            </td>
+                        {{/system}}
+                        {{^system}}
+                            <td class="right-border">
+                                <b>Site Web</b><br>
+                                <a href="{{companyUrl}}">{{companyUrl}}</a>
+                            </td>
+                        {{/system}}
+                        <td class="left-border">
+                            <b>Assistance</b><br>
+                            <a href="{{supportLink}}">{{supportLinkText}}</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td class="side-spacer"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

@@ -31,13 +31,13 @@ SyncronizationEngine::~SyncronizationEngine()
     m_startedAsyncCallsCounter.wait();
 }
 
-OutgoingTransactionDispatcher& 
+OutgoingTransactionDispatcher&
     SyncronizationEngine::outgoingTransactionDispatcher()
 {
     return m_outgoingTransactionDispatcher;
 }
 
-const OutgoingTransactionDispatcher& 
+const OutgoingTransactionDispatcher&
     SyncronizationEngine::outgoingTransactionDispatcher() const
 {
     return m_outgoingTransactionDispatcher;
@@ -53,13 +53,13 @@ const TransactionLog& SyncronizationEngine::transactionLog() const
     return m_transactionLog;
 }
 
-IncomingTransactionDispatcher& 
+IncomingTransactionDispatcher&
     SyncronizationEngine::incomingTransactionDispatcher()
 {
     return m_incomingTransactionDispatcher;
 }
 
-const IncomingTransactionDispatcher& 
+const IncomingTransactionDispatcher&
     SyncronizationEngine::incomingTransactionDispatcher() const
 {
     return m_incomingTransactionDispatcher;
@@ -93,7 +93,7 @@ void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
 
 void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
 {
-    // New connections will not be authorized since system is deleted, 
+    // New connections will not be authorized since system is deleted,
     // but existing ones have to be closed.
     m_connectionManager.closeConnectionsToSystem(
         systemId.c_str(),

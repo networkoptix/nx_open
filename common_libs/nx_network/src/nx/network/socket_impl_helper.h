@@ -6,7 +6,7 @@ namespace nx {
 namespace network {
 
 /**
- * @param AbstractSocketProviderType functor with operator() that 
+ * @param AbstractSocketProviderType functor with operator() that
  * returns type that implements methods of AbstractSocket class.
  */
 template<class AbstractBaseType, class AbstractSocketProviderType>

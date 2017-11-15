@@ -67,7 +67,7 @@ DnsResolver::~DnsResolver()
 void DnsResolver::pleaseStop()
 {
     NX_LOGX(lm("DnsResolver::pleaseStop"), cl_logDEBUG2);
-    
+
     QnMutexLocker lock(&m_mutex);
     m_terminated = true;
     m_cond.wakeAll();

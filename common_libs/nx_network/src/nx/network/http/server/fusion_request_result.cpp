@@ -1,16 +1,10 @@
-/**********************************************************
-* Nov 20, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "fusion_request_result.h"
 
 #include <nx/fusion/model_functions.h>
 
 namespace nx_http {
 
-FusionRequestResult::FusionRequestResult()
-:
+FusionRequestResult::FusionRequestResult():
     errorClass(FusionRequestErrorClass::noError),
     resultCode(QnLexical::serialized(FusionRequestErrorDetail::ok)),
     errorDetail(static_cast<int>(FusionRequestErrorDetail::ok))
@@ -74,13 +68,13 @@ nx_http::StatusCode::Value FusionRequestResult::calculateHttpStatusCode() const
             }
 
         case FusionRequestErrorClass::unauthorized:
-            // This is authorization failure, not authentication! 
-                // "401 Unauthorized" is not applicable here since it 
+            // This is authorization failure, not authentication!
+                // "401 Unauthorized" is not applicable here since it
                 // actually signals authentication error.
             return nx_http::StatusCode::forbidden;
 
         case FusionRequestErrorClass::logicError:
-            // Using "404 Not Found" to signal any logic error. 
+            // Using "404 Not Found" to signal any logic error.
                 // It is allowed by HTTP. See [rfc2616, 10.4.5] for details
             return nx_http::StatusCode::notFound;
 

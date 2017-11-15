@@ -14,7 +14,7 @@ namespace stun {
 class NX_NETWORK_API StunOverHttpServer
 {
 public:
-    using StunConnectionPool = 
+    using StunConnectionPool =
         nx::network::server::StreamServerConnectionHolder<nx::stun::ServerConnection>;
 
     static const char* const kStunProtocolName;

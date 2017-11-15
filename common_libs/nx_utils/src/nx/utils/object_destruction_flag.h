@@ -58,7 +58,7 @@ public:
     }
 
     /**
-     * @note Objects operating with same flag must not overlap
+     * NOTE: Objects operating with same flag must not overlap
      */
     class Watcher
     {

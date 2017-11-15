@@ -1,12 +1,9 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
-        <h1>Failed to access System</h1>
-        <p>This link is broken,<br>
-            System may be disconnected from {{PRODUCT_NAME}},<br>
-            Access to this System may be revoked, <br>
-            or you may be logged into a different account</p>
+        <h1>ไม่สามารถเข้าถึงระบบ</h1>
+        <p>ลิงค์นี้เสีย, <br> ระบบอาจถูกตัดการเชื่อมต่อจาก {{PRODUCT_NAME}}, <br> การเข้าถึงระบบนี้อาจถูกเพิกถอนหรือ <br> หรือคุณอาจจะเข้าสู่ระบบบัญชีอื่น</p>
         <p>
-            <a href="/systems" class="btn btn-default">Available Systems list</a>
+            <a href="/systems" class="btn btn-default">รายการระบบที่พร้อมใช้งาน</a>
         </p>
     </div>
 
@@ -18,7 +15,7 @@
         <div class="col-md-8 col-md-pull-4">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
                 <span class="no-data-panel-body">
-                    You do not have access to System information.
+                    คุณไม่มีสิทธิ์เข้าถึงข้อมูลระบบ
                 </span>
             </div>
             <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>

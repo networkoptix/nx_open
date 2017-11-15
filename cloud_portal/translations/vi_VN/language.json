@@ -1,5 +1,5 @@
 {
-  "language_name":"tiếng Việt",
+  "language_name":"Tiếng Việt",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
@@ -39,7 +39,7 @@
     "notActivated":"chưa kích hoạt",
     "activated":"đã kích hoạt",
     "online":"trực tuyến",
-    "offline":"Ngoại tuyến",
+    "offline":"ngoại tuyến",
     "unavailable":"không khả dụng"
   },
   "accessRoles":{
@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Tài khoản của bạn đã được lưu thành công",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"Link kích hoạt đã được gửi",
     "passwordChangedSuccess":"Tài khoản của bạn đã được lưu thành công",
     "changePassword":"Đổi mật khẩu",
     "newPasswordLabel":"Mật khẩu mới",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"Gửi lại link kích hoạt",
     "resetPassword":"Đặt lại mật khẩu",
     "setNewPassword":"Lưu mật khẩu",
     "setNewPasswordLabel":"Mật khẩu mới"

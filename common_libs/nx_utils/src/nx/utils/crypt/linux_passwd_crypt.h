@@ -17,8 +17,8 @@ QByteArray NX_UTILS_API linuxCryptSha512( const QByteArray& password, const QByt
 
 
 /*!
-    Currently implemented on linux only. Modifies /etc/shadow. \a digest MUST be suitable for a shadow file
-    \note on linux process MUST have root priviledge to be able to modify /etc/shadow
+    Currently implemented on linux only. Modifies /etc/shadow. digest MUST be suitable for a shadow file
+    NOTE: on linux process MUST have root priviledge to be able to modify /etc/shadow
 */
 bool NX_UTILS_API setRootPasswordDigest( const QByteArray& userName, const QByteArray& digest );
 

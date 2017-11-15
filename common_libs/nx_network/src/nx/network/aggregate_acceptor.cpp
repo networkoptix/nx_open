@@ -34,7 +34,7 @@ AggregateAcceptor::AggregateAcceptor()
 void AggregateAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    
+
     m_timer.bindToAioThread(aioThread);
     for (auto& acceptor: m_acceptors)
         acceptor.acceptor->bindToAioThread(aioThread);

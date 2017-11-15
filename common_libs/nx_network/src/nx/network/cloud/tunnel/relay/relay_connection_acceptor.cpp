@@ -136,7 +136,7 @@ void ReverseConnection::onConnectDone(
             {
                 const auto systemErrorCode = SystemError::getLastOSErrorCode();
                 NX_DEBUG(this, lm("Failed to enable keep alive. %1")
-                    .arg(SystemError::toString(systemErrorCode)));
+                    .args(SystemError::toString(systemErrorCode)));
             }
         }
 

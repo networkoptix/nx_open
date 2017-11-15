@@ -17,7 +17,7 @@ static const size_t FDSET_INCREASE_STEP = 1024;
 
 typedef struct my_fd_set {
     u_int fd_count;               /* how many are SET? */
-    //!an array of SOCKETs. Actually, this array has size \a PollSetImpl::fdSetSize
+    //!an array of SOCKETs. Actually, this array has size PollSetImpl::fdSetSize
     SOCKET fd_array[INITIAL_FDSET_SIZE];
 } my_fd_set;
 
@@ -32,9 +32,9 @@ static void freeFDSet( my_fd_set* fdSet )
     ::free( fdSet );
 }
 
-//!Reallocs \a fdSet to be of size \a newSize while preseving existing data
+//!Reallocs fdSet to be of size newSize while preseving existing data
 /*!
-    in case of allocation error \a *fdSet is freed and set to NULL
+    in case of allocation error *fdSet is freed and set to NULL
 */
 static void reallocFDSet( my_fd_set** fdSet, size_t newSize )
 {
@@ -203,7 +203,7 @@ public:
     aio::EventType currentSocketREvent;
     PollSetImpl* pollSetImpl;
     my_fd_set* curFdSet;
-    //!Index in \a curFdSet.fd_array
+    //!Index in curFdSet.fd_array
     size_t fdIndex;
 
     ConstIteratorImplOld()
@@ -233,7 +233,7 @@ public:
         //win32 select moves signalled socket handles to the beginning of fd_array and 
         //    sets fd_count properly, so it actually does like epoll
 
-        //NOTE fdIndex points to current next fd. It does not correspond to \a currentSocket and \a currentSocketREvent
+        //NOTE fdIndex points to current next fd. It does not correspond to currentSocket and currentSocketREvent
         NX_ASSERT( fdIndex <= curFdSet->fd_count );
         //there may be INVALID_SOCKET in fd arrays due to PollSet::remove call
         for( ;; )
@@ -307,7 +307,7 @@ PollSet::const_iterator& PollSet::const_iterator::operator=( const PollSet::cons
     return *this;
 }
 
-//!Selects next socket which state has been changed with previous \a poll call
+//!Selects next socket which state has been changed with previous poll call
 PollSet::const_iterator PollSet::const_iterator::operator++(int)    //it++
 {
     const_iterator bak( *this );
@@ -315,7 +315,7 @@ PollSet::const_iterator PollSet::const_iterator::operator++(int)    //it++
     return bak;
 }
 
-//!Selects next socket which state has been changed with previous \a poll call
+//!Selects next socket which state has been changed with previous poll call
 PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
 {
     m_impl->findNextSignalledSocket();

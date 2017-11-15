@@ -5,7 +5,7 @@
 namespace nx_http {
 
 /**
- * Should be used when HTTP request handler wishes to set Content-Length 
+ * Should be used when HTTP request handler wishes to set Content-Length
  * to some specific value (or just omit it) and at the same time does not provide body at all.
  */
 class NX_NETWORK_API EmptyMessageBodySource:

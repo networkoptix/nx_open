@@ -38,8 +38,8 @@ public:
 //!Timer events scheduler
 /*!
     Holds internal thread which calls method TimerEventHandler::onTimer
-    \note If some handler executes \a TimerEventHandler::onTimer for long time, some tasks can be called with delay, since all tasks are processed by a single thread
-    \note This timer require nor event loop (as QTimer), nor it's thread-dependent (as SystemTimer), but it delivers timer events to internal thread,
+    NOTE: If some handler executes TimerEventHandler::onTimer for long time, some tasks can be called with delay, since all tasks are processed by a single thread
+    NOTE: This timer require nor event loop (as QTimer), nor it's thread-dependent (as SystemTimer), but it delivers timer events to internal thread,
         so additional synchronization in timer event handler may be required
 */
 class NX_UTILS_API StandaloneTimerManager
@@ -49,8 +49,8 @@ class NX_UTILS_API StandaloneTimerManager
 public:
     //!This class is to simplify timer id usage
     /*!
-        \note Not thread-safe
-        \warning This class calls \a StandaloneTimerManager::joinAndDeleteTimer, so watch out for deadlock!
+        NOTE: Not thread-safe
+        \warning This class calls StandaloneTimerManager::joinAndDeleteTimer, so watch out for deadlock!
     */
     class NX_UTILS_API TimerGuard
     {
@@ -62,7 +62,7 @@ public:
         TimerGuard(StandaloneTimerManager* const StandaloneTimerManager, TimerId timerID);
         TimerGuard(TimerGuard&& right);
         /*!
-        Calls \a TimerGuard::reset()
+        Calls TimerGuard::reset()
         */
         ~TimerGuard();
 
@@ -92,7 +92,7 @@ public:
     StandaloneTimerManager();
     virtual ~StandaloneTimerManager();
 
-    //!Adds timer that is executed once after \a delay expiration
+    //!Adds timer that is executed once after delay expiration
     /*!
         \param taskHandler
         \param delay Timeout (millisecond) to call taskHandler->onTimer()
@@ -101,16 +101,16 @@ public:
     TimerId addTimer(
         TimerEventHandler* const taskHandler,
         std::chrono::milliseconds delay);
-    //!Adds timer that is executed once after \a delay expiration
+    //!Adds timer that is executed once after delay expiration
     TimerId addTimer(
         MoveOnlyFunc<void(TimerId)> taskHandler,
         std::chrono::milliseconds delay);
     TimerGuard addTimerEx(
         MoveOnlyFunc<void(TimerId)> taskHandler,
         std::chrono::milliseconds delay);
-    //!This timer will trigger every \a delay until deleted
+    //!This timer will trigger every delay until deleted
     /*!
-        \note first event will trigger after \a firstShotDelay period
+        NOTE: first event will trigger after firstShotDelay period
     */
     TimerId addNonStopTimer(
         MoveOnlyFunc<void(TimerId)> taskHandler,
@@ -119,24 +119,24 @@ public:
     //!Modifies delay on existing timer
     /*!
         If timer is being executed currently, nothing is done.
-        Otherwise, timer will be called in \a newDelayMillis from now
-        \return \a true, if timer delay has been changed
+        Otherwise, timer will be called in newDelayMillis from now
+        \return true, if timer delay has been changed
     */
     bool modifyTimerDelay(TimerId timerID, std::chrono::milliseconds delay);
     /*!
         If task is already running, it can be still running after method return
         If timer handler is being executed at the moment, it can still be executed after return of this method
-        \param timerID ID of timer, created by \a addTimer call. If no such timer, nothing is done
+        \param timerID ID of timer, created by addTimer call. If no such timer, nothing is done
     */
     void deleteTimer(const TimerId& timerID);
     //!Delete timer and wait for handler execution (if its is being executed)
     /*!
-        This method garantees that timer \a timerID handler is not being executed after return of this method.
+        This method garantees that timer timerID handler is not being executed after return of this method.
 
         It is recommended to use previous method, if appropriate, since this method is a bit more heavier.
 
-        \param timerID ID of timer, created by \a addTimer call. If no such timer, nothing is done
-        \note If this method is called from \a TimerEventHandler::onTimer to delete timer being executed, nothing is done
+        \param timerID ID of timer, created by addTimer call. If no such timer, nothing is done
+        NOTE: If this method is called from TimerEventHandler::onTimer to delete timer being executed, nothing is done
     */
     void joinAndDeleteTimer(const TimerId& timerID);
 

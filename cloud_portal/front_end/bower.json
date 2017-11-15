@@ -20,7 +20,7 @@
     "ngstorage": "0.3.11",
     "angular-base64": "^2.0.5",
     "ngToast": "ngtoast#^2.0.0",
-    "screenfull": "2.0.0",
+    "screenfull": "3.3.1",
     "angular-clipboard": "1.6.0"
   },
   "devDependencies": {

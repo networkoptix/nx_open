@@ -108,7 +108,7 @@ bool NX_NETWORK_API isNewDiscoveryAddressBetter(
 
 static const int MAC_ADDR_LEN = 18;
 /*!
-    \param host If function succeeds \a *host contains pointer to statically-allocated buffer,
+    \param host If function succeeds *host contains pointer to statically-allocated buffer,
         so it MUST NOT be freed!
     \return 0 on success, -1 in case of error. Use errno to get error code
 */

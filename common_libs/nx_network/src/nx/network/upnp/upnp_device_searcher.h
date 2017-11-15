@@ -47,10 +47,10 @@ public:
 //!Discovers UPnP devices on network and passes found devices info to registered handlers
 /*!
     Searches devices asynchronously
-    \note sends discover packets from all local network interfaces
-    \note Handlers are iterated in order they were registered
-    \note Class methods are thread-safe with the only exception: \a saveDiscoveredDevicesSnapshot() and \a processDiscoveredDevices() calls MUST be serialized by calling entity
-    \note this class is single-tone
+    NOTE: sends discover packets from all local network interfaces
+    NOTE: Handlers are iterated in order they were registered
+    NOTE: Class methods are thread-safe with the only exception: saveDiscoveredDevicesSnapshot() and processDiscoveredDevices() calls MUST be serialized by calling entity
+    NOTE: this class is single-tone
 */
 class NX_NETWORK_API DeviceSearcher:
     public QObject,
@@ -72,29 +72,29 @@ public:
         unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
     virtual ~DeviceSearcher();
 
-    //!Implementation of \a QnStoppable::pleaseStop
+    //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop() override;
 
     /*!
-        If \a handler is already added for \a deviceType, nothing is done
-        \note Handlers are iterated in order they were registered
-        \note if \a deviceType is empty, all devices will be reported
+        If handler is already added for deviceType, nothing is done
+        NOTE: Handlers are iterated in order they were registered
+        NOTE: if deviceType is empty, all devices will be reported
     */
     void registerHandler( SearchHandler* handler, const QString& deviceType = QString() );
 
     /*!
-     *  If \a handler is not added for \a deviceType, nothing is done
-     *  \note if \a deviceType is empty, handler will be unregistred for ALL device types
+     *  If handler is not added for deviceType, nothing is done
+     *  NOTE: if deviceType is empty, handler will be unregistred for ALL device types
      *        even if they were registred by separate calls with certain types
      */
     void unregisterHandler( SearchHandler* handler, const QString& deviceType = QString() );
 
-    //!Makes internal copy of discovered but not processed devices. \a processDiscoveredDevices uses this copy
+    //!Makes internal copy of discovered but not processed devices. processDiscoveredDevices uses this copy
     void saveDiscoveredDevicesSnapshot();
     //!Passes discovered devices info snapshot to registered handlers
     /*!
         If some handlers processes packet (UPNPSearchHandler::processPacket returns true), then packet is removed and not passed to other handlers
-        \param handlerToUse If NULL, all handlers are used, otherwise packets are passed to \a handlerToUse only
+        \param handlerToUse If NULL, all handlers are used, otherwise packets are passed to handlerToUse only
     */
     void processDiscoveredDevices( SearchHandler* handlerToUse = NULL );
     int cacheTimeout() const;
@@ -109,7 +109,7 @@ private:
         HostAddress deviceAddress;
         //!Address of local interface, device has been discovered on
         QHostAddress localInterfaceAddress;
-        //!Device uuid. Places as a separater member because it becomes known before \a devInfo
+        //!Device uuid. Places as a separater member because it becomes known before devInfo
         QByteArray uuid;
         nx::utils::Url descriptionUrl;
         DeviceInfo devInfo;
@@ -160,7 +160,7 @@ private:
     nx::Buffer m_receiveBuffer;
     bool m_needToUpdateReceiveSocket;
 
-    //!Implementation of \a TimerEventHandler::onTimer
+    //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
     void onSomeBytesRead(
         AbstractCommunicatingSocket* sock,
@@ -180,11 +180,11 @@ private:
     //QByteArray getDeviceDescription( const QByteArray& uuidStr, const QUrl& url );
     QHostAddress findBestIface( const HostAddress& host );
     /*!
-        \note MUST be called with \a m_mutex locked. Also, returned item MUST be used under same lock
+        NOTE: MUST be called with m_mutex locked. Also, returned item MUST be used under same lock
     */
     const UPNPDescriptionCacheItem* findDevDescriptionInCache( const QByteArray& uuid );
     /*!
-        \note MUST be called with \a m_mutex locked
+        NOTE: MUST be called with m_mutex locked
     */
     void updateItemInCache( DiscoveredDeviceInfo devInfo );
 

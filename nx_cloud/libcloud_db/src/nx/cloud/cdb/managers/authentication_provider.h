@@ -24,7 +24,7 @@ namespace ec2 { class AbstractVmsP2pCommandBus; }
 class AbstractTemporaryAccountPasswordManager;
 
 /**
- * Provides some temporary hashes which can be used by mediaserver 
+ * Provides some temporary hashes which can be used by mediaserver
  * to authenticate requests using cloud account credentials.
  * NOTE: These requests are allowed for system only.
  */
@@ -46,7 +46,7 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) override;
-    
+
     virtual void afterUpdatingAccountPassword(
         nx::utils::db::QueryContext* const queryContext,
         const api::AccountData& account) override;
@@ -59,7 +59,7 @@ public:
         const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler);
     /**
-     * @return intermediate HTTP Digest response that can be used to calculate 
+     * @return intermediate HTTP Digest response that can be used to calculate
      *   HTTP Digest response with only ha2 known.
      * Usage of intermediate HTTP Digest response is required to keep ha1 inside cdb.
      */
@@ -83,7 +83,7 @@ private:
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
 
-    boost::optional<AccountWithEffectivePassword> 
+    boost::optional<AccountWithEffectivePassword>
         getAccountByLogin(const std::string& login) const;
     nx::utils::db::DBResult validateNonce(
         nx::utils::db::QueryContext* queryContext,

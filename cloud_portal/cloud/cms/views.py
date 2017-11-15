@@ -238,7 +238,7 @@ def product_settings(request, product_id):
         action = form.cleaned_data['action']
         generate_json = action == 'generate_json'
         update_structure = action == 'update_structure'
-        update_content = action == 'generate_json'
+        update_content = action == 'update_content'
 
         file = request.FILES["file"]
 

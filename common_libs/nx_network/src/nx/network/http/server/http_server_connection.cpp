@@ -92,7 +92,7 @@ void HttpServerConnection::onAuthenticationDone(
     nx_http::server::AuthenticationResult authenticationResult,
     nx_http::Message requestMessage)
 {
-    RequestProcessingContext processingContext = 
+    RequestProcessingContext processingContext =
         prepareRequestProcessingContext(*requestMessage.request);
 
     if (!authenticationResult.isSucceeded)
@@ -109,7 +109,7 @@ void HttpServerConnection::onAuthenticationDone(
         std::move(requestMessage));
 }
 
-HttpServerConnection::RequestProcessingContext 
+HttpServerConnection::RequestProcessingContext
     HttpServerConnection::prepareRequestProcessingContext(
         const nx_http::Request& request)
 {
@@ -218,7 +218,7 @@ void HttpServerConnection::prepareAndSendResponse(
     RequestProcessingContext processingContext,
     ResponseMessageContext responseMessageContext)
 {
-    responseMessageContext.msg.response->statusLine.version = 
+    responseMessageContext.msg.response->statusLine.version =
         std::move(processingContext.httpVersion);
     responseMessageContext.msg.response->statusLine.reasonPhrase =
         nx_http::StatusCode::toString(
@@ -229,7 +229,7 @@ void HttpServerConnection::prepareAndSendResponse(
         responseMessageContext.msgBody->bindToAioThread(getAioThread());
         if (responseMessageContext.msgBody->mimeType().isEmpty())
         {
-            // Malformed message body? 
+            // Malformed message body?
             // TODO: #ak Add assert here and ensure no one uses this path.
             responseMessageContext.msgBody.reset();
         }
@@ -344,9 +344,9 @@ void HttpServerConnection::someMsgBodyRead(
     {
         if (!m_currentMsgBody->contentLength())
         {
-            // The only way to signal about the end of message body is to close a connection 
+            // The only way to signal about the end of message body is to close a connection
             // if Content-Length is not specified.
-            // Connection will be closed after sending this response if noone takes socket 
+            // Connection will be closed after sending this response if noone takes socket
             // for any reason (like establishing some tunnel, etc...).
             m_isPersistent = false;
         }

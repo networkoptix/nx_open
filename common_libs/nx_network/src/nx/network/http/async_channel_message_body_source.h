@@ -49,12 +49,12 @@ public:
             void(SystemError::ErrorCode, BufferType)> completionHandler) override
     {
         const std::size_t kReadBufferSize = 16 * 1024;
-            
+
         using namespace std::placeholders;
 
         if (messageBodyTransferLimitHasBeenReached())
             return reportEndOfMessageBody(std::move(completionHandler));
-        
+
         m_completionHandler.swap(completionHandler);
 
         m_readBuffer.reserve(kReadBufferSize);
@@ -122,7 +122,7 @@ private:
 };
 
 template<typename AsyncChannel>
-std::unique_ptr<AsyncChannelMessageBodySource<AsyncChannel>> 
+std::unique_ptr<AsyncChannelMessageBodySource<AsyncChannel>>
     makeAsyncChannelMessageBodySource(
         nx_http::StringType mimeType,
         std::unique_ptr<AsyncChannel> asyncChannel)

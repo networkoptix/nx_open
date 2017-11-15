@@ -9,6 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <http/http_api_path.h>
+#include <vms_gateway_process.h>
 
 #include "test_setup.h"
 
@@ -31,6 +32,8 @@ public:
 
     ~ProxyUsingRelaying()
     {
+        if (m_relayConnectionAcceptor)
+            m_relayConnectionAcceptor->pleaseStopSync();
         if (m_httpClient)
             m_httpClient->pleaseStopSync();
         if (m_serverConnection)
@@ -38,6 +41,15 @@ public:
     }
 
 protected:
+    void waitForPeerToEstablishRelayConnections()
+    {
+        while (!moduleInstance()->impl()->relayEngine()
+            .listeningPeerPool().isPeerOnline(m_peerName.toStdString()))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
     void whenIssueProxyRequest()
     {
         m_httpClient = std::make_unique<nx_http::AsyncClient>();
@@ -98,8 +110,11 @@ private:
             .setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint())
             .setPath(nx::cloud::gateway::kApiPathPrefix).toUrl();
 
-        m_relayConnectionAcceptor = 
-            std::make_unique<nx::network::cloud::relay::ConnectionAcceptor>(m_baseUrl);
+        auto relayUrl = m_baseUrl;
+        relayUrl.setUserName(m_peerName);
+
+        m_relayConnectionAcceptor =
+            std::make_unique<nx::network::cloud::relay::ConnectionAcceptor>(relayUrl);
         m_relayConnectionAcceptor->acceptAsync(
             std::bind(&ProxyUsingRelaying::saveAcceptedConnection, this, _1, _2));
     }
@@ -124,8 +139,10 @@ private:
     }
 };
 
-TEST_F(ProxyUsingRelaying, DISABLED_relay_connection_is_used_for_proxying)
+TEST_F(ProxyUsingRelaying, relay_connection_is_used_for_proxying)
 {
+    waitForPeerToEstablishRelayConnections();
+
     whenIssueProxyRequest();
 
     thenConnectionIsAccepted();

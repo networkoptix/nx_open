@@ -63,6 +63,41 @@ void SystemMergeManager::startMergingSystems(
     issueVmsMergeRequest(authzInfo, mergeRequestContextPtr);
 }
 
+void SystemMergeManager::processMergeHistoryRecord(
+    nx::utils::db::QueryContext* queryContext,
+    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+{
+    NX_DEBUG(this, lm("Received notification that system %1 merge is complete. "
+        "Marking system for deletion").args(mergeHistoryRecord.mergedSystemCloudId));
+
+    data::SystemData system;
+    auto resultCode = m_systemManager->fetchSystemById(
+        queryContext,
+        mergeHistoryRecord.mergedSystemCloudId.toStdString(),
+        &system);
+    if (resultCode != nx::utils::db::DBResult::ok)
+        throw nx::utils::db::Exception(resultCode);
+
+    if (!mergeHistoryRecord.verify(system.authKey.c_str()))
+    {
+        NX_WARNING(this, lm("Could not verify merge history record for system %1. Ignoring...")
+            .args(system.id));
+        return;
+    }
+
+    if (system.status != api::SystemStatus::beingMerged)
+    {
+        NX_DEBUG(this, lm("Received merge history record for system %1 "
+            "that is in unexpected state %2. Proceeding...")
+            .args(system.id, QnLexical::serialized(system.status)));
+    }
+
+    resultCode = m_systemManager->markSystemForDeletion(
+        queryContext, mergeHistoryRecord.mergedSystemCloudId.toStdString());
+    if (resultCode != nx::utils::db::DBResult::ok)
+        throw nx::utils::db::Exception(resultCode);
+}
+
 api::ResultCode SystemMergeManager::validateRequestInput(
     const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemToBeMerged)
@@ -88,7 +123,7 @@ api::ResultCode SystemMergeManager::validateRequestInput(
     const auto systemToBeMerged = m_systemManager->findSystemById(idOfSystemToBeMerged);
     if (!systemToBeMerged)
         return api::ResultCode::notFound;
-    
+
     if (systemToMergeTo->ownerAccountEmail != systemToBeMerged->ownerAccountEmail)
     {
         NX_DEBUG(this, lm("Cannot merge system %1 (owner %2) to system %3 (owner %4). "
@@ -108,7 +143,7 @@ void SystemMergeManager::issueVmsMergeRequest(
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Merge %1 into %2. Issuing request to system %1")
-        .args(mergeRequestContext->idOfSystemToBeMerged, 
+        .args(mergeRequestContext->idOfSystemToBeMerged,
             mergeRequestContext->idOfSystemToMergeTo));
 
     const auto username = authzInfo.get<std::string>(attr::authAccountEmail);
@@ -117,7 +152,7 @@ void SystemMergeManager::issueVmsMergeRequest(
         username ? *username : std::string(),
         mergeRequestContext->idOfSystemToBeMerged,
         mergeRequestContext->idOfSystemToMergeTo,
-        std::bind(&SystemMergeManager::processVmsMergeRequestResult, this, 
+        std::bind(&SystemMergeManager::processVmsMergeRequestResult, this,
             mergeRequestContext, _1));
 }
 
@@ -139,9 +174,9 @@ void SystemMergeManager::processVmsMergeRequestResult(
 
     m_dbManager->executeUpdate(
         std::bind(&SystemMergeManager::updateSystemStateInDb, this, _1,
-            mergeRequestContext->idOfSystemToMergeTo, 
+            mergeRequestContext->idOfSystemToMergeTo,
             mergeRequestContext->idOfSystemToBeMerged),
-        std::bind(&SystemMergeManager::processUpdateSystemResult, this, 
+        std::bind(&SystemMergeManager::processUpdateSystemResult, this,
             mergeRequestContext, _1, _2));
 }
 
@@ -177,7 +212,7 @@ void SystemMergeManager::finishMerge(
         .args(mergeRequestContextPtr->idOfSystemToBeMerged,
             mergeRequestContextPtr->idOfSystemToMergeTo,
             QnLexical::serialized(resultCode)));
-        
+
     std::unique_ptr<MergeRequestContext> mergeRequestContext;
     {
         QnMutexLocker lock(&m_mutex);

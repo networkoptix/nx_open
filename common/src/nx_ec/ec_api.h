@@ -34,6 +34,7 @@
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_misc_data.h>
+#include <nx_ec/data/api_system_merge_history_record.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
@@ -649,7 +650,7 @@ namespace ec2
         }
 
         template<class TargetType, class HandlerType>
-        int getMisParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
+        int getMiscParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
         {
             return getMiscParam(paramName, std::static_pointer_cast<impl::GetMiscParamHandler>(std::make_shared<impl::CustomGetMiscParamHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -663,6 +664,30 @@ namespace ec2
                 outData);
         }
 
+        ErrorCode saveSystemMergeHistoryRecord(const ec2::ApiSystemMergeHistoryRecord& param)
+        {
+            int(AbstractMiscManager::*fn)(const ec2::ApiSystemMergeHistoryRecord&, impl::SimpleHandlerPtr) = 
+                &AbstractMiscManager::saveSystemMergeHistoryRecord;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
+        }
+
+        template<class TargetType, class HandlerType>
+        int getSystemMergeHistory(TargetType* target, HandlerType handler)
+        {
+            return getSystemMergeHistory(
+                std::static_pointer_cast<impl::GetSystemMergeHistoryHandlerPtr>(
+                    std::make_shared<impl::CustomGetSystemMergeHistoryHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode getSystemMergeHistorySync(ApiSystemMergeHistoryRecordList* const outData)
+        {
+            return impl::doSyncCall<impl::GetSystemMergeHistoryHandler>(
+                [this](const impl::GetSystemMergeHistoryHandlerPtr &handler) {
+                    return this->getSystemMergeHistory(handler);
+                },
+                outData);
+        }
+
     protected:
         virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
@@ -670,6 +695,9 @@ namespace ec2
         virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
         virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) = 0;
         virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) = 0;
+
+        virtual int saveSystemMergeHistoryRecord(const ApiSystemMergeHistoryRecord& param, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

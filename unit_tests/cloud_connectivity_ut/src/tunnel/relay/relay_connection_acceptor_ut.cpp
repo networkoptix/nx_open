@@ -56,14 +56,14 @@ protected:
         return m_relayServerUrl;
     }
 
-    api::BeginListeningResponse prevReportedBeginListeningResponse() const
+    api::BeginListeningResponse lastReportedBeginListeningResponse() const
     {
         return m_beginListeningResponse;
     }
 
-    void setKeepAliveReported(bool val)
+    void setKeepAliveReported(bool keepAliveReportedFlag)
     {
-        if (!val)
+        if (!keepAliveReportedFlag)
         {
             m_beginListeningResponse.keepAliveOptions.reset();
         }
@@ -72,7 +72,7 @@ protected:
             m_beginListeningResponse.keepAliveOptions = KeepAliveOptions();
             m_beginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
                 std::chrono::seconds(3);
-            m_beginListeningResponse.keepAliveOptions->probeSendPeriod = 
+            m_beginListeningResponse.keepAliveOptions->probeSendPeriod =
                 std::chrono::seconds(3);
             m_beginListeningResponse.keepAliveOptions->probeCount = 3;
         }
@@ -240,7 +240,7 @@ protected:
 
     void thenRelaySettingsAreAvailable()
     {
-        ASSERT_EQ(prevReportedBeginListeningResponse(), m_connection->beginListeningResponse());
+        ASSERT_EQ(lastReportedBeginListeningResponse(), m_connection->beginListeningResponse());
     }
 
     void thenNotificationIsIgnored()
@@ -262,7 +262,17 @@ protected:
         boost::optional<KeepAliveOptions> keepAliveOptions;
         ASSERT_TRUE(connection->getKeepAlive(&keepAliveOptions))
             << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_EQ(prevReportedBeginListeningResponse().keepAliveOptions, keepAliveOptions);
+
+        auto expectedKeepAliveOptions =
+            lastReportedBeginListeningResponse().keepAliveOptions;
+        if (expectedKeepAliveOptions)
+            expectedKeepAliveOptions->resetUnsupportedFieldsToSystemDefault();
+
+        ASSERT_EQ(
+            static_cast<bool>(expectedKeepAliveOptions),
+            static_cast<bool>(keepAliveOptions));
+        if (keepAliveOptions)
+            ASSERT_EQ(*expectedKeepAliveOptions, *keepAliveOptions);
     }
 
 private:

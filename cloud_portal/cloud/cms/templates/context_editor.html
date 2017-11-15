@@ -79,26 +79,23 @@
 
     {% if perms.cms.edit_content %}
     <div class="submit-row">
+        {% if preview_link %}
+        <button class='btn btn-sm btn-default pull-left' onClick="openPreview()">Open Preview</button>
+        {% endif %}
         {% if user.is_superuser and context.file_path%}
-        <button class="btn">
+        <button class="btn btn-sm btn-default">
             <a href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
                download>Download Draft</a>
         </button>
         {% endif %}
-        <button class="btn" type="submit" name="SaveDraft">Save Draft</button>
-        <button class="btn" type="submit" name="Preview">Save and Preview</button>
-        <button class="btn" type="submit" name="SendReview">Send for Review</button>
-        <button class="btn" type="reset"  name="Reset">Reset</button>
+        <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
+        <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
+        <button class="btn btn-sm btn-success" type="submit" name="SendReview">Send for Review</button>
+        <button class="btn btn-sm btn-danger" type="reset"  name="Reset">Reset</button>
     </div>
     {% endif %}
 
 </form>
-
-{% if preview_link %}
-<div class="submit-row">
-    <button class='btn' onClick="openPreview()">Open Preview</button>
-</div>
-{% endif %}
 
 <!--{% if image %}
 <div> <img src="data:image/png;base64,{{image}}"> </div>

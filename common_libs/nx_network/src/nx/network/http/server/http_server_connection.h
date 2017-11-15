@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <memory>
 
@@ -50,7 +50,7 @@ class AbstractMessageDispatcher;
 
 /**
  * Used to install handlers on some events on HTTP connection.
- * WARNING: There is no way to remove installed event handler. 
+ * WARNING: There is no way to remove installed event handler.
  *   Event handler implementation MUST ensure it does not crash.
  */
 class ConnectionEvents
@@ -65,7 +65,7 @@ using ResponseIsReadyHandler =
         std::unique_ptr<nx_http::AbstractMsgBodySource>,
         ConnectionEvents)>;
 
-template<typename ConnectionType> using BaseConnection = 
+template<typename ConnectionType> using BaseConnection =
     nx::network::server::BaseStreamProtocolConnection<
         ConnectionType,
         nx_http::Message,

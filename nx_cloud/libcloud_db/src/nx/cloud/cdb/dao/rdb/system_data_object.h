@@ -27,7 +27,7 @@ public:
         const std::string& systemId,
         std::uint64_t* const sequence) override;
 
-    virtual nx::utils::db::DBResult markSystemAsDeleted(
+    virtual nx::utils::db::DBResult markSystemForDeletion(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId) override;
 

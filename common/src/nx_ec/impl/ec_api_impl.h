@@ -201,6 +201,7 @@ namespace ec2
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiVideowallDataList&);
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiWebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
+            void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const ec2::ApiSystemMergeHistoryRecordList&);
         };
 
 
@@ -224,6 +225,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, ec2::ApiResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
+        DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager

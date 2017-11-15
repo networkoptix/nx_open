@@ -105,6 +105,15 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::removeResourceParam);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::setResourceParam);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::removeUser);
+    m_ec2SyncronizationEngine->incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::saveUser);
+
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
 
     m_startedAsyncCallsCounter.wait();
@@ -222,11 +231,16 @@ void SystemManager::unbindSystem(
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string>(
-        std::bind(&SystemManager::markSystemAsDeleted, this, _1, _2),
+        std::bind(&SystemManager::markSystemForDeletion, this, _1, _2),
         std::move(systemId.systemId),
-        std::bind(&SystemManager::systemMarkedAsDeleted, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, std::move(completionHandler)));
+        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            completionHandler = std::move(completionHandler)](
+                nx::utils::db::QueryContext* /*queryContext*/,
+                nx::utils::db::DBResult dbResult,
+                std::string /*systemId*/)
+        {
+            completionHandler(dbResultToApiResult(dbResult));
+        });
 }
 
 void SystemManager::getSystems(
@@ -552,6 +566,25 @@ boost::optional<api::SystemData> SystemManager::findSystemById(const std::string
     return *systemIter;
 }
 
+nx::utils::db::DBResult SystemManager::fetchSystemById(
+    nx::utils::db::QueryContext* queryContext,
+    const std::string& systemId,
+    data::SystemData* const system)
+{
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
+        {{ "system.id", ":systemId", QnSql::serialized_field(systemId) }};
+
+    std::vector<data::SystemData> systems;
+    auto dbResult = m_systemDao->fetchSystems(queryContext, sqlFilter, &systems);
+    if (dbResult != nx::utils::db::DBResult::ok)
+        return dbResult;
+    if (systems.empty())
+        return nx::utils::db::DBResult::notFound;
+    NX_ASSERT(systems.size() == 1);
+    *system = std::move(systems[0]);
+    return nx::utils::db::DBResult::ok;
+}
+
 nx::utils::db::DBResult SystemManager::updateSystemStatus(
     nx::utils::db::QueryContext* queryContext,
     const std::string& systemId,
@@ -562,6 +595,28 @@ nx::utils::db::DBResult SystemManager::updateSystemStatus(
             systemId, systemStatus));
 
     return m_systemDao->updateSystemStatus(queryContext, systemId, systemStatus);
+}
+
+nx::utils::db::DBResult SystemManager::markSystemForDeletion(
+    nx::utils::db::QueryContext* const queryContext,
+    const std::string& systemId)
+{
+    auto dbResult = m_systemDao->markSystemForDeletion(queryContext, systemId);
+    if (dbResult != nx::utils::db::DBResult::ok)
+        return dbResult;
+
+    dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId);
+    if (dbResult != nx::utils::db::DBResult::ok)
+        return dbResult;
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, systemId]()
+        {
+            markSystemForDeletionInCache(systemId);
+            m_systemMarkedAsDeletedSubscription.notify(systemId);
+        });
+
+    return nx::utils::db::DBResult::ok;
 }
 
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
@@ -768,37 +823,7 @@ void SystemManager::systemAdded(
         std::move(resultData.systemData));
 }
 
-nx::utils::db::DBResult SystemManager::markSystemAsDeleted(
-    nx::utils::db::QueryContext* const queryContext,
-    const std::string& systemId)
-{
-    auto dbResult = m_systemDao->markSystemAsDeleted(queryContext, systemId);
-    if (dbResult != nx::utils::db::DBResult::ok)
-        return dbResult;
-
-    dbResult = m_systemSharingDao.deleteSharing(queryContext, systemId);
-    if (dbResult != nx::utils::db::DBResult::ok)
-        return dbResult;
-
-    return nx::utils::db::DBResult::ok;
-}
-
-void SystemManager::systemMarkedAsDeleted(
-    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-    nx::utils::db::QueryContext* /*queryContext*/,
-    nx::utils::db::DBResult dbResult,
-    std::string systemId,
-    std::function<void(api::ResultCode)> completionHandler)
-{
-    if (dbResult == nx::utils::db::DBResult::ok)
-        markSystemAsDeletedInCache(systemId);
-
-    m_systemMarkedAsDeletedSubscription.notify(systemId);
-
-    completionHandler(dbResultToApiResult(dbResult));
-}
-
-void SystemManager::markSystemAsDeletedInCache(const std::string& systemId)
+void SystemManager::markSystemForDeletionInCache(const std::string& systemId)
 {
     using namespace std::chrono;
 
@@ -1782,25 +1807,6 @@ nx::utils::db::DBResult SystemManager::doBlockingDbQuery(Func func)
         });
     //waiting for completion
     return future.get();
-}
-
-nx::utils::db::DBResult SystemManager::fetchSystemById(
-    nx::utils::db::QueryContext* queryContext,
-    const std::string& systemId,
-    data::SystemData* const system)
-{
-    const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {{"system.id", ":systemId", QnSql::serialized_field(systemId)}};
-
-    std::vector<data::SystemData> systems;
-    auto dbResult = m_systemDao->fetchSystems(queryContext, sqlFilter, &systems);
-    if (dbResult != nx::utils::db::DBResult::ok)
-        return dbResult;
-    if (systems.empty())
-        return nx::utils::db::DBResult::notFound;
-    NX_ASSERT(systems.size() == 1);
-    *system = std::move(systems[0]);
-    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemManager::fetchSystemToAccountBinder(

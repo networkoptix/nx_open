@@ -259,6 +259,26 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
         result);
 }
 
+void MediaServerClient::ec2GetSystemMergeHistory(
+    std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler)
+{
+    performAsyncEc2Call("ec2/getSystemMergeHistory", std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
+    ec2::ApiSystemMergeHistoryRecordList* result)
+{
+    using Ec2GetSystemMergeHistoryAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<Ec2GetSystemMergeHistoryAsyncFuncPointer>(
+            &MediaServerClient::ec2GetSystemMergeHistory),
+        result);
+}
+
 nx_http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
 {
     return m_prevResponseHttpStatusCode;

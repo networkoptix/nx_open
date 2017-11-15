@@ -3,7 +3,10 @@
 #include <stdexcept>
 
 #include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
+#include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
@@ -11,11 +14,39 @@
 #include "http_handlers.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
+#include "../controller/statistics_provider.h"
 #include "../settings.h"
 
 namespace nx {
 namespace cloud {
 namespace relay {
+
+template<typename ResultType>
+class GetHandler:
+    public nx_http::AbstractFusionRequestHandler<void, ResultType>
+{
+public:
+    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
+
+    GetHandler(FunctorType func):
+        m_func(std::move(func))
+    {
+    }
+
+private:
+    FunctorType m_func;
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const /*connection*/,
+        const nx_http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/) override
+    {
+        auto data = m_func();
+        this->requestCompleted(nx_http::FusionRequestResult(), std::move(data));
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
 
 View::View(
     const conf::Settings& settings,
@@ -66,7 +97,25 @@ void View::registerApiHandlers()
         nx_http::Method::post,
         &m_controller->connectSessionManager());
 
-    // TODO: #ak Following handlers are here for compatiblity with 3.1-beta. Remove after 3.1 release.
+    registerStatisticsApiHandlers();
+    // TODO: #ak Following handlers are here for compatibility with 3.1-beta. Remove after 3.1 release.
+    registerCompatibilityHandlers();
+}
+
+void View::registerStatisticsApiHandlers()
+{
+    using GetAllStatisticsHandler = GetHandler<controller::Statistics>;
+
+    registerApiHandler<GetAllStatisticsHandler>(
+        api::kRelayStatisticsMetricsPath,
+        nx_http::Method::get,
+        std::bind(
+            &controller::AbstractStatisticsProvider::getAllStatistics,
+            &m_controller->statisticsProvider()));
+}
+
+void View::registerCompatibilityHandlers()
+{
     registerApiHandler<relaying::BeginListeningHandler>(
         nx_http::Method::options,
         &m_controller->listeningPeerManager());
@@ -75,16 +124,25 @@ void View::registerApiHandlers()
         &m_controller->connectSessionManager());
 }
 
-template<typename Handler, typename Manager>
+template<typename Handler, typename Arg>
 void View::registerApiHandler(
     const nx_http::StringType& method,
-    Manager* manager)
+    Arg arg)
+{
+    registerApiHandler<Handler, Arg>(Handler::kPath, method, std::move(arg));
+}
+
+template<typename Handler, typename Arg>
+void View::registerApiHandler(
+    const char* path,
+    const nx_http::StringType& method,
+    Arg arg)
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
-        Handler::kPath,
-        [this, manager]() -> std::unique_ptr<Handler>
+        path,
+        [this, arg]() -> std::unique_ptr<Handler>
         {
-            return std::make_unique<Handler>(manager);
+            return std::make_unique<Handler>(arg);
         },
         method);
 }

@@ -57,6 +57,7 @@
                 <module>cloud_db_ut</module>
                 <module>connection_mediator_ut</module>
                 <module>traffic_relay_ut</module>
+                <module>relaying_ut</module>
 
                 <module>client_ut</module>
                 <module>vms_gateway_ut</module>
