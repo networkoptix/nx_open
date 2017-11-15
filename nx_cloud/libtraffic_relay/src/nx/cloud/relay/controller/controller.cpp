@@ -1,7 +1,6 @@
 #include "controller.h"
 
 #include "relay_public_ip_discovery.h"
-#include "statistics_provider.h"
 #include "../model/model.h"
 #include "../model/remote_relay_peer_pool.h"
 #include "../settings.h"
@@ -24,8 +23,6 @@ Controller::Controller(
     m_listeningPeerManager(
         relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
-    m_statisticsProvider(controller::StatisticsProviderFactory::instance().create(
-        model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
 {
@@ -45,16 +42,6 @@ controller::AbstractConnectSessionManager& Controller::connectSessionManager()
 relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
 {
     return *m_listeningPeerManager;
-}
-
-controller::AbstractStatisticsProvider& Controller::statisticsProvider()
-{
-    return *m_statisticsProvider;
-}
-
-const controller::AbstractStatisticsProvider& Controller::statisticsProvider() const
-{
-    return *m_statisticsProvider;
 }
 
 bool Controller::discoverPublicAddress()
@@ -128,8 +115,6 @@ void Controller::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscri
         },
         subscriptionId);
 }
-
-
 
 } // namespace relay
 } // namespace cloud

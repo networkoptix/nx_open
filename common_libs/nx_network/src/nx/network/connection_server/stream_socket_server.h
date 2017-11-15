@@ -145,7 +145,8 @@ private:
 template<class CustomServerType, class ConnectionType>
 class StreamSocketServer:
     public StreamServerConnectionHolder<ConnectionType>,
-    public aio::BasicPollable
+    public aio::BasicPollable,
+    public AbstractStatisticsProvider
 {
     using base_type = StreamServerConnectionHolder<ConnectionType>;
     using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
@@ -215,7 +216,7 @@ public:
         m_keepAliveOptions = std::move(options);
     }
 
-    Statistics statistics() const
+    virtual Statistics statistics() const override
     {
         return m_statisticsCalculator.statistics(
             static_cast<int>(this->connectionCount()));

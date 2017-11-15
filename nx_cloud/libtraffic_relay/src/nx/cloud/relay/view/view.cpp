@@ -14,8 +14,8 @@
 #include "http_handlers.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
-#include "../controller/statistics_provider.h"
 #include "../settings.h"
+#include "../statistics_provider.h"
 
 namespace nx {
 namespace cloud {
@@ -70,6 +70,17 @@ View::~View()
         });
 }
 
+void View::registerStatisticsApiHandlers(
+    const AbstractStatisticsProvider& statisticsProvider)
+{
+    using GetAllStatisticsHandler = GetHandler<Statistics>;
+
+    registerApiHandler<GetAllStatisticsHandler>(
+        api::kRelayStatisticsMetricsPath,
+        nx_http::Method::get,
+        std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider));
+}
+
 void View::start()
 {
     if (!m_multiAddressHttpServer->listen(m_settings.http().tcpBacklogSize))
@@ -85,6 +96,11 @@ std::vector<SocketAddress> View::httpEndpoints() const
     return m_multiAddressHttpServer->endpoints();
 }
 
+const View::MultiHttpServer& View::httpServer() const
+{
+    return *m_multiAddressHttpServer;
+}
+
 void View::registerApiHandlers()
 {
     registerApiHandler<relaying::BeginListeningHandler>(
@@ -97,21 +113,8 @@ void View::registerApiHandlers()
         nx_http::Method::post,
         &m_controller->connectSessionManager());
 
-    registerStatisticsApiHandlers();
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta. Remove after 3.1 release.
     registerCompatibilityHandlers();
-}
-
-void View::registerStatisticsApiHandlers()
-{
-    using GetAllStatisticsHandler = GetHandler<controller::Statistics>;
-
-    registerApiHandler<GetAllStatisticsHandler>(
-        api::kRelayStatisticsMetricsPath,
-        nx_http::Method::get,
-        std::bind(
-            &controller::AbstractStatisticsProvider::getAllStatistics,
-            &m_controller->statisticsProvider()));
 }
 
 void View::registerCompatibilityHandlers()

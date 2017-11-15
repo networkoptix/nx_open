@@ -14,6 +14,8 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
+class AbstractStatisticsProvider;
+
 namespace conf { class Settings; }
 class Controller;
 class Model;
@@ -21,18 +23,24 @@ class Model;
 class View
 {
 public:
+    using MultiHttpServer =
+        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>;
+
     View(
         const conf::Settings& settings,
         const Model& model,
         Controller* controller);
     ~View();
 
+    void registerStatisticsApiHandlers(const AbstractStatisticsProvider&);
+
     void start();
 
     std::vector<SocketAddress> httpEndpoints() const;
 
+    const MultiHttpServer& httpServer() const;
+
 private:
-    using MultiHttpServer = network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>;
     using MultiHttpServerPtr = std::unique_ptr<MultiHttpServer>;
 
     const conf::Settings& m_settings;
@@ -43,7 +51,6 @@ private:
     MultiHttpServerPtr m_multiAddressHttpServer;
 
     void registerApiHandlers();
-    void registerStatisticsApiHandlers();
     void registerCompatibilityHandlers();
 
     template<typename Handler, typename Arg>
