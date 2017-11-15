@@ -60,7 +60,7 @@ void setupButton(QPushButton& button)
 {
     button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    static const auto kButtonName = lit("itemStateExtraActionButton");
+    static const auto kButtonName = lit("itemStateActionButton");
     button.setObjectName(kButtonName);
 
     static const auto kStyleSheetTemplateRaw = R"(
