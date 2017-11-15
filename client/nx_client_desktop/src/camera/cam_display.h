@@ -81,10 +81,10 @@ public:
      * \returns                         Current time in microseconds.
      */
 
-    virtual qint64 getCurrentTime() const;
-    virtual qint64 getDisplayedTime() const;
-    virtual qint64 getExternalTime() const;
-    virtual qint64 getNextTime() const;
+    virtual qint64 getCurrentTime() const override;
+    virtual qint64 getDisplayedTime() const override;
+    virtual qint64 getExternalTime() const override;
+    virtual qint64 getNextTime() const override;
 
     void setMTDecoding(bool value);
 

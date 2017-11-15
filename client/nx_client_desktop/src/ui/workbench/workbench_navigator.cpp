@@ -615,7 +615,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing)
         if (reader->isRealTimeSource())
         {
             /* Media was paused while on live. Jump to archive when resumed. */
-            qint64 time = m_currentMediaWidget->display()->camera()->getCurrentTime();
+            qint64 time = m_currentMediaWidget->display()->camDisplay()->getExternalTime();
             reader->resumeMedia();
             if (time != (qint64)AV_NOPTS_VALUE && !reader->isReverseMode())
                 reader->directJumpToNonKeyFrame(time + 1);
@@ -757,7 +757,7 @@ qint64 QnWorkbenchNavigator::positionUsec() const
     if (!m_currentMediaWidget)
         return 0;
 
-    return m_currentMediaWidget->display()->camera()->getCurrentTime();
+    return m_currentMediaWidget->display()->camDisplay()->getExternalTime();
 }
 
 void QnWorkbenchNavigator::setPosition(qint64 positionUsec)
@@ -1042,7 +1042,7 @@ void QnWorkbenchNavigator::stepBackward()
     m_pausedOverride = false;
 
     /* Here we want to know real reader time. */
-    qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
+    qint64 currentTime = m_currentMediaWidget->display()->camDisplay()->getExternalTime();
 
     if (!reader->isSkippingFrames()
         && currentTime > reader->startTime()
@@ -1501,7 +1501,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (isCurrentWidgetSynced())
                 timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
             else
-                timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+                timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
 
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
