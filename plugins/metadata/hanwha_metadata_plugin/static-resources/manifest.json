@@ -13,6 +13,8 @@
                 "localization": {
                 }
             },
+            
+            "_": "Following fields belong to private plugin implementation.",
             "internalName": "FaceDetection",
             "description": "Face %1",
             "positiveState": "has been detected",
