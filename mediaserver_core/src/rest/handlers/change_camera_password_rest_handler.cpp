@@ -6,6 +6,22 @@
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <api/helpers/camera_id_helper.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+
+QnSecurityCamResourceList allCamerasInGroup(const QnSecurityCamResourcePtr& camera)
+{
+    QnResourcePtr server = camera->getParentServer();
+    auto groupId = camera->getGroupId();
+    if (groupId.isEmpty() || !server)
+        return QnSecurityCamResourceList() << camera;
+    return camera->resourcePool()->getAllCameras(server).filtered(
+        [groupId](const QnVirtualCameraResourcePtr& camRes)
+        {
+            return camRes->getGroupId() == groupId;
+        }
+        );
+}
 
 int QnChangeCameraPasswordRestHandler::executePost(
         const QString& /*path*/,
@@ -65,13 +81,15 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx_http::StatusCode::ok;
     }
 
-    camera->setAuth(auth);
-    if (!camera->saveParams())
+    for (auto camera: allCamerasInGroup(camera))
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error");
-        return nx_http::StatusCode::ok;
+        camera->setAuth(auth);
+        if (!camera->saveParams())
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error");
+            return nx_http::StatusCode::ok;
+        }
+        camera->reinitAsync();
     }
-    camera->reinitAsync();
-
     return nx_http::StatusCode::ok;
 }
