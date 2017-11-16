@@ -58,6 +58,6 @@ private:
         const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates);
 };
 
-} // namespace test 
+} // namespace test
 } // namespace cdb
 } // namespace nx

@@ -32,7 +32,7 @@ class UDPHolePunchingConnectionInitiationFsm:
     using base_type = network::aio::BasicPollable;
 
 public:
-    /** 
+    /**
      * @note onFsmFinishedEventHandler is allowed to free
      *     UDPHolePunchingConnectionInitiationFsm instance.
      */
@@ -88,7 +88,7 @@ private:
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
 
     virtual void stopWhileInAioThread() override;
-    
+
     void processConnectRequest(
         const ConnectionStrongRef& originatingPeerConnection,
         api::ConnectRequest request,

@@ -142,7 +142,7 @@ std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
 void MediatorFunctionalTest::registerCloudDataProvider(
     AbstractCloudDataProvider* cloudDataProvider)
 {
-    m_factoryFuncToRestore = 
+    m_factoryFuncToRestore =
         AbstractCloudDataProviderFactory::setFactoryFunc(
             [cloudDataProvider](
                 const boost::optional<nx::utils::Url>& /*cdbUrl*/,

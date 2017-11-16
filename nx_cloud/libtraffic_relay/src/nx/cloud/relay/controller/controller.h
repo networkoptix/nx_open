@@ -28,24 +28,17 @@ public:
     controller::AbstractConnectSessionManager& connectSessionManager();
     relaying::AbstractListeningPeerManager& listeningPeerManager();
 
-    controller::AbstractStatisticsProvider& statisticsProvider();
-    const controller::AbstractStatisticsProvider& statisticsProvider() const;
-
     bool discoverPublicAddress();
 
 private:
     controller::TrafficRelay m_trafficRelay;
     std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
     std::unique_ptr<relaying::AbstractListeningPeerManager> m_listeningPeerManager;
-    std::unique_ptr<controller::AbstractStatisticsProvider> m_statisticsProvider;
     Model* m_model;
     const conf::Settings* m_settings;
     std::vector<nx::utils::SubscriptionId> m_listeningPeerPoolSubscriptions;
 
-    void subscribeForPeerConnected(
-        nx::utils::SubscriptionId* subscriptionId,
-        std::string publicAddress);
-
+    void subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId);
     void subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscriptionId);
 };
 

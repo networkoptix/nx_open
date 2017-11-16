@@ -40,8 +40,8 @@ public:
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
         nx_http::server::AuthenticationCompletionHandler completionHandler) override;
-        
-    static nx::String realm(); 
+
+    static nx::String realm();
 
 private:
     const nx_http::AuthMethodRestrictionList& m_authRestrictionList;

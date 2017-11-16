@@ -57,7 +57,7 @@ nx::utils::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
         transactionData.ubjsonSerializedTransaction};
 
     QnMutexLocker lk(&m_mutex);
-    
+
     auto insertionPair = m_transactions.insert(transaction);
     if (!insertionPair.second)
         m_transactions.replace(insertionPair.first, std::move(transaction));

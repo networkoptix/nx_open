@@ -3,6 +3,7 @@
 #include <nx/utils/system_error.h>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/connection_server/server_statistics.h>
 
 #include "message.h"
 #include "message_parser.h"
@@ -20,6 +21,7 @@ class MessageDispatcher;
  */
 class NX_NETWORK_API UdpServer:
     public network::aio::BasicPollable,
+    public network::server::AbstractStatisticsProvider,
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
     typedef nx::network::UnreliableMessagePipeline<
@@ -53,6 +55,8 @@ public:
         const Message& message,
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
     const std::unique_ptr<network::UDPSocket>& socket();
+
+    virtual nx::network::server::Statistics statistics() const override;
 
 private:
     PipelineType m_messagePipeline;

@@ -66,8 +66,8 @@ void VmsGatewayStub::reportRequestResult(RequestContext requestContext)
 {
     VmsRequestResult vmsRequestResult;
 
-    vmsRequestResult.resultCode = 
-        m_malfunctioningSystems.find(requestContext.params.targetSystemId) 
+    vmsRequestResult.resultCode =
+        m_malfunctioningSystems.find(requestContext.params.targetSystemId)
             == m_malfunctioningSystems.end()
         ? VmsResultCode::ok
         : VmsResultCode::networkError;

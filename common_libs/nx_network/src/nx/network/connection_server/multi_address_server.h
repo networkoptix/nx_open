@@ -9,6 +9,8 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
 
+#include "server_statistics.h"
+
 namespace nx {
 namespace network {
 namespace server {
@@ -17,7 +19,8 @@ namespace server {
  * Listens multiple addresses by creating multiple servers (SocketServerType).
  */
 template<class SocketServerType>
-class MultiAddressServer
+class MultiAddressServer:
+    public AbstractStatisticsProvider
 {
     template<typename... Args>
     static std::unique_ptr<SocketServerType> realFactoryFunc(Args... params)
@@ -123,6 +126,27 @@ public:
     {
         for (auto& listener: m_listeners)
             (listener.get()->*function)(std::forward<Args>(args)...);
+    }
+
+    virtual Statistics statistics() const override
+    {
+        Statistics cumulativeStatistics;
+        for (const auto& listener: m_listeners)
+        {
+            const auto statistics = listener->statistics();
+            cumulativeStatistics.connectionCount += statistics.connectionCount;
+            cumulativeStatistics.connectionsAcceptedPerMinute +=
+                statistics.connectionsAcceptedPerMinute;
+            cumulativeStatistics.requestsServedPerMinute +=
+                statistics.requestsServedPerMinute;
+            cumulativeStatistics.requestsAveragePerConnection +=
+                statistics.requestsAveragePerConnection;
+        }
+
+        if (!m_listeners.empty())
+            cumulativeStatistics.requestsAveragePerConnection /= (int) m_listeners.size();
+
+        return cumulativeStatistics;
     }
 
 private:

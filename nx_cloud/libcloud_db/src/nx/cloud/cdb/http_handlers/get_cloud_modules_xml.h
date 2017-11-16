@@ -14,7 +14,7 @@ class GetCloudModulesXml:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
-    using GenerateModulesXmlFunc = 
+    using GenerateModulesXmlFunc =
         nx::utils::MoveOnlyFunc<QByteArray(const nx::String& /*httpHostHeader*/)>;
 
     static const QString kHandlerPath;

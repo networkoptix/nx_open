@@ -22,9 +22,9 @@ public:
         etUpdate,
         etDelete
     };
-    
+
     DataChangeEvent() : type(etNone) {}
-    
+
     EventType type;
     DataType data;
 };

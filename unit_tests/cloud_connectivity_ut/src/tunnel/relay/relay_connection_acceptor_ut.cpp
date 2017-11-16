@@ -272,7 +272,9 @@ protected:
             static_cast<bool>(expectedKeepAliveOptions),
             static_cast<bool>(keepAliveOptions));
         if (keepAliveOptions)
+        {
             ASSERT_EQ(*expectedKeepAliveOptions, *keepAliveOptions);
+        }
     }
 
 private:

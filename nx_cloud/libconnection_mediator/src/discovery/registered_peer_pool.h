@@ -35,7 +35,7 @@ public:
 
     /**
      * If connection from peer with id peerId is already present, it is replaced.
-     * Each message inside websocket is treated as JSON representation of 
+     * Each message inside websocket is treated as JSON representation of
      * BasicInstanceInformation descendant.
      * When connection has been broken peer is still considered online for Discovery::keepAliveTimeout.
      */

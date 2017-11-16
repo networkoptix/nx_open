@@ -45,7 +45,7 @@ public:
         m_settings.load(args.size(), args.data());
 
         prepareTestData();
-        
+
         m_vmsP2pCommandBusStub.setOnSaveResourceAttribute(
             std::bind(&AuthenticationProvider::onSaveResourceAttribute, this, _1, _2));
 

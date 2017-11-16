@@ -18,13 +18,13 @@ nx::utils::db::DBResult DataObject::save(
 {
     const char queryText[] = R"sql(
         INSERT INTO connect_session_statistics(
-            start_time_utc, end_time_utc, result_code, session_id, originating_host_endpoint, 
+            start_time_utc, end_time_utc, result_code, session_id, originating_host_endpoint,
             originating_host_name, destination_host_endpoint, destination_host_name)
         VALUES(
             :startTime, :endTime, :resultCode, :sessionId, :originatingHostEndpoint,
             :originatingHostName, :destinationHostEndpoint, :destinationHostName)
     )sql";
-    
+
     QSqlQuery saveRecordQuery(*queryContext->connection());
     if (!saveRecordQuery.prepare(queryText))
     {

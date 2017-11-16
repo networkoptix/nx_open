@@ -397,7 +397,7 @@ class WriteOnlyRestHandler:
     using base_type = AbstractFiniteMsgBodyHttpHandler<Input>;
 
 public:
-    //using HandlerFunc = 
+    //using HandlerFunc =
     //    void(const AuthorizationInfo& authzInfo,
     //        const std::vector<nx_http::StringType>& restPathParams,
     //        Input inputData,

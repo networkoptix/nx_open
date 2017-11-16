@@ -38,7 +38,7 @@ public:
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override
-    {   
+    {
         QnJsonRestResult restResult;
         if (!m_serverIdForModuleInformation)
         {

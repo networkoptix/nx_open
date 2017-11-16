@@ -89,7 +89,7 @@ protected:
      * @param queryFunc throws nx::utils::db::Exception.
      */
     template<typename QueryFunc>
-    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type 
+    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type
         executeSelectQuerySyncThrow(QueryFunc queryFunc)
     {
         return m_persistentDbManager->queryExecutor()

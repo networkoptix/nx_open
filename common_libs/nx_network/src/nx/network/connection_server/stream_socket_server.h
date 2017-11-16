@@ -14,6 +14,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+#include "detail/server_statistics_calculator.h"
+#include "server_statistics.h"
+
 namespace nx {
 namespace network {
 namespace server {
@@ -142,7 +145,8 @@ private:
 template<class CustomServerType, class ConnectionType>
 class StreamSocketServer:
     public StreamServerConnectionHolder<ConnectionType>,
-    public aio::BasicPollable
+    public aio::BasicPollable,
+    public AbstractStatisticsProvider
 {
     using base_type = StreamServerConnectionHolder<ConnectionType>;
     using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
@@ -212,6 +216,12 @@ public:
         m_keepAliveOptions = std::move(options);
     }
 
+    virtual Statistics statistics() const override
+    {
+        return m_statisticsCalculator.statistics(
+            static_cast<int>(this->connectionCount()));
+    }
+
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
@@ -221,10 +231,22 @@ protected:
         m_socket.reset();
     }
 
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        ConnectionType* connection) override
+    {
+        m_statisticsCalculator.saveConnectionStatistics(
+            connection->lifeDuration(),
+            connection->messagesReceivedCount());
+
+        base_type::closeConnection(closeReason, connection);
+    }
+
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_socket;
     boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    detail::StatisticsCalculator m_statisticsCalculator;
 
     StreamSocketServer(StreamSocketServer&);
     StreamSocketServer& operator=(const StreamSocketServer&);
@@ -248,6 +270,8 @@ private:
                 .arg(SystemError::toString(code)), cl_logWARNING);
             return;
         }
+
+        m_statisticsCalculator.connectionAccepted();
 
         if (m_keepAliveOptions)
         {

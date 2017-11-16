@@ -138,7 +138,7 @@ private:
         ManagerType* manager);
 
     /**
-     * @param handler is 
+     * @param handler is
      * void(const AuthorizationInfo& authzInfo,
      *     const std::vector<nx_http::StringType>& restPathParams,
      *     InputData inputData,

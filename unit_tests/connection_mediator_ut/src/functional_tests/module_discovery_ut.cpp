@@ -150,7 +150,7 @@ private:
         if (resultCode != nx::cloud::discovery::ResultCode::ok)
         {
             throw std::runtime_error(
-                "Error fetching peer status. " + 
+                "Error fetching peer status. " +
                 QnLexical::serialized(resultCode).toStdString());
         }
 

@@ -34,7 +34,7 @@ public:
     void resume();
 
     MergeRequestParameters popRequest();
-    
+
     void failEveryRequestToSystem(const std::string& id);
 
 private:

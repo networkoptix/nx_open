@@ -198,7 +198,7 @@ api::ResultCode CdbLauncher::addAccount(
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, *activationCode) = 
+    std::tie(result, *activationCode) =
         makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
             std::bind(
                 &nx::cdb::api::AccountManager::registerNewAccount,

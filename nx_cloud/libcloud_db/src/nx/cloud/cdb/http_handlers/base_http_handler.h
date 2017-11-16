@@ -53,7 +53,7 @@ protected:
         HttpRequestResourceReader httpRequestResources(request);
 
         // Performing authorization.
-        // Authorization is performed here since it can depend on input data which 
+        // Authorization is performed here since it can depend on input data which
         // needs to be deserialized depending on request type.
         if (!m_authorizationManager.authorize(
                 authenticationData,
@@ -226,7 +226,7 @@ public:
                 &authInfo))
             return;
 
-        processRequest( 
+        processRequest(
             AuthorizationInfo(std::move(authInfo)),
             [this](api::ResultCode resultCode, Output... outData)
             {

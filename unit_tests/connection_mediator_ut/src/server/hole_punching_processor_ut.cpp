@@ -336,9 +336,9 @@ TEST_F(
     proper_error_is_reported_in_case_of_silent_listening_peer)
 {
     givenSilentServer();
- 
+
     whenIssueConnectRequest();
-    
+
     thenConnectResultCodeIs(api::ResultCode::noReplyFromServer);
     waitForMediatorToDropConnectSession();
 }
