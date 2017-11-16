@@ -1,27 +1,27 @@
 {
-  "cameraLinks":{
-    "highStream":"高解像度ストリーム",
-    "lowStream":"低解像度ストリーム",
-    "transcoding":"トランスコーディング",
-    "unknown":"不明",
-    "copyToClipboard":"クリップボードにコピー",
-    "copyDefaultText":"コピー",
-    "copyActiveText":"クリップボードにコピーしました"
-  },
-  "systemOffline":"システムはオフライン",
-  "cameraStates":{
-    "offline":"オフライン",
-    "error":"エラー",
-    "unauthorized":"認証が必要",
-    "noData":"データがありません",
-    "iosVideoTooLarge":"iOSはfullHD(2MP：1920x1080)より大きいビデオをサポートしていません",
-    "flashRequired":"ARMベースのサーバーからビデオを再生するには、<a href='https://get.adobe.com/flashplayer/' target='_blank'> Adob​​e Flash</a>をインストールしてください",
-    "flashOrWebmRequired":"ビデオを再生することはできません<br>\nIeで再生するには<a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
-    "noArmSupport":"このブラウザまたはデバイスは、ARMベースのサーバーからのビデオ再生をサポートしていません",
-    "noFormat":"このブラウザまたはデバイスは、このカメラからのビデオ再生をサポートしていません",
-    "ieNoWebm":"ビデオを再生することはできません<br>\nIeに <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM codec</a>をインストールして下さい",
-    "ieWin10":"Microsoft EdgeまたはGoogle Chromeブラウザを使用してください",
-    "ubuntuNX":"このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください"
-  },
-  "searchCamPlaceholder":"検索"
+    "cameraLinks": {
+        "highStream": "高解像度ストリーム",
+        "lowStream": "低解像度ストリーム",
+        "transcoding": "トランスコーディング",
+        "unknown": "未知の値",
+        "copyToClipboard": "クリップボードにコピー",
+        "copyDefaultText": "コピー",
+        "copyActiveText": "クリップボードにコピーしました"
+    },
+    "systemOffline": "システムはオフライン",
+    "cameraStates": {
+        "offline": "オフライン",
+        "error": "エラー",
+        "unauthorized": "認証が必要",
+        "noData": "データがありません",
+        "iosVideoTooLarge": "iOSはfullHD(2MP：1920x1080)より大きいビデオをサポートしていません",
+        "flashRequired": "ARMベースのサーバーからビデオを再生するには、<a href='https://get.adobe.com/flashplayer/' target='_blank'> Adob​​e Flash</a>をインストールしてください",
+        "flashOrWebmRequired": "ビデオを再生することはできません<br>\nIeで再生するには<a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
+        "noArmSupport": "このブラウザまたはデバイスは、ARMベースのサーバーからのビデオ再生をサポートしていません",
+        "noFormat": "このブラウザまたはデバイスは、このカメラからのビデオ再生をサポートしていません",
+        "ieNoWebm": "ビデオを再生することはできません<br>\nIeに <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM codec</a>をインストールして下さい",
+        "ieWin10": "Microsoft EdgeまたはGoogle Chromeブラウザを使用してください",
+        "ubuntuNX": "このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください"
+    },
+    "searchCamPlaceholder": "検索"
 }

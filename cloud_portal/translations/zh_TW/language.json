@@ -1,237 +1,237 @@
 {
-  "language_name":"繁体中文",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"確定",
-    "cancelButton":"取消",
-    "loginTitle":"登入到 {{PRODUCT_NAME}}",
-    "loginButton":"登入",
-    "logoutAuthorisedTitle":"您已經登入",
-    "logoutAuthorisedContinueButton":"繼續",
-    "logoutAuthorisedLogoutButton":"登出"
+  "language_name": "繁体中文",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "確定",
+    "cancelButton": "取消",
+    "loginTitle": "登入到 {{PRODUCT_NAME}}",
+    "loginButton": "登入",
+    "logoutAuthorisedTitle": "您已經登入",
+    "logoutAuthorisedContinueButton": "繼續",
+    "logoutAuthorisedLogoutButton": "登出"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"歡迎來到",
-    "register":"新建帳戶",
-    "changePassword":"更改密碼 -",
-    "account":"帳號設定 -",
-    "systems":"系統 -",
-    "system":"系統 -",
-    "systemShare":"共用系統 -",
-    "activate":"啟動帳號 -",
-    "activateSent":"啟動帳號 -",
-    "activateSuccess":"帳號啟動 -",
-    "activateCode":"啟動帳號 -",
-    "restorePassword":"重置密碼 -",
-    "restorePasswordSuccess":"密碼已儲存 -",
-    "restorePasswordCode":"重置密碼 -",
-    "view":"查看攝影機 - ",
-    "debug":"除錯",
-    "login":"登入 -",
-    "download":"下載 {{VMS_NAME}}",
-    "downloadPlatform":"下載 {{VMS_NAME}} ",
-    "pageNotFound":"找不到頁面"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "歡迎來到",
+    "register": "新建帳戶",
+    "changePassword": "更改密碼 -",
+    "account": "帳號設定 -",
+    "systems": "系統 -",
+    "system": "系統 -",
+    "systemShare": "共用系統 -",
+    "activate": "啟動帳號 -",
+    "activateSent": "啟動帳號 -",
+    "activateSuccess": "帳號啟動 -",
+    "activateCode": "啟動帳號 -",
+    "restorePassword": "重置密碼 -",
+    "restorePasswordSuccess": "密碼已儲存 -",
+    "restorePasswordCode": "重置密碼 -",
+    "view": "查看攝影機 - ",
+    "debug": "除錯",
+    "login": "登入 -",
+    "download": "下載 {{VMS_NAME}}",
+    "downloadPlatform": "下載 {{VMS_NAME}} ",
+    "pageNotFound": "找不到頁面"
   },
-  "systemStatuses":{
-    "notActivated":"未啟動",
-    "activated":"啟動",
-    "online":"線上",
-    "offline":"離線",
-    "unavailable":"不可用的"
+  "systemStatuses": {
+    "notActivated": "未啟動",
+    "activated": "啟動",
+    "online": "線上",
+    "offline": "離線",
+    "unavailable": "不可用的"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"停用",
-      "description":"使用者被停用, 無法登入到系統"
+  "accessRoles": {
+    "disabled": {
+      "label": "停用",
+      "description": "使用者被停用, 無法登入到系統"
     },
-    "Owner":{
-      "label":"擁有者",
-      "description":"不受限權限包括共用及從雲端連接/斷開系統的能力"
+    "Owner": {
+      "label": "擁有者",
+      "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
-    "Viewer":{
-      "label":"瀏覽",
-      "description":"可以瀏覽即時影像和回放錄影資料"
+    "Viewer": {
+      "label": "瀏覽",
+      "description": "可以瀏覽即時影像和回放錄影資料"
     },
-    "Live Viewer":{
-      "label":"即時影像瀏覽",
-      "description":"只能瀏覽即時影像"
+    "Live Viewer": {
+      "label": "即時影像瀏覽",
+      "description": "只能瀏覽即時影像"
     },
-    "Advanced Viewer":{
-      "label":"進階瀏覽",
-      "description":"可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
+    "Advanced Viewer": {
+      "label": "進階瀏覽",
+      "description": "可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
     },
-    "Administrator":{
-      "label":"管理者",
-      "description":"不受限的權限包括共用的能力"
+    "Administrator": {
+      "label": "管理者",
+      "description": "不受限的權限包括共用的能力"
     },
-    "Custom":{
-      "label":"自訂",
-      "description":"使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
+    "Custom": {
+      "label": "自訂",
+      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
     },
-    "cloudAdmin":{
-      "label":"管理者",
-      "description":"可以配置系統和共用它"
+    "cloudAdmin": {
+      "label": "管理者",
+      "description": "可以配置系統和共用它"
     },
-    "customRole":{
-      "label":"自訂角色",
-      "description":"在系統中指定的自訂使用者角色"
+    "customRole": {
+      "label": "自訂角色",
+      "description": "在系統中指定的自訂使用者角色"
     },
-    "owner":{
-      "label":"擁有者",
-      "description":"不受限權限包括共用及從雲端連接/斷開系統的能力"
+    "owner": {
+      "label": "擁有者",
+      "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
-    "viewer":{
-      "label":"瀏覽者",
-      "description":"可以瀏覽即時影像和回放錄影資料"
+    "viewer": {
+      "label": "瀏覽",
+      "description": "可以瀏覽即時影像和回放錄影資料"
     },
-    "liveViewer":{
-      "label":"即時影像瀏覽者",
-      "description":"只能瀏覽即時影像"
+    "liveViewer": {
+      "label": "即時影像瀏覽",
+      "description": "只能瀏覽即時影像"
     },
-    "advancedViewer":{
-      "label":"進階瀏覽者",
-      "description":"可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
+    "advancedViewer": {
+      "label": "進階瀏覽",
+      "description": "可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
     },
-    "custom":{
-      "label":"自訂",
-      "description":"使用 {{PRODUCT_NAME}} 用戶端應用程式以設置自訂權限"
+    "custom": {
+      "label": "自訂",
+      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"無法發送確認郵件",
-    "cantDisconnectSystemPrefix":"無法刪除系統",
-    "cantUnshareWithMeSystemPrefix":"無法刪除系統",
-    "cantSharePrefix":"無法共用系統",
-    "cantGetUsersListPrefix":"使用者清單不可用",
-    "cantGetSystemsListPrefix":"系統清單不可用",
-    "cantRegisterPrefix":"出現錯誤",
-    "cantGetSystemInfoPrefix":"系統資訊不可用",
-    "cantChangeAccountPrefix":"無法儲存變更",
-    "cantChangePasswordPrefix":"無法儲存密碼",
-    "cantActivatePrefix":"無法啟動您的帳號",
-    "cantSendConfirmationPrefix":"無法發送確認郵件",
-    "cloudInvalidResponse":"雲端 DB 回覆預期外的回應",
-    "notAuthorized":"不正確的電子郵件或密碼",
-    "wrongParameters":"表單上的一些參數不正確",
-    "wrongCode":"帳號已經啟動或確認碼不正確",
-    "wrongCodeRestore":"確認代碼已使用或不正確",
-    "forbidden":"您沒有權限執行此操作",
-    "accountNotActivated":"此帳號尚未啟動. <a href=\"/activate\"> 再發送一次啟動連結</a>",
-    "accountBlocked":"此帳號已被封鎖.",
-    "notFound":"找不到",
-    "alreadyExists":"此帳號已存在",
-    "unknownError":"發生意外的錯誤",
-    "accountAlreadyActivated":"此帳號已啟動",
-    "emailNotFound":"帳號不存在",
-    "EmailAlreadyExists":"此電子郵件已被註冊",
-    "oldPasswordMistmatch":"目前密碼不正確",
-    "passwordMismatch":"密碼不正確",
-    "cantEditYourself":"不允許變更自己的權限",
-    "cantEditAdmin":"此使用者具有管理員權限",
-    "cantOpenClient":"{{VMS_NAME}} 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
-    "lostConnection":"與 {{systemName}} 的連線斷開了",
-    "thisSystem":"系統"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "無法發送確認郵件",
+    "cantDisconnectSystemPrefix": "無法刪除系統",
+    "cantUnshareWithMeSystemPrefix": "無法刪除系統",
+    "cantSharePrefix": "無法共用系統",
+    "cantGetUsersListPrefix": "使用者清單不可用",
+    "cantGetSystemsListPrefix": "系統清單不可用",
+    "cantRegisterPrefix": "出現錯誤",
+    "cantGetSystemInfoPrefix": "系統資訊不可用",
+    "cantChangeAccountPrefix": "無法儲存變更",
+    "cantChangePasswordPrefix": "無法儲存密碼",
+    "cantActivatePrefix": "無法啟動您的帳號",
+    "cantSendConfirmationPrefix": "無法發送確認郵件",
+    "cloudInvalidResponse": "雲端 DB 回覆預期外的回應",
+    "notAuthorized": "不正確的電子郵件或密碼",
+    "wrongParameters": "表單上的一些參數不正確",
+    "wrongCode": "帳號已經啟動或確認碼不正確",
+    "wrongCodeRestore": "確認代碼已使用或不正確",
+    "forbidden": "您沒有權限執行此操作",
+    "accountNotActivated": "此帳號尚未啟動. <a href=\"/activate\"> 再發送一次啟動連結</a>",
+    "accountBlocked": "此帳號已被封鎖.",
+    "notFound": "找不到",
+    "alreadyExists": "此帳號已存在",
+    "unknownError": "發生意外的錯誤",
+    "accountAlreadyActivated": "此帳號已啟動",
+    "emailNotFound": "帳號不存在",
+    "EmailAlreadyExists": "此電子郵件已被註冊",
+    "oldPasswordMistmatch": "目前密碼不正確",
+    "passwordMismatch": "密碼不正確",
+    "cantEditYourself": "不允許變更自己的權限",
+    "cantEditAdmin": "此使用者具有管理員權限",
+    "cantOpenClient": "{{VMS_NAME}} 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
+    "lostConnection": "與 {{systemName}} 的連線斷開了",
+    "thisSystem": "系統"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"密碼必須包含至少 8 個字元",
-    "requiredMessage":"只能使用拉丁字母, 數字和符號鍵盤, 避免前後空格",
-    "weakMessage":"使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
-    "strongMessage":"理想的密碼!",
-    "commonMessage":"此密碼是很常用的組合"
+  "passwordRequirements": {
+    "minLengthMessage": "密碼必須包含至少 8 個字元",
+    "requiredMessage": "只能使用拉丁字母, 數字和符號鍵盤, 避免前後空格",
+    "weakMessage": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
+    "strongMessage": "理想的密碼!",
+    "commonMessage": "此密碼是很常用的組合"
   },
-  "sharing":{
-    "confirmOwner":"如果您更改系統擁有者, 您將註銷目前此帳號的所有權. 此操作是不可逆的, 是否確定?",
-    "shareTitle":"共用",
-    "shareConfirmButton":"共用",
-    "editShareTitle":"編輯權限",
-    "editShareConfirmButton":"儲存",
-    "permissionsSaved":"新權限已儲存"
+  "sharing": {
+    "confirmOwner": "如果您更改系統擁有者, 您將註銷目前此帳號的所有權. 此操作是不可逆的, 是否確定?",
+    "shareTitle": "共用",
+    "shareConfirmButton": "共用",
+    "editShareTitle": "編輯權限",
+    "editShareConfirmButton": "儲存",
+    "permissionsSaved": "新權限已儲存"
   },
-  "system":{
-    "yourSystem":"您的系統",
-    "mySystemSearch":"我的",
-    "unavailable":"無法連接至系統",
-    "offline":"系統處於離線狀態",
-    "openClient":"在 {{VMS_NAME}} 中打開",
-    "confirmRenameTitle":"系統名稱",
-    "confirmRenameAction":"儲存",
-    "successRename":"系統名稱已儲存",
-    "confirmDisconnectTitle":"從 {{PRODUCT_NAME}} 斷開系統嗎?",
-    "confirmDisconnectAction":"斷線",
-    "confirmUnshareFromMe":"您正要從您的帳號斷開此系統. 您將再也無法存取此系統. 確定?",
-    "confirmUnshareFromMeTitle":"斷開系統?",
-    "confirmUnshareFromMeAction":"斷線",
-    "confirmUnshare":"此使用者將無法存取系統. 確定?",
-    "confirmUnshareTitle":"刪除使用者?",
-    "confirmUnshareAction":"刪除",
-    "successDisconnected":"系統成功地斷開 {{PRODUCT_NAME}}",
-    "successDeleted":"從您的帳戶成功刪除系統 {{systemName}}",
-    "permissionsRemoved":"權限從 {{email}} 被移除"
+  "system": {
+    "yourSystem": "您的系統",
+    "mySystemSearch": "我的",
+    "unavailable": "無法連接至系統",
+    "offline": "系統處於離線狀態",
+    "openClient": "在 {{VMS_NAME}} 中打開",
+    "confirmRenameTitle": "系統名稱",
+    "confirmRenameAction": "儲存",
+    "successRename": "系統名稱已儲存",
+    "confirmDisconnectTitle": "從 {{PRODUCT_NAME}} 斷開系統嗎?",
+    "confirmDisconnectAction": "斷線",
+    "confirmUnshareFromMe": "您正要從您的帳號斷開此系統. 您將再也無法存取此系統. 確定?",
+    "confirmUnshareFromMeTitle": "斷開系統?",
+    "confirmUnshareFromMeAction": "斷線",
+    "confirmUnshare": "此使用者將無法存取系統. 確定?",
+    "confirmUnshareTitle": "刪除使用者?",
+    "confirmUnshareAction": "刪除",
+    "successDisconnected": "系統成功地斷開 {{PRODUCT_NAME}}",
+    "successDeleted": "從您的帳戶成功刪除系統 {{systemName}}",
+    "permissionsRemoved": "權限從 {{email}} 被移除"
   },
-  "account":{
-    "accountSavedSuccess":"您的帳號已成功儲存",
-    "activationLinkSent":"啟動連結已發送",
-    "passwordChangedSuccess":"您的帳號已成功儲存",
-    "changePassword":"變更密碼",
-    "newPasswordLabel":"新密碼",
-    "saveChanges":"儲存"
+  "account": {
+    "accountSavedSuccess": "您的帳號已成功儲存",
+    "activationLinkSent": "啟動連結已發送",
+    "passwordChangedSuccess": "您的帳號已成功儲存",
+    "changePassword": "變更密碼",
+    "newPasswordLabel": "新密碼",
+    "saveChanges": "儲存"
   },
-  "downloads":{
-    "noClientDetectedTitle":"安裝 {{VMS_NAME}} 來查看您的系統",
-    "action":"下載 {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "安裝 {{VMS_NAME}} 來查看您的系統",
+    "action": "下載 {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"僅用戶端",
-      "server":"僅伺服器",
-      "bundle":"用戶端和伺服器",
-      "servertool":"設定工具"
+    "appTypes": {
+      "client": "僅用戶端",
+      "server": "僅伺服器",
+      "bundle": "用戶端和伺服器",
+      "servertool": "設定工具"
     }
   },
-  "activeActions":{
-    "sendConfirm":"重新發送啟動連結",
-    "resetPassword":"重置密碼",
-    "setNewPassword":"儲存密碼",
-    "setNewPasswordLabel":"新密碼"
+  "activeActions": {
+    "sendConfirm": "重新發送啟動連結",
+    "resetPassword": "重置密碼",
+    "setNewPassword": "儲存密碼",
+    "setNewPasswordLabel": "新密碼"
   },
-  "regActions":{
-    "passwordLabel":"密碼",
-    "createAccount":"新建帳號"
+  "regActions": {
+    "passwordLabel": "密碼",
+    "createAccount": "新建帳號"
   },
-  "header":{
-    "allSystems":"所有系統",
-    "systems":"系統"
+  "header": {
+    "allSystems": "所有系統",
+    "systems": "系統"
   }
 }
