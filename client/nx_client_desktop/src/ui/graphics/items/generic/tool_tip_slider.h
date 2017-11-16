@@ -71,6 +71,12 @@ protected:
     virtual void setupHideAnimator(VariantAnimator* animator) const = 0;
 
     /**
+     * Check whether tooltip is actually visible (or animating right now) - or hidden (or hiding
+     * right now)
+     */
+    bool actualToolTipVisibility() const;
+
+    /**
      * Function to handle auto-hide behavior.
      */
     virtual bool calculateToolTipAutoVisibility() const;
