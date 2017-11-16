@@ -13,7 +13,7 @@
 #include <nx/utils/random.h>
 
 #include <nx/cloud/relay/controller/connect_session_manager.h>
-#include <nx/cloud/relay/controller/statistics_provider.h>
+#include <nx/cloud/relay/statistics_provider.h>
 #include <nx/cloud/relaying/listening_peer_manager.h>
 
 #include "connect_session_manager_mock.h"
@@ -217,21 +217,21 @@ TEST_F(HttpApiOpenConnectionToTheTargetHost, request_is_delivered)
 namespace {
 
 class StatisticsProviderStub:
-    public controller::AbstractStatisticsProvider
+    public AbstractStatisticsProvider
 {
 public:
-    virtual controller::Statistics getAllStatistics() const override
+    virtual Statistics getAllStatistics() const override
     {
         return m_statistics;
     }
 
-    void setStatistics(controller::Statistics statistics)
+    void setStatistics(Statistics statistics)
     {
         m_statistics = statistics;
     }
 
 private:
-    controller::Statistics m_statistics;
+    Statistics m_statistics;
 };
 
 } // namespace
@@ -243,7 +243,7 @@ public:
     HttpApiStatistics()
     {
         m_statisticsProviderFactoryBak =
-            controller::StatisticsProviderFactory::instance().setCustomFunc(
+            StatisticsProviderFactory::instance().setCustomFunc(
                 std::bind(&HttpApiStatistics::createStatisticsProviderStub, this));
     }
 
@@ -254,7 +254,7 @@ public:
 
         if (m_statisticsProviderFactoryBak)
         {
-            controller::StatisticsProviderFactory::instance().setCustomFunc(
+            StatisticsProviderFactory::instance().setCustomFunc(
                 std::move(*m_statisticsProviderFactoryBak));
         }
     }
@@ -280,15 +280,14 @@ protected:
 
 private:
     using GetStatisticsHttpClient =
-        nx_http::FusionDataHttpClient<void, nx::cloud::relay::controller::Statistics>;
+        nx_http::FusionDataHttpClient<void, nx::cloud::relay::Statistics>;
 
     std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
-    nx::utils::SyncQueue<nx::cloud::relay::controller::Statistics> m_receivedStatistics;
-    boost::optional<controller::StatisticsProviderFactory::Function>
-        m_statisticsProviderFactoryBak;
-    controller::Statistics m_expectedStatistics;
+    nx::utils::SyncQueue<nx::cloud::relay::Statistics> m_receivedStatistics;
+    boost::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
+    Statistics m_expectedStatistics;
 
-    std::unique_ptr<controller::AbstractStatisticsProvider> createStatisticsProviderStub()
+    std::unique_ptr<AbstractStatisticsProvider> createStatisticsProviderStub()
     {
         auto result = std::make_unique<StatisticsProviderStub>();
         m_expectedStatistics = generateRandomStatistics();
@@ -296,21 +295,28 @@ private:
         return std::move(result);
     }
 
-    controller::Statistics generateRandomStatistics()
+    Statistics generateRandomStatistics()
     {
-        controller::Statistics statistics;
+        Statistics statistics;
+
         statistics.relaying.connectionsAcceptedPerMinute =
             nx::utils::random::number<>(1, 20);
         statistics.relaying.connectionsCount = nx::utils::random::number<>(1, 20);
         statistics.relaying.connectionsAveragePerServerCount = nx::utils::random::number<>(1, 20);
         statistics.relaying.listeningServerCount = nx::utils::random::number<>(1, 20);
+
+        statistics.http.connectionCount = nx::utils::random::number<>(1, 20);
+        statistics.http.connectionsAcceptedPerMinute = nx::utils::random::number<>(1, 20);
+        statistics.http.requestsAveragePerConnection = nx::utils::random::number<>(1, 20);
+        statistics.http.requestsServedPerMinute = nx::utils::random::number<>(1, 20);
+
         return statistics;
     }
 
     void saveStatisticsRequestResult(
         SystemError::ErrorCode /*systemErrorCode*/,
         const nx_http::Response* response,
-        nx::cloud::relay::controller::Statistics statistics)
+        nx::cloud::relay::Statistics statistics)
     {
         onRequestCompletion(
             response

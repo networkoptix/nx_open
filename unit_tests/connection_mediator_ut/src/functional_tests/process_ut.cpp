@@ -46,7 +46,7 @@ public:
 
         m_udpClient = std::make_unique<api::MediatorClientUdpConnection>(stunEndpoint());
     }
-    
+
     void stopMediator()
     {
         stop();

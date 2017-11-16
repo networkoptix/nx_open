@@ -62,7 +62,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using SystemHealthInfoProviderFactoryFunction = 
+using SystemHealthInfoProviderFactoryFunction =
     std::unique_ptr<AbstractSystemHealthInfoProvider>(
         ec2::ConnectionManager* ec2ConnectionManager,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager);

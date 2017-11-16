@@ -36,7 +36,7 @@ protected:
             m_otherAccount.email,
             api::SystemAccessRole::viewer);
     }
-    
+
     void whenRequestUserListUsingSystemCredentials()
     {
         m_prevResult = getSystemSharings(m_system.id, m_system.authKey, &m_systemUsers);
@@ -1241,7 +1241,7 @@ protected:
     void whenUserRequestedThatSystemDetails()
     {
         api::SystemDataEx systemData;
-        m_previousResultCode = 
+        m_previousResultCode =
             getSystem(m_userAccount.email, m_userAccount.password, m_system.id, &systemData);
     }
 

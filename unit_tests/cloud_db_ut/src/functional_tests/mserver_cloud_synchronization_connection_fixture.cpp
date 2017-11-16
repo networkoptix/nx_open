@@ -104,13 +104,13 @@ nx::utils::Url Ec2MserverCloudSynchronizationConnection::cdbSynchronizationUrl()
         .setHost(endpoint().address.toString()).setPort(endpoint().port);
 }
 
-OnConnectionBecomesActiveSubscription& 
+OnConnectionBecomesActiveSubscription&
     Ec2MserverCloudSynchronizationConnection::onConnectionBecomesActiveSubscription()
 {
     return m_connectionHelper.onConnectionBecomesActiveSubscription();
 }
 
-OnConnectionFailureSubscription& 
+OnConnectionFailureSubscription&
     Ec2MserverCloudSynchronizationConnection::onConnectionFailureSubscription()
 {
     return m_connectionHelper.onConnectionFailureSubscription();
@@ -147,6 +147,6 @@ int Ec2MserverCloudSynchronizationConnection::numberOfConnectionsInACertainState
     return count;
 }
 
-} // namespace test 
+} // namespace test
 } // namespace cdb
 } // namespace nx

@@ -215,7 +215,7 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchUserSharings(
                sa.usage_frequency as usageFrequency
         FROM system_to_account sa, account a
         WHERE sa.account_id=a.id
-    )sql"; 
+    )sql";
 
     QString filterStr;
     if (!filterFields.empty())

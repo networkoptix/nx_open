@@ -96,8 +96,7 @@ void RemoteRelayPeerPool::prepareDbStructure()
 
                 return m_cassConnection->executeUpdate(
                     "CREATE TABLE cdb.relay_peers ( \
-                        relay_id            uuid, \
-                        relay_host          text, \
+                        node_id             text, \
                         domain_suffix_1     text, \
                         domain_suffix_2     text, \
                         domain_suffix_3     text, \
@@ -124,94 +123,16 @@ void RemoteRelayPeerPool::prepareDbStructure()
             }).wait();
 }
 
-cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
-{
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (!m_hostId.empty())
-            return cf::make_ready_future((int)CASS_OK);
-    }
-
-    return m_cassConnection->prepareQuery("SELECT host_id from system.local;")
-        .then(
-            [this](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
-            {
-                auto prepareResult = prepareFuture.get();
-                if (prepareResult.first != CASS_OK)
-                {
-                    NX_DEBUG(this, lm("Error preparing \"select local host id\" query. %1")
-                        .arg(prepareResult.first));
-                    return cf::make_ready_future(
-                        std::make_pair(prepareResult.first, cassandra::QueryResult()));
-                }
-
-                return m_cassConnection->executeSelect(std::move(prepareResult.second));
-            })
-        .then(
-            [this](
-                cf::future<std::pair<CassError, cassandra::QueryResult>> selectFuture)
-            {
-                auto result = selectFuture.get();
-                if (result.first != CASS_OK)
-                {
-                    NX_DEBUG(this, lm("Error selecting local host id. %1").arg(result.first));
-                    return (int)result.first;
-                }
-
-                if (!result.second.next())
-                {
-                    NX_DEBUG(this, "Select local host id failed. Empty cursor.");
-                    return (int)CASS_ERROR_SERVER_INVALID_QUERY;
-                }
-
-                boost::optional<cassandra::Uuid> localHostId;
-                auto getValueResult = result.second.get(0, &localHostId);
-                if (!getValueResult)
-                {
-                    NX_DEBUG(this, "Get local host id from QueryResult failed");
-                    return (int)CASS_ERROR_SERVER_INVALID_QUERY;
-                }
-
-                if (!(bool)localHostId)
-                {
-                    NX_DEBUG(this, "Local host id is NULL");
-                    return (int)CASS_ERROR_SERVER_INVALID_QUERY;
-                }
-
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    m_hostId = localHostId->uuidString;
-                    NX_ASSERT(!m_hostId.empty());
-                }
-
-                NX_VERBOSE(this, lm("Read local host id %1").arg(localHostId->uuidString));
-
-                return (int)CASS_OK;
-            });
-}
-
-cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
-        const std::string& domainName) const
+cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(const std::string& domainName) const
 {
     if (!m_dbReady)
         return cf::make_ready_future(std::string());
 
-    return getLocalHostId()
-        .then(
-            [this, domainName](cf::future<int> getLocalHostIdFuture)
-            {
-                auto errorCode = (CassError)getLocalHostIdFuture.get();
-                if (errorCode != CASS_OK)
-                    return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
+    auto whereString = whereStringForFind(domainName);
+    std::string queryString = "SELECT node_id FROM cdb.relay_peers " + whereString;
+    NX_VERBOSE(this, lm("find relay: query string: %1").arg(queryString));
 
-                auto whereString = whereStringForFind(domainName);
-                std::string queryString = "SELECT relay_id, relay_host \
-                     FROM cdb.relay_peers " + whereString;
-
-                NX_VERBOSE(this, lm("find relay: query string: %1").arg(queryString));
-
-                return m_cassConnection->prepareQuery(queryString.c_str());
-            })
+    return m_cassConnection->prepareQuery(queryString.c_str())
         .then(
             [this](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
             {
@@ -236,33 +157,19 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                     return std::string();
                 }
 
-                std::string thisHostId;
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    thisHostId = m_hostId;
-                }
-
-                boost::optional<cassandra::Uuid> hostUuid;
                 boost::optional<std::string> relayHost;
                 while (result.second.next())
                 {
-                    if (!getQueryResultValue(result.second, "relay_id", &hostUuid))
+                    if (!getQueryResultValue(result.second, "node_id", &relayHost))
                         return std::string();
 
-                    if (hostUuid->uuidString == thisHostId)
+                    if (*relayHost == m_nodeId)
                     {
                         NX_VERBOSE(this, 
                             lm("find relay: selected host string is equal to this host string (%1)")
-                                .arg(thisHostId));
+                                .arg(m_nodeId));
                         continue;
                     }
-
-                    if (!getQueryResultValue(result.second, "relay_host", &relayHost))
-                        return std::string();
-
-                    NX_VERBOSE(this, lm("find relay: Getting next cursor value (%1, %2)")
-                        .arg(hostUuid->uuidString).arg(*relayHost));
-
 
                     NX_VERBOSE(this, lm("Found relay host %1 for domain %2")
                         .arg(*relayHost)
@@ -277,35 +184,27 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
             });
 }
 
-cf::future<bool> RemoteRelayPeerPool::addPeer(
-    const std::string& domainName,
-    const std::string& relayHost)
+cf::future<bool> RemoteRelayPeerPool::addPeer(const std::string& domainName)
 {
     if (!m_dbReady)
         return cf::make_ready_future(false);
 
-    return getLocalHostId()
-        .then(
-            [this](cf::future<int> getLocalHostIdFuture)
-            {
-                auto errorCode = (CassError)getLocalHostIdFuture.get();
-                if (errorCode != CASS_OK)
-                {
-                    NX_DEBUG(this, lm("Error getting local host id. %1").arg(errorCode));
-                    return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
-                }
+    NX_ASSERT(!m_nodeId.empty());
+    if (m_nodeId.empty())
+    {
+        NX_ERROR(this, "Node id must be set before adding peers");
+        return cf::make_ready_future(false);
+    }
 
-                return m_cassConnection->prepareQuery(
+    return m_cassConnection->prepareQuery(
                     "INSERT INTO cdb.relay_peers ( \
-                        relay_id, \
-                        relay_host, \
+                        node_id, \
                         domain_suffix_1, \
                         domain_suffix_2, \
                         domain_suffix_3, \
-                        domain_name_tail ) VALUES(?, ?, ?, ?, ?, ?);");
-            })
+                        domain_name_tail ) VALUES(?, ?, ?, ?, ?);")
         .then(
-            [this, domainName, relayHost](
+            [this, domainName](
                 cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
             {
                 auto prepareResult = prepareFuture.get();
@@ -316,7 +215,7 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
                     return cf::make_ready_future(std::move((CassError)prepareResult.first));
                 }
 
-                if (!bindUpdateParameters(&prepareResult.second, domainName, relayHost))
+                if (!bindUpdateParameters(&prepareResult.second, domainName, UpdateType::add))
                 {
                     NX_DEBUG(this, lm("Error binding parameters for insert into cdb.relay_peers"));
                     return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
@@ -345,24 +244,12 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
     if (!m_dbReady)
         return cf::make_ready_future(false);
 
-    return getLocalHostId()
-        .then(
-            [this](cf::future<int> getLocalHostIdFuture)
-            {
-                auto errorCode = (CassError)getLocalHostIdFuture.get();
-                if (errorCode != CASS_OK)
-                {
-                    NX_DEBUG(this, lm("Error getting local host id. %1").arg(errorCode));
-                    return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
-                }
-
-                return m_cassConnection->prepareQuery(
+    return m_cassConnection->prepareQuery(
                     "DELETE FROM cdb.relay_peers WHERE \
                         domain_suffix_1=? AND \
                         domain_suffix_2=? AND \
                         domain_suffix_3=? AND \
-                        domain_name_tail = ?;");
-            })
+                        domain_name_tail = ?;")
         .then(
             [this, domainName](
                 cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
@@ -375,7 +262,7 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
                     return cf::make_ready_future(std::move((CassError)prepareResult.first));
                 }
 
-                if (!bindUpdateParameters(&prepareResult.second, domainName))
+                if (!bindUpdateParameters(&prepareResult.second, domainName, UpdateType::remove))
                 {
                     NX_DEBUG(this, "Error binding parameters for delete from cdb.relay_peers");
                     return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
@@ -399,15 +286,15 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
             });
 }
 
-bool RemoteRelayPeerPool::isConnectedToDb() const
+void RemoteRelayPeerPool::setNodeId(const std::string& nodeId)
 {
-    return m_dbReady;
+    m_nodeId = nodeId;
 }
 
 bool RemoteRelayPeerPool::bindUpdateParameters(
     cassandra::Query* query,
     const std::string& domainName,
-    const boost::optional<std::string>& relayHost) const
+    UpdateType updateType) const
 {
     auto reversedDomainName = nx::utils::reverseWords(domainName, ".");
     std::vector<std::string> domainParts;
@@ -416,18 +303,10 @@ bool RemoteRelayPeerPool::bindUpdateParameters(
     NX_ASSERT(!domainParts.empty());
 
     bool bindResult = true;
-    if ((bool) relayHost)
-    {
-        cassandra::Uuid localHostId;
-        {
-            QnMutexLocker lock(&m_mutex);
-            localHostId.uuidString = m_hostId;
-        }
-        bindResult &= query->bind("relay_id", localHostId);
-    }
 
-    if ((bool) relayHost)
-        bindResult &= query->bind("relay_host", relayHost.get());
+    if (updateType == UpdateType::add)
+        bindResult &= query->bind("node_id", m_nodeId);
+
     bindResult &= query->bind("domain_suffix_1", domainParts[0]);
     bindResult &= query->bind("domain_suffix_2", domainParts.size() > 1 ? domainParts[1] : "");
     bindResult &= query->bind("domain_suffix_3", domainParts.size() > 2 ? domainParts[2] : "");

@@ -14,12 +14,12 @@ class AbstractSystemManager;
 class AbstractSystemSharingManager;
 
 /**
- * Performs request authorization based on authentication info, 
+ * Performs request authorization based on authentication info,
  * requested entity and requested action type.
  * Checks two types of authorization rules:
- * - static. Defined by calls to this class. 
+ * - static. Defined by calls to this class.
  *   These are rules that are required for other parts of code to function correctly.
- * - dynamic. Defined by authorization_rules.xml. 
+ * - dynamic. Defined by authorization_rules.xml.
  *   These rules can be safely altered (e.g., for customization purposes) in xml without altering code.
  */
 class AuthorizationManager
@@ -32,7 +32,7 @@ public:
         const AbstractSystemSharingManager& systemSharingManager);
 
     /**
-     * @param dataToAuthorize Authorization information can 
+     * @param dataToAuthorize Authorization information can
      *   contain data filter to restrict access to data.
      * @return true if authorized, false otherwise.
      * NOTE: This method cannot block.

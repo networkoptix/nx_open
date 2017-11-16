@@ -162,7 +162,7 @@ std::size_t TransactionConnectionHelper::connectedConnections() const
     return m_connectedConnections.size();
 }
 
-OnConnectionBecomesActiveSubscription& 
+OnConnectionBecomesActiveSubscription&
     TransactionConnectionHelper::onConnectionBecomesActiveSubscription()
 {
     return m_onConnectionBecomesActiveSubscription;
@@ -174,7 +174,7 @@ OnConnectionFailureSubscription&
     return m_onConnectionFailureSubscription;
 }
 
-TransactionConnectionHelper::ConnectionContext 
+TransactionConnectionHelper::ConnectionContext
     TransactionConnectionHelper::prepareConnectionContext(
         const std::string& login,
         const std::string& password,
@@ -259,7 +259,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
             /*fallthrough*/
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
-            // Transaction transport invokes this handler with mutex locked, 
+            // Transaction transport invokes this handler with mutex locked,
             // so have to do some work around this misbehavior.
             m_aioTimer.post(
                 [this, connectionId]()
@@ -321,7 +321,7 @@ void TransactionConnectionHelper::removeConnection(
         });
 }
 
-TransactionConnectionHelper::ConnectionId 
+TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::getConnectionId(
         ec2::QnTransactionTransportBase* connection) const
 {

@@ -1,10 +1,11 @@
 #include "relay_service.h"
 
 #include "controller/controller.h"
-#include "model/model.h"
-#include "view/view.h"
-#include "settings.h"
 #include "libtraffic_relay_app_info.h"
+#include "model/model.h"
+#include "settings.h"
+#include "statistics_provider.h"
+#include "view/view.h"
 
 namespace nx {
 namespace cloud {
@@ -55,6 +56,11 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 
     View view(settings, model, &controller);
     m_view = &view;
+
+    auto statisticsProvider = StatisticsProviderFactory::instance().create(
+        model.listeningPeerPool(),
+        view.httpServer());
+    view.registerStatisticsApiHandlers(*statisticsProvider);
 
     // TODO: #ak: process rights reduction should be done here.
 

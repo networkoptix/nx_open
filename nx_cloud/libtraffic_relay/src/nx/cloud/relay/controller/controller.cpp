@@ -1,7 +1,6 @@
 #include "controller.h"
 
 #include "relay_public_ip_discovery.h"
-#include "statistics_provider.h"
 #include "../model/model.h"
 #include "../model/remote_relay_peer_pool.h"
 #include "../settings.h"
@@ -24,8 +23,6 @@ Controller::Controller(
     m_listeningPeerManager(
         relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
-    m_statisticsProvider(controller::StatisticsProviderFactory::instance().create(
-        model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
 {
@@ -47,16 +44,6 @@ relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
     return *m_listeningPeerManager;
 }
 
-controller::AbstractStatisticsProvider& Controller::statisticsProvider()
-{
-    return *m_statisticsProvider;
-}
-
-const controller::AbstractStatisticsProvider& Controller::statisticsProvider() const
-{
-    return *m_statisticsProvider;
-}
-
 bool Controller::discoverPublicAddress()
 {
     auto publicHostAddress = controller::PublicIpDiscoveryService::get();
@@ -64,9 +51,10 @@ bool Controller::discoverPublicAddress()
         return false;
 
     SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
+    m_model->remoteRelayPeerPool().setNodeId(publicSocketAddress.toStdString());
 
     nx::utils::SubscriptionId subscriptionId;
-    subscribeForPeerConnected(&subscriptionId, publicSocketAddress.toStdString());
+    subscribeForPeerConnected(&subscriptionId);
     m_listeningPeerPoolSubscriptions.push_back(subscriptionId);
 
     subscribeForPeerDisconnected(&subscriptionId);
@@ -75,14 +63,12 @@ bool Controller::discoverPublicAddress()
     return true;
 }
 
-void Controller::subscribeForPeerConnected(
-    nx::utils::SubscriptionId* subscriptionId,
-    std::string publicAddress)
+void Controller::subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId)
 {
     m_model->listeningPeerPool().peerConnectedSubscription().subscribe(
-        [this, publicAddress = std::move(publicAddress)](std::string peer)
+        [this](std::string peer)
         {
-            m_model->remoteRelayPeerPool().addPeer(peer, publicAddress)
+            m_model->remoteRelayPeerPool().addPeer(peer)
                 .then(
                     [this, peer](cf::future<bool> addPeerFuture)
                     {
@@ -128,8 +114,6 @@ void Controller::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscri
         },
         subscriptionId);
 }
-
-
 
 } // namespace relay
 } // namespace cloud

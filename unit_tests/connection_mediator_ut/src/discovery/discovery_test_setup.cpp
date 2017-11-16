@@ -24,7 +24,7 @@ PeerInformation::PeerInformation():
 
 bool operator==(const PeerInformation& left, const PeerInformation& right)
 {
-    if (!(static_cast<const BasicInstanceInformation&>(left) == 
+    if (!(static_cast<const BasicInstanceInformation&>(left) ==
           static_cast<const BasicInstanceInformation&>(right)))
     {
         return false;

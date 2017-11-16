@@ -120,7 +120,7 @@ bool AuthorizationManager::checkStaticRules(
 {
     NX_VERBOSE(this, "Checking static authorization rules");
 
-    if (requestedEntity == EntityType::system && 
+    if (requestedEntity == EntityType::system &&
         (requestedAction == DataActionType::update || requestedAction == DataActionType::delete_))
     {
         // TODO: #ak Introduce some general code here when adding next static rule.
@@ -149,7 +149,7 @@ bool AuthorizationManager::checkDynamicRules(
     nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const
 {
     NX_VERBOSE(this, "Checking dynamic authorization rules");
-    
+
     nx::utils::stree::ResourceContainer additionalResourceContainer;
     nx::utils::stree::ResourceWriterProxy resProxy(outAuthzInfo, &additionalResourceContainer);
     m_stree.search(

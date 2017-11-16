@@ -17,7 +17,7 @@ namespace client {
 
 TEST(CloudModulesXmlHandler, common)
 {
-    //< ? xml version = \"1.0\" encoding=\"utf-8\"?>  
+    //< ? xml version = \"1.0\" encoding=\"utf-8\"?>
     QByteArray testData( "                          \
         <modules>                                   \
         <cdb>                                       \

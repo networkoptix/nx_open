@@ -73,7 +73,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * @param InstanceInformation Must inherit BasicInstanceInformation 
+ * @param InstanceInformation Must inherit BasicInstanceInformation
  */
 template<typename InstanceInformation>
 class ModuleRegistrar:
@@ -129,7 +129,7 @@ public:
 
         auto keepAliveConnectionUrl = m_baseUrl;
         keepAliveConnectionUrl.setPath(nx::network::url::normalizePath(
-            keepAliveConnectionUrl.path() + "/" + 
+            keepAliveConnectionUrl.path() + "/" +
             nx_http::rest::substituteParameters(
                 nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId}).c_str()));
 
@@ -216,7 +216,7 @@ private:
             // TODO: #ak Reconnecting.
             return;
         }
-    
+
         // Retrying to send.
         sendNext();
     }
@@ -243,13 +243,13 @@ public:
     {
         post(
             [this, handler = std::move(handler)]() mutable
-            {   
+            {
                 // TODO Include type.
                 auto url = m_baseUrl;
                 url.setPath(nx::network::url::normalizePath(
                     url.path() + nx::cloud::discovery::http::kDiscoveredModulesPath));
 
-                auto httpClient = 
+                auto httpClient =
                     std::make_unique<nx_http::FusionDataHttpClient<void, std::vector<InstanceInformation>>>(
                         url, nx_http::AuthInfo());
                 httpClient->bindToAioThread(getAioThread());

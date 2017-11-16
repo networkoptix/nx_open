@@ -46,7 +46,7 @@ public:
 };
 
 /**
- * This interface introduced for testing purposes. 
+ * This interface introduced for testing purposes.
  * It is incomplete and quite raw.
  */
 class AbstractAccountManager
@@ -61,7 +61,7 @@ public:
         const std::string& userName) const = 0;
 
     virtual void addExtension(AbstractAccountManagerExtension*) = 0;
-    
+
     virtual void removeExtension(AbstractAccountManagerExtension*) = 0;
 
     virtual std::string generateNewAccountId() const = 0;
@@ -125,7 +125,7 @@ public:
         const AuthorizationInfo& authzInfo,
         data::AccountConfirmationCode emailVerificationCode,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
-    
+
     /**
      * Retrieves account corresponding to authorization data \a authzInfo.
      */
@@ -159,7 +159,7 @@ public:
      */
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const override;
-    
+
     virtual nx::utils::db::DBResult insertAccount(
         nx::utils::db::QueryContext* const queryContext,
         data::AccountData account) override;

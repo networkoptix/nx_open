@@ -232,7 +232,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
         boost::none);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
-    if (m_settings.connectionParameters().connectionResultWaitTimeout == 
+    if (m_settings.connectionParameters().connectionResultWaitTimeout ==
         std::chrono::seconds::zero())
     {
         return done(api::ResultCode::timedOut);
@@ -273,8 +273,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
         tcpEndpoints.begin(),
         m_serverPeerData.endpoints.begin(), m_serverPeerData.endpoints.end());
 
-    if (request.udpEndpointList.empty() && 
-        tcpEndpoints.empty() && 
+    if (request.udpEndpointList.empty() &&
+        tcpEndpoints.empty() &&
         (request.connectionMethods & api::ConnectionMethod::proxy) == 0)
     {
         completionHandler(api::ResultCode::noSuitableConnectionMethod);
@@ -290,7 +290,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
         std::move(tcpEndpoints),
         boost::none);
 
-    // Saving completion handler so that client and server receive 
+    // Saving completion handler so that client and server receive
     // connect and connectionAck responses simultaneously.
     m_connectionAckCompletionHandler = std::move(completionHandler);
 

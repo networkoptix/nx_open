@@ -40,7 +40,7 @@ protected:
     virtual void SetUp() override
     {
         base_type::SetUp();
-        
+
         registerWebSocketAcceptHandlerAt(
             nx_http::rest::substituteParameters(
                 http::kModuleKeepAliveConnectionPath, { m_moduleId.c_str() }).c_str());

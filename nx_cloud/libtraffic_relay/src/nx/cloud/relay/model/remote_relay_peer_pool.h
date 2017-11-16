@@ -31,35 +31,33 @@ public:
     ~RemoteRelayPeerPool();
 
     virtual bool connectToDb() override;
-
-    virtual cf::future<std::string> findRelayByDomain(
-        const std::string& domainName) const override;
-
-    virtual cf::future<bool> addPeer(
-        const std::string& domainName,
-        const std::string& relayHost) override;
-
+    virtual cf::future<std::string> findRelayByDomain( const std::string& domainName) const override;
+    virtual cf::future<bool> addPeer( const std::string& domainName) override;
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
-
-    bool isConnectedToDb() const;
+    virtual void setNodeId(const std::string& nodeId) override;
 
 protected:
     cassandra::AbstractAsyncConnection* getConnection();
 
 private:
+    enum class UpdateType
+    {
+        add,
+        remove
+    };
+
     const conf::Settings& m_settings;
     std::unique_ptr<cassandra::AbstractAsyncConnection> m_cassConnection;
     bool m_dbReady = false;
-    mutable std::string m_hostId;
     mutable QnMutex m_mutex;
+    std::string m_nodeId;
 
     void prepareDbStructure();
     std::string whereStringForFind(const std::string& domainName) const;
     bool bindUpdateParameters(
         cassandra::Query* query,
         const std::string& domainName,
-        const boost::optional<std::string>& relayHost = boost::none) const;
-    cf::future<int> getLocalHostId() const;
+        UpdateType updateType) const;
 };
 
 class RemoteRelayPeerPoolFactory

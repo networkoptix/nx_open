@@ -69,7 +69,7 @@ TEST_F(DbRegress, general)
     ASSERT_EQ(api::SystemStatus::activated, laOfficeTestSystemIter->status);
 }
 
-class DbFailure: 
+class DbFailure:
     public CdbFunctionalTest
 {
 public:
@@ -80,7 +80,7 @@ public:
 };
 
 /**
- * Blocking db connection thread and checking if subsequent db request will fail with 
+ * Blocking db connection thread and checking if subsequent db request will fail with
  * retryLater result.
  */
 TEST_F(DbFailure, basic)
@@ -95,7 +95,7 @@ TEST_F(DbFailure, basic)
             if (insertDelay)
                 std::this_thread::sleep_for(std::chrono::seconds(2));
         });
-    
+
     EMailManagerFactory::setFactory(
         [&testEmailManager](const conf::Settings& /*settings*/)
         {

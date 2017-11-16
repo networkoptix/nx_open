@@ -55,13 +55,13 @@ protected:
     void givenLoadedCloudModulesXmlTemplate()
     {
         const auto templateFilePath = createTemporaryXmlTemplateFile();
-        m_moduleUrlProvider = 
+        m_moduleUrlProvider =
             std::make_unique<cdb::CloudModuleUrlProvider>(templateFilePath);
     }
 
     void tryToLoadInvalidFile()
     {
-        m_moduleUrlProvider = 
+        m_moduleUrlProvider =
             std::make_unique<cdb::CloudModuleUrlProvider>(
                 lm("/%1").arg(QnUuid::createUuid().toString()));
     }
@@ -144,7 +144,7 @@ protected:
         for (const auto& header: m_additionalHttpHeaders)
             fetcher.addAdditionalHttpHeaderForGetRequest(header.first, header.second);
         nx::utils::promise<void> done;
-        auto completionHandler = 
+        auto completionHandler =
             [this, &done](nx_http::StatusCode::Value statusCode, nx::utils::Url moduleUrl)
             {
                 m_fetchUrlResult = {statusCode, moduleUrl};
@@ -157,7 +157,7 @@ protected:
         network::SocketGlobals::addressResolver().removeFixedAddress(
             m_expectedHost, endpoint());
     }
-    
+
     void assertHostHasBeenTakenFromHttpRequest()
     {
         ASSERT_EQ(nx_http::StatusCode::ok, m_fetchUrlResult.first);

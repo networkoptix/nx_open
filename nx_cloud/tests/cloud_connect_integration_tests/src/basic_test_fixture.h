@@ -62,11 +62,9 @@ public:
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& /*domainName*/) const override;
 
-    virtual cf::future<bool> addPeer(
-        const std::string& domainName,
-        const std::string& relayHost) override;
-
+    virtual cf::future<bool> addPeer( const std::string& domainName) override;
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
+    virtual void setNodeId(const std::string& /*nodeId*/) {}
 
 private:
     BasicTestFixture* m_relayTest;
@@ -165,7 +163,7 @@ private:
     void startRelay(int index);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
 
-    virtual void peerAdded(const std::string& /*serverName*/, const std::string& /*relay*/) {}
+    virtual void peerAdded(const std::string& /*serverName*/) {}
     virtual void peerRemoved(const std::string& /*serverName*/) {}
     void setUpRemoteRelayPeerPoolFactoryFunc();
     void setUpPublicIpFactoryFunc();

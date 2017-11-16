@@ -89,7 +89,7 @@ TEST_F(ListeningPeer, connection_override)
 
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server2->listen().first);
 
-    // TODO #ak Checking that server2 connection has overridden server1 
+    // TODO #ak Checking that server2 connection has overridden server1
         // since both servers have same server id.
 
     auto dataLocker = moduleInstance()->impl()->listeningPeerPool()->

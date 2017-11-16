@@ -212,7 +212,7 @@ nx::utils::db::DBResult SystemDataObject::fetchSystems(
         SELECT system.id, system.name, system.customization, system.auth_key as authKey,
                account.email as ownerAccountEmail, system.status_code as status,
                system.expiration_utc_timestamp as expirationTimeUtc,
-               system.seq as systemSequence, system.opaque as opaque, 
+               system.seq as systemSequence, system.opaque as opaque,
                system.registration_time_utc as registrationTime
         FROM system, account
         WHERE system.owner_account_id = account.id

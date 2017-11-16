@@ -8,11 +8,11 @@
 namespace nx {
 namespace cloud {
 namespace relay {
-namespace controller {
 
 bool Statistics::operator==(const Statistics& right) const
 {
-    return relaying == right.relaying;
+    return relaying == right.relaying
+        && http == right.http;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
@@ -23,9 +23,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 StatisticsProvider::StatisticsProvider(
-    const relaying::AbstractListeningPeerPool& listeningPeerPool)
+    const relaying::AbstractListeningPeerPool& listeningPeerPool,
+    const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider)
     :
-    m_listeningPeerPool(listeningPeerPool)
+    m_listeningPeerPool(listeningPeerPool),
+    m_httpServerStatisticsProvider(httpServerStatisticsProvider)
 {
 }
 
@@ -33,6 +35,7 @@ Statistics StatisticsProvider::getAllStatistics() const
 {
     Statistics statistics;
     statistics.relaying = m_listeningPeerPool.statistics();
+    statistics.http = m_httpServerStatisticsProvider.statistics();
     return statistics;
 }
 
@@ -40,7 +43,7 @@ Statistics StatisticsProvider::getAllStatistics() const
 
 StatisticsProviderFactory::StatisticsProviderFactory():
     base_type(std::bind(&StatisticsProviderFactory::defaultFactoryFunction, this,
-        std::placeholders::_1))
+        std::placeholders::_1, std::placeholders::_2))
 {
 }
 
@@ -51,12 +54,14 @@ StatisticsProviderFactory& StatisticsProviderFactory::instance()
 }
 
 std::unique_ptr<AbstractStatisticsProvider> StatisticsProviderFactory::defaultFactoryFunction(
-    const relaying::AbstractListeningPeerPool& listeningPeerPool)
+    const relaying::AbstractListeningPeerPool& listeningPeerPool,
+    const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider)
 {
-    return std::make_unique<StatisticsProvider>(listeningPeerPool);
+    return std::make_unique<StatisticsProvider>(
+        listeningPeerPool,
+        httpServerStatisticsProvider);
 }
 
-} // namespace controller
 } // namespace relay
 } // namespace cloud
 } // namespace nx
