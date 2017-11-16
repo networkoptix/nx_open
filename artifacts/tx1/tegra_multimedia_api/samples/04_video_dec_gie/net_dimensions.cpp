@@ -4,6 +4,8 @@
 
 #include <nx/kit/debug.h>
 
+#include "tegra_video_ini.h"
+
 /**
  * Parse a natural number from string like "...dim: 1024".
  * @return -1 on error.
@@ -76,5 +78,8 @@ NetDimensions getNetDimensions(
         NX_PRINT << "ERROR: Unable to parse net width and/or height from \"" << filename << "\".";
         return error;
     }
+
+    NX_OUTPUT << "Net dimensions parsed from .prototxt: ("
+        << result.width << ", " << result.height << ")";
     return result;
 }

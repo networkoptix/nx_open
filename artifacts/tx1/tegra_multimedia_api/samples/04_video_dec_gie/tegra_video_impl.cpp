@@ -13,7 +13,7 @@
 #include "tegra_video_ini.h"
 #include "net_dimensions.h"
 
-#define NX_PRINT_PREFIX "[tegra_video_impl #" << m_id << "] "
+#define NX_PRINT_PREFIX "[tegra_video_impl" << (m_id.empty() ? "" : " #" + m_id) << "] "
 #include <nx/kit/debug.h>
 
 namespace {
@@ -21,7 +21,7 @@ namespace {
 class Impl: public TegraVideo
 {
 public:
-    Impl() { NX_OUTPUT << "Impl(): created"; }
+    Impl();
 
     virtual ~Impl() override;
 
@@ -51,10 +51,25 @@ private:
     std::mutex m_mutex;
 };
 
+Impl::Impl()
+{
+    NX_OUTPUT << __func__ << "()";
+}
+
+Impl::~Impl()
+{
+    NX_OUTPUT << __func__ << "() BEGIN";
+
+    stop(); //< Ignore possible errors.
+
+    NX_OUTPUT << __func__ << "() END";
+}
+
 bool Impl::start(const Params& params)
 {
-    NX_OUTPUT << "start() BEGIN: params:";
-    NX_OUTPUT << "{";
+    m_id = params.id; //< Used for logging, thus, assigned before logging.
+
+    NX_OUTPUT << __func__ << "({";
     NX_OUTPUT << "    id: " << params.id;
     NX_OUTPUT << "    modelFile: " << params.modelFile;
     NX_OUTPUT << "    deployFile: " << params.deployFile;
@@ -62,9 +77,8 @@ bool Impl::start(const Params& params)
     NX_OUTPUT << "    cacheFile: " << params.cacheFile;
     NX_OUTPUT << "    netWidth: " << params.netWidth;
     NX_OUTPUT << "    netHeight: " << params.netHeight;
-    NX_OUTPUT << "}";
+    NX_OUTPUT << "}) BEGIN";
 
-    m_id = params.id;
     m_modelFile = params.modelFile;
     m_deployFile = params.deployFile;
     m_cacheFile = params.cacheFile;
@@ -93,19 +107,19 @@ bool Impl::start(const Params& params)
             m_modelFile, m_deployFile, m_cacheFile);
         if (result != 0)
         {
-            NX_OUTPUT << "start() END -> false: Detector::startInference() failed with error "
-                << result;
+            NX_OUTPUT << __func__
+                << "() END -> false: Detector::startInference() failed with error " << result;
             return false;
         }
     }
 
-    NX_OUTPUT << "start() END -> true";
+    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 
 bool Impl::stop()
 {
-    NX_OUTPUT << "stop() BEGIN";
+    NX_OUTPUT << __func__ << "() BEGIN";
 
     bool success = true;
 
@@ -117,22 +131,13 @@ bool Impl::stop()
     }
     m_detectors.clear();
 
-    NX_OUTPUT << "stop() END -> " << (success ? "true" : "false");
+    NX_OUTPUT << __func__ << "() END -> " << (success ? "true" : "false");
     return success;
-}
-
-Impl::~Impl()
-{
-    NX_OUTPUT << "~Impl() BEGIN";
-
-    stop(); //< Ignore possible errors.
-
-    NX_OUTPUT << "~Impl() END";
 }
 
 bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
 {
-    NX_OUTPUT << "pushCompressedFrame(data, dataSize: " << compressedFrame->dataSize
+    NX_OUTPUT << __func__ << "(data, dataSize: " << compressedFrame->dataSize
            << ", ptsUs: " << compressedFrame->ptsUs << ") BEGIN";
 
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -144,7 +149,7 @@ bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
             compressedFrame->data, compressedFrame->dataSize, compressedFrame->ptsUs);
     }
 
-    NX_OUTPUT << "pushCompressedFrame() END -> true";
+    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 
@@ -153,7 +158,7 @@ void Impl::processRectsFromAdditionalDetectors()
 {
     if (m_detectors.empty())
     {
-        NX_PRINT << "INTERNAL ERROR: No detectors.";
+        NX_PRINT << "INTERNAL ERROR: " << __func__ << "(): No detectors.";
         return;
     }
 
@@ -183,15 +188,18 @@ void Impl::processRectsFromAdditionalDetectors()
 bool Impl::pullRectsForFrame(
     Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs)
 {
-    NX_OUTPUT << "pullRectsForFrame() BEGIN";
+    NX_OUTPUT << __func__ << "() BEGIN";
     if (!outRects || !outPtsUs)
+    {
+        NX_OUTPUT << __func__ << "() END -> false: either outRects or outPtsUs is null";
         return false;
+    }
 
     processRectsFromAdditionalDetectors();
 
     if (!m_detectors.front()->hasRectangles())
     {
-        NX_OUTPUT << "pullRectsForFrame() END -> false: !m_detector->hasRectangles()";
+        NX_OUTPUT << __func__ << "() END -> false: !m_detector->hasRectangles()";
         return false;
     }
 
@@ -199,7 +207,8 @@ bool Impl::pullRectsForFrame(
 
     if (rectsFromGie.size() > maxRectsCount)
     {
-        NX_PRINT << "INTERNAL ERROR: pullRectsForFrame(): too many rects: " << rectsFromGie.size();
+        NX_PRINT << "INTERNAL ERROR: "
+            << __func__ << "(): Too many rects: " << rectsFromGie.size();
         return false;
     }
 
@@ -215,7 +224,7 @@ bool Impl::pullRectsForFrame(
         r.height = (float) rect.height / m_netHeight;
     }
 
-    NX_OUTPUT << "pullRectsForFrame() END";
+    NX_OUTPUT << __func__ << "() END -> true";
     return true;
 }
 

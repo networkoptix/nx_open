@@ -3,7 +3,7 @@
 
 #include <nx/kit/test.h>
 
-#include "net_dimensions.h"
+#include <net_dimensions.h>
 
 static void test(const std::string& text, NetDimensions expectedDimensions)
 {
@@ -77,9 +77,4 @@ TEST(net_dimensions, invalidMissingAnyDimensionLines)
 TEST(net_dimensions, invalidEmptyText)
 {
     testInvalid("");
-}
-
-int main(int argc, char** argv)
-{
-    return nx::kit::test::runAllTests();
 }

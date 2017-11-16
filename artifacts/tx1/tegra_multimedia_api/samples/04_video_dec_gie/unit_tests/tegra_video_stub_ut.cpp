@@ -2,15 +2,9 @@
 
 #include <nx/kit/test.h>
 
-#include "tegra_video.h"
+#include <tegra_video.h>
 
 static std::unique_ptr<TegraVideo> tegraVideo;
-
-#if 0
-static void test(const std::string& text, NetDimensions expectedDimensions)
-{
-}
-#endif // 0
 
 TEST(tegra_video_stub, setup)
 {
@@ -72,9 +66,4 @@ TEST(tegra_video_stub, frames)
 TEST(tegra_video_stub, stop)
 {
     ASSERT_TRUE(tegraVideo->stop());
-}
-
-int main(int argc, char** argv)
-{
-    return nx::kit::test::runAllTests();
 }
