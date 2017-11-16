@@ -310,10 +310,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
     const nx::vms::event::AbstractActionPtr& action)
 {
     if (action->actionType() != vms::event::ActionType::showPopupAction)
-    {
-        NX_ASSERT(false, "Invalid action type.");
         return;
-    }
 
     if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
         return;
