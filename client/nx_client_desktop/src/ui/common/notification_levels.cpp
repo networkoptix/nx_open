@@ -121,3 +121,14 @@ QColor QnNotificationLevel::notificationColor(Value level)
     }
     return QColor();
 }
+
+QColor QnNotificationLevel::notificationTextColor(Value level)
+{
+    switch (level)
+    {
+        case Value::ImportantNotification: return qnGlobals->warningTextColor();
+        case Value::CriticalNotification:  return qnGlobals->errorTextColor();
+        case Value::OtherNotification:     return Qt::white;
+        default: return QColor(); //< Undefined and should be treated as default.
+    }
+}

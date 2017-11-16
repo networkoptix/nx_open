@@ -116,7 +116,7 @@ QPixmap SystemHealthListModel::Private::pixmap(int index) const
 
 QColor SystemHealthListModel::Private::color(int index) const
 {
-    return QnNotificationLevel::notificationColor(
+    return QnNotificationLevel::notificationTextColor(
         QnNotificationLevel::valueOf(m_items[index].message));
 }
 

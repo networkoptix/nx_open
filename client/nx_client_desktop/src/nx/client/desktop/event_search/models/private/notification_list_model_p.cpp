@@ -204,7 +204,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.timestampMs = timestampMs;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
-    eventData.titleColor = QnNotificationLevel::notificationColor(
+    eventData.titleColor = QnNotificationLevel::notificationTextColor(
         QnNotificationLevel::valueOf(action));
 
     if (action->actionType() == vms::event::playSoundAction)

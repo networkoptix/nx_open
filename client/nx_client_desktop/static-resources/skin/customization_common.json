@@ -106,7 +106,7 @@
         "successTextColor": "green_l2",
         "notificationColorCritical": "red_l2",
         "notificationColorImportant": "yellow_core",
-        "notificationColorCommon": "light10"
+        "notificationColorCommon": "green_l2"
     },
 
     "QApplication": {
