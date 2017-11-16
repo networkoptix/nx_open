@@ -1730,7 +1730,9 @@ void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
     if (!canBeVisible)
         animated = false;
 
-    bool visible = canBeVisible && m_tooltipVisible;
+    const bool visible = canBeVisible && m_tooltipVisible;
+    if (visible == actualToolTipVisibility())
+        return;
 
     if (visible)
         showToolTip(false); //< Always show tooltip immediately.
