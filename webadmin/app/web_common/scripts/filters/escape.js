@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudApp')
+angular.module('nxCommon')
 .filter('escape', function($sce) {
   var entityMap = {
     '&': '&amp;',
