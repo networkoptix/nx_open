@@ -115,13 +115,13 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
     }
-    
+
     const auto curConnectionStrongRef = peerIter->second.peerConnection.lock();
     if (curConnectionStrongRef != connection)
     {
         //detaching from old connection
 
-        //binding to a new connection 
+        //binding to a new connection
         peerIter->second.peerConnection = connection;
         connection->addOnConnectionCloseHandler([this, peerData, connection]()
         {
@@ -145,7 +145,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter);
 }
 
-boost::optional<ListeningPeerPool::ConstDataLocker> 
+boost::optional<ListeningPeerPool::ConstDataLocker>
     ListeningPeerPool::findAndLockPeerDataByHostName(const nx::String& hostName) const
 {
     QnMutexLocker lock(&m_mutex);

@@ -103,7 +103,7 @@ void fillAndSendResponse(
 }
 
 
-/** 
+/**
     Does following:\n
     - reads input data out of STUN \a request
     - passes it to the member function \a processingFunc of \a processor

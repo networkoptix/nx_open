@@ -118,7 +118,7 @@ void MediaserverEndpointTesterBase::ping(
 MediaserverEndpointTester::MediaserverEndpointTester(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher)
-    : 
+    :
     MediaserverEndpointTesterBase(cloudData, dispatcher)
 {
 }
