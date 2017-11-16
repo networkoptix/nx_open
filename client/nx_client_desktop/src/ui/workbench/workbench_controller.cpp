@@ -104,8 +104,10 @@
 
 #include <utils/common/delayed.h>
 #include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
+#include <nx/client/core/utils/geometry.h>
 
 using namespace nx::client::desktop::ui;
+using nx::client::core::Geometry;
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
@@ -518,8 +520,8 @@ void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis)
     if(boundingRect.isEmpty())
         return;
 
-    QPoint aReturn = -aAxis * qAbs(dot(toPoint(boundingRect.size()), aAxis) / dot(aAxis, aAxis));
-    QPoint bReturn = -bAxis * qAbs(dot(toPoint(boundingRect.size()), bAxis) / dot(bAxis, bAxis));
+    QPoint aReturn = -aAxis * qAbs(Geometry::dot(Geometry::toPoint(boundingRect.size()), aAxis) / Geometry::dot(aAxis, aAxis));
+    QPoint bReturn = -bAxis * qAbs(Geometry::dot(Geometry::toPoint(boundingRect.size()), bAxis) / Geometry::dot(bAxis, bAxis));
 
     QPoint pos = center;
     QnWorkbenchItem *item = NULL;
@@ -585,7 +587,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
     QKeyEvent *e = static_cast<QKeyEvent *>(event);
 
-    auto w = qobject_cast<MainWindow*>(mainWindow());
+    auto w = qobject_cast<MainWindow*>(mainWindowWidget());
     NX_EXPECT(w);
     if (w && w->handleKeyPress(e->key()))
         return;
@@ -718,7 +720,8 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     /* Calculate snap point */
     Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
     QRect initialGeometry = m_resizedWidget->item()->geometry();
-    QRect widgetInitialGeometry = mapper()->mapToGrid(rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation()));
+    QRect widgetInitialGeometry = mapper()->mapToGrid(
+        Geometry::rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation()));
     m_resizingSnapPoint = Qn::calculatePinPoint(initialGeometry.intersected(widgetInitialGeometry), grabbedSection);
 }
 
@@ -726,7 +729,8 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     if(m_resizedWidget != item || item == NULL)
         return;
 
-    QRectF widgetGeometry = rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
+    QRectF widgetGeometry =
+        Geometry::rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
 
     /* Calculate integer size. */
     QSize gridSize = mapper()->mapToGrid(widgetGeometry).size();
@@ -1112,7 +1116,8 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     {
         /* Don't raise if there's only one item in the layout. */
         QRectF occupiedGeometry = widget->geometry();
-        occupiedGeometry = dilated(occupiedGeometry, occupiedGeometry.size() * raisedGeometryThreshold);
+        occupiedGeometry = Geometry::dilated(
+            occupiedGeometry, occupiedGeometry.size() * raisedGeometryThreshold);
 
         if (occupiedGeometry.contains(display()->raisedGeometry(widget->geometry(), widget->rotation())))
             workbench()->setItem(Qn::RaisedRole, nullptr);
@@ -1356,7 +1361,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     auto widget = widgets.at(0);
     if(widget->resource()->flags() & Qn::network)
         return;
-    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindowWidget()));
     dialog->exec();
 }
 

@@ -12,7 +12,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/graphics/view/graphics_view.h>
@@ -58,7 +57,10 @@ class QnCamDisplay;
  *
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations
+class QnWorkbenchDisplay:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware,
+    protected QnSceneTransformations
 {
     Q_OBJECT
 

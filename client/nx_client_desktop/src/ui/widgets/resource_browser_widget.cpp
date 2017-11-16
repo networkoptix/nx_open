@@ -107,7 +107,7 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
 // -------------------------------------------------------------------------- //
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchContext* context):
     QWidget(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(context),
     ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),

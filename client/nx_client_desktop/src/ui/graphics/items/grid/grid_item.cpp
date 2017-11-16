@@ -11,12 +11,14 @@
 #include <utils/common/checked_cast.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <ui/style/nx_style.h>
-#include <ui/common/geometry.h>
 #include <ui/common/color_to_vector_converter.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
 #include "grid_highlight_item.h"
+
+using nx::client::core::Geometry;
 
 namespace {
     const char *pointPropertyName = "_qn_itemPoint";
@@ -115,7 +117,7 @@ void QnGridItem::setCellState(const QPoint &cell, int cellState) {
         data.item = newHighlightItem();
 
         qreal d =  m_lineWidth / 2;
-        data.item->setRect(QnGeometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
+        data.item->setRect(Geometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
         setItemCell(data.item, cell);
     }
 
@@ -172,7 +174,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QPointF(mapper()->spacing() / 2, mapper()->spacing() / 2);
-    QPointF delta = QnGeometry::toPoint(mapper()->step());
+    QPointF delta = Geometry::toPoint(mapper()->step());
 
     /* Vertical lines. */
     qreal x = topLeft.x();

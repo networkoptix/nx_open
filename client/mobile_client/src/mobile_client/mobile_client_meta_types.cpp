@@ -7,7 +7,6 @@
 
 #include <context/connection_manager.h>
 #include <ui/timeline/timeline.h>
-#include <ui/qml/quick_item_mouse_tracker.h>
 #include <ui/qml/text_input.h>
 #include <ui/models/systems_model.h>
 #include <models/camera_list_model.h>
@@ -42,7 +41,7 @@ using namespace nx::client::mobile;
 
 void QnMobileClientMetaTypes::initialize()
 {
-    QnClientCoreMetaTypes::initialize();
+    nx::client::core::initializeMetaTypes();
 
     registerMetaTypes();
     registerQmlTypes();
@@ -81,7 +80,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
-    qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
     qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");

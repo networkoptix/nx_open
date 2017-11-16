@@ -363,7 +363,7 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
 
     //TODO #vkutin Think how to do it differently.
     // At application startup m_controlsWidget has default (not maximized) size, so we cannot use its width here.
-    const qreal maxWidth = mainWindow()->width() / 2;
+    const qreal maxWidth = mainWindowWidget()->width() / 2;
 
     const qreal targetWidth = qBound(minWidth, x, maxWidth);
 

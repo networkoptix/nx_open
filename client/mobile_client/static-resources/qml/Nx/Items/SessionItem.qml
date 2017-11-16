@@ -101,7 +101,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: Nx.url(hostsModelAccessor.defaultAddress).address()
+        address: NxGlobals.url(hostsModelAccessor.defaultAddress).address()
         user: authenticationDataModel.defaultCredentials.user
         factoryDetailsText: d.kFactorySystemDetailsText
     }
@@ -177,8 +177,9 @@ Pane
 
         if (!compatible)
         {
-            if (Nx.softwareVersion(invalidVersion).isLessThan(Nx.softwareVersion(kMinimimVersion))
-                || applicationInfo.oldMobileClientUrl() == "")
+            if (NxGlobals.softwareVersion(invalidVersion)
+                    .isLessThan(NxGlobals.softwareVersion(kMinimimVersion))
+                || applicationInfo.oldMobileClientUrl() === "")
             {
                 Workflow.openStandardDialog("",
                     qsTr("This server has too old version. "

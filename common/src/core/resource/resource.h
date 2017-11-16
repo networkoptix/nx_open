@@ -41,17 +41,18 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_FLAGS(Qn::ResourceFlags)
     Q_FLAGS(Ptz::Capabilities)
     Q_FLAGS(Qn::ResourceFlags)
-    Q_PROPERTY(QnUuid id READ getId WRITE setId)
-    Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
-    Q_PROPERTY(QString uniqueId READ getUniqueId)
+    Q_PROPERTY(QnUuid id READ getId CONSTANT)
+    Q_PROPERTY(QnUuid typeId READ getTypeId CONSTANT)
+    Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
-    Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
-    Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
+    Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
+    Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
-    Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+    Q_PROPERTY(Ptz::Capabilities ptzCapabilities
+        READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
 public:
 
     QnResource(QnCommonModule* commonModule = nullptr);
@@ -65,7 +66,7 @@ public:
     virtual void setParentId(const QnUuid& parent);
 
     // device unique identifier
-    virtual QString getUniqueId() const { return getId().toString(); };
+    virtual QString getUniqueId() const { return getId().toString(); }
     virtual void setUniqId(const QString& value);
 
 

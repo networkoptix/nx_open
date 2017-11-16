@@ -5,12 +5,13 @@
 
 #include <QtCore/private/qobject_p.h>
 
-#include <ui/common/geometry.h>
-
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -240,7 +241,7 @@ void QnGraphicsStackedWidgetPrivate::setWidgetGeometry(QGraphicsWidget* widget, 
     if (qFuzzyEquals(size, geometry.size()))
         widget->setGeometry(geometry);
     else
-        widget->setGeometry(QnGeometry::aligned(size, geometry, alignment(widget)));
+        widget->setGeometry(Geometry::aligned(size, geometry, alignment(widget)));
 }
 
 void QnGraphicsStackedWidgetPrivate::updateGeometries()

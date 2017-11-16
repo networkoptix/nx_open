@@ -6,9 +6,11 @@
 #include <QtWidgets/QStylePainter>
 #include <QtWidgets/private/qpushbutton_p.h>
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -250,7 +252,7 @@ QPoint QnDropdownButton::menuPosition() const
     globalRect.moveTopRight(mapToGlobal(rect().bottomRight() + QPoint(0, 1)));
 
     const auto desktop = QApplication::desktop();
-    return QnGeometry::movedInto(globalRect, desktop->screenGeometry(this)).topLeft().toPoint();
+    return Geometry::movedInto(globalRect, desktop->screenGeometry(this)).topLeft().toPoint();
 }
 
 void QnDropdownButton::actionsUpdated()

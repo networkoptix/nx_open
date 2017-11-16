@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/widgets/main_window.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
@@ -85,11 +86,8 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
     const int seconds = std::max((millisecondsLeft + 500) / 1000, 0);
     const auto message = recordingCountdownText(seconds);
 
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
         welcomeScreen->setMessage(seconds > 0 ? message : QString());
-    }
 
     if (m_messageBox)
     {
@@ -163,11 +161,8 @@ void QnWorkbenchScreenRecordingHandler::stopRecordingCountdown()
     if (m_messageBox)
         m_messageBox->hideImmideately();
 
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setMessage(QString());
-    }
+    if (mainWindow() && mainWindow()->welcomeScreen())
+        mainWindow()->welcomeScreen()->setMessage(QString());
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const
@@ -304,7 +299,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
     while (true)
     {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
+            mainWindowWidget(),
             tr("Save Recording As..."),
             qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
             tr("AVI (Audio/Video Interleaved) (*.avi)")));
@@ -322,7 +317,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
             QFile::remove(filePath);
             if (!QFile::rename(fileName, filePath))
             {
-                QnFileMessages::overwriteFailed(mainWindow(), filePath);
+                QnFileMessages::overwriteFailed(mainWindowWidget(), filePath);
                 continue;
             }
 
@@ -341,5 +336,5 @@ void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
     stopRecording();
 
-    QnMessageBox::critical(mainWindow(), tr("Failed to start recording"), reason);
+    QnMessageBox::critical(mainWindowWidget(), tr("Failed to start recording"), reason);
 }

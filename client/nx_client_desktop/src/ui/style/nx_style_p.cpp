@@ -12,8 +12,10 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
 
 using namespace style;
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -231,18 +233,18 @@ void QnNxStylePrivate::drawSwitch(
     QSize switchSize = standalone ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
 
     QRectF rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, switchSize, option->rect);
-    rect = QnGeometry::eroded(rect, 0.5);
+    rect = Geometry::eroded(rect, 0.5);
 
-    QRectF indicatorsRect = QnGeometry::eroded(rect, 3.5);
+    QRectF indicatorsRect = Geometry::eroded(rect, 3.5);
 
     /* Set clip path with excluded grip circle: */
-    QRectF gripRect = QnGeometry::eroded(rect, 1);
+    QRectF gripRect = Geometry::eroded(rect, 1);
     gripRect.moveLeft(gripRect.left() + (gripRect.width() - gripRect.height()) * animationProgress);
     gripRect.setWidth(gripRect.height());
     QPainterPath wholeRect;
     wholeRect.addRect(option->rect);
     QPainterPath gripCircle;
-    gripCircle.addEllipse(QnGeometry::dilated(gripRect, 0.5));
+    gripCircle.addEllipse(Geometry::dilated(gripRect, 0.5));
     painter->setClipPath(wholeRect.subtracted(gripCircle));
 
     const double kSideTransition = 0.3;
@@ -306,7 +308,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
     QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
     const int size = Metrics::kCheckIndicatorSize - 5;
-    QRect rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
+    QRect rect = Geometry::aligned(QSize(size, size), option->rect, Qt::AlignCenter);
 
     QRectF aaAlignedRect(rect);
     aaAlignedRect.adjust(0.5, 0.5, 0.5, 0.5);
@@ -418,7 +420,7 @@ void QnNxStylePrivate::drawCross(
         const QColor& color) const
 {
     const QSizeF crossSize(Metrics::kCrossSize, Metrics::kCrossSize);
-    QRectF crossRect = aligned(crossSize, rect);
+    QRectF crossRect = Geometry::aligned(crossSize, rect);
 
     QPen pen(color, 1.5, Qt::SolidLine, Qt::FlatCap);
     QnScopedPainterPenRollback penRollback(painter, pen);

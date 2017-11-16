@@ -1,0 +1,5 @@
+module Nx.Instruments
+
+DragInstrument 1.0 DragInstrument.qml
+ResizeInstrument 1.0 ResizeInstrument.qml
+RotationInstrument 1.0 RotationInstrument.qml

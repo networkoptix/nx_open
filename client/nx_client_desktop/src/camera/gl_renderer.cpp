@@ -12,6 +12,7 @@
 #include <QtWidgets/QErrorMessage>
 
 #include <nx/utils/log/log.h>
+#include <nx/client/core/utils/geometry.h>
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
@@ -23,7 +24,6 @@
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
-#include <ui/common/geometry.h>
 #include "ui/fisheye/fisheye_ptz_controller.h"
 
 #include <camera/client_video_camera.h>
@@ -32,6 +32,8 @@
 #   include <utils/common/performance.h>
 #endif
 #include "utils/color_space/image_correction.h"
+
+using nx::client::core::Geometry;
 
 namespace {
     const int ROUND_COEFF = 8;
@@ -48,7 +50,6 @@ namespace {
     static const int kMaxBlurSize = 2048;
 
 } // anonymous namespace
-
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererShaders
@@ -413,12 +414,12 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
                 if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
                     drawFisheyeRGBVideoTexture(
                         picLock,
-                        QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                        Geometry::subRect(picLock->textureRect(), sourceRect),
                         picLock->glTextures()[0],
                         v_array, opacity);
                 else
                     drawVideoTextureDirectly(
-                        QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                        Geometry::subRect(picLock->textureRect(), sourceRect),
                         picLock->glTextures()[0],
                         v_array, opacity);
                 break;
@@ -427,7 +428,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
                 NX_ASSERT( isYV12ToRgbaShaderUsed() );
                 drawYVA12VideoTexture(
                     picLock,
-                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                    Geometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
@@ -439,7 +440,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
                 NX_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
-                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                    Geometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
@@ -450,7 +451,7 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
             case AV_PIX_FMT_NV12:
                 NX_ASSERT( isNV12ToRgbShaderUsed() );
                 drawNV12VideoTexture(
-                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                    Geometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     v_array, opacity);

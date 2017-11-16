@@ -127,7 +127,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         return;
 
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(true, mainWindow()));
+        new QnCameraBookmarkDialog(true, mainWindowWidget()));
 
     bookmark.description = QString(); //< Force user to fill description out.
     bookmarksDialog->loadData(bookmark);

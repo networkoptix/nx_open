@@ -65,7 +65,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
             return;
 
         QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog());
-        dialog->initializeContext(this);
+        dialog->initializeContext();
         dialog->setWindowModality(Qt::ApplicationModal);
         if (dialog->exec() != QDialog::Accepted)
             return;

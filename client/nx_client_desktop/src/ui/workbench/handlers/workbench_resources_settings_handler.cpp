@@ -67,7 +67,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (ini().redesignedCameraSettingsDialog)
     {
         QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
-            m_cameraSettingsDialog, mainWindow());
+            m_cameraSettingsDialog, mainWindowWidget());
         dialogConstructor.disableAutoFocus();
 
         if (!m_cameraSettingsDialog->setCameras(cameras))
@@ -82,7 +82,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     else
     {
         QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
-            m_legacyCameraSettingsDialog, mainWindow());
+            m_legacyCameraSettingsDialog, mainWindowWidget());
         dialogConstructor.disableAutoFocus();
 
         if (!m_legacyCameraSettingsDialog->setCameras(cameras))
@@ -116,7 +116,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(m_serverSettingsDialog, mainWindow());
+    QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(m_serverSettingsDialog, mainWindowWidget());
     dialogConstructor.disableAutoFocus();
 
     m_serverSettingsDialog->setServer(server);
@@ -131,7 +131,7 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
     if (!m_userSettingsDialog)
-        m_userSettingsDialog = new QnUserSettingsDialog(mainWindow());
+        m_userSettingsDialog = new QnUserSettingsDialog(mainWindowWidget());
 
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
@@ -152,7 +152,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
         return;
 
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog,
-        mainWindow());
+        mainWindowWidget());
 
     // Navigating resource tree, we should not take focus. From System Administration - we must.
     bool force = params.argument(Qn::ForceRole, false);
@@ -170,7 +170,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
-    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
+    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindowWidget()));
     if (!userRoleId.isNull())
         dialog->selectUserRole(userRoleId);
 
@@ -197,7 +197,7 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
+    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->readFromResource(layout);
 
