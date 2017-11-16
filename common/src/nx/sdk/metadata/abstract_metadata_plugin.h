@@ -16,6 +16,7 @@ namespace metadata {
 static const nxpl::NX_GUID IID_MetadataPlugin
     = {{0x6d, 0x73, 0x71, 0x36, 0x17, 0xad, 0x43, 0xf9, 0x9f, 0x80, 0x7d, 0x56, 0x91, 0x36, 0x82, 0x94}};
 
+// TODO: Rename without "Metadata" - already mentioned in namespace name.
 /**
  * @brief The AbstractMetadataPlugin class is a main interface for metadata plugins.
  * Each metadata plugin should implement this interface.
@@ -55,8 +56,8 @@ public:
         Error* outError) = 0;
     /**
      * @brief provides null terminated UTF8 string containing json manifest
-     * according to nx_metadata_plugin_manifest.schema.json.     
-     * @return pointer to c-style string which MUST be valid till plugin object exists 
+     * according to nx_metadata_plugin_manifest.schema.json.
+     * @return pointer to c-style string which MUST be valid till plugin object exists
      */
     virtual const char* capabilitiesManifest(Error* error) const = 0;
 };

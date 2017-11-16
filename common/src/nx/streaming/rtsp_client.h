@@ -322,7 +322,7 @@ public:
 
     void sendBynaryResponse(const quint8* buffer, int size);
 
-    QnRtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
+    QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
     int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
@@ -346,6 +346,7 @@ public:
     void setScaleHeaderEnabled(bool value);
     void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
 
+    bool processTcpRtcpData(const quint8* data, int size);
 signals:
     void gotTextResponse(QByteArray text);
 private:

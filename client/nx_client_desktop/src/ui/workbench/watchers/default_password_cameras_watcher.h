@@ -1,8 +1,6 @@
 #pragma once
 
-#include <unordered_set>
-
-#include <QtCore/QUuid>
+#include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
@@ -15,22 +13,26 @@ namespace desktop {
 class DefaultPasswordCamerasWatcher: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = QnCommonModuleAware;
+    using base_type = Connective<QObject>;
 
 public:
     DefaultPasswordCamerasWatcher(QObject* parent = nullptr);
+    virtual ~DefaultPasswordCamerasWatcher() override;
 
     bool notificationIsVisible() const;
 
     QnVirtualCameraResourceList camerasWithDefaultPassword() const;
 
+private:
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void handleResourceRemoved(const QnResourcePtr& resource);
+
 signals:
     void notificationIsVisibleChanged();
-    void camerasWithDefaultPasswordChanged();
 
 private:
-    bool m_notificationIsVisible = false;
-    QHash<QUuid, QnVirtualCameraResourcePtr> m_camerasWithDefaultPassword;
+    struct Private;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop

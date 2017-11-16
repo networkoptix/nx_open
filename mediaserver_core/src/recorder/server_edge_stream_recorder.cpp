@@ -1,5 +1,7 @@
 #include "server_edge_stream_recorder.h"
 
+#include <nx/utils/log/log.h>
+
 QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
     const QnResourcePtr &dev,
     QnServer::ChunksCatalog catalog,
@@ -65,6 +67,23 @@ void QnServerEdgeStreamRecorder::fileFinished(
             provider,
             fileSize,
             m_lastfileStartedInfo.startTimeMs);
+
+        NX_VERBOSE(this, lm(
+            "File has been written. "
+            "Start time: %1 (%2ms). "
+            "End time: %3 (%4ms). "
+            "Duration: %5ms. "
+            "Recording bounds: %6 (%7ms) - %8 (%9ms). ")
+                .args(
+                    QDateTime::fromMSecsSinceEpoch(m_lastfileStartedInfo.startTimeMs),
+                    m_lastfileStartedInfo.startTimeMs,
+                    QDateTime::fromMSecsSinceEpoch(m_lastfileStartedInfo.startTimeMs + durationMs),
+                    m_lastfileStartedInfo.startTimeMs + durationMs,
+                    durationMs,
+                    QDateTime::fromMSecsSinceEpoch(m_startRecordingBound->count() / 1000),
+                    m_startRecordingBound->count() / 1000,
+                    QDateTime::fromMSecsSinceEpoch(m_endRecordingBound->count() / 1000),
+                    m_endRecordingBound->count() / 1000));
 
         if (m_fileWrittenHandler)
         {

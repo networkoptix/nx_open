@@ -88,8 +88,6 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         if (!m_legacyCameraSettingsDialog->setCameras(cameras))
             return;
 
-        m_legacyCameraSettingsDialog->updateFromResources();
-
         if (parameters.hasArgument(Qn::FocusTabRole))
         {
             const auto tab = parameters.argument(Qn::FocusTabRole).toInt();

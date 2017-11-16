@@ -1,5 +1,8 @@
 #include "tegra_video.h"
-/**@file Implementation of TegraVideo. */
+
+/**@file
+ * Implementation of libtegra_video.so (class TegraVideo).
+ */
 
 #include "video_dec_gie_main.h"
 
@@ -23,6 +26,8 @@ public:
     virtual ~Impl() override;
 
     virtual bool start(const Params& params) override;
+
+    virtual bool stop() override;
 
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override;
 
@@ -98,12 +103,29 @@ bool Impl::start(const Params& params)
     return true;
 }
 
+bool Impl::stop()
+{
+    NX_OUTPUT << "stop() BEGIN";
+
+    bool success = true;
+
+    for (auto& detector: m_detectors)
+    {
+        if (!detector->stopSync())
+            success = false;
+        detector.reset();
+    }
+    m_detectors.clear();
+
+    NX_OUTPUT << "stop() END -> " << (success ? "true" : "false");
+    return success;
+}
+
 Impl::~Impl()
 {
     NX_OUTPUT << "~Impl() BEGIN";
 
-    for (auto& detector: m_detectors)
-        detector->stopSync(); //< Ignore possible errors.
+    stop(); //< Ignore possible errors.
 
     NX_OUTPUT << "~Impl() END";
 }
@@ -206,8 +228,12 @@ bool Impl::hasMetadata() const
 
 //-------------------------------------------------------------------------------------------------
 
+#if !defined(TEGRA_VIDEO_STUB_ONLY)
+
 TegraVideo* TegraVideo::createImpl()
 {
     ini().reload();
-        return new Impl();
+    return new Impl();
 }
+
+#endif // !defined(TEGRA_VIDEO_STUB_ONLY)

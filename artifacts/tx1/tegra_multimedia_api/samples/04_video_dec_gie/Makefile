@@ -43,80 +43,93 @@ ALGO_DIR := ../common/algorithm/cuda
 GIE_DIR := ../common/algorithm/gie
 
 SRCS := \
-	video_dec_gie_csvparser.cpp \
-	video_dec_gie_main.cpp \
-	main_tv.cpp \
-	tegra_video.cpp \
-	tegra_video_impl.cpp \
-	tegra_video_stub.cpp \
-	net_dimensions.cpp \
-	$(wildcard $(CLASS_DIR)/*.cpp) \
+    video_dec_gie_csvparser.cpp \
+    video_dec_gie_main.cpp \
+    main_tv.cpp \
+    tegra_video.cpp \
+    tegra_video_impl.cpp \
+    tegra_video_stub.cpp \
+    net_dimensions.cpp \
+    $(wildcard $(CLASS_DIR)/*.cpp) \
+
+OBJS := $(SRCS:.cpp=.o)
 
 HEADERS := $(wildcard *.h)
 
+# Allows to add flags in command line: make ADDITIONAL_CPPFLAGS=...
 CPPFLAGS += \
-	-std=c++11 \
-	-fPIC \
-	-fvisibility=hidden \
-	-DNX_KIT_API= \
-	-DTEGRA_VIDEO_API='__attribute__ ((visibility ("default")))' \
-	-I"../.." \
-	-I"../common/algorithm/cuda" \
-	-I"../common/algorithm/gie" \
-	-I"$(CUDA_PATH)/targets/aarch64-linux/include" \
-	-I"$(NX_KIT_DIR)" \
+    $(ADDITIONAL_CPPFLAGS) \
+    -std=c++11 \
+    -fPIC \
+    -fvisibility=hidden \
+    -DNX_KIT_API= \
+    -DTEGRA_VIDEO_API='__attribute__ ((visibility ("default")))' \
+    -I"../.." \
+    -I"$(ALGO_DIR)" \
+    -I"$(GIE_DIR)" \
+    -I"$(CUDA_PATH)/targets/aarch64-linux/include" \
+    -I"$(NX_KIT_DIR)" \
 
 LDFLAGS += \
-	-L"$(CUDA_PATH)/targets/aarch64-linux/lib" \
-	-ldl -lpthread -lrt \
-	-lv4l2 -lEGL -lGLESv2 -lX11 \
-	-lnvbuf_utils -lnvjpeg \
-	-lcuda -lcudart \
+    -L"$(CUDA_PATH)/targets/aarch64-linux/lib" \
+    -ldl -lpthread -lrt \
+    -lv4l2 -lEGL -lGLESv2 -lX11 \
+    -lnvbuf_utils -lnvjpeg \
+    -lcuda -lcudart \
 
 OBJS += \
-	../common/algorithm/cuda/NvAnalysis.o \
-	../common/algorithm/cuda/NvCudaProc.o \
-	../common/algorithm/gie/gie_inference.o \
-	debug.o \
-	ini_config.o \
+    $(ALGO_DIR)/NvAnalysis.o \
+    $(ALGO_DIR)/NvCudaProc.o \
+    $(GIE_DIR)/gie_inference.o \
+    debug.o \
+    ini_config.o \
 
 LDFLAGS += \
-	-lnvinfer -lnvcaffe_parser \
-	-lcudnn -lcublas -lcudart_static \
-	-lnvToolsExt -lrt -ldl -lwconv \
-	-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_objdetect \
+    -lnvinfer \
+    -lnvcaffe_parser \
+    -lcudnn \
+    -lcublas \
+    -lcudart_static \
+    -lnvToolsExt \
+    -lrt \
+    -ldl \
+    -lwconv \
+    -lopencv_core \
+    -lopencv_imgproc \
+    -lopencv_highgui \
+    -lopencv_objdetect \
 
 all: $(APP) $(SO) $(TEST)
 
-$(CLASS_DIR)/%.o: $(CLASS_DIR)/%.cpp
-	$(MAKE) -C $(CLASS_DIR)
+$(CLASS_DIR)/%.o: $(CLASS_DIR)/%.cpp; \
+    $(MAKE) -C $(CLASS_DIR)
 
-debug.o: $(NX_KIT_SRC_DIR)/debug.cpp $(NX_KIT_SRC_DIR)/debug.h
-	$(CPP) $(CPPFLAGS) -c $<
+debug.o: $(NX_KIT_SRC_DIR)/debug.cpp $(NX_KIT_SRC_DIR)/debug.h; \
+    $(CPP) $(CPPFLAGS) -c $<
 
-ini_config.o: $(NX_KIT_SRC_DIR)/ini_config.cpp $(NX_KIT_SRC_DIR)/ini_config.h
-	$(CPP) $(CPPFLAGS) -c $<
+ini_config.o: $(NX_KIT_SRC_DIR)/ini_config.cpp $(NX_KIT_SRC_DIR)/ini_config.h; \
+    $(CPP) $(CPPFLAGS) -c $<
 
-test.o: $(NX_KIT_SRC_DIR)/test.cpp $(NX_KIT_SRC_DIR)/test.h
-	$(CPP) $(CPPFLAGS) -c $<
+test.o: $(NX_KIT_SRC_DIR)/test.cpp $(NX_KIT_SRC_DIR)/test.h; \
+    $(CPP) $(CPPFLAGS) -c $<
 
-$(ALGO_DIR)/%.o: $(ALGO_DIR)/%.c
-	$(MAKE) -C $(ALGO_DIR)
+$(ALGO_DIR)/%.o: $(ALGO_DIR)/%.cpp; \
+    $(MAKE) -C $(ALGO_DIR)
 
-$(ALGO_DIR)/%.o: $(ALGO_DIR)/%.cu
-	$(MAKE) -C $(ALGO_DIR)
+$(ALGO_DIR)/%.o: $(ALGO_DIR)/%.cu; \
+    $(MAKE) -C $(ALGO_DIR)
 
-$(GIE_DIR)/%.o: $(GIE_DIR)/%.cpp
-	$(MAKE) -C $(GIE_DIR)
+$(GIE_DIR)/%.o: $(GIE_DIR)/%.cpp; \
+    $(MAKE) -C $(GIE_DIR)
 
-%.o: %.cpp $(HEADERS)
-	$(CPP) $(CPPFLAGS) -c $<
+%.o: %.cpp $(HEADERS); \
+    $(CPP) $(CPPFLAGS) -c $<
 
-$(APP): $(OBJS)
-	$(CPP) -o $@ $(OBJS) $(CPPFLAGS) $(LDFLAGS)
+$(APP): $(OBJS); \
+    $(CPP) -o $@ $(OBJS) $(CPPFLAGS) $(LDFLAGS)
 
-$(SO): $(APP)
-	$(CPP) -o $@ $(OBJS) $(CPPFLAGS) $(LDFLAGS) -shared
+$(SO): $(APP); \
+    $(CPP) -o $@ $(OBJS) $(CPPFLAGS) $(LDFLAGS) -shared
 
 TEST_OBJS := \
     net_dimensions.o \
@@ -124,11 +137,11 @@ TEST_OBJS := \
     test.o \
     debug.o \
 
-$(TEST): $(TEST_OBJS)
-	$(CPP) -o $@ $(TEST_OBJS) $(CPPFLAGS) $(LDFLAGS)
+$(TEST): $(TEST_OBJS); \
+    $(CPP) -o $@ $(TEST_OBJS) $(CPPFLAGS) $(LDFLAGS)
 
-clean:
-	$(MAKE) -C $(CLASS_DIR) clean
-	$(MAKE) -C $(ALGO_DIR) clean
-	$(MAKE) -C $(GIE_DIR) clean
-	rm -rf *.o $(APP) $(SO) $(TEST)
+clean:; \
+    $(MAKE) -C $(CLASS_DIR) clean; \
+    $(MAKE) -C $(ALGO_DIR) clean; \
+    $(MAKE) -C $(GIE_DIR) clean; \
+    rm -rf *.o $(APP) $(SO) $(TEST); \

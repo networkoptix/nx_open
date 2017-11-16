@@ -60,7 +60,7 @@ struct Attribute
 enum class Error
 {
     noError,
-    unknownError,
+    unknownError, //< TODO: #mike: Consider renaming to "otherError".
     needMoreBufferSpace,
     typeIsNotSupported,
     networkError

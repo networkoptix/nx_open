@@ -178,10 +178,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                             .withArgument(Qn::ShowSingleCameraRole, true);
                     };
 
-                m_currentDefaultPasswordChangeWidget =
-                    addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
-                        QnNotificationLevel::Value::ImportantNotification,
-                        tr("Set Passwords"), false);
+                m_currentDefaultPasswordChangeWidget = addCustomPopup(
+                    action::ChangeDefaultCameraPasswordAction,
+                    parametersGetter,
+                    QnNotificationLevel::Value::ImportantNotification,
+                    tr("Set Passwords"),
+                    false);
             }
         };
 
@@ -356,19 +358,22 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     if (!action)
         return nullptr;
 
-    QnNotificationWidget* item = new QnNotificationWidget(m_list);
+    auto item = new QnNotificationWidget(m_list);
     item->setText(action->text());
-    item->setTooltipText(action->toolTip());
     item->setNotificationLevel(notificationLevel);
     item->setCloseButtonAvailable(closeable);
 
     if (!buttonText.isEmpty())
     {
-        item->addTextButton(action->icon(), buttonText,
-            [this, actionId, parameters = parametersGetter()]()
+        item->addTextButton(action->icon(),
+            buttonText,
+            [this, actionId, parametersGetter]()
             {
                 const auto triggerAction =
-                    [this, actionId, parameters] { menu()->trigger(actionId, parameters); };
+                    [this, actionId, parametersGetter]
+                    {
+                        menu()->trigger(actionId, parametersGetter());
+                    };
 
                 // Action will trigger additional event loop, which will cause problems here.
                 executeDelayedParented(triggerAction, kDefaultDelay, this);
@@ -729,7 +734,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         action = params.value<vms::event::AbstractActionPtr>();
         if (action)
         {
-            auto resourceId = action->getRuntimeParams().eventResourceId;
+            QnUuid resourceId;
+            const auto runtimeParameters = action->getRuntimeParams();
+            if (!runtimeParameters.metadata.cameraRefs.empty())
+                resourceId = runtimeParameters.metadata.cameraRefs[0];
+            else
+                resourceId = runtimeParameters.eventResourceId;
+
             resource = resourcePool()->getResourceById(resourceId);
         }
     }

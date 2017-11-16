@@ -19,6 +19,7 @@
                 <include>nx_network.dll</include>
                 <include>nx_utils.dll</include>
                 <include>nx_kit.dll</include>
+                <include>vms_gateway_core.dll</include>
 
                 <include>swresample*.dll</include>
                 <include>swscale*.dll</include>

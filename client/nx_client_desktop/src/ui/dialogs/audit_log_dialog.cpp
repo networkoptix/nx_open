@@ -862,10 +862,12 @@ void QnAuditLogDialog::makeSessionData()
             }
             else
             {
-                // group sessions because of different servers may have same session
+                // Group sessions because of different servers may have same session
+                // or a single server can duplicate session after restart
                 QnAuditRecord& existRecord = itr.value();
                 existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
-                existRecord.rangeEndSec = qMax(existRecord.rangeEndSec, record.rangeEndSec);
+                existRecord.rangeEndSec = (existRecord.rangeEndSec == 0 || record.rangeEndSec == 0)
+                    ? 0 : qMax(existRecord.rangeEndSec, record.rangeEndSec);
             }
         }
         activityPerSession[record.authSession.id]++;
