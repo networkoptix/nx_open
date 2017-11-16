@@ -91,9 +91,18 @@ void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr 
     if (m_camera == camera)
         return;
 
+    if (m_camera)
+        m_camera->disconnect(this);
+
     {
         QnMutexLocker locker(&m_cameraMutex);
         m_camera = camera;
+    }
+
+    if (m_camera)
+    {
+        connect(m_camera, &QnResource::statusChanged, this,
+            &QnCameraAdvancedSettingsWidget::updatePage);
     }
 
     m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
@@ -158,7 +167,6 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page)
 
 void QnCameraAdvancedSettingsWidget::updatePage()
 {
-
     auto calculatePage =
         [this]
         {
