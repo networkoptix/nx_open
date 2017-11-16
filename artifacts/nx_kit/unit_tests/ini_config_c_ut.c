@@ -1,5 +1,5 @@
 // Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
-#include "test_ini_config_c.h"
+#include "ini_config_c_ut.h"
 
 /**@file
  * C99 test for ini_config_c.h.
@@ -34,7 +34,7 @@ static void createFile(const char* filename, const char* content)
 #define STR(VALUE) STR_DETAIL(VALUE)
 #define STR_DETAIL(VALUE) #VALUE
 
-TEST(test_ini_config_c)
+TEST(ini_config_c_ut)
 {
     const bool defaultFlag = ini.testFlag;
     const int defaultInt = ini.testInt;

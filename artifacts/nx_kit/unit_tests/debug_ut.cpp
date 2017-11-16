@@ -241,7 +241,7 @@ TEST(debug, relativeSrcFilename)
     ASSERT_EQ(kAnyEnding, relativeSrcFilename("/any/starting/src/" + kAnyEnding));
 
     // debug.cpp: <commonPrefix>src/nx/kit/debug.cpp
-    // __FILE__:  <commonPrefix>tests/debug_test.cpp
+    // __FILE__:  <commonPrefix>unit_tests/debug_ut.cpp
     //            <commonPrefix>toBeOmitted/dir/file.cpp
 
     std::string thisFile = __FILE__;
