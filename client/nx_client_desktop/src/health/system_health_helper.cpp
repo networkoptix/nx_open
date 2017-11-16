@@ -87,6 +87,16 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
                 .arg(makeHref(tr("Connect"), lit("settings")))
                 .arg(style::Metrics::kStandardPadding);
         }
+
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+            return tr("Remote archive synchronization has been started");
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+            return tr("Remote archive synchronization has been finished");
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+            return tr("Remote archive synchronization is in progress");
+        case QnSystemHealth::RemoteArchiveSyncError:
+            return tr("Error occured during remote archive synchronization");
+
         default:
             break;
     }
