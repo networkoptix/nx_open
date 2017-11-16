@@ -9,6 +9,8 @@
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
+
+#define NX_PRINT_PREFIX "[metadata::stub::Manager] "
 #include <nx/kit/debug.h>
 
 namespace nx {

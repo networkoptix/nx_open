@@ -4,7 +4,9 @@
 
 #include <QtCore/QUrl>
 
+#define NX_PRINT_PREFIX "[metadata::hanwha::Manager] "
 #include <nx/kit/debug.h>
+
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 
