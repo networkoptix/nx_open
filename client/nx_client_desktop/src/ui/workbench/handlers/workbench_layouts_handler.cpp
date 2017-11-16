@@ -184,13 +184,13 @@ void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QStri
         newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
-        ui::messages::Resources::layoutAlreadyExists(mainWindow());
+        ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
         return;
     }
 
     if (!existing.isEmpty())
     {
-        if (!ui::messages::Resources::overrideLayout(mainWindow()))
+        if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
             return;
         removeLayouts(existing);
     }
@@ -278,7 +278,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if (name.isEmpty())
     {
-        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindowWidget()));
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter Layout Name:"));
 
@@ -308,7 +308,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
                     return;
                 }
 
-                if (!ui::messages::Resources::overrideLayout(mainWindow()))
+                if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
                     return;
 
                 saveLayout(layout);
@@ -320,14 +320,14 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
             QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
-                ui::messages::Resources::layoutAlreadyExists(mainWindow());
+                ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
                 dialog->setName(proposedName);
                 continue;
             }
 
             if (!existing.isEmpty())
             {
-                if (!ui::messages::Resources::overrideLayout(mainWindow()))
+                if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
                     return;
 
                 removeLayouts(existing);
@@ -341,13 +341,13 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
         QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
-            ui::messages::Resources::layoutAlreadyExists(mainWindow());
+            ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
             return;
         }
 
         if (!existing.isEmpty())
         {
-            if (!ui::messages::Resources::overrideLayout(mainWindow()))
+            if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
                 return;
             removeLayouts(existing);
         }
@@ -427,8 +427,8 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
         const auto resources = action::ParameterTypes::resources(items);
 
         const bool confirm = isLayoutTour
-            ? ui::messages::Resources::removeItemsFromLayoutTour(mainWindow(), resources)
-            : ui::messages::Resources::removeItemsFromLayout(mainWindow(), resources);
+            ? ui::messages::Resources::removeItemsFromLayoutTour(mainWindowWidget(), resources)
+            : ui::messages::Resources::removeItemsFromLayout(mainWindowWidget(), resources);
 
         if (!confirm)
             return;
@@ -569,7 +569,7 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
     if (!accessibleToCustomUsers)
         return true;
 
-    return ui::messages::Resources::sharedLayoutEdit(mainWindow());
+    return ui::messages::Resources::sharedLayoutEdit(mainWindowWidget());
 }
 
 bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
@@ -591,7 +591,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
     if (!accessibleToCustomUsers)
         return true;
 
-    return ui::messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
+    return ui::messages::Resources::deleteSharedLayouts(mainWindowWidget(), layouts);
 }
 
 bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
@@ -605,13 +605,13 @@ bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     switch (user->userRole())
     {
         case Qn::UserRole::CustomPermissions:
-            return ui::messages::Resources::changeUserLocalLayout(mainWindow(), change.removed);
+            return ui::messages::Resources::changeUserLocalLayout(mainWindowWidget(), change.removed);
         case Qn::UserRole::CustomUserRole:
             return ui::messages::Resources::addToRoleLocalLayout(
-                    mainWindow(),
+                    mainWindowWidget(),
                     calculateResourcesToShare(change.added, user))
                 && ui::messages::Resources::removeFromRoleLocalLayout(
-                    mainWindow(),
+                    mainWindowWidget(),
                     change.removed);
         default:
             break;
@@ -650,7 +650,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
             stillAccessible << resource;
     }
 
-    return ui::messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
+    return ui::messages::Resources::deleteLocalLayouts(mainWindowWidget(), stillAccessible);
 }
 
 bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
@@ -690,7 +690,7 @@ bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& su
             resourcesBecomeUnaccessible << resource;
     }
 
-    return ui::messages::Resources::stopSharingLayouts(mainWindow(),
+    return ui::messages::Resources::stopSharingLayouts(mainWindowWidget(),
         resourcesBecomeUnaccessible, subject);
 }
 
@@ -830,7 +830,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     if (!user)
         return;
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindowWidget()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
     dialog->setName(generateUniqueLayoutName(resourcePool(), user, tr("New Layout"), tr("New Layout %1")));
@@ -842,7 +842,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), dialog->name(), user->getId());
     if (!canRemoveLayouts(existing))
     {
-        ui::messages::Resources::layoutAlreadyExists(mainWindow());
+        ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
         return;
     }
 
@@ -854,7 +854,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
                 return layout->hasFlags(Qn::local);
             });
 
-        if (!allAreLocal && !ui::messages::Resources::overrideLayout(mainWindow()))
+        if (!allAreLocal && !ui::messages::Resources::overrideLayout(mainWindowWidget()))
             return;
 
         removeLayouts(existing);

@@ -12,7 +12,7 @@
 
 QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
     ui(new Ui::ChangeUserPasswordDialog())
 {
     ui->setupUi(this);

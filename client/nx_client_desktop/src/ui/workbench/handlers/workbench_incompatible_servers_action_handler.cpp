@@ -49,7 +49,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QnMessageBox::information(mainWindow(),
+        QnMessageBox::information(mainWindowWidget(),
             tr("Systems will be merged shortly"),
             tr("Servers from the other System will appear in the resource tree."));
         return;
@@ -78,7 +78,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
         const auto message = utils::MergeSystemsStatus::getErrorMessage(
              kStatus, moduleInformation).prepend(lit("\n"));
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Cloud Systems cannot be merged"),
             message);
         return;
@@ -112,7 +112,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
 
     m_connectTool = new QnConnectToCurrentSystemTool(this);
 
-    auto progressDialog = new QnProgressDialog(mainWindow());
+    auto progressDialog = new QnProgressDialog(mainWindowWidget());
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
     progressDialog->setCancelButton(nullptr);
     progressDialog->setWindowTitle(tr("Connecting to the current System..."));
@@ -140,7 +140,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
         return;
     }
 
-    m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindow());
+    m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindowWidget());
     m_mergeDialog->setAttribute(Qt::WA_DeleteOnClose);
     m_mergeDialog->open();
 }
@@ -153,19 +153,19 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindow(),
+            QnMessageBox::success(mainWindowWidget(),
                 tr("Server will be connected to System shortly"),
                 tr("It will appear in the resource tree when the database synchronization is finished."));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::critical(mainWindowWidget(),
                 tr("Failed to update Server"),
                 m_connectTool->updateResult().errorMessage());
             break;
 
         case QnConnectToCurrentSystemTool::MergeFailed:
-            QnMessageBox::critical(mainWindow(),
+            QnMessageBox::critical(mainWindowWidget(),
                 tr("Failed to merge Systems"),
                 m_connectTool->mergeErrorMessage());
             break;
@@ -193,7 +193,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     const auto message = utils::MergeSystemsStatus::getErrorMessage(
         utils::MergeSystemsStatus::starterLicense, server->getModuleInformation());
 
-    const auto result = QnMessageBox::warning(mainWindow(),
+    const auto result = QnMessageBox::warning(mainWindowWidget(),
         tr("Total amount of licenses will decrease"), message,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
@@ -217,7 +217,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
 
 QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 {
-    QnInputDialog dialog(mainWindow());
+    QnInputDialog dialog(mainWindowWidget());
     dialog.setWindowTitle(tr("Enter password..."));
     dialog.setCaption(tr("Administrator password"));
     dialog.setEchoMode(QLineEdit::Password);

@@ -1,5 +1,4 @@
-#ifndef QN_INSTRUMENT_H
-#define QN_INSTRUMENT_H
+#pragma once
 
 #include <functional> /* For std::unary_function. */
 
@@ -11,7 +10,6 @@
 
 #include <utils/common/connective.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/customization/customized.h>
 
@@ -126,10 +124,11 @@ namespace detail {
  * inside derived class's destructor if it reimplements either
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public Customized<Connective<QObject> >, protected QnGeometry, protected QnSceneTransformations {
-    Q_OBJECT;
+class Instrument: public Customized<Connective<QObject>>, protected QnSceneTransformations
+{
+    Q_OBJECT
 
-    typedef Customized<Connective<QObject> > base_type;
+    using base_type = Customized<Connective<QObject>>;
 
 public:
     /**
@@ -827,5 +826,3 @@ QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QWidget,        Viewport);
 QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsItem,  Item);
 
 #undef QN_DEFINE_INSTRUMENT_WATCHED_TYPE
-
-#endif // QN_INSTRUMENT_H

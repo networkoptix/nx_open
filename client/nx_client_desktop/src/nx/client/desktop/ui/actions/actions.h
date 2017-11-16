@@ -1136,6 +1136,9 @@ enum IDType
 
     ChangeDefaultCameraPasswordAction,
 
+    // TODO: #dklychkov Remove when the new scene engine becomes default.
+    OpenNewSceneAction,
+
     ActionCount,
 
     NoAction = -1

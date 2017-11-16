@@ -23,8 +23,12 @@ class QnLayoutResource: public QnResource,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
+    Q_PROPERTY(float cellAspectRatio
+        READ cellAspectRatio WRITE setCellAspectRatio NOTIFY cellAspectRatioChanged)
+    Q_PROPERTY(qreal cellSpacing
+        READ cellSpacing WRITE setCellSpacing NOTIFY cellSpacingChanged)
 
-    typedef QnResource base_type;
+    using base_type = QnResource;
 
 public:
     QnLayoutResource(QnCommonModule* commonModule = nullptr);
@@ -51,7 +55,7 @@ public:
 
     void removeItem(const QnLayoutItemData &item);
 
-    void removeItem(const QnUuid &itemUuid);
+    Q_INVOKABLE void removeItem(const QnUuid &itemUuid);
 
     /**
      * @note Resource replacement is not supported for item.

@@ -18,7 +18,6 @@
 #include <QtWidgets/QHeaderView>
 
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/geometry.h>
 #include <ui/style/noptix_style_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -30,7 +29,6 @@
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/geometry.h>
 #include <ui/customization/customizer.h>
 #include <nx/utils/raii_guard.h>
 

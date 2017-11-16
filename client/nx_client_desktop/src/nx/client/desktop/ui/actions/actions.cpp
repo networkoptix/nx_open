@@ -1762,6 +1762,11 @@ void initialize(Manager* manager, Action* root)
 
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
+
+    factory(OpenNewSceneAction)
+        .flags(GlobalHotkey | DevMode)
+        .shortcut(lit("Ctrl+Shift+E"))
+        .autoRepeat(false);
 }
 
 } // namespace action

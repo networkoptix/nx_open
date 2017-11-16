@@ -105,7 +105,7 @@ struct WorkbenchExportHandler::Private
             tr("Stop Export"),
             0,
             100,
-            q->mainWindow());
+            q->mainWindowWidget());
 
         connect(progressDialog, &QnProgressDialog::canceled, exportManager.data(),
             [this, exportProcessId, progressDialog]
@@ -205,10 +205,10 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     {
         case ExportProcessStatus::success:
             d->addResourceToPool(exportProcess.filename, resourcePool());
-            QnMessageBox::success(mainWindow(), tr("Export completed"));
+            QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
             break;
         case ExportProcessStatus::failure:
-            QnMessageBox::critical(mainWindow(), tr("Export failed"),
+            QnMessageBox::critical(mainWindowWidget(), tr("Export failed"),
                 ExportProcess::errorString(info.error));
             break;
         case ExportProcessStatus::cancelled:
@@ -244,7 +244,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             {
                 if (!quiet)
                 {
-                    QnMessageBox::warning(mainWindow(), tr("Cannot write file"),
+                    QnMessageBox::warning(mainWindowWidget(), tr("Cannot write file"),
                         tr("%1 is in use by another export.", "%1 is file name")
                             .arg(filename.completeFileName()));
                 }
@@ -253,7 +253,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
 
             if (QFileInfo::exists(filename.completeFileName()))
             {
-                if (quiet || !QnFileMessages::confirmOverwrite(mainWindow(), filename.completeFileName()))
+                if (quiet || !QnFileMessages::confirmOverwrite(mainWindowWidget(), filename.completeFileName()))
                     return false;
             }
 
@@ -269,7 +269,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
                 widget,
                 bookmark,
                 isFileNameValid,
-                mainWindow()));
+                mainWindowWidget()));
         }
         else
         {
@@ -281,7 +281,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
                 layoutExportAllowed,
                 period,
                 isFileNameValid,
-                mainWindow()));
+                mainWindowWidget()));
         }
     }
     else
@@ -293,7 +293,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
                 context(),
                 bookmark,
                 isFileNameValid,
-                mainWindow()));
+                mainWindowWidget()));
         }
         else
         {
@@ -302,7 +302,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
                 context(),
                 period,
                 isFileNameValid,
-                mainWindow()));
+                mainWindowWidget()));
         }
     }
 

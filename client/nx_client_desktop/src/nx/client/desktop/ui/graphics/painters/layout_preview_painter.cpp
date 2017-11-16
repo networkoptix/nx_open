@@ -15,7 +15,11 @@
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
+#include <nx/client/core/utils/geometry.h>
+
 #include <utils/common/scoped_painter_rollback.h>
+
+using nx::client::core::Geometry;
 
 namespace nx {
 namespace client {
@@ -131,7 +135,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
 
     QRect contentsRect(paintRect);
     contentsRect.adjust(-kFrameWidth, -kFrameWidth, kFrameWidth, kFrameWidth);
-    qreal targetAr = QnGeometry::aspectRatio(contentsRect);
+    qreal targetAr = Geometry::aspectRatio(contentsRect);
     if (sourceAr > targetAr)
     {
         xscale = contentsRect.width() / bounding.width();
@@ -164,7 +168,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         qreal h1 = (cellRect.height() - space * 2) * yscale;
 
         QRectF itemRect(x1, y1, w1, h1);
-        paintItem(painter, QnGeometry::eroded(itemRect, 1), data);
+        paintItem(painter, Geometry::eroded(itemRect, 1), data);
     }
 
     QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
@@ -220,8 +224,8 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
     const auto info = thumbnailForItem(item);
     if (!info.pixmap.isNull())
     {
-        auto ar = QnGeometry::aspectRatio(info.pixmap.size());
-        auto rect = QnGeometry::expanded(ar, itemRect, Qt::KeepAspectRatio).toRect();
+        auto ar = Geometry::aspectRatio(info.pixmap.size());
+        auto rect = Geometry::expanded(ar, itemRect, Qt::KeepAspectRatio).toRect();
 
         if (info.ignoreTrasformation)
         {
@@ -239,7 +243,7 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
                     else
                     {
                         painter->drawPixmap(targetRect, info.pixmap,
-                            QnGeometry::subRect(info.pixmap.rect(), zoomRect).toRect());
+                            Geometry::subRect(info.pixmap.rect(), zoomRect).toRect());
                     }
                 };
 
@@ -249,8 +253,8 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
                 painter->translate(itemRect.center());
                 painter->rotate(item.rotation);
                 painter->translate(-itemRect.center());
-                const auto targetRect = QnGeometry::encloseRotatedGeometry(rect,
-                    QnGeometry::aspectRatio(info.pixmap.size()), item.rotation);
+                const auto targetRect = Geometry::encloseRotatedGeometry(rect,
+                    Geometry::aspectRatio(info.pixmap.size()), item.rotation);
 
                 drawPixmap(targetRect.toRect());
             }
@@ -277,7 +281,7 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
                 pw->setText(tr("NO DATA"));
                 pw->setProperty(style::Properties::kDontPolishFontProperty, true);
                 pw->setAlignment(Qt::AlignCenter);
-                pw->setGeometry(QnGeometry::eroded(itemRect.toRect(), kMargin));
+                pw->setGeometry(Geometry::eroded(itemRect.toRect(), kMargin));
                 setPaletteColor(pw.data(), QPalette::Window, m_itemBackgroundColor);
 
                 const int devicePixelRatio = painter->device()->devicePixelRatio();
@@ -296,13 +300,13 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
             case Qn::ThumbnailStatus::Loading:
             {
                 static const qreal kFillFactor = 0.5;
-                const auto busyRect = QnGeometry::expanded(
-                    QnGeometry::aspectRatio(m_busyIndicator->size()),
+                const auto busyRect = Geometry::expanded(
+                    Geometry::aspectRatio(m_busyIndicator->size()),
                     itemRect.size() * kFillFactor,
                     itemRect.center(),
                     Qt::KeepAspectRatio);
 
-                qreal scaleFactor = QnGeometry::scaleFactor(m_busyIndicator->size(),
+                qreal scaleFactor = Geometry::scaleFactor(m_busyIndicator->size(),
                     busyRect.size(), Qt::KeepAspectRatio);
 
                 QnScopedPainterTransformRollback transformRollback(painter);

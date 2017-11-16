@@ -22,6 +22,7 @@
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 
@@ -49,6 +50,8 @@
 #include "camera_schedule_widget.h"
 #include "camera_motion_mask_widget.h"
 
+using nx::client::core::Geometry;
+
 namespace {
 
 static const QSize kFisheyeThumbnailSize(0, 0); //unlimited size for better calibration
@@ -71,8 +74,8 @@ SingleCameraSettingsWidget::SingleCameraSettingsWidget(QWidget *parent) :
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    ui->licensingWidget->initializeContext(this);
-    ui->cameraScheduleWidget->initializeContext(this);
+    ui->licensingWidget->initializeContext();
+    ui->cameraScheduleWidget->initializeContext();
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
 
@@ -1001,7 +1004,7 @@ void SingleCameraSettingsWidget::at_tabWidget_currentChanged()
                             painter->setBrush(brushColor);
                         }
 
-                        painter->drawRect(QnGeometry::eroded(QRectF(option->rect), 0.5));
+                        painter->drawRect(Geometry::eroded(QRectF(option->rect), 0.5));
 
                         if (auto button = qobject_cast<const QAbstractButton*>(widget))
                             painter->drawText(option->rect, Qt::AlignCenter, button->text());

@@ -64,6 +64,9 @@
         "red_d2":       "#8e1717",
         "red_d3":       "#741414",
         "red_d4":       "#5e1010",
+        "red_d5":       "#480d0d",
+        "red_d6":       "#330909",
+        "red_d7":       "#1d0505",
 
         "brand_l4":     "#77d2ff",
         "brand_l3":     "#5ecbff",
@@ -80,8 +83,8 @@
 
         "brand_contrast":   "#ffffff",
 
-        "error":        "#d65029",
-        "error_d1":     "#743320",
+        "orange_main":  "#d65029",
+        "orange_d3":    "#743320",
 
         "timeline_main":    "#3a911e",
         "timeline_bg":      "#223925",

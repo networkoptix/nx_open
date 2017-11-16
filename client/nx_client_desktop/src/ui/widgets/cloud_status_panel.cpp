@@ -130,8 +130,8 @@ QSize QnCloudStatusPanel::sizeHint() const
 QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):
     QObject(parent),
     q_ptr(parent),
-    loggedInMenu(new QMenu(parent->mainWindow())),
-    offlineMenu(new QMenu(parent->mainWindow())),
+    loggedInMenu(new QMenu(parent->mainWindowWidget())),
+    offlineMenu(new QMenu(parent->mainWindowWidget())),
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu(nullptr),
 #endif

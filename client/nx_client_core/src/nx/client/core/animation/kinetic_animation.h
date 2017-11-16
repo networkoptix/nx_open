@@ -25,6 +25,8 @@ public:
     Q_INVOKABLE void continueMeasurement(const QPointF& position);
     Q_INVOKABLE void finishMeasurement(const QPointF& position);
 
+    Q_INVOKABLE void stop();
+
     // Current position.
     QPointF position() const;
 

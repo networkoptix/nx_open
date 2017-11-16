@@ -327,7 +327,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
         }
 
-        QnMessageBox::success(mainWindow(),
+        QnMessageBox::success(mainWindowWidget(),
             tr("Systems will be merged shortly"),
             successMessage);
 

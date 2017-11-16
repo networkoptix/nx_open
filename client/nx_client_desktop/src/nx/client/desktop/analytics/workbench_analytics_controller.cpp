@@ -18,9 +18,11 @@
 #include <nx/client/desktop/layout_templates/layout_template.h>
 #include <nx/client/desktop/layout_templates/template_layout_builder.h>
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/graphics/items/resource/resource_widget.h> //TODO: #GDM move enum to client globals
 #include <ui/style/skin.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -335,8 +337,8 @@ QRectF WorkbenchAnalyticsController::Private::adjustZoomRect(const QRectF& value
 
     // Zoom rects are stored in relative coordinates, so aspect ratio must be 1.0
     if (!ini().allowCustomArZoomWindows)
-        result = QnGeometry::expanded(1.0, result, Qt::KeepAspectRatioByExpanding);
-    result = QnGeometry::movedInto(result, kFullRect);
+        result = Geometry::expanded(1.0, result, Qt::KeepAspectRatioByExpanding);
+    result = Geometry::movedInto(result, kFullRect);
     return result;
 }
 

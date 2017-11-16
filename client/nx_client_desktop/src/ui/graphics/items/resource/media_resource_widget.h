@@ -36,6 +36,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class RecordingStatusHelper;
 class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
 
@@ -322,7 +323,6 @@ private:
     void initDisplay();
     void initSoftwareTriggers();
     void initIoModuleOverlay();
-    void initIconButton();
     void initStatusOverlayController();
 
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
@@ -377,6 +377,8 @@ private:
     mutable bool m_motionLabelPositionsValid = false;
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
+
+    nx::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
 
     QnPtzControllerPtr m_ptzController;
     QnFisheyeHomePtzController* m_homePtzController = nullptr;

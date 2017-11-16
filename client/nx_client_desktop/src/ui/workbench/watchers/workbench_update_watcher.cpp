@@ -20,7 +20,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-#include <ui/common/geometry.h>
 
 #include <update/update_checker.h>
 #include <update/update_info.h>
@@ -162,7 +161,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         makeHtml(extras.join(lit("<br>"))),
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
 
     messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));

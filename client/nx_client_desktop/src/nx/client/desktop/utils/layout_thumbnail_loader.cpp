@@ -7,12 +7,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+
+using nx::client::core::Geometry;
 
 namespace nx {
 namespace client {
@@ -89,7 +91,7 @@ struct LayoutThumbnailLoader::Private
 
                 if (qFuzzyIsNull(rotation))
                 {
-                    const auto targetRect = QnGeometry::expanded(aspectRatio,
+                    const auto targetRect = Geometry::expanded(aspectRatio,
                         cellRect, Qt::KeepAspectRatio);
 
                     QPainter painter(&data.image);
@@ -109,7 +111,7 @@ struct LayoutThumbnailLoader::Private
                         aspectRatio = 1.0 / aspectRatio;
 
                     const auto cellCenter = cellRect.center();
-                    const auto targetRect = QnGeometry::encloseRotatedGeometry(
+                    const auto targetRect = Geometry::encloseRotatedGeometry(
                         cellRect, aspectRatio, rotation);
 
                     QPainter painter(&data.image);
@@ -143,11 +145,11 @@ struct LayoutThumbnailLoader::Private
 
         const auto sourceRect = zoomRect.isNull()
             ? tile.rect()
-            : QnGeometry::subRect(tile.rect(), zoomRect).toRect();
+            : Geometry::subRect(tile.rect(), zoomRect).toRect();
 
         if (qFuzzyIsNull(rotation))
         {
-            const auto targetRect = QnGeometry::expanded(aspectRatio,
+            const auto targetRect = Geometry::expanded(aspectRatio,
                 cellRect, Qt::KeepAspectRatio);
 
             QPainter painter(&data.image);
@@ -157,7 +159,7 @@ struct LayoutThumbnailLoader::Private
         else
         {
             const auto cellCenter = cellRect.center();
-            const auto targetRect = QnGeometry::encloseRotatedGeometry(
+            const auto targetRect = Geometry::encloseRotatedGeometry(
                 cellRect, aspectRatio, rotation);
 
             QPainter painter(&data.image);
@@ -320,7 +322,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     qreal xscale, yscale;
     const qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
 
-    const qreal targetAr = QnGeometry::aspectRatio(d->maximumSize);
+    const qreal targetAr = Geometry::aspectRatio(d->maximumSize);
     if (sourceAr > targetAr)
     {
         xscale = d->maximumSize.width() / bounding.width();
@@ -359,7 +361,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!camera)
         {
             // Non-camera resources are drawn as "NOT A CAMERA".
-            const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
+            const auto scaledCellAr = Geometry::aspectRatio(scaledCellRect);
             d->updateTileStatus(Qn::ThumbnailStatus::Invalid, scaledCellAr,
                 scaledCellRect, rotation);
             continue;
@@ -377,14 +379,14 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
             {
-                d->updateTileStatus(status, QnGeometry::aspectRatio(loader->sizeHint()),
+                d->updateTileStatus(status, Geometry::aspectRatio(loader->sizeHint()),
                     scaledCellRect, rotation);
             });
 
         connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, loader, rotation, scaledCellRect, zoomRect](const QImage& tile)
             {
-                d->drawTile(tile, QnGeometry::aspectRatio(loader->sizeHint()),
+                d->drawTile(tile, Geometry::aspectRatio(loader->sizeHint()),
                     scaledCellRect, rotation, zoomRect);
             });
 

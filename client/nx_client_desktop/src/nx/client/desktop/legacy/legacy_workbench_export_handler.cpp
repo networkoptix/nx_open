@@ -174,7 +174,7 @@ bool WorkbenchExportHandler::lockFile(const QString &filename)
 {
     if (m_filesIsUse.contains(filename))
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("File already used for recording"),
             QFileInfo(filename).completeBaseName()
                 + L'\n' + tr("Please choose another name or wait until recording is finished."));
@@ -184,7 +184,7 @@ bool WorkbenchExportHandler::lockFile(const QString &filename)
     if (QFile::exists(filename) && !QFile::remove(filename))
     {
 
-        QnFileMessages::overwriteFailed(mainWindow(),
+        QnFileMessages::overwriteFailed(mainWindowWidget(),
             QFileInfo(filename).completeBaseName());
         return false;
     }
@@ -215,7 +215,7 @@ bool WorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &la
     if (!validateItemTypes(layout))
         return false;
 
-    QnProgressDialog* exportProgressDialog = new QnProgressDialog(mainWindow(), Qt::Dialog);
+    QnProgressDialog* exportProgressDialog = new QnProgressDialog(mainWindowWidget(), Qt::Dialog);
 
     if (!cancellable)
     {
@@ -355,7 +355,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
             return;
 
         QScopedPointer<QnSessionAwareFileDialog> dialog(new QnSessionAwareFileDialog(
-            mainWindow(),
+            mainWindowWidget(),
             tr("Export Video As..."),
             suggestion,
             allowedFormatFilter
@@ -534,7 +534,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
             if (QFile::exists(fileName))
             {
                 if (!QnFileMessages::confirmOverwrite(
-                    mainWindow(), QFileInfo(fileName).completeBaseName()))
+                    mainWindowWidget(), QFileInfo(fileName).completeBaseName()))
                 {
                     continue;
                 }
@@ -572,7 +572,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
     }
     else
     {
-        QnProgressDialog *exportProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindow());
+        auto exportProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindowWidget());
         exportProgressDialog->setWindowTitle(tr("Exporting Video"));
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setModal(false);
@@ -705,7 +705,7 @@ void WorkbenchExportHandler::at_layout_exportFinished(bool success, const QStrin
     }
     else if (!tool->errorMessage().isEmpty())
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Failed to export Multi-Video"), tool->errorMessage());
     }
 }
@@ -732,7 +732,7 @@ bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout
     const auto showWarning =
         [this]()
         {
-            QnMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindowWidget(),
                 tr("Local files not allowed for Multi-Video export"),
                 tr("Please remove all local files from the layout and try again.")
             );
@@ -809,7 +809,7 @@ bool WorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& e
             return false;
 
         QScopedPointer<QnSessionAwareFileDialog> dialog(new QnSessionAwareFileDialog(
-            mainWindow(),
+            mainWindowWidget(),
             dialogName,
             suggestion,
             mediaFileFilter
@@ -849,7 +849,7 @@ bool WorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& e
             // method called under condition because in other case this message is popped out by the dialog itself
             if (QFile::exists(fileName) &&
                 !QnFileMessages::confirmOverwrite(
-                    mainWindow(), QFileInfo(fileName).completeBaseName()))
+                    mainWindowWidget(), QFileInfo(fileName).completeBaseName()))
             {
                 return false;
             }
@@ -885,7 +885,7 @@ bool WorkbenchExportHandler::confirmExport(
 {
     QnMessageBox dialog(icon, text, extras,
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
 
     dialog.addButton(tr("Export"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     return (dialog.exec() != QDialogButtonBox::Cancel);
@@ -940,13 +940,13 @@ void WorkbenchExportHandler::at_exportRapidReviewAction_triggered()
 
     if (durationMs < ui::dialogs::ExportRapidReview::kMinimalSourcePeriodLength)
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Too short period selected"),
             tr("For exporting as Rapid Review, video length should be at least 10 seconds."));
         return;
     }
 
-    auto dialog = std::make_unique<ui::dialogs::ExportRapidReview>(mainWindow());
+    auto dialog = std::make_unique<ui::dialogs::ExportRapidReview>(mainWindowWidget());
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setSourcePeriodLengthMs(durationMs);
     int speed = qnSettings->timelapseSpeed();
@@ -988,7 +988,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAsAction_triggered()
 
 void WorkbenchExportHandler::showExportCompleteMessage()
 {
-    QnMessageBox::success(mainWindow(), tr("Export completed"));
+    QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
 }
 
 void WorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName)
@@ -1010,7 +1010,7 @@ void WorkbenchExportHandler::at_camera_exportFinished(bool success, const QStrin
     }
     else if (tool->status() != StreamRecorderError::noError)
     {
-        QnMessageBox::critical(mainWindow(),
+        QnMessageBox::critical(mainWindowWidget(),
             tr("Failed to export video"),
             QnStreamRecorder::errorString(tool->status()));
     }

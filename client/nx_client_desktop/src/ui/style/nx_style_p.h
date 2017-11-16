@@ -4,8 +4,6 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/private/qcommonstyle_p.h>
 
-#include <ui/common/geometry.h>
-
 #include "nx_style.h"
 #include "generic_palette.h"
 #include "noptix_style_animator.h"
@@ -14,7 +12,7 @@
 class QInputDialog;
 class QScrollBar;
 
-class QnNxStylePrivate : public QCommonStylePrivate, public QnGeometry
+class QnNxStylePrivate: public QCommonStylePrivate
 {
     Q_DECLARE_PUBLIC(QnNxStyle)
 

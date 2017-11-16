@@ -3,12 +3,11 @@
 #include <QCommonStyle>
 
 #include <ui/style/generic_palette.h>
-#include <ui/common/geometry.h>
 
 class QGroupBox;
 
 class QnNxStylePrivate;
-class QnNxStyle : public QCommonStyle, public QnGeometry
+class QnNxStyle: public QCommonStyle
 {
     Q_OBJECT
     Q_DECLARE_PRIVATE(QnNxStyle)

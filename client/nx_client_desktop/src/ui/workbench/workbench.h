@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_H
-#define QN_WORKBENCH_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -36,15 +35,20 @@ class QnWorkbenchItem;
  * <li>Currently zoomed item - an item that is shown in full screen.</li>
  * </ul>
  */
-class QnWorkbench: public QObject, public QnWorkbenchContextAware { // TODO: #Elric remove context-aware
-    Q_OBJECT;
+class QnWorkbench: public QObject, public QnWorkbenchContextAware
+{
+    // TODO: #Elric remove context-aware
+    Q_OBJECT
+    Q_PROPERTY(QnWorkbenchLayout* currentLayout
+        READ currentLayout WRITE setCurrentLayout NOTIFY currentLayoutChanged)
+
 public:
     /**
      * Constructor.
      *
      * \param parent                    Parent object for this workbench.
      */
-    QnWorkbench(QObject *parent = NULL);
+    QnWorkbench(QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -251,5 +255,3 @@ private:
     /** Whether current layout is being changed. */
     bool m_inLayoutChangeProcess;
 };
-
-#endif // QN_WORKBENCH_H

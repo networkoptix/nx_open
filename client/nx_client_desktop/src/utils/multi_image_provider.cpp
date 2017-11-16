@@ -3,8 +3,9 @@
 #include <QtGui/QPainter>
 
 #include <client/client_globals.h>
+#include <nx/client/core/utils/geometry.h>
 
-#include <ui/common/geometry.h>
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -33,7 +34,7 @@ QnMultiImageProvider::QnMultiImageProvider(
                 if (loadedImage.isNull())
                     return;
 
-                QSize newSize = QnGeometry::bounded(loadedImage.size(), kMaxSize, Qt::KeepAspectRatio).toSize();
+                QSize newSize = Geometry::bounded(loadedImage.size(), kMaxSize, Qt::KeepAspectRatio).toSize();
                 QRect rect(kOffset, newSize);
 
                 if (!m_image.isNull())
@@ -97,7 +98,7 @@ QSize QnMultiImageProvider::sizeHint() const
     if (m_providers.empty())
         return QSize();
 
-    return QnGeometry::bounded(m_providers.front()->sizeHint(), kMaxSize, Qt::KeepAspectRatio).toSize();
+    return Geometry::bounded(m_providers.front()->sizeHint(), kMaxSize, Qt::KeepAspectRatio).toSize();
 }
 
 Qn::ThumbnailStatus QnMultiImageProvider::status() const

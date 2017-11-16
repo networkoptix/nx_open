@@ -27,7 +27,6 @@
 #include <text/time_strings.h>
 
 #include <ui/animation/opacity_animator.h>
-#include <ui/common/geometry.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
@@ -39,6 +38,7 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <ui/help/help_topics.h>
 
@@ -49,6 +49,7 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
+using nx::client::core::Geometry;
 
 namespace
 {
@@ -242,7 +243,7 @@ namespace
     template<class Data>
     void drawCroppedData(QPainter* painter, const QRectF& target, const QRectF& cropTarget, const Data& data, const QRectF& source, QRectF* drawnTarget = nullptr)
     {
-        MarginsF targetMargins(
+        QMarginsF targetMargins(
             qMax(0.0, cropTarget.left() - target.left()),
             qMax(0.0, cropTarget.top() - target.top()),
             qMax(0.0, target.right() - cropTarget.right()),
@@ -254,7 +255,7 @@ namespace
         if (targetMargins.isNull())
             erodedTarget = target;
         else
-            erodedTarget = QnGeometry::eroded(target, targetMargins);
+            erodedTarget = Geometry::eroded(target, targetMargins);
 
         if (!erodedTarget.isValid())
         {
@@ -262,8 +263,8 @@ namespace
         }
         else
         {
-            MarginsF sourceMargins = QnGeometry::cwiseMul(QnGeometry::cwiseDiv(targetMargins, target.size()), source.size());
-            QRectF erodedSource = QnGeometry::eroded(source, sourceMargins);
+            QMarginsF sourceMargins = Geometry::cwiseMul(Geometry::cwiseDiv(targetMargins, target.size()), source.size());
+            QRectF erodedSource = Geometry::eroded(source, sourceMargins);
 
             drawData(painter, erodedTarget, data, erodedSource);
         }
@@ -2317,7 +2318,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
         const auto pixmapSize = pixmap.size() / pixmap.devicePixelRatio();
         QRectF fullRect(lineBarRect.left() + kLineLabelPaddingPixels, lineTop, pixmapSize.width(), lineHeight);
-        QRectF centeredRect = QnGeometry::aligned(pixmapSize, fullRect);
+        QRectF centeredRect = Geometry::aligned(pixmapSize, fullRect);
 
         painter->drawPixmap(centeredRect, pixmap, pixmap.rect());
 
@@ -2711,8 +2712,8 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
         QSizeF labelSizeBound = rect.size();
         labelSizeBound.setHeight(m_noThumbnailsPixmap.height());
 
-        QRect labelRect = QnGeometry::aligned(QnGeometry::expanded(
-            QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
+        QRect labelRect = Geometry::aligned(Geometry::expanded(
+            Geometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
             Qt::KeepAspectRatio), rect, Qt::AlignCenter).toRect();
 
         drawCroppedPixmap(painter, labelRect, rect, m_noThumbnailsPixmap, m_noThumbnailsPixmap.rect());
@@ -2726,7 +2727,7 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
     if (thumbnailsLoader()->thumbnailSize().isEmpty())
         return;
 
-    qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
+    qreal aspectRatio = Geometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
     qreal thumbnailWidth = rect.height() * aspectRatio;
 
     if (!m_oldThumbnailData.isEmpty() || m_thumbnailsUpdateTimer->isActive())
@@ -2792,7 +2793,7 @@ void QnTimeSlider::drawThumbnail(QPainter* painter, const ThumbnailData& data, c
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
         QColor color = linearCombine(1.0 - a, QColor(255, 255, 255, 32), a, m_colors.selectionMarker); // TODO: #Elric customize
-        rect = QnGeometry::eroded(rect, width / 2.0);
+        rect = Geometry::eroded(rect, width / 2.0);
 
         painter->setPen(QPen(color, width));
         painter->setBrush(Qt::NoBrush);
