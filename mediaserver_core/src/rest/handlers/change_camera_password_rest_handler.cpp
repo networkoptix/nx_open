@@ -55,9 +55,9 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx_http::StatusCode::ok;
     }
 
-    auto camera = nx::camera_id_helper::findCameraByFlexibleId(
+    auto requestedCamera = nx::camera_id_helper::findCameraByFlexibleId(
         owner->resourcePool(), data.cameraId);
-    if (!camera)
+    if (!requestedCamera)
     {
         result.setError(
             QnJsonRestResult::InvalidParameter,
@@ -65,7 +65,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx_http::StatusCode::ok;
     }
 
-    if (camera->getParentId() != owner->commonModule()->moduleGUID())
+    if (requestedCamera->getParentId() != owner->commonModule()->moduleGUID())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This server is not a resource owner."));
         return nx_http::StatusCode::forbidden;
@@ -75,13 +75,13 @@ int QnChangeCameraPasswordRestHandler::executePost(
     auth.setUser(data.user);
     auth.setPassword(data.password);
     QString errorString;
-    if (!camera->setCameraCredentialsSync(auth, &errorString))
+    if (!requestedCamera->setCameraCredentialsSync(auth, &errorString))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errorString);
         return nx_http::StatusCode::ok;
     }
 
-    for (auto camera: allCamerasInGroup(camera))
+    for (auto camera: allCamerasInGroup(requestedCamera))
     {
         camera->setAuth(auth);
         if (!camera->saveParams())
