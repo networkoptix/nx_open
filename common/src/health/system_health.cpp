@@ -12,13 +12,24 @@ bool QnSystemHealth::isMessageVisible(MessageType message)
     return true;
 }
 
-bool QnSystemHealth::isMessageOptional(MessageType message)
+bool QnSystemHealth::isMessageVisibleInSettings(MessageType message)
 {
     /* Hidden messages must not be disabled. */
     if (!isMessageVisible(message))
         return false;
 
-    return message != QnSystemHealth::CloudPromo;
+    switch (message)
+    {
+        case QnSystemHealth::CloudPromo:
+
+        // TODO: remove these in VMS-7724
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+        case QnSystemHealth::RemoteArchiveSyncError:
+            return false;
+    }
+
+    return true;
 }
 
 bool QnSystemHealth::isMessageLocked(MessageType message)

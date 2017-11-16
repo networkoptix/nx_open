@@ -255,10 +255,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
-        case QnSystemHealth::RemoteArchiveSyncStarted:
-        case QnSystemHealth::RemoteArchiveSyncFinished:
-        case QnSystemHealth::RemoteArchiveSyncError:
-        case QnSystemHealth::RemoteArchiveSyncProgress:
             return false;
 
         case QnSystemHealth::NoLicenses:
@@ -271,6 +267,10 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::ArchiveFastScanFinished:
         case QnSystemHealth::SystemIsReadOnly:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
         case QnSystemHealth::CloudPromo:
             return true;
 
@@ -484,7 +484,7 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
     for (int i = 0; i < QnSystemHealth::Count; i++)
     {
         QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
+        if (!QnSystemHealth::isMessageVisibleInSettings(messageType))
             continue;
 
         bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
