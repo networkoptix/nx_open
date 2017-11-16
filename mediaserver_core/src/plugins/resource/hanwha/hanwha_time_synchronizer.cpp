@@ -80,6 +80,11 @@ void HanwhaTimeSyncronizer::start(HanwhaSharedResourceContext* resourceConext)
     promise.get_future().wait();
 }
 
+void HanwhaTimeSyncronizer::setTimeSynchronizationEnabled(bool enabled)
+{
+    m_timeSynchronizationEnabled = enabled;
+}
+
 void HanwhaTimeSyncronizer::setTimeZoneShiftHandler(TimeZoneShiftHandler handler)
 {
     m_timer.post(
@@ -119,14 +124,13 @@ void HanwhaTimeSyncronizer::verifyDateTime()
 
                 const auto serverDateTime = qnSyncTime->currentDateTime();
                 const auto timeDiffSecs = std::abs((int) utcDateTime.secsTo(serverDateTime));
-                if (timeDiffSecs > kAcceptableTimeDiffSecs)
+                if (timeDiffSecs > kAcceptableTimeDiffSecs && m_timeSynchronizationEnabled)
                 {
                     NX_DEBUG(this, lm("Camera has %1 time which is %2 seconds different")
                         .args(utcDateTime, utcDateTime.secsTo(serverDateTime)));
 
                     return setDateTime(serverDateTime);
                 }
-
                 // TODO: Uncomment in case we need to synchronize time zone as well.
                 // if (response.getOrThrow("POSIXTimeZone") != getPosixTimeZone(dateTime.timeZone()))
                 // {

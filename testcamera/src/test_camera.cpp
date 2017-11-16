@@ -29,7 +29,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileNam
 
     QnAviResourcePtr file(new QnAviResource(fileName));
     QnAviArchiveDelegate aviDelegate;
-    if (!aviDelegate.open(file))
+    if (!aviDelegate.open(file, nullptr))
     {
         qDebug() << "Can't open file" << fileName;
         return rez;

@@ -34,6 +34,7 @@ protected:
         const QnLiveStreamParams& params) override;
 
     virtual void closeStream() override;
+    virtual QnAbstractMediaDataPtr getNextData() override;
 
     friend class HanwhaArchiveDelegate;
 private:
@@ -55,7 +56,7 @@ private:
     QnRtspClient& rtspClient();
 
     QString toHanwhaPlaybackTime(int64_t timestamp) const;
-
+    QnAbstractMediaDataPtr createEmptyPacket();
 private:
     HanwhaResourcePtr m_hanwhaResource;
     bool m_rateControlEnabled = true;
@@ -65,6 +66,8 @@ private:
     int64_t m_startTimeUsec = 0;
     int64_t m_endTimeUsec = 0;
     int m_overlappedId = 0;
+    qint64 m_lastTimestampUsec = AV_NOPTS_VALUE;
+    nx::utils::ElapsedTimer m_timeSinceLastFrame;
 };
 
 } // namespace plugins

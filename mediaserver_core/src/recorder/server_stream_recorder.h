@@ -112,6 +112,8 @@ private:
     void resumeRebuildIfLowDataNoLock();
     bool cleanupQueueIfOverflow();
     void addQueueSizeUnsafe(qint64 value);
+    virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const override;
+
 private slots:
     void at_recordingFinished(const StreamRecorderErrorStruct& status,
         const QString& filename);

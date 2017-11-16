@@ -30,6 +30,8 @@
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/cryptographic_hash.h>
+#include "archive_integrity_watcher.h"
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -403,6 +405,15 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
         return;
     m_lastMotionState = value;
     emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
+}
+
+void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metadata) const
+{
+    using namespace nx::mediaserver;
+    NX_ASSERT(m_startDateTime > 0);
+    metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
+    metadata->integrityHash =
+        IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTime / 1000));
 }
 
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)

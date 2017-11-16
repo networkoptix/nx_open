@@ -55,7 +55,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     for (int i = 0; i < QnSystemHealth::Count; i++)
     {
         QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
+        if (!QnSystemHealth::isMessageVisibleInSettings(messageType))
             continue;
 
         QCheckBox* checkbox = new QCheckBox(this);
@@ -104,7 +104,7 @@ void QnPopupSettingsWidget::loadDataToUi()
     for (int i = 0; i < QnSystemHealth::Count; i++)
     {
         QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
+        if (!QnSystemHealth::isMessageVisibleInSettings(messageType))
             continue;
 
         bool checked = ((healthShown & healthFlag) == healthFlag);
@@ -173,7 +173,7 @@ quint64 QnPopupSettingsWidget::watchedSystemHealth() const
     for (int i = 0; i < QnSystemHealth::Count; i++)
     {
         QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
+        if (!QnSystemHealth::isMessageVisibleInSettings(messageType))
             continue;
 
         if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())

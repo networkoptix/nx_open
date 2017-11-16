@@ -363,18 +363,18 @@ qint64 QnRtspTimeHelper::getUsecTime(
 
     const qint64 currentUs = qnSyncTime->currentUSecsSinceEpoch();
     const qint64 currentMs = (/*rounding*/ 500 + currentUs) / 1000;
-    if (statistics.isEmpty() || m_timePolicy == TimePolicy::ForceLocalTime)
+    if (statistics.isEmpty() || m_timePolicy == TimePolicy::forceLocalTime)
     {
         VERBOSE(lm("-> %2 (%3), resourceId: %1")
             .arg(m_resourceId)
             .arg(currentUs)
-            .arg(m_timePolicy == TimePolicy::ForceLocalTime
+            .arg(m_timePolicy == TimePolicy::forceLocalTime
                 ? "ignoreCameraTime=true"
                 : "empty statistics"));
         return currentUs;
     }
 
-    if (m_timePolicy == TimePolicy::OnvifExtension
+    if (m_timePolicy == TimePolicy::onvifExtension
         && statistics.ntpOnvifExtensionTime.is_initialized())
     {
         VERBOSE(lm("-> %2 (%3), resourceId: %1")
@@ -388,7 +388,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const double currentSeconds = currentMs / 1000.0;
     const int rtpTimeDiff = rtpTime - statistics.timestamp;
     const double cameraSeconds = statistics.ntpTime + rtpTimeDiff / (double) frequency;
-    if (m_timePolicy == TimePolicy::ForceCameraTime)
+    if (m_timePolicy == TimePolicy::forceCameraTime)
     {
         VERBOSE(lm("-> %2 (%3), resourceId: %1")
             .arg(m_resourceId)
@@ -421,9 +421,9 @@ qint64 QnRtspTimeHelper::getUsecTime(
     #endif
 
     if (jitterSeconds > IGNORE_CAMERA_TIME_THRESHOLD_S
-        && m_timePolicy == TimePolicy::IgnoreCameraTimeIfBigJitter)
+        && m_timePolicy == TimePolicy::ignoreCameraTimeIfBigJitter)
     {
-        m_timePolicy = TimePolicy::ForceLocalTime;
+        m_timePolicy = TimePolicy::forceLocalTime;
         NX_DEBUG(this, lm("Jitter exceeds %1 s; camera time will be ignored")
             .arg(IGNORE_CAMERA_TIME_THRESHOLD_S));
         VERBOSE(lm("-> %1").arg(currentUs));
@@ -2004,7 +2004,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 #endif
 
     int bytesRead = m_tcpSock->recv( buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL );
-    return bytesRead < 0 ? 0 : bytesRead;
+    return bytesRead;
 #else
     const size_t bufSizeBak = bufSize;
 

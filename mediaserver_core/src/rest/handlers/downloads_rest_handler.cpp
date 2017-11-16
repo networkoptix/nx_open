@@ -7,6 +7,7 @@
 #include <rest/server/json_rest_result.h>
 #include <rest/helpers/request_helpers.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/file_system.h>
 
 using nx::vms::common::p2p::downloader::Downloader;
 using nx::vms::common::p2p::downloader::FileInformation;
@@ -387,7 +388,7 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
-    if (!verifySimpleRelativePath(request.fileName))
+    if (!nx::utils::file_system::isRelativePathSafe(request.fileName))
     {
         return helper.makeError(
             nx_http::StatusCode::badRequest,

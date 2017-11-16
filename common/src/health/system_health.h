@@ -26,6 +26,7 @@ enum MessageType
     ArchiveRebuildFinished,
     ArchiveRebuildCanceled,
     ArchiveFastScanFinished,
+    ArchiveIntegrityFailed,
 
     RemoteArchiveSyncStarted,
     RemoteArchiveSyncFinished,
@@ -43,7 +44,7 @@ bool isRemoteArchiveMessage(MessageType);
 bool isMessageVisible(MessageType message);
 
 /** Some messages must not be displayed in settings dialog, so user cannot disable them. */
-bool isMessageOptional(MessageType message);
+bool isMessageVisibleInSettings(MessageType message);
 
 /** Some messages must not be auto-hidden by timeout. */
 bool isMessageLocked(MessageType message);
