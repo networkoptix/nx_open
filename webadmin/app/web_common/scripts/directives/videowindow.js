@@ -152,15 +152,6 @@ angular.module('nxCommon')
                             break;
 
                         case "Firefox":
-                            if(weHaveWebm && canPlayNatively("webm"))
-                            {
-                                return "webm";
-                            }
-                            if(weHaveHls && window.jscd.os === 'Linux'){
-                                scope.videoFlags.ubuntuNX = true;
-                                return false;
-                            }
-
                         case "Chrome":
                         case "Opera":
                         case "Webkit":
@@ -173,6 +164,10 @@ angular.module('nxCommon')
                             }
                             if(weHaveWebm && canPlayNatively("webm")){
                                 return "webm";
+                            }
+                            if(weHaveHls && window.jscd.os === 'Linux'){
+                                scope.videoFlags.ubuntuNX = true;
+                                return false;
                             }
                     }
 
