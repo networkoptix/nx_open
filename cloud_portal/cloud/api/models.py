@@ -11,7 +11,7 @@ from cloud import settings
 from django.utils import timezone
 
 #current hack until 17.1.2 when we have global classes
-email_css = "overflow: hidden;text-overflow: ellipsis;white-space: nowrap; width:125px;"
+email_css = "overflow: hidden;text-overflow: ellipsis;white-space: nowrap; width:205px;"
 name_css = "overflow: hidden;text-overflow: ellipsis;white-space: nowrap; width:95px;"
 
 
