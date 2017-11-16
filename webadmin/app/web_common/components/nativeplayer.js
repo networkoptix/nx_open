@@ -2,7 +2,6 @@
 
 
 function NativePlayer(){
-    'use strict';
 
     // requestAnimationFrame polyfill
     this.init = function(element,readyHandler) {
@@ -13,7 +12,13 @@ function NativePlayer(){
 }
 
 NativePlayer.prototype.play = function(){
-    this.video.play().catch(function(){});
+    this.video.play().catch(function(error){
+        var errorString = error.toString();
+        if(error.name != 'AbortError' && errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0){
+            console.log(errorString);
+            throw error;
+        }
+    });
 };
 
 NativePlayer.prototype.pause = function(){

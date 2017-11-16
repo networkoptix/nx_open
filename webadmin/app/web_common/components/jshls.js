@@ -466,11 +466,16 @@ JsHlsAPI.prototype.kill = function(){
 };
 
 JsHlsAPI.prototype.play = function(offset){
-    return this.video.play();
+    this.video.play().catch(function(error){
+        var errorString = error.toString();
+        if(errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0){
+            throw error;
+        }
+    });
 };
 
 JsHlsAPI.prototype.pause = function(){
-    return this.video.pause();
+    this.video.pause();
 };
 
 JsHlsAPI.prototype.volume = function(volumeLevel){
