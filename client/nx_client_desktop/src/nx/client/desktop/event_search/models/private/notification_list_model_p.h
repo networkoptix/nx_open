@@ -2,7 +2,13 @@
 
 #include "../notification_list_model.h"
 
+#include <QtCore/QHash>
+#include <QtCore/QPointer>
+#include <QtCore/QScopedPointer>
+
 #include <nx/vms/event/event_fwd.h>
+
+class AudioPlayer;
 
 namespace nx {
 namespace client {
@@ -37,6 +43,8 @@ private:
     NotificationListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
+    QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
+    QHash<QnUuid, QPointer<AudioPlayer>> m_players;
 };
 
 } // namespace

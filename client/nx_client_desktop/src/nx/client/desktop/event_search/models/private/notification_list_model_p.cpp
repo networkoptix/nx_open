@@ -14,10 +14,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <utils/common/delayed.h>
+#include <utils/media/audio_player.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -36,6 +38,25 @@ QPixmap toPixmap(const QIcon& icon)
     return QnSkin::maximumSizePixmap(icon);
 }
 
+AudioPlayer* loopSound(const QString& filePath)
+{
+    QScopedPointer<AudioPlayer> player(new AudioPlayer());
+    if (!player->open(filePath))
+        return nullptr;
+
+    connect(player.data(), &AudioPlayer::done, player.data(),
+        [filePath, player = player.data()]()
+        {
+            player->close();
+            if (player->open(filePath))
+                player->playAsync();
+            else
+                player->deleteLater();
+        });
+
+    return player.take();
+}
+
 } // namespace
 
 NotificationListModel::Private::Private(NotificationListModel* q):
@@ -51,7 +72,20 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(handler, &QnWorkbenchNotificationsHandler::notificationRemoved,
         this, &Private::removeNotification);
 
-    connect(q, &EventListModel::modelReset, this, [this]() { m_uuidHashes.clear(); });
+    connect(q, &EventListModel::modelReset, this,
+        [this]()
+        {
+            m_uuidHashes.clear();
+            m_itemsByLoadingSound.clear();
+
+            for (auto player: m_players)
+            {
+                if (player)
+                    player->deleteLater();
+            }
+
+            m_players.clear();
+        });
 
     connect(q, &EventListModel::rowsAboutToBeRemoved, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
@@ -61,7 +95,29 @@ NotificationListModel::Private::Private(NotificationListModel* q):
                 const auto& event = this->q->getEvent(row);
                 const auto extraData = Private::extraData(event);
                 m_uuidHashes[extraData.first][extraData.second].remove(event.id);
+
+                if (auto player = m_players.value(event.id))
+                    player->deleteLater();
+
+                m_players.remove(event.id);
             }
+    });
+
+    connect(context()->instance<ServerNotificationCache>(),
+        &ServerNotificationCache::fileDownloaded, this,
+        [this](const QString& fileName)
+        {
+            const auto path = context()->instance<ServerNotificationCache>()->getFullPath(fileName);
+            for (const auto& id: m_itemsByLoadingSound.values(fileName))
+            {
+                auto& player = m_players[id];
+                if (player)
+                    player->deleteLater();
+
+                player = loopSound(path);
+            }
+
+            m_itemsByLoadingSound.remove(fileName);
         });
 }
 
@@ -151,22 +207,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.titleColor = QnNotificationLevel::notificationColor(
         QnNotificationLevel::valueOf(action));
 
-    // TODO: FIXME: #vkutin Restore functionality.
-#if 0
-    switch (action->actionType())
+    if (action->actionType() == vms::event::playSoundAction)
     {
-        // TODO: #GDM not the best place for it.
-        case vms::event::playSoundAction:
-        {
-            QString soundUrl = action->getParams().url;
-            m_itemsByLoadingSound.insert(soundUrl, item);
+        const auto soundUrl = action->getParams().url;
+        if (!m_itemsByLoadingSound.contains(soundUrl))
             context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
-            break;
-        }
-        default:
-            break;
-    };
-#endif
+
+        m_itemsByLoadingSound.insert(soundUrl, eventData.id);
+    }
 
     if (action->actionType() == vms::event::showOnAlarmLayoutAction)
     {
@@ -318,10 +366,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     const nx::vms::event::AbstractActionPtr& action)
 {
     if (action->actionType() != vms::event::ActionType::showPopupAction)
-    {
-        NX_ASSERT(false, "Invalid action type.");
         return;
-    }
 
     if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
         return;
