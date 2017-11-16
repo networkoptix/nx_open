@@ -199,9 +199,22 @@ protected slots:
 
     void at_convertCameraToEntropix_triggered();
 
+    void at_changeDefaultCameraPassword_triggered();
+
     void at_openNewScene_triggered();
 
 private:
+    void showSingleCameraErrorMessage(const QString& explanation = QString());
+    void showMultipleCamerasErrorMessage(
+        int totalCameras,
+        const QnVirtualCameraResourceList& camerasWithError,
+        const QString& explanation = QString());
+
+    void changeDefaultPasswords(
+        const QString& previousPassword,
+        const QnVirtualCameraResourceList& cameras,
+        bool showSingleCamera);
+
     void notifyAboutUpdate();
 
     void openFailoverPriorityDialog();
@@ -266,10 +279,10 @@ private:
     struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        QUrl url;
+        nx::utils::Url url;
     };
 
-    std::multimap<QUrl, ServerRequest> m_serverRequests;
+    std::multimap<nx::utils::Url, ServerRequest> m_serverRequests;
 };
 
 } // namespace workbench

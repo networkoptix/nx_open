@@ -706,11 +706,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Change Cell Aspect Ratio...</source>
-      <translation>Aanpassen van de aspect ratio van de cellen...</translation>
+      <translation>Aanpassen van de aspect ratio van de cameo's...</translation>
     </message>
     <message>
       <source>Change Cell Spacing...</source>
-      <translation>Ruimte tussen cellen wijzigen...</translation>
+      <translation>Ruimte tussen cameo's wijzigen...</translation>
     </message>
     <message>
       <source>None</source>
@@ -960,7 +960,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <translation>Hardware-Id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -1037,25 +1037,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2665,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrecte email of wachtwoord</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -3736,7 +3734,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware ID</translation>
+      <translation>Gelieerd aan Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -4012,11 +4010,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware ID %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4047,7 +4045,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
@@ -4321,6 +4319,10 @@ to %1</source>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>houd ingedrukt</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Uitgeschakeld volgens schema</translation>
     </message>
   </context>
   <context>
@@ -4623,7 +4625,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>De notificatie wordt weergegeven totdat een van de gebruikers, een bladwijzer aanmaken met gebeurtenisbeschrijving</translation>
     </message>
   </context>
   <context>
@@ -7212,14 +7214,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Voer wachtwoord in...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administrator wachtwoord</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Systemen zullen spoedig zijn samengevoegd</translation>
     </message>
@@ -7240,10 +7234,6 @@ to %1</source>
       <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Wachtwoord mag niet leeg zijn.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
     </message>
@@ -7258,6 +7248,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Server wordt spoedig op het systeem aangesloten</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Voer wachtwoord in...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Admin wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -7810,11 +7808,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Stop tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start tour</translation>
     </message>
   </context>
   <context>
@@ -8079,8 +8077,8 @@ to %1</source>
       <translation>Gebruik de toetsenbordpijlen om layouts te veranderen. Druk op Esc om de showreel te verlaten.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Druk op een willekeurige toets om de tour te stoppen.</translation>
     </message>
   </context>
   <context>

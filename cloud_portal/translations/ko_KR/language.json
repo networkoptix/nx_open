@@ -1,13 +1,12 @@
 {
-  "language_name":"국어",
+  "language_name":"언어",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
     "okButton":"Ok",
     "cancelButton":"취소",
-    "loginTitle":"{{PRODUCT_NAME}}에 로그인",
+    "loginTitle":"{{PRODUCT_NAME}} 에 로그인",
     "loginButton":"로그인",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton":"계속",
     "logoutAuthorisedLogoutButton":"로그 아웃"
@@ -29,13 +28,11 @@
     "restorePassword":"패스워드 재설정",
     "restorePasswordSuccess":"패스워드 저장됨-",
     "restorePasswordCode":"패스워드 재설정",
-    "view":"View cameras - ",
-    "contentPage":"",
+    "view":"카메라 보기 - ",
     "debug":"디버그",
     "login":"로그인 -",
     "download":"{{VMS_NAME}} 다운로드",
     "downloadPlatform":"에 대한 {{VMS_NAME}} 다운로드 ",
-    "startPage":"",
     "pageNotFound":"페이지를 찾을 수 없음"
   },
   "systemStatuses":{
@@ -83,24 +80,24 @@
       "description":"시스템에 지정된 사용자 지정 사용자 역할"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"소유자",
+      "description":"클라우드에서 시스템을 공유하고 연결 / 연결 해제하는 기능을 포함한 무제한 액세스"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"뷰어",
+      "description":"라이브 비디오를보고 아카이브를 열람 할 수 있습니다."
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"라이브 뷰어",
+      "description":"라이브 비디오 만 볼 수 있음"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"고급 뷰어",
+      "description":"라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다."
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"사용자 정의",
+      "description":"{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     }
   },
   "errorCodes":{
@@ -137,7 +134,7 @@
     "cantEditAdmin":"이 사용자는 관리자 권한이 있습니다.",
     "cantOpenClient":"{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
     "lostConnection":"{{systemName}} 연결이 끊어졌습니다.",
-    "thisSystem":"the system"
+    "thisSystem":"시스템"
   },
   "passwordRequirements":{
     "minLengthMessage":"비밀번호는 최소 8자 이상 포함되어야 합니다.",
@@ -159,11 +156,11 @@
     "mySystemSearch":"IMeMyMine",
     "unavailable":"시스템에 연결할 수 없습니다.",
     "offline":"시스템이 오프라인 상태입니다.",
-    "openClient":"{{VMS_NAME}}에서 열기",
+    "openClient":"{{VMS_NAME}} 에서 열기",
     "confirmRenameTitle":"시스템 이름",
     "confirmRenameAction":"저장",
     "successRename":"시스템 이름 저장",
-    "confirmDisconnectTitle":"{{PRODUCT_NAME}}에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectTitle":"{{PRODUCT_NAME}} 에서 시스템 연결을 끊으시겠습니까?",
     "confirmDisconnectAction":"연결 끊기",
     "confirmUnshareFromMe":"이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle":"시스템 연결을 끊으시겠습니까?",
@@ -171,20 +168,20 @@
     "confirmUnshare":"이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
     "confirmUnshareTitle":"사용자 삭제?",
     "confirmUnshareAction":"삭제",
-    "successDisconnected":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다.",
-    "successDeleted":"시스템 {{systemName}}이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "permissionsRemoved":"권한이 {{email}}에서 제거 되었습니다."
+    "successDisconnected":"시스템이 성공적으로 {{PRODUCT_NAME}} 에서 분리 되었습니다.",
+    "successDeleted":"시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
+    "permissionsRemoved":"권한이 {{email}} 에서 제거 되었습니다."
   },
   "account":{
     "accountSavedSuccess":"계정이 성공적으로 저장되었습니다.",
+    "activationLinkSent":"활성화 링크 전송",
     "passwordChangedSuccess":"계정이 성공적으로 저장되었습니다.",
     "changePassword":"패스워드 변경",
     "newPasswordLabel":"새 패스워드",
     "saveChanges":"저장"
   },
   "downloads":{
-    "noClientDetectedTitle":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다",
-    "noClientDetectedMessage":"",
+    "noClientDetectedTitle":"시스템이 성공적으로 {{VMS_NAME}} 에서 분리 되었습니다",
     "action":"{{VMS_NAME}} 다운로드",
     "mobile":{
       "ios":{
@@ -196,17 +193,17 @@
     },
     "groups":{
       "windows":{
-        "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "label":"윈도우즈",
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -224,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"보내기",
+    "sendConfirm":"활성화 링크 재전송",
     "resetPassword":"패스워드 재설정",
     "setNewPassword":"패스워드 저장",
     "setNewPasswordLabel":"새 패스워드"
@@ -234,7 +231,7 @@
     "createAccount":"계정 만들기"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"모든 시스템",
     "systems":"시스템"
   }
 }

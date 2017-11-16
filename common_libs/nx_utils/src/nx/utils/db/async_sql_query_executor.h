@@ -57,7 +57,7 @@ public:
      * @param queryFunc throws nx::utils::db::Exception.
      * @throws nx::utils::db::Exception.
      */
-    template<typename QueryFunc, typename... OutputData>
+    template<typename QueryFunc>
     void executeUpdateQuerySync(QueryFunc queryFunc)
     {
         nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
@@ -69,8 +69,7 @@ public:
             },
             [&queryDonePromise](
                 nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult,
-                OutputData... outputData)
+                nx::utils::db::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -158,14 +157,14 @@ public:
 
     /**
      * Executes data modification request that spawns some output data.
-     * Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.
-     * Transaction is started before \a dbUpdateFunc call.
-     * Transaction committed if \a dbUpdateFunc succeeded.
+     * Hold multiple threads inside. dbUpdateFunc is executed within random thread.
+     * Transaction is started before dbUpdateFunc call.
+     * Transaction committed if dbUpdateFunc succeeded.
      * @param dbUpdateFunc This function may executed SQL commands and fill output data
      * @param completionHandler DB operation result is passed here. Output data is valid only if operation succeeded
-     * @note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails).
-     * @note \a dbUpdateFunc may not be called if there was no connection available for
-     *       \a ConnectionOptions::maxPeriodQueryWaitsForAvailableConnection period.
+     * NOTE: DB operation may fail even if dbUpdateFunc finished successfully (e.g., transaction commit fails).
+     * NOTE: dbUpdateFunc may not be called if there was no connection available for
+     *       ConnectionOptions::maxPeriodQueryWaitsForAvailableConnection period.
      */
     template<typename InputData, typename OutputData>
     void executeUpdate(

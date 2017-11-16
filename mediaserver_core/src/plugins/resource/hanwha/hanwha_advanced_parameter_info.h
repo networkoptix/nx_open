@@ -1,7 +1,9 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <common/common_globals.h>
-#include <core/resource/camera_advanced_param.h> 
+#include <core/resource/camera_advanced_param.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -35,6 +37,7 @@ public:
     QString submenu() const;
     QString parameterName() const;
     QString parameterValue() const;
+    bool shouldAffectAllChannels() const;
 
     bool isValid() const;
 
@@ -61,13 +64,20 @@ private:
     QString m_group;
     QString m_groupIncludeCondition;
     bool m_isGroupLead = false;
+    bool m_shouldAffectAllChannels = false;
 
     QString m_cgi;
     QString m_submenu;
     QString m_parameterName;
     QString m_parameterValue;
+
+    static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
+    static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;
 };
 
 } // namespace plugins
 } // namespace meduiaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
+

@@ -68,15 +68,12 @@ namespace nx
 }
 
 
-void resetTransactionTransportConnections();
-
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
     QnOptionalBool isEnabled,
     const QnUserResourcePtr& userRes,
     QString* errString = nullptr);
-bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 
 bool isLocalAppServer(const QString &host);
@@ -87,7 +84,7 @@ bool isLocalAppServer(const QString &host);
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeLocalSystemId(
+bool configureLocalSystem(
     const ConfigureSystemData& data,
     ec2::AbstractTransactionMessageBus* messageBus);
 
@@ -95,11 +92,6 @@ bool changeLocalSystemId(
  * Auto detect HTTP content type based on message body
  */
 QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
-
-/**
- * @return false if failed to save some data.
- */
-bool resetSystemToStateNew(QnCommonModule* commonModule);
 
 /**
  * Drop message bus connections to other servers in the system.

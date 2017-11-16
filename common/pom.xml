@@ -3,12 +3,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.1.1-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
@@ -18,7 +18,7 @@
         <guid>${common.guid}</guid>
 
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lnx_network -lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <global.libs>-lcloud_db_client -lnx_network -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
@@ -74,6 +74,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_kit/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloud_db_client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

@@ -97,7 +97,7 @@ typedef QnListMap<QByteArray, QByteArray> QnReplyHeaderList;
 typedef QHash<QString, QString> QnRequestParams;
 
 /** NOTE: If identical param names exist in url, the first one is taken. */
-QnRequestParams requestParamsFromUrl(const QUrl& url);
+QnRequestParams requestParamsFromUrl(const nx::utils::Url& url);
 
 struct QnHTTPRawResponse
 {

@@ -355,6 +355,26 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
     return result;
 }
 
+Qn::RenderStatus QnGLRenderer::discardFrame()
+{
+    DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
+    if (!picLock.get())
+    {
+        NX_DEBUG(this, "Exited QnGLRenderer::paint (1)");
+        return Qn::NothingRendered;
+    }
+
+    m_lastDisplayedFlags = static_cast<unsigned>(picLock->flags());
+    const auto result = (picLock->sequence() != m_prevFrameSequence)
+        ? Qn::NewFrameRendered
+        : Qn::OldFrameRendered;
+
+    m_prevFrameSequence = picLock->sequence();
+    m_lastDisplayedMetadata = picLock->metadata();
+
+    return result;
+}
+
 Qn::RenderStatus QnGLRenderer::drawVideoData(
     const QRectF &sourceRect,
     const QRectF &targetRect,
@@ -821,7 +841,7 @@ bool QnGLRenderer::isLowQualityImage() const
     return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;
 }
 
-QnAbstractCompressedMetadataPtr QnGLRenderer::lastFrameMetadata() const
+FrameMetadata QnGLRenderer::lastFrameMetadata() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_lastDisplayedMetadata;

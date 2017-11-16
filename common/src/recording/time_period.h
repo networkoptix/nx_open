@@ -26,10 +26,19 @@ public:
      * \param durationMs                Period's duration, in milliseconds.
      */
     QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
+    QnTimePeriod(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& duration);
 
     static QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs);
 
     QnTimePeriod& operator = (const QnTimePeriod &other);
+
+    bool isLeftIntersection(const QnTimePeriod& other) const;
+
+    bool isRightIntersection(const QnTimePeriod& other) const;
+
+    bool isContainedIn(const QnTimePeriod& other) const;
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;
@@ -73,6 +82,20 @@ public:
      * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
      */
     qint64 distanceToTime(qint64 timeMs) const;
+
+    /**
+     * Truncate period duration to the specified timeMs. This functions does nothing if truncate point is outside period.
+     */
+    void truncate(qint64 timeMs);
+
+    /**
+     * Truncate period start time to the specified timeMs. This functions does nothing if truncate point is outside period.
+     */
+    void truncateFront(qint64 timeMs);
+
+    QnTimePeriod truncated(qint64 timeMs) const;
+
+    QnTimePeriod truncatedFront(qint64 timeMs) const;
 
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);

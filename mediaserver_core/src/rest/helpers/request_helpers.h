@@ -1,19 +1,19 @@
 #pragma once
 
-#include <network/router.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/utils/system_error.h>
-#include <core/resource/resource_fwd.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/user_resource.h>
+#include <network/router.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/utils/system_error.h>
 
 template<typename Context, typename RequestFunc>
 void runMultiserverRequest(
     QnRouter* router,
-    QUrl url,
+    nx::utils::Url url,
     const RequestFunc &request,
     const QnMediaServerResourcePtr &server,
     Context *context)
@@ -44,13 +44,13 @@ void runMultiserverRequest(
 template<typename Context, typename CompletionFunc>
 void runMultiserverDownloadRequest(
     QnRouter* router,
-    QUrl url,
+    nx::utils::Url url,
     const QnMediaServerResourcePtr &server,
     const CompletionFunc &requestCompletionFunc,
     Context *context)
 {
     const auto downloadRequest = [requestCompletionFunc]
-        (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
+        (const nx::utils::Url &url, const nx_http::HttpHeaders &headers, Context *context)
     {
         context->executeGuarded([url, requestCompletionFunc, headers, context]()
         {
@@ -65,7 +65,7 @@ void runMultiserverDownloadRequest(
 template<typename Context, typename CompletionFunc>
 void runMultiserverUploadRequest(
     QnRouter* router,
-    QUrl url,
+    nx::utils::Url url,
     const QByteArray &data,
     const QByteArray &contentType,
     const QString &user,
@@ -75,7 +75,7 @@ void runMultiserverUploadRequest(
     Context *context)
 {
     const auto downloadRequest = [completionFunc, data, contentType, user, password]
-        (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
+        (const nx::utils::Url &url, const nx_http::HttpHeaders &headers, Context *context)
     {
         context->executeGuarded([url, data, completionFunc, headers
             , contentType, context, user, password]()
@@ -87,4 +87,19 @@ void runMultiserverUploadRequest(
     };
 
     runMultiserverRequest(router, url, downloadRequest, server, context);
+}
+
+inline bool verifySimpleRelativePath(const QString& path)
+{
+    if (path.startsWith("/"))
+        return false; //< UNIX root.
+
+    if (path.size() > 1 && path[1] == ':')
+        return false; //< Windows drive.
+
+    if (path.contains(".."))
+        return false; //< May be a path traversal attempt.
+
+    // TODO: It makes sense to add some more security cheks e.g. symlinks, etc.
+    return true;
 }

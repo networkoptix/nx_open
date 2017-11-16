@@ -1,5 +1,6 @@
 #include "outgoing_tunnel_pool.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/log/log.h>
@@ -66,7 +67,7 @@ void OutgoingTunnelPool::establishNewConnection(
 
     auto& tunnelContext = getTunnel(targetHostAddress);
     tunnelContext.handlers.push_back(std::move(handler));
-    
+
     tunnelContext.tunnel->establishNewConnection(
         std::move(timeout),
         std::move(socketAttributes),
@@ -103,19 +104,31 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     const auto id = lm("%1_%2_%3").args(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(s_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,
-        "Own peer id is not supposed to be changed");
 
-    m_isOwnPeerIdAssigned = true;
-    m_ownPeerId = QString(id).toUtf8();
-    NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
+    if (m_isOwnPeerIdAssigned)
+    {
+        if (s_isIgnoringOwnPeerIdChange)
+            return;
+        NX_ASSERT(false, "Own peer id is not supposed to be changed");
+    }
+    else
+    {
+        m_isOwnPeerIdAssigned = true;
+        m_ownPeerId = QString(id).toUtf8();
+        NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
+    }
 }
 
-void OutgoingTunnelPool::clearOwnPeerId()
+void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const String& name, const QnUuid& uuid)
 {
     QnMutexLocker lock(&m_mutex);
-    m_isOwnPeerIdAssigned = false;
-    m_ownPeerId.clear();
+
+    if (m_isOwnPeerIdAssigned &&
+        m_ownPeerId.startsWith(lm("%1_%2").args(name, uuid.toSimpleString()).toUtf8()))
+    {
+        m_isOwnPeerIdAssigned = false;
+        m_ownPeerId.clear();
+    }
 }
 
 OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClosedSubscription()
@@ -123,12 +136,12 @@ OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClos
     return m_onTunnelClosedSubscription;
 }
 
-void OutgoingTunnelPool::allowOwnPeerIdChange()
+void OutgoingTunnelPool::ignoreOwnPeerIdChange()
 {
-    s_isOwnPeerIdChangeAllowed = true;
+    s_isIgnoringOwnPeerIdChange = true;
 }
 
-OutgoingTunnelPool::TunnelContext& 
+OutgoingTunnelPool::TunnelContext&
     OutgoingTunnelPool::getTunnel(const AddressEntry& targetHostAddress)
 {
     const auto iterAndInsertionResult = m_pool.emplace(
@@ -225,7 +238,7 @@ void OutgoingTunnelPool::tunnelsStopped(
         });
 }
 
-bool OutgoingTunnelPool::s_isOwnPeerIdChangeAllowed(false);
+bool OutgoingTunnelPool::s_isIgnoringOwnPeerIdChange(false);
 
 } // namespace cloud
 } // namespace network

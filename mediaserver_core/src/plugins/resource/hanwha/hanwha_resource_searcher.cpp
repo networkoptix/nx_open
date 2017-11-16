@@ -7,21 +7,40 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/scope_guard.h>
 
 #include "hanwha_resource_searcher.h"
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
+#include "hanwha_common.h"
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
 
-namespace
-{
-    static const QString kUpnpBasicDeviceType("Basic");
-    static const QString kHanwhaManufacturerName("Hanwha Techwin");
-    static const QString kHanwhaCameraName("Hanwha_Common");
-}
+namespace {
+
+static const QString kUpnpBasicDeviceType("Basic");
+static const QString kHanwhaCameraName("Hanwha_Common");
+static const QString kHanwhaResourceTypeName = lit("Hanwha_Sunapi");
+static const QString kHanwhaDefaultUser = lit("admin");
+static const QString kHanwhaDefaultPassword = lit("4321");
+
+} // namespace
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url)
+{
+    // This is not the same context as for resources, bc we do not have MAC address before hand.
+    auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
+    const auto context = qnServerModule->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(sharedId);
+
+    context->setRecourceAccess(url, auth);
+    m_sharedContext[sharedId] = context;
+    return context->information();
+}
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
@@ -30,9 +49,13 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
-QnResourcePtr HanwhaResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+
+QnResourcePtr HanwhaResourceSearcher::createResource(
+    const QnUuid &resourceTypeId,
+    const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    NX_EXPECT(!resourceType.isNull());
     if (resourceType.isNull())
     {
         NX_WARNING(this, lm("No resource type for Hanwha camera. Id = %1").arg(resourceTypeId));
@@ -43,7 +66,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(const QnUuid &resourceTypeI
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr( new HanwhaResource() );
+    result = QnVirtualCameraResourcePtr(new HanwhaResource());
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -53,50 +76,40 @@ QString HanwhaResourceSearcher::manufacture() const
     return kHanwhaManufacturerName;
 }
 
-QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
-    const QUrl& url,
+QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url,
     const QAuthenticator& auth,
     bool isSearchAction)
 {
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();
 
-    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+    auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnResourceList result;
     HanwhaResourcePtr resource(new HanwhaResource());
-    QUrl urlCopy(url);
+    utils::Url urlCopy(url);
     urlCopy.setScheme("http");
-    QString urlStr = urlCopy.toString();
 
     resource->setUrl(urlCopy.toString());
     resource->setDefaultAuth(auth);
 
-    HanwhaRequestHelper helper(resource);
-    HanwhaResponse systemInfo = helper.view("system/deviceinfo");
-    if (!systemInfo.isSuccessful())
+    const auto info = cachedDeviceInfo(auth, urlCopy);
+    if (!info || info->macAddress.isEmpty())
         return QList<QnResourcePtr>();
 
-    auto macAddr = systemInfo.parameter<QString>("ConnectedMACAddress");
-    auto model = systemInfo.parameter<QString>("Model");
-    if (!macAddr || !model)
-        return QList<QnResourcePtr>();
-    auto firmware = systemInfo.parameter<QString>("FirmwareVersion");
-    
-    resource->setMAC(QnMacAddress(*macAddr));
-    resource->setModel(*model);
-    resource->setName(*model);
-    if (firmware)
-        resource->setFirmware(*firmware);
+    resource->setMAC(QnMacAddress(info->macAddress));
+    resource->setModel(info->model);
+    resource->setName(info->model);
+    resource->setFirmware(info->firmware);
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
     result << resource;
     const int channel = resource->getChannel();
     if (isSearchAction)
-        addMultichannelResources(result);
-    else if (channel > 0 || getChannels(resource) > 1)
+        addMultichannelResources(result, auth);
+    else if (channel > 0 || info->channelCount > 1)
         resource->updateToChannel(channel);
     return result;
 }
@@ -136,27 +149,36 @@ bool HanwhaResourceSearcher::processPacket(
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/)
 {
+    if (discoveryMode() == DiscoveryMode::disabled)
+        return false;
+
     if (!isHanwhaCamera(devInfo))
         return false;
 
     QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
         cameraMac = QnMacAddress(devInfo.serialNumber);
+    if (cameraMac.isNull())
+    {
+        NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
+            .arg(devInfo.udn).arg(devInfo.serialNumber));
+        return false;
+    }
 
     QString model(devInfo.modelName);
 
 	{
 		QnMutexLocker lock(&m_mutex);
-		if (m_alreadFoundMacAddresses.find(cameraMac.toString()) != m_alreadFoundMacAddresses.end())
+        const bool alreadyFound = m_alreadFoundMacAddresses.find(cameraMac.toString())
+            != m_alreadFoundMacAddresses.end();
+
+		if (alreadyFound)
             return true;
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
 
-    QAuthenticator defaultAuth;
-    defaultAuth.setUser("admin");
-    defaultAuth.setPassword("4321");
-    createResource(devInfo, cameraMac, defaultAuth, foundUpnpResources);
+    createResource(devInfo, cameraMac, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
     m_alreadFoundMacAddresses.insert(cameraMac.toString());
@@ -168,15 +190,16 @@ bool HanwhaResourceSearcher::processPacket(
 void HanwhaResourceSearcher::createResource(
     const nx_upnp::DeviceInfo& devInfo,
     const QnMacAddress& mac,
-    const QAuthenticator& auth,
     QnResourceList& result)
 {
-
-    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+    auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
+    QnResourceData resourceData = qnStaticCommon
+        ->dataPool()
+        ->data(devInfo.manufacturer, devInfo.modelName);
+
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
@@ -189,36 +212,27 @@ void HanwhaResourceSearcher::createResource(
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
 
-    if (!auth.isNull()) 
-        resource->setDefaultAuth(auth);
+    resource->setDefaultAuth(getDefaultAuth());
 
     result << resource;
-    addMultichannelResources(result);
-}
 
-int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
-{
-    auto result = m_channelsByCamera.value(resource->getUniqueId());
-    if (result > 0)
-        return result;
-    
+    auto resPool = commonModule()->resourcePool();
+    auto rpRes = resPool->getNetResourceByPhysicalId(
+        resource->getUniqueId()).dynamicCast<HanwhaResource>();
 
-    HanwhaRequestHelper helper(resource);
-    auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
-    if (maxChannels)
-        result = *maxChannels;
-
-    m_channelsByCamera.insert(resource->getUniqueId(), result);
-    return result;
+    addMultichannelResources(result, rpRes ? rpRes->getAuth() : getDefaultAuth());
 }
 
 template <typename T>
-void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
+void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
     HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
 
-    const auto channels = getChannels(firstResource);
+    const auto info = cachedDeviceInfo(auth, firstResource->getUrl());
+    if (!info)
+        return;
+
+    const auto channels = info->channelCount;
     if (channels > 1)
     {
         firstResource->updateToChannel(0);
@@ -226,7 +240,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             HanwhaResourcePtr resource(new HanwhaResource());
 
-            auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+            auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())
                 return;
 
@@ -236,9 +250,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
 
-            auto auth = firstResource->getAuth();
-            if (!auth.isNull())
-                resource->setDefaultAuth(auth);
+            resource->setDefaultAuth(getDefaultAuth());
 
             resource->setUrl(firstResource->getUrl());
             resource->updateToChannel(i);
@@ -246,6 +258,14 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
             result.push_back(resource);
         }
     }
+}
+
+QAuthenticator HanwhaResourceSearcher::getDefaultAuth()
+{
+    QAuthenticator defaultAuth;
+    defaultAuth.setUser(kHanwhaDefaultUser);
+    defaultAuth.setPassword(kHanwhaDefaultPassword);
+    return defaultAuth;
 }
 
 } // namespace plugins

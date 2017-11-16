@@ -1,5 +1,6 @@
 #include "mediator_relay_integration_test_setup.h"
 
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -45,7 +46,7 @@ private:
     QUrl m_relayUrl;
 };
 
-} // namespace 
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 

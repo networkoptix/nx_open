@@ -6,14 +6,14 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>שפה</translation>
+      <translation>Hebrew - עברית</translation>
     </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation>הסיסמא או שם המשתמש אינם חוקיים.</translation>
+      <translation>הסיסמה או שם המשתמש אינם חוקיים.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>מערכת חדשה</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>וודא שפורט %1 נגישץ (כלומר שהוא מופנה).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות המכשיר.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות המצלמה.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות מודלות קלט/פלט.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>אם זה לא עוזר, שחזר את הגדרות ברירות המחדל של היצרן בדף האינטרנט של ההתקן.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>המצלמה שוחזרה מארכיון. מחק את המצלמה והוסף אותה שוב לתצוגת וידאו חי.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המכשיר (שגיאה &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המצלמה (שגיאה &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות התקן הקלט/פלט (שגיאה &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -572,7 +572,7 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מצלמה %n</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
@@ -581,7 +581,7 @@
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מצלמה %n</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
@@ -590,7 +590,7 @@
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מכשיר %n</numerusform>
         <numerusform>%n מכשירים</numerusform>
         <numerusform>%n התקנים</numerusform>
@@ -599,7 +599,7 @@
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>מכשיר %n</numerusform>
         <numerusform>%n מכשירים</numerusform>
         <numerusform>%n התקנים</numerusform>
@@ -640,7 +640,7 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n מודול קלט/פלט אחד</numerusform>
         <numerusform>%n מודולי קלט/פלט</numerusform>
         <numerusform>%n מודולי קלט/פלט</numerusform>
@@ -649,7 +649,7 @@
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
         <numerusform>%n מודולי קלט/פלט</numerusform>
         <numerusform>%n מודולי קלט/פלט</numerusform>
@@ -880,22 +880,22 @@
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>secs</translation>
+      <translation>שניות</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
+      <translation>דקות</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>hrs</translation>
+      <translation>שעות</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>days</translation>
+      <translation>ימים</translation>
     </message>
     <message>
       <source>wks</source>
@@ -1095,15 +1095,15 @@
     </message>
     <message>
       <source>Play sound</source>
-      <translation>הפעל סאונד</translation>
+      <translation>השמע צליל</translation>
     </message>
     <message>
       <source>Speak</source>
-      <translation>דבר</translation>
+      <translation>דבר (אנגלית בלבד)</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>הפעל פריסט PTZ</translation>
+      <translation>הפעל פריסט בממונעת</translation>
     </message>
     <message>
       <source>Show text overlay</source>
@@ -1221,7 +1221,7 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>התנגשות IP בהתקנים</numerusform>
+        <numerusform>התנגשות כתובות בהתקנים</numerusform>
         <numerusform>התנגשות IP בהתקנים</numerusform>
         <numerusform>התנגשות IP בהתקנים</numerusform>
         <numerusform>התנגשות IP בהתקנים</numerusform>
@@ -1230,7 +1230,7 @@
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>התנגשות IP במצלמות</numerusform>
+        <numerusform>התנגשות כתובות במצלמות</numerusform>
         <numerusform>התנגשות IP במצלמות</numerusform>
         <numerusform>התנגשות IP במצלמות</numerusform>
         <numerusform>התנגשות IP במצלמות</numerusform>
@@ -1278,7 +1278,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation>תקלה בשרת &quot;%1&quot;</translation>
+      <translation>תקלה בשרת "%1"</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1292,7 +1292,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation>קונפליקט בשרת &quot;%1&quot;</translation>
+      <translation>קונפליקט בשרת "%1"</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
@@ -1363,7 +1363,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

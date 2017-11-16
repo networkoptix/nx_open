@@ -40,10 +40,13 @@ public:
     virtual void afterUpdatingAccountPassword(
         nx::utils::db::QueryContext* const /*queryContext*/,
         const api::AccountData& /*account*/) {}
+    virtual void afterUpdatingAccount(
+        nx::utils::db::QueryContext*,
+        const data::AccountUpdateDataWithEmail&) {}
 };
 
 /**
- * This interface introduced for testing purposes. 
+ * This interface introduced for testing purposes.
  * It is incomplete and quite raw.
  */
 class AbstractAccountManager
@@ -58,7 +61,25 @@ public:
         const std::string& userName) const = 0;
 
     virtual void addExtension(AbstractAccountManagerExtension*) = 0;
+
     virtual void removeExtension(AbstractAccountManagerExtension*) = 0;
+
+    virtual std::string generateNewAccountId() const = 0;
+
+    virtual nx::utils::db::DBResult insertAccount(
+        nx::utils::db::QueryContext* const queryContext,
+        data::AccountData account) = 0;
+
+    virtual nx::utils::db::DBResult fetchAccountByEmail(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& accountEmail,
+        data::AccountData* const accountData) = 0;
+
+    virtual nx::utils::db::DBResult createPasswordResetCode(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        std::chrono::seconds codeExpirationTimeout,
+        data::AccountConfirmationCode* const confirmationCode) = 0;
 };
 
 /**
@@ -69,10 +90,6 @@ class AccountManager:
     public AbstractAuthenticationDataProvider
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<
-        nx::utils::db::DBResult(nx::utils::db::QueryContext*, const data::AccountUpdateDataWithEmail&)
-    > UpdateAccountSubroutine;
-
     /**
      * @throw std::runtime_error In case of failure to pre-fill data cache
      */
@@ -108,7 +125,7 @@ public:
         const AuthorizationInfo& authzInfo,
         data::AccountConfirmationCode emailVerificationCode,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
-    
+
     /**
      * Retrieves account corresponding to authorization data \a authzInfo.
      */
@@ -135,36 +152,34 @@ public:
 
     //---------------------------------------------------------------------------------------------
 
-    std::string generateNewAccountId() const;
+    virtual std::string generateNewAccountId() const override;
 
     /**
      * Fetches account from cache.
      */
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const override;
-    
-    nx::utils::db::DBResult insertAccount(
+
+    virtual nx::utils::db::DBResult insertAccount(
         nx::utils::db::QueryContext* const queryContext,
-        data::AccountData account);
+        data::AccountData account) override;
     nx::utils::db::DBResult updateAccount(
         nx::utils::db::QueryContext* const queryContext,
         data::AccountData account);
 
-    nx::utils::db::DBResult fetchAccountByEmail(
+    virtual nx::utils::db::DBResult fetchAccountByEmail(
         nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
-        data::AccountData* const accountData);
+        data::AccountData* const accountData) override;
 
-    nx::utils::db::DBResult createPasswordResetCode(
+    virtual nx::utils::db::DBResult createPasswordResetCode(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         std::chrono::seconds codeExpirationTimeout,
-        data::AccountConfirmationCode* const confirmationCode);
+        data::AccountConfirmationCode* const confirmationCode) override;
 
     virtual void addExtension(AbstractAccountManagerExtension*) override;
     virtual void removeExtension(AbstractAccountManagerExtension*) override;
-    // TODO: #ak Modify to an abstract extension.
-    void setUpdateAccountSubroutine(UpdateAccountSubroutine func);
 
 private:
     const conf::Settings& m_settings;
@@ -178,7 +193,6 @@ private:
     /** map<email, temporary password>. */
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     nx::utils::Counter m_startedAsyncCallsCounter;
-    UpdateAccountSubroutine m_updateAccountSubroutine;
     std::unique_ptr<dao::AbstractAccountDataObject> m_dao;
     ExtensionPool<AbstractAccountManagerExtension> m_extensions;
 

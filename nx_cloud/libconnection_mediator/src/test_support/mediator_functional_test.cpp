@@ -13,6 +13,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -141,10 +142,10 @@ std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
 void MediatorFunctionalTest::registerCloudDataProvider(
     AbstractCloudDataProvider* cloudDataProvider)
 {
-    m_factoryFuncToRestore = 
+    m_factoryFuncToRestore =
         AbstractCloudDataProviderFactory::setFactoryFunc(
             [cloudDataProvider](
-                const boost::optional<QUrl>& /*cdbUrl*/,
+                const boost::optional<nx::utils::Url>& /*cdbUrl*/,
                 const std::string& /*user*/,
                 const std::string& /*password*/,
                 std::chrono::milliseconds /*updateInterval*/,
@@ -231,7 +232,7 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
     const auto urlStr =
         lm("http://%1%2").arg(httpEndpoint().toString())
         .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
-    if (!httpClient.doGet(QUrl(urlStr)))
+    if (!httpClient.doGet(nx::utils::Url(urlStr)))
         return std::make_tuple(
             nx_http::StatusCode::serviceUnavailable,
             data::ListeningPeers());

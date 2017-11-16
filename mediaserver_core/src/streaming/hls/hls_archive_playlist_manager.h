@@ -14,7 +14,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
-#include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 
 
 namespace nx_hls
@@ -59,7 +59,7 @@ namespace nx_hls
         qint64 m_prevChunkEndTimestamp;
         bool m_eof;
         int m_chunkMediaSequence;
-        std::unique_ptr<QnThumbnailsArchiveDelegate> m_delegate;
+        QnAbstractArchiveDelegatePtr m_delegate;
         QElapsedTimer m_playlistUpdateTimer;
         qint64 m_timerCorrection;
         bool m_initialPlaylistCreated;

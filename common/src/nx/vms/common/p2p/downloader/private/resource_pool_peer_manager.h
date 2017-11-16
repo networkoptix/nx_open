@@ -43,10 +43,9 @@ public:
         int chunkIndex,
         ChunkCallback callback) override;
 
-    virtual rest::Handle downloadChunkFromInternet(
-        const QnUuid& peerId,
+    virtual rest::Handle downloadChunkFromInternet(const QnUuid& peerId,
         const QString& fileName,
-        const QUrl& url,
+        const nx::utils::Url &url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "http_stream_reader.h"
 #include "http_types.h"
@@ -8,8 +8,8 @@
 namespace nx_http {
 
 /**
- * This class is just a wrapper on top of nx_http::HttpStreamReader 
- * for use with nx::network::server::BaseStreamProtocolConnection class. 
+ * This class is just a wrapper on top of nx_http::HttpStreamReader
+ * for use with nx::network::server::BaseStreamProtocolConnection class.
  */
 class NX_NETWORK_API MessageParser:
     public nx::network::server::AbstractMessageParser<Message>
@@ -51,7 +51,7 @@ namespace deprecated {
 
 /**
  * This parser provides only whole message without providing message body on availability.
- * Introduced for backward compatibility. 
+ * Introduced for backward compatibility.
  * Should be removed and all usages refactored to use MessageParser.
  */
 class NX_NETWORK_API MessageParser:

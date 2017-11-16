@@ -16,7 +16,7 @@ cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
 cloud_gateway:
-    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
+    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
 
 mail_from: 'cloud@tricomresearch.com'
 
@@ -41,15 +41,16 @@ languages:
     - fr_FR
     - de_DE
     - es_ES
+    - nl_NL
     - ja_JP
+    - he_IL
     - ko_KR
+    - pl_PL
     - tr_TR
     - zh_CN
     - zh_TW
-    - he_IL
     - hu_HU
-    - nl_NL
-    - pl_PL
+    - th_TH
     - vi_VN
 
 queue_name: '$INSTANCE_NAME'

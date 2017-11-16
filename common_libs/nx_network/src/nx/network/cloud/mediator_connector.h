@@ -10,11 +10,13 @@
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
-#include "connection_mediator_url_fetcher.h"
 #include "mediator_client_connections.h"
 #include "mediator_server_connections.h"
 
 namespace nx {
+
+namespace network { namespace cloud { class ConnectionMediatorUrlFetcher; } }
+
 namespace hpm {
 namespace api {
 
@@ -40,6 +42,9 @@ public:
     MediatorConnector();
     virtual ~MediatorConnector() override;
 
+    MediatorConnector(MediatorConnector&&) = delete;
+    MediatorConnector& operator=(MediatorConnector&&) = delete;
+
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     /**
@@ -57,12 +62,12 @@ public:
     /**
      * NOTE: Mediator url resolution will still happen by referring to specified address.
      */
-    void mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl);
+    void mockupCloudModulesXmlUrl(const utils::Url &cloudModulesXmlUrl);
     /**
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
      */
-    void mockupMediatorUrl(const QUrl& mediatorUrl);
+    void mockupMediatorUrl(const utils::Url &mediatorUrl);
 
     void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const override;
@@ -81,7 +86,7 @@ private:
 
     std::shared_ptr<stun::AsyncClientWithHttpTunneling> m_stunClient;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
-    boost::optional<QUrl> m_mediatorUrl;
+    boost::optional<nx::utils::Url> m_mediatorUrl;
     boost::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 

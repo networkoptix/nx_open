@@ -3,7 +3,9 @@
 
 #include <memory>
 
-#include <plugins/resource/test_camera/testcamera_const.h>
+#include <nx/network/nettools.h>
+
+#include <core/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
 
 int MEDIA_PORT = 4985;
@@ -14,7 +16,7 @@ int MEDIA_PORT = 4985;
 
 class QnCameraDiscoveryListener: public QnLongRunnable
 {
-    struct NetRange
+    struct IpRangeV4
     {
         bool contains(quint32 addr) const
         {
@@ -44,10 +46,10 @@ protected:
             {
                 if (iface.address == QHostAddress(addr))
                 {
-                    NetRange netRange;
-                    netRange.firstIp = iface.networkAddress().toIPv4Address();
+                    IpRangeV4 netRange;
+                    netRange.firstIp = iface.subNetworkAddress().toIPv4Address();
                     netRange.lastIp = iface.broadcastAddress().toIPv4Address();
-                    m_allowedIpRange.push_back(netRange);
+                    m_allowedIpRanges.push_back(netRange);
                 }
             }
         }
@@ -72,10 +74,10 @@ protected:
             const quint32 v4Addr = ntohl(*addrPtr);
 
             return std::any_of(
-                m_allowedIpRange.begin(), 
-                m_allowedIpRange.end(),
-                [v4Addr](const NetRange& range)
-                { 
+                m_allowedIpRanges.begin(),
+                m_allowedIpRanges.end(),
+                [v4Addr](const IpRangeV4& range)
+                {
                     return range.contains(v4Addr);
                 });
         };
@@ -85,7 +87,7 @@ protected:
             int readed = discoverySock->recvFrom(buffer, sizeof(buffer), &peerEndpoint);
             if (readed > 0)
             {
-                if (!m_allowedIpRange.isEmpty() && !hasRange(peerEndpoint))
+                if (!m_allowedIpRanges.isEmpty() && !hasRange(peerEndpoint))
                     continue;
 
                 if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
@@ -105,7 +107,7 @@ protected:
 
 private:
     const QStringList m_localInterfacesToListen;
-    QVector<NetRange> m_allowedIpRange;
+    QVector<IpRangeV4> m_allowedIpRanges;
 };
 
 

@@ -33,6 +33,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -42,6 +43,8 @@
 
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
+
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 
 #include <recording/time_period.h>
 
@@ -81,7 +84,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <nx/utils/collection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -93,6 +95,7 @@
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -283,7 +286,7 @@ void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
     QStringList arguments;
     arguments << lit("--videowall");
     arguments << videoWallUuid.toString();
-    QUrl url = commonModule->currentUrl();
+    nx::utils::Url url = commonModule->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
     arguments << lit("--auth");
@@ -706,7 +709,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
 {
     QStringList arguments = args;
 
-    QUrl url = commonModule()->currentUrl();
+    nx::utils::Url url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
 
@@ -2010,11 +2013,15 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
 {
-    if (!context()->user())
+    const auto user = context()->user();
+    if (!user)
         return;
 
+    const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
+        commonModule()->moduleGUID(), user->getId());
+
     const auto desktopCamera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(
-        commonModule()->moduleGUID().toString());
+        desktopCameraId);
     if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
@@ -3013,11 +3020,14 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 
             // checking existing widgets with same screen sets
             // take any other item on this widget
-            int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx) { return idx.uuid() != item.uuid; });
-            if ((otherIdx >= 0)
-                && (indices[otherIdx].item().pcUuid == item.pcUuid)
-                && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
+            const auto other = std::find_if(indices.cbegin(), indices.cend(),
+                [&item](const QnVideoWallItemIndex &idx) { return idx.uuid() != item.uuid; });
+            if (other != indices.cend()
+                && (other->item().pcUuid == item.pcUuid)
+                && (other->item().screenSnaps.screens() == item.screenSnaps.screens()))
+            {
                 return workbenchItem;
+            }
 
             // our item is the only item on the widget, we can modify it as we want
             if (indices.size() == 1 && indices.first().item().uuid == item.uuid)

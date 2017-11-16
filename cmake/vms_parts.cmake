@@ -30,6 +30,7 @@ if("${platform}" MATCHES "android|ios")
     set(_withDesktopClient OFF)
     set(_withClouds OFF)
     set(_withTests OFF)
+    set(_withTestCamera OFF)
 endif()
 
 if("${platform}" STREQUAL "macosx")
@@ -39,6 +40,10 @@ endif()
 
 if(WINDOWS)
     set(_withTrayTool ON)
+endif()
+
+if(targetDevice STREQUAL "edge1")
+    set(_withTestCamera OFF)
 endif()
 
 option(withMediaServer "Enable media server" ${_withMediaServer})

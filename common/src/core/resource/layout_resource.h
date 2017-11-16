@@ -36,7 +36,7 @@ public:
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
-    QnLayoutResourcePtr clone() const;
+    QnLayoutResourcePtr clone(QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
 
     /** Create a new layout with a given resource on it. */
     static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);

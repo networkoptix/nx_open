@@ -157,9 +157,11 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
     {
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
-            resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
+            resource->getTypeId() == QnResourceTypePool::kDesktopCameraTypeUuid)
+        {
             qDebug() << "desktop camera added to resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
-            connect(resource, &QnResource::statusChanged, this, [this, resource] {
+            connect(resource, &QnResource::statusChanged, this, [this, resource]
+            {
                 qDebug() << "desktop camera status changed" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId() << resource->getStatus();
             });
         }
@@ -219,8 +221,9 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
-            resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
-                qDebug() << "desktop camera removed from resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
+            resource->getTypeId() == QnResourceTypePool::kDesktopCameraTypeUuid)
+        {
+            qDebug() << "desktop camera removed from resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
         }
 #endif
 
@@ -306,6 +309,24 @@ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
         return resIter.value();
 
     return QnResourcePtr(NULL);
+}
+
+QnSecurityCamResourceList QnResourcePool::getResourcesBySharedId(const QString& sharedId) const
+{
+    QnSecurityCamResourceList result;
+    QnMutexLocker locker(&m_resourcesMtx);
+    for (const QnResourcePtr &resource : m_resources)
+    {
+        const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+        if (camera)
+        {
+            const auto resourceSharedId = camera->getSharedId();
+            if (resourceSharedId == sharedId)
+                result.push_back(camera);
+        }
+    }
+
+    return result;
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const

@@ -6,7 +6,9 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnCameraSettingsDialog;
+namespace nx { namespace client { namespace desktop { class LegacyCameraSettingsDialog; } } }
+namespace nx { namespace client { namespace desktop { class CameraSettingsDialog; } } }
+
 class QnServerSettingsDialog;
 class QnUserSettingsDialog;
 
@@ -32,7 +34,8 @@ private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr& layout);
 
 private:
-    QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    QPointer<nx::client::desktop::LegacyCameraSettingsDialog> m_legacyCameraSettingsDialog;
+    QPointer<nx::client::desktop::CameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnServerSettingsDialog> m_serverSettingsDialog;
     QPointer<QnUserSettingsDialog> m_userSettingsDialog;
 };

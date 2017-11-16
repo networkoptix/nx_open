@@ -4,6 +4,7 @@
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
@@ -187,7 +188,8 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 
     setCreateStreamSocketFunc(
         []( bool /*sslRequired*/,
-            nx::network::NatTraversalSupport /*natTraversalRequired*/) ->
+            nx::network::NatTraversalSupport /*natTraversalRequired*/,
+            boost::optional<int> /*ipVersion*/) ->
                 std::unique_ptr< AbstractStreamSocket >
         {
             return std::make_unique<CloudStreamSocket>(AF_INET);

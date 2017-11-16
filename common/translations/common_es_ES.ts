@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>¿De todos modos se combinan?</translation>
+      <translation>¿Combinar de todos modos?</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -60,7 +60,7 @@
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation>El %1 descubierto de sistema está en modo seguro.</translation>
+      <translation>El sistema %1 descubierto está en modo seguro.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
@@ -70,12 +70,12 @@
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Ambos sistemas están conectados a %1. No se permite la fusión.</translation>
+      <translation>Ambos sistemas están conectados a %1. No se permite la unión.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Estos sistemas se construyen con diferentes %1 URL. No se permite la fusión.</translation>
+      <translation>Estos sistemas se construyen con diferentes %1 URL. No se permite la unión.</translation>
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nuevo Sistema</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>El Sistema descubierto %1 es incompatible con el Sistema actual.</translation>
     </message>
   </context>
   <context>
@@ -164,19 +164,19 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>Por favor trate de reanudar el dispositivo, luego restaure faltas de la fábrica en la página Web.</translation>
+      <translation>Por favor trate de reanudar el dispositivo, luego restaure a valores de fábrica en la página Web.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>Trate de reiniciar la cámara, a continuación, restaurar valores predeterminados de fábrica en la página web.</translation>
+      <translation>Trate de reiniciar la cámara, a continuación, restaue valores predeterminados de fábrica en la página web.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>Asegúrese de que el dispositivo está conectado a la red. Intentar reiniciar el dispositivo.</translation>
+      <translation>Asegúrese de que el dispositivo está conectado a la red. Intente reiniciar el dispositivo.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>Asegúrese de que la cámara esté conectada a la red. Intentar reiniciar la cámara.</translation>
+      <translation>Asegúrese de que la cámara esté conectada a la red. Intente reiniciar la cámara.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>Problema de cámara desconocido.</translation>
+      <translation>Problema de cámara desconocida.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
@@ -208,15 +208,15 @@
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>Demasiados errores de los medios de comunicación. Por favor abrir diálogo de temas de cámara para más detalles.</translation>
+      <translation>Demasiados errores de los medios. Por favor abrir el diálogo de cámara para más detalles.</translation>
     </message>
     <message>
       <source>Camera plugin error. %1</source>
-      <translation>Error de complemento de la cámara. %1</translation>
+      <translation>Error de plugin de la cámara. %1</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Intente reiniciar el módulo de E/S y, a continuación, restaurar los valores predeterminados de fábrica en la página web.</translation>
+      <translation>Intente reiniciar el módulo de E/S y, a continuación, restaure los valores predeterminados de fábrica en la página web.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
@@ -224,11 +224,11 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Petición de Módulo E/S &quot;%1&quot; falla con error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Módulo de E/S es tema desconocido.</translation>
+      <translation>Problema desconocido en el Módulo E/S.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
@@ -236,7 +236,8 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Demasiados errores de medios. Por favor, abra el módulo E/S cuestiones del diálogo para más detalles.</translation>
+      <translation>Demasiados errores de medios. Por favor, abra el diálogo 
+ del módulo E/S para más detalles.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -255,24 +256,12 @@
       <translation>Asegúrese de que el puerto %1 es accesible (por ejemplo, reenviar).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminución de la fps en ajustes de dispositivo.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminución de la fps en ajustes de dispositivo.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminución de la fps en ajustes del módulo de I/O.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
+      <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web de la cámara.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
@@ -312,7 +301,19 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>La cámara se ha restaurado del archivo. Elimine la cámara y agrégala de nuevo para ver el video en vivo.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del dispositivo (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración de la cámara (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del módulo E/S (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -374,7 +375,7 @@
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>No se pudo realizar la copia de corriente directa porque el tamaño de marco es indefinido.</translation>
+      <translation>No se pudo realizar la copia directa al flujo porque el tamaño de cuadro es indefinido.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
@@ -408,11 +409,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -420,11 +421,11 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modulos</translation>
+      <translation>Modulos E/S</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Comenzar</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -456,7 +457,7 @@
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>Licensias de I/O Modulos</translation>
+      <translation>Licensias de Módulos E/S</translation>
     </message>
     <message>
       <source>Start Licenses</source>
@@ -468,7 +469,7 @@
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation>Licensias invalidas</translation>
+      <translation>Licensias inválidas</translation>
     </message>
     <message>
       <source>Free</source>
@@ -484,7 +485,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Licencias de tiempo</translation>
     </message>
   </context>
   <context>
@@ -550,7 +551,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Servidor correspondiente al hardware Id no encontrado</translation>
     </message>
   </context>
   <context>
@@ -592,7 +593,7 @@
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Camaras</translation>
+      <translation>Cámaras</translation>
     </message>
     <message>
       <source>cameras</source>
@@ -600,7 +601,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camara</translation>
+      <translation>Cámara</translation>
     </message>
     <message>
       <source>camera</source>
@@ -638,19 +639,19 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>I/O Modulos</translation>
+      <translation>Módulos E/S</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>I/O Modulos</translation>
+      <translation>Módulos E/S</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modulo</translation>
+      <translation>Módulo E/S</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>I/O Modulo</translation>
+      <translation>Módulo E/S</translation>
     </message>
   </context>
   <context>
@@ -669,15 +670,15 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Filigrana: %1</translation>
+      <translation>Marca de agua: %1</translation>
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Id del hardware: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Licencias de tiempo</translation>
     </message>
   </context>
   <context>
@@ -713,32 +714,32 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Más bajo</translation>
+      <translation>Mba</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Bajo</translation>
+      <translation>Ba</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Mediano</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Alto</translation>
+      <translation>Al</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Mejor</translation>
+      <translation>Mjr</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Predeterminado</translation>
+      <translation>Pd</translation>
     </message>
   </context>
   <context>
@@ -753,15 +754,15 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>No podría destinar secuencia de salida para la grabación.</translation>
+      <translation>No se pudo asignar el flujo de salida para la grabación.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>No se pudo asignar salida de secuencia deaudio.</translation>
+      <translation>No se pudo asignar salida del flujo de audio.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation>Información de codec de audio no es válidoa.</translation>
+      <translation>Información de codec de audio no es válida.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
@@ -840,7 +841,7 @@
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>M</source>
@@ -850,7 +851,7 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
+      <translation>a</translation>
     </message>
     <message>
       <source>msec</source>
@@ -865,7 +866,7 @@
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>mín</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
@@ -904,7 +905,7 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>segundo</numerusform>
+        <numerusform>segundos</numerusform>
         <numerusform>segundos</numerusform>
       </translation>
     </message>
@@ -912,7 +913,7 @@
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minuto</numerusform>
+        <numerusform>minutos</numerusform>
         <numerusform>minutos</numerusform>
       </translation>
     </message>
@@ -920,7 +921,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>hora</numerusform>
+        <numerusform>horas</numerusform>
         <numerusform>horas</numerusform>
       </translation>
     </message>
@@ -980,7 +981,7 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>Propietaria</translation>
+      <translation>Dueño</translation>
     </message>
     <message>
       <source>Administrator</source>
@@ -1000,7 +1001,7 @@
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>Función personalizada</translation>
+      <translation>Rol personalizado</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1020,7 +1021,7 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>Función de usuario personalizada.</translation>
+      <translation>Rol de usuario personalizado.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
@@ -1063,7 +1064,7 @@
     </message>
     <message>
       <source>Speak</source>
-      <translation>Habla</translation>
+      <translation>Hablar</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
@@ -1126,11 +1127,11 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation>Servidor a iniciado</translation>
+      <translation>Servidor ha iniciado</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation>Problema de licensia</translation>
+      <translation>Problema de licencia</translation>
     </message>
     <message>
       <source>Archive backup finished</source>
@@ -1175,15 +1176,15 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>Conflicto de dispositivos IP</numerusform>
-        <numerusform>Conflicto de dispositivos IP</numerusform>
+        <numerusform>Conflicto de IP de los dispositivos</numerusform>
+        <numerusform>Conflicto de IP de los dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>Conflicto de IP cámaras</numerusform>
-        <numerusform>Conflicto de IP cámaras</numerusform>
+        <numerusform>Conflicto de IP de las cámaras</numerusform>
+        <numerusform>Conflicto de IP de las cámaras</numerusform>
       </translation>
     </message>
     <message>
@@ -1208,7 +1209,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>Módulo I / O %1 se desconecto</translation>
+      <translation>El módulo de E/S %1 fue desconectado</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1228,33 +1229,33 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Servidor &quot;%1&quot; Error</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Conflicto IP del dispositivo en %1</translation>
+      <translation>Conflicto de IP del dispositivo en %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Conflicto IP de la Cámara %1</translation>
+      <translation>Conflicto de IP de la Cámara %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Servidor &quot;%1&quot; Conflicto</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Servidor &quot;%1&quot; Inició</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>El servidor &quot;%1&quot; tiene un problema de licencia</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>El servidor &quot;%1&quot; ha finalizado una copia de seguridad del archivo</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1266,7 +1267,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Se han producido múltiples eventos %1</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1308,7 +1309,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Disparador: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1318,9 +1319,9 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n veces, primero: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n veces, primero: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1357,11 +1358,11 @@
     </message>
     <message>
       <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>La pérdida del paquete RTP detectado, prev seq.=%1 siguiente seq.=%2.</translation>
+      <translation>Pérdida de paquete RTP detectado, prev seq.=%1 siguiente seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>La pérdida del paquete RTP detectado.</translation>
+      <translation>Pérdida paquete RTP detectado.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
@@ -1377,7 +1378,7 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation>Error de I/O ha ocurrido en %1.</translation>
+      <translation>Error de E/S ha ocurrido en %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
@@ -1385,11 +1386,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>El disco HDD / SSD &quot;%1&quot; está lleno. El disco contiene demasiados datos que no son gestionados por VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>El disco del sistema &quot;%1&quot; está casi lleno.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1401,27 +1402,27 @@
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation>Archivo de copia de seguridad ha fallado: Archivo fuente abierta / error de lectura</translation>
+      <translation>Archivo de copia de seguridad ha fallado: Error de abrir / leer archivo fuente</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation>Archivo de copia de seguridad ha fallado: Archivo de destino crear error / escritura</translation>
+      <translation>Archivo de copia de seguridad ha fallado: Error de creación / lectura de archivo destino</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>Archivo de copia de seguridad ha fallado: Archivo de error catálogo</translation>
+      <translation>Archivo de copia de seguridad ha fallado: Error de catálogo de archivo</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>Backup de archivo terminado, pero no totalmente completa porque el tiempo de copia de seguridad. Se copiarán los datos a %1</translation>
+      <translation>Copia de seguridad de archivo ha terminado, pero no completamente porque ha expirado el tiempo. Se copiarán los datos hasta %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation>Copia de seguridad del archivo es completado con éxito</translation>
+      <translation>Copia de seguridad del archivo ha completado con éxito</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>Archivo de copia de seguridad es cancelado por el usuario. Los datos se copian al %1</translation>
+      <translation>Archivo de copia de seguridad es cancelado por el usuario. Los datos se copian hasta %1</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
@@ -1453,11 +1454,11 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Nombre del Disparador</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation>Role</translation>
+      <translation>Rol</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -1475,11 +1476,11 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Todos los Administradores</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Todos Los Usuarios</translation>
+      <translation>Todos los Usuarios</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1487,23 +1488,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Disparador suave</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Disparador suave %1 en %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Disparador Suave %1 se ha activado varias veces</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Enviar correo electrónico</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Confirmar</translation>
     </message>
   </context>
   <context>

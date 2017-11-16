@@ -84,7 +84,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
         &controller.discoveredPeerPool());
     m_httpServer = &httpServer;
 
-    // TODO: #ak Following call should be removed. 
+    // TODO: #ak Following call should be removed.
     // Http server should be passed to stun server via constructor.
     stunServer->initializeHttpTunnelling(&httpServer);
 

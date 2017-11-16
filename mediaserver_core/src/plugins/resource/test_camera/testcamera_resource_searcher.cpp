@@ -5,7 +5,7 @@
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <plugins/resource/test_camera/testcamera_const.h>
+#include <core/resource/test_camera/testcamera_const.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
@@ -152,7 +152,7 @@ QString QnTestCameraResourceSearcher::manufacture() const
     return QLatin1String(QnTestCameraResource::kManufacturer);
 }
 
-QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol

@@ -22,6 +22,7 @@ enum class StreamRecorderError
     incompatibleCodec,
     fileWrite,
     invalidResourceType,
+    dataNotFound,
 
     LastError
 };

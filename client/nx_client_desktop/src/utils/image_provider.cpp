@@ -28,7 +28,7 @@ QImage QnBasicImageProvider::image() const
 
 QSize QnBasicImageProvider::sizeHint() const
 {
-    return m_image.size();
+    return m_image.size() / m_image.devicePixelRatio();
 }
 
 Qn::ThumbnailStatus QnBasicImageProvider::status() const

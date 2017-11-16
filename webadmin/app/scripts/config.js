@@ -8,7 +8,7 @@ var Config = {
     webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
-        'en_US', 'ru'
+        'en_US', 'ru_RU'
     ],
 
     defaultLogin: 'admin',
@@ -87,6 +87,7 @@ var Config = {
         updateNotificationsEnabled: {label: 'Update notifications enabled', type: 'checkbox'},
         arecontRtspEnabled: {label: 'Arecont RTSP Enabled', type: 'checkbox'},
         backupNewCamerasByDefault: {label: 'Backup new cameras by default', type: 'checkbox'},
+        maxSceneItems: {label: 'Max cameras on the scene (0 - default)', type: 'number'},
         statisticsAllowed: {
             label: 'Send anonymous usage statistics and crash reports',
             type: 'checkbox',
@@ -130,7 +131,9 @@ var Config = {
         updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-        staticResources: "web_common/"
+        staticResources: "web_common/",
+        maxCrashCount: 2,
+        nativeTimeout: 60 * 1000 //60s
     },
     debugEvents: {
         events: [

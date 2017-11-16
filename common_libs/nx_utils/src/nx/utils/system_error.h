@@ -81,7 +81,7 @@ namespace SystemError
 
     //!Returns error code of previous system call
     NX_UTILS_API ErrorCode getLastOSErrorCode();
-    //!Returns text description of \a errorCode
+    //!Returns text description of errorCode
     NX_UTILS_API QString toString( ErrorCode errorCode );
     //!Same as toString(getLastOSErrorCode())
     NX_UTILS_API QString getLastOSErrorText();

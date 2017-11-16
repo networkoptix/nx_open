@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>Developer tools</h2>
         <p>
-            Bent u tevreden met het ontwikkelen van intergrations? Laat het ons weten.
+            Heb je een idee hoe we onze ontwikkelaar tools kunnen verbeteren of wil je in geprek met onze ontwikkelaars?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Geef feedback</a></p>
     </div>
@@ -11,9 +11,8 @@
     <div>
         <h3>Generic Events Generator</h3>
         <p>
-            Generic Events zijn een speciaal soort gebeurtenissen voor 3rd party systemen om acties in het VMS te activeren.
-            Om generic events te creëren, dient het te integreren systeem een HTTP request te kunnen maken naar de server (met behulp van de Server API).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            Een Generic Event is een methode om gebeurtenissen van systemen van derden naar een systeem te verzenden en die kan worden gebruikt om systeemdoelen, die aangemaakt zijn onder de camera regels, te activeren.
+            De Generic Event Generator is een hulpmiddel waarmee u HTTP Generic Event API calls kunt aanmaken, welke u eenvoudig kunt knippen en plakken in het apparaat dat het Generic Event uit dient te sturen.
         </p>
         <p><a href="#/developers/events">Generic Events Generator</a></p>
     </div>
@@ -23,18 +22,18 @@
             De server API biedt een standaard set van API calls voor 3rd party systemen. Het geeft developers de mogelijkheid om toegang te verkrijgen tot elke systeem feature die beschikbaar is in de reguliere client: query/beheer systeem resources (servers, camera's, gebruikers, rechten), verkrijgen van stream van live en opgenomen beelden uit het systeem, het genereren van events, creëren van regels, PTZ camera's bedienen en nog veel meer.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (nieuw)</b></a>
-            - interactieve documentatie met tools voor het testen van API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
-            - lijst van belangrijke wijzigingen in de API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentatie</a>
+            <a href="#/developers/api"><b>API Test Tool (nieuw)</b></a>
+            - interactive documentatie met hulpmiddelen voor het testen van API calls<br>
+            <a href="#/developers/changelog">API veranderingslogboek</a>
+            - overzicht met de belangrijkste wijzigingen in de API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentatie</a>
         </p>
 
     </div>
     <div>
         <h3>Camera Details Paneel</h3>
         <p>
-            Speciaal paneel voor een webclient die extra informatie voor camera's bevat:
+            Geeft voor de ontwikkelaar extra informatie weer over de camera's in de Web Admin-interface:
         </p>
         <ul>
             <li>Camera ID</li>
@@ -42,8 +41,7 @@
             <li>Directe export video vanaf de browser</li>
         </ul>
         <p>
-            Om het Camera Detail Paneel te openen - open <a href="#/view">web client</a>, kies de camera,
-            instellingen icoon (gear) en kies "Camera Details"
+            Om het Camera Details Paneel te openen - ga naar de Web Admin interface, selecteer <a href="#/view"> Weergave </a>, selecteer de doelcamera, klik op het instellingenpictogram (tandwieltje) en kies vervolgens "Camera details"
         </p>
         <p><a href="#/view/?cameraLinks">open Camera Details Paneel</a></p>
     </div>

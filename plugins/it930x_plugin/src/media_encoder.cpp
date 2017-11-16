@@ -125,7 +125,7 @@ namespace ite
     nxcip::StreamReader * MediaEncoder::getLiveStreamReader()
     {
         std::lock_guard<std::mutex> lock(m_cameraManager->get_mutex());
-        if (!m_cameraManager->rxDeviceRef())
+        if (!m_cameraManager->rxDeviceRef() || !m_cameraManager->rxDeviceRef()->deviceReady())
             return nullptr;
 
         StreamReader * stream = new StreamReader(m_cameraManager, m_encoderNumber);

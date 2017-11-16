@@ -25,12 +25,12 @@ QnUuid QnConnectionInfo::serverId() const
     return QnUuid::fromStringSafe(ecsGuid);
 }
 
-QUrl QnConnectionInfo::effectiveUrl() const
+nx::utils::Url QnConnectionInfo::effectiveUrl() const
 {
     if (!allowSslConnections)
         return ecUrl;
 
-    QUrl secure(ecUrl);
+    nx::utils::Url secure(ecUrl);
     secure.setScheme(lit("https"));
     return secure;
 }

@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+Đây là bản sửa mới cho {{ message.product }}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+Nhấp vào liên kết để xem lại dự thảo {{ message.id }} cho {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Liên kết đến bài đánh giá: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+Trên trang này bạn có thể
+1) Tạo bản xem trước để xem các thay đổi gần đây nhất.
+2) Xuất bản phiên bản này sẽ cập nhật tất cả nội dung.
+3) Chỉnh sửa ngữ cảnh bằng cách nhấp vào nút chỉnh sửa bản ghi. Để xem những thay đổi đó, bạn sẽ cần phải tạo một phiên bản mới.

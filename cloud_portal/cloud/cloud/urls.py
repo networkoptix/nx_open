@@ -18,7 +18,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
 admin.site.index_template = 'admin/index.html'
@@ -36,6 +37,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
+    url(r'^admin_tools/', include('admin_tools.urls')),
+    url(r'^zapier/', include('zapier.urls')),
 
     url(r'^apple-app-site-association',
         TemplateView.as_view(template_name="static/apple-app-site-association",
@@ -43,7 +46,8 @@ urlpatterns = [
     url(r'^\.well-known/apple-app-site-association',
         TemplateView.as_view(template_name="static/apple-app-site-association",
                              content_type='application/json')),
-    url(r'.*',
+    url(r'^(?!static).*',
         TemplateView.as_view(template_name="static/index.html"))
-]
+
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

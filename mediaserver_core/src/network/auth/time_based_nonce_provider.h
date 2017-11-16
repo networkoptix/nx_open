@@ -1,13 +1,12 @@
 #pragma once
 
-#include "abstract_nonce_provider.h"
-
 #include <QtCore/QMap>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/auth/abstract_nonce_provider.h>
 
 class TimeBasedNonceProvider:
-    public AbstractNonceProvider
+    public nx::vms::auth::AbstractNonceProvider
 {
 public:
     virtual QByteArray generateNonce() override;

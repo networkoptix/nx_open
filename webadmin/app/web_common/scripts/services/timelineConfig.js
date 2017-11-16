@@ -82,10 +82,13 @@ var TimelineConfig = {
 
     //Scroll bar marks
     scrollBarMarksColor : [105,135,150],  //$light16
-    scrollBarMarksHeightOffset : 3,
+    scrollBarMarksHeightOffset : 4,
     scrollBarMarksSpacing : 4,
 
+    edgeBufferZone: 0.1, //Uses 10% of the timeline's edges
+
     timeMarkerColor: [43,56,63, 0.9], // Timemarker color //$dark9
+    timeMarkerActiveColor: [43,56,63], //$dark9 with no opacity
     timeMarkerTextColor: [255,255,255],  //$light1
     pointerMarkerColor: [205,215,220, 0.9], // Mouse pointer marker color //$light6
     pointerMarkerTextColor: [43,56,63],  //$dark9
@@ -106,6 +109,8 @@ var TimelineConfig = {
     markerPullDown: 3,
     markerTriangleHeight: 3/100,
     markerLineHeightOffset: 4,
+    markerTimeOffset: 6,
+    markerSideBuffer: 10,
 
     dateFormat: 'd mmmm yyyy', // Timemarker format for date
     timeFormat: 'HH:MM:ss', // Timemarker format for time
@@ -123,10 +128,10 @@ var TimelineConfig = {
     scrollButtonsArrowColor:[255,255,255,0.8],  //$light1
     scrollButtonsArrowActiveColor:[255,255,255,1],  //$light1
     scrollButtonsArrow:{
-        size:20,
-        width:10
+        size:16,
+        width:8
     },
-    scrollButtonMarginBottom: 5,
+    scrollButtonMarginBottom: 4,
     scrollSpeed: 1, // Relative to screen - one click on scrollbar
     scrollButtonSpeed: 0.25, // One click on scrollbutton
     slowScrollSpeed: 0.25,

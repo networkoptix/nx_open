@@ -29,6 +29,7 @@ enum class QnLayoutFlag
     NoTimeline = 0x10,
     SpecialBackground = 0x20,
     FillViewport = 0x40, //< Layout must fill viewport as much as possible
+    MotionWidget = 0x80, //< Layout is a special one, that displayed on a camera motion widget.
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)

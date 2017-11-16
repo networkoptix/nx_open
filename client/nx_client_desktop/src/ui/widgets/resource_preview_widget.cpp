@@ -167,7 +167,7 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
         const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
         const auto paintSize = Geometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
         const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-            size(), QRect(QPoint(), paintSize.toSize()));
+            paintSize.toSize(), QRect(QPoint(), size()));
         painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
         painter.drawPixmap(paintRect, m_preview);
     }
@@ -197,7 +197,7 @@ QSize QnResourcePreviewWidget::sizeHint() const
     if (!m_cachedSizeHint.isValid())
     {
         if (!m_preview.isNull())
-            m_cachedSizeHint = m_preview.size();
+            m_cachedSizeHint = m_preview.size() / m_preview.devicePixelRatio();
 
         if (m_cachedSizeHint.isEmpty())
         {
@@ -229,7 +229,7 @@ bool QnResourcePreviewWidget::hasHeightForWidth() const
 int QnResourcePreviewWidget::heightForWidth(int width) const
 {
     const QSizeF hint = sizeHint();
-    return qRound(hint.height() / hint.width() * width);
+    return qMin(hint.height(), qRound(hint.height() / hint.width() * width));
 }
 
 void QnResourcePreviewWidget::retranslateUi()
@@ -266,7 +266,8 @@ void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 
 void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
 {
-    const auto maxHeight = qMin(maximumHeight(), heightForWidth(maximumWidth()));
+    const auto maxHeight =
+        qMin(maximumHeight(), maximumWidth() / Geometry::aspectRatio(sizeHint()));
     m_preview = QPixmap::fromImage(image.size().height() > maxHeight
         ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
         : image);

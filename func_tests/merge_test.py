@@ -7,7 +7,7 @@ import logging
 import pytest
 from test_utils.utils import bool_to_str, str_to_bool, datetime_utc_now
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.server_rest_api import ServerRestApiError, HttpError
+from test_utils.rest_api import ServerRestApiError, HttpError
 import server_api_data_generators as generator
 
 
@@ -115,16 +115,16 @@ def test_merge_take_remote_settings(one, two):
         auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
 
-def test_merge_cloud_with_local(server_factory, cloud_host, test_system_settings):
+def test_merge_cloud_with_local(server_factory, cloud_account, test_system_settings):
     # Start local server systemName
     # and move it to working state
-    one = server_factory('one', setup_cloud_host=cloud_host, setup_settings=test_system_settings)
+    one = server_factory('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
     two = server_factory('two')
 
     # Merge systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(HttpError) as x_info:
         two.merge_systems(one)
-    assert x_info.value.error_string == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
+    assert x_info.value.reason == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
 
     # Merge systems (takeRemoteSettings = true)
     two.merge_systems(one, take_remote_settings=True)
@@ -133,27 +133,31 @@ def test_merge_cloud_with_local(server_factory, cloud_host, test_system_settings
         two, **test_system_settings['systemSettings'])
 
 
-def test_merge_cloud_systems(server_factory, cloud_host):
-    one = server_factory('one', setup_cloud_host=cloud_host)
-    two = server_factory('two', setup_cloud_host=cloud_host)
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
+def test_merge_cloud_systems(server_factory, cloud_account_factory):
+    cloud_account_1 = cloud_account_factory()
+    cloud_account_2 = cloud_account_factory()
+    one = server_factory('one', setup_cloud_account=cloud_account_1)
+    two = server_factory('two', setup_cloud_account=cloud_account_2)
 
-    # Merge 2 cloud systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(ServerRestApiError) as x_info:
-        two.merge_systems(one)
-    assert x_info.value.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    # Merge 2 cloud systems one way
+    with pytest.raises(HttpError) as x_info:
+        two.merge_systems(one, take_remote_settings=False)
+    assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 
-    with pytest.raises(ServerRestApiError) as x_info:
+    # Merge 2 cloud systems the other way
+    with pytest.raises(HttpError) as x_info:
         two.merge_systems(one, take_remote_settings=True)
-    assert x_info.value.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 
     # Test default (admin) user disabled
     check_admin_disabled(one)
 
 
-def test_cloud_merge_after_disconnect(server_factory, cloud_host, test_system_settings):
+def test_cloud_merge_after_disconnect(server_factory, cloud_account, test_system_settings):
     # Setup cloud and wait new cloud credentials
-    one = server_factory('one', setup_cloud_host=cloud_host, setup_settings=test_system_settings)
-    two = server_factory('two', setup_cloud_host=cloud_host)
+    one = server_factory('one', setup_cloud_account=cloud_account, setup_settings=test_system_settings)
+    two = server_factory('two', setup_cloud_account=cloud_account)
 
     # Check setupCloud's settings on Server1
     check_system_settings(
@@ -200,7 +204,7 @@ def test_merge_resources(server_factory):
     wait_entity_merge_done(one, two, 'GET', 'ec2', 'getCamerasEx', [camera_data['id']])
 
 
-def test_restart_one_server(server_factory, cloud_host):
+def test_restart_one_server(server_factory, cloud_account):
     one = server_factory('one')
     two = server_factory('two')
     one.merge([two])
@@ -213,7 +217,7 @@ def test_restart_one_server(server_factory, cloud_host):
     one.rest_api.ec2.removeResource.POST(id=guid2)
 
     # Start server 2 again and move it from initial to working state
-    two.setup_cloud_system(cloud_host)
+    two.setup_cloud_system(cloud_account)
     two.rest_api.ec2.getUsers.GET()
 
     # Merge systems (takeRemoteSettings = false)

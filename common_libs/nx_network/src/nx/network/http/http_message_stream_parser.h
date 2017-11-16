@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
@@ -18,7 +18,7 @@ public:
     virtual size_t flush() override;
 
     /**
-     * Message is available only within nx::utils::bstream::AbstractByteStreamFilter::processData 
+     * Message is available only within nx::utils::bstream::AbstractByteStreamFilter::processData
      *   call of the next filter.
      * @return previous http message.
      */

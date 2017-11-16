@@ -37,22 +37,24 @@ namespace std {
     }
 #endif
 
-#if defined(__GNUC__) && ATOMIC_INT_LOCK_FREE < 2 //< see bits/exception_ptr.h
-    typedef std::shared_ptr<exception> exception_ptr;
+#if defined(__GNUC__)
+    #if ATOMIC_INT_LOCK_FREE < 2 && !__GNUC_PREREQ(7,0) //< See bits/exception_ptr.h
+        typedef std::shared_ptr<exception> exception_ptr;
 
-    template <typename E>
-    exception_ptr make_exception_ptr(E e) { return std::make_shared<E>(std::move(e)); }
+        template <typename E>
+        exception_ptr make_exception_ptr(E e) { return std::make_shared<E>(std::move(e)); }
 
-    inline
-    exception_ptr current_exception()
-    {
-        try { throw; }
-        catch (std::exception e) { return make_exception_ptr(std::move(e)); }
-        return exception_ptr();
-    }
+        inline
+        exception_ptr current_exception()
+        {
+            try { throw; }
+            catch (std::exception e) { return make_exception_ptr(std::move(e)); }
+            return exception_ptr();
+        }
 
-    inline
-    void rethrow_exception(exception_ptr p) { throw *p; }
+        inline
+        void rethrow_exception(exception_ptr p) { throw *p; }
+    #endif
 #endif
 
 } // namespace std

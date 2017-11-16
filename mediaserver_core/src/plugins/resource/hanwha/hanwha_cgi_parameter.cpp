@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_cgi_parameter.h"
 
 #include <nx/utils/log/assert.h>
@@ -176,6 +178,16 @@ void HanwhaCgiParameter::setFormatInfo(const QString& formatInfo)
     m_formatInfo = formatInfo;
 }
 
+int HanwhaCgiParameter::maxLength() const
+{
+    return m_maxLength;
+}
+
+void HanwhaCgiParameter::setMaxLength(int maxLength)
+{
+    m_maxLength = maxLength;
+}
+
 QStringList HanwhaCgiParameter::possibleValues() const
 {
     return m_possibleValues;
@@ -189,3 +201,5 @@ void HanwhaCgiParameter::setPossibleValues(QStringList possibleValues)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

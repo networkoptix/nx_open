@@ -27,7 +27,7 @@ public:
         const std::string& systemId,
         std::uint64_t* const sequence) override;
 
-    virtual nx::utils::db::DBResult markSystemAsDeleted(
+    virtual nx::utils::db::DBResult markSystemForDeletion(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId) override;
 
@@ -43,14 +43,19 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) override;
 
-    virtual nx::utils::db::DBResult activateSystem(
+    virtual nx::utils::db::DBResult updateSystemStatus(
         nx::utils::db::QueryContext* const queryContext,
-        const std::string& systemId) override;
+        const std::string& systemId,
+        api::SystemStatus systemStatus) override;
 
     virtual nx::utils::db::DBResult fetchSystems(
         nx::utils::db::QueryContext* queryContext,
         const nx::utils::db::InnerJoinFilterFields& filterFields,
         std::vector<data::SystemData>* const systems) override;
+
+    virtual boost::optional<data::SystemData> fetchSystemById(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId) override;
 
     virtual nx::utils::db::DBResult deleteExpiredSystems(
         nx::utils::db::QueryContext* queryContext) override;

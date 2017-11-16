@@ -83,22 +83,19 @@ QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
     QnAbstractMediaDataPtr rez;
 
     if( m_savedMediaPacket )
-    {
         rez = m_savedMediaPacket;
-        m_savedMediaPacket = QnAbstractMediaDataPtr();
-    }
     else
+        rez = ThirdPartyStreamReader::readStreamReader(m_streamReader);
+    m_savedMediaPacket = QnAbstractMediaDataPtr();
+
+    if( rez )
     {
-        rez = ThirdPartyStreamReader::readStreamReader( m_streamReader );
-        if( rez )
+        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
+        if( videoData && !videoData->metadata.isEmpty())
         {
-            QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
-            if( videoData && videoData->motion )
-            {
-                rez = videoData->motion;
-                videoData->motion = QnMetaDataV1Ptr();
-                m_savedMediaPacket = videoData;
-            }
+            rez = videoData->metadata.first();
+            videoData->metadata.pop_front();
+            m_savedMediaPacket = videoData;
         }
     }
 
@@ -134,12 +131,12 @@ QnConstResourceAudioLayoutPtr ThirdPartyArchiveDelegate::getAudioLayout()
     return audioLayout;
 }
 
-void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
+void ThirdPartyArchiveDelegate::setSpeed( qint64 displayTime, double value )
 {
     nxcip::UsecUTCTimestamp actualSelectedTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     m_archiveReader->setReverseMode(
         ++m_cSeq,
-        value,
+        value < 0,
         (displayTime == 0 || displayTime == (qint64)AV_NOPTS_VALUE)
             ? nxcip::INVALID_TIMESTAMP_VALUE
             : displayTime,

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-/** Creates gmock checker that verifies argument type with \a dynamic_cast. */
+/** Creates gmock checker that verifies argument type with dynamic_cast. */
 #define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())
 
 /**
@@ -32,6 +32,16 @@
 #define NX_GTEST_ASSERT_FALSE(expected) do \
 { \
     NX_GTEST_ASSERT_EQ(false, expected); \
+} while (0)
+
+#define NX_GTEST_ASSERT_GT(actual, expected) do \
+{ \
+    NX_GTEST_ASSERT_TRUE(actual > expected); \
+} while (0)
+
+#define NX_GTEST_ASSERT_LT(actual, expected) do \
+{ \
+    NX_GTEST_ASSERT_TRUE(actual < expected); \
 } while (0)
 
 #define NX_GTEST_ASSERT_NO_THROW(expression) do \

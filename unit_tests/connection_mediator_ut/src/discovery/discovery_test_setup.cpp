@@ -24,7 +24,7 @@ PeerInformation::PeerInformation():
 
 bool operator==(const PeerInformation& left, const PeerInformation& right)
 {
-    if (!(static_cast<const BasicInstanceInformation&>(left) == 
+    if (!(static_cast<const BasicInstanceInformation&>(left) ==
           static_cast<const BasicInstanceInformation&>(right)))
     {
         return false;
@@ -49,7 +49,7 @@ void DiscoveryTestSetup::onWebSocketAccepted(
     m_acceptedConnections.push(std::move(connection));
 }
 
-QUrl DiscoveryTestSetup::getUrl() const
+nx::utils::Url DiscoveryTestSetup::getUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(nx_http::kUrlSchemeName)

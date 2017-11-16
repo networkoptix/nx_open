@@ -1,6 +1,8 @@
 #include "iqinvision_resource_searcher.h"
 #if defined(ENABLE_IQE)
 
+#include <nx/network/nettools.h>
+
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource.h"
 #include "utils/common/sleep.h"
@@ -79,7 +81,7 @@ bool QnPlIqResourceSearcher::isIqeModel(const QString& model)
 }
 
 QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
-    const QUrl& url, const QAuthenticator& /*auth*/, bool isSearchAction)
+    const nx::utils::Url& url, const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.

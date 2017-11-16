@@ -38,10 +38,10 @@ public:
 
         std::string accountActivationCodeExpirationTimeoutStr =
             lm("%1s").arg(rand()).toStdString();
-        std::string passwordResetCodeExpirationTimeoutStr = 
+        std::string passwordResetCodeExpirationTimeoutStr =
             lm("%1s").arg(rand()).toStdString();
         std::array<const char*, 4> args = {
-            "-accountManager/accountActivationCodeExpirationTimeout", 
+            "-accountManager/accountActivationCodeExpirationTimeout",
             accountActivationCodeExpirationTimeoutStr.c_str(),
             "-accountManager/passwordResetCodeExpirationTimeout",
             passwordResetCodeExpirationTimeoutStr.c_str()
@@ -93,7 +93,7 @@ protected:
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
-                std::bind(static_cast<F>(&cdb::AccountManager::updateAccount), 
+                std::bind(static_cast<F>(&cdb::AccountManager::updateAccount),
                     m_accountManager.get(), authzInfo, accountData, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }

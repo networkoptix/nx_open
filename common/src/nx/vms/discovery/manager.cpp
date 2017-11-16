@@ -4,6 +4,8 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
@@ -119,7 +121,7 @@ void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
         });
 }
 
-void Manager::checkEndpoint(const QUrl& url, QnUuid expectedId)
+void Manager::checkEndpoint(const nx::utils::Url& url, QnUuid expectedId)
 {
     checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()), std::move(expectedId));
 }

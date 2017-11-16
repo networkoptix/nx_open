@@ -74,7 +74,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     const std::string& accountId)
 {
     QString sqlRequestStr = R"sql(
-        SELECT nonce, intermediate_response as intermediateResponse, 
+        SELECT nonce, intermediate_response as intermediateResponse,
             expiration_time_utc as expirationTime
         FROM system_user_auth_info
         WHERE account_id=:accountId AND system_id=:systemId
@@ -112,7 +112,7 @@ void UserAuthentication::insertUserAuthRecords(
         nx::utils::db::SqlQuery query(*queryContext->connection());
         query.prepare(R"sql(
             INSERT INTO system_user_auth_info(
-                system_id, account_id, nonce,   
+                system_id, account_id, nonce,
                 intermediate_response, expiration_time_utc)
             VALUES(:systemId, :accountId, :nonce, :intermediateResponse, :expirationTime)
         )sql");

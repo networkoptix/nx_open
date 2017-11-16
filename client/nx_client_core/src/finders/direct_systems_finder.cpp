@@ -6,6 +6,7 @@
 #include <network/system_helpers.h>
 #include <network/local_system_description.h>
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>

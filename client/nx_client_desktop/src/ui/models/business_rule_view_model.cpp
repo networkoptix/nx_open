@@ -32,9 +32,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/client/desktop/utils/server_notification_cache.h>
-#include <utils/common/qtimespan.h>
-#include <utils/email/email.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <utils/media/audio_player.h>
 
 using namespace nx;
@@ -681,12 +679,12 @@ int QnBusinessRuleViewModel::aggregationPeriod() const
     return m_aggregationPeriodSec;
 }
 
-void QnBusinessRuleViewModel::setAggregationPeriod(int msecs)
+void QnBusinessRuleViewModel::setAggregationPeriod(int seconds)
 {
-    if (m_aggregationPeriodSec == msecs)
+    if (m_aggregationPeriodSec == seconds)
         return;
 
-    m_aggregationPeriodSec = msecs;
+    m_aggregationPeriodSec = seconds;
     m_modified = true;
 
     emit dataChanged(Field::aggregation | Field::modified);
@@ -1219,22 +1217,21 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getAggregationText() const
 {
-    if (!vms::event::allowsAggregation(m_actionType))
+    if (!allowsAggregation(m_actionType))
         return tr("N/A");
 
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");
 
-    const qint64 kMsecPerSec = 1000;
-    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days;
+    const auto duration = std::chrono::seconds(m_aggregationPeriodSec);
     static const QString kSeparator(L' ');
 
-    const qint64 aggregationPeriodMs = m_aggregationPeriodSec * kMsecPerSec;
-    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(
-        QTimeSpan::kDoNotSuppressSecondUnit,
-        kFormat,
-        QTimeSpan::SuffixFormat::Full,
-        kSeparator);
+    using HumanReadable = client::core::HumanReadable;
+    const auto timespan = HumanReadable::timeSpan(duration,
+        HumanReadable::DaysAndTime,
+        HumanReadable::SuffixFormat::Full,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 
     return tr("Every %1").arg(timespan);
 }

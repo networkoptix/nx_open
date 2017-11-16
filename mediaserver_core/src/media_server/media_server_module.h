@@ -29,6 +29,12 @@ class EventRuleWatcher;
 
 } // namespace metadata
 
+namespace resource {
+
+class SharedContextPool;
+
+} // namespace resource
+
 } // namespace mediaserver
 } // namespace nx
 
@@ -54,12 +60,18 @@ public:
 
     QSettings* roSettings() const;
     QSettings* runTimeSettings() const;
+
+    std::chrono::milliseconds lastRunningTime() const;
+    std::chrono::milliseconds lastRunningTimeBeforeRestart() const;
+    void setLastRunningTime(std::chrono::milliseconds value) const;
+
     MSSettings* settings() const;
     nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::mediaserver::LicenseWatcher* licenseWatcher() const;
     PluginManager* pluginManager() const;
     nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
+    nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
 
 private:
     QnCommonModule* m_commonModule;
@@ -80,6 +92,9 @@ private:
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     QThread* m_metadataManagerPoolThread = nullptr;
+    nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
+
+    mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

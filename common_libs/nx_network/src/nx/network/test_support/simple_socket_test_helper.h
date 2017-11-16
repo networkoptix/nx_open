@@ -33,7 +33,7 @@ inline size_t testClientCount()
 
 static const bool kEnableTestDebugOutput = false;
 template<typename Message>
-static void testDebugOutput(const Message& message)
+static inline void testDebugOutput(const Message& message)
 {
     if (kEnableTestDebugOutput)
         NX_LOG(lm("nx::network::test: %1").arg(message), cl_logDEBUG1);
@@ -491,7 +491,7 @@ void socketTransferAsync(
 }
 
 template<typename Sender, typename Receiver>
-void transferSyncAsync(Sender* sender, Receiver* receiver)
+inline void transferSyncAsync(Sender* sender, Receiver* receiver)
 {
     ASSERT_EQ(sender->AbstractCommunicatingSocket::send(kTestMessage), kTestMessage.size()) << SystemError::getLastOSErrorText().toStdString();
 
@@ -513,7 +513,7 @@ void transferSyncAsync(Sender* sender, Receiver* receiver)
 }
 
 template<typename Sender, typename Receiver>
-static void transferAsyncSync(Sender* sender, Receiver* receiver)
+static inline void transferAsyncSync(Sender* sender, Receiver* receiver)
 {
     nx::utils::promise<void> promise;
     sender->sendAsync(
@@ -532,7 +532,7 @@ static void transferAsyncSync(Sender* sender, Receiver* receiver)
 }
 
 template<typename Sender, typename Receiver>
-static void transferSync(Sender* sender, Receiver* receiver)
+static inline void transferSync(Sender* sender, Receiver* receiver)
 {
     ASSERT_EQ(sender->AbstractCommunicatingSocket::send(kTestMessage), kTestMessage.size()) << SystemError::getLastOSErrorText().toStdString();
 
@@ -541,7 +541,7 @@ static void transferSync(Sender* sender, Receiver* receiver)
 }
 
 template<typename Sender, typename Receiver>
-static void transferAsync(Sender* sender, Receiver* receiver)
+static inline void transferAsync(Sender* sender, Receiver* receiver)
 {
     nx::utils::promise<void> sendPromise;
     sender->sendAsync(
@@ -640,7 +640,7 @@ void socketTransferFragmentation(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    // On localhost TCP connection small packets usually transferred entirely, 
+    // On localhost TCP connection small packets usually transferred entirely,
     // so that we expect the same behavior for all our stream sockets.
     static const Buffer kMessage = utils::random::generate(100);
     static const size_t kTestRuns = utils::TestOptions::applyLoadMode<size_t>(5);
@@ -697,7 +697,7 @@ void socketMultiConnect(
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
     decltype(serverMaker()) server;
 
-    std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor = 
+    std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor =
         [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
         {
             acceptResults.push(code);
@@ -776,13 +776,17 @@ void socketErrorHandling(
     auto server = serverMaker();
 
     SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_TRUE(client->bind(SocketAddress::anyAddress))
+    ASSERT_TRUE(server->bind(SocketAddress::anyAddress))
         << SystemError::getLastOSErrorText().toStdString();
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 
+    ASSERT_EQ(true, server->listen());
+    ASSERT_EQ(SystemError::noError, SystemError::getLastOSErrorCode());
+
     SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_FALSE(server->bind(client->getLocalAddress()));
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::addrInUse);
+
+    ASSERT_TRUE(client->bind(server->getLocalAddress()));
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 
     // Sounds wierd but linux ::listen sometimes returns true...
     //

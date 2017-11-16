@@ -8,7 +8,7 @@
 class QN_EXPORT QnAbstractDataConsumer
 :
     public QnLongRunnable,
-    public QnAbstractDataReceptor
+    public QnAbstractMediaDataReceptor
 {
     Q_OBJECT
 

@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_advanced_parameter_info.h"
 #include "hanwha_utils.h"
 
@@ -19,6 +21,7 @@ static const QString kGroupAux = lit("group");
 static const QString kGroupLeadAux = lit("groupLead");
 static const QString kGropupIncludeAux = lit("groupInclude");
 static const QString kStreamsToReopenAux = lit("streamsToReopen");
+static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -48,7 +51,26 @@ Qn::ConnectionRole fromString<Qn::ConnectionRole>(const QString& str)
     return Qn::ConnectionRole::CR_Default;
 }
 
-} // namespace nx
+} // namespace
+
+const std::map<QString, QString HanwhaAdavancedParameterInfo::*>
+HanwhaAdavancedParameterInfo::m_stringAuxes = {
+    {kSupportAux, &HanwhaAdavancedParameterInfo::m_supportAttribute},
+    {kRangeAux, &HanwhaAdavancedParameterInfo::m_rangeParameter},
+    {kResourceProperty, &HanwhaAdavancedParameterInfo::m_resourceProperty},
+    {kSortingAux, &HanwhaAdavancedParameterInfo::m_sorting},
+    {kGroupAux, &HanwhaAdavancedParameterInfo::m_group},
+    {kGropupIncludeAux, &HanwhaAdavancedParameterInfo::m_groupIncludeCondition},
+    {kGroupLeadAux, &HanwhaAdavancedParameterInfo::m_group}
+};
+
+const std::map<QString, bool HanwhaAdavancedParameterInfo::*>
+HanwhaAdavancedParameterInfo::m_boolAuxes = {
+    {kSpecificAux, &HanwhaAdavancedParameterInfo::m_isSpecific},
+    {kNoChannelAux, &HanwhaAdavancedParameterInfo::m_channelIndependent},
+    {kCodecAux, &HanwhaAdavancedParameterInfo::m_isCodecDependent},
+    {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels}
+};
 
 HanwhaAdavancedParameterInfo::HanwhaAdavancedParameterInfo(
     const QnCameraAdvancedParameter& parameter)
@@ -80,12 +102,6 @@ QString HanwhaAdavancedParameterInfo::rangeParameter() const
 {
     if (!m_rangeParameter.isEmpty())
         return m_rangeParameter;
-
-    qDebug() << "Range parameter: " << lit("%1/%2/%3/%4")
-        .arg(m_cgi)
-        .arg(m_submenu)
-        .arg(m_updateAction)
-        .arg(m_parameterName);
 
     return lit("%1/%2/%3/%4")
         .arg(m_cgi)
@@ -169,6 +185,11 @@ QString HanwhaAdavancedParameterInfo::parameterValue() const
     return m_parameterValue;
 }
 
+bool HanwhaAdavancedParameterInfo::shouldAffectAllChannels() const
+{
+    return m_shouldAffectAllChannels;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
@@ -207,32 +228,19 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
         const auto auxName = split[0].trimmed();
         const auto auxValue = split[1].trimmed();
 
-        if (auxName == kSupportAux)
-            m_supportAttribute = auxValue;
-        else if (auxName == kRangeAux)
-            m_rangeParameter = auxValue;
-        else if (auxName == kSpecificAux)
-            m_isSpecific = fromString<bool>(auxValue);
-        else if (auxName == kNoChannelAux)
-            m_channelIndependent = fromString<bool>(auxValue);
-        else if (auxName == kProfileAux)
+        if (m_stringAuxes.find(auxName) != m_stringAuxes.cend())
+            this->*m_stringAuxes.at(auxName) = auxValue;
+
+        if (m_boolAuxes.find(auxName) != m_boolAuxes.cend())
+            this->*m_boolAuxes.at(auxName) = fromString<bool>(auxValue);
+
+        if (auxName == kProfileAux)
             m_profile = fromString<Qn::ConnectionRole>(auxValue);
-        else if (auxName == kCodecAux)
-            m_isCodecDependent = fromString<bool>(auxValue);
-        else if (auxName == kResourceProperty)
-            m_resourceProperty = auxValue;
-        else if (auxName == kSortingAux)
-            m_sorting = auxValue;
-        else if (auxName == kGroupAux)
-            m_group = auxValue;
-        else if (auxName == kGropupIncludeAux)
-            m_groupIncludeCondition = auxValue;
-        else if (auxName == kGroupLeadAux)
-        {
-            m_group = auxValue;
+
+        if (auxName == kGroupLeadAux)
             m_isGroupLead = true;
-        }
-        else if (auxName == kStreamsToReopenAux)
+
+        if (auxName == kStreamsToReopenAux)
         {
             m_streamsToReopen.clear();
             const auto split = auxValue.split(L',');
@@ -282,3 +290,6 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
+

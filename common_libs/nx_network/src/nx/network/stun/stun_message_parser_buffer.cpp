@@ -95,7 +95,7 @@ bool MessageParserBuffer::ensure(std::size_t count, void* buffer)
         {
             for (std::size_t i = m_position; i < (std::size_t)m_buffer.size(); ++i)
                 m_tempBuffer->push_back(m_buffer.at((int)i));
-            // Modify the position pointer here 
+            // Modify the position pointer here
             m_position = m_buffer.size();
         }
         return false;
@@ -117,7 +117,7 @@ bool MessageParserBuffer::ensure(std::size_t count, void* buffer)
                 return true;
             }
         }
-        // 2. Finish the buffer feeding 
+        // 2. Finish the buffer feeding
         memcpy(
             reinterpret_cast<char*>(buffer) + pos,
             m_buffer.constData() + m_position,

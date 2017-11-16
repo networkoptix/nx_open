@@ -72,7 +72,7 @@ public:
     using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTransactionDataObject>()>;
 
     static std::unique_ptr<AbstractTransactionDataObject> create();
-    
+
     template<typename CustomDataObjectType>
     static void setDataObjectType()
     {

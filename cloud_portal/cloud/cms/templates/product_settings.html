@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls admin_static %}
+{% load static %}
+
+{% block extrahead %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+    {{ block.super }}
+{% endblock %}
+
+{% block content%}
+<div>
+    <p><a href="{% url 'download_package' product.name %}" download>Download package (zip)</a></p>
+    <p><a href="{% url 'download_package' product.name %}?draft" download>Download package draft (zip)</a></p>
+</div>
+<form id="productForm" action="{% url 'product_settings' product.id %}"
+      method="post" class="aligned" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-row">
+            {{ field.label_tag }}
+            <div id="{{field.label}}" style="display:inline-block;">
+                {{ field }}
+                
+                {% if field.help_text %}
+                <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="submit-row">
+        <button class="btn btn-sm btn-primary" type="submit" name="Upload">Upload</button>
+    </div>
+
+</form>
+{% endblock%}

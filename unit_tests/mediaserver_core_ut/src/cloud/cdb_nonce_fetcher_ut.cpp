@@ -4,8 +4,8 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 
-#include <cloud/cloud_connection_manager.h>
-#include <network/auth/cdb_nonce_fetcher.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cdb_nonce_fetcher.h>
 
 namespace nx {
 namespace vms {
@@ -15,7 +15,7 @@ namespace test {
 namespace {
 
 class DummyCloudConnectionManager:
-    public AbstractCloudConnectionManager
+    public nx::vms::cloud_integration::AbstractCloudConnectionManager
 {
 public:
     DummyCloudConnectionManager(std::string cloudSystemId):
@@ -65,7 +65,7 @@ private:
 };
 
 class DummyCloudUserInfoPool:
-    public AbstractCloudUserInfoPool
+    public nx::vms::cloud_integration::AbstractCloudUserInfoPool
 {
 public:
     DummyCloudUserInfoPool(std::string cloudSystemId):
@@ -104,7 +104,7 @@ private:
 };
 
 class DummyNonceProvider:
-    public AbstractNonceProvider
+    public nx::vms::auth::AbstractNonceProvider
 {
 public:
     virtual QByteArray generateNonce() override
@@ -170,7 +170,7 @@ private:
     DummyCloudConnectionManager m_cloudConnectionManager;
     DummyCloudUserInfoPool m_cloudUserInfoPool;
     DummyNonceProvider m_nonceProvider;
-    ::CdbNonceFetcher m_cdbNonceFetcher;
+    nx::vms::cloud_integration::CdbNonceFetcher m_cdbNonceFetcher;
     QByteArray m_prevNonce;
 };
 

@@ -98,7 +98,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (Restart, "restart")
     (ConfigureObject, "configure")
     (PingSystemObject, "pingSystem")
-    (GetNonceObject, "getNonce")
+    (GetNonceObject, "getRemoteNonce")
     (RecordingStatsObject, "recStats")
     (AuditLogObject, "auditLog")
     (MergeSystemsObject, "mergeSystems")
@@ -980,7 +980,7 @@ int QnMediaServerConnection::configureAsync(
 }
 
 int QnMediaServerConnection::pingSystemAsync(
-    const QUrl& url, const QString& getKey, QObject* target, const char* slot)
+    const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot)
 {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
@@ -990,7 +990,7 @@ int QnMediaServerConnection::pingSystemAsync(
         params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
 
-int QnMediaServerConnection::getNonceAsync(const QUrl& url, QObject* target, const char* slot)
+int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot)
 {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
@@ -1020,7 +1020,7 @@ int QnMediaServerConnection::getAuditLogAsync(
 }
 
 int QnMediaServerConnection::mergeSystemAsync(
-    const QUrl& url, const QString& getKey, const QString& postKey, bool ownSettings,
+    const nx::utils::Url& url, const QString& getKey, const QString& postKey, bool ownSettings,
     bool oneServer, bool ignoreIncompatible, QObject* target, const char* slot)
 {
     QnRequestParamList params;

@@ -82,4 +82,8 @@ angular.module('cloudApp')
                 account.setEmail($scope.account.email);
             }
         });
+
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
     }]);

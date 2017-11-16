@@ -1,17 +1,10 @@
-/**********************************************************
-* Jan 18, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connection_requested_event_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-ConnectionRequestedEvent::ConnectionRequestedEvent()
-:
+ConnectionRequestedEvent::ConnectionRequestedEvent():
     StunIndicationData(kMethod),
     connectionMethods(0),
     cloudConnectVersion(kCurrentCloudConnectVersion),
@@ -50,6 +43,6 @@ bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
     return ret;
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

@@ -12,8 +12,8 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/utils/validators.h>
 
-#include <nx/client/desktop/ui/common/column_remap_proxy_model.h>
-#include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
+#include <nx/client/desktop/common/models/column_remap_proxy_model.h>
+#include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
 
 class QnUuid;

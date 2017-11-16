@@ -454,6 +454,9 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* w) override
     {
+        if (m_target && m_target->options().testFlag(QnResourceWidget::InvisibleWidgetOption))
+            return;
+
         if (m_target && m_target->options().testFlag(QnResourceWidget::AnalyticsModeMaster))
         {
             const QRectF masterItemGeometry = m_target->item()->combinedGeometry();

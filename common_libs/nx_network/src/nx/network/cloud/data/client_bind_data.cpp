@@ -11,24 +11,32 @@ ClientBindRequest::ClientBindRequest():
 
 void ClientBindRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::extension::attrs::PeerId>(std::move(originatingPeerID));
-    message->newAttribute<stun::extension::attrs::TcpReverseEndpointList>(std::move(tcpReverseEndpoints));
+    message->newAttribute<stun::extension::attrs::PeerId>(
+        std::move(originatingPeerID));
+    message->newAttribute<stun::extension::attrs::TcpReverseEndpointList>(
+        std::move(tcpReverseEndpoints));
 }
 
 bool ClientBindRequest::parseAttributes(const nx::stun::Message& message)
 {
     return
-        readStringAttributeValue<stun::extension::attrs::PeerId>(message, &originatingPeerID) &&
-        readAttributeValue<stun::extension::attrs::TcpReverseEndpointList>(message, &tcpReverseEndpoints);
+        readStringAttributeValue<stun::extension::attrs::PeerId>(
+            message, &originatingPeerID) &&
+        readAttributeValue<stun::extension::attrs::TcpReverseEndpointList>(
+            message, &tcpReverseEndpoints);
 
 }
+
+//-------------------------------------------------------------------------------------------------
 
 ClientBindResponse::ClientBindResponse():
     StunResponseData(kMethod)
 {
 }
 
-typedef stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
+typedef stun::extension::attrs::StringAttribute<
+    stun::extension::attrs::tcpConnectionKeepAlive
+> TcpKeepAlive;
 
 void ClientBindResponse::serializeAttributes(nx::stun::Message* const message)
 {
@@ -41,7 +49,8 @@ bool ClientBindResponse::parseAttributes(const nx::stun::Message& message)
     nx::String keepAliveOptions;
     if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
     {
-        tcpConnectionKeepAlive = KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
+        tcpConnectionKeepAlive =
+            KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
         return (bool)tcpConnectionKeepAlive; //< Empty means parsing has failed.
     }
     else

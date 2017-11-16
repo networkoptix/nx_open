@@ -9,7 +9,7 @@
 #ifdef ENABLE_THIRD_PARTY
 
 #include <core/dataprovider/abstract_media_stream_provider.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <core/resource/resource_media_layout.h>
 
 #include "third_party_resource.h"

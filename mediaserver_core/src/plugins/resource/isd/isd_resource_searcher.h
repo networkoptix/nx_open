@@ -7,6 +7,7 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_search_handler.h>
+#include <nx/utils/url.h>
 
 class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
@@ -26,7 +27,7 @@ public:
     virtual QnResourceList findResources(void) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
@@ -46,19 +47,20 @@ private:
         QnResourceList& result );
 
     QList<QnResourcePtr> checkHostAddrInternal(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth);
 
     bool testCredentials(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth);
 
     void cleanupSpaces(QString& rowWithSpaces) const;
 
     bool isDwOrIsd(const QString& vendorName, const QString& model) const;
 
-    QnResourcePtr processMdnsResponse (
-        const QnMdnsListener::ConsumerData& mdnsResponse,
+    QnResourcePtr processMdnsResponse(
+        const QString& mdnsResponse,
+        const QString& mdnsRemoteAddress,
         const QnResourceList& alreadyFoundResources);
 
 private:

@@ -323,7 +323,6 @@ private:
         }
     )};
 
-    QnStaticCommonModule m_staticCommonModule;
     QnCommonModule m_commonModule{/*clientMode*/ false, nx::core::access::Mode::direct};
     MockQnHttpConnectionListener listener{&m_commonModule};
     QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };

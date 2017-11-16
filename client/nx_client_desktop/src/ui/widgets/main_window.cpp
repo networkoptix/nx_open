@@ -39,6 +39,7 @@
 #include <ui/help/help_topics.h>
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -46,7 +47,8 @@
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
+#include <nx/client/desktop/export/workbench/workbench_export_handler.h>
+#include <nx/client/desktop/legacy/legacy_workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
@@ -58,8 +60,8 @@
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 #include <ui/workbench/handlers/workbench_text_overlays_handler.h>
+#include <nx/client/desktop/analytics/analytics_action_handler.h>
 #include <nx/client/desktop/radass/radass_action_handler.h>
-#include <ui/workbench/handlers/workbench_analytics_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -101,8 +103,8 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
-#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
 #include <nx/client/core/utils/geometry.h>
+
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
@@ -246,7 +248,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
-    context->instance<QnWorkbenchExportHandler>();
+    context->instance<WorkbenchExportHandler>();
+    context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
@@ -259,8 +262,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
     context->instance<workbench::LayoutToursHandler>();
-    context->instance<nx::client::desktop::RadassActionHandler>();
-    context->instance<QnWorkbenchAnalyticsHandler>();
+    context->instance<RadassActionHandler>();
+    context->instance<AnalyticsActionHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -368,7 +371,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isActiveXMode())
+    if (!qnRuntime->isActiveXMode() && !qnRuntime->isProfilerMode())
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
@@ -376,8 +379,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
          * * double buffering is disabled in drivers or in our program
          * Workaround must be disabled in activeX mode.
          */
-         QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-         Q_UNUSED(vsyncWorkaround);
+        auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+        Q_UNUSED(vsyncWorkaround);
     }
 
     updateWidgetsVisibility();

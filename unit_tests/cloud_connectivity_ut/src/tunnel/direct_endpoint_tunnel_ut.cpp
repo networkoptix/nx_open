@@ -1,9 +1,15 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_tunnel.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
 namespace nx {

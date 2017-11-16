@@ -13,7 +13,7 @@
 namespace nx_http {
 
 /**
- * If AbstractMsgBodySource::contentLength returns existing value then exactly 
+ * If AbstractMsgBodySource::contentLength returns existing value then exactly
  * specified number of bytes is fetched using AbstractMsgBodySource::readAsync.
  * Otherwise, data is fetched until empty buffer is received or error occurs.
  */

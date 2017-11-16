@@ -2,7 +2,7 @@
 
 #include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <utils/common/request_param.h>
 #include <common/common_module_aware.h>
 #include <camera/video_camera.h>
@@ -23,8 +23,15 @@ public:
         Stop
     };
 
-    bool startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString& error, const QnRequestParams &params);
-    bool startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider, const QnUuid& resourceId, Action action, QString &error);
+    bool startStopStreamToResource(const QString& sourceId,
+        const QnUuid& resourceId,
+        Action action,
+        QString& error,
+        const QnRequestParams& params);
+    bool startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider,
+        const QnUuid& resourceId,
+        Action action,
+        QString& error);
 
     QnAbstractStreamDataProviderPtr getActionDataProvider(const nx::vms::event::AbstractActionPtr& action);
     bool destroyActionDataProvider(const nx::vms::event::AbstractActionPtr& action);
@@ -32,7 +39,7 @@ public:
 private:
     QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
-    QnVideoCameraPtr getTransmitSource(const QnUuid& clientId) const;
+    QnVideoCameraPtr getTransmitSource(const QString& sourceId) const;
     QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;

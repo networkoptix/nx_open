@@ -5,6 +5,8 @@
 #include <nx/utils/settings.h>
 #include <nx/utils/basic_service_settings.h>
 
+#include <nx/cloud/relaying/settings.h>
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -21,23 +23,19 @@ struct Http
     Http();
 };
 
-struct ListeningPeer
-{
-    int recommendedPreemptiveConnectionCount;
-    int maxPreemptiveConnectionCount;
-    std::chrono::milliseconds disconnectedPeerTimeout;
-    std::chrono::milliseconds takeIdleConnectionTimeout;
-    std::chrono::milliseconds internalTimerPeriod;
-    KeepAliveOptions tcpKeepAlive;
-
-    ListeningPeer();
-};
-
 struct ConnectingPeer
 {
     std::chrono::milliseconds connectSessionIdleTimeout;
 
     ConnectingPeer();
+};
+
+struct CassandraConnection
+{
+    std::string host;
+    std::chrono::milliseconds delayBeforeRetryingInitialConnect;
+
+    CassandraConnection();
 };
 
 class Settings:
@@ -54,22 +52,21 @@ public:
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;
 
-    const ListeningPeer& listeningPeer() const;
+    const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
-    const QString& cassandraHost() const;
+    const CassandraConnection& cassandraConnection() const;
 
 private:
     utils::log::Settings m_logging;
     Http m_http;
-    ListeningPeer m_listeningPeer;
+    relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
-    QString m_cassandraHost;
+    CassandraConnection m_cassandraConnection;
 
     virtual void loadSettings() override;
 
     void loadHttp();
-    void loadListeningPeer();
     void loadConnectingPeer();
     void loadCassandraHost();
 };

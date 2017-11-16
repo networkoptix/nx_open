@@ -1,3 +1,6 @@
+INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/
+INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
+
 !android:!mac {
     QT += zlib-private
 }

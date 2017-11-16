@@ -18,10 +18,10 @@ namespace rest {
 /**
  * Usage example:
  * - Register path "/account/{accountId}/systems".
- * - PathMatcher::match("/account/vpupkin/systems") matches to the registered path 
+ * - PathMatcher::match("/account/vpupkin/systems") matches to the registered path
  *   and adds "vpupkin" to pathParams.
  *
- * NOTE: Empty parameter is not matched. 
+ * NOTE: Empty parameter is not matched.
  *   E.g., PathMatcher::match("/account//systems") returns boost::none.
  */
 template<typename Mapped>

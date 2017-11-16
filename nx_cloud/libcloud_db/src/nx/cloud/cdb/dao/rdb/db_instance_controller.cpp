@@ -10,12 +10,6 @@ namespace cdb {
 namespace dao {
 namespace rdb {
 
-namespace {
-
-constexpr auto kDbRepeatedConnectionAttemptDelay = std::chrono::seconds(5);
-
-} // namespace
-
 DbInstanceController::DbInstanceController(
     const nx::utils::db::ConnectionOptions& dbConnectionOptions,
     boost::optional<unsigned int> dbVersionToUpdateTo)
@@ -92,6 +86,9 @@ void DbInstanceController::initializeStructureMigration()
             m_userAuthRecordsMigrationNeeded = true;
             return nx::utils::db::DBResult::ok;
         });
+
+    // Version 17.2.
+    dbStructureUpdater().addUpdateScript(db::kAddBeingMergedState);
 }
 
 } // namespace rdb

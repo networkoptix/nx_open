@@ -22,7 +22,7 @@ namespace SystemError
 #endif
     }
 
-    //!Returns text description of \a errorCode
+    //!Returns text description of errorCode
     QString toString( ErrorCode errorCode )
     {
 #ifdef _WIN32

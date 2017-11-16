@@ -316,7 +316,7 @@ protected:
         m_threads.resize(threadCount);
         for (auto& thread: m_threads)
         {
-            std::vector<VmsTransactionLogCache::TranId> transactionsForThread = 
+            std::vector<VmsTransactionLogCache::TranId> transactionsForThread =
                 selectRandomTransactions(transactionPerThreadCount);
             thread = nx::utils::thread(
                 std::bind(&FtOutgoingTransactionSorter::testThreadMain, this,

@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "connection_mediator_url_fetcher.h"
+
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
 static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 
@@ -82,13 +84,13 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
     return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
-void MediatorConnector::mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl)
+void MediatorConnector::mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl)
 {
     QnMutexLocker lock(&m_mutex);
     m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);
 }
 
-void MediatorConnector::mockupMediatorUrl(const QUrl& mediatorUrl)
+void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -165,7 +167,7 @@ void MediatorConnector::stopWhileInAioThread()
 void MediatorConnector::fetchEndpoint()
 {
     m_mediatorUrlFetcher->get(
-        [this](nx_http::StatusCode::Value status, QUrl tcpUrl, QUrl udpUrl)
+        [this](nx_http::StatusCode::Value status, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
         {
             if (status != nx_http::StatusCode::ok)
             {

@@ -253,7 +253,7 @@ private:
     QElapsedTimer m_monotonicClock;
     // TODO #ak: use cyclic array here to minimize allocations
     /**
-     * @note This variable can be accessed within aio thread only.
+     * NOTE: This variable can be accessed within aio thread only.
      */
     std::deque<SocketAddRemoveTask> m_postedCalls;
     std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;

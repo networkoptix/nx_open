@@ -5,23 +5,24 @@
 #include <map>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/api/analytics/supported_events.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 #include <utils/common/value_cache.h>
+#include <common/common_globals.h>
+#include <api/model/api_ioport_data.h>
 
-#include "media_resource.h"
-#include "motion_window.h"
-#include "core/misc/schedule_task.h"
-#include "network_resource.h"
-#include "common/common_globals.h"
-#include <nx/vms/event/event_fwd.h>
+#include <core/dataconsumer/audio_data_transmitter.h>
+#include <core/misc/schedule_task.h>
 
-#include "api/model/api_ioport_data.h"
-#include <nx/api/analytics/supported_events.h>
-
-#include "core/dataconsumer/audio_data_transmitter.h"
+#include <core/resource/media_resource.h>
+#include <core/resource/motion_window.h>
+#include <core/resource/network_resource.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/combined_sensors_description.h>
-#include "media_stream_capability.h"
+#include <core/resource/media_stream_capability.h>
+#include <core/dataprovider/live_stream_params.h>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -117,6 +118,10 @@ public:
     /** Returns edge, analog or digital class */
     virtual Qn::LicenseType licenseType() const;
 
+    /**
+     * Returns true if all cameras in a same camera group should share 1 license
+     */
+    bool isSharingLicenseInGroup() const;
 
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
@@ -163,6 +168,8 @@ public:
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
+    virtual QString getSharedId() const;
+
     void setScheduleDisabled(bool value);
     bool isScheduleDisabled() const;
 
@@ -199,6 +206,8 @@ public:
     void setVendor(const QString &value);
 
     bool isGroupPlayOnly() const;
+
+    bool needsToChangeDefaultPassword() const;
 
     //!Implementation of QnMediaResource::toResource
     virtual const QnResource* toResource() const override;
@@ -301,6 +310,19 @@ public:
     virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
 
+    virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
+
+    /**
+     * Update user password at the camera. This function is able to change password for existing user only.
+     */
+    virtual bool setCameraCredentialsSync(
+        const QAuthenticator& auth, QString* outErrorString = nullptr);
+
+    /**
+     * Returns true if camera credential was auto detected by media server.
+     */
+    bool isDefaultAuth() const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -316,8 +338,10 @@ signals:
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
+    void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
+    void capabilitiesChanged(const QnResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -382,6 +406,8 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
+
+    virtual Qn::LicenseType calculateLicenseType() const;
 protected:
 #ifdef ENABLE_DATA_PROVIDERS
     QnAudioTransmitterPtr m_audioTransmitter;
@@ -396,13 +422,13 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    mutable Qn::LicenseType m_cachedLicenseType;
+    CachedValue<Qn::LicenseType> m_cachedLicenseType;
     CachedValue<bool> m_cachedHasDualStreaming2;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
-    mutable CachedValue<bool> m_cachedIsIOModule;
+    CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;

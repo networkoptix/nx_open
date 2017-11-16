@@ -42,10 +42,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
-        var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
-        var nativeResolutions = ['Auto', 'High', 'Low'];
-        var onlyHiResolution =  ['Auto', 'High'];
-        var onlyLoResolution =  ['Auto', 'Low'];
+        var transcodingResolutions = [L.common.resolution.auto, '1080p', '720p', '640p', '320p', '240p'];
 
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
@@ -137,14 +134,14 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
             if(!$scope.activeCamera){
                 $scope.activeResolution = 'Auto';
-                $scope.availableResolutions = ['Auto'];
+                $scope.availableResolutions = [L.common.resolution.auto];
             }
             //1. Does browser and server support webm?
             if($scope.player != 'webm'){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
-                var streams = ['Auto'];
+                var streams = [L.common.resolution.auto];
                 if($scope.activeCamera) {
                     var availableFormats = _.filter($scope.activeCamera.mediaStreams, function (stream) {
                         return stream.transports.indexOf('hls') > 0;
@@ -154,11 +151,11 @@ angular.module('nxCommon').controller('ViewCtrl',
                     for (var i = 0; i < availableFormats.length; i++) {
                         if (availableFormats[i].encoderIndex == 0) {
                             if (!( window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera) )) {
-                                streams.push('High');
+                                streams.push(L.common.resolution.high);
                             }
                         }
                         if (availableFormats[i].encoderIndex == 1) {
-                            streams.push('Low');
+                            streams.push(L.common.resolution.low);
                         }
                     }
                 }
@@ -261,7 +258,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' },
                 { src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt, type: mimeTypes.jpeg, transport:'preview'}
             ],function(src){
-                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
+                return formatSupported(src.transport,false);
             });
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
@@ -336,8 +333,32 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
-                screenfull.request($('.videowindow').get(0));
+                screenfull.request($('.view-panel').get(0));
             }
+        };
+
+        if ($scope.enableFullScreen) {
+            screenfull.onchange(function(){
+                $scope.isFullscreen = screenfull.isFullscreen;
+            });
+        }
+
+        switch(window.jscd.browser){
+            case "Safari":
+            case "Microsoft Internet Explorer":
+            case "Microsoft Edge":
+                $scope.enableFullscreenNotification = true;
+                break;
+            default:
+                $scope.enableFullscreenNotification = false;
+        }
+
+        $scope.closeFullscreen = function(){
+            screenfull.exit();
+        }
+
+        $scope.showCamerasPanel = function(){
+            $scope.showCameraPanel=true;
         };
 
         document.addEventListener('MSFullscreenChange',function(){ // IE only
@@ -399,9 +420,11 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
 
             // User server time offset of current server (server camera belongs to)
-            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-            if(serverOffset){
-                timeManager.setOffset(serverOffset);
+            if($scope.activeCamera){
+                var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
+                if(serverOffset){
+                    timeManager.setOffset(serverOffset);
+                }
             }
 
             $scope.showCameraPanel = !$scope.activeCamera;

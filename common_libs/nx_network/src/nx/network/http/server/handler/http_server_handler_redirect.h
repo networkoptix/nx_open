@@ -10,7 +10,7 @@ class NX_NETWORK_API Redirect:
     public AbstractHttpRequestHandler
 {
 public:
-    Redirect(const QUrl& actualLocation);
+    Redirect(const nx::utils::Url& actualLocation);
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
@@ -20,7 +20,7 @@ public:
         nx_http::RequestProcessedHandler completionHandler) override;
 
 private:
-    const QUrl m_actualLocation;
+    const nx::utils::Url m_actualLocation;
 };
 
 } // namespace handler

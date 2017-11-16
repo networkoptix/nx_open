@@ -62,13 +62,36 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     const QnConnectionInfo& connectionInfo)
 {
     static const QString kRowMarker = lit(" - ");
-    QString versionDetails =
-        kRowMarker
-        + tr("Client version: %1.").arg(qnStaticCommon->engineVersion().toString())
-        + L'\n'
-        + kRowMarker
-        + tr("Server version: %1.").arg(connectionInfo.version.toString())
-        + L'\n';
+    QString versionDetails;
+
+    auto addRow = [&versionDetails](const QString& text)
+        {
+            versionDetails += kRowMarker + text + L'\n';
+        };
+
+
+    addRow(tr("Client version: %1.").arg(qnStaticCommon->engineVersion().toString()));
+
+    if (qnRuntime->isDevMode())
+    {
+        addRow(lit("Protocol: %1, Cloud: %2")
+            .arg(QnAppInfo::ec2ProtoVersion())
+            .arg(nx::network::AppInfo::defaultCloudHost()));
+    }
+
+    addRow(tr("Server version: %1.").arg(connectionInfo.version.toString()));
+
+    if (qnRuntime->isDevMode())
+    {
+        addRow(lit("Brand: %1, Customization: %2")
+            .arg(connectionInfo.brand)
+            .arg(connectionInfo.customization));
+        addRow(lit("Protocol: %1, Cloud: %2")
+            .arg(connectionInfo.nxClusterProtoVersion)
+            .arg(connectionInfo.cloudHost));
+    }
+
+
 
     switch (result)
     {
@@ -367,7 +390,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return Qn::IncompatibleVersionConnectionResult;
 
-        QUrl serverUrl = connectionInfo.ecUrl;
+        nx::utils::Url serverUrl = connectionInfo.ecUrl;
         if (serverUrl.scheme().isEmpty())
         {
             serverUrl.setScheme(connectionInfo.allowSslConnections

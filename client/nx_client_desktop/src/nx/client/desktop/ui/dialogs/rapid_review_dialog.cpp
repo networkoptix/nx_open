@@ -10,7 +10,7 @@
 #include <ui/style/helper.h>
 
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -21,9 +21,14 @@ const int kInfoFontPixelSize = 16;
 
 QString durationMsToString(qint64 durationMs)
 {
+    using HumanReadable = nx::client::core::HumanReadable;
+
     static const QString kSeparator(L' ');
-    return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds,
-        QTimeSpan::SuffixFormat::Short, kSeparator);
+
+    return HumanReadable::timeSpan(std::chrono::milliseconds(durationMs),
+        HumanReadable::DaysAndTime | HumanReadable::Milliseconds,
+        HumanReadable::SuffixFormat::Short,
+        kSeparator);
 }
 
 } // namespace

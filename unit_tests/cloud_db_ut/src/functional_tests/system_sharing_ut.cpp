@@ -9,15 +9,66 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
-namespace {
+class SystemSharingNew:
+    public CdbFunctionalTest
+{
+    using base_type = CdbFunctionalTest;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_ownerAccount = addActivatedAccount2();
+        m_otherAccount = addActivatedAccount2();
+    }
+
+    void givenSystemSharedToMultipleAccount()
+    {
+        m_system = addRandomSystemToAccount(m_ownerAccount);
+        shareSystemEx(
+            m_ownerAccount,
+            m_system,
+            m_otherAccount.email,
+            api::SystemAccessRole::viewer);
+    }
+
+    void whenRequestUserListUsingSystemCredentials()
+    {
+        m_prevResult = getSystemSharings(m_system.id, m_system.authKey, &m_systemUsers);
+    }
+
+    void thenUserListIsReturned()
+    {
+        ASSERT_EQ(api::ResultCode::ok, m_prevResult);
+        ASSERT_EQ(2U, m_systemUsers.size());
+    }
+
+private:
+    AccountWithPassword m_ownerAccount;
+    AccountWithPassword m_otherAccount;
+    api::SystemData m_system;
+    api::ResultCode m_prevResult = api::ResultCode::ok;
+    std::vector<api::SystemSharingEx> m_systemUsers;
+};
+
+TEST_F(SystemSharingNew, system_credentials_can_be_used_to_get_user_list)
+{
+    givenSystemSharedToMultipleAccount();
+    whenRequestUserListUsingSystemCredentials();
+    thenUserListIsReturned();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class SystemSharing:
     public CdbFunctionalTest
 {
 };
-
-} // namespace
 
 TEST_F(SystemSharing, get_users)
 {
@@ -230,16 +281,16 @@ TEST_F(SystemSharing, get_users)
     {
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
-            getSystemSharings(system1.id, system1.authKey, &sharings),
-            api::ResultCode::ok);
+            api::ResultCode::ok,
+            getSystemSharings(system1.id, system1.authKey, &sharings));
         ASSERT_EQ(2U, sharings.size());
 
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account1.email, system1.id),
-            api::SystemAccessRole::owner);
+            api::SystemAccessRole::owner,
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account2.email, system1.id),
-            api::SystemAccessRole::viewer);
+            api::SystemAccessRole::viewer,
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 }
 
@@ -1190,7 +1241,7 @@ protected:
     void whenUserRequestedThatSystemDetails()
     {
         api::SystemDataEx systemData;
-        m_previousResultCode = 
+        m_previousResultCode =
             getSystem(m_userAccount.email, m_userAccount.password, m_system.id, &systemData);
     }
 
@@ -1233,5 +1284,6 @@ TEST_F(SystemSharingDisabledUser, user_get_empty_list_if_he_is_disabled_in_the_o
     thenResponseShouldBeEmpty();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

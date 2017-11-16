@@ -14,6 +14,7 @@
 #include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
+#include <nx/utils/log/log_main.h>
 
 
 static QByteArray ENCODE_PREFIX("BASE64_");
@@ -265,10 +266,16 @@ Ptz::Capabilities QnOnvifPtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnOnvifPtzController::stopInternal() {
+bool QnOnvifPtzController::stopInternal()
+{
     QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
+    if (ptzUrl.isEmpty())
+    {
+        NX_WARNING(
+            this,
+            lm("Can't execute PTZ stopInternal for resource '%1' because of no PTZ url.").arg(m_resource->getName()));
         return false;
+    }
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -293,8 +300,13 @@ bool QnOnvifPtzController::stopInternal() {
 
 bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
+    if (ptzUrl.isEmpty())
+    {
+        NX_WARNING(
+            this,
+            lm("Can't execute PTZ moveInternal for resource '%1' because of no PTZ url.").arg(m_resource->getName()));
         return false;
+    }
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -325,7 +337,8 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     return true;
 }
 
-bool QnOnvifPtzController::continuousMove(const QVector3D &speed) {
+bool QnOnvifPtzController::continuousMove(const QVector3D &speed)
+{
     if(qFuzzyIsNull(speed) && !m_stopBroken) {
         return stopInternal();
     } else {

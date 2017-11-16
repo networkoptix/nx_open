@@ -1,10 +1,10 @@
 #include "cloud_url_validator.h"
 
-#include <api/network_proxy_factory.h>
-
-#include <core/resource/media_server_resource.h>
-
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
+
+#include <api/network_proxy_factory.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx {
 namespace network {
@@ -14,7 +14,7 @@ bool isCloudServer(const QnMediaServerResourcePtr& server)
     if (!server)
         return false;
 
-    QUrl url = server->getApiUrl();
+    nx::utils::Url url = server->getApiUrl();
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
         return true;
 

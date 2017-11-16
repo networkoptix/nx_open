@@ -1,83 +1,120 @@
 #include "tegra_video.h"
 
-// Alternative impl of TegraVideo as a pure software stub.
+/**@file
+ * Alternative implementation of libtegra_video.so (class TegraVideo) as a pure software stub.
+ * */
 
 #include <string>
 
-#define OUTPUT_PREFIX "[tegra_video_stub #" << m_id << "] "
-#include <nx/utils/debug_utils.h>
+#define NX_PRINT_PREFIX "[tegra_video_stub #" << m_id << "] "
+#include <nx/kit/debug.h>
 
-#include "config.h"
+#include "tegra_video_ini.h"
 
 namespace {
 
 class Stub: public TegraVideo
 {
 public:
-    Stub(const Params& params);
+    Stub()
+    {
+        NX_OUTPUT << "Stub(): created";
+    }
 
-    virtual ~Stub() override;
+    virtual ~Stub() override
+    {
+        NX_OUTPUT << "~Stub(): destroyed";
+    }
 
-    virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override;
+    virtual bool start(const Params& params) override
+    {
+        NX_OUTPUT << "Stub(): params:";
+        NX_OUTPUT << "{";
+        NX_OUTPUT << "    id: " << params.id;
+        NX_OUTPUT << "    modelFile: " << params.modelFile;
+        NX_OUTPUT << "    deployFile: " << params.deployFile;
+        NX_OUTPUT << "    cacheFile: " << params.cacheFile;
+        NX_OUTPUT << "    cacheFile: " << params.cacheFile;
+        NX_OUTPUT << "    netWidth: " << params.netWidth;
+        NX_OUTPUT << "    netHeight: " << params.netHeight;
+        NX_OUTPUT << "}";
+
+        m_id = params.id;
+        m_modelFile = params.modelFile;
+        m_deployFile = params.deployFile;
+        m_cacheFile = params.cacheFile;
+        m_netWidth = params.netWidth;
+        m_netHeight = params.netHeight;
+
+        return true;
+    }
+
+    virtual bool stop() override
+    {
+        NX_OUTPUT << "stop() -> true";
+        return true;
+    }
+
+    virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override
+    {
+        NX_OUTPUT << "pushCompressedFrame(data, dataSize: " << compressedFrame->dataSize
+                  << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
+
+        m_hasMetadata = true;
+        return true;
+    }
 
     virtual bool pullRectsForFrame(
-        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override;
+        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override
+    {
+        NX_OUTPUT << "pullRectsForFrame() -> false";
 
-    virtual bool hasMetadata() const override;
+        *outPtsUs = 0;
+
+        // Produce 2 stub rects.
+        if (maxRectsCount < 2)
+        {
+            NX_PRINT << "ERROR: pullRectsForFrame(): "
+                << "maxRectsCount expected >= 2, actual " << maxRectsCount;
+            return false;
+        }
+        *outRectsCount = 2;
+
+        outRects[0].x = 10;
+        outRects[0].y = 20;
+        outRects[0].width = 100;
+        outRects[0].height = 50;
+
+        outRects[1].x = 20;
+        outRects[1].y = 10;
+        outRects[1].width = 50;
+        outRects[1].height = 100;
+
+        return true;
+    }
+
+    virtual bool hasMetadata() const override
+    {
+        return m_hasMetadata;
+    }
 
 private:
-    const std::string m_id;
-    const std::string m_modelFile;
-    const std::string m_deployFile;
-    const std::string m_cacheFile;
+    std::string m_id;
+    std::string m_modelFile;
+    std::string m_deployFile;
+    std::string m_cacheFile;
+    int m_netWidth = 0;
+    int m_netHeight = 0;
+
+    bool m_hasMetadata = false;
 };
-
-Stub::Stub(const Params& params):
-    m_id(params.id),
-    m_modelFile(params.modelFile),
-    m_deployFile(params.deployFile),
-    m_cacheFile(params.cacheFile)
-{
-    OUTPUT << "Stub(): created:";
-    OUTPUT << "    id: " << m_id;
-    OUTPUT << "    modelFile: " << m_modelFile;
-    OUTPUT << "    deployFile: " << m_deployFile;
-    OUTPUT << "    cacheFile: " << m_cacheFile;
-}
-
-Stub::~Stub()
-{
-    OUTPUT << "~Stub(): destroyed.";
-}
-
-bool Stub::pushCompressedFrame(const CompressedFrame* compressedFrame)
-{
-    OUTPUT << "pushCompressedFrame(data, dataSize: " << compressedFrame->dataSize
-        << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
-    return true;
-}
-
-bool Stub::pullRectsForFrame(
-    Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs)
-{
-    OUTPUT << "pullRectsForFrame() -> false";
-
-    *outPtsUs = 0;
-    *outRectsCount = 0;
-    return false;
-}
 
 } // namespace
 
-bool Stub::hasMetadata() const
-{
-    return false;
-}
-
 //-------------------------------------------------------------------------------------------------
 
-TegraVideo* TegraVideo::createStub(const Params& params)
+TegraVideo* TegraVideo::createStub()
 {
-    conf.reload();
-    return new Stub(params);
+    ini().reload();
+    return new Stub();
 }

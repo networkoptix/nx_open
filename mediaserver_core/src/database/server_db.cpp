@@ -463,10 +463,52 @@ bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
         QnSql::bind(data, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;
+
+        NX_VERBOSE(this, lm("Update audit record %1 for %2 (session %3): %4 %5-%6").args(
+            itr->first, data.authSession.userName, data.authSession.id,
+            QnLexical::serialized(data.eventType), data.rangeStartSec, data.rangeEndSec));
     }
+
     cleanupAuditLog();
     tran.commit();
     return true;
+}
+
+bool QnServerDb::closeUnclosedAuditRecords(int lastRunningTimeSec)
+{
+    QnDbTransactionLocker tran(getTransaction());
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery query(m_sdb);
+    if (lastRunningTimeSec)
+    {
+        query.prepare(R"sql(
+            UPDATE audit_log
+            SET rangeEndSec = :lastRunningTimeSec
+            WHERE (rangeStartSec != 0 AND rangeEndSec = 0)
+        )sql");
+
+        query.bindValue(":lastRunningTimeSec", lastRunningTimeSec);
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return false;
+
+        NX_DEBUG(this, lm("Close %1 audit records with last runnig time %2").args(
+            query.numRowsAffected(), lastRunningTimeSec));
+    }
+
+
+    query.prepare(R"sql(
+        UPDATE audit_log
+        SET rangeEndSec = rangeStartSec
+        WHERE rangeStartSec > rangeEndSec
+    )sql");
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    NX_DEBUG(this, lm("Fixed %1 incorrcet audit record end times").args(query.numRowsAffected()));
+    return tran.commit();
 }
 
 QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
@@ -899,6 +941,23 @@ vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& r
             query.value(businessRuleIdx).toByteArray());
         actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
 
+        if (actionData.eventParams.eventType == vms::event::cameraMotionEvent
+            || actionData.eventParams.eventType == vms::event::cameraInputEvent
+            || actionData.eventParams.eventType == vms::event::analyticsSdkEvent
+            || actionData.actionType == vms::event::ActionType::bookmarkAction
+            || actionData.actionType == vms::event::ActionType::acknowledgeAction)
+        {
+            QnNetworkResourcePtr camRes =
+                resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
+            if (camRes)
+            {
+                if (QnStorageManager::isArchiveTimeExists(
+                    camRes->getUniqueId(), actionData.eventParams.eventTimestampUsec / 1000))
+                {
+                    actionData.flags |= vms::event::ActionData::VideoLinkExists;
+                }
+            }
+        }
         result.push_back(std::move(actionData));
     }
 

@@ -72,7 +72,7 @@ public:
     QList<QnUuid> peersInGroup(const QString& group) const;
     void setPeerGroups(const QnUuid& peerId, const QStringList& groups);
 
-    void addInternetFile(const QUrl& url, const QString& fileName);
+    void addInternetFile(const nx::utils::Url& url, const QString& fileName);
 
     bool processNextRequest();
     void exec(int maxRequests = 0);
@@ -108,7 +108,7 @@ public:
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
         const QString& fileName,
-        const QUrl& url,
+        const nx::utils::Url& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;
@@ -136,7 +136,7 @@ private:
     QMultiHash<QString, QnUuid> m_peersByGroup;
     int m_requestIndex = 0;
 
-    QHash<QUrl, QString> m_fileByUrl;
+    QHash<nx::utils::Url, QString> m_fileByUrl;
 
     struct Request
     {
@@ -190,7 +190,7 @@ public:
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
         const QString& fileName,
-        const QUrl& url,
+        const nx::utils::Url& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;

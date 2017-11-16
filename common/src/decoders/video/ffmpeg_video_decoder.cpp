@@ -270,13 +270,13 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         return; // can't reset right now
     }
 
-    //closeDecoder();
-    //openDecoder();
-    //return;
+    QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
+    m_passedContext = nullptr;
 
-    if (m_passedContext && data->context)
+    if (data->context)
 	{
         m_codec = findCodec(data->context->getCodecId());
+        m_passedContext = avcodec_alloc_context3(nullptr);
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
     }
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
@@ -387,7 +387,11 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (data && m_codecId!= data->compressionType) {
         if (m_codecId != AV_CODEC_ID_NONE && data->context)
+        {
+            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+                return false; //< Can't switch decoder to new codec right now.
             resetDecoder(data);
+        }
         m_codecId = data->compressionType;
     }
 
@@ -510,12 +514,13 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
-        if (data->motion) {
+        if (!data->metadata.isEmpty())
+        {
             while (m_motionMap.size() > MAX_DECODE_THREAD+1)
                 m_motionMap.remove(0);
 
             m_motionMap
-                << QPair<qint64, QnAbstractCompressedMetadataPtr>(data->timestamp, data->motion);
+                << QPair<qint64, FrameMetadata>(data->timestamp, data->metadata);
         }
 
         // -------------------------
@@ -573,12 +578,15 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     if (got_picture)
     {
         int motionIndex = findMotionInfo(m_frame->pkt_dts);
-        if (motionIndex >= 0) {
+        if (motionIndex >= 0)
+        {
             outFrame->metadata = m_motionMap[motionIndex].second;
             m_motionMap.remove(motionIndex);
         }
         else
-            outFrame->metadata.reset();
+        {
+            outFrame->metadata.clear();
+        }
 
         AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&

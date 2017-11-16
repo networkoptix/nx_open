@@ -33,7 +33,7 @@ typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 
 /**
  * Base class for all HTTP request processors
- * @note Class methods are not thread-safe
+ * NOTE: Class methods are not thread-safe
  */
 class NX_NETWORK_API AbstractHttpRequestHandler
 {
@@ -41,7 +41,7 @@ public:
     virtual ~AbstractHttpRequestHandler();
 
     /**
-     * @param connection This object is valid only in this method. 
+     * @param connection This object is valid only in this method.
      *       One cannot rely on its availability after return of this method
      * @param request Message received
      * @param completionHandler Functor to be invoked to send response
@@ -54,7 +54,7 @@ public:
 
     void setRequestPathParams(std::vector<StringType> params);
     /**
-     * Parameters parsed from URL path. 
+     * Parameters parsed from URL path.
      * E.g., given http handler registered on path /account/%1/systems.
      * When receiving request with path /account/cartman/systems.
      * Then this method will return {cartman}.
@@ -66,7 +66,7 @@ protected:
     /**
      * Implement this method to handle request
      * @param response Implementation is allowed to modify response as it wishes
-     * WARNING: This object can be removed in completionHandler 
+     * WARNING: This object can be removed in completionHandler
      */
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,

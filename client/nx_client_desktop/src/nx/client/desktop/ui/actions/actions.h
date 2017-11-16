@@ -473,6 +473,12 @@ enum IDType
     SaveLayoutAction,
 
     /**
+     * Saves selected local layout.
+     */
+    SaveLocalLayoutAction,
+    SaveLocalLayoutAsAction,
+
+    /**
      * Saves selected layout under another name.
      *
      * Parameters:
@@ -937,6 +943,11 @@ enum IDType
     /**
      * Exports selected range.
      */
+    ExportVideoAction,
+
+    /**
+     * Exports selected range.
+     */
     ExportTimeSelectionAction,
 
     /**
@@ -1122,6 +1133,8 @@ enum IDType
     * Opens Web Page settings dialog.
     */
     WebPageSettingsAction,
+
+    ChangeDefaultCameraPasswordAction,
 
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,

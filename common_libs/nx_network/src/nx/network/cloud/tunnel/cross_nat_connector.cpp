@@ -1,13 +1,16 @@
 #include "cross_nat_connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection_watcher.h"
+#include "outgoing_tunnel_pool.h"
 #include "tcp/outgoing_reverse_tunnel_connection.h"
 #include "udp/connector.h"
+#include "../cloud_connect_settings.h"
 
 namespace nx {
 namespace network {
@@ -50,7 +53,7 @@ CrossNatConnector::CrossNatConnector(
         SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
     m_done(false)
 {
-    m_mediatorUdpClient = 
+    m_mediatorUdpClient =
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorUdpEndpoint);
     m_mediatorUdpClient->bindToAioThread(getAioThread());
 
@@ -61,7 +64,7 @@ CrossNatConnector::CrossNatConnector(
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
-    
+
     m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
     if (m_cloudConnectorExecutor)
@@ -128,9 +131,9 @@ void CrossNatConnector::messageReceived(
     //here we can receive response to connect result report. We just don't need it
 }
 
-void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/) 
+void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 {
-    //if error happens when sending connect result report, 
+    //if error happens when sending connect result report,
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }

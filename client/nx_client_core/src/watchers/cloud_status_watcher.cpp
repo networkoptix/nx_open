@@ -63,7 +63,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
     {
-        if (systemData.status != api::SystemStatus::ssActivated)
+        if (systemData.status != api::SystemStatus::activated)
             continue;
 
         const auto customization = QString::fromStdString(systemData.customization);
@@ -384,7 +384,7 @@ void QnCloudStatusWatcher::updateSystems()
                     }
             };
 
-            executeDelayed(handler, 0, thread());
+            executeDelayed(handler, 0, guard->thread());
         }
     );
 }

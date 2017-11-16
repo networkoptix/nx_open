@@ -312,7 +312,10 @@ void QnNotificationWidget::addTextButton(
     proxy->setWidget(button);
 
     auto rowLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    rowLayout->setContentsMargins(kNotificationIconWidth, 0, kHorizontalMargin, 0);
+    rowLayout->setContentsMargins(kNotificationIconWidth + m_primaryLayout->spacing(),
+        0,
+        kHorizontalMargin,
+        0);
     rowLayout->addItem(proxy);
     rowLayout->addStretch(1);
     m_verticalLayout->addItem(rowLayout);

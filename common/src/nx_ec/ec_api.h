@@ -8,7 +8,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QPair>
 #include <QtCore/QList>
-#include <QtCore/QUrl>
 
 #include "network/module_information.h"
 
@@ -35,6 +34,7 @@
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_misc_data.h>
+#include <nx_ec/data/api_system_merge_history_record.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
@@ -492,7 +492,7 @@ namespace ec2
         Q_OBJECT
     public:
     signals:
-        void peerDiscoveryRequested(const QUrl &url);
+        void peerDiscoveryRequested(const nx::utils::Url &url);
         void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
         void discoveredServerChanged(const ApiDiscoveredServerData &discoveredServer);
         void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList &discoveredServers);
@@ -502,17 +502,17 @@ namespace ec2
 
     class AbstractDiscoveryManager {
     public:
-        template<class TargetType, class HandlerType> int discoverPeer(const QnUuid &id, const QUrl &url, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int discoverPeer(const QnUuid &id, const nx::utils::Url &url, TargetType *target, HandlerType handler) {
             return discoverPeer(id, url, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QnUuid &id, const QUrl&url, bool ignore, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QnUuid &id, const nx::utils::Url&url, bool ignore, TargetType *target, HandlerType handler) {
             return addDiscoveryInformation(id, url, ignore, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QnUuid &id, const nx::utils::Url &url, bool ignore, TargetType *target, HandlerType handler) {
             return removeDiscoveryInformation(id, url, ignore, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -528,9 +528,9 @@ namespace ec2
         }
 
     protected:
-        virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
-        virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int discoverPeer(const QnUuid &id, const nx::utils::Url &url, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addDiscoveryInformation(const QnUuid &id, const nx::utils::Url &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeDiscoveryInformation(const QnUuid &id, const nx::utils::Url &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
@@ -650,7 +650,7 @@ namespace ec2
         }
 
         template<class TargetType, class HandlerType>
-        int getMisParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
+        int getMiscParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
         {
             return getMiscParam(paramName, std::static_pointer_cast<impl::GetMiscParamHandler>(std::make_shared<impl::CustomGetMiscParamHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -664,6 +664,30 @@ namespace ec2
                 outData);
         }
 
+        ErrorCode saveSystemMergeHistoryRecord(const ec2::ApiSystemMergeHistoryRecord& param)
+        {
+            int(AbstractMiscManager::*fn)(const ec2::ApiSystemMergeHistoryRecord&, impl::SimpleHandlerPtr) = 
+                &AbstractMiscManager::saveSystemMergeHistoryRecord;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
+        }
+
+        template<class TargetType, class HandlerType>
+        int getSystemMergeHistory(TargetType* target, HandlerType handler)
+        {
+            return getSystemMergeHistory(
+                std::static_pointer_cast<impl::GetSystemMergeHistoryHandlerPtr>(
+                    std::make_shared<impl::CustomGetSystemMergeHistoryHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode getSystemMergeHistorySync(ApiSystemMergeHistoryRecordList* const outData)
+        {
+            return impl::doSyncCall<impl::GetSystemMergeHistoryHandler>(
+                [this](const impl::GetSystemMergeHistoryHandlerPtr &handler) {
+                    return this->getSystemMergeHistory(handler);
+                },
+                outData);
+        }
+
     protected:
         virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
@@ -671,6 +695,9 @@ namespace ec2
         virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
         virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) = 0;
         virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) = 0;
+
+        virtual int saveSystemMergeHistoryRecord(const ApiSystemMergeHistoryRecord& param, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 
@@ -690,7 +717,7 @@ namespace ec2
          * Changes url client currently uses to connect to server. Required to handle situations
          * like user password change, server port change or systems merge.
          */
-        virtual void updateConnectionUrl(const QUrl& url) = 0;
+        virtual void updateConnectionUrl(const nx::utils::Url& url) = 0;
 
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
@@ -699,7 +726,7 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void stopReceivingNotifications() = 0;
 
-        virtual void addRemotePeer(const QnUuid& id, const QUrl& _url) = 0;
+        virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) = 0;
         virtual void deleteRemotePeer(const QnUuid& id) = 0;
 
         virtual Timestamp getTransactionLogTime() const = 0;
@@ -825,19 +852,19 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int testConnection( const QUrl& addr, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int testConnection( const nx::utils::Url& addr, TargetType* target, HandlerType handler ) {
             return testConnectionAsync( addr, std::static_pointer_cast<impl::TestConnectionHandler>(std::make_shared<impl::CustomTestConnectionHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param addr Empty url designates local Server ("local" means dll linked to executable, not Server running on local host)
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
-        template<class TargetType, class HandlerType> int connect( const QUrl& addr, const ApiClientInfoData& clientInfo,
+        template<class TargetType, class HandlerType> int connect( const nx::utils::Url& addr, const ApiClientInfoData& clientInfo,
                                                                    TargetType* target, HandlerType handler ) {
             auto cch = std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler);
             return connectAsync(addr, clientInfo, std::static_pointer_cast<impl::ConnectHandler>(cch));
         }
-        ErrorCode connectSync( const QUrl& addr, const ApiClientInfoData& clientInfo, AbstractECConnectionPtr* const connection ) {
+        ErrorCode connectSync( const nx::utils::Url& addr, const ApiClientInfoData& clientInfo, AbstractECConnectionPtr* const connection ) {
             auto call = std::bind(std::mem_fn(&AbstractECConnectionFactory::connectAsync), this, addr, clientInfo, std::placeholders::_1);
             return impl::doSyncCall<impl::ConnectHandler>(call, connection);
         }
@@ -849,8 +876,8 @@ namespace ec2
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:
-        virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
-        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
+        virtual int testConnectionAsync( const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler ) = 0;
+        virtual int connectAsync( const nx::utils::Url& addr, const ApiClientInfoData& clientInfo,
                                   impl::ConnectHandlerPtr handler ) = 0;
     };
 }

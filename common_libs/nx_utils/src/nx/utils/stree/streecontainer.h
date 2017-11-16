@@ -6,26 +6,25 @@ namespace nx {
 namespace utils {
 namespace stree {
 
-//TODO #ak use template alias here
 template <class KeyType, class MappedType>
-    class EqualMatchContainer : public std::map<KeyType, MappedType>
+class EqualMatchContainer: public std::map<KeyType, MappedType>
 {
 };
 
-/*!
-    \a find method selects element with min key greater than searched one
-*/
+/**
+ * find method selects element with min key greater than searched one.
+ */
 template<class KeyType, class MappedType, class Predicate>
-    class ConditionMatchContainer
+class ConditionMatchContainer
 {
-    typedef std::map<KeyType, MappedType, Predicate> InternalContainerType;
+    using InternalContainerType = std::map<KeyType, MappedType, Predicate>;
 
 public:
-    typedef typename InternalContainerType::iterator iterator;
-    typedef typename InternalContainerType::const_iterator const_iterator;
-    typedef typename InternalContainerType::key_type key_type;
-    typedef typename InternalContainerType::mapped_type mapped_type;
-    typedef typename InternalContainerType::value_type value_type;
+    using iterator = typename InternalContainerType::iterator;
+    using const_iterator = typename InternalContainerType::const_iterator;
+    using key_type = typename InternalContainerType::key_type;
+    using mapped_type = typename InternalContainerType::mapped_type;
+    using value_type = typename InternalContainerType::value_type;
 
     iterator begin()
     {
@@ -47,24 +46,24 @@ public:
         return m_container.end();
     }
 
-    void erase( const iterator& pos )
+    void erase(const iterator& pos)
     {
-        m_container.erase( pos );
+        m_container.erase(pos);
     }
 
-    iterator find( const key_type& key )
+    iterator find(const key_type& key)
     {
-        return m_container.upper_bound( key );
+        return m_container.upper_bound(key);
     }
 
-    const_iterator find( const key_type& key ) const
+    const_iterator find(const key_type& key) const
     {
-        return m_container.upper_bound( key );
+        return m_container.upper_bound(key);
     }
 
-    std::pair<iterator, bool> insert( const value_type& val )
+    std::pair<iterator, bool> insert(const value_type& val)
     {
-        return m_container.insert( val );
+        return m_container.insert(val);
     }
 
     template<typename KeyTypeRef, typename MappedTypeRef>
@@ -72,7 +71,7 @@ public:
     {
         return m_container.emplace(
             std::forward<KeyTypeRef>(key),
-            std::forward<MappedTypeRef>(mapped) );
+            std::forward<MappedTypeRef>(mapped));
     }
 
 private:
@@ -80,16 +79,14 @@ private:
 };
 
 template <class KeyType, class MappedType>
-    class MinGreaterMatchContainer
-:
-    public ConditionMatchContainer<KeyType, MappedType, std::less<KeyType> >
+class MinGreaterMatchContainer:
+    public ConditionMatchContainer<KeyType, MappedType, std::less<KeyType>>
 {
 };
 
 template <class KeyType, class MappedType>
-    class MaxLesserMatchContainer
-:
-    public ConditionMatchContainer<KeyType, MappedType, std::greater<KeyType> >
+class MaxLesserMatchContainer:
+    public ConditionMatchContainer<KeyType, MappedType, std::greater<KeyType>>
 {
 };
 

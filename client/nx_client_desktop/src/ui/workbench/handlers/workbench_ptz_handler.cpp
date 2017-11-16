@@ -7,7 +7,6 @@
 
 #include <api/app_server_connection.h>
 
-#include <nx/utils/collection.h>
 #include <utils/resource_property_adaptors.h>
 
 #include <common/common_globals.h>
@@ -237,12 +236,12 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
         if (!widget->ptzController()->getPresets(&presets))
             return;
 
-        int tourIdx = qnIndexOf(tours, [&id](const QnPtzTour &tour) { return id == tour.id; });
-        if (tourIdx < 0)
+        const auto tour = std::find_if(tours.cbegin(), tours.cend(),
+            [&id](const QnPtzTour &tour) { return id == tour.id; });
+        if (tour == tours.cend())
             return;
 
-        QnPtzTour tour = tours[tourIdx];
-        if (!tour.isValid(presets))
+        if (!tour->isValid(presets))
             return;
     }
 
@@ -279,15 +278,12 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
     if (!widget->ptzController()->getPresets(&presets))
         return;
 
-    int index = qnIndexOf(presets, [&](const QnPtzPreset &preset) { return preset.id == id; });
-    if (index == -1)
-    {
+    const auto preset = std::find_if(presets.cbegin(), presets.cend(),
+        [&](const QnPtzPreset &preset) { return preset.id == id; });
+    if (preset == presets.cend())
         menu()->trigger(action::PtzActivateTourAction, parameters);
-    }
     else
-    {
         menu()->trigger(action::PtzActivatePresetAction, parameters);
-    }
 }
 
 

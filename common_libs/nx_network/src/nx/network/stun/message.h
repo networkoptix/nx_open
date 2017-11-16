@@ -83,7 +83,7 @@ public:
     Header(const Header&);
     Header(Header&&);
     /**
-        \note \a transactionId is generated using \a Header::makeTransactionId
+        NOTE: transactionId is generated using Header::makeTransactionId
     */
     Header(MessageClass messageClass_, int method_);
     Header(MessageClass messageClass_, int method_, Buffer transactionId_);
@@ -137,7 +137,7 @@ public:
     }
 
     /** Add std::chrono::duration attribute.
-        \warning \a value.count() MUST NOT be greater than \a std::numeric_limits<int>::max()
+        \warning value.count() MUST NOT be greater than std::numeric_limits<int>::max()
     */
     template<typename Rep, typename Period>
     void addAttribute(int type, std::chrono::duration<Rep, Period> value)
@@ -147,7 +147,7 @@ public:
     }
 
     /** Add attribute of composite type.
-        Attribute MUST be represented as a structure. E.g, \a MessageIntegrity
+        Attribute MUST be represented as a structure. E.g, MessageIntegrity
     */
     template<typename T, typename... Args>
     void newAttribute(Args... args)

@@ -2,9 +2,12 @@
 #define __SIMPLE_HTTP_CLIENT__
 
 #include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QHostAddress>
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QSharedPointer>
+#include <nx/utils/url.h>
+#include <nx/network/socket_common.h>
 
 #include "socket.h"
 
@@ -41,7 +44,7 @@ public:
         \param timeout Timeout in milliseconds to be used as socket's read and write timeout
     */
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
-    CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth);
+    CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int timeout, const QAuthenticator& auth);
 
     /*!
         \param timeout Timeout in milliseconds to be used as socket's read and write timeout
@@ -81,7 +84,7 @@ public:
 
     static QByteArray basicAuth(const QAuthenticator& auth);
     /*!
-        \param isProxy If \a true, this method adds header Proxy-Authorization, otherwise Authorization
+        \param isProxy If true, this method adds header Proxy-Authorization, otherwise Authorization
     */
     static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url, bool isProxy = false);
     QByteArray getHeaderValue(const QByteArray& key);

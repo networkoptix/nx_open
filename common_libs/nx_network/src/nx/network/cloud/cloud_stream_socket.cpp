@@ -1,9 +1,9 @@
 #include "cloud_stream_socket.h"
 
-#include <nx/utils/system_error.h>
-
+#include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/system_error.h>
 
 #include "tunnel/outgoing_tunnel.h"
 #include "../socket_global.h"
@@ -53,7 +53,7 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
-    // TODO: #ak just ignoring for now. 
+    // TODO: #ak just ignoring for now.
     // Usually, we do not care about the exact port on tcp client socket.
     static_cast<void>(localAddress);
     return true;
@@ -170,7 +170,7 @@ bool CloudStreamSocket::connect(
                         promisePtr->set_value(std::make_pair(code, 0));
                 });
         });
-    
+
     auto result = promise.get_future().get().first;
     if (result != SystemError::noError)
     {

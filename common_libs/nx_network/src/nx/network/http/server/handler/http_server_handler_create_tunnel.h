@@ -10,7 +10,7 @@ namespace nx_http {
 namespace server {
 namespace handler {
 
-using TunnelCreatedHandler = 
+using TunnelCreatedHandler =
     nx::utils::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket>,
         std::vector<StringType> /*REST request parameters values*/)>;
@@ -48,7 +48,7 @@ public:
         }
 
         nx_http::RequestResult requestResult(nx_http::StatusCode::switchingProtocols);
-        requestResult.connectionEvents.onResponseHasBeenSent = 
+        requestResult.connectionEvents.onResponseHasBeenSent =
             [onTunnelCreated = std::move(m_onTunnelCreated), restParams = requestPathParams()](
                 HttpServerConnection* httpConnection)
             {

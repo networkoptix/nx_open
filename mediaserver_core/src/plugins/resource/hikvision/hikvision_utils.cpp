@@ -316,9 +316,9 @@ bool makeResolutionList(
             auto sArea = s.width() * s.height();
 
             if (fArea != sArea)
-                return fArea < sArea;
+                return fArea > sArea;
 
-            return f.width() < s.width();
+            return f.width() > s.width();
         });
 
     return true;
@@ -360,7 +360,7 @@ bool parseTransportElement(
 }
 
 bool doGetRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
     nx_http::StatusCode::Value* outStatusCode)
@@ -379,7 +379,7 @@ bool doGetRequest(
 }
 
 bool doPutRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx::Buffer& buffer,
     nx_http::StatusCode::Value* outStatusCode)
@@ -394,7 +394,7 @@ bool doPutRequest(
 }
 
 bool doRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx_http::Method::ValueType& method,
     const nx::Buffer* bufferToSend,

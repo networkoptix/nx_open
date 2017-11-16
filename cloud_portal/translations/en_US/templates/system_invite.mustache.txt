@@ -1,13 +1,15 @@
 Welcome to {{PRODUCT_NAME}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join {{PRODUCT_NAME}} and shared his system {{message.system_name}} with you.
+<0>{{message.sharer_name}}</0> has shared access to video management system "{{message.system_name}}" with you.
+
+To view and manage it, please create account on <1>{{PRODUCT_NAME}}</1> using your current email address and follow further instructions.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-You are invited you to join {{PRODUCT_NAME}}.
-The system {{message.system_name}} was shared with you.
+You have been granted access to video management system "{{message.system_name}}".
+To view and manage it, please create account on <0>{{PRODUCT_NAME}}</0> using your current email address and follow further instructions.
 {{/message.sharer_name}}
 
-Register and view the system: {{config.portal_url}}/register/{{message.code}}
+Create Account: {{config.portal_url}}/register/{{message.code}}
 

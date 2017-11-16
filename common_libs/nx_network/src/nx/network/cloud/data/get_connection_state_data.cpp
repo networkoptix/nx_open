@@ -18,6 +18,8 @@ bool GetConnectionStateRequest::parseAttributes(const nx::stun::Message& /*messa
     return true;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 GetConnectionStateResponse::GetConnectionStateResponse():
     StunResponseData(kMethod)
 {

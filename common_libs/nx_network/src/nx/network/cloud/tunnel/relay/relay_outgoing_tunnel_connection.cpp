@@ -9,7 +9,7 @@ namespace cloud {
 namespace relay {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
-    QUrl relayUrl,
+    nx::utils::Url relayUrl,
     nx::String relaySessionId,
     std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient)
     :
@@ -65,7 +65,7 @@ void OutgoingTunnelConnection::establishNewConnection(
             m_activeRequests.back()->completionHandler = std::move(handler);
             m_activeRequests.back()->timer.bindToAioThread(getAioThread());
             auto requestIter = --m_activeRequests.end();
-        
+
             std::unique_ptr<nx::cloud::relay::api::Client> relayClient;
             if (m_relayApiClient)
             {
@@ -81,7 +81,7 @@ void OutgoingTunnelConnection::establishNewConnection(
                 m_relaySessionId,
                 std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
                     _1, _2, requestIter));
-            
+
             if (timeout > std::chrono::milliseconds::zero())
             {
                 m_activeRequests.back()->timer.start(
@@ -130,8 +130,7 @@ void OutgoingTunnelConnection::onConnectionOpened(
     std::unique_ptr<AbstractStreamSocket> connection,
     std::list<std::unique_ptr<RequestContext>>::iterator requestIter)
 {
-    auto completionHandler = std::move(requestIter->get()->completionHandler);
-    auto socketAttributes = std::move(requestIter->get()->socketAttributes);
+    const auto requestContext = std::move(*requestIter);
     m_activeRequests.erase(requestIter);
 
     const auto errorCodeToReport = toSystemError(resultCode);
@@ -142,7 +141,7 @@ void OutgoingTunnelConnection::onConnectionOpened(
     {
         NX_ASSERT(connection->isInSelfAioThread());
         connection->cancelIOSync(aio::etNone);
-        socketAttributes.applyTo(connection.get());
+        requestContext->socketAttributes.applyTo(connection.get());
 
         std::unique_ptr<AbstractStreamSocket> outgoingConnection =
             std::make_unique<OutgoingConnection>(
@@ -152,7 +151,7 @@ void OutgoingTunnelConnection::onConnectionOpened(
     }
 
     utils::ObjectDestructionFlag::Watcher watcher(&m_objectDestructionFlag);
-    completionHandler(
+    requestContext->completionHandler(
         errorCodeToReport,
         std::move(connection),
         resultCode == nx::cloud::relay::api::ResultCode::ok);

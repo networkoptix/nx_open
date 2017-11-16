@@ -4,6 +4,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -143,7 +144,7 @@ void KnownServerConnections::Private::at_moduleFound(
     auto urls = qnClientCoreSettings->knownServerUrls();
 
     auto it = std::find_if(urls.begin(), urls.end(),
-        [&moduleData](const QUrl& url)
+        [&moduleData](const nx::utils::Url& url)
         {
             return moduleData.endpoint == nx::network::url::getEndpoint(url);
         });

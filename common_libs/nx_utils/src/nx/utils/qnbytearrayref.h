@@ -6,7 +6,7 @@
  * Reference to substring in QByteArray object.
  * Introduced to minimize memory copying by using QnByteArrayConstRef instead of QByteArray::mid
  * Provides a few methods of QByteArray to use it instead.
- * @note This class methods do not contain array boundary validation!
+ * NOTE: This class methods do not contain array boundary validation!
  */
 class NX_UTILS_API QnByteArrayConstRef
 {

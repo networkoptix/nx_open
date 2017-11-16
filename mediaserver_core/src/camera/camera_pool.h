@@ -5,15 +5,17 @@
 
 #include <QtCore/QMap>
 
+#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 
 #include "camera/video_camera.h"
-#include <common/common_module_aware.h>
-#include <nx/utils/singleton.h>
 
 #define qnCameraPool QnVideoCameraPool::instance()
+
+class MSSettings;
+class QnResourcePool;
 
 class VideoCameraLocker
 {
@@ -28,10 +30,13 @@ private:
     QnVideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool: public QnCommonModuleAware, public Singleton<QnVideoCameraPool>
+class QnVideoCameraPool:
+    public Singleton<QnVideoCameraPool>
 {
 public:
-    QnVideoCameraPool(QnCommonModule* commonModule);
+    QnVideoCameraPool(
+        const MSSettings& settings,
+        QnResourcePool* resourcePool);
     virtual ~QnVideoCameraPool();
 
     void stop();
@@ -41,6 +46,7 @@ public:
     */
     QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res) const;
     QnVideoCameraPtr addVideoCamera(const QnResourcePtr& res);
+    bool addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera);
     void removeVideoCamera(const QnResourcePtr& res);
     void updateActivity();
 
@@ -48,6 +54,9 @@ public:
 
 private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
+
+    const MSSettings& m_settings;
+    QnResourcePool* m_resourcePool = nullptr;
     CameraMap m_cameras;
     mutable QnMutex m_mutex;
 };

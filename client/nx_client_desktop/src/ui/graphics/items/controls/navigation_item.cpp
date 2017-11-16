@@ -267,7 +267,11 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, m_speedSlider, &QnSpeedSlider::finishAnimations);
 
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateSyncButtonState);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
+        &QnNavigationItem::updateSyncButtonState);
+    connect(navigator(), &QnWorkbenchNavigator::syncIsForcedChanged, this,
+        &QnNavigationItem::updateSyncButtonState);
+
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateJumpButtonsTooltips);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateBookButtonEnabled);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updateLiveButtonState);
@@ -511,12 +515,19 @@ void QnNavigationItem::updateLiveButtonState()
 
 void QnNavigationItem::updateSyncButtonState()
 {
-    /* setEnabled must be called last to avoid update from button's action enabled state. */
-    QnWorkbenchStreamSynchronizer* streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-    bool enabled = streamSynchronizer->isEffective()
+    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    const auto syncForced = navigator()->syncIsForced();
+
+    const auto syncAllowed = streamSynchronizer->isEffective()
         && navigator()->currentWidgetFlags().testFlag(QnWorkbenchNavigator::WidgetSupportsSync);
-    m_syncButton->setChecked(enabled && streamSynchronizer->isRunning());
-    m_syncButton->setEnabled(enabled);
+
+    // Call setEnabled last to avoid update from button's action enabled state.
+    m_syncButton->setChecked(syncAllowed && streamSynchronizer->isRunning());
+    m_syncButton->setEnabled(syncAllowed && !syncForced);
+
+    m_syncButton->setToolTip(syncForced
+        ? tr("NVR channels cannot be played unsyncronously")
+        : action(action::ToggleSyncAction)->toolTip());
 }
 
 void QnNavigationItem::updatePlayButtonChecked()
@@ -584,7 +595,7 @@ void QnNavigationItem::at_liveButton_clicked()
 
 void QnNavigationItem::at_syncButton_clicked()
 {
-    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
     if (m_syncButton->isChecked())
         streamSynchronizer->setState(navigator()->currentWidget());

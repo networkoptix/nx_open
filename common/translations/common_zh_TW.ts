@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>新系統</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>找到的系統 %1 與目前的系統不相容。</translation>
     </message>
   </context>
   <context>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>從伺服器 %1: "%2" 接收到錯誤回應.</translation>
+      <translation>從伺服器 %1: &quot;%2&quot; 接收到錯誤回應.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -255,18 +255,6 @@
       <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
     </message>
   </context>
   <context>
@@ -1288,7 +1288,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

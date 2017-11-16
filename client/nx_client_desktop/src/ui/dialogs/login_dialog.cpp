@@ -25,6 +25,7 @@
 #include <network/system_helpers.h>
 
 #include <nx/utils/raii_guard.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 #include <rest/server/json_rest_result.h>
@@ -36,9 +37,9 @@
 #include <utils/common/util.h>
 #include <utils/connection_diagnostics_helper.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
-#include <plugins/resource/avi/filetypesupport.h>
+#include <core/resource/avi/filetypesupport.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>
@@ -83,20 +84,20 @@ void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled)
     }
 }
 
-QStandardItem* newConnectionItem(const QString& text, const QUrl& url, bool isValid = true)
+QStandardItem* newConnectionItem(const QString& text, const nx::utils::Url& url, bool isValid = true)
 {
     if (url.isEmpty())
         return nullptr;
 
     auto result = new QStandardItem(text);
-    result->setData(url, Qn::UrlRole);
+    result->setData(qVariantFromValue(url), Qn::UrlRole);
     if (!isValid)
         result->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
 
     return result;
 }
 
-bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
+bool haveToStorePassword(const QnUuid& localId, const nx::utils::Url& url)
 {
     /**
      * At first we check if we have stored connection to same system
@@ -130,7 +131,7 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
 struct AutoFoundSystemViewModel
 {
     QString title;
-    QUrl url;
+    nx::utils::Url url;
     bool isValid = true;
 
     bool operator<(const AutoFoundSystemViewModel& other) const
@@ -264,9 +265,9 @@ void QnLoginDialog::updateFocus()
     ui->passwordLineEdit->selectAll();
 }
 
-QUrl QnLoginDialog::currentUrl() const
+nx::utils::Url QnLoginDialog::currentUrl() const
 {
-    QUrl url;
+    nx::utils::Url url;
     url.setScheme(lit("http"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
@@ -277,7 +278,7 @@ QUrl QnLoginDialog::currentUrl() const
 
 bool QnLoginDialog::isValid() const
 {
-    QUrl url = currentUrl();
+    nx::utils::Url url = currentUrl();
     return !ui->passwordLineEdit->text().isEmpty()
         && !ui->loginLineEdit->text().trimmed().isEmpty()
         && !ui->hostnameLineEdit->text().trimmed().isEmpty()
@@ -292,7 +293,7 @@ void QnLoginDialog::accept()
     if (!isValid())
         return;
 
-    QUrl url = currentUrl();
+    nx::utils::Url url = currentUrl();
 	const auto guard = QPointer<QnLoginDialog>(this);
     m_requestHandle = qnClientCoreModule->connectionFactory()->testConnection(
         url, this,
@@ -320,11 +321,11 @@ void QnLoginDialog::accept()
                     // In most cases we will connect succesfully by this url. Sow we can store it.
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-                    QUrl lastUrlForLoginDialog = url;
+                    nx::utils::Url lastUrlForLoginDialog = url;
                     if (!autoLogin)
                         lastUrlForLoginDialog.setPassword(QString());
 
-                    qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog);
+                    qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog.toString());
                     qnSettings->save();
 
                     const bool storePasswordForTile =
@@ -417,7 +418,7 @@ void QnLoginDialog::resetConnectionsModel()
 
     QModelIndex selectedIndex;
 
-    const auto url = qnSettings->lastLocalConnectionUrl();
+    const auto url = nx::utils::Url(qnSettings->lastLocalConnectionUrl());
     m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
         : ::newConnectionItem(defaultLastUsedConnectionName(), url));
@@ -443,7 +444,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     auto customConnections = qnSettings->customConnections();
     if (!m_lastUsedItem || customConnections.isEmpty())
     {
-        QUrl url;
+        nx::utils::Url url;
         url.setPort(DEFAULT_APPSERVER_PORT);
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
         url.setUserName(helpers::kFactorySystemUser);
@@ -577,7 +578,10 @@ void QnLoginDialog::updateUsability()
 void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index)
 {
     QStandardItem* item = m_connectionsModel->itemFromIndex(index);
-    QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
+    nx::utils::Url url;
+    if (item)
+        url = item->data(Qn::UrlRole).value<nx::utils::Url>();
+
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
     ui->loginLineEdit->setText(url.userName().isEmpty()
@@ -669,7 +673,7 @@ void QnLoginDialog::at_saveButton_clicked()
         connections.removeOne(name);
     }
 
-    const QUrl url = currentUrl();
+    const nx::utils::Url url = currentUrl();
     auto connectionData = QnConnectionData(name, url, kCustomConnectionLocalId);
 
     if (!savePassword)

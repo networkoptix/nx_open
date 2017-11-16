@@ -25,9 +25,11 @@
 #include <update/update_info.h>
 
 #include <utils/color_space/image_correction.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/ping_utility.h>
 #include <nx/client/desktop/utils/server_file_cache.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/client/desktop/layout_templates/layout_template.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
@@ -51,6 +53,9 @@ QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 Q_DECLARE_METATYPE(nx::cdb::api::ResultCode)
 Q_DECLARE_METATYPE(nx::cdb::api::SystemData)
 Q_DECLARE_METATYPE(rest::QnConnectionPtr)
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, Alignment)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, DateFormat)
 
 using namespace nx::client::desktop;
 
@@ -131,6 +136,10 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<nx::cdb::api::SystemData>();
     qRegisterMetaType<rest::QnConnectionPtr>();
 
+    qRegisterMetaType<nx::client::desktop::ExportMediaPersistentSettings>();
+
+    qRegisterMetaType<LayoutTemplate>();
+
     QMetaType::registerComparators<QnUuid>();
 
     QnJsonSerializer::registerSerializer<QnBookmarkColors>();
@@ -154,7 +163,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnGraphicsMessageBoxColors>();
     QnJsonSerializer::registerSerializer<QnResourceItemColors>();
     QnJsonSerializer::registerSerializer<QnPasswordStrengthColors>();
-
     QnJsonSerializer::registerSerializer<Qn::ImageBehaviour>();
     QnJsonSerializer::registerSerializer<QnBackgroundImage>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();

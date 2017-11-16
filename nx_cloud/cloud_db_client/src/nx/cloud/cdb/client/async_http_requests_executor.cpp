@@ -35,8 +35,8 @@ void AsyncRequestsExecutor::setCredentials(
     const std::string& password)
 {
     QnMutexLocker lk(&m_mutex);
-    m_auth.username = QString::fromStdString(login);
-    m_auth.password = QString::fromStdString(password);
+    m_auth.user.username = QString::fromStdString(login);
+    m_auth.user.authToken.setPassword(password.c_str());
 }
 
 void AsyncRequestsExecutor::setProxyCredentials(
@@ -44,8 +44,8 @@ void AsyncRequestsExecutor::setProxyCredentials(
     const std::string& password)
 {
     QnMutexLocker lk(&m_mutex);
-    m_auth.proxyUsername = QString::fromStdString(login);
-    m_auth.proxyPassword = QString::fromStdString(password);
+    m_auth.proxyUser.username = QString::fromStdString(login);
+    m_auth.proxyUser.authToken.setPassword(password.c_str());
 }
 
 void AsyncRequestsExecutor::setProxyVia(const SocketAddress& proxyEndpoint)

@@ -6,6 +6,7 @@
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/string.h>
@@ -37,7 +38,7 @@ public:
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override
-    {   
+    {
         QnJsonRestResult restResult;
         if (!m_serverIdForModuleInformation)
         {

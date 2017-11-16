@@ -23,7 +23,7 @@
       <item>
        <widget class="QnTreeComboBox" name="eventComboBox">
         <property name="maxVisibleItems">
-         <number>100</number>
+         <number>20</number>
         </property>
        </widget>
       </item>

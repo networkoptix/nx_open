@@ -3,7 +3,7 @@
 #include <server/server_globals.h>
 
 #include <api/model/camera_diagnostics_reply.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/http_types.h>

@@ -70,7 +70,7 @@ class EventManager
 {
 public:
     /**
-     * If haven't heard anything from mediaserver during this timeout 
+     * If haven't heard anything from mediaserver during this timeout
      * then closing event stream for mediaserver to send another request.
      */
     std::chrono::seconds mediaServerConnectionIdlePeriod;
@@ -83,6 +83,8 @@ class ModuleFinder
 public:
     QString cloudModulesXmlTemplatePath;
     QString newCloudModulesXmlTemplatePath;
+
+    ModuleFinder();
 };
 
 class Http
@@ -95,6 +97,15 @@ public:
     std::chrono::milliseconds connectionInactivityPeriod;
 
     Http();
+};
+
+class VmsGateway
+{
+public:
+    std::string url;
+    std::chrono::milliseconds requestTimeout;
+
+    VmsGateway();
 };
 
 /**
@@ -117,7 +128,7 @@ public:
 
     /** List of local endpoints to bind to. By default, 0.0.0.0:3346. */
     std::list<SocketAddress> endpointsToListen() const;
-    
+
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
@@ -129,6 +140,7 @@ public:
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
+    const VmsGateway& vmsGateway() const;
 
     void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
 
@@ -145,6 +157,7 @@ private:
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;
+    VmsGateway m_vmsGateway;
 
     virtual void loadSettings() override;
 };

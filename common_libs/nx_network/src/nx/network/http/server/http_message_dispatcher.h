@@ -76,7 +76,7 @@ public:
     }
 
 protected:
-    virtual void applyModRewrite(QUrl* url) const = 0;
+    virtual void applyModRewrite(nx::utils::Url* url) const = 0;
     virtual std::unique_ptr<AbstractHttpRequestHandler> getHandler(
         const StringType& method,
         const QString& path) const = 0;
@@ -107,13 +107,14 @@ public:
             pathMatchContext.defaultFactory = std::move(factoryFunc);
             return true;
         }
-        
+
         return pathMatchContext.pathToFactory.add(path.toUtf8(), std::move(factoryFunc));
     }
 
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
-        const QString& path = kAnyPath, const nx_http::StringType& method = kAnyMethod)
+        const QString& path = kAnyPath,
+        const nx_http::StringType& method = kAnyMethod)
     {
         return registerRequestProcessor<RequestHandlerType>(
             path,
@@ -139,7 +140,7 @@ private:
     std::map<QString, QString> m_rewritePrefixes;
     std::map<nx_http::StringType /*method*/, PathMatchContext> m_factories;
 
-    virtual void applyModRewrite(QUrl* url) const override
+    virtual void applyModRewrite(nx::utils::Url* url) const override
     {
         if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path()))
         {

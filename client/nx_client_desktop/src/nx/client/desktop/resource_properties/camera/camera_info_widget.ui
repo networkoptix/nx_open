@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CameraInfoWidget</class>
+ <widget class="QWidget" name="CameraInfoWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>944</width>
+    <height>453</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QnEditableLabel" name="nameLabel" native="true">
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <widget class="QWidget" name="lessInfoPage">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,1" columnstretch="0,0,1">
+       <item row="0" column="1">
+        <widget class="QLabel" name="modelTitleLabel">
+         <property name="text">
+          <string>Model</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="vendorTitleLabel">
+         <property name="text">
+          <string>Vendor</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="modelLabel">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="vendorLabel">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="ipAddressTitleLabel">
+         <property name="text">
+          <string>IP Address</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="ipAddressLabel">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="moreInfoPage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="vendorDetailLabel">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="detailInfoLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="vendorDetailTitleLabel">
+           <property name="text">
+            <string>Vendor</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="modelDetailTitleLabel">
+           <property name="text">
+            <string>Model</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="firmwareTitleLabel">
+           <property name="text">
+            <string>Firmware</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="vendorDetailTitle">
+           <property name="text">
+            <string notr="true">&lt;ACTI&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="modelDetailLabel">
+           <property name="text">
+            <string notr="true">&lt;E96&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="frimwareLabel">
+           <property name="text">
+            <string notr="true">&lt;A1D-500-V6.05.16-AC&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="networkInfoLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="ipAddressDetailTitleLabel">
+           <property name="text">
+            <string>IP Address</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="webPageTileLabel">
+           <property name="text">
+            <string>Web Page</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="macAddressTitleLabel">
+           <property name="text">
+            <string>MAC Address</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="ipAddressDetailLayout">
+           <item>
+            <widget class="QLabel" name="ipAddressDetailLabel">
+             <property name="text">
+              <string notr="true">&lt;192.168.1.1&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pingButton">
+             <property name="text">
+              <string>Ping</string>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="webPageLabel">
+           <property name="text">
+            <string notr="true">&lt;http://192.168.1.1/&gt;</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="macAddressLabel">
+           <property name="text">
+            <string notr="true">&lt;00-0F-7C-0C-76-E9&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="serviceInfoLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="cameraIdTitleLabel">
+           <property name="text">
+            <string>Camera ID</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="primaryStreamTitleLabel">
+           <property name="text">
+            <string>Primary Stream</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="secondaryStreamTitleLabel">
+           <property name="text">
+            <string>Secondary Stream</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="cameraIdLabel">
+           <property name="text">
+            <string notr="true">&lt;cf5bac1d-6b93-e517-41ab-6f13bbc7a2af&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="primaryStreamLayout">
+           <item>
+            <widget class="QLabel" name="primaryStreamLabel">
+             <property name="text">
+              <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="nx::client::desktop::ui::ClipboardButton" name="primaryStreamCopyButton">
+             <property name="text">
+              <string notr="true">&lt;Copy&gt;</string>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="primaryStreamSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="secondaryStreamLayout">
+           <item>
+            <widget class="QLabel" name="secondaryStreamLabel">
+             <property name="text">
+              <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="nx::client::desktop::ui::ClipboardButton" name="secondaryStreamCopyButton">
+             <property name="text">
+              <string notr="true">&lt;Copy&gt;</string>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="secondaryStreamSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="toggleInfoButton">
+       <property name="text">
+        <string notr="true">&lt;More info&gt;</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="showOnLayoutButton">
+       <property name="text">
+        <string>Show on layout</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="eventLogButton">
+       <property name="text">
+        <string>Event Log</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cameraRulesButton">
+       <property name="text">
+        <string>Camera rules</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnEditableLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/editable_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::ClipboardButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/client/desktop/ui/common/clipboard_button.h</header>
+  </customwidget>
+ </customwidgets>
+</ui>

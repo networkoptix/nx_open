@@ -154,7 +154,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     connect(ui->releaseNotesLabel, &QLabel::linkActivated, this, [this]()
     {
         if (!m_releaseNotesUrl.isEmpty())
-            QDesktopServices::openUrl(m_releaseNotesUrl);
+            QDesktopServices::openUrl(m_releaseNotesUrl.toQUrl());
     });
 
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,

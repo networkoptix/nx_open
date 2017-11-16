@@ -39,6 +39,7 @@
 
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/utils/vms_utils.h>
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/mediaserver/event/rule_processor.h>
 #include <nx/mediaserver/event/extended_rule_processor.h>
@@ -100,7 +101,7 @@
 
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <plugins/resource/flir/flir_io_executor.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
@@ -110,7 +111,7 @@
 #include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
-#include <plugins/storage/file_storage/db_storage_resource.h>
+#include <core/storage/file_storage/db_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <recorder/file_deletor.h>
@@ -184,6 +185,8 @@
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
 #include <rest/handlers/downloads_rest_handler.h>
+#include <rest/handlers/get_hardware_ids_rest_handler.h>
+#include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -191,6 +194,7 @@
 #include <rtsp/rtsp_connection.h>
 
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/initial_data_loader.h>
 #include <network/multicodec_rtp_reader.h>
 #include <network/router.h>
 
@@ -208,7 +212,9 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
+#include <nx/network/cloud/mediator_address_publisher.h>
 
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
@@ -247,14 +253,12 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
-#include "cloud/cloud_manager_group.h"
+#include "cloud/cloud_integration_manager.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
-#include <media_server/master_server_status_watcher.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
-#include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include "media_server_process_aux.h"
@@ -266,6 +270,7 @@
 #include <recorder/remote_archive_synchronizer.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
+#include <rest/handlers/change_camera_password_rest_handler.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -480,13 +485,15 @@ QnStorageResourcePtr createStorage(
     storage->setParentId(serverId);
     storage->setUrl(path);
 
-    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const QnPlatformMonitor::PartitionSpace& part)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
-    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    const auto storageType = (it != partitions.end())
+        ? it->type
+        : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
 
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
@@ -951,7 +958,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-QUrl appServerConnectionUrl(QSettings &settings)
+nx::utils::Url appServerConnectionUrl(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
     if (!qnServerModule->roSettings()->value("appserverPort").isNull())
@@ -960,18 +967,18 @@ QUrl appServerConnectionUrl(QSettings &settings)
         qnServerModule->roSettings()->remove("appserverPort");
     }
 
-    QUrl appServerUrl;
+    nx::utils::Url appServerUrl;
     QUrlQuery params;
 
     // ### remove
     QString host = settings.value("appserverHost").toString();
     if( QUrl( host ).scheme() == "file" )
     {
-        appServerUrl = QUrl( host ); // it is a completed URL
+        appServerUrl = nx::utils::Url( host ); // it is a completed URL
     }
     else if (host.isEmpty() || host == "localhost")
     {
-        appServerUrl = QUrl::fromLocalFile( closeDirPath( getDataDirectory() ) );
+        appServerUrl = nx::utils::Url::fromLocalFile( closeDirPath( getDataDirectory() ) );
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
@@ -1250,7 +1257,11 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    AddressFilters addressMask = AddressFilter::ipV4 | AddressFilter::ipV6 | AddressFilter::noLocal | AddressFilter::noLoopback;
+    AddressFilters addressMask =
+        AddressFilter::ipV4
+        | AddressFilter::ipV6
+        | AddressFilter::noLocal
+        | AddressFilter::noLoopback;
 
     QList<SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();
@@ -1268,7 +1279,7 @@ void MediaServerProcess::updateAddressesList()
     NX_LOGX(lit("Update mediaserver addresses: %1")
             .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
-    const QUrl defaultUrl(m_mediaServer->getApiUrl());
+    const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
     const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
     if (std::find(serverAddresses.begin(), serverAddresses.end(),
                   defaultAddress) == serverAddresses.end())
@@ -1283,283 +1294,16 @@ void MediaServerProcess::updateAddressesList()
     ec2::ApiMediaServerData server;
     fromResourceToApi(m_mediaServer, server);
     if (server != prevValue)
-        commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->save(server, this, &MediaServerProcess::at_serverSaved);
-
-    nx::network::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
-        serverAddresses.begin(), serverAddresses.end()));
-}
-
-void MediaServerProcess::loadResourcesFromECS(
-    ec2::AbstractECConnectionPtr ec2Connection,
-    QnCommonMessageProcessor* messageProcessor)
-{
-    ec2::ErrorCode rez;
     {
-        //reading servers list
-        ec2::ApiMediaServerDataList mediaServerList;
-        while( ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok )
-        {
-            NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        ec2::ApiDiscoveryDataList discoveryDataList;
-        while( ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok )
-        {
-            NX_LOG( lit("QnMain::run(). Can't get discovery data."), cl_logERROR );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        QMultiHash<QnUuid, QUrl> additionalAddressesById;
-        QMultiHash<QnUuid, QUrl> ignoredAddressesById;
-        for (const ec2::ApiDiscoveryData &data: discoveryDataList)
-        {
-            additionalAddressesById.insert(data.id, data.url);
-            if (data.ignore)
-                ignoredAddressesById.insert(data.id, data.url);
-        }
-
-        for(const auto &mediaServer: mediaServerList)
-        {
-            QList<SocketAddress> addresses;
-            ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses);
-
-            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer.id);
-            for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
-                const SocketAddress addr(it->host(), it->port());
-                if (it->port() == -1 && addresses.contains(addr))
-                    it = additionalAddresses.erase(it);
-                else
-                    ++it;
-            }
-            const auto dictionary = commonModule()->serverAdditionalAddressesDictionary();
-            dictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
-            dictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
-            messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
-        }
-        do {
-            if (needToStop())
-                return;
-        } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
-
-
-        // read resource status
-        ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetStatusList( statusList );
-
-        //reading server attributes
-        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
-
+        auto mediaServerManager =
+            commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
+        mediaServerManager->save(server, this, &MediaServerProcess::at_serverSaved);
     }
 
-
-    {
-        // read camera list
-        ec2::ApiCameraDataList cameras;
-        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        //reading camera attributes
-        ec2::ApiCameraAttributesDataList cameraUserAttributesList;
-        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
-
-        // read properties dictionary
-        ec2::ApiResourceParamWithRefDataList kvPairs;
-        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetPropertyList(kvPairs);
-
-        /* Properties and attributes must be read before processing cameras because of getAuth() method */
-        QnManualCameraInfoMap manualCameras;
-        for (const auto &camera : cameras)
-        {
-            messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
-            if (camera.manuallyAdded)
-            {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
-                if (resType)
-                {
-                    const auto auth = QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId);
-                    manualCameras.insert(camera.url,
-                        QnManualCameraInfo(QUrl(camera.url), auth, resType->getName()));
-                }
-                else
-                {
-                    NX_ASSERT(false, lm("No resourse type in the pool %1").arg(camera.typeId));
-                }
-            }
-        }
-        commonModule()->resourceDiscoveryManager()->registerManualCameras(manualCameras);
-    }
-
-    {
-        ec2::ApiServerFootageDataList serverFootageData;
-        while (( rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        commonModule()->cameraHistoryPool()->resetServerFootageData(serverFootageData);
-        commonModule()->cameraHistoryPool()->setHistoryCheckDelay(1000);
-    }
-
-    {
-        //loading users
-        ec2::ApiUserDataList users;
-        while(( rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const auto &user: users)
-            messageProcessor->updateResource(user, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading videowalls
-        ec2::ApiVideowallDataList videowalls;
-        while(( rez = ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for (const ec2::ApiVideowallData& videowall: videowalls)
-            messageProcessor->updateResource(videowall, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading layouts
-        ec2::ApiLayoutDataList layouts;
-        while(( rez = ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const auto &layout: layouts)
-            messageProcessor->updateResource(layout, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading webpages
-        ec2::ApiWebPageDataList webpages;
-        while ((rez = ec2Connection->getWebPageManager(Qn::kSystemAccess)->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for (const auto &webpage : webpages)
-            messageProcessor->updateResource(webpage, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading accessible resources
-        ec2::ApiAccessRightsDataList accessRights;
-        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetAccessRights(accessRights);
-    }
-
-    {
-        //loading user roles
-        ec2::ApiUserRoleDataList userRoles;
-        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetUserRoles(userRoles);
-    }
-
-    {
-        //loading business rules
-        vms::event::RuleList rules;
-        while( (rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
-        {
-            qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for (const auto& rule: rules)
-            messageProcessor->on_businessEventAddedOrUpdated(rule);
-    }
-
-    {
-        // load licenses
-        QnLicenseList licenses;
-        while( (rez = ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses)) != ec2::ErrorCode::ok )
-        {
-            qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const QnLicensePtr &license: licenses)
-            messageProcessor->on_licenseChanged(license);
-    }
-
-    // Start receiving local notifications
-    auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
-    processor->startReceivingLocalNotifications(ec2Connection);
+    nx::network::SocketGlobals::addressPublisher().updateAddresses(
+        std::list<SocketAddress>(
+            serverAddresses.begin(),
+            serverAddresses.end()));
 }
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
@@ -1719,8 +1463,8 @@ void MediaServerProcess::at_timer()
         return;
 
     // TODO: #2.4 #GDM This timer make two totally different functions. Split it.
-    qnServerModule->runTimeSettings()->setValue(
-        "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qnServerModule->setLastRunningTime(
+        std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
 
     const auto& resPool = commonModule()->resourcePool();
     QnResourcePtr mServer = resPool->getResourceById(commonModule()->moduleGUID());
@@ -1779,11 +1523,11 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudManagerGroup* cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
-	auto processorPool = tcpListener->processorPool();
+    auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
     processorPool->registerRedirectRule(lit(""), welcomePage);
     processorPool->registerRedirectRule(lit("/"), welcomePage);
@@ -1821,6 +1565,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
     reg("api/getNonce", new QnGetNonceRestHandler());
+    reg("api/getRemoteNonce", new QnGetNonceRestHandler(lit("/api/getNonce")));
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
@@ -1834,6 +1579,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     reg("api/pingSystem", new QnPingSystemRestHandler());
+    reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
     reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated, still used in the client
@@ -1857,7 +1603,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
@@ -1874,7 +1620,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
 
     // TODO: Introduce constants for API methods registered here, also use them in
-    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors.
+    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
+    // except when it is the path of some other api method.
 
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler()); //< deprecated
     reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
@@ -1898,6 +1645,10 @@ void MediaServerProcess::registerRestHandlers(
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+
+    static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
+    reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
+    reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -1912,7 +1663,7 @@ void MediaServerProcess::regTcp(
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudManagerGroup* const cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
@@ -1958,7 +1709,7 @@ bool MediaServerProcess::initTcpListener(
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), nx_http::AuthMethod::http);
+    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/.+"), nx_http::AuthMethod::http);
 
     nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values) (
         nx_http::AuthMethod::cookie |
@@ -2143,7 +1894,8 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
-void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
+void MediaServerProcess::resetSystemState(
+    nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
 {
     for (;;)
     {
@@ -2154,7 +1906,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
             continue;
         }
 
-        if (!resetSystemToStateNew(commonModule()))
+        if (!nx::vms::utils::resetSystemToStateNew(commonModule()))
         {
             qWarning() << "Error while resetting system to state \"new \". Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2445,42 +2197,15 @@ void MediaServerProcess::run()
     commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
-    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
-
-    TimeBasedNonceProvider timeBasedNonceProvider;
-    CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);
-    auto authHelper = std::make_unique<QnAuthHelper>(
-        commonModule(),
-        &timeBasedNonceProvider,
-        &cloudManagerGroup);
-    connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
-
-    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
-    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), nx_http::AuthMethod::noAuth );
-
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/ping"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/camera_event*"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/showLog*"), nx_http::AuthMethod::urlQueryParam);   //allowed by default for now
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/gettime"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
-
-    //by following delegating hls authentication to target server
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
+    auto auditManager = std::make_unique<QnMServerAuditManager>(
+        qnServerModule->lastRunningTimeBeforeRestart(), commonModule());
 
     std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
         new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
-    std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
+    auto videoCameraPool = std::make_unique<QnVideoCameraPool>(
+        *qnServerModule->settings(),
+        commonModule()->resourcePool());
 
     std::unique_ptr<QnMotionHelper> motionHelper(new QnMotionHelper());
 
@@ -2496,7 +2221,7 @@ void MediaServerProcess::run()
     QSettings* settings = qnServerModule->roSettings();
 
     commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(commonModule()));
-    QUrl appServerUrl = appServerConnectionUrl(*settings);
+    nx::utils::Url appServerUrl = appServerConnectionUrl(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( qnServerModule->roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
@@ -2510,7 +2235,7 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
 
     auto remoteArchiveSynchronizer =
-        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(qnServerModule);
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
@@ -2558,8 +2283,24 @@ void MediaServerProcess::run()
             commonModule(),
             settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
+    TimeBasedNonceProvider timeBasedNonceProvider;
+
+    auto cloudIntegrationManager = std::make_unique<CloudIntegrationManager>(
+        commonModule(),
+        ec2ConnectionFactory->messageBus(),
+        &timeBasedNonceProvider);
+
+    auto authHelper = std::make_unique<QnAuthHelper>(
+        commonModule(),
+        &timeBasedNonceProvider,
+        &cloudIntegrationManager->cloudManagerGroup());
+    connect(
+        authHelper.get(), &QnAuthHelper::emptyDigestDetected,
+        this, &MediaServerProcess::at_emptyDigestDetected);
+
+    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
+
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
-    QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
 
     //passing settings
     std::map<QString, QVariant> confParams;
@@ -2709,7 +2450,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
+    if (!initTcpListener(&cloudIntegrationManager->cloudManagerGroup(), ec2ConnectionFactory->messageBus()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2773,7 +2514,7 @@ void MediaServerProcess::run()
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
-        cloudManagerGroup.connectionManager.setProxyVia(
+        cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
@@ -2847,7 +2588,7 @@ void MediaServerProcess::run()
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     commonModule()->setModuleInformation(selfInformation);
-    commonModule()->bindModuleinformation(m_mediaServer);
+    commonModule()->bindModuleInformation(m_mediaServer);
 
     // show our cloud host value in registry in case of installer will check it
     const auto& globalSettings = commonModule()->globalSettings();
@@ -2899,7 +2640,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher(commonModule()));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
-    QnMediaServerResourceSearchers searchers(commonModule());
+    auto resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
     auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
@@ -2908,7 +2649,20 @@ void MediaServerProcess::run()
 
     commonModule()->resourceAccessManager()->beginUpdate();
     commonModule()->resourceAccessProvider()->beginUpdate();
-    loadResourcesFromECS(ec2Connection, commonModule()->messageProcessor());
+
+    nx::vms::utils::loadResourcesFromEcs(
+        commonModule(),
+        ec2Connection,
+        commonModule()->messageProcessor(),
+        m_mediaServer,
+        [this]() { return needToStop(); });
+
+    // Start receiving local notifications
+    auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
+    serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
+
+
+
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
 
@@ -2950,7 +2704,7 @@ void MediaServerProcess::run()
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
                     "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
 
-            resetSystemState(cloudManagerGroup.connectionManager);
+            resetSystemState(cloudIntegrationManager->cloudManagerGroup().connectionManager);
         }
         if (settingsProxy->isCloudInstanceChanged())
         {
@@ -3014,14 +2768,14 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        [this, &cloudManagerGroup]()
+        [this, &cloudIntegrationManager]()
         {
             updateAddressesList();
-            cloudManagerGroup.connectionManager.setProxyVia(
+            cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
                 SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
-    m_firstRunningTime = qnServerModule->runTimeSettings()->value("lastRunningTime").toLongLong();
+    m_firstRunningTime = qnServerModule->lastRunningTime().count();
 
     m_crashReporter.reset(new ec2::CrashReporter(commonModule()));
 
@@ -3082,7 +2836,7 @@ void MediaServerProcess::run()
     emit started();
     exec();
 
-    disconnect(QnAuthHelper::instance(), 0, this, 0);
+    disconnect(authHelper.get(), 0, this, 0);
     disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
     disconnect(qnNormalStorageMan, 0, this, 0);
     disconnect(qnBackupStorageMan, 0, this, 0);
@@ -3128,6 +2882,8 @@ void MediaServerProcess::run()
 
     hlsSessionPool.reset();
 
+    // Remove all stream recorders.
+    remoteArchiveSynchronizer.reset();
     recordingManager.reset();
 
     mserverResourceSearcher.reset();
@@ -3142,6 +2898,7 @@ void MediaServerProcess::run()
     serverResourceProcessor.reset();
 
     mdnsListener.reset();
+    resourceSearchers.reset();
     upnpDeviceSearcher.reset();
 
     connectorThread->quit();
@@ -3153,7 +2910,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -3165,7 +2921,7 @@ void MediaServerProcess::run()
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();
 
-    connectToCloudWatcher.reset();
+    cloudIntegrationManager.reset();
     ec2Connection.reset();
     ec2ConnectionFactory.reset();
 
@@ -3173,7 +2929,7 @@ void MediaServerProcess::run()
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();
-    qnServerModule->runTimeSettings()->setValue("lastRunningTime", 0);
+    qnServerModule->setLastRunningTime(std::chrono::milliseconds::zero());
 
     authHelper.reset();
     //fileDeletor.reset();
@@ -3186,7 +2942,8 @@ void MediaServerProcess::run()
 
     performActionsOnExit();
 
-    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
+    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerIdIfEqual(
+        "ms", commonModule()->moduleGUID());
 
     m_autoRequestForwarder.reset();
 
@@ -3418,4 +3175,31 @@ int MediaServerProcess::main(int argc, char* argv[])
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const
 {
     return m_cmdLineArguments;
+}
+
+void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions)
+{
+    // For "OPTIONS * RTSP/1.0"
+    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth);
+
+    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx_http::AuthMethod::urlQueryParam);
+    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getNonce"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/static/.*"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
+    // authentication is implemented.
+    // WARNING: This is severe vulnerability introduced in 3.0.
+    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
+        nx_http::AuthMethod::noAuth);
 }

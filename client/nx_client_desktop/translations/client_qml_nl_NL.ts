@@ -50,7 +50,7 @@
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Zoek</translation>
+      <translation>Zoeken</translation>
     </message>
   </context>
   <context>

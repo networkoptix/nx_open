@@ -112,7 +112,7 @@ void QnRestConnectionProcessor::run()
 
     d->response.messageBody.clear();
 
-    QUrl url = getDecodedUrl();
+    nx::utils::Url url = getDecodedUrl();
     RestRequest request{url.path(),  QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded), this};
     RestResponse response;
 

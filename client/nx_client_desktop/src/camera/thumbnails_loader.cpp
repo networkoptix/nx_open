@@ -22,7 +22,7 @@ extern "C"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
 
-#include "plugins/resource/avi/thumbnails_archive_delegate.h"
+#include "core/resource/avi/thumbnails_archive_delegate.h"
 #include "nx/streaming/archive_stream_reader.h"
 
 #include "nx/streaming/rtsp_client_archive_delegate.h"
@@ -30,7 +30,7 @@ extern "C"
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
-#include "plugins/resource/avi/avi_resource.h"
+#include "core/resource/avi/avi_resource.h"
 
 #include <recording/time_period.h>
 #include "core/resource/media_server_resource.h"

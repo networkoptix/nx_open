@@ -46,7 +46,7 @@ nx_add_target(nx_client_desktop LIBRARY
     PUBLIC_LIBS
         Qt5::Core Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
         Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
-        nx_client_core nx_speech_synthesizer nx_audio libvms_gateway
+        nx_client_core nx_speech_synthesizer nx_audio libvms_gateway_core
 )
 
 if(WINDOWS)

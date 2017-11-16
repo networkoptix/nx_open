@@ -6,42 +6,63 @@ from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json
 import os
-from util.config import get_config
 from util.helpers import get_language_for_email
+from cms.models import customization_cache, check_update_cache
+from cms.controllers import filldata 
+from django.core.cache import cache, caches
 
 
-titles_cache = {}
-templates_cache = {}
-configs_cache = {}
-logos_cache = {}
-modified_file_time_cache = {}
+def email_cache(customization_name, cache_type, value=None, force=None):
+    data = cache.get('email_cache')
+    global_id = 0
+    if not data:
+        data = {customization_name: {'version_id': global_id}}
+
+    if customization_name in data and 'version_id' in data[customization_name]:
+        global_force, global_id = check_update_cache(customization_name, data[customization_name]['version_id'])
+        if not force:
+            force = global_force
+
+    if data and customization_name in data and 'version_id' in data[customization_name]\
+            and data[customization_name]['version_id'] != global_id:
+        force = True
+
+    if not data:
+        data = {}
+
+    if customization_name not in data or force:
+        data[customization_name] = {'version_id': global_id}
+
+    if cache_type not in data[customization_name]:
+        data[customization_name][cache_type] = {}
+
+    if value:
+        data[customization_name][cache_type] = value
+        cache.set('email_cache', data)
+    else:
+        cache.set('email_cache', data)
+        return data[customization_name][cache_type]
 
 
-def send(email, msg_type, message, customization):
-    custom_config = get_custom_config(customization)
-    lang = get_language_for_email(email, custom_config['languages'])
-
-    templates_root = os.path.join(
-        settings.STATIC_LOCATION, customization, "templates")
-    templates_location = os.path.join(templates_root, "lang_" + lang)
-    subject = msg_type
+def send(email, msg_type, message, customization_name):
+    language_code = get_language_for_email(email, customization_name)
 
     config = {
-        'portal_url': custom_config['cloud_portal']['url']
+        'portal_url': customization_cache(customization_name, "portal_url")
     }
 
-    subject = custom_config["mail_prefix"] + ' ' + \
-        get_email_title(customization, lang, msg_type, templates_location)
+    subject = get_email_title(customization_name, language_code, msg_type)
     subject = pystache.render(subject, {"message": message, "config": config})
 
-    message_html_template = read_template(msg_type, templates_location, True)
-    message_txt_template = read_template(msg_type, templates_location, False)
+    message_html_template = read_template(customization_name, msg_type, language_code, True)
+    message_txt_template = read_template(customization_name, msg_type, language_code, False)
 
-    email_html_body = pystache.render(
-        message_html_template, {"message": message, "config": config})
-    email_txt_body = pystache.render(
-        message_txt_template, {"message": message, "config": config})
-    email_from = custom_config["mail_from"]
+    email_html_body = pystache.render(message_html_template, {"message": message, "config": config})
+    email_txt_body = pystache.render(message_txt_template, {"message": message, "config": config})
+
+    email_from_name = customization_cache(customization_name, "mail_from_name")
+    email_from_email = customization_cache(customization_name, "mail_from_email")
+    email_from = '%s <%s>' % (email_from_name, email_from_email)
 
     msg = EmailMultiAlternatives(
         subject, email_txt_body, email_from, to=(email,))
@@ -53,57 +74,34 @@ def send(email, msg_type, message, customization):
     # msg.attach_alternative(email_txt_body, "text/plain")
 
     msg.mixed_subtype = 'related'
-    logo_filename = os.path.join(templates_root, 'email_logo.png')
-    msg_img = MIMEImage(read_logo(logo_filename))
+    msg_img = MIMEImage(read_file(customization_name, 'templates/email_logo.png'))
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
     return msg.send()
 
 
-def get_custom_config(customization):
-    if customization not in configs_cache:
-        configs_cache[customization] = get_config(customization)
-    return configs_cache[customization]
+def get_email_title(customization_name, language_code, event):
+    titles_cache = email_cache(customization_name, 'email_titles')
+    if language_code not in titles_cache:
+        filename = "templates/lang_{{language}}/notifications-language.json"
+        data = read_file(customization_name, filename, language_code)
+        titles_cache[language_code] = json.load(data)
+        email_cache(customization_name, 'email_titles', titles_cache)
+    return titles_cache[language_code][event]["emailSubject"]
 
 
-def get_email_title(customization, lang, event, templates_location):
-    if customization not in titles_cache:
-        titles_cache[customization] = {}
-    if lang not in titles_cache[customization]:
-        filename = os.path.join(
-            templates_location, "notifications-language.json")
-        with open(filename) as data_file:
-            titles_cache[customization][lang] = json.load(data_file)
-    return titles_cache[customization][lang][event]["emailSubject"]
-
-
-def read_template(name, location, html):
+def read_template(customization_name, name, language_code, html):
     suffix = ''
     if not html:
         suffix = '.txt'
-    filename = os.path.join(location, name + suffix + '.mustache')
-    if filename not in templates_cache:
-        try:
-            # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
-            with codecs.open(filename, 'r', 'utf-8') as stream:
-                templates_cache[filename] = stream.read()
-        except Exception as e:
-            raise type(e)(e.message + ' :' + filename)
-    return templates_cache[filename]
+    filename = os.path.join("templates/lang_{{language}}", name + suffix + '.mustache')
+    return read_file(customization_name, filename, language_code)
+    
 
-
-def read_logo(filename):
-    global modified_file_time_cache, logos_cache
-
-    # os.stat(filename)[8] gets the modified time for the file
-    # If the file is not cached then it needs to be added
-    # If the file is cached but the modified time is different from the time
-    # that was saved then it needs to be updated
-    if filename not in logos_cache or filename in modified_file_time_cache\
-            and os.stat(filename)[8] != modified_file_time_cache[filename]:
-        with open(filename, 'rb') as fp:
-            logos_cache[filename] = fp.read()
-        # After the file has been updated safe the modified time to the
-        # modified_file_time_cache
-        modified_file_time_cache[filename] = os.stat(filename)[8]
-    return logos_cache[filename]
+def read_file(customization_name, filename, language_code=None):
+    files_cache = email_cache(customization_name, 'files')
+    translated_name = filename.replace("{{language}}", language_code)
+    if translated_name not in files_cache:
+        files_cache[translated_name] = filldata.read_customized_file(filename, customization_name, language_code)
+        email_cache(customization_name, 'files', files_cache)
+    return files_cache[translated_name]

@@ -16,14 +16,14 @@
 #include <memory>
 
 #if defined(QT_CORE_LIB)
-    // To be supported in NX_PRINT_VALUE.
+    // To be supported in toString() and NX_PRINT_VALUE.
     #include <QtCore/QByteArray>
     #include <QtCore/QString>
     #include <QtCore/QUrl>
 #endif
 
 #if !defined(NX_KIT_API)
-    #define NX_KIT_API
+    #define NX_KIT_API /*empty*/
 #endif
 
 namespace nx {
@@ -54,6 +54,16 @@ NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
 
 //-------------------------------------------------------------------------------------------------
 // Output
+
+/** Define if needed to redirect NX_PRINT... to qDebug(). */
+#if defined(NX_PRINT_TO_QDEBUG)
+    #define NX_DEBUG_STREAM qDebug().nospace().noquote()
+    #define NX_DEBUG_ENDL /*empty*/
+    static inline QDebug operator<<(QDebug d, const std::string& s)
+    {
+        return d << QString::fromStdString(s);
+    }
+#endif
 
 #if !defined(NX_DEBUG_INI)
     /** If needed, redefine to form a prefix for NX_DEBUG_ENABLE... macros. */
@@ -113,10 +123,16 @@ NX_KIT_API std::ostream*& stream();
         << ", file " << nx::kit::debug::relativeSrcFilename(__FILE__);
 
 /**
- * Print the expression text and its value in brackets.
+ * Convert various values to their accurate text representation, e.g. quoted and escaped strings.
+ */
+template<typename T>
+std::string toString(T value);
+
+/**
+ * Print the expression text and its value via toString().
  */
 #define NX_PRINT_VALUE(VALUE) \
-    NX_PRINT << "####### " #VALUE ": " << nx::kit::debug::detail::toString((VALUE))
+    NX_PRINT << "####### " #VALUE ": " << nx::kit::debug::toString((VALUE))
 
 /**
  * Hex-dump binary data using NX_PRINT.
@@ -184,8 +200,6 @@ NX_KIT_API std::ostream*& stream();
 //-------------------------------------------------------------------------------------------------
 // Implementation
 
-namespace detail {
-
 #define NX_KIT_DEBUG_DETAIL_CONCAT(X, Y) NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y)
 #define NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y) X##Y
 
@@ -227,6 +241,8 @@ std::string toString(P* ptr)
 {
     return toString((const void*) ptr);
 }
+
+namespace detail {
 
 typedef std::function<void(const char*)> PrintFunc;
 

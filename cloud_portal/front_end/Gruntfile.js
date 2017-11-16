@@ -13,6 +13,9 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
+    //var cloudHost = 'localhost';  // for python manage.py runserver
+    //var cloudPort = 8000;
+
     var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
     var cloudPort = 80;
 
@@ -70,7 +73,7 @@ module.exports = function (grunt) {
             },
             compass: {
                 files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}',
-                        'customizations/<%= yeoman.config.customization %>/front_end/{,*/}*.{scss,sass}',
+                        'skins/<%= yeoman.config.skin %>/front_end/{,*/}*.{scss,sass}',
                         '<%= yeoman.web_common %>/styles/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
@@ -446,13 +449,13 @@ module.exports = function (grunt) {
         copy: {
             custom: {
                 expand: true,
-                cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                cwd: '../skins/<%= yeoman.config.skin %>/front_end',
                 dest: '.tmp/',
                 src: '**'
             },
             custom_css: {
                 expand: true,
-                cwd: '../customizations/<%= yeoman.config.customization %>/front_end/styles/',
+                cwd: '../skins/<%= yeoman.config.skin %>/front_end/styles/',
                 dest: '<%= yeoman.app %>/styles/custom/',
                 src: '**'
             },
@@ -488,7 +491,7 @@ module.exports = function (grunt) {
                     },
                     {
                         expand: true,
-                        cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                        cwd: '../skins/<%= yeoman.config.skin %>/front_end',
                         dest: '<%= yeoman.dist %>/',
                         src: '**'
                     },
@@ -580,30 +583,10 @@ module.exports = function (grunt) {
                 options: {
                     args: {specs: ['test/e2e/_restore-all-passwords/*spec.js']}
                 }
-            },            
-            userclean1: {
-                options: {
-                    args: {specs: ['test/e2e/_restore-all-passwords/create-users_spec.js']}
-                }
-            },
-            userclean2: {
-                options: {
-                    args: {specs: ['test/e2e/_restore-all-passwords/spec.js']}
-                }
             },
             account: {
                 options: {
                     args: {specs: ['test/e2e/account/*spec.js']}
-                }
-            },
-            account1: {
-                options: {
-                    args: {specs: ['test/e2e/account/account_spec.js']}
-                }
-            },
-            account2: {
-                options: {
-                    args: {specs: ['test/e2e/account/change-pass_spec.js']}
                 }
             },
             login: {
@@ -611,39 +594,9 @@ module.exports = function (grunt) {
                     args: {specs: ['test/e2e/login/*spec.js']}
                 }
             },
-            login1: {
-                options: {
-                    args: {specs: ['test/e2e/login/login_spec.js']}
-                }
-            },
-            login2: {
-                options: {
-                    args: {specs: ['test/e2e/login/all_places_negative_spec.js']}
-                }
-            },
-            login3: {
-                options: {
-                    args: {specs: ['test/e2e/login/all_places_positive_spec.js']}
-                }
-            },
             register: {
                 options: {
                     args: {specs: ['test/e2e/register/*spec.js']}
-                }
-            },
-            register1: {
-                options: {
-                    args: {specs: ['test/e2e/register/register_spec.js']}
-                }
-            },
-            register2: {
-                options: {
-                    args: {specs: ['test/e2e/register/activate_spec.js']}
-                }
-            },
-            register3: {
-                options: {
-                    args: {specs: ['test/e2e/register/common-form_spec.js']}
                 }
             },
             restorepass: {
@@ -651,39 +604,9 @@ module.exports = function (grunt) {
                     args: {specs: ['test/e2e/restore_pass/*spec.js']}
                 }
             },
-            restorepass1: {
-                options: {
-                    args: {specs: ['test/e2e/restore_pass/restore_pass_spec.js']}
-                }
-            },
-            restorepass2: {
-                options: {
-                    args: {specs: ['test/e2e/restore_pass/restore_pass_ext_spec.js']}
-                }
-            },
-            restorepass3: {
-                options: {
-                    args: {specs: ['test/e2e/restore_pass/email_spec.js']}
-                }
-            },
             syspage: {
                 options: {
                     args: {specs: ['test/e2e/system_page/*spec.js']}
-                }
-            },
-            syspage1: {
-                options: {
-                    args: {specs: ['test/e2e/system_page/share_spec.js']}
-                }
-            },
-            syspage2: {
-                options: {
-                    args: {specs: ['test/e2e/system_page/system_spec.js']}
-                }
-            },
-            syspage3: {
-                options: {
-                    args: {specs: ['test/e2e/system_page/users_spec.js']}
                 }
             },
             systems: {
@@ -769,8 +692,8 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('setbranding', function (branding) {
-        var config = {customization: branding};
+    grunt.registerTask('setskin', function (skin) {
+        var config = {skin: skin};
         grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
     });
 

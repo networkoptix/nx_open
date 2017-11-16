@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -82,7 +83,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     if (ipVersion == AF_INET)
         ASSERT_EQ(senderHost.ipV4()->s_addr, remoteHost.ipV4()->s_addr);
     else if (ipVersion == AF_INET6)
-        ASSERT_EQ(0, memcmp(&senderHost.ipV6().get(), &remoteHost.ipV6().get(), sizeof(in6_addr)));
+        ASSERT_EQ(0, memcmp(&senderHost.ipV6().first.get(), &remoteHost.ipV6().first.get(), sizeof(in6_addr)));
     else
         FAIL();
 

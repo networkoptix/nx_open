@@ -9,8 +9,8 @@
 #include <core/resource_access/resource_access_filter.h>
 
 #include <utils/common/warnings.h>
-#include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "plugins/resource/avi/avi_resource.h"
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -37,7 +37,7 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
     return Qn::Online;
 }
 
-QnLayoutResourcePtr QnLayoutResource::clone() const
+QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
 {
     QnLayoutResourcePtr result(new QnLayoutResource(commonModule()));
 
@@ -63,6 +63,8 @@ QnLayoutResourcePtr QnLayoutResource::clone() const
     }
     for (int i = 0; i < items.size(); i++)
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
+    if (remapHash)
+        *remapHash = newUuidByOldUuid;
 
     result->setItems(items);
     return result;

@@ -2,6 +2,8 @@
 
 #include <initializer_list>
 
+#include <nx/network/buffer.h>
+
 #include "../http_types.h"
 
 namespace nx_http {
@@ -24,7 +26,8 @@ bool substituteNextParameter(
         return false;
     }
 
-    path->replace(
+    nx::replace(
+        path,
         openingBracketPos,
         closingBracketPos - openingBracketPos + 1,
         argument);
@@ -59,6 +62,26 @@ nx::String substituteParameters(
         NX_ASSERT(false);
     }
     return resultPath;
+}
+
+template<typename ArgumentType>
+std::string substituteParameters(
+    const std::string& pathTemplate,
+    std::initializer_list<ArgumentType> arguments)
+{
+    return substituteParameters(
+        nx::String::fromStdString(pathTemplate),
+        std::move(arguments)).toStdString();
+}
+
+template<typename ArgumentType>
+std::string substituteParameters(
+    const char* pathTemplate,
+    std::initializer_list<ArgumentType> arguments)
+{
+    return substituteParameters(
+        nx::String(pathTemplate),
+        std::move(arguments)).toStdString();
 }
 
 } // namespace rest

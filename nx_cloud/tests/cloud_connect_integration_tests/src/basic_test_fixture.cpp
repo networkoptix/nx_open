@@ -8,10 +8,11 @@
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
-#include <nx/cloud/relay/controller/connect_session_manager.h>
+//#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
-#include <nx/cloud/relay/model/listening_peer_pool.h>
-#include <nx/cloud/relay/model/model.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
+//#include <nx/cloud/relay/model/model.h>
 
 namespace nx {
 namespace network {
@@ -36,12 +37,15 @@ boost::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
-cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
-    const std::string& domainName,
-    const std::string& relayHost)
+cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(const std::string& domainName)
 {
-    m_relayTest->peerAdded(domainName, relayHost);
+    m_relayTest->peerAdded(domainName);
     return cf::make_ready_future(true);
+}
+
+bool MemoryRemoteRelayPeerPool::connectToDb()
+{
+    return false;
 }
 
 cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
@@ -194,14 +198,14 @@ void BasicTestFixture::stopServer()
     m_httpServer.reset();
 }
 
-QUrl BasicTestFixture::relayUrl(int relayNum) const
+nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
     auto relayUrlString = lm("http://%1/")
         .arg(m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].toStdString()).toQString();
 
-    return QUrl(relayUrlString);
+    return nx::utils::Url(relayUrlString);
 }
 
 void BasicTestFixture::restartMediator()
@@ -375,7 +379,7 @@ void BasicTestFixture::startHttpServer()
 
     m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
-    m_staticUrl = QUrl(lm("http://%1/static").arg(serverSocketCloudAddress()));
+    m_staticUrl = nx::utils::Url(lm("http://%1/static").arg(serverSocketCloudAddress()));
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 

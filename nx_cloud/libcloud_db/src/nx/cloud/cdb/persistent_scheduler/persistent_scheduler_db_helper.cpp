@@ -7,7 +7,7 @@ namespace nx {
 namespace cdb {
 
 static const int kSchedulerDbStartingVersion = 1;
-static const std::string kPersistentShedulerStructureName = 
+static const std::string kPersistentShedulerStructureName =
     "scheduler_7AF3398A-CFE0-4AEF-8D2F-F8FBD7B5F0BA";
 static const char* const kSchedulerDbScheme = R"sql(
     CREATE TABLE schedule_data(

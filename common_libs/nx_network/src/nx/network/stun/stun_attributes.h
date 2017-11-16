@@ -185,7 +185,7 @@ struct NX_NETWORK_API FingerPrint: Attribute
 {
     static const int TYPE = fingerPrint;
 
-    FingerPrint(uint32_t crc32_);
+    FingerPrint(uint32_t crc32_ = 0);
     virtual int getType() const override { return TYPE; }
     uint32_t getCrc32() const { return crc32; }
 

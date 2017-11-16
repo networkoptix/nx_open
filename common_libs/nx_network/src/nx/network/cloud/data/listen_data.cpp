@@ -40,7 +40,7 @@ ListenResponse::ListenResponse():
 {
 }
 
-using TcpKeepAlive = 
+using TcpKeepAlive =
     stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive>;
 
 void ListenResponse::serializeAttributes(nx::stun::Message* const message)

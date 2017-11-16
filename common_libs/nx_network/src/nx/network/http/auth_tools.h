@@ -11,14 +11,58 @@
 
 namespace nx_http {
 
+enum class AuthTokenType
+{
+    none,
+    password,
+    ha1,
+};
+
+class NX_NETWORK_API AuthToken
+{
+public:
+    nx::String value;
+    AuthTokenType type = AuthTokenType::none;
+
+    void setPassword(const nx::String& password);
+    void setHa1(const nx::String& ha1);
+    bool empty() const;
+};
+
+class NX_NETWORK_API PasswordAuthToken:
+    public AuthToken
+{
+public:
+    PasswordAuthToken(const nx::String& password);
+};
+
+class NX_NETWORK_API Ha1AuthToken:
+    public AuthToken
+{
+public:
+    Ha1AuthToken(const nx::String& ha1);
+};
+
+class NX_NETWORK_API Credentials
+{
+public:
+    QString username;
+    AuthToken authToken;
+
+    Credentials() = default;
+    Credentials(
+        const QString& username,
+        const AuthToken& authToken);
+};
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Generates Authorization header and adds it to the request.
  */
 bool NX_NETWORK_API addAuthorization(
     Request* const request,
-    const StringType& userName,
-    const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const Credentials& credentials,
     const header::WWWAuthenticate& wwwAuthenticateHeader);
 
 BufferType NX_NETWORK_API calcHa1(
@@ -68,6 +112,12 @@ bool NX_NETWORK_API calcDigestResponse(
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader);
+bool NX_NETWORK_API calcDigestResponse(
+    const StringType& method,
+    const Credentials& credentials,
+    const StringType& uri,
+    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    header::DigestAuthorization* const digestAuthorizationHeader);
 
 /**
  * To be used by server to validate recevied Authorization against known credentials.
@@ -81,7 +131,7 @@ bool NX_NETWORK_API validateAuthorization(
 
 /**
  * @param ha1 That's what calcHa1 has returned.
- * WARNING: ha1.size() + 1 + nonce.size() MUST be divisible by 64! 
+ * WARNING: ha1.size() + 1 + nonce.size() MUST be divisible by 64!
  *   This is requirement of MD5 algorithm.
  */
 BufferType NX_NETWORK_API calcIntermediateResponse(

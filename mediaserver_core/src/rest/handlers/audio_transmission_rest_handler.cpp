@@ -28,14 +28,14 @@ int QnAudioTransmissionRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    auto clientId = params[kClientIdParamName];
+    auto sourceId = params[kClientIdParamName];
     auto resourceId = params[kResourceIdParamName];
     QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
         ? QnAudioStreamerPool::Action::Start
         : QnAudioStreamerPool::Action::Stop;
 
     if (!QnAudioStreamerPool::instance()->startStopStreamToResource(
-            QnUuid::fromStringSafe(clientId),
+            sourceId,
             QnUuid::fromStringSafe(resourceId),
             action,
             errorStr,

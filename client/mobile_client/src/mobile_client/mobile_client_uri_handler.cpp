@@ -39,7 +39,7 @@ const char*QnMobileClientUriHandler::handlerMethodName()
     return "handleUrl";
 }
 
-void QnMobileClientUriHandler::handleUrl(const QUrl& url)
+void QnMobileClientUriHandler::handleUrl(const nx::utils::Url& url)
 {
     SystemUri uri(url);
 
@@ -47,14 +47,14 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
     {
         // Open external URLs.
         if (url.isValid())
-            QDesktopServices::openUrl(url);
+            QDesktopServices::openUrl(url.toQUrl());
         return;
     }
 
     if (uri.referral().source == SystemUri::ReferralSource::MobileClient)
     {
         // Ignore our own URL requests.
-        QDesktopServices::openUrl(url);
+        QDesktopServices::openUrl(url.toQUrl());
         return;
     }
 
@@ -64,7 +64,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
         if (uri.scope() == SystemUri::Scope::Generic)
         {
             // Re-call openUrl to let QDesktopServices open URL in browser.
-            QDesktopServices::openUrl(url);
+            QDesktopServices::openUrl(url.toQUrl());
         }
 
         return;

@@ -117,7 +117,7 @@ TEST(IoServerMonitorTest, main)
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");
 
-    QUrl url = launcher.apiUrl();
+    nx::utils::Url url = launcher.apiUrl();
     url.setPath("/api/iomonitor");
     QUrlQuery query;
     query.addQueryItem(Qn::PHYSICAL_ID_URL_QUERY_ITEM, kTestCamPhysicalId);

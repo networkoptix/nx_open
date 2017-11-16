@@ -26,7 +26,7 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
     QnAbstractMediaData::assign(other);
     width = other->width;
     height = other->height;
-    motion = other->motion;
+    metadata = other->metadata;
     pts = other->pts;
 }
 

@@ -4,6 +4,8 @@
 {% load cms_filters %}
 
 {% block extrahead %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
 {% endblock %}
 
@@ -20,18 +22,51 @@
     {% endif %}
 </fieldset>
 
-<form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
-    <input type="hidden" name="currentLanguage" value="{{ language.id }}">
+<form id="contextForm" action="{% url 'page_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
+    <input type="hidden" name="currentLanguage" value="{{ language.code }}">
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">
-            {{ field.label_tag }}
-            <div id="{{field.label}}" style="display:inline-block;">
-                {% if field|is_ImageField and field.value%}
-                <div>
-                    <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
-                </div>
+            {% is_optional field.name context as optional %}
+            {% has_value field.name context customization language as record_exists %}
+            {% if not optional and not record_exists %}
+            <label class="text-danger" for="id_{{ field.name }}">{{ field.label }}</label>
+            {% else %}
+            <label for="id_{{ field.name }}">{{ field.label }}</label>
+            {% endif %}
+            <div id="{{field.name}}" style="display:inline-block;">
+                {% if field|is_ImageField and field.value %}
+                    <div>
+                        {% if optional and record_exists %}
+                        <label><input id="delete_{{field.name}}" type="checkbox"
+                                      name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        <br><br>
+                        {% endif %}
+
+                        {%if optional and not record_exists %}
+                        <img class="preview-image context-preview optional-image"
+                             src="data:image/png;base64,{{field.value}}">
+                        {% else %}
+                        <img class="preview-image context-preview"
+                             src="data:image/png;base64,{{field.value}}">
+                        {% endif %}
+                    </div>
+
+                {% elif field|is_FileField and field.value %}
+                    <div>
+                        {% if optional and record_exists %}
+                        <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        {% endif %}
+
+                        <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>
+                        {% if optional and not record_exists %}
+                        Download Example
+                        {% else %}
+                        Download
+                        {% endif %}
+                        </a>
+                    </div>
                 {% endif %}
                 {{ field }}
                 
@@ -44,26 +79,30 @@
 
     {% if perms.cms.edit_content %}
     <div class="submit-row">
-        <button class="button" type="submit" name="SaveDraft">Save Draft</button>
-        <button class="button" type="submit" name="Preview">Save and Preview</button>
-        <button class="button" type="submit" name="SendReview">Send for Review</button>
-        <button class="button" type="reset"  name="Reset">Reset</button>
+        {% if preview_link %}
+        <button class='btn btn-sm btn-default pull-left' onClick="openPreview()">Open Preview</button>
+        {% endif %}
+        {% if user.is_superuser and context.file_path%}
+        <button class="btn btn-sm btn-default">
+            <a href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
+               download>Download Draft</a>
+        </button>
+        {% endif %}
+        <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
+        <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
+        <button class="btn btn-sm btn-success" type="submit" name="SendReview">Send for Review</button>
+        <button class="btn btn-sm btn-danger" type="reset"  name="Reset">Reset</button>
     </div>
     {% endif %}
 
 </form>
-
-{% if preview_link %}
-<div class="submit-row">
-<button onClick="openPreview()">Open Preview</button>
-{% endif %}
 
 <!--{% if image %}
 <div> <img src="data:image/png;base64,{{image}}"> </div>
 {% endif %}-->
 <script>
     function openPreview(){
-        window.open("//{{ preview_link }}");
+        window.open("{{ preview_link }}");
     }
 
     function wasTouched(){
@@ -108,12 +147,11 @@
         menubar: false,
         resize: 'both',
         theme:'advanced',
-        theme_advanced_buttons1: 'undo,redo,separator,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent',
+        plugins: 'preview,-visualblocks,-advcode,paste',
+        theme_advanced_buttons1: 'undo,redo,separator,formatselect,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword',
         theme_advanced_toolbar_location: 'top',
         theme_advanced_toolbar_align: 'left',
-        theme_advanced_resizing: true,
-        paste_text_sticky: true,
-        paste_text_sticky_default : true
+        theme_advanced_resizing: true
     });
 </script>
 {% endblock%}

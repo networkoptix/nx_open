@@ -3,7 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include <libvms_gateway/src/test_support/vms_gateway_functional_test.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+
+#include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
 
 #include <controller.h>
 #include <mediator_service.h>
@@ -33,6 +35,10 @@ protected:
     void givenGatewayThatFailedToConnectToMediator()
     {
         mediator().stop();
+
+        // TODO: #ak We cannot rely on that mediator will be able to start on the same port.
+        // Must hold port busy somehow. 
+        // E.g., could introduce simple tcp forwarder based on AsyncChannelBridge class.
 
         whenStartGateway();
 

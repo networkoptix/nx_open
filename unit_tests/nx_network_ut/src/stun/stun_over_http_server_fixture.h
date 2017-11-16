@@ -25,7 +25,7 @@ public:
 
     virtual bool bind(const SocketAddress& localEndpoint) override;
     virtual bool listen() override;
-    virtual QUrl getServerUrl() const override;
+    virtual utils::Url getServerUrl() const override;
     virtual nx::stun::MessageDispatcher& dispatcher() override;
     virtual void sendIndicationThroughEveryConnection(nx::stun::Message) override;
     virtual std::size_t connectionCount() const override;
@@ -45,7 +45,7 @@ protected:
     virtual void SetUp() override;
 
     nx::stun::MessageDispatcher& dispatcher();
-    QUrl tunnelUrl() const;
+    utils::Url tunnelUrl() const;
     nx::stun::Message popReceivedMessage();
     nx::stun::Message prepareRequest();
 

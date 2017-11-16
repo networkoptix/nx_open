@@ -71,6 +71,7 @@ namespace ec2 {
     struct ApiVideowallMatrixItemWithRefData;
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
+    struct ApiSystemMergeHistoryRecord;
     struct ApiUpdateInstallData;
     struct ApiLoginData;
     struct ApiDiscoveryData;
@@ -136,6 +137,7 @@ namespace ec2 {
     typedef std::vector<ApiWebPageData> ApiWebPageDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
     typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
+    typedef std::vector<ApiSystemMergeHistoryRecord> ApiSystemMergeHistoryRecordList;
 
     /**
      * Wrapper to be used for overloading as a distinct type for ApiStorageData api requests.
@@ -211,6 +213,7 @@ namespace ec2 {
     (ApiUpdateInstallData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
+    (ApiSystemMergeHistoryRecord) \
     (ApiLoginData)\
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\

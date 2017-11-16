@@ -7,7 +7,7 @@
 #include <core/onvif/onvif_config_data.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/credentials.h>
-#include <core/dataprovider/stream_mixer.h>
+#include <core/dataprovider/stream_mixer_data.h>
 #include <core/resource/resource_data_structures.h>
 #include <core/resource/camera_advanced_param.h>
 

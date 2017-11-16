@@ -73,6 +73,11 @@ QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedClientPeers() const
     return m_bus->directlyConnectedClientPeers();
 }
 
+QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
+{
+    return m_bus->directlyConnectedServerPeers();
+}
+
 QnUuid TransactionMessageBusAdapter::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
 {
     return m_bus->routeToPeerVia(dstPeer, distance);
@@ -83,7 +88,7 @@ int TransactionMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
     return m_bus->distanceToPeer(dstPeer);
 }
 
-void TransactionMessageBusAdapter::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url)
+void TransactionMessageBusAdapter::addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url &url)
 {
     m_bus->addOutgoingConnectionToPeer(id, url);
 }

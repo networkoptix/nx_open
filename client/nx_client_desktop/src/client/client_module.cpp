@@ -15,6 +15,8 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
+#include <camera/camera_data_manager.h>
+
 #include <nx/utils/crash_dump/systemexcept.h>
 
 #include <camera/camera_bookmarks_manager.h>
@@ -45,7 +47,6 @@
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/layout_tour_manager.h>
 
@@ -53,8 +54,9 @@
 
 #include <finders/systems_finder.h>
 #include <nx/vms/discovery/manager.h>
-#include <network/router.h>
 
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
@@ -65,11 +67,11 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
-#include <plugins/storage/file_storage/qtfile_storage_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/qtfile_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
-#include <analytics/metadata_analytics_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -77,13 +79,14 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/synctime.h>
 
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
+#include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
+#include <nx/client/desktop/layout_templates/layout_template_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -177,7 +180,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initMetaInfo();
     initApplication();
     initSingletons(startupParams);
-    initRuntimeParams(startupParams);
     initLog(startupParams);
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -307,6 +309,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnClientRuntimeSettings());
     commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
 
+    initRuntimeParams(startupParams);
+
     /* Shorted initialization if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return;
@@ -332,7 +336,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new QnMetadataAnalyticsController());
+    commonModule->store(new nx::client::desktop::MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -344,6 +348,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
+
+    commonModule->store(new ResourceWidgetPixmapCache());
 
     // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
     initLocalInfo(startupParams);
@@ -368,6 +374,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnQtbugWorkaround());
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
+    m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
+
+    commonModule->store(new LayoutTemplateManager());
+
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
@@ -379,6 +389,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
+    qnRuntime->setProfilerMode(startupParams.profilerMode);
 
     if (!startupParams.engineVersion.isEmpty())
     {
@@ -514,8 +525,10 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
+    {
         nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
+    }
 
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);
@@ -616,6 +629,11 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+QnCameraDataManager* QnClientModule::cameraDataManager() const
+{
+    return m_cameraDataManager;
 }
 
 nx::client::desktop::RadassController* QnClientModule::radassController() const

@@ -62,7 +62,7 @@ public:
     virtual ~AbstractAuthenticationManager() = default;
 
     /**
-     * @param authProperties Properties found during authentication 
+     * @param authProperties Properties found during authentication
      *     should be placed here (e.g., some entity ID).
      * @param completionHandler Allowed to be called directly within this call.
      */

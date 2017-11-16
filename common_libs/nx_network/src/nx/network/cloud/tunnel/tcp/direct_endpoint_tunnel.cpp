@@ -35,7 +35,7 @@ DirectTcpEndpointTunnel::~DirectTcpEndpointTunnel()
 void DirectTcpEndpointTunnel::stopWhileInAioThread()
 {
     m_controlConnection.reset();
-    
+
     auto connectionClosedHandler = std::move(m_connectionClosedHandler);
     m_connectionClosedHandler = nullptr;
 
@@ -108,7 +108,7 @@ void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
-    connectionContextIter->tcpSocket = 
+    connectionContextIter->tcpSocket =
         std::make_unique<TCPSocket>(SocketFactory::tcpClientIpVersion());
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
@@ -157,7 +157,7 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         QnMutexLocker lk(&m_mutex);
         m_connections.erase(connectionContextIter);
     }
-    
+
     if (tcpSocket && !context.socketAttributes.applyTo(tcpSocket.get()))
     {
         sysErrorCode = SystemError::getLastOSErrorCode();

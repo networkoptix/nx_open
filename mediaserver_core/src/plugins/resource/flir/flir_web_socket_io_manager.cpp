@@ -105,7 +105,7 @@ void WebSocketIoManager::stopIOMonitoring()
 bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive)
 {
     QString path;
-    QUrl url;
+    nx::utils::Url url;
 
     NX_LOGX(
         lm("Setting output port state. Port: %1, isActive: %2")

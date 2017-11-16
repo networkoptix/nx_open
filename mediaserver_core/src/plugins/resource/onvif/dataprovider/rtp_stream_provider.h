@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 
 class QnRtpStreamReader: public CLServerPushStreamReader
@@ -29,7 +29,7 @@ protected:
 private:
     QString m_request;
     RtpTransport::Value m_rtpTransport;
-
+    size_t m_dataPassed = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

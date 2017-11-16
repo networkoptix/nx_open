@@ -23,7 +23,7 @@ void* MessageSerializerBuffer::Poke(std::size_t size)
     return m_buffer->data() + oldSize;
 }
 
-// Write the uint16 value into the buffer with bytes order swap 
+// Write the uint16 value into the buffer with bytes order swap
 void* MessageSerializerBuffer::WriteUint16(std::uint16_t value)
 {
     void* ret = Poke(sizeof(std::uint16_t));
@@ -93,7 +93,7 @@ std::size_t MessageSerializerBuffer::size() const
     return m_buffer->size();
 }
 
-// Use this function to set up the message length position 
+// Use this function to set up the message length position
 std::uint16_t* MessageSerializerBuffer::WriteMessageLength()
 {
     NX_ASSERT(m_headerLength == NULL);

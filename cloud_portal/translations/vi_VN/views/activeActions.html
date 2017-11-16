@@ -1,34 +1,24 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
-            Your account is successfully activated<br>
-            <a class="btn btn-default" href="/login">Log In</a>
-        </h1>
-
-        <h1 class="process-success" ng-if="!activate.success">
-            Account is already activated or confirmation code is incorrect
-        </h1>
+        <h1 class="process-success" ng-if="activate.success"> Tài khoản của bạn đã được kích hoạt thành công <br> <a class="btn btn-default" href="/login"> Đăng nhập </a></h1> <h1 class="process-success" ng-if="!activate.success"> Tài khoản đã  sãn sàng sử dụng hãy kích hoạt hoặckích hoạt bằng mã </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Your account is successfully activated<br>
-            <a href="/login">Log In</a>
+            Tài khoản của bạn đã được kích hoạt thành công <br> <a href="/login"> Đăng nhập </a>
             <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
         </h1>
     </div>
-
-    <div ng-if="reactivatingSuccess">
-        <h1 class="process-success">
-            Confirmation message is sent to Email <br>{{data.email}}
-        </h1>
-    </div>
     
-    <div ng-if="reactivating">
-        <h1>Confirm your account</h1>
+    <div ng-if="reactivating" class="text-center">
+        <div ng-if='data.email'>
+            <h1>Bạn đã đăng ký tại Nx Cloud</h1>
+            <p>Chúng tôi đã gửi thư đính kèm link kích hoạt đến  {{data.email}}.<br>. Vui lòng kích hoạt tài khoản của bạn bằng cách click vào link này.</p>
+        </div>
+        <h1 ng-if="!data.email">Xác nhận tài khoản của bạn</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
-            <div class="form-group" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Emai</label>
+            <div class="form-group" ng-if="!data.email" validate-field>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -37,12 +27,11 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> Email là bắt buộc </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vui lòng nhập Email hợp lệ </span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="col-sm-offset-2 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
@@ -53,15 +42,15 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            Đặt lại mật khẩu được gửi tới Email <br> {{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Reset Password</h1>
+        <h1>Đặt lại mật khẩu</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">Emai</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -70,8 +59,7 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> Email là bắt buộc </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vui lòng nhập Email hợp lệ </span>
                 </div>
             </div>
             <div class="form-group">
@@ -85,12 +73,11 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Password successfully saved<br>
-            <a href="/login">Log In</a>
+            Đã lưu thành công mật khẩu <br> <a href="/login"> Đăng nhập </a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>Set New Password</h1>
+            <h1> Đặt mật khẩu mới </h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">

@@ -120,7 +120,7 @@ void TemporaryCredentialsParams::put(int resID, const QVariant& value)
     switch(resID)
     {
         case attr::credentialsExpirationPeriod:
-            timeouts.expirationPeriod = 
+            timeouts.expirationPeriod =
                 duration_cast<seconds>(nx::utils::parseTimerDuration(value.toString()));
             return;
 
@@ -177,7 +177,7 @@ bool AccessRestrictions::parse(const std::string& str)
             continue;
         }
     }
-    
+
     return true;
 }
 

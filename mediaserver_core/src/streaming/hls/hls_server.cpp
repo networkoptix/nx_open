@@ -235,16 +235,6 @@ namespace nx_hls
 
     } // namespace
 
-    void QnHttpLiveStreamingProcessor::prepareUrlPath(QUrl* url)
-    {
-#if 0 // Not needed because currently hls requests are forwarded via AutoRequestForwarder.
-        //TODO #ak check that request has been proxied via media server, not regular Http proxy
-        const QString& currentPath = url.path();
-        url.setPath(lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID()),
-            currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath));
-#endif // 0
-    }
-
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
         const nx_http::Request& request,
         nx_http::Response* const response )
@@ -570,8 +560,6 @@ namespace nx_hls
             nx_http::header::Via via;
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
-            if( !via.entries.empty() )
-                prepareUrlPath(&playlistData.url);
         }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
@@ -691,8 +679,6 @@ namespace nx_hls
             nx_http::header::Via via;
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
-            if( !via.entries.empty() )
-                prepareUrlPath(&baseChunkUrl);
         }
 
         const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();
@@ -1067,7 +1053,7 @@ namespace nx_hls
             if (startDatetimeIter != requestParams.end())
             {
                 // Converting startDatetime to startTimestamp.
-                // This is secondary functionality, not used by this 
+                // This is secondary functionality, not used by this
                 //   HLS implementation (since all chunks are referenced by npt timestamps).
                 result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
             }

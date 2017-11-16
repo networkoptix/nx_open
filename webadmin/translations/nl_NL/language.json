@@ -1,117 +1,143 @@
 {
-  "language_name":"LANGUAGE_NAME",
-  "dialogs":{
-    "okButton":"Oké",
-    "openLink":"Bezoek deze link",
-    "openLinkWithTitle":"Bezoek deze link naar {{title}}"
-  },
-  "setup":{
-    "createAccount":"account aanmaken",
-    "errorNoHDD":"Dit apparaat is bedoeld om te werken met een harde schijf. <br>Gelieve het apparaat uit te schakelen en een harde schijf te installeren.",
-    "errorNoNetwork":"Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n                Sluit het apparaat aan op het  lokale netwerk of het internet"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"Wachtwoord moet ten minste 8 karakters hebben",
-    "requiredMessage":"Alleen letters, cijfers en symbolen van het toetsenbord zijn toegestaan",
-    "weakMessage":"Het wachtwoord moet bestaan uit verschillende soorten symbolen",
-    "strongMessage":"Sterk wachtwoord!",
-    "commonMessage":"Dit wachtwoord staat in de lijst van meest populaire wachtwoorden"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Server",
-      "system":"Systeem",
-      "device":"Apparaat"
+    "language_name": "Nederlands",
+    "dialogs": {
+        "okButton": "Oké",
+        "openLink": "Bezoek deze link",
+        "openLinkWithTitle": "Bezoek deze link naar {{title}}"
     },
-    "confirmRestart":"Server nu herstarten?",
-    "couldntCheckInternet":"Kan de cloudverbinding niet controleren",
-    "confirmRestoreDefault":"Database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
-    "confirmRestoreDefaultTitle":"Fabrieksinstellingen herstellen",
-    "unexpectedError":"Mislukt: er heeft zich een onverwachte fout voorgedaan",
-    "connnetionError":"Netwerkfout",
-    "wrongPassword":"Wachtwoord onjuist.",
-    "error":"Fout: ",
-    "restartNeeded":"Wijzigingen opgeslagen. Wilt u de server herstarten om de nieuwe instellingen toe te passen?",
-    "settingsSaved":"Instellingen opgeslagen",
-    "confirmHardwareRestart":"Wilt u het besturingssysteem opnieuw opstarten?",
-    "confirmRestoreSettings":"Alle serverinstellingen wissen? Het archief wordt bewaard, maar de netwerkinstellingen worden gewist.",
-    "confirmRestoreSettingsNotNetwork":"De configuratie van de server wissen? Archief-en netwerkinstellingen worden opgeslagen.",
-    "unavailable":"Niet Beschikbaar",
-    "unsafePortConfirm":"Het is niet veilig om een poortnummer te gebruiken lager dan 1025. De server kan hierdoor niet toegankelijk zijn. Toch doorgaan?",
-    "confirmDisconnectFromCloud":"Verbinding verbreken met systeem {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Alle cloud gebruikersaccounts worden verwijderd.</span><br><br>Het systeem zal toegankelijk zijn via het lokale netwerk middels het lokale administrator account.",
-    "confirmDisconnectFromCloudAction":"Verbinding verbreken",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"Verbinding maken met het systeem is mislukt",
-    "createLocalOwnerTitle":"Maak een lokaal administrator account aan",
-    "confirmChangePassword":"Verander het administrator wachtwoord",
-    "confirmChangePasswordTitle":"Systeemwachtwoord veranderen? Het zal gevolgen hebben voor gebruiker 'admin' en het root-wachtwoord voor sommige servers",
-    "confirmChangePasswordAction":"Nieuw wachtwoord opslaan",
-    "nx1ControlHint":"Client applicatie is gestart. Gebruik een toetsenbord en muis of de mobiele applicatie om deze te beheren."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Server monitoring",
-      "storage":"Opslagruimte",
-      "log":"Log"
+    "setup": {
+        "createAccount": "account aanmaken",
+        "errorNoHDD": "Dit apparaat is bedoeld om te werken met een harde schijf. <br>Gelieve het apparaat uit te schakelen en een harde schijf te installeren.",
+        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n                Sluit het apparaat aan op het  lokale netwerk of het internet"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "Wachtwoord moet ten minste 8 karakters hebben",
+        "requiredMessage": "Alleen letters, cijfers en symbolen van het toetsenbord zijn toegestaan",
+        "weakMessage": "Het wachtwoord moet bestaan uit verschillende soorten symbolen",
+        "strongMessage": "Sterk wachtwoord!",
+        "commonMessage": "Dit wachtwoord staat in de lijst van meest populaire wachtwoorden"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Server",
+            "system": "Systeem",
+            "device": "Apparaat"
+        },
+        "confirmRestart": "Server nu herstarten?",
+        "couldntCheckInternet": "Kan de cloudverbinding niet controleren",
+        "confirmRestoreDefault": "Database en instellingen wissen? Dit proces zal enige tijd duren en de server zal daarna opnieuw worden opgestart.",
+        "confirmRestoreDefaultTitle": "Fabrieksinstellingen herstellen",
+        "unexpectedError": "Mislukt: er heeft zich een onverwachte fout voorgedaan",
+        "connnetionError": "Netwerkfout",
+        "wrongPassword": "Wachtwoord onjuist.",
+        "error": "Fout: ",
+        "restartNeeded": "Wijzigingen opgeslagen. Wilt u de server herstarten om de nieuwe instellingen toe te passen?",
+        "settingsSaved": "Instellingen opgeslagen",
+        "confirmHardwareRestart": "Wilt u het besturingssysteem opnieuw opstarten?",
+        "confirmRestoreSettings": "Alle serverinstellingen wissen? Het archief wordt bewaard, maar de netwerkinstellingen worden gewist.",
+        "confirmRestoreSettingsNotNetwork": "De configuratie van de server wissen? Archief-en netwerkinstellingen worden opgeslagen.",
+        "unavailable": "Niet Beschikbaar",
+        "unsafePortConfirm": "Het is niet veilig om een poortnummer te gebruiken lager dan 1025. De server kan hierdoor niet toegankelijk zijn. Toch doorgaan?",
+        "confirmDisconnectFromCloud": "Verbinding verbreken met systeem {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle cloud gebruikersaccounts worden verwijderd.</span><br><br>Het systeem zal toegankelijk zijn via het lokale netwerk middels het lokale administrator account.",
+        "confirmDisconnectFromCloudAction": "Verbinding verbreken",
+        "disconnectedFromCloudSuccess": "Systeem is succesvol afgesloten van {{CLOUD_NAME}}",
+        "confirmDisconnectFromSystem": "Maak de server los van het huidige systeem",
+        "confirmDisconnectFromSystemAction": "Losmaken",
+        "disconnectedFromSystemSuccess": "Server is succesvol losgemaakt van het systeem",
+        "connectedSuccess": "Verbinding maken met het systeem is mislukt",
+        "createLocalOwnerTitle": "Maak een lokaal administrator account aan",
+        "confirmChangePassword": "Wijzig admin wachtwoord",
+        "confirmChangePasswordTitle": "Systeemwachtwoord veranderen? Het zal gevolgen hebben voor gebruiker 'admin' en het root-wachtwoord voor sommige servers",
+        "confirmChangePasswordAction": "Nieuw wachtwoord opslaan",
+        "nx1ControlHint": "Client applicatie is gestart. Gebruik een toetsenbord en muis of de mobiele applicatie om deze te beheren."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Server monitoring",
+            "storage": "Opslagruimte",
+            "log": "Log"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Systeem is onbereikbaar of bestaat niet.",
+        "incorrectCurrentPassword": "Wachtwoord onjuist.",
+        "incorrectRemotePassword": "Naam of wachtwoord onjuist.",
+        "incompatibleVersion": "Het systeem is onbereikbaar, niet bestaand of is voorzien van een incompatibele versie.",
+        "wrongUrl": "Kan geen verbinding maken met de gekozen server.",
+        "newSystemError": "Kan de systemen niet samenvoegen. Het externe systeem is niet juist geconfigureerd.",
+        "safeMode": "Kan de systemen niet samenvoegen. Het externe systeem is in de veilige modus.",
+        "configError": "Kan de systemen niet samenvoegen. Eén van de systemen staat wellicht in de veilige modus.",
+        "cloudError": "De systemen kunnen niet worden samengevoegd. Het gekozen systeem is verbonden met de cloud. Verbreek de cloudverbinding.",
+        "cloudBothError": "De systemen kunnen niet worden samengevoegd. Beide systemen zijn verbonden met de cloud. Verbreek de cloudverbinding.",
+        "cloudHostConflict": "Kan de systemen niet samenvoegen, omdat de server verbonden zijn verschillende clouds hosts",
+        "licenceError": "Waarschuwing! U wilt systemen met samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Doorgaan met samenvoegen?",
+        "connectionFailed": "Verbinding mislukt: ",
+        "unknownError": "Onbekende fout",
+        "mergeFailed": "Samenvoegen mislukt: ",
+        "mergeSucceed": "Samenvoegen gelukt.",
+        "newSystemDisplayName": "Nieuw systeem",
+        "incompatibleProtocol": "incompatibele versie",
+        "incompatibleCloudHost": "cloud conflict",
+        "incompatibleCloudState": "verbonden met de cloud"
+    },
+    "login": {
+        "incorrectPassword": "Gebruikersnaam of wachtwoord is onjuist"
+    },
+    "navigaion": {
+        "cannotGetUser": "Serverfout: kan de gebruikersgegevens niet ophalen"
+    },
+    "offlineDialog": {
+        "serverOffline": "server is offline"
+    },
+    "restartDialog": {
+        "serverStarting": "server start op",
+        "serverRestarting": "server start opnieuw op",
+        "serverOffline": "server is offline"
+    },
+    "fileUpload": {
+        "started": "Update succesvol gestart. Dit zal enkele minuten duren",
+        "upToDate": "Update is mislukt. De gekozen versie is reeds geïnstalleerd.",
+        "invalidFile": "Update is mislukt. Het gekozen bestand is niet geldig.",
+        "incompatibleSystem": "Update is mislukt. Het gekozen bestand is voor een ander systeem.",
+        "extractionError": "Update is mislukt. Er is onvoldoende ruimte om de update uit te voeren. Controleer de beschikbare opslagruimte.",
+        "installationError": "Update is mislukt. Het installatiescript kan niet worden uitgevoerd.",
+        "selectFiles": "Bestand(en) selecteren"
+    },
+    "advanced": {
+        "free": "Gratis",
+        "total": "Totaal",
+        "occupied": "Bezet",
+        "reserved": "Gereserveerd"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web interface"
+    },
+    "common": {
+        "systemOffline": "Systeem Offline",
+        "cameraLinks": {
+            "copyToClipboard": "kopieer naar klembord",
+            "highStream": "Hoge stroom",
+            "copyDefaultText": "kopiëren",
+            "unknown": "Unknown",
+            "lowStream": "Lage stroom",
+            "transcoding": "Transcoding",
+            "copyActiveText": "gekopieerd naar het klembord"
+        },
+        "searchCamPlaceholder": "zoeken",
+        "cameraStates": {
+            "noFormat": "Deze browser of apparaat ondersteunt geen videoweergave van deze camera.",
+            "ieWin10": "Gebruik Microsoft Edge of Google Chrome als browser.",
+            "iosVideoTooLarge": "iOS ondersteunt geen video groter dan fullHD (2MP: 1920x1080).",
+            "unauthorized": "Authentication required",
+            "ubuntuNX": "Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser.",
+            "ieNoWebm": "Installeer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+            "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> of<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor het afspelen van video in Internet Explorer.",
+            "noArmSupport": "Deze browser of apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
+            "error": "Error",
+            "offline": "Offline",
+            "noData": "Geen data",
+            "flashRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> om video af te spelen van ARM-based servers."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"Systeem is onbereikbaar of bestaat niet.",
-    "incorrectCurrentPassword":"Wachtwoord onjuist.",
-    "incorrectRemotePassword":"Naam of wachtwoord onjuist.",
-    "incompatibleVersion":"Het systeem is onbereikbaar, niet bestaand of is voorzien van een incompatibele versie.",
-    "wrongUrl":"Kan geen verbinding maken met de gekozen server.",
-    "newSystemError":"Kan de systemen niet samenvoegen. Het externe systeem is niet juist geconfigureerd.",
-    "safeMode":"Kan de systemen niet samenvoegen. Het externe systeem is in de veilige modus.",
-    "configError":"Kan de systemen niet samenvoegen. Eén van de systemen staat wellicht in de veilige modus.",
-    "cloudError":"De systemen kunnen niet worden samengevoegd. Het gekozen systeem is verbonden met de cloud. Verbreek de cloudverbinding.",
-    "cloudBothError":"De systemen kunnen niet worden samengevoegd. Beide systemen zijn verbonden met de cloud. Verbreek de cloudverbinding.",
-    "cloudHostConflict":"Kan de systemen niet samenvoegen, omdat de server verbonden zijn verschillende clouds hosts",
-    "licenceError":"Waarschuwing! U wilt systemen met samenvoegen met meerdere starterpacks. Slechts één starterpack is toegestaan per systeem, zodat de andere starterpacks zullen worden gedeactiveerd. Doorgaan met samenvoegen?",
-    "connectionFailed":"Verbinding mislukt: ",
-    "unknownError":"Onbekende fout",
-    "mergeFailed":"Samenvoegen mislukt: ",
-    "mergeSucceed":"Samenvoegen gelukt.",
-    "newSystemDisplayName":"Nieuw systeem",
-    "incompatibleProtocol":"incompatibele versie",
-    "incompatibleCloudHost":"cloud conflict",
-    "incompatibleCloudState":"verbonden met de cloud"
-  },
-  "login":{
-    "incorrectPassword":"Gebruikersnaam of wachtwoord is onjuist"
-  },
-  "navigaion":{
-    "cannotGetUser":"Serverfout: kan de gebruikersgegevens niet ophalen"
-  },
-  "offlineDialog":{
-    "serverOffline":"server is offline"
-  },
-  "restartDialog":{
-    "serverStarting":"server start op",
-    "serverRestarting":"server start opnieuw op",
-    "serverOffline":"server is offline"
-  },
-  "fileUpload":{
-    "started":"Update succesvol gestart. Dit zal enkele minuten duren",
-    "upToDate":"Update is mislukt. De gekozen versie is reeds geïnstalleerd.",
-    "invalidFile":"Update is mislukt. Het gekozen bestand is niet geldig.",
-    "incompatibleSystem":"Update is mislukt. Het gekozen bestand is voor een ander systeem.",
-    "extractionError":"Update is mislukt. Er is onvoldoende ruimte om de update uit te voeren. Controleer de beschikbare opslagruimte.",
-    "installationError":"Update is mislukt. Het installatiescript kan niet worden uitgevoerd.",
-    "selectFiles":"Bestand(en) selecteren"
-  },
-  "advanced":{
-    "free":"Gratis",
-    "total":"Totaal",
-    "occupied":"Bezet",
-    "reserved":"Gereserveerd"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
-  }
 }

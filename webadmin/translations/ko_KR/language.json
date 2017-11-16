@@ -1,117 +1,143 @@
 {
-  "language_name":"국어",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"이 링크를 방문",
-    "openLinkWithTitle":"{{title}} 링크를 방문"
-  },
-  "setup":{
-    "createAccount":"계정을 만듭니다",
-    "errorNoHDD":"이 장치는 Hdd를 설치하여 사용하도록 설계 되었습니다. <br>장치 전원을 Off하고 Hdd를 설치하세요",
-    "errorNoNetwork":"이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"비밀번호는 8자 이상이어야 합니다",
-    "requiredMessage":"라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
-    "weakMessage":"암호는 다양한 유형의 기호를 포함 해야 합니다.",
-    "strongMessage":"강력한 암호!",
-    "commonMessage":"이 비밀번호는 매우 흔한 비밀번호입니다."
-  },
-  "settings":{
-    "tabs":{
-      "server":"서버:",
-      "system":"시스템",
-      "device":"장치"
+    "language_name": "언어",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "이 링크를 방문",
+        "openLinkWithTitle": "{{title}} 링크를 방문"
     },
-    "confirmRestart":"서버를 다시 시작?",
-    "couldntCheckInternet":"클라우드 연결을 확인 할 수 없습니다.",
-    "confirmRestoreDefault":"데이터베이스와 셋팅을 클리어 하시겠습니까? 이 절차후 상단한 시간이 소요되면 시스템 재부팅이 요구됩니다.",
-    "confirmRestoreDefaultTitle":"공장 기본값 복원",
-    "unexpectedError":"실패: 예기치 않은 오류가 발생 했습니다.",
-    "connnetionError":"접속 에러",
-    "wrongPassword":"비밀번호가 틀립니다.",
-    "error":"오류: ",
-    "restartNeeded":"변경 저장 됩니다. 새로운 설정을 적용 하려면 서버를 다시 시작?",
-    "settingsSaved":"설정이 저장되었습니다!",
-    "confirmHardwareRestart":"서버 운영 체제를 다시 시작 할까요?",
-    "confirmRestoreSettings":"모든 서버 설정을 복원할까요? 녹화데이터는 유지되지만 네트워크 설정이 초기화됩니다.",
-    "confirmRestoreSettingsNotNetwork":"서버 구성을 다시 설정 하겠습니까? 녹화데이터 및 네트워크 설정은유지 됩니다.",
-    "unavailable":"이용 불가",
-    "unsafePortConfirm":"1025 이하의 포트를 사용 하는 것은 안전 하지 않습니다. 서버를 액세스하지 못할 수 있습니다. 그래도 진행 하시겠습니까?",
-    "confirmDisconnectFromCloud":"{{CLOUD_NAME}} 에서 시스템을 분리",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 모든 클라우드 사용자 삭제 됩니다.</span> <br><br>로컬 네트워크에서 관리자 계정을 통해 액세스할 수 있을 것입니다.",
-    "confirmDisconnectFromCloudAction":"연결 끊기",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"시스템은 성공적으로 연결 됨",
-    "createLocalOwnerTitle":"로컬 관리자를 만듦",
-    "confirmChangePassword":"관리자 암호 변경",
-    "confirmChangePasswordTitle":"시스템 비밀 번호를 변경하시나요? Admin 사용자와 Root 계정에 영향을 줄 수있어요",
-    "confirmChangePasswordAction":"새 암호를 저장",
-    "nx1ControlHint":"클라이언트 응용 프로그램이 시작 되었습니다. 키보드/마우스 또는 모바일 응용 프로그램을 이용하여 제어하세요."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"상태 모니터링",
-      "storage":"저장공간",
-      "log":"기록"
+    "setup": {
+        "createAccount": "계정을 만듭니다",
+        "errorNoHDD": "이 장치는 Hdd를 설치하여 사용하도록 설계 되었습니다. <br>장치 전원을 Off하고 Hdd를 설치하세요",
+        "errorNoNetwork": "이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "비밀번호는 8자 이상이어야 합니다",
+        "requiredMessage": "라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
+        "weakMessage": "암호는 다양한 유형의 기호를 포함 해야 합니다.",
+        "strongMessage": "강력한 패스워드!",
+        "commonMessage": "이 비밀번호는 매우 흔한 비밀번호입니다."
+    },
+    "settings": {
+        "tabs": {
+            "server": "서버:",
+            "system": "시스템",
+            "device": "장치"
+        },
+        "confirmRestart": "서버를 다시 시작?",
+        "couldntCheckInternet": "클라우드 연결을 확인 할 수 없습니다.",
+        "confirmRestoreDefault": "데이터베이스와 셋팅을 클리어 하시겠습니까? 이 절차후 상단한 시간이 소요되면 시스템 재부팅이 요구됩니다.",
+        "confirmRestoreDefaultTitle": "공장 기본값 복원",
+        "unexpectedError": "실패: 예기치 않은 오류가 발생 했습니다.",
+        "connnetionError": "접속 에러",
+        "wrongPassword": "비밀번호가 틀립니다.",
+        "error": "오류: ",
+        "restartNeeded": "변경 저장 됩니다. 새로운 설정을 적용 하려면 서버를 다시 시작?",
+        "settingsSaved": "설정이 저장되었습니다!",
+        "confirmHardwareRestart": "서버 운영 체제를 다시 시작 할까요?",
+        "confirmRestoreSettings": "모든 서버 설정을 복원할까요? 녹화데이터는 유지되지만 네트워크 설정이 초기화됩니다.",
+        "confirmRestoreSettingsNotNetwork": "서버 구성을 다시 설정 하겠습니까? 녹화데이터 및 네트워크 설정은유지 됩니다.",
+        "unavailable": "이용 불가",
+        "unsafePortConfirm": "1025 이하의 포트를 사용 하는 것은 안전 하지 않습니다. 서버를 액세스하지 못할 수 있습니다. 그래도 진행 하시겠습니까?",
+        "confirmDisconnectFromCloud": "{{CLOUD_NAME}} 에서 시스템을 분리",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 모든 클라우드 사용자 삭제 됩니다.</span> <br><br>로컬 네트워크에서 관리자 계정을 통해 액세스할 수 있을 것입니다.",
+        "confirmDisconnectFromCloudAction": "연결 끊기",
+        "disconnectedFromCloudSuccess": "시스템은 성공적으로 {{CLOUD_NAME}} 에서 분리되었습니다.",
+        "confirmDisconnectFromSystem": "현재 시스템에서 서버 분리",
+        "confirmDisconnectFromSystemAction": "분리",
+        "disconnectedFromSystemSuccess": "서버가 시스템에서 성공적으로 분리되었습니다.",
+        "connectedSuccess": "시스템은 성공적으로 연결 됨",
+        "createLocalOwnerTitle": "로컬 관리자를 만듦",
+        "confirmChangePassword": "관리자 패스워드 변경",
+        "confirmChangePasswordTitle": "시스템 비밀 번호를 변경하시나요? Admin 사용자와 Root 계정에 영향을 줄 수있어요",
+        "confirmChangePasswordAction": "새 암호를 저장",
+        "nx1ControlHint": "클라이언트 응용 프로그램이 시작 되었습니다. 키보드/마우스 또는 모바일 응용 프로그램을 이용하여 제어하세요."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "상태 모니터링",
+            "storage": "저장공간",
+            "log": "기록"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "시스템에 연결할 수 없거나 존재 하지 않습니다.",
+        "incorrectCurrentPassword": "비밀번호 오류",
+        "incorrectRemotePassword": "사용자 이름 또는 비밀번호가 잘못되었습니다.",
+        "incompatibleVersion": "시스템이 접속하지 않거나, 존재 하지 않거나, 호환되지 않은 버젼입니다.",
+        "wrongUrl": "지정된 된 서버에 연결할 수 없습니다.",
+        "newSystemError": "시스템을 병합할 수 없습니다. 원격 시스템 구성 되지 않습니다.",
+        "safeMode": "시스템을 병합할 수 없습니다. 원격 시스템 안전 모드입니다.",
+        "configError": "시스템을 병합할 수 없습니다. 시스템 중 하나가 안전 모드입니다.",
+        "cloudError": "시스템을 병합할 수 없습니다. 하위 시스템이 클라우드에 연결된 상태이니 접속 해지후 시도하세요",
+        "cloudBothError": "시스템을 병합할 수 없습니다. 하위 시스템이 클라우드에 연결된 상태이니 접속 해지후 시도하세요",
+        "cloudHostConflict": "서버들이 다른 클라우드 호스트에 연결된 상태여서 병합을 할 수없습니다.",
+        "licenceError": "경고! Starter 라이센스르 이용하여 병합하려 하고 있습니다. 시스템당 1개의 starter license만 사용가능합니다. 2번째 starter license는 비활성화 됩니다. 그래도 병합 하시겠습니까?",
+        "connectionFailed": "연결 실패: ",
+        "unknownError": "알 수 없는 오류",
+        "mergeFailed": "병합에 실패했습니다. ",
+        "mergeSucceed": "병합 성공.",
+        "newSystemDisplayName": "새로운 시스템",
+        "incompatibleProtocol": "호환 되지 않는 버전",
+        "incompatibleCloudHost": "클라우드 충돌",
+        "incompatibleCloudState": "클라우드 연결"
+    },
+    "login": {
+        "incorrectPassword": "사용자 이름 또는 비밀번호가 잘못되었습니다."
+    },
+    "navigaion": {
+        "cannotGetUser": "서버 오류: 현재 사용자 데이터를 검색할 수 없습니다"
+    },
+    "offlineDialog": {
+        "serverOffline": "서버 오프라인"
+    },
+    "restartDialog": {
+        "serverStarting": "서버 시작",
+        "serverRestarting": "서버 다시 시작!",
+        "serverOffline": "서버 오프라인"
+    },
+    "fileUpload": {
+        "started": "업데이트는 성공적으로 시작 했다. 그것은 몇 분 정도 걸릴 것입니다.",
+        "upToDate": "업데이트 하지 못했습니다. 제공 된 버전은 이미 설치 되어있습니다.",
+        "invalidFile": "업데이트 하지 못했습니다. 제공된 파일은 유효한 업데이트 파일이 아닙니다.",
+        "incompatibleSystem": "업데이트 하지 못했습니다. 제공 된 파일은 다른 시스템을 위한것입니다.",
+        "extractionError": "업데이트 하지 못했습니다. 아카이브를 추출 하기에 공간이 부족 합니다, 사용 가능한 저장소를 확인 합니다.",
+        "installationError": "업데이트 하지 못했습니다. 설치 스크립트를 실행할 수 없습니다.",
+        "selectFiles": "파일 선택"
+    },
+    "advanced": {
+        "free": "무료",
+        "total": "전체",
+        "occupied": "사용중",
+        "reserved": "예약됨"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} 웹 인터페이스"
+    },
+    "common": {
+        "systemOffline": "시스템 오프라인",
+        "cameraLinks": {
+            "copyToClipboard": "클립보드에 복사",
+            "highStream": "고해상도 스트림",
+            "copyDefaultText": "복사",
+            "unknown": "알 수 없음",
+            "lowStream": "낮은 스트림",
+            "transcoding": "트랜스코딩",
+            "copyActiveText": "클립보드에 복사됨"
+        },
+        "searchCamPlaceholder": "검색",
+        "cameraStates": {
+            "noFormat": "이 브라우저 또는 장치는이 카메라의 비디오 재생을 지원하지 않습니다.",
+            "ieWin10": "Microsoft Edge 또는 Google 크롬 브라우저를 사용하십시오.",
+            "iosVideoTooLarge": "iOS는 fullHD (2MP: 1920x1080) 보다 큰 비디오를 지원하지 않습니다.",
+            "unauthorized": "인증이 필요합니다",
+            "ubuntuNX": "이 브라우저는 ARM 기반 서버의 비디오를 지원하지 않습니다. 대신 Chromium 브라우저를 사용하십시오.",
+            "ieNoWebm": "Internet Explorer에 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM 코덱</a>를 설치 하십시요.",
+            "flashOrWebmRequired": "Internet Explorer에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> 또는 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>을 설치하십시오.",
+            "noArmSupport": "이 브라우저 또는 장치는 ARM 기반 서버의 비디오 재생을 지원하지 않습니다.",
+            "error": "오류",
+            "offline": "오프라인",
+            "noData": "데이터 없음",
+            "flashRequired": "ARM 기반 서버에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>을 설치하십시오."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"시스템에 연결할 수 없거나 존재 하지 않습니다.",
-    "incorrectCurrentPassword":"비밀번호 오류",
-    "incorrectRemotePassword":"사용자 이름 또는 비밀번호가 잘못되었습니다.",
-    "incompatibleVersion":"시스템이 접속하지 않거나, 존재 하지 않거나, 호환되지 않은 버젼입니다.",
-    "wrongUrl":"지정된 된 서버에 연결할 수 없습니다.",
-    "newSystemError":"시스템을 병합할 수 없습니다. 원격 시스템 구성 되지 않습니다.",
-    "safeMode":"시스템을 병합할 수 없습니다. 원격 시스템 안전 모드입니다.",
-    "configError":"시스템을 병합할 수 없습니다. 시스템 중 하나가 안전 모드입니다.",
-    "cloudError":"시스템을 병합할 수 없습니다. 하위 시스템이 클라우드에 연결된 상태이니 접속 해지후 시도하세요",
-    "cloudBothError":"시스템을 병합할 수 없습니다. 하위 시스템이 클라우드에 연결된 상태이니 접속 해지후 시도하세요",
-    "cloudHostConflict":"서버들이 다른 클라우드 호스트에 연결된 상태여서 병합을 할 수없습니다.",
-    "licenceError":"경고! Starter 라이센스르 이용하여 병합하려 하고 있습니다. 시스템당 1개의 starter license만 사용가능합니다. 2번째 starter license는 비활성화 됩니다. 그래도 병합 하시겠습니까?",
-    "connectionFailed":"연결 실패: ",
-    "unknownError":"알 수 없는 오류",
-    "mergeFailed":"병합에 실패했습니다. ",
-    "mergeSucceed":"병합 성공.",
-    "newSystemDisplayName":"새로운 시스템",
-    "incompatibleProtocol":"호환 되지 않는 버전",
-    "incompatibleCloudHost":"클라우드 충돌",
-    "incompatibleCloudState":"클라우드 연결"
-  },
-  "login":{
-    "incorrectPassword":"사용자 이름 또는 비밀번호가 잘못되었습니다."
-  },
-  "navigaion":{
-    "cannotGetUser":"서버 오류: 현재 사용자 데이터를 검색할 수 없습니다"
-  },
-  "offlineDialog":{
-    "serverOffline":"서버 오프라인"
-  },
-  "restartDialog":{
-    "serverStarting":"서버 시작",
-    "serverRestarting":"서버 다시 시작!",
-    "serverOffline":"서버 오프라인"
-  },
-  "fileUpload":{
-    "started":"업데이트는 성공적으로 시작 했다. 그것은 몇 분 정도 걸릴 것입니다.",
-    "upToDate":"업데이트 하지 못했습니다. 제공 된 버전은 이미 설치 되어있습니다.",
-    "invalidFile":"업데이트 하지 못했습니다. 제공된 파일은 유효한 업데이트 파일이 아닙니다.",
-    "incompatibleSystem":"업데이트 하지 못했습니다. 제공 된 파일은 다른 시스템을 위한것입니다.",
-    "extractionError":"업데이트 하지 못했습니다. 아카이브를 추출 하기에 공간이 부족 합니다, 사용 가능한 저장소를 확인 합니다.",
-    "installationError":"업데이트 하지 못했습니다. 설치 스크립트를 실행할 수 없습니다.",
-    "selectFiles":"파일 선택"
-  },
-  "advanced":{
-    "free":"무료",
-    "total":"전체",
-    "occupied":"사용중",
-    "reserved":"예약됨"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
-  }
 }

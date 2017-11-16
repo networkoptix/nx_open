@@ -19,6 +19,7 @@ static const QList<QnUuid> kOwnerRoleIds {
 
 } // namespace
 
+const QByteArray koldGuidPostfix("DEFAULT_BUSINESS_RULES");
 const QByteArray Rule::kGuidPostfix("vms_businessrule");
 
 Rule::Rule() :
@@ -128,9 +129,9 @@ int Rule::aggregationPeriod() const
     return m_aggregationPeriod;
 }
 
-void Rule::setAggregationPeriod(int msecs)
+void Rule::setAggregationPeriod(int seconds)
 {
-    m_aggregationPeriod = msecs;
+    m_aggregationPeriod = seconds;
 }
 
 bool Rule::isDisabled() const
@@ -252,6 +253,39 @@ void Rule::removeResource(const QnUuid& resId)
         if (m_eventResources[i] == resId)
             m_eventResources.removeAt(i);
     }
+}
+
+QMap<QnUuid, QnUuid> Rule::remappedGuidsToFix()
+{
+    static const QMap<int, int> intValues =
+    {
+        { 20, 10020 },
+        { 22, 10022 },
+        { 23, 10023 }
+    };
+    QMap<QnUuid, QnUuid> result;
+    for (auto itr = intValues.begin(); itr != intValues.end(); ++itr)
+    {
+        result.insert(
+            intToGuid(itr.key(), kGuidPostfix),
+            intToGuid(itr.value(), kGuidPostfix));
+    }
+
+    for (int i = 0; i <= 19; ++i)
+    {
+        result.insert(
+            intToGuid(i, koldGuidPostfix),
+            intToGuid(i, kGuidPostfix));
+    }
+
+    for (int i = 10020; i <= 10023; ++i)
+    {
+        result.insert(
+            intToGuid(i, koldGuidPostfix),
+            intToGuid(i, kGuidPostfix));
+    }
+
+    return result;
 }
 
 RuleList Rule::getDefaultRules()

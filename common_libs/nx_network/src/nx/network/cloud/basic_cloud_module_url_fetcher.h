@@ -93,7 +93,7 @@ public:
     /**
      * NOTE: Default value is taken from application settings.
      */
-    void setModulesXmlUrl(QUrl url)
+    void setModulesXmlUrl(nx::utils::Url url)
     {
         m_modulesXmlUrl = std::move(url);
     }
@@ -153,14 +153,14 @@ protected:
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
     }
 
-    QUrl buildUrl(const QString& str, int moduleAttrName)
+    nx::utils::Url buildUrl(const QString& str, int moduleAttrName)
     {
-        QUrl url(str);
+        nx::utils::Url url(str);
         if (url.host().isEmpty())
         {
             // str could be host:port.
             const SocketAddress endpoint(str);
-            url = QUrl();
+            url = nx::utils::Url();
             url.setHost(endpoint.address.toString());
             if (endpoint.port > 0)
                 url.setPort(endpoint.port);
@@ -191,7 +191,7 @@ private:
     const CloudInstanceSelectionAttributeNameset m_nameset;
     std::vector<Handler> m_resolveHandlers;
     bool m_requestIsRunning;
-    QUrl m_modulesXmlUrl;
+    nx::utils::Url m_modulesXmlUrl;
     std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeadersForGetRequest;
     std::map<QString, QString> m_moduleToDefaultUrlScheme;
 

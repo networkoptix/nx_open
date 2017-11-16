@@ -173,7 +173,7 @@ void QnUserProfileWidget::applyChanges()
 
         if (isOwnProfile)
         {
-            QUrl url = commonModule()->currentUrl();
+            nx::utils::Url url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
 
             if (auto connection = QnAppServerConnectionFactory::ec2Connection())

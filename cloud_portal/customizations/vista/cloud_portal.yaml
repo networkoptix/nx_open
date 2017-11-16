@@ -16,7 +16,7 @@ cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
 cloud_gateway:
-    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
+    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
 
 mail_from: 'Qcloud <support@vista-cctv.com>'
 
@@ -35,14 +35,12 @@ admins:
         - 'cloud-portal-admins@networkoptix.com'
 
 languages:
-    - en_US
     - en_GB
     - ru_RU
     - fr_FR
     - de_DE
     - es_ES
     - hu_HU
-    - nl_NL
 
 queue_name: '$INSTANCE_NAME'
 

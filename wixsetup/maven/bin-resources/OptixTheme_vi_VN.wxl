@@ -4,9 +4,14 @@
   <String Id="Caption">Thiết lập [WixBundleName] - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/ Cài đặt | / Sửa | / Gỡ bỏ cài đặt | / Bố trí [directory] - cài đặt, sửa, gỡ cài đặt hoặc tạo bản sao cục bộ hoàn chỉnh của gói trong thư mục. Cài đặt là mặc định.
-/ Chế độ Thụ động | / Chế độ yên lặng - hiển thị giao diện người dùng tối thiểu không có nhắc nhở hoặc hiển thị. Theo mặc định giao diện người dùng và tất cả các nhắc nhở được hiển thị.
-/ Norestart - ngăn chặn bất kỳ nỗ lực để khởi động lại. Theo mặc định giao diện người dùng sẽ nhắc nhở trước khi khởi động lại. / Log log.txt - đăng nhập vào một tệp cụ thể. Theo mặc định, tạo tệp nhật ký %TEMP%.</String>
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
+   creates a complete local copy of the bundle in directory. Install is the default.
+
+/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
+   no prompts. By default UI and all prompts are displayed.
+
+/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
+/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Bạn có chắc muốn hủy bỏ không?</String>
   <String Id="ClientAndServer">Máy chủ và Máy trạm</String>
   <String Id="ClientOnly">Chỉ máy trạm</String>
@@ -14,45 +19,45 @@
   <String Id="ServerOnly">Chỉ máy chủ</String>
   <String Id="ServerOnlyDesc">Các ứng dụng trên máy chủ được sử dụng để lưu thông tin hệ thống và lưu trữ</String>
   <String Id="HelpHeader">Thiết lập trợ giúp</String>
-  <String Id="HelpCloseButton">gần</String>
+  <String Id="HelpCloseButton">Gần</String>
   <String Id="InstallAcceptCheckbox">Tôi đồng ý với các điều khoản và điều kiện nêu trên</String>
   <String Id="InstallOptionsButton">Tùy chọn</String>
   <String Id="InstallInstallButton">Cài đặt</String>
-  <String Id="InstallCloseButton">gần</String>
+  <String Id="InstallCloseButton">Gần</String>
   <String Id="OptionsHeader">Thiết lập tùy chọn</String>
   <String Id="OptionsLocationLabel">Vị trí cài đặt:</String>
   <String Id="OptionsBrowseButton">Chọn</String>
-  <String Id="OptionsOkButton">xác định</String>
-  <String Id="OptionsCancelButton">hủy bỏ</String>
+  <String Id="OptionsOkButton">Xác định</String>
+  <String Id="OptionsCancelButton">Hủy bỏ</String>
   <String Id="ProgressHeader">Tiến trình cài đặt</String>
   <String Id="ProgressLabel">Đang xử lý...</String>
   <String Id="OverallProgressPackageText">Đang khởi tạo...</String>
-  <String Id="ProgressCancelButton">hủy bỏ</String>
+  <String Id="ProgressCancelButton">Hủy bỏ</String>
   <String Id="ModifyHeader">Sửa đổi Cài đặt</String>
   <String Id="ModifyRepairButton">Sửa</String>
   <String Id="ModifyUninstallButton">Gỡ cài đặt</String>
-  <String Id="ModifyCloseButton">gần</String>
+  <String Id="ModifyCloseButton">Gần</String>
   <String Id="SuccessHeader">Cài đặt thành công</String>
   <String Id="SuccessUninstallHeader">Gỡ cài đặt thành công</String>
   <String Id="SuccessInstallHeader">Gỡ cài đặt thành công</String>
   <String Id="SuccessLaunchButton">Chạy</String>
   <String Id="SuccessRestartText">Bạn phải khởi động lại máy tính trước khi bạn sử dụng phần mềm</String>
   <String Id="SuccessRestartButton">Khởi động lại</String>
-  <String Id="SuccessCloseButton">gần</String>
+  <String Id="SuccessCloseButton">Gần</String>
   <String Id="FailureHeader">Cài đặt thất bại</String>
   <String Id="FailureHyperlinkLogText">Một hoặc nhiều vấn đề khiến thiết lập thất bại. Hãy khắc phục sự cố và sau đó thử cài đặt lại. Để biết nhiều thông tin hơn hãy xem</String>
   <String Id="FailureHyperlinkLogTextLink">file nhật ký</String>
   <String Id="FailureRestartText">Bạn phải khởi động lại máy tính của bạn để hoàn thành quá trình rollback của phần mềm</String>
   <String Id="FailureRestartButton">Khởi động lại</String>
-  <String Id="FailureCloseButton">gần</String>
+  <String Id="FailureCloseButton">Gần</String>
   <String Id="WillInstall">[WixBundleName] sẽ cài đặt trên thiết bị của bạn</String>
   <String Id="InstallLicenseLinkText">Thỏa thuận bản quyền người dùng cuối</String>
   <String Id="FilesInUseHeader">File sử dụng</String>
   <String Id="FilesInUseLabel">Các ứng dụng sau đây cần được dừng lại để tiếp tục cài đặt:</String>
   <String Id="FilesInUseCloseRadioButton">Đóng các ứng dụng và cố gắng khởi động lại chúng</String>
   <String Id="FilesInUseDontCloseRadioButton">Không đóng ứng dụng. Khởi động lại sẽ được yêu cầu</String>
-  <String Id="FilesInUseOkButton">xác định</String>
-  <String Id="FilesInUseCancelButton">hủy bỏ</String>
+  <String Id="FilesInUseOkButton">Xác định</String>
+  <String Id="FilesInUseCancelButton">Hủy bỏ</String>
   <String Id="InstallLicenseText">Bằng cách nhấp vào \"Chấp nhận và Cài đặt\", bạn đồng ý</String>
   <String Id="Options">Tùy chọn</String>
   <String Id="SelectApps">Chọn các ứng dụng cần cài đặt:</String>

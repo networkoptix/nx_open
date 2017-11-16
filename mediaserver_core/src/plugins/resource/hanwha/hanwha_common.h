@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -40,18 +42,36 @@ enum class HanwhaClientType
     mobile
 };
 
+enum class HanwhaSessionType
+{
+    undefined,
+    live,
+    archive,
+    preview,
+    fileExport,
+    count
+};
+
 //TODO: #dmishin consider using Fusion instead of custom methods.
+
+static const int kHanwhaBlockedHttpCode = 490;
+
+static const QString kHanwhaManufacturerName("Hanwha Techwin");
 static const int kHanwhaInvalidProfile = -1;
 static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaInvalidFps = -1;
 static const int kHanwhaInvalidBitrate = -1;
 static const int kHanwhaInvalidChannel = -1;
+static const int kHanwhaDefaultOverlappedId = 0;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
-static const int kHanwhaMaxPresetNumber = 1000;
+static const int kHanwhaDefaultMaxPresetNumber = 1000;
 static const int kHanwhaProfileNameMaxLength = 12;
 
-const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
-const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
+static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
+static const QString kHanwhaUtcDateTimeFormat("yyyy-MM-ddThh:mm:ssZ");
+
+static const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
+static const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
 
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");
@@ -163,9 +183,14 @@ static const QString kHanwhaTrueValueAttribute = lit("true");
 static const QString kHanwhaFalseValueAttribute = lit("false");
 static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
 static const QString kHanwhaFormatAttribute = lit("format");
+static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
+
+static const QString kHanwhaNvrDeviceType = lit("NVR");
 
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

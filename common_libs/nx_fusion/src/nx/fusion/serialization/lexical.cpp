@@ -1,5 +1,6 @@
 #include "lexical.h"
 #include "lexical_functions.h"
+#include <nx/utils/url.h>
 
 class QnLexicalSerializerStorage: public QnSerializerStorage<QnLexicalSerializer> {
 public:
@@ -24,6 +25,7 @@ public:
         registerSerializer<QColor>();
         registerSerializer<QnUuid>();
         registerSerializer<QUrl>();
+        registerSerializer<nx::utils::Url>();
 
         registerSerializer<QnLatin1Array>();
     }

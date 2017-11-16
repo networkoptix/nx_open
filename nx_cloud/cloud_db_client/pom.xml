@@ -2,12 +2,12 @@
     <parent>
         <artifactId>nx_cloud</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.1.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_db_client</artifactId>
     <packaging>pom</packaging>
@@ -30,11 +30,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>nx_fusion</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>
 
         <dependency>

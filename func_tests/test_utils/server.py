@@ -17,13 +17,12 @@ import tzlocal
 import requests.exceptions
 import pytest
 from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
-from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
+from .rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
-from .cloud_host import CloudHost
 from .camera import make_schedule_task, Camera, SampleMediaFile
 from .media_stream import open_media_stream
 from .host import Host
-from .cloud_host import CloudHost
+from .cloud_host import CloudAccount
 
 
 DEFAULT_HTTP_SCHEMA = 'http'
@@ -35,7 +34,7 @@ MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=1)  # timeout when waiting for server become online (pingable)
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=5)  # timeout when waiting for server become online (pingable)
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
@@ -69,17 +68,17 @@ def generate_auth_key(method, user, password, nonce, realm):
 class ServerConfig(object):
 
     def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
-                 box=None, config_file_params=None, setup_settings=None, setup_cloud_host=None,
+                 box=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
                  http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
         assert config_file_params is None or isinstance(config_file_params, dict), repr(config_file_params)
         assert setup_settings is None or isinstance(setup_settings, dict), repr(setup_settings)
-        assert setup_cloud_host is None or isinstance(setup_cloud_host, CloudHost), repr(setup_cloud_host)
+        assert setup_cloud_account is None or isinstance(setup_cloud_account, CloudAccount), repr(setup_cloud_account)
         assert http_schema in [None, 'http', 'https'], repr(http_schema)
         self.name = name
         self.start = start
-        self.setup = setup  # setup as local system if setup_cloud_host is None, to cloud if it is set
+        self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
         # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
         # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
         # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
@@ -88,7 +87,7 @@ class ServerConfig(object):
         self.box = box  # VagrantBox or None
         self.config_file_params = config_file_params  # dict or None
         self.setup_settings = setup_settings or {}  # dict
-        self.setup_cloud_host = setup_cloud_host  # CloudHost or None
+        self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
         self.http_schema = http_schema or DEFAULT_HTTP_SCHEMA  # 'http' or 'https'
         self.rest_api_timeout = rest_api_timeout
 
@@ -112,9 +111,7 @@ class Server(object):
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
-        self.user = REST_API_USER
-        self.password = REST_API_PASSWORD
-        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password, rest_api_timeout)
+        self.rest_api = ServerRestApi(self.title, self.rest_api_url, REST_API_USER, REST_API_PASSWORD, rest_api_timeout)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
@@ -128,6 +125,14 @@ class Server(object):
 
     def __str__(self):
         return '%r@%s' % (self.name, self.rest_api_url)
+
+    @property
+    def user(self):
+        return self.rest_api.user
+
+    @property
+    def password(self):
+        return self.rest_api.password
 
     @property
     def internal_url(self):
@@ -306,18 +311,18 @@ class Server(object):
         self.rest_api.api.setupLocalSystem.POST(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
         self.load_system_settings(log_settings=True)
 
-    def setup_cloud_system(self, cloud_host, **kw):
-        assert isinstance(cloud_host, CloudHost), repr(cloud_host)
-        bind_info = cloud_host.bind_system(self.name)
+    def setup_cloud_system(self, cloud_account, **kw):
+        assert isinstance(cloud_account, CloudAccount), repr(cloud_account)
+        bind_info = cloud_account.bind_system(self.name)
         setup_response = self.rest_api.api.setupCloudSystem.POST(
             systemName=self.name,
             cloudAuthKey=bind_info.auth_key,
             cloudSystemID=bind_info.system_id,
-            cloudAccountName=cloud_host.user,
+            cloudAccountName=cloud_account.user,
             timeout=datetime.timedelta(minutes=5),
             **kw)
         settings = setup_response['settings']
-        self.set_user_password(cloud_host.user, cloud_host.password)
+        self.set_user_password(cloud_account.user, cloud_account.password)
         self.load_system_settings(log_settings=True)
         assert self.settings['systemName'] == self.name
         return settings
@@ -371,9 +376,7 @@ class Server(object):
 
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
-        self.user = user
-        self.password = password
-        self.rest_api.set_credentials(self.user, self.password)
+        self.rest_api.set_credentials(user, password)
         if self.is_started():
             self._wait_for_credentials_accepted()
 

@@ -6,7 +6,6 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <nx/utils/system_error.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
 
@@ -20,8 +19,10 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "cloud/address_resolver.h"
 
 #ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */
@@ -165,9 +166,10 @@ bool Socket<SocketInterfaceToImplement>::close()
     if (m_fd == -1)
         return true;
 
-    NX_ASSERT(
-        !nx::network::SocketGlobals::isInitialized() ||
-        !nx::network::SocketGlobals::aioService().isSocketBeingMonitored(static_cast<Pollable*>(this)));
+    if (this->impl()->aioThread.load())
+    {
+        NX_ASSERT(!this->impl()->aioThread.load()->isSocketBeingMonitored(this));
+    }
 
     auto fd = m_fd;
     m_fd = -1;
@@ -406,10 +408,19 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
         return false;
     }
 
-    if (m_ipVersion == AF_INET6)
+    int on = 1;
+
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
+        return false;
+
+#if !defined(Q_OS_WIN)
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
+        return false;
+#endif
+
+    if (m_ipVersion == AF_INET6
+        && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)))
     {
-        int off = 0;
-        if (::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)))
             return false;
     }
 
@@ -809,7 +820,8 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
     if (connectResult != 0)
     {
-        if (SystemError::getLastOSErrorCode() != SystemError::inProgress)
+        auto errorCode = SystemError::getLastOSErrorCode();
+        if (errorCode != SystemError::inProgress)
             return false;
         if (isNonBlockingModeBak)
             return true;        //async connect started
@@ -1107,8 +1119,8 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
         ka.keepalivetime = intDuration<milliseconds>(info->inactivityPeriodBeforeFirstProbe);
         ka.keepaliveinterval = intDuration<milliseconds>(info->probeSendPeriod);
 
-        // the value can not be changed, 0 means default
-        info->probeCount = 0;
+        // The value can not be changed, 0 means default.
+        info->probeCount = 10; //< Value cannot be changed on mswin.
     }
 
     DWORD length = sizeof(ka);
@@ -1129,9 +1141,9 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
         return true;
 
 #if defined( Q_OS_LINUX )
-    const int inactivityPeriodBeforeFirstProbe = 
+    const int inactivityPeriodBeforeFirstProbe =
         intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
-    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, 
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE,
             &inactivityPeriodBeforeFirstProbe, sizeof(inactivityPeriodBeforeFirstProbe)) < 0)
     {
         return false;
@@ -1148,9 +1160,9 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
     if (setsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count)) < 0)
         return false;
 #elif defined( Q_OS_MACX )
-    const int inactivityPeriodBeforeFirstProbe = 
+    const int inactivityPeriodBeforeFirstProbe =
         intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
-    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, 
+    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE,
             &inactivityPeriodBeforeFirstProbe, sizeof(inactivityPeriodBeforeFirstProbe)) < 0)
     {
         return false;
@@ -1183,7 +1195,7 @@ bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
     *result = KeepAliveOptions();
 #if defined(Q_OS_LINUX)
     int inactivityPeriodBeforeFirstProbe = 0;
-    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, 
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE,
             &inactivityPeriodBeforeFirstProbe, &length) < 0)
     {
         return false;
@@ -1496,9 +1508,10 @@ UDPSocket::UDPSocket(int ipVersion):
         //error
     }
 
-    // Made with an assumption that SO_LINGER may cause ::close system call to block 
+    // Made with an assumption that SO_LINGER may cause ::close system call to block
     // on win32 with some network drivers when network inteface fails.
-    struct linger lingerOptions = {0};
+    struct linger lingerOptions;
+    memset(&lingerOptions, 0, sizeof(lingerOptions));
     if (setsockopt(
             handle(), SOL_SOCKET, SO_LINGER,
             (const char*) &lingerOptions, sizeof(lingerOptions)) < 0)

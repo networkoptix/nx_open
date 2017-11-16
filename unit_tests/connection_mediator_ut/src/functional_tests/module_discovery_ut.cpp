@@ -117,7 +117,7 @@ protected:
     {
         const auto relayUrl = reportedTrafficRelayUrl();
         ASSERT_TRUE(static_cast<bool>(relayUrl));
-        ASSERT_EQ(m_moduleUrl, QUrl(*relayUrl));
+        ASSERT_EQ(m_moduleUrl, nx::utils::Url(*relayUrl));
     }
 
     void thenNoModuleUrlHasBeenReported()
@@ -127,7 +127,7 @@ protected:
 
 private:
     std::string m_moduleId;
-    QUrl m_moduleUrl;
+    nx::utils::Url m_moduleUrl;
     std::unique_ptr<DiscoveryClient> m_moduleRegistrar;
 
     nx::cloud::discovery::PeerStatus fetchPeerStatus()
@@ -150,7 +150,7 @@ private:
         if (resultCode != nx::cloud::discovery::ResultCode::ok)
         {
             throw std::runtime_error(
-                "Error fetching peer status. " + 
+                "Error fetching peer status. " +
                 QnLexical::serialized(resultCode).toStdString());
         }
 

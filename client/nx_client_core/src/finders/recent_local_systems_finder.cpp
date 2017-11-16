@@ -1,9 +1,11 @@
 #include "recent_local_systems_finder.h"
 
-#include <client_core/client_core_settings.h>
-#include <client_core/local_connection_data.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
+
+#include <client_core/client_core_settings.h>
+#include <client_core/local_connection_data.h>
 
 namespace {
 
@@ -53,7 +55,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
         const auto connection = it.value();
 
         const bool hasOnlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
-            [](const QUrl& url)
+            [](const nx::utils::Url& url)
             {
                 return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
             });

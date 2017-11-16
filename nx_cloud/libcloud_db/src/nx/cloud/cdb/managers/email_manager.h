@@ -7,8 +7,6 @@
 #include <set>
 
 #include <QtCore/QString>
-#include <QtCore/QUrl>
-
 #include <nx_ec/data/api_email_data.h>
 #include <utils/common/threadqueue.h>
 #include <nx/fusion/serialization/json.h>
@@ -56,11 +54,11 @@ private:
         ::ec2::ApiEmailData email;
         std::function<void( bool )> completionHandler;
     };
-    
+
     const conf::Settings& m_settings;
     bool m_terminated;
     mutable QnMutex m_mutex;
-    QUrl m_notificationModuleUrl;
+    nx::utils::Url m_notificationModuleUrl;
     std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
     nx::utils::Counter m_startedAsyncCallsCounter;
     std::atomic<std::uint64_t> m_notificationSequence;

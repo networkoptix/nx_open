@@ -5,6 +5,7 @@
 
 #include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 #include <QDir>
 #include <QSettings>
@@ -35,7 +36,7 @@ public:
     /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
      */
-    bool send(const QUrl& serverApi, const QFileInfo& crash, QSettings* settings);
+    bool send(const nx::utils::Url& serverApi, const QFileInfo& crash, QSettings* settings);
 
 private:
     friend class ReportData;

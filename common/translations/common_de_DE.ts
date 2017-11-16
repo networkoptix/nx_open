@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Neues System</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Die entdeckte System %1 ist inkompatibel mit dem aktuellen System.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>Stellen Sie sicher, dass Port %1 erreichbar ist (Portweiterleitung).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Wenn das nicht hilft, stellen Sie das Gerät über die Webseite auf Werkseinstellungen.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Die Kamera wurde aus dem Archiv wiederhergestellt. Löschen Sie die Kamera und fügen Sie sie erneut hinzu, um das Live-Video anzuzeigen.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen (Fehler &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -550,7 +550,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
+      <translation>Server mit passender Hardware-Id wurde nicht gefunden</translation>
     </message>
   </context>
   <context>
@@ -673,7 +673,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>Hardware-ID: %1</translation>
+      <translation>Hardware-Id: %1</translation>
     </message>
     <message>
       <source>Time License</source>
@@ -1104,7 +1104,7 @@
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation>
-        <numerusform>Bewegung auf Kameras</numerusform>
+        <numerusform>Bewegung auf Kamera</numerusform>
         <numerusform>Bewegung auf Kameras</numerusform>
       </translation>
     </message>
@@ -1147,35 +1147,35 @@
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
-        <numerusform>Eingangssignal auf Geräten</numerusform>
+        <numerusform>Eingangssignal auf Gerät</numerusform>
         <numerusform>Eingangssignal auf Geräten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
-        <numerusform>Eingangssignal auf Kameras</numerusform>
+        <numerusform>Eingangssignal auf Kamera</numerusform>
         <numerusform>Eingangssignal auf Kameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Geräte getrennt</numerusform>
-        <numerusform>Geräte getrennt</numerusform>
+        <numerusform>Gerät getrennt</numerusform>
+        <numerusform>Geräten getrennt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Kameras getrennt</numerusform>
+        <numerusform>Kamera getrennt</numerusform>
         <numerusform>Kameras getrennt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>IP-Adresskonflikt auf mehreren Geräten</numerusform>
+        <numerusform>IP-Adresskonflikt auf mehreren Gerät</numerusform>
         <numerusform>IP-Adresskonflikt auf mehreren Geräten</numerusform>
       </translation>
     </message>
@@ -1183,7 +1183,7 @@
       <source>Cameras IP Conflict</source>
       <translation>
         <numerusform>IP-Adresskonflikt auf einer Kamera</numerusform>
-        <numerusform>IP-Adresskonflikt auf einer Kamera</numerusform>
+        <numerusform>IP-Adresskonflikt auf einer Kameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1313,7 +1313,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

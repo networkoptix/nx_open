@@ -6,7 +6,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <nx/utils/thread/mutex.h>
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>
@@ -729,7 +729,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
     if (!transport->isIncoming())
     {
         //we can connect to the peer
-        const QUrl remoteAddr = transport->remoteAddr();
+        const nx::utils::Url remoteAddr = transport->remoteAddr();
         //saving credentials has been used to establish connection
         startSynchronizingTimeWithPeer( //starting sending time sync info to peer
             transport->remotePeer().id,
@@ -810,7 +810,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     NX_LOG(lm("TimeSynchronizationManager. About to report sync_time to peer %1 (%2)")
         .arg(peerID).arg(peerIter->second.peerAddress.toString()), cl_logDEBUG2);
 
-    QUrl targetUrl;
+    nx::utils::Url targetUrl;
     targetUrl.setScheme( lit("http") );
     targetUrl.setHost( peerIter->second.peerAddress.address.toString() );
     targetUrl.setPort( peerIter->second.peerAddress.port );
@@ -855,17 +855,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
             nx_http::StringType::number(peerIter->second.rttMillis.get()));
     }
 
-    clientPtr->setUserName( peerIter->second.authData.userName );
-    if( peerIter->second.authData.password )
-    {
-        clientPtr->setAuthType( nx_http::AuthType::authBasicAndDigest );
-        clientPtr->setUserPassword( peerIter->second.authData.password.get() );
-    }
-    else if( peerIter->second.authData.ha1 )
-    {
-        clientPtr->setAuthType( nx_http::AuthType::authDigestWithPasswordHash );
-        clientPtr->setUserPassword( peerIter->second.authData.ha1.get() );
-    }
+    clientPtr->setUserCredentials(peerIter->second.authData.userCredentials);
 
     clientPtr->doGet( targetUrl );
     peerIter->second.syncTimerID.reset();
@@ -909,7 +899,8 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-        peerIter->second.syncTimerID =
+
+    peerIter->second.syncTimerID =
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(
@@ -1164,7 +1155,7 @@ void TimeSynchronizationManager::onDbManagerInitialized()
             m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - restoredTimeDelta;
             m_usedTimeSyncInfo.timePriorityKey = restoredPriorityKey;
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-            // TODO: #ak The next line is doubtful. It may be needed in case if server was down 
+            // TODO: #ak The next line is doubtful. It may be needed in case if server was down
             // for a long time and time priority sequence has overflowed.
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
             NX_LOGX( lit("Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
@@ -1287,7 +1278,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
     const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
     const int synchronizedToLocalTimeOffset = getSyncTime() - curSysTime;
 
-    //local OS time has been changed. If system time is set 
+    //local OS time has been changed. If system time is set
     //by local host time then updating system time
     const bool isSystemTimeSynchronizedWithInternet =
         settings->isSynchronizingTimeWithInternet() &&
@@ -1297,7 +1288,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
         !isSystemTimeSynchronizedWithInternet;
 
-    const bool isSynchronizedToLocalTimeOffsetExceeded = 
+    const bool isSynchronizedToLocalTimeOffsetExceeded =
         qAbs(synchronizedToLocalTimeOffset) >
         duration_cast<milliseconds>(settings->maxDifferenceBetweenSynchronizedAndLocalTime()).count();
 
@@ -1321,7 +1312,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
             isTimeChanged = true;
         }
     }
-    
+
     if (!isTimeChanged &&
         m_connection &&
         isSynchronizedToLocalTimeOffsetExceeded)

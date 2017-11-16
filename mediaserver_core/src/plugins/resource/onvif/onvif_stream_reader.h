@@ -4,7 +4,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "onvif_helper.h"
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
 #include "onvif_resource.h"
@@ -63,7 +63,7 @@ private:
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired, const QnLiveStreamParams& params) const;
     CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
-    
+
     CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
     Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;

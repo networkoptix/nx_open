@@ -7,7 +7,6 @@
     "cancelButton":"Отмена",
     "loginTitle":"Войти в {{PRODUCT_NAME}}",
     "loginButton":"Войти",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Вы уже выполнили вход",
     "logoutAuthorisedContinueButton":"Продолжить",
     "logoutAuthorisedLogoutButton":"Выйти"
@@ -29,13 +28,11 @@
     "restorePassword":"Сброс пароля -",
     "restorePasswordSuccess":"Пароль сохранен -",
     "restorePasswordCode":"Сброс пароля -",
-    "view":"View cameras - ",
-    "contentPage":"",
+    "view":"Просмотр камер - ",
     "debug":"Отладка",
     "login":"Войти -",
     "download":"Скачать {{VMS_NAME}}",
     "downloadPlatform":"Скачать {{VMS_NAME}} для ",
-    "startPage":"",
     "pageNotFound":"Страница не найдена"
   },
   "systemStatuses":{
@@ -56,15 +53,15 @@
     },
     "Viewer":{
       "label":"Видео с камер и архив",
-      "description":"Может смотреть живое видео и архив"
+      "description":"Может смотреть видео в реальном времени и архив"
     },
     "Live Viewer":{
-      "label":"Только видео с камер",
-      "description":"Может смотреть только живое видео"
+      "label":"Только видео в реальном времени",
+      "description":"Может смотреть только видео в реальном времени"
     },
     "Advanced Viewer":{
       "label":"Просмотр и настройка",
-      "description":"Может смотреть живое видео, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description":"Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
     },
     "Administrator":{
       "label":"Администратор",
@@ -83,28 +80,28 @@
       "description":"Особая роль, настроенная в Системе"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"Владелец",
+      "description":"Неограниченный доступ, включая управление общим доступом и подключением системы к облаку"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"Видео с камер и архив",
+      "description":"Может смотреть живое видео и архив"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"Только видео в реальном времени",
+      "description":"Может смотреть только видео в реальном времени"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Просмотр и настройка",
+      "description":"Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"Особые",
+      "description":"Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
     }
   },
   "errorCodes":{
-    "ok":"ok",
+    "ok":"ок",
     "cantSendActivationPrefix":"Не удается отправить подтверждение по Email",
     "cantDisconnectSystemPrefix":"Не удается удалить систему",
     "cantUnshareWithMeSystemPrefix":"Не удается удалить систему",
@@ -114,7 +111,7 @@
     "cantRegisterPrefix":"Произошла ошибка",
     "cantGetSystemInfoPrefix":"Информация о системе недоступна",
     "cantChangeAccountPrefix":"Не удается сохранить изменения",
-    "cantChangePasswordPrefix":"Cannot save password",
+    "cantChangePasswordPrefix":"Не удается сохранить пароль",
     "cantActivatePrefix":"Не удается активировать вашу учетную запись",
     "cantSendConfirmationPrefix":"Не удается отправить подтверждение по Email",
     "cloudInvalidResponse":"Облачная БД вернула неожиданный ответ",
@@ -137,7 +134,7 @@
     "cantEditAdmin":"Этот пользователь имеет полномочия администратора",
     "cantOpenClient":"Приложение {{VMS_NAME}} не обнаружено. <a href=\"/download\">Скачать</a>",
     "lostConnection":"Подключение к {{systemName}} потеряно",
-    "thisSystem":"the system"
+    "thisSystem":"система"
   },
   "passwordRequirements":{
     "minLengthMessage":"Пароль должен содержать не менее 8 символов",
@@ -156,7 +153,7 @@
   },
   "system":{
     "yourSystem":"Ваша система",
-    "mySystemSearch":"IMeMyMine",
+    "mySystemSearch":"ЯМойМоя",
     "unavailable":"Система недоступна",
     "offline":"Система не в сети",
     "openClient":"Открыть в {{VMS_NAME}}",
@@ -177,6 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Ваша учетная запись успешно сохранена",
+    "activationLinkSent":"Ссылка для активации отправлена",
     "passwordChangedSuccess":"Ваша учетная запись успешно сохранена",
     "changePassword":"Изменить пароль",
     "newPasswordLabel":"Новый пароль",
@@ -184,7 +182,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"Установите {{VMS_NAME}} для работы с системой",
-    "noClientDetectedMessage":"",
     "action":"Скачать {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +194,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -224,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Отправить",
+    "sendConfirm":"Повторно отправить ссылку активации",
     "resetPassword":"Сброс пароля",
     "setNewPassword":"Сохранить пароль",
     "setNewPasswordLabel":"Новый пароль"
@@ -234,7 +231,7 @@
     "createAccount":"Зарегистрироваться"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"Все системы",
     "systems":"Системы"
   }
 }

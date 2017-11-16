@@ -34,11 +34,12 @@ namespace ec2
         virtual void stop() = 0;
 
         virtual QSet<QnUuid> directlyConnectedClientPeers() const = 0;
+        virtual QSet<QnUuid> directlyConnectedServerPeers() const = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
         virtual int distanceToPeer(const QnUuid& dstPeer) const = 0;
 
-        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) = 0;
+        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) = 0;
         virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) = 0;
 
         virtual void dropConnections() = 0;
@@ -54,6 +55,7 @@ namespace ec2
         virtual ConnectionGuardSharedState* connectionGuardSharedState() = 0;
         virtual detail::QnDbManager* getDb() const = 0;
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) = 0;
+
     signals:
         void peerFound(QnUuid data, Qn::PeerType peerType);
         void peerLost(QnUuid data, Qn::PeerType peerType);

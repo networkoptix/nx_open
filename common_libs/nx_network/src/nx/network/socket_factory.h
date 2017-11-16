@@ -24,7 +24,8 @@ public:
 
     typedef std::function<std::unique_ptr<AbstractStreamSocket>(
         bool /*sslRequired*/,
-        nx::network::NatTraversalSupport /*natTraversalRequired*/)> CreateStreamSocketFuncType;
+        nx::network::NatTraversalSupport /*natTraversalRequired*/,
+        boost::optional<int> /*ipVersion*/)> CreateStreamSocketFuncType;
     typedef std::function<std::unique_ptr<AbstractStreamServerSocket>(
         bool /*sslRequired*/,
         nx::network::NatTraversalSupport /*natTraversalRequired*/,
@@ -39,7 +40,8 @@ public:
      */
     static std::unique_ptr< AbstractStreamSocket > createStreamSocket(
         bool sslRequired = false,
-        nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled);
+        nx::network::NatTraversalSupport natTraversalRequired = nx::network::NatTraversalSupport::enabled,
+        boost::optional<int> ipVersion = boost::none);
 
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
@@ -51,7 +53,7 @@ public:
 
     /**
      * Enforces factory to produce certain sockets
-     * @note DEBUG use ONLY!
+     * NOTE: DEBUG use ONLY!
      */
     static void enforceStreamSocketType(SocketType type);
     static void enforceStreamSocketType(QString type);
@@ -94,9 +96,12 @@ private:
     static std::atomic<int> s_tcpServerIpVersion;
 
     static std::unique_ptr<AbstractStreamSocket> defaultStreamSocketFactoryFunc(
-        nx::network::NatTraversalSupport nttType, SocketType forcedSocketType);
+        nx::network::NatTraversalSupport nttType,
+        SocketType forcedSocketType,
+        boost::optional<int> _ipVersion);
 
     static std::unique_ptr<AbstractStreamServerSocket> defaultStreamServerSocketFactoryFunc(
-        nx::network::NatTraversalSupport nttType, SocketType socketType,
+        nx::network::NatTraversalSupport nttType,
+        SocketType socketType,
         boost::optional<int> _ipVersion);
 };

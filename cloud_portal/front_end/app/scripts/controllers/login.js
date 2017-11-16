@@ -18,6 +18,10 @@ angular.module('cloudApp')
             dialogs.closeMe($scope);
         };
 
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
+
         $scope.login = process.init(function() {
             return account.login($scope.auth.email, $scope.auth.password, $scope.auth.remember);
         },{
@@ -30,7 +34,7 @@ angular.module('cloudApp')
             }
         }).then(function(){
             if(dialogSettings.params.redirect){
-                $location.path(Config.redirectAuthorised);
+                $location.path($routeParams.next ? $routeParams.next : Config.redirectAuthorised);
             }
             setTimeout(function(){
                 document.location.reload();

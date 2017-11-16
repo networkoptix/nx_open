@@ -68,7 +68,7 @@ public:
     {
         if (requestPathParams().empty())
             return completionHandler(nx_http::StatusCode::badRequest);
-        
+
         auto peerInfo = m_registeredPeerPool->getPeerInfo(requestPathParams()[0].toStdString());
         if (!peerInfo)
             return completionHandler(nx_http::StatusCode::notFound);

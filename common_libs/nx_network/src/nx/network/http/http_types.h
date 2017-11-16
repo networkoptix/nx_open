@@ -19,6 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 
 /**
  * Holds http-implementation suitable for async/sync i/o.
@@ -73,8 +74,8 @@ struct NX_NETWORK_API ci_less:
 };
 
 /** HTTP header container.
- * WARNING: This is multimap(!) to allow same header be present multiple times in a 
- * single http message. 
+ * WARNING: This is multimap(!) to allow same header be present multiple times in a
+ * single http message.
  * To insert or replace use nx_http::insertOrReplaceHeader
  */
 using HttpHeaders = std::multimap<StringType, StringType, ci_less>;
@@ -101,6 +102,15 @@ bool NX_NETWORK_API readHeader(
  */
 HttpHeaders::iterator NX_NETWORK_API insertOrReplaceHeader(
     HttpHeaders* const headers, const HttpHeader& newHeader);
+
+template<typename HeaderType>
+HttpHeaders::iterator insertOrReplaceHeader(
+    HttpHeaders* const headers, const HeaderType& header)
+{
+    return insertOrReplaceHeader(
+        headers,
+        HttpHeader(HeaderType::NAME, header.toString()));
+}
 
 HttpHeaders::iterator NX_NETWORK_API insertHeader(
     HttpHeaders* const headers, const HttpHeader& newHeader);
@@ -238,7 +248,7 @@ class NX_NETWORK_API RequestLine
 {
 public:
     StringType method;
-    QUrl url;
+    nx::utils::Url url;
     MimeProtoVersion version;
 
     RequestLine() = default;
@@ -506,7 +516,7 @@ public:
 
     void parse(const nx_http::StringType& str);
     /**
-     * @return true if encodingName is present in header and 
+     * @return true if encodingName is present in header and
      *   returns corresponding qvalue in *q (if not null).
      */
     bool encodingIsAllowed(const nx_http::StringType& encodingName, double* q = nullptr) const;
@@ -648,6 +658,20 @@ private:
     void readProductComment(Product* product, QnByteArrayConstRef* inputStr);
 };
 
+class NX_NETWORK_API StrictTransportSecurity
+{
+public:
+    static const StringType NAME;
+
+    std::chrono::seconds maxAge = std::chrono::seconds::zero();
+    bool includeSubDomains = false;
+    bool preload = false;
+
+    bool operator==(const StrictTransportSecurity&) const;
+    bool parse(const nx_http::StringType& strValue);
+    StringType toString() const;
+};
+
 } // namespace header
 
 typedef std::pair<StringType, StringType> ChunkExtension;
@@ -674,7 +698,7 @@ public:
      */
     int parse(const ConstBufferRefType& buf);
     /**
-     * @return bytes written to dstBuffer. -1 in case of serialize error. 
+     * @return bytes written to dstBuffer. -1 in case of serialize error.
      *   In this case contents of dstBuffer are undefined.
      */
     int serialize(BufferType* const dstBuffer) const;

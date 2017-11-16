@@ -243,38 +243,89 @@ void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setRowCount(0);
 }
 
-int QnCameraAdditionDialog::fillTable(const QnManualResourceSearchList &cameras) {
+int QnCameraAdditionDialog::fillTable(QnManualResourceSearchList cameras)
+{
+    std::sort(cameras.begin(), cameras.end(),
+        [](const QnManualResourceSearchEntry& left, const QnManualResourceSearchEntry& right)
+        {
+            // Insert new cameras to the beginning, old to the end.
+            if (left.existsInPool != right.existsInPool)
+                return right.existsInPool;
+
+            const auto leftUrl(QUrl::fromUserInput(left.url));
+            const auto rightUrl(QUrl::fromUserInput(right.url));
+
+            // Try to sort by IP address first.
+            bool leftIpOk = true;
+            const auto leftIp = QHostAddress(leftUrl.host()).toIPv4Address(&leftIpOk);
+            bool rightIpOk = true;
+            const auto rightIp = QHostAddress(rightUrl.host()).toIPv4Address(&rightIpOk);
+            if (leftIpOk && rightIpOk && leftIp != rightIp)
+                return leftIp < rightIp;
+
+            // Sort by host then.
+            if (leftUrl.host() != rightUrl.host())
+                return leftUrl.host() < rightUrl.host();
+
+            // Sort cameras on the same host by channels of the recorder.
+            static const QString kChannelParameter = lit("channel");
+            const QUrlQuery leftQuery(leftUrl);
+            const QUrlQuery rightQuery(rightUrl);
+            if (leftQuery.hasQueryItem(kChannelParameter)
+                || rightQuery.hasQueryItem(kChannelParameter))
+            {
+                const auto leftChannel = leftQuery.queryItemValue(kChannelParameter).toInt();
+                const auto rightChannel = rightQuery.queryItemValue(kChannelParameter).toInt();
+
+                // Default value is 0, so we can safely compare existing channel with absent.
+                NX_EXPECT(leftChannel != rightChannel, "Two cameras on the same host?");
+                if (leftChannel != rightChannel)
+                    return leftChannel < rightChannel;
+            }
+
+            if (left.name != right.name)
+            {
+                return nx::utils::naturalStringCompare(
+                    left.name, right.name, Qt::CaseInsensitive) < 0;
+            }
+
+            return left.uniqueId < right.uniqueId;
+        });
+
     clearTable();
 
     int newCameras = 0;
-    foreach(const QnManualResourceSearchEntry &info, cameras) {
-        bool enabledRow = !info.existsInPool;
-        if (enabledRow)
-            newCameras++;
+    for (const auto& info: cameras)
+    {
+        const bool isNewCamera = !info.existsInPool;
+        if (isNewCamera)
+            ++newCameras;
 
-        //insert new cameras to the beginning, old to the end
-        int row = enabledRow ? 0 : ui->camerasTable->rowCount();
+        const int row = ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
 
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-        if (enabledRow) {
+        if (isNewCamera)
+        {
             checkItem->setCheckState(Qt::Checked);
-        } else {
+        }
+        else
+        {
             checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
-            checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
+            checkItem->setFlags(checkItem->flags() &~Qt::ItemIsEnabled);
             checkItem->setCheckState(Qt::PartiallyChecked);
         }
         checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualResourceSearchEntry>(info));
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.vendor);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
-        if (!enabledRow)
+        if (!isNewCamera)
             manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
 
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
         nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEditable);
-        if (!enabledRow)
+        if (!isNewCamera)
             nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEnabled);
 
         QFont font = ui->camerasTable->font();

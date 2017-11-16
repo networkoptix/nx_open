@@ -10,10 +10,6 @@ LineSplitter::LineSplitter():
 {
 }
 
-LineSplitter::~LineSplitter()
-{
-}
-
 bool LineSplitter::parseByLines(
     const ConstBufferRefType& data,
     QnByteArrayConstRef* const lineBuffer,
@@ -31,7 +27,7 @@ bool LineSplitter::parseByLines(
     // Searching line end in data.
     static const char CRLF[] = "\r\n";
     const char* lineEnd = std::find_first_of(
-        data.data(), 
+        data.data(),
         data.data() + data.size(),
         CRLF,
         CRLF + sizeof(CRLF) - 1);

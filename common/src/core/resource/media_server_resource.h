@@ -42,11 +42,11 @@ public:
     QList<SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList
-    void setAdditionalUrls(const QList<QUrl> &urls);
-    QList<QUrl> getAdditionalUrls() const;
+    void setAdditionalUrls(const QList<nx::utils::Url> &urls);
+    QList<nx::utils::Url> getAdditionalUrls() const;
 
-    void setIgnoredUrls(const QList<QUrl> &urls);
-    QList<QUrl> getIgnoredUrls() const;
+    void setIgnoredUrls(const QList<nx::utils::Url> &urls);
+    QList<nx::utils::Url> getIgnoredUrls() const;
 
     boost::optional<SocketAddress> getCloudAddress() const;
 
@@ -54,7 +54,7 @@ public:
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
-    virtual QUrl getApiUrl() const;
+    virtual nx::utils::Url getApiUrl() const;
 
     SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
@@ -121,6 +121,9 @@ public:
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
     qint64 currentStatusTime() const;
 
+    /** Server local timezone. */
+    qint64 utcOffset(qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
     void beforeDestroy();
 
     /**
@@ -157,8 +160,8 @@ private:
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
     QList<SocketAddress> m_netAddrList;
-    QList<QUrl> m_additionalUrls;
-    QList<QUrl> m_ignoredUrls;
+    QList<nx::utils::Url> m_additionalUrls;
+    QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
@@ -173,7 +176,7 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
-    QUrl buildApiUrl() const;
+    nx::utils::Url buildApiUrl() const;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr)

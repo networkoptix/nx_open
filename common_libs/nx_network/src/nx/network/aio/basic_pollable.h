@@ -42,7 +42,7 @@ public:
      *     object creation before any usage.
      * Some implementation may allow more (e.g., binding if no async 
      *     operations are scheduled at the moment)
-     * @note Re-binding is allowed
+     * NOTE: Re-binding is allowed
      */
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;

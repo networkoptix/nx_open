@@ -31,7 +31,7 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_STRING(NX_ANALYTICS_PATH "/pednet.caffemodel", modelFile, "");
     NX_INI_STRING(NX_VAR_PATH "/var/cuda_engine.cache", cacheFile, "");
 
-    NX_INI_FLAG(0, enableDetectionPlugin, "");
+    NX_INI_FLAG(1, enableDetectionPlugin, "");
     NX_INI_FLAG(1, enableMotionDetection, "");
 
     // Rectangles filtering parameters
@@ -93,7 +93,7 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_STRING("There are men nearby", detectionStartDescription, "");
     NX_INI_STRING("There are no men nearby", detectionEndDescription, "");
 
-    NX_INI_FLAG(1, useKeyFramesOnly, "Decode and perform inference for key frames only.");
+    NX_INI_FLAG(0, useKeyFramesOnly, "Decode and perform inference for key frames only.");
 
     NX_INI_STRING(
         "primary",

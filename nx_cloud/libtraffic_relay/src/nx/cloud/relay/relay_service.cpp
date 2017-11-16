@@ -1,10 +1,11 @@
 #include "relay_service.h"
 
 #include "controller/controller.h"
-#include "model/model.h"
-#include "view/view.h"
-#include "settings.h"
 #include "libtraffic_relay_app_info.h"
+#include "model/model.h"
+#include "settings.h"
+#include "statistics_provider.h"
+#include "view/view.h"
 
 namespace nx {
 namespace cloud {
@@ -20,7 +21,7 @@ std::vector<SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
-const model::ListeningPeerPool& RelayService::listeningPeerPool() const
+const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() const
 {
     return m_model->listeningPeerPool();
 }
@@ -35,6 +36,15 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     Model model(settings);
+    while (!model.doMandatoryInitialization())
+    {
+        if (isTerminated())
+            return -1;
+
+        NX_INFO(this, lm("Retrying model initialization after delay"));
+        std::this_thread::sleep_for(
+            settings.cassandraConnection().delayBeforeRetryingInitialConnect);
+    }
     m_model = &model;
 
     Controller controller(settings, &model);
@@ -46,6 +56,11 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
 
     View view(settings, model, &controller);
     m_view = &view;
+
+    auto statisticsProvider = StatisticsProviderFactory::instance().create(
+        model.listeningPeerPool(),
+        view.httpServer());
+    view.registerStatisticsApiHandlers(*statisticsProvider);
 
     // TODO: #ak: process rights reduction should be done here.
 

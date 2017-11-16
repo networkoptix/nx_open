@@ -518,6 +518,20 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         makeReplyProcessor(this, handler));
 }
 
+void QnResourcesChangesManager::cleanAccessibleResources(const QnUuid& subject)
+{
+    auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return;
+
+    auto handler = [this, subject](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {};
+
+    ec2::ApiAccessRightsData accessRights;
+    accessRights.userId = subject;
+    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
+        makeReplyProcessor(this, handler));
+}
+
 void QnResourcesChangesManager::saveUserRole(const ec2::ApiUserRoleData& role)
 {
     auto connection = commonModule()->ec2Connection();

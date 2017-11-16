@@ -4,6 +4,7 @@
 
 #include <nx/utils/safe_direct_connection.h>
 #include <utils/common/hash.h>
+#include <nx/utils/url.h>
 
 #ifdef ENABLE_ACTI
 
@@ -14,13 +15,13 @@ class QnActiSystemInfoChecker:
     Q_OBJECT
 
 public:
-    QnActiSystemInfoChecker(const QUrl& url);
+    QnActiSystemInfoChecker(const nx::utils::Url &url);
     virtual ~QnActiSystemInfoChecker();
     boost::optional<QnActiResource::ActiSystemInfo> getSystemInfo();
     boost::optional<QAuthenticator> getSuccessfulAuth();
     bool isFailed();
 
-    void setUrl(const QUrl& url);
+    void setUrl(const nx::utils::Url &url);
     void setAuthOptions(QSet<QAuthenticator> authOptions);
     void setCacheExpirationInterval(const std::chrono::seconds& expirationInterval);
 
@@ -36,7 +37,7 @@ private:
     void handleFail();
 
 private:
-    QUrl m_baseUrl;
+    nx::utils::Url m_baseUrl;
 
     boost::optional<QnActiResource::ActiSystemInfo> m_systemInfo;
     boost::optional<QAuthenticator> m_lastSuccessfulAuth;

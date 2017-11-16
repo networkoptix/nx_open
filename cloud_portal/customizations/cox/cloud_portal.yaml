@@ -16,7 +16,7 @@ cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
 cloud_gateway:
-    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
+    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
 
 mail_from: 'Cox Cloud <CCI-tier5-support.chs@cox.com>'
 
@@ -46,11 +46,8 @@ languages:
     - tr_TR
     - zh_CN
     - zh_TW
-    - he_IL
     - hu_HU
-    - nl_NL
-    - pl_PL
-    - vi_VN
+    - th_TH
 
 queue_name: $INSTANCE_NAME
 

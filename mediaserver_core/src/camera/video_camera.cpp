@@ -14,14 +14,13 @@
 #include <nx/streaming/config.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
-#include <core/dataprovider/cpull_media_stream_provider.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/cpull_media_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 
-#include <media_server/settings.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <media_server/media_server_module.h>
+#include <media_server/settings.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -114,11 +113,15 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
-/*!
-    using different allocator for stored ket frames, since these key frames can be kept in QnVideoCameraGopKeeper::m_lastKeyFrames
-    for 80 seconds and that can cause huge memory consumption if CyclicAllocator has been used to alloc original frames
-*/
 static CyclicAllocator gopKeeperKeyFramesAllocator;
+
+static QnAbstractAllocator* getAllocator(size_t frameSize)
+{
+    const static size_t kMaxFrameSize = CyclicAllocator::DEFAULT_ARENA_SIZE / 2;
+    return frameSize < kMaxFrameSize
+            ? static_cast<QnAbstractAllocator*>(&gopKeeperKeyFramesAllocator)
+            : static_cast<QnAbstractAllocator*>(QnSystemAllocator::instance());
+}
 
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
@@ -136,8 +139,10 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             int ch = video->channelNumber;
             m_lastKeyFrame[ch] = video;
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
+
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
+                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(getAllocator(video->dataSize()))));
+
             while ((!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold) ||
                     (m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE))
                 m_lastKeyFrames[ch].pop_front();
@@ -244,7 +249,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
     if (returnIframeBeforeTime)
         --itr; // prefer frame before defined time if no exact match
 
-    return *itr;
+    return QnConstCompressedVideoDataPtr((*itr)->clone());
 }
 
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTime(
@@ -266,7 +271,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getGopTillTime(q
     {
         const QnConstAbstractDataPacketPtr& data = randomAccess.at(i);
         auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
-        if (video && video->timestamp <= time && video->channelNumber == channel)
+        if (video && video->timestamp <= time && video->channelNumber == (quint32) channel)
             frameSequence->push(video);
     }
 
@@ -348,15 +353,18 @@ void QnVideoCameraGopKeeper::clearVideoData()
 
 // --------------- QnVideoCamera ----------------------------
 
-QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
+QnVideoCamera::QnVideoCamera(
+    const MSSettings& settings,
+    const QnResourcePtr& resource)
 :
+    m_settings(settings),
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
-    m_loStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
+    m_loStreamHlsInactivityPeriodMS(m_settings.roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
-    m_hiStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
+    m_hiStreamHlsInactivityPeriodMS(m_settings.roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
@@ -487,7 +495,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
+                duration_cast<microseconds>(m_settings.hlsTargetDuration()).count());
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
@@ -498,7 +506,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
+                duration_cast<microseconds>(m_settings.hlsTargetDuration()).count());
         }
     }
 }
@@ -718,6 +726,11 @@ nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQu
         : nx_hls::HLSLivePlaylistManagerPtr();
 }
 
+QnResourcePtr QnVideoCamera::resource() const
+{
+    return m_resource;
+}
+
 //!Starts caching live stream, if not started
 /*!
     \return true, if started, false if failed to start
@@ -791,7 +804,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
 
-        int removedChunksToKeepCount = qnServerModule->roSettings()->value(
+        int removedChunksToKeepCount = m_settings.roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
             nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
 

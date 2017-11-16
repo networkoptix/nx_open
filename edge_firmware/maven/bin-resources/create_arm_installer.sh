@@ -398,9 +398,10 @@ copyBpiSpecificFiles()
     echo "Copying (bpi) root/"
     cp -r "$CURRENT_BUILD_DIR/root" "$TAR_DIR/"
 
-    local -r TOOLS_DIR="$TAR_DIR/root/tools/nx"
+    local -r TOOLS_PATH="root/tools/$CUSTOMIZATION"
+    local -r TOOLS_DIR="$TAR_DIR/$TOOLS_PATH"
     local -r CONF_FILE="mediaserver.conf.template"
-    echo "Copying $CONF_FILE (used for factory reset) to root/tools/nx/"
+    echo "Copying $CONF_FILE (used for factory reset) to $TOOLS_PATH/"
     mkdir -p "$TOOLS_DIR"
     cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$CONF_FILE" "$TOOLS_DIR/"
 }
@@ -444,14 +445,13 @@ copyVox()
 }
 
 # [in] LIB_INSTALL_DIR
-copyLibcIfNeeded()
+copyToolchainLibsIfNeeded()
 {
-    # TODO: Consider unconditionally copying from the compiler artifact. Decision on usage will
-    # then be made in install.sh on the box.
-    if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
-        echo "Copying libstdc++ (Banana Pi)"
-        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.s"* "$LIB_INSTALL_DIR/"
-    fi
+    [ -z "$TOOLCHAIN_LIB_DIR" ] && exit
+
+    echo "Copying toolchain libs (libstdc++, libatomic)"
+    cp -r "$TOOLCHAIN_LIB_DIR/libstdc++.so"* "$LIB_INSTALL_DIR/"
+    cp -r "$TOOLCHAIN_LIB_DIR/libatomic.so"* "$LIB_INSTALL_DIR/"
 }
 
 # [in] WORK_DIR
@@ -547,7 +547,7 @@ main()
     copyDebs
     copyAdditionalSysrootFilesIfNeeded
     copyVox
-    copyLibcIfNeeded
+    copyToolchainLibsIfNeeded
 
     if [ "$BOX" = "bpi" ]; then
         copyBpiSpecificFiles

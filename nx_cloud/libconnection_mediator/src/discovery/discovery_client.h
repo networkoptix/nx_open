@@ -54,7 +54,7 @@ struct BasicInstanceInformation
 {
     std::string type;
     std::string id;
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
 
     BasicInstanceInformation(std::string type):
         type(type)
@@ -73,7 +73,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * @param InstanceInformation Must inherit BasicInstanceInformation 
+ * @param InstanceInformation Must inherit BasicInstanceInformation
  */
 template<typename InstanceInformation>
 class ModuleRegistrar:
@@ -90,7 +90,7 @@ class ModuleRegistrar:
 
 public:
     ModuleRegistrar(
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const std::string& moduleId)
         :
         m_baseUrl(baseUrl),
@@ -129,9 +129,9 @@ public:
 
         auto keepAliveConnectionUrl = m_baseUrl;
         keepAliveConnectionUrl.setPath(nx::network::url::normalizePath(
-            keepAliveConnectionUrl.path() + "/" + 
+            keepAliveConnectionUrl.path() + "/" +
             nx_http::rest::substituteParameters(
-                nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId.c_str()})));
+                nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId}).c_str()));
 
         m_webSocketConnector = std::make_unique<nx_http::AsyncClient>();
         nx::network::websocket::addClientHeaders(m_webSocketConnector.get(), "NxDiscovery");
@@ -152,7 +152,7 @@ protected:
     }
 
 private:
-    QUrl m_baseUrl;
+    nx::utils::Url m_baseUrl;
     std::unique_ptr<nx_http::AsyncClient> m_webSocketConnector;
     std::unique_ptr<nx::network::WebSocket> m_webSocket;
     nx::Buffer m_sendBuffer;
@@ -216,7 +216,7 @@ private:
             // TODO: #ak Reconnecting.
             return;
         }
-    
+
         // Retrying to send.
         sendNext();
     }
@@ -233,7 +233,7 @@ class ModuleFinder:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    ModuleFinder(const QUrl& baseUrl);
+    ModuleFinder(const nx::utils::Url& baseUrl);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -243,13 +243,13 @@ public:
     {
         post(
             [this, handler = std::move(handler)]() mutable
-            {   
+            {
                 // TODO Include type.
                 auto url = m_baseUrl;
                 url.setPath(nx::network::url::normalizePath(
                     url.path() + nx::cloud::discovery::http::kDiscoveredModulesPath));
 
-                auto httpClient = 
+                auto httpClient =
                     std::make_unique<nx_http::FusionDataHttpClient<void, std::vector<InstanceInformation>>>(
                         url, nx_http::AuthInfo());
                 httpClient->bindToAioThread(getAioThread());
@@ -274,7 +274,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_baseUrl;
+    const nx::utils::Url m_baseUrl;
     std::vector<std::unique_ptr<nx::network::aio::BasicPollable>> m_runningRequests;
 
     template<typename InstanceInformation>

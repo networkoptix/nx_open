@@ -126,6 +126,29 @@ public:
                 dialog->show();
             });
 
+        addButton(lit("Toggle default password"),
+            [this]
+            {
+                const auto cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
+                if (cameras.empty())
+                    return;
+
+                const auto caps = Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability;
+
+                const bool isDefaultPassword = cameras.first()->needsToChangeDefaultPassword();
+
+                for (const auto& camera: cameras)
+                {
+                    // Toggle current option.
+                    if (isDefaultPassword)
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() & ~caps);
+                    else
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() | caps);
+                    camera->saveParamsAsync();
+                }
+
+            });
+
         addButton(lit("Palette"), [this]
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
@@ -135,6 +158,31 @@ public:
                 messageBox->addCustomWidget(w);
                 messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
+            });
+
+        addButton(lit("RandomizePtz"), [this]
+            {
+                QList<Ptz::Capabilities> presets;
+                presets.push_back(Ptz::NoPtzCapabilities);
+                presets.push_back(Ptz::ContinuousZoomCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability);
+                presets.push_back(Ptz::ContinuousPanTiltCapabilities);
+                presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
+
+                for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                {
+                    int idx = presets.indexOf(camera->getPtzCapabilities());
+                    if (idx < 0)
+                        idx = 0;
+                    else
+                        idx = (idx + 1) % presets.size();
+
+                    camera->setPtzCapabilities(presets[idx]);
+                }
+
             });
 
         addButton(lit("Resource Pool"), [this]

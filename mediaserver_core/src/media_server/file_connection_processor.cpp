@@ -169,7 +169,7 @@ void QnFileConnectionProcessor::run()
     parseRequest();
     d->response.messageBody.clear();
 
-    QUrl url = getDecodedUrl();
+    nx::utils::Url url = getDecodedUrl();
     QString path = QString('/') + QnTcpListener::normalizedPath(url.path());
     const QString fileFormat = QFileInfo(path).suffix().toLower();
     QByteArray contentType = contentTypes.value(fileFormat, kDefaultContentType);

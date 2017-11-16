@@ -11,6 +11,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class ModuleDiscovery:
     public CdbFunctionalTest
@@ -50,8 +51,8 @@ private:
     struct Result
     {
         nx_http::StatusCode::Value resultCode = nx_http::StatusCode::ok;
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     nx::network::cloud::ConnectionMediatorUrlFetcher m_urlFetcher;
@@ -60,8 +61,8 @@ private:
 
     void saveMediatorUrls(
         nx_http::StatusCode::Value resultCode,
-        QUrl tcpUrl,
-        QUrl udpUrl)
+        nx::utils::Url tcpUrl,
+        nx::utils::Url udpUrl)
     {
         Result result;
         result.resultCode = resultCode;
@@ -79,5 +80,6 @@ TEST_F(ModuleDiscovery, cloud_modules_xml_with_multiple_mediator_ports)
     andXmlContainsMultipleMediatorPorts();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

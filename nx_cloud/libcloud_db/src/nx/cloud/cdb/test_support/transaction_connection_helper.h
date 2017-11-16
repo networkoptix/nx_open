@@ -54,13 +54,13 @@ public:
      * @return New connection id.
      */
     ConnectionId establishTransactionConnection(
-        const QUrl& appserver2BaseUrl,
+        const nx::utils::Url& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy,
         int protocolVersion,
         const QnUuid& peerId = QnUuid());
-    
+
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
         ConnectionId connectionId,
@@ -117,9 +117,8 @@ private:
         KeepAlivePolicy keepAlivePolicy,
         int protocolVersion,
         const QnUuid& peerId);
-    void startConnection(
-        ConnectionContext* connectionContext,
-        const QUrl& appserver2BaseUrl);
+    void startConnection(ConnectionContext* connectionContext,
+        const utils::Url &appserver2BaseUrl);
 
     ::ec2::ApiPeerData localPeer() const;
 
@@ -127,7 +126,7 @@ private:
         ::ec2::QnTransactionTransportBase* /*connection*/,
         ::ec2::QnTransactionTransportBase::State /*newState*/);
 
-    QUrl prepareTargetUrl(const QUrl& appserver2BaseUrl, const QnUuid& localPeerId);
+    nx::utils::Url prepareTargetUrl(const nx::utils::Url& appserver2BaseUrl, const QnUuid& localPeerId);
 
     void moveConnectionToReadyForStreamingState(
         ::ec2::QnTransactionTransportBase* connection);

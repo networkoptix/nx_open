@@ -41,14 +41,14 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
     connect(action(action::OpenCloudMainUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered);
     connect(action(action::OpenCloudViewSystemUrl), &QAction::triggered, this,
-        [this]{QDesktopServices::openUrl(m_cloudUrlHelper->viewSystemUrl());});
+        [this]{QDesktopServices::openUrl(m_cloudUrlHelper->viewSystemUrl().toQUrl());});
     connect(action(action::OpenCloudManagementUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered);
 
     connect(action(action::OpenCloudRegisterUrl), &QAction::triggered, this,
         [this]()
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl().toQUrl());
         });
 }
 
@@ -86,10 +86,10 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()
 {
-    QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
+    QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl().toQUrl());
 }
 
 void QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered()
 {
-    QDesktopServices::openUrl(m_cloudUrlHelper->accountManagementUrl());
+    QDesktopServices::openUrl(m_cloudUrlHelper->accountManagementUrl().toQUrl());
 }

@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>tiếng Việt</translation>
+      <translation>Tên ngôn ngữ</translation>
     </message>
   </context>
   <context>
@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Hệ thống mới</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Phát hiện %1 lỗi không tương thích với hệ thống hiện tại.</translation>
     </message>
   </context>
   <context>
@@ -104,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>xác định</translation>
+      <translation>Xác định</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -160,7 +160,7 @@
     </message>
     <message>
       <source>Parameters:</source>
-      <translation>tham số:</translation>
+      <translation>Tham số:</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
@@ -216,55 +216,43 @@
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Hãy cố gắng để khởi động lại các  I / O module, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
+      <translation>Hãy cố gắng để khởi động lại các I/O module, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>Hãy chắc chắn rằng các I / O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
+      <translation>Hãy chắc chắn rằng các I/O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Yêu cầu mô-đun I / O &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
+      <translation>Yêu cầu mô-đun I/O &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Không biết I / O module vấn đề.</translation>
+      <translation>Không biết I/O module vấn đề.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>dữ liệu không hợp lệ đã nhận được từ các I / O module %1.</translation>
+      <translation>Dữ liệu không hợp lệ đã nhận được từ các I / O module %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Quá nhiều lỗi phương tiện truyền thông. Hãy mở tôi vấn đề I / O module thoại để biết thêm chi tiết.</translation>
+      <translation>Quá nhiều lỗi phương tiện truyền thông. Hãy mở tôi vấn đề I/O module thoại để biết thêm chi tiết.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>quá trình khởi tạo thiết bị được tiến hành.</translation>
+      <translation>Quá trình khởi tạo thiết bị được tiến hành.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>quá trình khởi tạo máy ảnh được tiến hành.</translation>
+      <translation>Quá trình khởi tạo máy ảnh được tiến hành.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>I / O Module khởi tạo quá trình được tiến hành.</translation>
+      <translation>I/O Module khởi tạo quá trình được tiến hành.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
       <translation>Hãy chắc chắn rằng cổng %1 có thể truy cập (ví dụ chuyển tiếp).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Trước tiên, hãy thử bật ghi (nếu nó tắt) hảy giảm fps trong cài đặt thiết bị.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt mô-đun I / O.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
@@ -276,7 +264,7 @@
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>Nếu nó không hỗ trợ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web I / O module.</translation>
+      <translation>Nếu nó không hỗ trợ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web I/O module.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
@@ -314,6 +302,18 @@
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Camera đã được khôi phục lưu trữ. Xóa camera và thêm lại để xem Video trực tiếp.</translation>
     </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của thiết bị (lỗi &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của camera (lỗi &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của module I/O (lỗi &quot;%1&quot;).</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -323,7 +323,7 @@
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
+      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -335,7 +335,7 @@
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
+      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
       <source>Could not initialize resampling context, error code: %1</source>
@@ -362,7 +362,7 @@
     <name>QnFfmpegTranscoder</name>
     <message>
       <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>trong FFMPEG Thư lãm thư viện không thể tìm thấy một container %1 。</translation>
+      <translation>Trong FFMPEG Thư lãm thư viện không thể tìm thấy một container %1.</translation>
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
@@ -378,7 +378,7 @@
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation>không thể tìm thấy %1 Mã hóa.</translation>
+      <translation>Không thể tìm thấy %1 Mã hóa.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
@@ -389,7 +389,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
+      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -400,11 +400,11 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation>phép loại suy</translation>
+      <translation>Phép loại suy</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation>đặc trưng</translation>
+      <translation>Đặc trưng</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -416,11 +416,11 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>bức tường video</translation>
+      <translation>Bức tường video</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/o Module</translation>
+      <translation>I/O Module</translation>
     </message>
     <message>
       <source>Start</source>
@@ -428,27 +428,27 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation>phép loại suy encoder</translation>
+      <translation>Phép loại suy encoder</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation>phép loại suy giấy phép</translation>
+      <translation>Phép loại suy giấy phép</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>giấy phép chuyên nghiệp</translation>
+      <translation>Giấy phép chuyên nghiệp</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>giấy phép cạnh</translation>
+      <translation>Giấy phép cạnh</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation>giấy phép Vmax</translation>
+      <translation>Giấy phép Vmax</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>giấy phép phép loại suy encoder</translation>
+      <translation>Giấy phép phép loại suy encoder</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
@@ -464,7 +464,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation>vô hiệu</translation>
+      <translation>Vô hiệu</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>thời gian</translation>
+      <translation>Thời gian</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -518,11 +518,11 @@
     <name>QnLicenseValidator</name>
     <message>
       <source>Invalid signature</source>
-      <translation>chữ ký không hợp lệ</translation>
+      <translation>Chữ ký không hợp lệ</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation>tùy biến không hợp lệ</translation>
+      <translation>Tùy biến không hợp lệ</translation>
     </message>
     <message>
       <source>License is expired</source>
@@ -530,7 +530,7 @@
     </message>
     <message>
       <source>Invalid type</source>
-      <translation>kiểu không hợp lệ</translation>
+      <translation>Kiểu không hợp lệ</translation>
     </message>
     <message>
       <source>Only single license is allowed for this device</source>
@@ -542,7 +542,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>lỗi không xác định</translation>
+      <translation>Lỗi không xác định</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -588,11 +588,11 @@
     </message>
     <message>
       <source>cameras</source>
-      <translation>Máy ảnh</translation>
+      <translation>máy ảnh</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>máy chụp hình</translation>
+      <translation>Máy chụp hình</translation>
     </message>
     <message>
       <source>camera</source>
@@ -600,7 +600,7 @@
     </message>
     <message>
       <source>Devices</source>
-      <translation>thiết bị</translation>
+      <translation>Thiết bị</translation>
     </message>
     <message>
       <source>devices</source>
@@ -608,7 +608,7 @@
     </message>
     <message>
       <source>Device</source>
-      <translation>thiết bị</translation>
+      <translation>Thiết bị</translation>
     </message>
     <message>
       <source>device</source>
@@ -628,34 +628,34 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>I/o Module</translation>
+      <translation>I/O Modules</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>I/o Module</translation>
+      <translation>I/O Modules</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/o Module</translation>
+      <translation>I/O Module</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>I/o Module</translation>
+      <translation>I/O Module</translation>
     </message>
   </context>
   <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>không biết</translation>
+      <translation>Không biết</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>miễn phí bản quyền</translation>
+      <translation>Miễn phí bản quyền</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>Bản quyền đã cấp cho</translation>
+      <translation>Bản quyền đã cấp cho: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
@@ -674,23 +674,23 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>thấp nhất (Ls)</translation>
+      <translation>Thấp nhất (Ls)</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>thấp (L)</translation>
+      <translation>Thấp (L)</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>trong (M)</translation>
+      <translation>Trong (M)</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>cao (H)</translation>
+      <translation>Cao (H)</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>cao nhất (Hs)</translation>
+      <translation>Cao nhất (Hs)</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -777,15 +777,15 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>xác định</translation>
+      <translation>Xác định</translation>
     </message>
     <message>
       <source>Not Found</source>
-      <translation>không thể tìm thấy</translation>
+      <translation>Không thể tìm thấy</translation>
     </message>
     <message>
       <source>Not Implemented</source>
-      <translation>không thực hiện</translation>
+      <translation>Không thực hiện</translation>
     </message>
     <message>
       <source>Unsupported Transport</source>
@@ -810,7 +810,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>thứ hai</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
@@ -962,11 +962,11 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>chủ nhân</translation>
+      <translation>Chủ nhân</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>giám sát viên</translation>
+      <translation>Giám sát viên</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
@@ -1025,7 +1025,7 @@
     </message>
     <message>
       <source>Panic recording</source>
-      <translation>video khẩn cấp</translation>
+      <translation>Video khẩn cấp</translation>
     </message>
     <message>
       <source>Write to log</source>
@@ -1045,7 +1045,7 @@
     </message>
     <message>
       <source>Speak</source>
-      <translation>nói</translation>
+      <translation>Nói</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
@@ -1061,27 +1061,27 @@
     </message>
     <message>
       <source>Do HTTP request</source>
-      <translation>gởi HTTP yêu cầu</translation>
+      <translation>Gởi HTTP yêu cầu</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation>sản lượng thiết bị</translation>
+      <translation>Sản lượng thiết bị</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation>sản lượng máy ảnh</translation>
+      <translation>Sản lượng máy ảnh</translation>
     </message>
     <message>
       <source>Device recording</source>
-      <translation>thiết bị ghi âm</translation>
+      <translation>Thiết bị ghi âm</translation>
     </message>
     <message>
       <source>Camera recording</source>
-      <translation>camera ghi âm</translation>
+      <translation>Camera ghi âm</translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation>sự kiện chung</translation>
+      <translation>Sự kiện chung</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
@@ -1095,23 +1095,23 @@
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>vấn đề về mạng</translation>
+      <translation>Vấn đề về mạng</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>máy chủ thất bại</translation>
+      <translation>Máy chủ thất bại</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>xung đột máy chủ</translation>
+      <translation>Xung đột máy chủ</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation>máy chủ bắt đầu</translation>
+      <translation>Máy chủ bắt đầu</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation>vấn đề giấy phép</translation>
+      <translation>Vấn đề giấy phép</translation>
     </message>
     <message>
       <source>Archive backup finished</source>
@@ -1123,7 +1123,7 @@
     </message>
     <message>
       <source>Any Event</source>
-      <translation>bất kỳ tổ chức sự kiện</translation>
+      <translation>Bất kỳ tổ chức sự kiện</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1175,7 +1175,7 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>thiết bị %1 đã được ngắt kết nối</translation>
+      <translation>Thiết bị %1 đã được ngắt kết nối</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>I / O Module %1 đã bị ngắt kết nối</translation>
+      <translation>I/O Module %1 đã bị ngắt kết nối</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1245,11 +1245,11 @@
     </message>
     <message>
       <source>Event: %1</source>
-      <translation>biến cố：%1</translation>
+      <translation>Biến cố：%1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>nguồn：%1</translation>
+      <translation>Nguồn：%1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
@@ -1257,11 +1257,11 @@
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation>cổng đầu vào: %1</translation>
+      <translation>Cổng đầu vào: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation>lý do：%1</translation>
+      <translation>Lý do：%1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
@@ -1270,7 +1270,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
@@ -1300,7 +1300,7 @@
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>thời gian：%1 trong %2</translation>
+      <translation>Thời gian：%1 trong %2</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
@@ -1349,7 +1349,7 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation>I/O lỗi trong %1。</translation>
+      <translation>I/O lỗi trong %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
@@ -1393,7 +1393,7 @@
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>sao lưu kho lưu trữ được hủy bỏ bởi người dùng. Dữ liệu được sao lưu vào %1</translation>
+      <translation>Sao lưu kho lưu trữ được hủy bỏ bởi người dùng. Dữ liệu được sao lưu vào %1</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
@@ -1417,11 +1417,11 @@
     </message>
     <message>
       <source>While %1</source>
-      <translation>trong khi %1</translation>
+      <translation>Trong khi %1</translation>
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation>trên %1 %2</translation>
+      <translation>Trên %1 %2</translation>
     </message>
     <message>
       <source>Trigger Name</source>

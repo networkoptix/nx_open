@@ -1,38 +1,17 @@
 // -* mode: groovy -*-
 // Continuous integration main jenkinsfile
 
-NX_REPOSITORY_CREDENTIALS_ID = 'nx-repository-readonly'
+
+@Library('jenkins')
+import org.nx.jenkins.CiRunner
 
 
 def main() {
-	def must_clean_workspace = params?.clean ?: false
-	def devtools_script = null
-
-	stage('Checkout master') {
-		node ('master') {
-			dir('nx_vms') {
-				checkout scm
-			}
-			/*
-			checkout([
-					$class: 'MercurialSCM',
-					credentialsId: NX_REPOSITORY_CREDENTIALS_ID,
-					installation: '(Default)',
-					revision: 'default',
-					source: 'ssh://hg@la.hdw.mx/devtools',
-					subdir: 'devtools',
-				])
-			 */
-			git '/home/vfedorov/git/ci'
-			devtools_script = load 'ci/ci.groovy'
-			devtools_script.run_master_node_preparations()
-		}
-	}
-
-	devtools_script.main()
+	def runner = new CiRunner(this, env, params, currentBuild)
+	runner.main(
+		build_tool: 'cmake',
+		should_run_fun_tests: false,
+	)
 }
 
-
-// ==============================================================================
 main()
-// ==============================================================================

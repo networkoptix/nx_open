@@ -1,7 +1,8 @@
 #pragma once
 
-#include <nx/utils/test_support/run_test.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/test_support/run_test.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {
@@ -25,7 +26,7 @@ inline int runTest(
             auto sgGuard = std::make_unique<SocketGlobalsHolder>(socketGlobalsFlags);
             SocketGlobals::applyArguments(args);
             SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
-            cloud::OutgoingTunnelPool::allowOwnPeerIdChange();
+            cloud::OutgoingTunnelPool::ignoreOwnPeerIdChange();
 
             utils::test::DeinitFunctions deinitFunctions;
             if (extraInit)

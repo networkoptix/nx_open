@@ -127,7 +127,7 @@ private:
     {
         const auto jsonString = notification.serializeToJson();
         bool deserializationSuccessful = false;
-        auto notificationData = 
+        auto notificationData =
             QJson::deserialized<nx::cdb::BasicNotification>(
                 jsonString,
                 nx::cdb::BasicNotification(),

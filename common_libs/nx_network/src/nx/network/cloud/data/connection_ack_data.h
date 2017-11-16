@@ -11,8 +11,7 @@ namespace api {
 /**
  * [connection_mediator, 4.3.8]
  */
-class NX_NETWORK_API ConnectionAckRequest
-:
+class NX_NETWORK_API ConnectionAckRequest:
     public StunRequestData
 {
 public:

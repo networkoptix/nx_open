@@ -1,117 +1,143 @@
 {
-  "language_name":"Deutsch",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Besuchen Sie diesen Link",
-    "openLinkWithTitle":"Besuchen Sie diesen Link für {{title}}"
-  },
-  "setup":{
-    "createAccount":"Account erstellen",
-    "errorNoHDD":"Dieses Gerät ist dafür gedacht mit einem installierten Festplattenlaufwerk zu arbeiten.<br>Schalten Sie das Gerät bitte ab und installieren Sie ein Festplattenlaufwerk.",
-    "errorNoNetwork":"Dieses Gerät benötigt eine Netzwerkverbindung um zu funktionieren.<br>Bitte verbinden Sie es mit dem lokalen Netzwerk zum Internet"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"Das Passwort muss mindestens 8 Zeichen lang sein",
-    "requiredMessage":"Es sind nur lateinische Buchstaben, Ziffern und Tastatursymbole erlaubt",
-    "weakMessage":"Passwort sollte verschiedene Symbole enthalten",
-    "strongMessage":"Sicheres Passwort!",
-    "commonMessage":"Dieses Passwort ist in der Liste der beliebtesten Passwörter"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Server",
-      "system":"System",
-      "device":"Gerät"
+    "language_name": "Deutsch",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Besuchen Sie diesen Link",
+        "openLinkWithTitle": "Besuchen Sie diesen Link für {{title}}"
     },
-    "confirmRestart":"Server neu starten?",
-    "couldntCheckInternet":"Cloudverbindung konnte nicht überprüft werden",
-    "confirmRestoreDefault":"Datenbank und Einstellungen löschen? Dieser Vorgang dauert einige Zeit und der Server wird anschließend neu gestartet.",
-    "confirmRestoreDefaultTitle":"Werkseinstellungen wiederherstellen",
-    "unexpectedError":"Fehler: unerwarteter Fehler ist aufgetreten",
-    "connnetionError":"Verbindungsfehler",
-    "wrongPassword":"Falsches Passwort.",
-    "error":"Fehler: ",
-    "restartNeeded":"Änderungen gespeichert. Starten Sie den Server neu um die Einstellungen zu übernehmen?",
-    "settingsSaved":"Einstellungen gespeichert",
-    "confirmHardwareRestart":"Serverbetriebssystem neu starten?",
-    "confirmRestoreSettings":"Alle Servereinstellungen zurücksetzen? Das Archiv wird gespeichert, aber die Netzwerkeinstellungen werden zurückgesetzt.",
-    "confirmRestoreSettingsNotNetwork":"Servereinstellungen zurücksetzen? Das Archiv und die Netzwerkeinstellungen werden gespeichert.",
-    "unavailable":"Nicht verfügbar",
-    "unsafePortConfirm":"Es ist nicht sicher Portnummern unter 1025 zu verwenden. Der Server ist dann möglicherweise nicht mehr erreichbar. Trotzdem fortfahren?",
-    "confirmDisconnectFromCloud":"System von {{CLOUD_NAME}} trennen",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Alle Cloudnutzer werden gelöscht.</span><br><br>Das System wird über das lokale Netzwerk mit dem lokalen Administratoraccount erreichbar sein.",
-    "confirmDisconnectFromCloudAction":"Trennen",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"Das System wurde erfolgreich verbunden",
-    "createLocalOwnerTitle":"Lokalen Administrator erstellen",
-    "confirmChangePassword":"Admin-Passwort ändern",
-    "confirmChangePasswordTitle":"Systempasswort ändern? Es wird sich auf den Benutzer \"admin\" und das Root-Passwort für einige Server auswirken",
-    "confirmChangePasswordAction":"Neues Passwort speichern",
-    "nx1ControlHint":"Die Clientanwendung wurde gestartet. Verwenden Sie eine Tastatur/Maus oder die mobile Anwendung, um zu steuern."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Statusüberwachung",
-      "storage":"Speicher",
-      "log":"Log"
+    "setup": {
+        "createAccount": "account erstellen",
+        "errorNoHDD": "Dieses Gerät ist dafür gedacht mit einem installierten Festplattenlaufwerk zu arbeiten.<br>Schalten Sie das Gerät bitte ab und installieren Sie ein Festplattenlaufwerk.",
+        "errorNoNetwork": "Dieses Gerät benötigt eine Netzwerkverbindung um zu funktionieren.<br>Bitte verbinden Sie es mit dem lokalen Netzwerk zum Internet"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "Das Passwort muss mindestens 8 Zeichen lang sein",
+        "requiredMessage": "Es sind nur lateinische Buchstaben, Ziffern und Tastatursymbole erlaubt",
+        "weakMessage": "Passwort sollte verschiedene Symbole enthalten",
+        "strongMessage": "Sicheres Passwort!",
+        "commonMessage": "Dieses Passwort ist in der Liste der beliebtesten Passwörter"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Server",
+            "system": "System",
+            "device": "Gerät"
+        },
+        "confirmRestart": "Server neu starten?",
+        "couldntCheckInternet": "Cloudverbindung konnte nicht überprüft werden",
+        "confirmRestoreDefault": "Datenbank und Einstellungen löschen? Dieser Vorgang dauert einige Zeit und der Server wird anschließend neu gestartet.",
+        "confirmRestoreDefaultTitle": "Werkseinstellungen wiederherstellen",
+        "unexpectedError": "Fehler: unerwarteter Fehler ist aufgetreten",
+        "connnetionError": "Verbindungsfehler",
+        "wrongPassword": "Falsches Passwort.",
+        "error": "Fehler: ",
+        "restartNeeded": "Änderungen gespeichert. Starten Sie den Server neu um die Einstellungen zu übernehmen?",
+        "settingsSaved": "Einstellungen gespeichert",
+        "confirmHardwareRestart": "Serverbetriebssystem neu starten?",
+        "confirmRestoreSettings": "Alle Servereinstellungen zurücksetzen? Das Archiv wird gespeichert, aber die Netzwerkeinstellungen werden zurückgesetzt.",
+        "confirmRestoreSettingsNotNetwork": "Servereinstellungen zurücksetzen? Das Archiv und die Netzwerkeinstellungen werden gespeichert.",
+        "unavailable": "Nicht verfügbar",
+        "unsafePortConfirm": "Es ist nicht sicher Portnummern unter 1025 zu verwenden. Der Server ist dann möglicherweise nicht mehr erreichbar. Trotzdem fortfahren?",
+        "confirmDisconnectFromCloud": "System von {{CLOUD_NAME}} trennen",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Alle Cloudnutzer werden gelöscht.</span><br><br>Das System wird über das lokale Netzwerk mit dem lokalen Administratoraccount erreichbar sein.",
+        "confirmDisconnectFromCloudAction": "Trennen",
+        "disconnectedFromCloudSuccess": "System wurde von {{CLOUD_NAME}} erfolgreich getrennt",
+        "confirmDisconnectFromSystem": "Server aus dem aktuellen System trennen",
+        "confirmDisconnectFromSystemAction": "Trennen",
+        "disconnectedFromSystemSuccess": "Server wurde erfolgreich vom System getrennt",
+        "connectedSuccess": "Das System wurde erfolgreich verbunden",
+        "createLocalOwnerTitle": "Lokalen Administrator erstellen",
+        "confirmChangePassword": "Admin-Passwort ändern",
+        "confirmChangePasswordTitle": "Systempasswort ändern? Es wird sich auf den Benutzer \"admin\" und das Root-Passwort für einige Server auswirken",
+        "confirmChangePasswordAction": "Neues Passwort speichern",
+        "nx1ControlHint": "Die Clientanwendung wurde gestartet. Verwenden Sie eine Tastatur/Maus oder die mobile Anwendung, um zu steuern."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Statusüberwachung",
+            "storage": "Speicher",
+            "log": "Log"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "System ist nicht erreichbar oder existiert nicht.",
+        "incorrectCurrentPassword": "Das Passwort ist falsch.",
+        "incorrectRemotePassword": "Login oder Passwort falsch.",
+        "incompatibleVersion": "System ist nicht erreichbar/nicht vorhanden oder es handelt sich um eine inkompatible Version.",
+        "wrongUrl": "Keine Verbindung zum angegebenen Server.",
+        "newSystemError": "Systeme können nicht zusammengeführt werden. Remote-System ist nicht konfiguriert.",
+        "safeMode": "Systeme können nicht zusammengeführt werden. Remote-System ist im abgesicherten Modus.",
+        "configError": "Systeme können nicht zusammengeführt werden. Vielleicht ist eines der Systeme im abgesicherten Modus.",
+        "cloudError": "Systeme können nicht zusammengeführt werden. Abhängiges System ist mit der Cloud verbunden. Sie müssen es zuerst trennen.",
+        "cloudBothError": "Systeme können nicht zusammengeführt werden. Beide Systeme sind mit der Cloud verbunden. Sie müssen erst eines davon trennen.",
+        "cloudHostConflict": "Systeme können nicht zusammengeführt werden, da die Server mit verschiedenen Cloud-Hosts erstellt wurden",
+        "licenceError": "Warnung! Sie haben vor Systeme mit Starter-Lizenzen zusammenzuführen. Nur eine Starter-Lizenz pro System ist erlaubt, weshalb die zweite Lizenz deaktiviert wird. Trotzdem zusammenführen?",
+        "connectionFailed": "Verbindung fehlgeschlagen: ",
+        "unknownError": "Unbekannter Fehler",
+        "mergeFailed": "Fehler beim Zusammenführen: ",
+        "mergeSucceed": "Zusammenführung erfolgreich abgeschlossen.",
+        "newSystemDisplayName": "Neues System",
+        "incompatibleProtocol": "inkompatible Version",
+        "incompatibleCloudHost": "cloudkonflikt",
+        "incompatibleCloudState": "cloud verbunden"
+    },
+    "login": {
+        "incorrectPassword": "Login oder Passwort falsch"
+    },
+    "navigaion": {
+        "cannotGetUser": "Serverfehler: kann die aktuellen Benutzerdaten nicht abrufen"
+    },
+    "offlineDialog": {
+        "serverOffline": "server ist offline"
+    },
+    "restartDialog": {
+        "serverStarting": "server wird gestartet",
+        "serverRestarting": "server startet neu",
+        "serverOffline": "server ist offline"
+    },
+    "fileUpload": {
+        "started": "Update wurde erfolgreich gestartet. Es kann einige Minuten dauern",
+        "upToDate": "Update fehlgeschlagen. Die angebotene Version ist bereits installiert.",
+        "invalidFile": "Update fehlgeschlagen. Die angegebene Datei ist kein gültiges Update-Archiv.",
+        "incompatibleSystem": "Update fehlgeschlagen. Die angegebene Datei ist für ein anderes System.",
+        "extractionError": "Update fehlgeschlagen. Nicht genügend Speicherplatz für den Archivauszug vorhanden, bitte verfügbaren Speicher prüfen.",
+        "installationError": "Update fehlgeschlagen. Das Installationsskript kann nicht ausgeführt werden.",
+        "selectFiles": "Dateien auswählen"
+    },
+    "advanced": {
+        "free": "Kostenlos",
+        "total": "Insgesamt",
+        "occupied": "Belegt",
+        "reserved": "Reserviert"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} Benutzeroberfläche"
+    },
+    "common": {
+        "systemOffline": "System offline",
+        "cameraLinks": {
+            "copyToClipboard": "in zwischenablage kopieren",
+            "highStream": "Hoher Stream",
+            "copyDefaultText": "kopieren",
+            "unknown": "Unbekannt",
+            "lowStream": "Niedriger Stream",
+            "transcoding": "Umkodierung",
+            "copyActiveText": "in die zwischenablage kopiert"
+        },
+        "searchCamPlaceholder": "suche",
+        "cameraStates": {
+            "noFormat": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.",
+            "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
+            "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
+            "unauthorized": "Authentifizierung erforderlich",
+            "ubuntuNX": "Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium.",
+            "ieNoWebm": "Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
+            "flashOrWebmRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
+            "noArmSupport": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
+            "error": "Fehler",
+            "offline": "Offline",
+            "noData": "Keine Daten",
+            "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos von ARM-basierten Servern abzuspielen."
+        }
     }
-  },
-  "join":{
-    "systemIsUnreacheble":"System ist nicht erreichbar oder existiert nicht.",
-    "incorrectCurrentPassword":"Das Passwort ist falsch.",
-    "incorrectRemotePassword":"Login oder Passwort falsch.",
-    "incompatibleVersion":"System ist nicht erreichbar/nicht vorhanden oder es handelt sich um eine inkompatible Version.",
-    "wrongUrl":"Keine Verbindung zum angegebenen Server.",
-    "newSystemError":"Systeme können nicht zusammengeführt werden. Remote-System ist nicht konfiguriert.",
-    "safeMode":"Systeme können nicht zusammengeführt werden. Remote-System ist im abgesicherten Modus.",
-    "configError":"Systeme können nicht zusammengeführt werden. Vielleicht ist eines der Systeme im abgesicherten Modus.",
-    "cloudError":"Systeme können nicht zusammengeführt werden. Abhängiges System ist mit der Cloud verbunden. Sie müssen es zuerst trennen.",
-    "cloudBothError":"Systeme können nicht zusammengeführt werden. Beide Systeme sind mit der Cloud verbunden. Sie müssen erst eines davon trennen.",
-    "cloudHostConflict":"Systeme können nicht zusammengeführt werden, da die Server mit verschiedenen Cloud-Hosts erstellt wurden",
-    "licenceError":"Warnung! Sie haben vor Systeme mit Starter-Lizenzen zusammenzuführen. Nur eine Starter-Lizenz pro System ist erlaubt, weshalb die zweite Lizenz deaktiviert wird. Trotzdem zusammenführen?",
-    "connectionFailed":"Verbindung fehlgeschlagen: ",
-    "unknownError":"Unbekannter Fehler",
-    "mergeFailed":"Fehler beim Zusammenführen: ",
-    "mergeSucceed":"Zusammenführung erfolgreich abgeschlossen.",
-    "newSystemDisplayName":"Neues System",
-    "incompatibleProtocol":"inkompatible Version",
-    "incompatibleCloudHost":"Cloudkonflikt",
-    "incompatibleCloudState":"Cloud verbunden"
-  },
-  "login":{
-    "incorrectPassword":"Login oder Passwort falsch"
-  },
-  "navigaion":{
-    "cannotGetUser":"Serverfehler: kann die aktuellen Benutzerdaten nicht abrufen"
-  },
-  "offlineDialog":{
-    "serverOffline":"Server ist offline"
-  },
-  "restartDialog":{
-    "serverStarting":"Server wird gestartet",
-    "serverRestarting":"Server startet neu",
-    "serverOffline":"Server ist offline"
-  },
-  "fileUpload":{
-    "started":"Update wurde erfolgreich gestartet. Es kann einige Minuten dauern",
-    "upToDate":"Update fehlgeschlagen. Die angebotene Version ist bereits installiert.",
-    "invalidFile":"Update fehlgeschlagen. Die angegebene Datei ist kein gültiges Update-Archiv.",
-    "incompatibleSystem":"Update fehlgeschlagen. Die angegebene Datei ist für ein anderes System.",
-    "extractionError":"Update fehlgeschlagen. Nicht genügend Speicherplatz für den Archivauszug vorhanden, bitte verfügbaren Speicher prüfen.",
-    "installationError":"Update fehlgeschlagen. Das Installationsskript kann nicht ausgeführt werden.",
-    "selectFiles":"Dateien auswählen"
-  },
-  "advanced":{
-    "free":"Kostenlos",
-    "total":"Insgesamt",
-    "occupied":"Belegt",
-    "reserved":"Reserviert"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} Benutzeroberfläche"
-  }
 }

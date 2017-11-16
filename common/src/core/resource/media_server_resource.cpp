@@ -192,10 +192,10 @@ QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
     return m_netAddrList;
 }
 
-void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
+void QnMediaServerResource::setAdditionalUrls(const QList<nx::utils::Url> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(id);
+    QList<nx::utils::Url> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(id);
     if (oldUrls == urls)
         return;
 
@@ -203,15 +203,15 @@ void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
+QList<nx::utils::Url> QnMediaServerResource::getAdditionalUrls() const
 {
     return commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
 }
 
-void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
+void QnMediaServerResource::setIgnoredUrls(const QList<nx::utils::Url> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
+    QList<nx::utils::Url> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
     if (oldUrls == urls)
         return;
 
@@ -219,7 +219,7 @@ void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
+QList<nx::utils::Url> QnMediaServerResource::getIgnoredUrls() const
 {
     return commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
@@ -240,10 +240,10 @@ quint16 QnMediaServerResource::getPort() const
 
 QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
 {
-    auto toAddress = [](const QUrl& url) { return SocketAddress(url.host(), url.port(0)); };
+    auto toAddress = [](const nx::utils::Url& url) { return SocketAddress(url.host(), url.port(0)); };
 
     QSet<SocketAddress> ignored;
-    for (const QUrl &url : getIgnoredUrls())
+    for (const nx::utils::Url &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
     QSet<SocketAddress> result;
@@ -254,7 +254,7 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
         result.insert(address);
     }
 
-    for (const QUrl &url : getAdditionalUrls())
+    for (const nx::utils::Url &url : getAdditionalUrls())
     {
         SocketAddress address = toAddress(url);
         if (ignored.contains(address))
@@ -316,7 +316,7 @@ void QnMediaServerResource::setUrl(const QString& url)
     emit apiUrlChanged(toSharedPointer(this));
 }
 
-QUrl QnMediaServerResource::getApiUrl() const
+nx::utils::Url QnMediaServerResource::getApiUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(apiUrlScheme(isSslAllowed()))
@@ -376,7 +376,7 @@ SocketAddress QnMediaServerResource::getPrimaryAddress() const
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
-    return nx::network::url::getEndpoint(QUrl(m_url));
+    return nx::network::url::getEndpoint(nx::utils::Url(m_url));
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const
@@ -387,6 +387,7 @@ Qn::PanicMode QnMediaServerResource::getPanicMode() const
 Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
 {
     QString strVal = getProperty(QnMediaResource::panicRecordingKey());
+    NX_DEBUG(this, lm("%1 calculated panic mode %2").args(getId(), strVal));
     Qn::PanicMode result = Qn::PM_None;
     QnLexical::deserialize(strVal, &result);
     return result;
@@ -395,8 +396,10 @@ Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
 void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
     if(getPanicMode() == panicMode)
         return;
+
     QString strVal;
     QnLexical::serialize(panicMode, &strVal);
+    NX_DEBUG(this, lm("%1 change panic mode to %2").args(getId(), strVal));
     setProperty(QnMediaResource::panicRecordingKey(), strVal);
     m_panicModeCache.update();
 }
@@ -643,6 +646,15 @@ qint64 QnMediaServerResource::currentStatusTime() const
     return m_statusTimer.elapsed();
 }
 
+qint64 QnMediaServerResource::utcOffset(qint64 defaultValue) const
+{
+    bool present = true;
+    const auto offset = getProperty(Qn::kTimezoneUtcOffset).toLongLong(&present);
+    if (present && offset != Qn::InvalidUtcOffset)
+        return offset;
+    return defaultValue;
+}
+
 QString QnMediaServerResource::getAuthKey() const
 {
     return m_authKey;
@@ -691,9 +703,9 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
     }
 }
 
-QUrl QnMediaServerResource::buildApiUrl() const
+nx::utils::Url QnMediaServerResource::buildApiUrl() const
 {
-    QUrl url;
+    nx::utils::Url url;
     if (m_primaryAddress.isNull())
     {
         url = m_apiConnection->url();

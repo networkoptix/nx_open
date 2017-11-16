@@ -106,7 +106,7 @@
         "successTextColor": "green_l2",
         "notificationColorCritical": "red_l2",
         "notificationColorImportant": "yellow_core",
-        "notificationColorCommon": "green_l2"
+        "notificationColorCommon": "light10"
     },
 
     "QApplication": {
@@ -828,6 +828,29 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
+    "nx::client::desktop::ui::SelectableTextButton": {
+        "palette": {
+            "_": "selected",
+            "active": {
+                "window": "dark5",
+                "dark": "dark5",
+                "midlight": "dark5",
+                "shadow": "dark4",
+                "windowText": "light10",
+                "text": "light10"
+            },
+            "_": "not selected",
+            "inactive": {
+                "window": "dark10",
+                "dark": "dark6",
+                "shadow": "transparent",
+                "midlight": "dark11",
+                "windowText": "light14",
+                "text": "light16"
+            }
+        }
+    },
+
     "nx::client::desktop::ui::graphics::SoftwareTriggerButton": {
         "palette": {
             "default": {
@@ -845,6 +868,14 @@
         "fontColor": "light16",
         "backgroundColor": "dark7",
         "itemBackgroundColor": "dark5"
+    },
+
+    "nx::client::desktop::EventTile": {
+        "palette": {
+            "default": {
+                "window": "dark9"
+            }
+        }
     },
 
     "QnHudOverlayWidget": {
@@ -872,7 +903,14 @@
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
         }
-    }
+    },
 
+    "nx::client::desktop::EventPanel": {
+        "palette": {
+            "default": {
+                "window": "dark6"
+            }
+        }
+    }
 }
 

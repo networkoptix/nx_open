@@ -175,8 +175,12 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     result.offset      = fields[7].toInt();
     result.payloadData = fields[8];
 
-    if (result.offset + result.payloadData.size() > result.messageSize)
-        return result; // error
+    if (result.offset < 0)
+        return result; //< Error: negative offset.
+
+    const auto payloadEndPosition = result.offset + result.payloadData.size();
+    if (payloadEndPosition < 0 || payloadEndPosition > result.messageSize)
+        return result; // Error: position overflow.
 
     *ok = true;
     return result;

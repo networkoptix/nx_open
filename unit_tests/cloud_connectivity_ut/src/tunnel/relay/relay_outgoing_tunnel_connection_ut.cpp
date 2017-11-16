@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/tunnel/relay/relay_outgoing_tunnel_connection.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -244,7 +245,7 @@ private:
         using namespace std::placeholders;
         using namespace nx::cloud::relay;
 
-        const auto relayUrl = QUrl("http://127.0.0.1:12345");
+        const auto relayUrl = nx::utils::Url("http://127.0.0.1:12345");
 
         auto clientToRelayConnection = api::ClientFactory::create(relayUrl);
 

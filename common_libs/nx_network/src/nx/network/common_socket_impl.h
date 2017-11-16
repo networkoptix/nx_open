@@ -33,7 +33,7 @@ public:
     std::array<MonitoringContext, nx::network::aio::etMax> monitoredEvents;
     std::atomic<int> terminated;
     /**
-     * This socket sequence is unique even after socket destruction 
+     * This socket sequence is unique even after socket destruction
      * (socket pointer is not unique after delete call).
      */
     SocketSequenceType socketSequence;

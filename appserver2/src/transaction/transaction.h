@@ -1380,6 +1380,28 @@ APPLY(10101, getMiscParam, ApiMiscData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* regular transaction type */ \
+APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       makeCreateHashFromCustomFieldHelper(&ApiSystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       CloudTransactionType()) \
+APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 
@@ -1623,6 +1645,13 @@ APPLY(10101, getMiscParam, ApiMiscData, \
         ApiTransactionData& operator=(const ApiTransactionData&) = default;
         ApiTransactionData(ApiTransactionData&&) = default;
         ApiTransactionData& operator=(ApiTransactionData&&) = default;
+
+        bool operator==(const ApiTransactionData& right) const
+        {
+            return tranGuid == right.tranGuid
+                && tran == right.tran
+                && dataSize == right.dataSize;
+        }
     };
 #define ApiTransactionData_Fields (tranGuid)(tran)(dataSize)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))

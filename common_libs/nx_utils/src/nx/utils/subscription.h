@@ -20,7 +20,7 @@ constexpr static const SubscriptionId kInvalidSubscriptionId = 0;
 
 /**
  * Subscription-notification model event.
- * @note All methods are thread-safe.
+ * NOTE: All methods are thread-safe.
  */
 template <typename... Data>
 class Subscription
@@ -62,9 +62,9 @@ public:
     }
 
     /** 
-     * @param subscriptionId Value returned by \a Subscription::subscribe
-     * @note Can be safely called with in event handler
-     * @note If event handler is running in another thread, blocks until handler has returned
+     * @param subscriptionId Value returned by Subscription::subscribe
+     * NOTE: Can be safely called with in event handler
+     * NOTE: If event handler is running in another thread, blocks until handler has returned
      */
     void removeSubscription(SubscriptionId subscriptionId)
     {

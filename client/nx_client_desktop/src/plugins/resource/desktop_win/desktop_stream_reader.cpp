@@ -5,6 +5,8 @@
 #include <nx/streaming/config.h>
 
 #include <nx/utils/log/log.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <nx/streaming/video_data_packet.h>
 
 struct FffmpegLog
 {
@@ -28,7 +30,7 @@ struct FffmpegLog
 
 
 QnDesktopStreamreader::QnDesktopStreamreader(const QnResourcePtr &dev):
-    CLServerPushStreamReader(dev),
+    QnAbstractStreamDataProvider(dev),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),

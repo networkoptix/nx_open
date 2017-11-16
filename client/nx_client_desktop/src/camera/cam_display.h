@@ -16,6 +16,9 @@
 #include "video_stream_display.h"
 #include <map>
 
+// TODO: #GDM use forward declaration
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
@@ -86,7 +89,7 @@ public:
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality);
+    QImage getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
@@ -119,6 +122,7 @@ public:
 
     QnMediaResourcePtr resource() const;
 
+    Qn::MediaStreamEvent lastMediaEvent() const;
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -134,7 +138,6 @@ public slots:
 signals:
     void liveMode(bool value);
     void stillImageChanged();
-
 protected:
     void setSingleShotMode(bool single);
     virtual void setSpeed(float speed) override;
@@ -233,7 +236,7 @@ protected:
     int m_executingJump;
     int m_skipPrevJumpSignal;
     int m_processedPackets;
-    std::map<qint64, QnAbstractCompressedMetadataPtr> m_lastMetadata[CL_MAX_CHANNELS];
+    std::map<qint64, FrameMetadata> m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
     bool m_isStillImage;
@@ -267,6 +270,7 @@ protected:
     int m_liveBufferSize;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
+    Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
 };
 
 #endif //QN_CAM_DISPLAY_H

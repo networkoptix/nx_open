@@ -72,7 +72,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::license::Deacti
 namespace {
 
 static const auto kDeactivateLicenseUrl =
-    QUrl::fromUserInput(lit("http://licensing.networkoptix.com/nxlicensed/api/v1/deactivate/"));
+    nx::utils::Url::fromUserInput(lit("http://licensing.networkoptix.com/nxlicensed/api/v1/deactivate/"));
 
 using namespace nx::client::desktop::license;
 using ErrorCode = Deactivator::ErrorCode;

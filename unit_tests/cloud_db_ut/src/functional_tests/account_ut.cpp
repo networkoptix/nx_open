@@ -322,7 +322,7 @@ TEST_F(Account, bad_registration)
 
     //checking correct error message
     auto client = nx_http::AsyncHttpClient::create();
-    QUrl url;
+    nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");
@@ -332,7 +332,7 @@ TEST_F(Account, bad_registration)
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
         client.get(),
-        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); }, 
+        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); },
         Qt::DirectConnection);
     client->doPost(url, "application/json", QJson::serialized(account1));
 
@@ -368,7 +368,7 @@ TEST_F(Account, request_query_decode)
     account1.customization = nx::utils::AppInfo::customizationName().toStdString();
 
     nx_http::HttpClient httpClient;
-    QUrl url(
+    nx::utils::Url url(
         lm("http://127.0.0.1:%1/cdb/account/register?email=%2&fullName=%3&passwordHa1=%4&customization=%5")
         .arg(endpoint().port).arg(account1.email).arg(account1.fullName)
         .arg(account1.passwordHa1).arg(nx::utils::AppInfo::customizationName().toStdString()));
@@ -391,7 +391,7 @@ TEST_F(Account, request_query_decode)
     result = activateAccount(activationCode, &activatedAccountEmail);
     ASSERT_EQ(result, api::ResultCode::ok);
     ASSERT_EQ(
-        QUrl::fromPercentEncoding(account1.email.c_str()).toStdString(),
+        nx::utils::Url::fromPercentEncoding(account1.email.c_str()).toStdString(),
         activatedAccountEmail);
 
     result = getAccount(account1.email, account1Password, &account1);
@@ -429,7 +429,7 @@ TEST_F(Account, update)
     ASSERT_EQ(
         api::ResultCode::ok,
         updateAccount(account1.email, account1.password, update));
-    
+
     account1.password = account1NewPassword;
     account1.fullName = update.fullName.get();
     account1.customization = update.customization.get();
@@ -879,12 +879,12 @@ protected:
 
     void givenNotActivatedAccount()
     {
-        m_registrationTimeRange.first = 
+        m_registrationTimeRange.first =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         auto result = addAccount(&m_account, &m_account.password, &m_activationCode);
         ASSERT_EQ(api::ResultCode::ok, result);
         ASSERT_TRUE(!m_activationCode.code.empty());
-        m_registrationTimeRange.second = 
+        m_registrationTimeRange.second =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
@@ -895,12 +895,12 @@ protected:
 
     void whenActivatedAccount()
     {
-        m_activationTimeRange.first = 
+        m_activationTimeRange.first =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         std::string accountEmail;
         auto result = activateAccount(m_activationCode, &accountEmail);
         ASSERT_EQ(api::ResultCode::ok, result);
-        m_activationTimeRange.second = 
+        m_activationTimeRange.second =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
@@ -933,7 +933,7 @@ protected:
             nx::utils::floor<milliseconds>(account.registrationTime),
             nx::utils::floor<milliseconds>(m_registrationTimeRange.second));
     }
-    
+
     void assertActivationTimestampIsCorrect()
     {
         using namespace std::chrono;
@@ -1079,7 +1079,7 @@ private:
 
     void notificationReceived(const nx::cdb::AbstractNotification& notification)
     {
-        const auto inviteNotification = 
+        const auto inviteNotification =
             dynamic_cast<const InviteUserNotification*>(&notification);
         if (inviteNotification)
             m_inviteNotifications.push_back(*inviteNotification);

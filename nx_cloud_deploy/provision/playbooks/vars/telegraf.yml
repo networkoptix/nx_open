@@ -1,0 +1,18 @@
+telegraf_agent_output:
+  - type: cloudwatch
+    config:
+      - access_key = "AKIAJB4UPBAUWYXSMBVA"
+      - secret_key = "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"
+      - region = "us-east-1"
+      - namespace = "CustomSystem"
+telegraf_plugins_default:
+  - plugin: cpu
+    config:
+      - percpu = false
+      - report_active = true
+  - plugin: io
+  - plugin: mem
+  - plugin: net
+    config:
+      - interfaces = ["{{ ansible_default_ipv4.interface }}"]
+  - plugin: system

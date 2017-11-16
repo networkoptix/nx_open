@@ -146,7 +146,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
             const bool animate = display()->animationAllowed();
             updateStatusOverlay(animate);
         });
-    connect(m_resource, &QnResource::statusChanged, this, &QnResourceWidget::updateOverlayButton);
 
     /* Set up overlay widgets. */
     QFont font = this->font();
@@ -169,15 +168,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Status overlay. */
     m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
 
-    connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this](bool animated)
-        {
-            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
-                ? Invisible
-                : Visible;
-            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
-            updateOverlayButton();
-        });
+    setupOverlayButtonsHandlers();
 
     addOverlayWidget(m_statusOverlay, detail::OverlayParams(Invisible, true, false, StatusLayer));
 
@@ -219,6 +210,28 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 QnResourceWidget::~QnResourceWidget()
 {
     ensureAboutToBeDestroyedEmitted();
+}
+
+void QnResourceWidget::setupOverlayButtonsHandlers()
+{
+    const auto updateButtons =
+        [this]()
+        {
+            updateOverlayButton();
+            updateCustomOverlayButton();
+        };
+
+    connect(m_resource, &QnResource::statusChanged, this, updateButtons);
+    connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, updateButtons](bool animated)
+        {
+            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
+                ? Invisible
+                : Visible;
+            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
+            updateButtons();
+        });
+
 }
 
 // TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
@@ -556,6 +569,17 @@ QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
     return m_selectionState;
 }
 
+QPixmap QnResourceWidget::placeholderPixmap() const
+{
+    return m_placeholderPixmap;
+}
+
+void QnResourceWidget::setPlaceholderPixmap(const QPixmap& pixmap)
+{
+    m_placeholderPixmap = pixmap;
+    emit placeholderPixmapChanged();
+}
+
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     QSizeF result;
@@ -840,10 +864,21 @@ Qn::ResourceOverlayButton QnResourceWidget::calculateOverlayButton(
     return Qn::ResourceOverlayButton::Empty;
 }
 
+QString QnResourceWidget::overlayCustomButtonText(Qn::ResourceStatusOverlay /*statusOverlay*/) const
+{
+    return QString();
+}
+
 void QnResourceWidget::updateOverlayButton()
 {
     const auto statusOverlay = m_statusController->statusOverlay();
     m_statusController->setCurrentButton(calculateOverlayButton(statusOverlay));
+}
+
+void QnResourceWidget::updateCustomOverlayButton()
+{
+    const auto statusOverlay = m_statusController->statusOverlay();
+    m_statusController->setCustomButtonText(overlayCustomButtonText(statusOverlay));
 }
 
 void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)

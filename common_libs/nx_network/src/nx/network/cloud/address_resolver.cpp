@@ -7,6 +7,8 @@
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include "mediator_connector.h"
+
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
 static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
@@ -27,8 +29,7 @@ QString toString(const AddressType& type)
     return lit("undefined=%1").arg(static_cast<int>(type));
 }
 
-TypedAddress::TypedAddress(HostAddress address_, AddressType type_)
-:
+TypedAddress::TypedAddress(HostAddress address_, AddressType type_):
     address(std::move(address_)),
     type(std::move(type_))
 {
@@ -39,9 +40,9 @@ QString TypedAddress::toString() const
     return lm("%1(%2)").args(address, type);
 }
 
-AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
-    : type(type_)
-    , value(value_)
+AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_):
+    type(type_),
+    value(value_)
 {
 }
 
@@ -69,26 +70,26 @@ QString AddressAttribute::toString() const
     return lit("undefined=%1").arg(static_cast<int>(type));
 }
 
-AddressEntry::AddressEntry(AddressType type_, HostAddress host_)
-    : type(type_)
-    , host(std::move(host_))
+AddressEntry::AddressEntry(AddressType type_, HostAddress host_):
+    type(type_),
+    host(std::move(host_))
 {
 }
 
-AddressEntry::AddressEntry(const SocketAddress& address)
-    : type(AddressType::direct)
-    , host(address.address)
+AddressEntry::AddressEntry(const SocketAddress& address):
+    type(AddressType::direct),
+    host(address.address)
 {
     attributes.push_back(AddressAttribute(
         AddressAttributeType::port, address.port));
 }
 
-bool AddressEntry::operator ==(const AddressEntry& rhs) const
+bool AddressEntry::operator==(const AddressEntry& rhs) const
 {
     return type == rhs.type && host == rhs.host && attributes == rhs.attributes;
 }
 
-bool AddressEntry::operator <(const AddressEntry& rhs) const
+bool AddressEntry::operator<(const AddressEntry& rhs) const
 {
     return type < rhs.type && host < rhs.host && attributes < rhs.attributes;
 }
@@ -194,6 +195,65 @@ void AddressResolver::resolveDomain(
         });
 }
 
+namespace {
+
+// InPlaceResolver ---------------------------------------------------------------------------------
+using ResolveHandler = AddressResolver::ResolveHandler;
+
+class InPlaceResolver
+{
+public:
+    InPlaceResolver(int ipVersion, const HostAddress& hostname);
+    bool resolve(ResolveHandler* handler);
+private:
+    int m_ipVersion;
+    HostAddress m_hostname;
+
+    bool callHandler(HostAddress hostAddress, ResolveHandler* handler);
+};
+
+InPlaceResolver::InPlaceResolver(int ipVersion, const HostAddress& hostname):
+    m_ipVersion(ipVersion),
+    m_hostname(hostname)
+{
+    NX_ASSERT(m_ipVersion == AF_INET || m_ipVersion == AF_INET6);
+    if (m_ipVersion != AF_INET && m_ipVersion != AF_INET6)
+        NX_ERROR(this, "Unknown ip version");
+}
+
+bool InPlaceResolver::resolve(ResolveHandler* handler)
+{
+    if (m_hostname.isIpAddress())
+        return callHandler(std::move(m_hostname), handler);
+
+    if (m_ipVersion == AF_INET && m_hostname.ipV4())
+        return callHandler(*m_hostname.ipV4(), handler);
+
+    HostAddress::IpV6WithScope ipV6WithScope = m_hostname.ipV6();
+    if (!ipV6WithScope.first || !m_hostname.isPureIpV6())
+        return false;
+
+    return callHandler(HostAddress(*ipV6WithScope.first, ipV6WithScope.second), handler);
+}
+
+bool InPlaceResolver::callHandler(HostAddress hostAddress, ResolveHandler* handler)
+{
+    NX_VERBOSE(this, lm("IP %1 resolved in place").arg(m_hostname));
+    AddressEntry entry(AddressType::direct, std::move(hostAddress));
+    (*handler)(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
+
+    return true;
+}
+
+static bool inPlaceResolve(int ipVersion, const HostAddress& hostAddress, ResolveHandler* handler)
+{
+    InPlaceResolver resolver(ipVersion, hostAddress);
+    return resolver.resolve(handler);
+}
+// -------------------------------------------------------------------------------------------------
+
+} // namespace
+
 void AddressResolver::resolveAsync(
     const HostAddress& hostName,
     ResolveHandler handler,
@@ -201,27 +261,8 @@ void AddressResolver::resolveAsync(
     int ipVersion,
     void* requestId)
 {
-    if (hostName.isIpAddress())
-    {
-        NX_VERBOSE(this, lm("IP %1 is already resolved").arg(hostName));
-        AddressEntry entry(AddressType::direct, hostName);
-        return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
-    }
-
-    // Checking if hostName is fixed address, to speed up resolution when IPv6 is disabled.
-    if (ipVersion == AF_INET)
-    {
-        const auto hostStr = hostName.toString().toStdString();
-        struct in_addr resolvedAddress;
-        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
-        if (inet_pton(AF_INET, hostStr.c_str(), &resolvedAddress) > 0)
-        {
-            // Resolved.
-            NX_VERBOSE(this, lm("Hostname %1 is IP v4 address").arg(hostStr));
-            AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
-            return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
-        }
-    }
+    if (inPlaceResolve(ipVersion, hostName, &handler))
+        return;
 
     if (SocketGlobals::ini().isHostDisabled(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
@@ -273,7 +314,7 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
     int ipVersion)
 {
     utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
-    auto handler = 
+    auto handler =
         [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
         {
             promise.set_value({code, std::move(entries)});
@@ -445,15 +486,12 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
     if (domain.indexOf(lit(".")) != -1)
         return; // only top level domains might be fast resolved
 
-    const bool hasFound = iterateSubdomains(
+    iterateSubdomains(
         domain, [&](HaInfoIterator other)
         {
             info->second.fixedEntries = other->second.fixedEntries;
             return true; // just resolve to first avaliable
         });
-
-    if (!hasFound)
-        info->second.fixedEntries.clear();
 }
 
 void AddressResolver::dnsResolve(

@@ -57,14 +57,14 @@ public:
         m_relayTest(relayTest)
     {}
 
+    virtual bool connectToDb() override;
+
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& /*domainName*/) const override;
 
-    virtual cf::future<bool> addPeer(
-        const std::string& domainName,
-        const std::string& relayHost) override;
-
+    virtual cf::future<bool> addPeer( const std::string& domainName) override;
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
+    virtual void setNodeId(const std::string& /*nodeId*/) {}
 
 private:
     BasicTestFixture* m_relayTest;
@@ -95,7 +95,7 @@ protected:
 
     void startServer();
     void stopServer();
-    QUrl relayUrl(int relayNum = 0) const;
+    nx::utils::Url relayUrl(int relayNum = 0) const;
     void restartMediator();
 
     void assertConnectionCanBeEstablished();
@@ -138,7 +138,7 @@ private:
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<TestHttpServer> m_httpServer;
     TestHttpServer m_cloudModulesXmlProvider;
-    QUrl m_staticUrl;
+    nx::utils::Url m_staticUrl;
     std::list<std::unique_ptr<nx_http::AsyncClient>> m_httpClients;
     std::atomic<int> m_unfinishedRequestsLeft;
     boost::optional<nx::String> m_remotePeerName;
@@ -163,7 +163,7 @@ private:
     void startRelay(int index);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
 
-    virtual void peerAdded(const std::string& /*serverName*/, const std::string& /*relay*/) {}
+    virtual void peerAdded(const std::string& /*serverName*/) {}
     virtual void peerRemoved(const std::string& /*serverName*/) {}
     void setUpRemoteRelayPeerPoolFactoryFunc();
     void setUpPublicIpFactoryFunc();

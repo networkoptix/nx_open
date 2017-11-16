@@ -1,11 +1,8 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_codec_limits.h"
 
 #include "hanwha_utils.h"
-
-bool operator<(const QSize& lhs, const QSize& rhs)
-{
-    return lhs.width() * lhs.height() < rhs.width() * rhs.height();
-}
 
 namespace nx {
 namespace mediaserver_core {
@@ -232,3 +229,5 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

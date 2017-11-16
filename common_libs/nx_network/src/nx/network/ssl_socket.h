@@ -1,5 +1,4 @@
-#ifndef __SSL_SOCKET_H_
-#define __SSL_SOCKET_H_
+#pragma once
 
 #ifdef ENABLE_SSL
 
@@ -127,7 +126,7 @@ private:
  *
  *  Auto detects whether remote side uses SSL and delegates calls to SslSocket
  *      or to system socket directly.
- *  @note Can only be used on server side for accepting connections
+ *  NOTE: Can only be used on server side for accepting connections
 */
 class NX_NETWORK_API MixedSslSocket:
     public SslSocket
@@ -196,5 +195,3 @@ private:
 } // namespace nx
 
 #endif // ENABLE_SSL
-
-#endif // __SSL_SOCKET_H_

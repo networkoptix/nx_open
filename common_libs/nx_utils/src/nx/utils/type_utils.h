@@ -44,7 +44,7 @@ struct Apply<0>
 
 }   //namespace detail
 
-/** Calls \a f passing it members of tuple \a t as arguments */
+/** Calls f passing it members of tuple t as arguments */
 template<typename F, typename T>
 inline auto expandTupleIntoArgs(F && f, T && t)->
 decltype(detail::Apply<
@@ -94,7 +94,7 @@ std::shared_ptr<Object> wrapShared(Object* ptr, Deleter deleter)
 
 
 /** tuple_first_element<default_type, tuple_type>.
-    \a tuple_first_element::type is typedefed to default_type if tuple_type is empty. 
+    tuple_first_element::type is typedefed to default_type if tuple_type is empty. 
     Otherwise, to the type of tuple's first element
 */
 template<typename DefaultType, typename T> struct tuple_first_element;

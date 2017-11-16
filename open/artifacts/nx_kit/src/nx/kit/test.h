@@ -42,9 +42,9 @@ namespace test {
 
 /**
  * Usage: call from main():
- * <code><pre>
+ * <pre><code>
  *     return nx::kit::test::runAllTests();
- * </pre></code>
+ * </code></pre>
  * @return Number of failed tests.
  */
 NX_KIT_API int runAllTests();

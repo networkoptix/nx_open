@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -88,7 +83,7 @@ constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
     nx::hpm::api::kUdpTunnelKeepAliveIntervalDefault;
 
 const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
-constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
+constexpr const int kDefaultUdpTunnelKeepAliveRetries =
     nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 
 const QLatin1String kTunnelInactivityTimeout("cloudConnect/tunnelInactivityTimeout");
@@ -100,8 +95,12 @@ constexpr const std::chrono::seconds kDefaultConnectionAckAwaitTimeout =
     std::chrono::seconds(7);
 
 const QLatin1String kConnectionResultWaitTimeout("cloudConnect/connectionResultWaitTimeout");
-constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout = 
+constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout =
     std::chrono::seconds(15);
+
+const QLatin1String kMaxRelayInstanceSearchTime("cloudConnect/maxRelayInstanceSearchTime");
+constexpr const std::chrono::seconds kDefaultMaxRelayInstanceSearchTime =
+    std::chrono::seconds(3);
 
 // Cloud connect methods start delays.
 
@@ -138,7 +137,7 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 const QLatin1String kTrafficRelayUrl("trafficRelay/url");
 
-} // namespace 
+} // namespace
 
 namespace nx {
 namespace hpm {
@@ -146,7 +145,8 @@ namespace conf {
 
 ConnectionParameters::ConnectionParameters():
     connectionAckAwaitTimeout(kDefaultConnectionAckAwaitTimeout),
-    connectionResultWaitTimeout(kDefaultConnectionResultWaitTimeout)
+    connectionResultWaitTimeout(kDefaultConnectionResultWaitTimeout),
+    maxRelayInstanceSearchTime(kDefaultMaxRelayInstanceSearchTime)
 {
 }
 
@@ -241,7 +241,7 @@ void Settings::loadSettings()
     const auto cdbUrlStr = settings().value(kCdbUrl, kDefaultCdbUrl).toString();
     if (!cdbUrlStr.isEmpty())
     {
-        m_cloudDB.url = QUrl(cdbUrlStr);
+        m_cloudDB.url = nx::utils::Url(cdbUrlStr);
     }
     else
     {
@@ -250,7 +250,7 @@ void Settings::loadSettings()
         if (!endpointString.isEmpty())
         {
             // Supporting both url and host:port here.
-            m_cloudDB.url = QUrl(endpointString);
+            m_cloudDB.url = nx::utils::Url(endpointString);
             if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
             {
                 const SocketAddress endpoint(endpointString);
@@ -375,6 +375,11 @@ void Settings::loadConnectionParameters()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionResultWaitTimeout).toString(),
             kDefaultConnectionResultWaitTimeout);
+
+    m_connectionParameters.maxRelayInstanceSearchTime =
+        nx::utils::parseTimerDuration(
+            settings().value(kMaxRelayInstanceSearchTime).toString(),
+            kDefaultMaxRelayInstanceSearchTime);
 
     // Connection methods start delays.
     m_connectionParameters.udpHolePunchingStartDelay =

@@ -3,7 +3,9 @@
 #include <fstream>
 #include <list>
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
+#include <nx/network/cloud/connection_mediator_url_fetcher.h>
 #include <nx/network/http/http_client.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -53,13 +55,13 @@ protected:
     void givenLoadedCloudModulesXmlTemplate()
     {
         const auto templateFilePath = createTemporaryXmlTemplateFile();
-        m_moduleUrlProvider = 
+        m_moduleUrlProvider =
             std::make_unique<cdb::CloudModuleUrlProvider>(templateFilePath);
     }
 
     void tryToLoadInvalidFile()
     {
-        m_moduleUrlProvider = 
+        m_moduleUrlProvider =
             std::make_unique<cdb::CloudModuleUrlProvider>(
                 lm("/%1").arg(QnUuid::createUuid().toString()));
     }
@@ -137,13 +139,13 @@ protected:
         FetcherType fetcher;
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
-        fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
+        fetcher.setModulesXmlUrl(nx::utils::Url(lm("http://%1:%2%3")
             .arg(m_expectedHost).arg(endpoint().port).arg(kDeprecatedCloudModuleXmlPath)));
         for (const auto& header: m_additionalHttpHeaders)
             fetcher.addAdditionalHttpHeaderForGetRequest(header.first, header.second);
         nx::utils::promise<void> done;
-        auto completionHandler = 
-            [this, &done](nx_http::StatusCode::Value statusCode, QUrl moduleUrl)
+        auto completionHandler =
+            [this, &done](nx_http::StatusCode::Value statusCode, nx::utils::Url moduleUrl)
             {
                 m_fetchUrlResult = {statusCode, moduleUrl};
                 done.set_value();
@@ -155,7 +157,7 @@ protected:
         network::SocketGlobals::addressResolver().removeFixedAddress(
             m_expectedHost, endpoint());
     }
-    
+
     void assertHostHasBeenTakenFromHttpRequest()
     {
         ASSERT_EQ(nx_http::StatusCode::ok, m_fetchUrlResult.first);
@@ -171,7 +173,7 @@ protected:
 
 private:
     QString m_expectedHost;
-    std::pair<nx_http::StatusCode::Value, QUrl> m_fetchUrlResult;
+    std::pair<nx_http::StatusCode::Value, nx::utils::Url> m_fetchUrlResult;
     std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeaders;
 
     void init()

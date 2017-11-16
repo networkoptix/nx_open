@@ -19,15 +19,14 @@ namespace api {
 
 static ClientFactory::CustomFactoryFunc factoryFunc;
 
-std::unique_ptr<Client> ClientFactory::create(
-    const QUrl& baseUrl)
+std::unique_ptr<Client> ClientFactory::create(const utils::Url &baseUrl)
 {
     if (factoryFunc)
         return factoryFunc(baseUrl);
     return std::make_unique<ClientImpl>(baseUrl);
 }
 
-ClientFactory::CustomFactoryFunc 
+ClientFactory::CustomFactoryFunc
     ClientFactory::setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc)
 {
     CustomFactoryFunc oldFunc;
@@ -39,7 +38,7 @@ ClientFactory::CustomFactoryFunc
 //-------------------------------------------------------------------------------------------------
 // ClientImpl
 
-ClientImpl::ClientImpl(const QUrl& baseUrl):
+ClientImpl::ClientImpl(const nx::utils::Url& baseUrl):
     m_baseUrl(baseUrl),
     m_prevSysErrorCode(SystemError::noError)
 {
@@ -95,12 +94,12 @@ void ClientImpl::startSession(
             CreateClientSessionResponse response)
         {
             response.actualRelayUrl = contentLocationUrl;
-            // Removing request path from the end of response.actualRelayUrl 
+            // Removing request path from the end of response.actualRelayUrl
             // so that we have basic relay url.
             NX_ASSERT(
-                response.actualRelayUrl.find(requestPath.toStdString()) != std::string::npos);
+                response.actualRelayUrl.find(requestPath) != std::string::npos);
             NX_ASSERT(
-                response.actualRelayUrl.find(requestPath.toStdString()) + requestPath.size() ==
+                response.actualRelayUrl.find(requestPath) + requestPath.size() ==
                 response.actualRelayUrl.size());
 
             response.actualRelayUrl.erase(
@@ -128,7 +127,7 @@ void ClientImpl::openConnectionToTheTargetHost(
             std::move(completionHandler));
 }
 
-QUrl ClientImpl::url() const
+nx::utils::Url ClientImpl::url() const
 {
     return m_baseUrl;
 }
@@ -157,7 +156,7 @@ void ClientImpl::issueUpgradeRequest(
     std::initializer_list<RequestPathArgument> requestPathArguments,
     CompletionHandler completionHandler)
 {
-    using ResponseOrVoid = 
+    using ResponseOrVoid =
         typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type;
 
     auto httpClient = prepareHttpRequest<Request, ResponseOrVoid>(
@@ -196,7 +195,7 @@ void ClientImpl::issueRequest(
         std::move(requestPathArguments));
 
     post(
-        [this, httpClient = std::move(httpClient), 
+        [this, httpClient = std::move(httpClient),
             completionHandler = std::move(completionHandler)]() mutable
         {
             executeRequest<Response>(
@@ -211,11 +210,11 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
         const char* requestPathTemplate,
         std::initializer_list<RequestPathArgument> requestPathArguments)
 {
-    QUrl requestUrl = m_baseUrl;
+    nx::utils::Url requestUrl = m_baseUrl;
     requestUrl.setPath(network::url::normalizePath(
         requestUrl.path() +
         nx_http::rest::substituteParameters(
-            requestPathTemplate, std::move(requestPathArguments))));
+            requestPathTemplate, std::move(requestPathArguments)).c_str()));
 
     auto httpClient = std::make_unique<
         nx_http::FusionDataHttpClient<Request, Response>>(
@@ -272,7 +271,7 @@ void ClientImpl::executeRequest(
                 const nx_http::Response* httpResponse,
                 Response response) mutable
         {
-            auto contentLocationUrl = 
+            auto contentLocationUrl =
                 httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
@@ -295,7 +294,7 @@ ResultCode ClientImpl::toUpgradeResultCode(
     if (resultCode == api::ResultCode::ok)
     {
         // Server did not upgrade connection, but reported OK. It is unexpected...
-        return api::ResultCode::unknownError; 
+        return api::ResultCode::unknownError;
     }
     return resultCode;
 }

@@ -10,7 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relay/settings.h>
+#include <nx/cloud/relaying/settings.h>
 
 #include <http/target_peer_connector.h>
 
@@ -25,10 +25,66 @@ class StreamSocketThatCannotConnect:
     public nx::network::TCPSocket
 {
 public:
+    enum class ConnectFailureType
+    {
+        doNotReportResult,
+        reportError,
+    };
+
+    StreamSocketThatCannotConnect(ConnectFailureType connectFailureType):
+        m_connectFailureType(connectFailureType)
+    {
+    }
+
     virtual void connectAsync(
         const SocketAddress& /*addr*/,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
+        if (m_connectFailureType == ConnectFailureType::reportError)
+            post([handler = std::move(handler)]() { handler(SystemError::connectionRefused); });
+    }
+
+private:
+    ConnectFailureType m_connectFailureType;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class ListeningPeerPoolStub:
+    public relaying::AbstractListeningPeerPool
+{
+public:
+    virtual void addConnection(
+        const std::string& /*peerName*/,
+        std::unique_ptr<AbstractStreamSocket> /*connection*/) override
+    {
+    }
+
+    virtual std::size_t getConnectionCountByPeerName(const std::string& /*peerName*/) const
+    {
+        return 0;
+    }
+
+    virtual bool isPeerOnline(const std::string& /*peerName*/) const
+    {
+        return false;
+    }
+
+    virtual std::string findListeningPeerByDomain(const std::string& /*domainName*/) const
+    {
+        return std::string();
+    }
+
+    virtual void takeIdleConnection(
+        const relaying::ClientInfo& /*clientInfo*/,
+        const std::string& /*peerName*/,
+        relaying::TakeIdleConnectionHandler /*completionHandler*/) override
+    {
+    }
+
+    virtual relaying::Statistics statistics() const override
+    {
+        return relaying::Statistics();
     }
 };
 
@@ -42,7 +98,9 @@ class TargetPeerConnector:
 public:
     TargetPeerConnector():
         m_peerName(nx::utils::generateRandomName(7).toStdString()),
-        m_listeningPeerPool(m_listeningPeerPoolSettings)
+        m_listeningPeerPool(
+            std::make_unique<relaying::ListeningPeerPool>(
+                m_listeningPeerPoolSettings))
     {
     }
 
@@ -68,7 +126,7 @@ protected:
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         m_serverConnection = connection.get();
 
-        m_listeningPeerPool.addConnection(m_peerName, std::move(connection));
+        m_listeningPeerPool->addConnection(m_peerName, std::move(connection));
 
         m_targetEndpoint = SocketAddress(m_peerName.c_str(), 0);
     }
@@ -78,7 +136,7 @@ protected:
         using namespace std::placeholders;
 
         m_targetPeerConnector = std::make_unique<gateway::TargetPeerConnector>(
-            &m_listeningPeerPool,
+            m_listeningPeerPool.get(),
             m_targetEndpoint);
         if (m_connectTimeout)
             m_targetPeerConnector->setTimeout(*m_connectTimeout);
@@ -98,6 +156,13 @@ protected:
     {
         // TODO Check that connection is actually established.
         thenConnectionIsEstablished();
+    }
+
+    void thenConnectFailed()
+    {
+        m_prevResult = m_connectResultQueue.pop();
+        ASSERT_NE(SystemError::noError, m_prevResult.systemErrorCode);
+        ASSERT_EQ(nullptr, m_prevResult.connection);
     }
 
     void thenTimeoutIsReported()
@@ -120,12 +185,33 @@ protected:
         ASSERT_EQ(m_connectTimeout->count(), sendTimeoutMillis);
     }
 
-    void switchToStreamSocketThatCannotConnect()
+    void switchToStreamSocketThatNeverReportsConnectResult()
     {
-        using namespace std::placeholders;
-
         m_streamSocketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
-            std::bind(&TargetPeerConnector::createStreamSocket, this, _1, _2));
+            [](bool /*sslRequired*/,
+                nx::network::NatTraversalSupport /*natTraversalRequired*/,
+                boost::optional<int> /*ipVersion*/) -> std::unique_ptr<AbstractStreamSocket>
+            {
+                return std::make_unique<StreamSocketThatCannotConnect>(
+                    StreamSocketThatCannotConnect::ConnectFailureType::doNotReportResult);
+            });
+    }
+
+    void switchToStreamSocketThatAlwaysFailsToConnect()
+    {
+        m_streamSocketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
+            [](bool /*sslRequired*/,
+                nx::network::NatTraversalSupport /*natTraversalRequired*/,
+                boost::optional<int> /*ipVersion*/) -> std::unique_ptr<AbstractStreamSocket>
+            {
+                return std::make_unique<StreamSocketThatCannotConnect>(
+                    StreamSocketThatCannotConnect::ConnectFailureType::reportError);
+            });
+    }
+
+    void switchToListeningPeerPoolThatNeverReportsConnections()
+    {
+        m_listeningPeerPool = std::make_unique<ListeningPeerPoolStub>();
     }
 
     void enableConnectTimeout(std::chrono::milliseconds timeout)
@@ -147,8 +233,8 @@ private:
     SocketAddress m_targetEndpoint;
     boost::optional<SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
-    cloud::relay::conf::ListeningPeer m_listeningPeerPoolSettings;
-    cloud::relay::model::ListeningPeerPool m_listeningPeerPool;
+    relaying::Settings m_listeningPeerPoolSettings;
+    std::unique_ptr<relaying::AbstractListeningPeerPool> m_listeningPeerPool;
     ConnectResult m_prevResult;
     AbstractStreamSocket* m_serverConnection = nullptr;
 
@@ -163,13 +249,6 @@ private:
     {
         m_connectResultQueue.push({systemErrorCode, std::move(connection)});
     }
-
-    std::unique_ptr<AbstractStreamSocket> createStreamSocket(
-        bool /*sslRequired*/,
-        nx::network::NatTraversalSupport /*natTraversalRequired*/)
-    {
-        return std::make_unique<StreamSocketThatCannotConnect>();
-    }
 };
 
 TEST_F(TargetPeerConnector, regular_connection_is_established)
@@ -181,9 +260,9 @@ TEST_F(TargetPeerConnector, regular_connection_is_established)
 
 TEST_F(TargetPeerConnector, timeout)
 {
-    switchToStreamSocketThatCannotConnect();
+    switchToStreamSocketThatNeverReportsConnectResult();
     enableConnectTimeout(std::chrono::milliseconds(1));
-    
+
     givenDirectlyAccessibleServer();
     whenConnect();
     thenTimeoutIsReported();
@@ -200,7 +279,14 @@ TEST_F(TargetPeerConnector, passes_timeout_to_underlying_socket)
     andTimeoutHasBeenSetOnUnderlyingSocket();
 }
 
-//TEST_F(TargetPeerConnector, reports_regular_connection_error)
+TEST_F(TargetPeerConnector, reports_regular_connection_error)
+{
+    switchToStreamSocketThatAlwaysFailsToConnect();
+
+    givenDirectlyAccessibleServer();
+    whenConnect();
+    thenConnectFailed();
+}
 
 TEST_F(TargetPeerConnector, takes_connection_from_listening_peer_pool)
 {
@@ -209,9 +295,15 @@ TEST_F(TargetPeerConnector, takes_connection_from_listening_peer_pool)
     thenConnectionIsTakenFromListeningPeer();
 }
 
-//TEST_F(TargetPeerConnector, timeout_reported_if_listening_peer_pool_does_not_answer)
+TEST_F(TargetPeerConnector, timeout_reported_if_listening_peer_pool_does_not_answer)
+{
+    switchToListeningPeerPoolThatNeverReportsConnections();
+    enableConnectTimeout(std::chrono::milliseconds(1));
 
-//TEST_F(TargetPeerConnector, listening_peer_pool_is_checked_first)
+    givenRegisteredListeningPeer();
+    whenConnect();
+    thenTimeoutIsReported();
+}
 
 } // namespace test
 } // namespace gateway

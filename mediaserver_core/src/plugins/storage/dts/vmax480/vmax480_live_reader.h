@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_VMAX
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include "providers/spush_media_stream_provider.h"
 #include "core/resource/resource_fwd.h"
 #include "vmax480_stream_fetcher.h"
 

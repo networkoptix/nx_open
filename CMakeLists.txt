@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -36,7 +36,7 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 3.1.0)
+project(vms VERSION 3.1.1)
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
@@ -50,6 +50,8 @@ set(mobileClientVersion 17.3)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_DEBUG_POSTFIX "" CACHE INTERNAL "" FORCE)
 
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
@@ -128,6 +130,11 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
+if(targetDevice STREQUAL "bpi")
+    set_property(TARGET Qt5::Gui APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
+endif()
+
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
         COMPONENTS
@@ -152,6 +159,8 @@ if(WINDOWS)
         add_subdirectory(wixsetup)
     endif()
 endif()
+
+add_subdirectory(dependencies)
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
@@ -181,6 +190,23 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
+    set(_build_shared_libs ${BUILD_SHARED_LIBS})
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+    # Prevent overriding the parent project's compiler/linker settings on Windows.
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+    add_subdirectory(${CMAKE_SOURCE_DIR}/artifacts/googletest)
+
+    unset(BUILD_SHARED_LIBS CACHE)
+    set(BUILD_SHARED_LIBS ${_build_shared_libs})
+    unset(_build_shared_libs)
+
+    add_library(GTest INTERFACE)
+    target_link_libraries(GTest INTERFACE gtest gtest_main)
+    add_library(GMock INTERFACE)
+    target_link_libraries(GMock INTERFACE gmock gmock_main)
+
     add_subdirectory(unit_tests)
     add_subdirectory(tests)
 endif()

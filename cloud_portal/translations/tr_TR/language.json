@@ -7,7 +7,6 @@
     "cancelButton":"İptal",
     "loginTitle":"{{PRODUCT_NAME}}'e giriş yapın",
     "loginButton":"Giriş yap",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Zaten giriş yapılmış",
     "logoutAuthorisedContinueButton":"Devam et",
     "logoutAuthorisedLogoutButton":"Oturumu Kapat"
@@ -30,12 +29,10 @@
     "restorePasswordSuccess":"Parola kaydedildi -",
     "restorePasswordCode":"Parolayı sıfırla -",
     "view":"Kameraları görüntüle - ",
-    "contentPage":"",
     "debug":"Hata ayıklama",
     "login":"Giriş yap -",
     "download":"İndir {{VMS_NAME}}",
     "downloadPlatform":"İndir {{VMS_NAME}} ",
-    "startPage":"",
     "pageNotFound":"Sayfa bulunamadı"
   },
   "systemStatuses":{
@@ -177,6 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Hesabınız başarıyla kaydedildi",
+    "activationLinkSent":"Aktivasyon linki gönderildi",
     "passwordChangedSuccess":"Hesabınız başarıyla kaydedildi",
     "changePassword":"Parola Değiştir",
     "newPasswordLabel":"Yeni Parola",
@@ -184,7 +182,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"Sisteminizi görüntülemek için {{VMS_NAME}}'i yükleyin",
-    "noClientDetectedMessage":"",
     "action":"İndir {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +194,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Sunucu 2003, Sunucu 2008, Sunucu 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -224,8 +221,8 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Gönder",
-    "resetPassword":"Parolayı sıfırla -",
+    "sendConfirm":"Aktivasyon linki gönder",
+    "resetPassword":"Parolayı sıfırla",
     "setNewPassword":"Parolayı kaydet",
     "setNewPasswordLabel":"Yeni Parola"
   },

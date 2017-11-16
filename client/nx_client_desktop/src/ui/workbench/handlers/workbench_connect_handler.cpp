@@ -40,6 +40,7 @@
 
 #include <finders/systems_finder.h>
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 
 #include <helpers/system_weight_helper.h>
@@ -106,19 +107,19 @@ static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 static constexpr int kReconnectDelayMs = 3000;
 
-bool isConnectionToCloud(const QUrl& url)
+bool isConnectionToCloud(const nx::utils::Url& url)
 {
     return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
 }
 
-bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
+bool isSameConnectionUrl(const nx::utils::Url& first, const nx::utils::Url& second)
 {
     return ((first.host() == second.host())
         && (first.port() == second.port())
         && (first.userName() == second.userName()));
 }
 
-QString getConnectionName(const QString& systemName, const QUrl& url)
+QString getConnectionName(const QString& systemName, const nx::utils::Url& url)
 {
     static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
         "%1 is user name, %2 is name of system");
@@ -126,7 +127,7 @@ QString getConnectionName(const QString& systemName, const QUrl& url)
     return kNameTemplate.arg(url.userName(), systemName);
 }
 
-void removeCustomConnection(const QnUuid& localId, const QUrl& url)
+void removeCustomConnection(const QnUuid& localId, const nx::utils::Url& url)
 {
     NX_ASSERT(!localId.isNull(), "We can't remove custom user connections");
 
@@ -146,7 +147,7 @@ void removeCustomConnection(const QnUuid& localId, const QUrl& url)
     qnSettings->save();
 }
 
-void storeCustomConnection(const QnUuid& localId, const QString& systemName, const QUrl& url)
+void storeCustomConnection(const QnUuid& localId, const QString& systemName, const nx::utils::Url& url)
 {
     if (url.password().isEmpty())
         return;
@@ -195,7 +196,7 @@ void storeCustomConnection(const QnUuid& localId, const QString& systemName, con
 void storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
-    QUrl url,
+    nx::utils::Url url,
     bool storePassword)
 {
     if (!storePassword)
@@ -575,7 +576,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     auto connectionInfo = connection->connectionInfo();
 
     setPhysicalState(PhysicalState::waiting_peer);
-    QUrl url = connectionInfo.effectiveUrl();
+    nx::utils::Url url = connectionInfo.effectiveUrl();
     if (connectionInfo.ecUrl != url)
         connection->updateConnectionUrl(url);
 
@@ -592,7 +593,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QnConnectionInfo& info,
     ConnectionOptions options)
 {
@@ -929,7 +930,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     NX_ASSERT(parameters.hasArgument(Qn::StoreSessionRole));
     const bool storeSession = parameters.argument(Qn::StoreSessionRole, true);
-    QUrl url = parameters.argument(Qn::UrlRole, QUrl());
+    nx::utils::Url url = parameters.argument(Qn::UrlRole, nx::utils::Url());
 
     if (directConnection)
     {
@@ -988,7 +989,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     if (reachableServer == servers.cend())
         return;
 
-    QUrl url = system->getServerHost(reachableServer->id);
+    nx::utils::Url url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
     url.setPassword(credentials.password.value());
@@ -1004,7 +1005,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
     if (m_logicalState != LogicalState::connected)
         return;
 
-    QUrl currentUrl = commonModule()->currentUrl();
+    nx::utils::Url currentUrl = commonModule()->currentUrl();
     disconnectFromServer(DisconnectFlag::Force);
 
     // Do not store connections in case of reconnection
@@ -1023,7 +1024,7 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
     disconnectFromServer(flags);
 }
 
-void QnWorkbenchConnectHandler::connectToServer(const QUrl &url)
+void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)
 {
     auto validState =
         m_logicalState == LogicalState::testing
@@ -1069,9 +1070,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
     return true;
 }
 
-void QnWorkbenchConnectHandler::handleTestConnectionReply(
-    int handle,
-    const QUrl& url,
+void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
+    const nx::utils::Url &url,
     ec2::ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
     ConnectionOptions options,
@@ -1186,7 +1186,7 @@ void QnWorkbenchConnectHandler::clearConnection()
 }
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
-    const QUrl& url,
+    const nx::utils::Url& url,
     ConnectionOptions options,
     bool force)
 {
@@ -1205,7 +1205,7 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 {
-    QUrl currentUrl = commonModule()->currentUrl();
+    nx::utils::Url currentUrl = commonModule()->currentUrl();
     NX_ASSERT(!currentUrl.isEmpty());
     if (currentUrl.isEmpty())
         return false;

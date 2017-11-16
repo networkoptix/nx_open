@@ -509,7 +509,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         updateCodecByFormat(d->streamingFormat);
 
-        const QUrlQuery decodedUrlQuery( getDecodedUrl() );
+        const QUrlQuery decodedUrlQuery( getDecodedUrl().toQUrl() );
 
         QSize videoSize(640,480);
         QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
@@ -565,19 +565,20 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes) {
-            QnImageFilterHelper extraParams;
-            extraParams.setVideoLayout(mediaRes->getVideoLayout());
+        if (mediaRes)
+        {
+            QnLegacyTranscodingSettings extraParams;
+            extraParams.resource = mediaRes;
             int rotation;
             if (decodedUrlQuery.hasQueryItem("rotation"))
                 rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
             else
                 rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
             qreal customAR = mediaRes->customAspectRatio();
-            extraParams.setRotation(rotation);
-            extraParams.setCustomAR(customAR);
+            extraParams.rotation = rotation;
+            extraParams.forcedAspectRatio = customAR;
 
-            d->transcoder.setExtraTranscodeParams(extraParams);
+            d->transcoder.setTranscodingSettings(extraParams);
             d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 

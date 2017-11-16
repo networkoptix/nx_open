@@ -14,6 +14,7 @@ class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
+class QnCameraDataManager;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -28,6 +29,7 @@ public:
 
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QnCameraDataManager* cameraDataManager() const;
 
     nx::client::desktop::RadassController* radassController() const;
 
@@ -51,6 +53,7 @@ private:
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
+    QnCameraDataManager* m_cameraDataManager;
     nx::client::desktop::RadassController* m_radassController;
 };
 

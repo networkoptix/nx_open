@@ -60,7 +60,7 @@ api::ResultCode RequestProcessor::getMediaserverData(
         return api::ResultCode::notAuthorized;
     }
 
-//    if( !system->mediatorEnabled )    //cloud connect is not 
+//    if( !system->mediatorEnabled )    //cloud connect is not
 //    {
 //        sendErrorResponse( connection, request.header, stun::error::badRequest,
 //                       "Mediator is not enabled for this system" );

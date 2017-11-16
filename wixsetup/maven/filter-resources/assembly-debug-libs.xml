@@ -13,6 +13,7 @@
                 <include>**/nx_utils.pdb</include>
                 <include>**/nx_vms_utils.pdb</include>
                 <include>**/udt.pdb</include>
+                <include>**/vms_gateway_core.pdb</include>
                 <include>**/ax${product.name}${parsedVersion.majorVersion}.pdb</include>
             </includes>
         </fileSet>

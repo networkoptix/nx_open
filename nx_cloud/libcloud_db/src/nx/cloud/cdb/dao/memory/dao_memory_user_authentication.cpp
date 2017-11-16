@@ -47,7 +47,7 @@ void UserAuthentication::insertUserAuthRecords(
     m_userAuthInfo[std::make_pair(systemId, accountId)] = userAuthRecords;
 }
 
-std::vector<AbstractUserAuthentication::SystemInfo> 
+std::vector<AbstractUserAuthentication::SystemInfo>
     UserAuthentication::fetchAccountSystems(
         nx::utils::db::QueryContext* const /*queryContext*/,
         const std::string& accountId)

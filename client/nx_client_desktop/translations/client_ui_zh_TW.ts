@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>如果啟用了模糊化功能, 在Intel HD Graphics上可能會有問題. 我們強烈建議您不要開啟.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>停用模糊化</translation>
     </message>
   </context>
   <context>
@@ -2514,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation>文字標籤</translation>
+      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>

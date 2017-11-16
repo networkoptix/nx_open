@@ -1,13 +1,23 @@
 #include "tegra_video.h"
 
-#include "config.h"
+// ATTENTION: To force stub-only impl, define a macro at compiling: -DTEGRA_VIDEO_STUB_ONLY.
 
-TegraVideo* TegraVideo::create(const Params& params)
+#include "tegra_video_ini.h"
+
+TegraVideo* TegraVideo::create()
 {
-    conf.reload();
-    conf.skipNextReload(); //< Each of the methods below calls conf.reload().
-    if (conf.disable)
-        return createStub(params);
+    ini().reload();
+    if (ini().disable)
+        return createStub();
     else
-        return createImpl(params);
+        return createImpl();
 }
+
+#if defined(TEGRA_VIDEO_STUB_ONLY)
+
+TegraVideo* TegraVideo::createImpl()
+{
+    return createStub();
+}
+
+#endif // defined(TEGRA_VIDEO_STUB_ONLY)

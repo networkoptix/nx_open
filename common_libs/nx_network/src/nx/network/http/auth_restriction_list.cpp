@@ -1,51 +1,53 @@
 #include "auth_restriction_list.h"
 
-#include <nx/utils/match/wildcard.h>
-
 namespace nx_http {
+
+const unsigned int AuthMethodRestrictionList::kDefaults =
+    AuthMethod::cookie | AuthMethod::http |
+    AuthMethod::videowall | AuthMethod::urlQueryParam;
 
 unsigned int AuthMethodRestrictionList::getAllowedAuthMethods(
     const nx_http::Request& request) const
 {
     QString path = request.requestLine.url.path();
-    // TODO: #ak Replace mid and chop with single midRef call.
-    while (path.startsWith(lit("//")))
-        path = path.mid(1);
-    while (path.endsWith(L'/'))
-        path.chop(1);
+    unsigned int allowed = kDefaults;
 
-    unsigned int allowed =
-        AuthMethod::cookie | AuthMethod::http | 
-        AuthMethod::videowall | AuthMethod::urlQueryParam;
-    for (std::pair<QString, unsigned int> allowRule: m_allowed)
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& rule: m_allowed)
     {
-        if (!wildcardMatch(allowRule.first, path))
-            continue;
-        allowed |= allowRule.second;
+        if (rule.second.expression.exactMatch(path))
+            allowed |= rule.second.method;
     }
 
-    for (std::pair<QString, unsigned int> denyRule: m_denied)
+    for (const auto& rule: m_denied)
     {
-        if (!wildcardMatch(denyRule.first, path))
-            continue;
-        allowed &= ~denyRule.second;
+        if (rule.second.expression.exactMatch(path))
+            allowed &= ~rule.second.method;
     }
 
     return allowed;
+}
+
+AuthMethodRestrictionList::Rule::Rule(const QString& expression, unsigned int method):
+    expression(QLatin1String("/*") + expression + QLatin1String("/?")),
+    method(method)
+{
 }
 
 void AuthMethodRestrictionList::allow(
     const QString& pathMask,
     AuthMethod::Value method)
 {
-    m_allowed[pathMask] = method;
+    QnMutexLocker lock(&m_mutex);
+    m_allowed.emplace(pathMask, Rule(pathMask, method));
 }
 
 void AuthMethodRestrictionList::deny(
     const QString& pathMask,
     AuthMethod::Value method)
 {
-    m_denied[pathMask] = method;
+    QnMutexLocker lock(&m_mutex);
+    m_denied.emplace(pathMask, Rule(pathMask, method));
 }
 
 } // namespace nx_http

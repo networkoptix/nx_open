@@ -1,10 +1,4 @@
-/**********************************************************
-* Nov 20, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_FUSION_REQUEST_RESULT_H
-#define NX_FUSION_REQUEST_RESULT_H
+#pragma once
 
 #include <QtCore/QString>
 
@@ -12,7 +6,6 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 
 #include "../http_types.h"
-
 
 namespace nx_http {
 
@@ -67,7 +60,10 @@ private:
 
 #define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)
 
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+/**
+ * Not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec.
+ */
+
 bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);
 void NX_NETWORK_API serialize(QnJsonContext*, const FusionRequestResult&, class QJsonValue*);
 
@@ -75,9 +71,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorClass)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx_http::FusionRequestErrorClass), (lexical))
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorDetail)
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
 void NX_NETWORK_API serialize(const nx_http::FusionRequestErrorDetail&, QString*);
 
 } // namespace nx_http
-
-#endif  //NX_FUSION_REQUEST_RESULT_H

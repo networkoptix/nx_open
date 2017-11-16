@@ -76,7 +76,7 @@ Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
     return m_serverData.status;
 }
 
-QUrl QnFakeMediaServerResource::getApiUrl() const
+nx::utils::Url QnFakeMediaServerResource::getApiUrl() const
 {
     auto url = base_type::getApiUrl();
     url.setUserName(m_authenticator.user());
@@ -92,5 +92,5 @@ void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authentic
 
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)
 {
-    Q_ASSERT("This function should be not used for fake media servers");
+    NX_ASSERT(false, "This function should be not used for fake media servers");
 }

@@ -164,6 +164,7 @@ private:
     int m_channelCount = 1;
 };
 
+//TODO: Use <test_support/resource/camera_resource_stup.h> instead.
 class MockCamera: public QnVirtualCameraResource
 {
 public:
@@ -225,9 +226,9 @@ public:
     virtual QString getDriverName() const override { return lit("MockCamera"); }
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
-    virtual Qn::LicenseType licenseType() const override { return m_cameraType; }
 
 protected:
+    virtual Qn::LicenseType calculateLicenseType() const override { return m_cameraType; }
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override { return nullptr; }
 
 private:

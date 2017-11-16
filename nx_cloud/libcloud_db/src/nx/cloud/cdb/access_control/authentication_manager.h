@@ -1,13 +1,6 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef cloud_db_authentication_manager_h
-#define cloud_db_authentication_manager_h
+#pragma once
 
 #include <functional>
-#include <random>
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
 
@@ -28,11 +21,11 @@ class TemporaryAccountPasswordManager;
 class StreeManager;
 class AbstractAuthenticationDataProvider;
 
-//!Performs authentication based on various parameters
-/*!
-    Typically, username/digest is used to authenticate, but IP address/network interface and other data can be used also.
-    Uses account data and some predefined static data to authenticate incoming requests.
-    \note Listens to user data change events
+/**
+ * Performs authentication based on various parameters.
+ * Typically, username/digest is used to authenticate, but IP address/network interface and other data can be used also.
+ * Uses account data and some predefined static data to authenticate incoming requests.
+ * NOTE: Listens to user data change events.
  */
 class AuthenticationManager:
     public nx_http::server::AbstractAuthenticationManager
@@ -47,14 +40,12 @@ public:
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
         nx_http::server::AuthenticationCompletionHandler completionHandler) override;
-        
-    static nx::String realm(); 
+
+    static nx::String realm();
 
 private:
     const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
-    std::random_device m_rd;
-    std::uniform_int_distribution<size_t> m_dist;
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
 
     bool validateNonce(const nx_http::StringType& nonce);
@@ -68,7 +59,5 @@ private:
     nx::Buffer generateNonce();
 };
 
-}   //cdb
-}   //nx
-
-#endif
+} // namespace cdb
+} // namespace nx

@@ -31,6 +31,14 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
         return result;
 
     auto role = getRole();
+    if (role == Qn::CR_LiveVideo && 
+        !m_hikvisionResource->getPtzConfigurationToken().isEmpty() &&
+        m_hikvisionResource->getPtzProfileToken().isEmpty())
+    {
+        // Need to assign some Onvif profile to execute PTZ commands
+        m_hikvisionResource->findDefaultPtzProfileToken();
+    }
+
     auto streamingUrl = buildHikvisionStreamUrl(channelProperties.rtspPortNumber);
     m_hikvisionResource->updateSourceUrl(streamingUrl.toString(), getRole());
     if (!isCameraControlRequired)
@@ -68,9 +76,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     return m_rtpReader.openStream();
 }
 
-QUrl HikvisionHevcStreamReader::buildHikvisionStreamUrl(int rtspPortNumber) const
+utils::Url HikvisionHevcStreamReader::buildHikvisionStreamUrl(int rtspPortNumber) const
 {
-    auto url = QUrl(m_hikvisionResource->getUrl());
+    auto url = nx::utils::Url(m_hikvisionResource->getUrl());
     url.setScheme(lit("rtsp"));
     url.setPort(rtspPortNumber);
     url.setPath(kChannelStreamingPathTemplate.arg(
@@ -81,9 +89,9 @@ QUrl HikvisionHevcStreamReader::buildHikvisionStreamUrl(int rtspPortNumber) cons
     return url;
 }
 
-QUrl HikvisionHevcStreamReader::hikvisionRequestUrlFromPath(const QString& path) const
+nx::utils::Url HikvisionHevcStreamReader::hikvisionRequestUrlFromPath(const QString& path) const
 {
-    auto url = QUrl(m_hikvisionResource->getUrl());
+    auto url = nx::utils::Url(m_hikvisionResource->getUrl());
     url.setPath(path);
 
     return url;
@@ -201,7 +209,7 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
 
     auto outputScaleSize = outputQuality.size();
     auto inputScale = (double)inputScaleSize / (inputQualityIndex + 1);
-    auto outputIndex = (int)std::round(outputQuality.size() / inputScale) - 1;
+    auto outputIndex = qRound(outputQuality.size() / inputScale) - 1;
 
     bool indexIsCorrect = outputIndex < outputQuality.size() && outputIndex >= 0; 
     NX_ASSERT(indexIsCorrect, lit("Wrong Hikvision quality index."));

@@ -62,6 +62,7 @@ namespace Qn
     static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
+    static const QString kGroupPlayParamName = lit("groupplay");
 
     static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
     static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
@@ -84,6 +85,7 @@ namespace Qn
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
+    static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
@@ -106,6 +108,9 @@ namespace Qn
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
+
+    // Mediaserver common info
+    static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");
 
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");

@@ -25,7 +25,7 @@ public:
         }
 
         Method::ValueType method;
-        QUrl url;
+        nx::utils::Url url;
         nx_http::HttpHeaders headers;
         nx_http::StringType contentType;
         nx_http::StringType messageBody;
@@ -35,10 +35,10 @@ public:
     ClientPool(QObject *parent = nullptr);
     virtual ~ClientPool();
 
-    int doGet(const QUrl& url, nx_http::HttpHeaders headers = nx_http::HttpHeaders());
+    int doGet(const nx::utils::Url& url, nx_http::HttpHeaders headers = nx_http::HttpHeaders());
 
     int doPost(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QByteArray& contentType,
         const QByteArray& msgBody,
         nx_http::HttpHeaders headers = nx_http::HttpHeaders());
@@ -71,7 +71,7 @@ private:
         int handle;
     };
 private:
-    HttpConnection* getUnusedConnection(const QUrl& url);
+    HttpConnection* getUnusedConnection(const nx::utils::Url &url);
     void sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient);
     void sendNextRequestUnsafe();
     void cleanupDisconnectedUnsafe();

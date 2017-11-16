@@ -26,6 +26,7 @@
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
@@ -4274,8 +4275,8 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     audioTransmitter->setContentType(params.contentType.toUtf8());
     audioTransmitter->setNoAuth(params.noAuth);
 
-    QUrl srcUrl(getUrl());
-    QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+    nx::utils::Url srcUrl(getUrl());
+    nx::utils::Url url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
     audioTransmitter->setTransmissionUrl(url);
 
     return true;

@@ -1,5 +1,7 @@
 <a ng-click="selectCamera(camera);$event.stopPropagation()" class="camera-node hide-excess-text" ng-class="[camera.status,{'toggle-info':toggleInfo}]">
     <div class="pull-left camera-preview">
+        <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
+                ng-src="{{camera.preview}}" error-loading='camera.errorLoading' preview-image>
         <div>
             <camera-status camera="camera" type="'camera'"></camera-status>
         </div>
@@ -7,8 +9,6 @@
              ng-class="camera.status == 'Offline' ? 'camera-preview-offline' : 'camera-preview-unauthorized'"></span>
         <span ng-if="camera.errorLoading && !(camera.status == 'Offline' || camera.status == 'Unauthorized')"
               class='camera-preview-failed'></span>
-        <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
-                ng-src="{{camera.preview}}" error-loading='camera.errorLoading' preview-image>
     </div>
     <div class="camera-name">{{camera.name}}<br/>
         <small ng-if="toggleInfo">{{camera.url}}</small>

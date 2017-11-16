@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <set>
 
 #include <boost/optional/optional.hpp>
@@ -23,7 +25,7 @@ public:
     explicit HanwhaCgiParameters(
         const nx::Buffer& rawBuffer,
         nx_http::StatusCode::Value statusCode);
-   
+
     boost::optional<HanwhaCgiParameter> parameter(
         const QString& cgi,
         const QString& submenu,
@@ -42,7 +44,7 @@ private:
     bool parseCgis(QXmlStreamReader& reader);
 
     bool parseSubmenus(QXmlStreamReader& reader, const QString& cgi);
-    
+
     bool parseActions(QXmlStreamReader& reader, const QString& cgi, const QString& submenu);
 
     bool parseParameters(
@@ -77,3 +79,5 @@ private:
 } // namespace plugins
 } // namespace mediaserve_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

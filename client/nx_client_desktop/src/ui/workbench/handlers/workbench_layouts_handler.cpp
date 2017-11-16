@@ -44,11 +44,10 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>     // TODO: #GDM dependencies
 #include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
-
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
 #include <nx/utils/string.h>
@@ -217,9 +216,7 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
 
     if (layout->isFile())
     {
-        bool isReadOnly = !accessController()->hasPermissions(layout, Qn::WritePermission);
-        QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
-        exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
+        menu()->trigger(action::SaveLocalLayoutAction, layout);
     }
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
@@ -268,7 +265,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 
     if (layout->isFile())
     {
-        context()->instance<QnWorkbenchExportHandler>()->doAskNameAndExportLocalLayout(layout->getLocalRange(), layout, Qn::LayoutLocalSaveAs);
+        menu()->trigger(action::SaveLocalLayoutAsAction, layout);
         return;
     }
 
@@ -315,6 +312,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
                     return;
 
                 saveLayout(layout);
+                return;
             }
 
             /* Check if we have rights to overwrite the layout */
@@ -1038,9 +1036,17 @@ void LayoutsHandler::at_openNewTabAction_triggered()
 {
     QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
 
-    layout->setName(generateUniqueLayoutName(resourcePool(), context()->user(), tr("New Layout"), tr("New Layout %1")));
+    const auto parameters = menu()->currentParameters(sender());
 
+    if (parameters.hasArgument(Qn::LayoutSyncStateRole))
+    {
+        const auto syncState = parameters.argument(Qn::LayoutSyncStateRole);
+        layout->setData(Qn::LayoutSyncStateRole, syncState);
+    }
+
+    layout->setName(generateUniqueLayoutName(resourcePool(), context()->user(), tr("New Layout"), tr("New Layout %1")));
     workbench()->addLayout(layout);
+
     workbench()->setCurrentLayout(layout);
 }
 

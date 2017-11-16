@@ -74,7 +74,7 @@ nx::utils::db::DBResult SystemDataObject::selectSystemSequence(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
+nx::utils::db::DBResult SystemDataObject::markSystemForDeletion(
     nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
@@ -88,7 +88,7 @@ nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
         )sql");
     markSystemAsRemoved.bindValue(
         ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
+        QnSql::serialized_field(static_cast<int>(api::SystemStatus::deleted_)));
     markSystemAsRemoved.bindValue(
         ":expiration_utc_timestamp",
         (int)(nx::utils::timeSinceEpoch().count() +
@@ -172,9 +172,10 @@ nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::activateSystem(
+nx::utils::db::DBResult SystemDataObject::updateSystemStatus(
     nx::utils::db::QueryContext* const queryContext,
-    const std::string& systemId)
+    const std::string& systemId,
+    api::SystemStatus systemStatus)
 {
     QSqlQuery updateSystemStatusQuery(*queryContext->connection());
     updateSystemStatusQuery.prepare(
@@ -183,7 +184,7 @@ nx::utils::db::DBResult SystemDataObject::activateSystem(
         "WHERE id=:id");
     updateSystemStatusQuery.bindValue(
         ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssActivated)));
+        QnSql::serialized_field(static_cast<int>(systemStatus)));
     updateSystemStatusQuery.bindValue(
         ":id",
         QnSql::serialized_field(systemId));
@@ -192,8 +193,9 @@ nx::utils::db::DBResult SystemDataObject::activateSystem(
         std::numeric_limits<int>::max());
     if (!updateSystemStatusQuery.exec())
     {
-        NX_LOG(lit("Failed to read system list from DB. %1").
-            arg(updateSystemStatusQuery.lastError().text()), cl_logWARNING);
+        NX_WARNING(this, lm("Failed to update system %1 status to %2 from DB. %3")
+            .args(systemId, QnLexical::serialized(systemStatus),
+                updateSystemStatusQuery.lastError().text()));
         return nx::utils::db::DBResult::ioError;
     }
 
@@ -210,7 +212,7 @@ nx::utils::db::DBResult SystemDataObject::fetchSystems(
         SELECT system.id, system.name, system.customization, system.auth_key as authKey,
                account.email as ownerAccountEmail, system.status_code as status,
                system.expiration_utc_timestamp as expirationTimeUtc,
-               system.seq as systemSequence, system.opaque as opaque, 
+               system.seq as systemSequence, system.opaque as opaque,
                system.registration_time_utc as registrationTime
         FROM system, account
         WHERE system.owner_account_id = account.id
@@ -240,7 +242,28 @@ nx::utils::db::DBResult SystemDataObject::fetchSystems(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::QueryContext* queryContext)
+boost::optional<data::SystemData> SystemDataObject::fetchSystemById(
+    nx::utils::db::QueryContext* queryContext,
+    const std::string& systemId)
+{
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
+        {{"system.id", ":systemId", QnSql::serialized_field(systemId)}};
+
+    std::vector<data::SystemData> systems;
+    const auto result = fetchSystems(queryContext, sqlFilter, &systems);
+    if (result != nx::utils::db::DBResult::ok)
+        throw nx::utils::db::Exception(result);
+
+    if (systems.empty())
+        return boost::none;
+
+    NX_ASSERT(systems.size() == 1);
+
+    return std::move(systems[0]);
+}
+
+nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(
+    nx::utils::db::QueryContext* queryContext)
 {
     //dropping expired not-activated systems and expired marked-for-removal systems
     QSqlQuery dropExpiredSystems(*queryContext->connection());
@@ -250,10 +273,10 @@ nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::Qu
         "AND expiration_utc_timestamp < :currentTime");
     dropExpiredSystems.bindValue(
         ":notActivatedStatusCode",
-        static_cast<int>(api::SystemStatus::ssNotActivated));
+        static_cast<int>(api::SystemStatus::notActivated));
     dropExpiredSystems.bindValue(
         ":deletedStatusCode",
-        static_cast<int>(api::SystemStatus::ssDeleted));
+        static_cast<int>(api::SystemStatus::deleted_));
     dropExpiredSystems.bindValue(
         ":currentTime",
         (int)nx::utils::timeSinceEpoch().count());

@@ -12,9 +12,9 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/private/two_way_audio_widget_p.h>
 
-QnTwoWayAudioWidget::QnTwoWayAudioWidget(QGraphicsWidget *parent)
+QnTwoWayAudioWidget::QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent)
     : base_type(parent)
-    , d_ptr(new QnTwoWayAudioWidgetPrivate(this))
+    , d_ptr(new QnTwoWayAudioWidgetPrivate(sourceId, this))
 {
     Q_D(const QnTwoWayAudioWidget);
 

@@ -1,5 +1,5 @@
 {
-  "language_name":"Português (PT)",
+  "language_name":"Português (BR)",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
@@ -7,7 +7,6 @@
     "cancelButton":"Cancelar",
     "loginTitle":"Log in to {{PRODUCT_NAME}}",
     "loginButton":"Log in",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"You are already logged in",
     "logoutAuthorisedContinueButton":"Continue",
     "logoutAuthorisedLogoutButton":"Log Out"
@@ -30,12 +29,10 @@
     "restorePasswordSuccess":"Password saved -",
     "restorePasswordCode":"Reset password -",
     "view":"View cameras - ",
-    "contentPage":"",
     "debug":"Debug",
     "login":"Log in -",
     "download":"Download {{VMS_NAME}}",
     "downloadPlatform":"Download {{VMS_NAME}} for ",
-    "startPage":"",
     "pageNotFound":"Page not found"
   },
   "systemStatuses":{
@@ -83,7 +80,7 @@
       "description":"Custom user role specified in System"
     },
     "owner":{
-      "label":"Owner",
+      "label":"Dono",
       "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
     },
     "viewer":{
@@ -177,6 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Your account is successfully saved",
+    "activationLinkSent":"Activation Link Sent",
     "passwordChangedSuccess":"Your account is successfully saved",
     "changePassword":"Change Password",
     "newPasswordLabel":"New password",
@@ -184,7 +182,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
-    "noClientDetectedMessage":"",
     "action":"Download {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +194,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -224,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
+    "sendConfirm":"Resend activation link",
     "resetPassword":"Reset Password",
     "setNewPassword":"Guardar password",
     "setNewPasswordLabel":"New password"

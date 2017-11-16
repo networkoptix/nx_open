@@ -42,7 +42,7 @@ public:
     void switchLocalSystemId(const QnUuid& localSystemId);
 
     /** Save items for the local system, cleanup non-existing. */
-    void saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool);
+    void saveData(const QnUuid& localSystemId, QnResourcePool* resourcePool) const;
 
 signals:
     void modeChanged(const QnLayoutItemIndex& item, RadassMode value);

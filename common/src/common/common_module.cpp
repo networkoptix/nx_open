@@ -49,9 +49,6 @@
 #include <api/session_manager.h>
 #include <network/router.h>
 
-#include <analytics/plugins/detection/detection_plugin_factory.h>
-#include <analytics/common/metadata_plugin_factory.h>
-
 using namespace nx;
 
 namespace {
@@ -149,8 +146,6 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
     m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
-    m_detectionPluginFactory = new nx::analytics::DetectionPluginFactory(this); //< Depends on nothing.
-    m_metadataPluginFactory = new nx::analytics::MetadataPluginFactory(this); //< Depends on nothing.    
     m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
     // Depends on resource pool.
@@ -214,7 +209,7 @@ QnCommonModule::~QnCommonModule()
     clear();
 }
 
-void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server)
+void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)
 {
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);
@@ -245,11 +240,11 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
-QUrl QnCommonModule::currentUrl() const
+nx::utils::Url QnCommonModule::currentUrl() const
 {
     if (auto connection = ec2Connection())
         return connection->connectionInfo().ecUrl;
-    return QUrl();
+    return nx::utils::Url();
 }
 
 QnMediaServerResourcePtr QnCommonModule::currentServer() const

@@ -18,6 +18,7 @@
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
+#include <api/server_rest_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 
@@ -75,8 +76,8 @@
 
 #include <network/cloud_url_validator.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <platform/environment.h>
 
@@ -98,10 +99,10 @@
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/camera_password_change_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -109,6 +110,9 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+
+#include <nx/client/desktop/resource_properties/media_file/media_file_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -140,7 +144,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
-
 #include <nx/client/desktop/utils/server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
@@ -226,6 +229,12 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
+    connect(qnGlobalSettings, &QnGlobalSettings::maxSceneItemsChanged, this,
+        [this]
+        {
+            qnRuntime->setMaxSceneItemsOverride(qnGlobalSettings->maxSceneItemsOverride());
+        });
+
     // local settings
     connect(action(action::PreferencesGeneralTabAction), &QAction::triggered, this,
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
@@ -278,6 +287,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
     connect(action(action::ReviewLayoutTourInNewWindowAction), &QAction::triggered, this,
         &ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered);
+
+    connect(action(action::ChangeDefaultCameraPasswordAction), &QAction::triggered,
+        this, &ActionHandler::at_changeDefaultCameraPassword_triggered);
 
     connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
@@ -654,22 +666,150 @@ void ActionHandler::at_previousLayoutAction_triggered()
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
 }
 
+void ActionHandler::showSingleCameraErrorMessage(const QString& explanation)
+{
+    static const auto kMessageText = tr("Failed to change password");
+    QnMessageBox::critical(mainWindowWidget(), kMessageText, explanation);
+}
+
+void ActionHandler::showMultipleCamerasErrorMessage(
+    int totalCameras,
+    const QnVirtualCameraResourceList& camerasWithError,
+    const QString& explanation)
+{
+    static const auto kMessageTemplate = tr("Failed to change passwords on %1 of %2 cameras");
+    static const auto kSimpleOptions = QnResourceListView::Options(
+        QnResourceListView::HideStatusOption
+        | QnResourceListView::ServerAsHealthMonitorOption
+        | QnResourceListView::SortAsInTreeOption);
+
+    QnSessionAwareMessageBox messageBox(mainWindowWidget());
+    messageBox.setIcon(QnMessageBoxIcon::Critical);
+    messageBox.setText(kMessageTemplate.arg(
+        QString::number(camerasWithError.size()), QString::number(totalCameras)));
+    if (!explanation.isEmpty())
+        messageBox.setInformativeText(explanation);
+    messageBox.addCustomWidget(
+        new QnResourceListView(camerasWithError, kSimpleOptions, &messageBox),
+        QnMessageBox::Layout::AfterMainLabel);
+
+    messageBox.setStandardButtons(QDialogButtonBox::Ok);
+    messageBox.exec();
+}
+
+void ActionHandler::changeDefaultPasswords(
+    const QString& previousPassword,
+    const QnVirtualCameraResourceList& cameras,
+    bool showSingleCamera)
+{
+    const auto server = commonModule()->currentServer();
+    const auto serverConnection = server ? server->restConnection() : rest::QnConnectionPtr();
+    if (!serverConnection)
+    {
+        NX_EXPECT(false, "No connection to server");
+        return;
+    }
+
+    QnCameraPasswordChangeDialog dialog(
+        previousPassword, cameras, showSingleCamera, mainWindowWidget());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
+    using PassswordChangeResultList = QList<PasswordChangeResult>;
+
+    const auto errorResultsStorage = QSharedPointer<PassswordChangeResultList>(
+        new PassswordChangeResultList());
+
+    const auto password = dialog.password();
+    const auto guard = QPointer<ActionHandler>(this);
+    const auto completionGuard = QnRaiiGuard::createDestructible(
+        [this, guard, cameras, errorResultsStorage, password, showSingleCamera]()
+        {
+            if (!guard || errorResultsStorage->isEmpty())
+                return;
+
+            // Show error dialog and try one more time
+            const auto camerasWithError =
+                [errorResultsStorage]()
+                {
+                    QnVirtualCameraResourceList result;
+                    for (const auto errorResult: *errorResultsStorage)
+                        result.push_back(errorResult.first);
+                    return result;
+                }();
+
+            auto explanation =
+                [errorResultsStorage]()
+                {
+                    QnRestResult::Error error = errorResultsStorage->first().second.error;
+                    if (errorResultsStorage->size() != 1)
+                    {
+                        const bool hasAnotherError = std::any_of(
+                            errorResultsStorage->begin() + 1, errorResultsStorage->end(),
+                            [error](const PasswordChangeResult& result)
+                            {
+                                return error != result.second.error;
+                            });
+
+                        if (hasAnotherError)
+                            error = QnRestResult::NoError;
+                    }
+
+                    return error == QnRestResult::NoError
+                        ? QString() //< NoError means different or unspecified error
+                        : errorResultsStorage->first().second.errorString;
+                }();
+
+            if (cameras.size() > 1)
+                showMultipleCamerasErrorMessage(cameras.size(), camerasWithError, explanation);
+            else
+                showSingleCameraErrorMessage(explanation);
+
+            changeDefaultPasswords(password, camerasWithError, showSingleCamera);
+        });
+
+    for (const auto camera: cameras)
+    {
+        auto auth = camera->getDefaultAuth();
+        auth.setPassword(password);
+
+        const auto resultCallback =
+            [guard, completionGuard, camera, errorResultsStorage]
+                (bool success, rest::Handle /*handle*/, QnRestResult result)
+            {
+                if (!guard)
+                    return;
+
+                if (!success)
+                    errorResultsStorage->append(PasswordChangeResult(camera, QnRestResult()));
+                else if (result.error != QnRestResult::NoError)
+                    errorResultsStorage->append(PasswordChangeResult(camera, result));
+            };
+
+        serverConnection->changeCameraPassword(
+            camera->getId(), auth, resultCallback, QThread::currentThread());
+    }
+}
+
+void ActionHandler::at_changeDefaultCameraPassword_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto camerasWithDefaultPassword =
+        parameters.resources().filtered<QnVirtualCameraResource>();
+
+    if (camerasWithDefaultPassword.isEmpty())
+    {
+        NX_EXPECT(false, "No cameras with default password");
+        return;
+    }
+
+    const bool showSingleCameraList = parameters.argument(Qn::ShowSingleCameraRole, false);
+    changeDefaultPasswords(QString(), camerasWithDefaultPassword, showSingleCameraList);
+}
+
 void ActionHandler::at_openInLayoutAction_triggered()
 {
-    /**
-     * When we add widget (possibliy with animation) to the scene, whole scene may loose
-     * ability to handle hover events.
-     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
-     */
-    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
-        ? QnRaiiGuard::create(
-            []() { QCursor::setPos(QPoint(0, 0)); },
-            [this, mp = QCursor::pos()]()
-            {
-                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
-            })
-        : QnRaiiGuardPtr();
-
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
@@ -686,17 +826,29 @@ void ActionHandler::at_openInLayoutAction_triggered()
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
     {
+        static const auto kExtraItemRoles =
+            {Qn::ItemTimeRole, Qn::ItemPausedRole, Qn::ItemSpeedRole};
+
+        using ExtraItemDataHash = QHash<Qn::ItemDataRole, QVariant>;
+        QHash<QnUuid, ExtraItemDataHash> extraItemRoleValues;
+
         QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
         for (auto widget: widgets)
         {
             QnLayoutItemData data = widget->item()->data();
+            const auto oldUuid = data.uuid;
+            data.uuid = QnUuid::createUuid();
             data.flags = Qn::PendingGeometryAdjustment;
-            itemDataByUuid[data.uuid] = data;
-        }
+            itemDataByUuid[oldUuid] = data;
 
-        /* Generate new UUIDs. */
-        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
-            pos->uuid = QnUuid::createUuid();
+            for (const auto extraItemRole: kExtraItemRoles)
+            {
+                const auto value =
+                    qnResourceRuntimeDataManager->layoutItemData(oldUuid, extraItemRole);
+                if (value.isValid())
+                    extraItemRoleValues[data.uuid].insert(extraItemRole, value);
+            }
+        }
 
         /* Update cross-references. */
         for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
@@ -712,6 +864,10 @@ void ActionHandler::at_openInLayoutAction_triggered()
                 return;
 
             layout->addItem(data);
+
+            const auto values = extraItemRoleValues[data.uuid];
+            for (auto it = values.begin(); it != values.end(); ++it)
+                qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
         }
     }
     else
@@ -824,12 +980,27 @@ void ActionHandler::at_openInNewTabAction_triggered()
         workbench()->setCurrentLayout(wbLayout);
     }
 
-    const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
-    if (openable.empty())
-        return;
-    parameters.setResources(openable);
+    if (parameters.widgets().isEmpty())
+    {
+        // Called from resources tree view
+        const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+        if (openable.empty())
+            return;
 
-    menu()->trigger(action::OpenNewTabAction);
+        parameters.setResources(openable);
+        menu()->trigger(action::OpenNewTabAction);
+    }
+    else
+    {
+        // Called from the current layout
+        auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+        action::Parameters params;
+        params.setArgument(Qn::LayoutSyncStateRole, streamSynchronizer->state());
+
+        menu()->trigger(action::OpenNewTabAction, params);
+    }
+
     menu()->trigger(action::DropResourcesAction, parameters);
 }
 
@@ -1061,7 +1232,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     if (!resources.empty())
     {
-        parameters.setResources(resources);
+        if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
+            parameters.setResources(resources);
         if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
             menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
     }
@@ -1620,19 +1792,21 @@ void ActionHandler::at_mediaFileSettingsAction_triggered() {
     if (!media)
         return;
 
-    QScopedPointer<QnMediaFileSettingsDialog> dialog;
+    QScopedPointer<MediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAware<QnMediaFileSettingsDialog>(mainWindowWidget()));
+        dialog.reset(new QnSessionAware<MediaFileSettingsDialog>(mainWindowWidget()));
     else
-        dialog.reset(new QnMediaFileSettingsDialog(mainWindowWidget()));
+        dialog.reset(new MediaFileSettingsDialog(mainWindowWidget()));
 
     dialog->updateFromResource(media);
-    if (dialog->exec()) {
+    if (dialog->exec())
+    {
         dialog->submitToResource(media);
     }
-    else {
-        QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
-        if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
+    else
+    {
+        auto centralWidget = display()->widget(Qn::CentralRole);
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
             mediaWidget->setDewarpingParams(media->getDewarpingParams());
     }
 }
@@ -2141,7 +2315,7 @@ void ActionHandler::at_browseUrlAction_triggered() {
     if (url.isEmpty())
         return;
 
-    QDesktopServices::openUrl(QUrl::fromUserInput(url));
+    QDesktopServices::openUrl(nx::utils::Url::fromUserInput(url).toQUrl());
 }
 
 void ActionHandler::at_versionMismatchMessageAction_triggered()
@@ -2324,14 +2498,14 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     if (nx::network::isCloudServer(server))
         return;
 
-    QUrl url(server->getApiUrl());
+    nx::utils::Url url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
     url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(url.toQUrl());
 }
 
 void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
@@ -2341,10 +2515,10 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         return;
     // path may contains path + url query params
     // TODO: #akolesnikov #3.1 VMS-2806
-    QUrl serverUrl(server->getApiUrl().toString() + path);
+    nx::utils::Url serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    QUrl proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
+    nx::utils::Url proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -2391,20 +2565,20 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
             appserverUrl.userName(), appserverUrl.password(),
             auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
 
-        QUrl targetUrl(request.url);
-        QUrlQuery urlQuery(targetUrl);
+        nx::utils::Url targetUrl(request.url);
+        QUrlQuery urlQuery(targetUrl.toQUrl());
         urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
         targetUrl.setQuery(urlQuery);
 
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));
 
-        QDesktopServices::openUrl(targetUrl);
+        QDesktopServices::openUrl(targetUrl.toQUrl());
     }
 }
 
