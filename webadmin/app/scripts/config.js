@@ -8,7 +8,7 @@ var Config = {
     webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
-        'en_US', 'ru'
+        'en_US', 'ru_RU'
     ],
 
     defaultLogin: 'admin',
