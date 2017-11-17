@@ -3,11 +3,12 @@
 #include <set>
 #include <chrono>
 
+#include <QtCore/QRect>
+
 #include <analytics/common/abstract_metadata.h>
 
-#include <nx/utils/uuid.h>
-
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace common {
@@ -49,13 +50,13 @@ QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
     (DetectionMetadataPacket)
 
 using DetectionMetadataPacketPtr = std::shared_ptr<DetectionMetadataPacket>;
+using ConstDetectionMetadataPacketPtr = std::shared_ptr<const DetectionMetadataPacket>;
 using DetectionMetadataTrack = DetectionMetadataPacket;
 
 bool operator<(const DetectionMetadataPacket& first,
     const DetectionMetadataPacket& second);
 bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second);
 bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second);
-
 
 } // namespace metadata
 } // namespace common
