@@ -660,7 +660,7 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras)
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
         tr("Deactivate licenses?", "", extras.size()),
         QString(),
-        QDialogButtonBox::Cancel);
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
     confirmationDialog.setInformativeText(extras.join(kEmptyLine), false);
     confirmationDialog.setInformativeTextFormat(Qt::RichText);
     confirmationDialog.addButton(lit("Deactivate"),
@@ -734,7 +734,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     const bool totalFail = licenses.size() == errorsCount;
     const auto standardButton = totalFail ? QDialogButtonBox::Ok : QDialogButtonBox::Cancel;
     QnMessageBox dialog(icon, text, QString(),
-        standardButton, QDialogButtonBox::NoButton);
+        standardButton, QDialogButtonBox::NoButton, this);
 
     auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     dialog.addButton(copyButton, QDialogButtonBox::HelpRole);

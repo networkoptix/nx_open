@@ -64,8 +64,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         if (!permissions.testFlag(Qn::WritePasswordPermission))
             return;
 
-        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog());
-        dialog->initializeContext(this);
+        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog(this));
         dialog->setWindowModality(Qt::ApplicationModal);
         if (dialog->exec() != QDialog::Accepted)
             return;

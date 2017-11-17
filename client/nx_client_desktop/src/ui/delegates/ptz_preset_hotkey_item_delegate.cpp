@@ -31,7 +31,7 @@ public:
 // -------------------------------------------------------------------------- //
 // QnPtzPresetHotkeyItemDelegate
 // -------------------------------------------------------------------------- //
-QnPtzPresetHotkeyItemDelegate::QnPtzPresetHotkeyItemDelegate(QObject *parent):
+QnPtzPresetHotkeyItemDelegate::QnPtzPresetHotkeyItemDelegate(QWidget* parent):
     base_type(parent),
     m_filter(new QnComboBoxContainerEventFilter(this))
 {}
@@ -110,7 +110,8 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
         : tr("Hotkey used by tour \"%1\"").arg(existing.tourModel.tour.name));
 
     QnMessageBox messageBox(QnMessageBoxIcon::Warning, message,
-        QString(), QDialogButtonBox::Cancel);
+        QString(), QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        qobject_cast<QWidget*>(parent()));
     messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;

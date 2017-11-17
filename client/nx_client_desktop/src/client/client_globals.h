@@ -271,6 +271,8 @@ namespace Qn
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
         ShowSingleCameraRole,                       /**< Used for default password dialog. */
+		
+		ParentWidgetRole,                           /** Used for dialg's parent widget*/
         RoleCount
     };
 
