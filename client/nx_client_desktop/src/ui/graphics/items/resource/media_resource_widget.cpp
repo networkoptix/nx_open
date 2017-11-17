@@ -60,6 +60,7 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
@@ -366,6 +367,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     /* Set up overlays */
     initIoModuleOverlay();
     ensureTwoWayAudioWidget();
+    initAreaHighlightOverlay();
 
     /* Set up buttons. */
     createButtons();
@@ -560,6 +562,18 @@ void QnMediaResourceWidget::initIoModuleOverlay()
                 updateIoModuleVisibility(animationAllowed());
             });
     }
+}
+
+void QnMediaResourceWidget::initAreaHighlightOverlay()
+{
+    if (!hasVideo())
+        return;
+
+    m_areaHighlightOverlayWidget = new AreaHighlightOverlayWidget(m_compositeOverlay);
+    addOverlayWidget(m_areaHighlightOverlayWidget, detail::OverlayParams(Visible, true, true));
+
+    connect(m_statusOverlay, &QnStatusOverlayWidget::opacityChanged,
+        this, &QnMediaResourceWidget::updateAreaHighlightVisibility);
 }
 
 void QnMediaResourceWidget::initStatusOverlayController()
@@ -2452,6 +2466,15 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
 
     updateStatusOverlay(animate);
     updateOverlayButton();
+}
+
+void QnMediaResourceWidget::updateAreaHighlightVisibility()
+{
+    if (!m_areaHighlightOverlayWidget)
+        return;
+
+    const auto visibility = (m_statusOverlay->opacity() > 0) ? Invisible : Visible;
+    setOverlayWidgetVisibility(m_areaHighlightOverlayWidget, visibility, false);
 }
 
 void QnMediaResourceWidget::processDiagnosticsRequest()

@@ -39,6 +39,7 @@ namespace desktop {
 class RecordingStatusHelper;
 class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
+class AreaHighlightOverlayWidget;
 
 namespace ui {
 namespace graphics {
@@ -277,6 +278,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
+    Q_SLOT void updateAreaHighlightVisibility();
 
     void updateCompositeOverlayMode();
 
@@ -323,6 +325,7 @@ private:
     void initDisplay();
     void initSoftwareTriggers();
     void initIoModuleOverlay();
+    void initAreaHighlightOverlay();
     void initStatusOverlayController();
 
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
@@ -398,6 +401,8 @@ private:
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 
