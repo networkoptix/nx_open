@@ -17,7 +17,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(Item)> ItemStayTimeoutHandler;
 
     /**
-     * @param timeoutHandler This handler is called from SyncQueueWithItemStayTimeout::pop, 
+     * @param timeoutHandler This handler is called from SyncQueueWithItemStayTimeout::pop,
      * so it MUST NOT block
      */
     void enableItemStayTimeoutEvent(
@@ -60,8 +60,8 @@ public:
             if (!itemContext)
                 return boost::none;
 
-            if (m_itemStayTimeout && 
-                (std::chrono::steady_clock::now() - itemContext->insertionTime 
+            if (m_itemStayTimeout &&
+                (std::chrono::steady_clock::now() - itemContext->insertionTime
                     >= m_itemStayTimeout.get()))
             {
                 m_itemStayTimeoutHandler(std::move(itemContext->data));

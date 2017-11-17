@@ -42,10 +42,10 @@ public:
     std::function<void(Result)> pusher();
 
     /**
-     * While reader is in terminated status, all pop operations with readerId 
+     * While reader is in terminated status, all pop operations with readerId
      * supplied return immediately without value.
-     * WARNING: It is highly recommended to call SyncQueue::removeReaderFromTerminatedList 
-     * after termination has been completed (e.g., reader thread has stopped) to prevent 
+     * WARNING: It is highly recommended to call SyncQueue::removeReaderFromTerminatedList
+     * after termination has been completed (e.g., reader thread has stopped) to prevent
      * "terminated reader list" from holding redundant information.
      */
     void addReaderToTerminatedList(QueueReaderId readerId);
@@ -60,8 +60,7 @@ private:
 };
 
 template<typename R1, typename R2>
-class SyncMultiQueue
-:
+class SyncMultiQueue:
     public SyncQueue<std::pair<R1, R2>>
 {
 public:
