@@ -21,7 +21,7 @@ class QnMediaFileSettingsDialog:
     using base_type = QnButtonBoxDialog;
 
 public:
-    explicit QnMediaFileSettingsDialog(QWidget* parent = nullptr);
+    explicit QnMediaFileSettingsDialog(QWidget* parent);
     virtual ~QnMediaFileSettingsDialog();
 
     void updateFromResource(const QnMediaResourcePtr& resource);

@@ -17,7 +17,7 @@ class QnCameraBookmarkDialog : public QnSessionAwareButtonBoxDialog
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnCameraBookmarkDialog(bool mandatoryDescription, QWidget *parent = 0);
+    explicit QnCameraBookmarkDialog(bool mandatoryDescription, QWidget *parent);
 
     ~QnCameraBookmarkDialog();
 

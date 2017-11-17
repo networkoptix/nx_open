@@ -10,7 +10,7 @@ class QnPtzPresetHotkeyItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
 
 public:
-    QnPtzPresetHotkeyItemDelegate(QObject *parent = NULL);
+    QnPtzPresetHotkeyItemDelegate(QWidget* parent);
     virtual ~QnPtzPresetHotkeyItemDelegate();
 
     virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
