@@ -141,7 +141,9 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
 QnClientSettings::~QnClientSettings() {
 }
 
-QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
+    const QVariant& defaultValue) const
+{
     switch(id)
     {
         case LAST_USED_CONNECTION:
@@ -232,6 +234,13 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
             if (!compatibleValue.isEmpty())
                 return translationPath30ToLocale(compatibleValue);
             return base_type::readValueFromSettings(settings, id, defaultValue);
+        }
+
+        case POPUP_SYSTEM_HEALTH:
+        {
+            quint64 packed = base_type::readValueFromSettings(settings, id, 0xFFFFFFFFFFFFFFFFull)
+                .toULongLong();
+            return QVariant::fromValue(QnSystemHealth::unpackVisibleInSettings(packed));
         }
 
         default:
@@ -325,6 +334,16 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         {
             base_type::writeValueToSettings(settings, id, value);
             settings->setValue(k30TranslationPath, localeTo30TranslationPath(value.toString()));
+            break;
+        }
+
+        case POPUP_SYSTEM_HEALTH:
+        {
+            quint64 packed = base_type::readValueFromSettings(settings, id, 0xFFFFFFFFFFFFFFFFull)
+                .toULongLong();
+            packed = QnSystemHealth::packVisibleInSettings(packed,
+                value.value<QSet<QnSystemHealth::MessageType>>());
+            base_type::writeValueToSettings(settings, id, packed);
             break;
         }
 

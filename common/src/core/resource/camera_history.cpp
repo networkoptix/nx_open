@@ -142,7 +142,7 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
             [this](const vms::event::AbstractActionPtr& businessAction)
             {
                 vms::event::EventType eventType = businessAction->getRuntimeParams().eventType;
-                if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent) 
+                if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
                 {
                     QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - vms::event::systemHealthEvent);
                     if (healthMessage == QnSystemHealth::ArchiveRebuildFinished
@@ -165,7 +165,6 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
                         {
                             cameras = getServerFootageData(eventParams.eventResourceId);
                         }
-                        
 
                         for (const auto &cameraId: cameras)
                             invalidateCameraHistory(cameraId);

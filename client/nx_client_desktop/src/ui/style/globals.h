@@ -112,8 +112,11 @@ public:
     virtual ~QnGlobals();
 
 protected:
-    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual QVariant readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) override;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id,
+        const QVariant& defaultValue) const override;
+
+    virtual QVariant readValueFromJson(const QJsonObject &json, int id,
+        const QVariant& defaultValue) override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
