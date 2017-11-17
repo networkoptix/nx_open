@@ -19,8 +19,7 @@ QnSecurityCamResourceList allCamerasInGroup(const QnSecurityCamResourcePtr& came
         [groupId](const QnVirtualCameraResourcePtr& camRes)
         {
             return camRes->getGroupId() == groupId;
-        }
-        );
+        });
 }
 
 int QnChangeCameraPasswordRestHandler::executePost(
