@@ -781,9 +781,6 @@ void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
             return;
         (*userAttributesLock)->groupName = value;
     }
-    {
-        QnMutexLocker lk(&m_mutex);
-    }
     emit groupNameChanged(::toSharedPointer(this));
 }
 
@@ -1036,9 +1033,17 @@ Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() cons
     return value;
 }
 
-void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    (*userAttributesLock)->secondaryQuality = quality;
+void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality)
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
+        if ((*userAttributesLock)->secondaryQuality == quality)
+            return;
+        (*userAttributesLock)->secondaryQuality = quality;
+    }
+
+    m_cachedHasDualStreaming2.reset();
+    emit secondaryStreamQualityChanged(toSharedPointer());
 }
 
 Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const {

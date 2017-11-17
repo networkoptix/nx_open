@@ -1,6 +1,10 @@
 #pragma once
 
-#include <nx/client/desktop/radass/radass_fwd.h>
+#include <QtCore/QObject>
+
+#include <utils/common/connective.h>
+
+#include "radass_fwd.h"
 
 class QnCamDisplay;
 class QnArchiveStreamReader;
@@ -9,10 +13,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class RadassController: public QObject
+class RadassController: public Connective<QObject>
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
 public:
     explicit RadassController(QObject* parent = nullptr);

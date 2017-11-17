@@ -2,7 +2,7 @@
 
 #include <QtCore>
 
-class QnAviArchiveMetadata;
+struct QnAviArchiveMetadata;
 
 /**
  * @brief The AbstractArchiveIntegrityWatcher class
