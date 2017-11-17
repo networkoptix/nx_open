@@ -286,9 +286,6 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
-            return nx_http::StatusCode::forbidden;
-
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
@@ -325,6 +322,13 @@ namespace nx_hls
         {
             requestParams.insert( std::make_pair( it->first, it->second ) );
         }
+
+        bool isLive =
+            requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME) == requestParams.end();
+        auto requiredPermission = isLive
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
+            return nx_http::StatusCode::forbidden;
 
         if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
         {

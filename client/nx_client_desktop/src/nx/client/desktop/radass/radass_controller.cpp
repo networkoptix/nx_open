@@ -5,8 +5,6 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <nx/client/desktop/radass/radass_types.h>
-
 #include <camera/cam_display.h>
 
 #include <nx/streaming/archive_stream_reader.h>
@@ -15,6 +13,10 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <utils/common/counter_hash.h>
+
+#include "radass_types.h"
+#include "radass_support.h"
 
 namespace {
 
@@ -67,14 +69,23 @@ bool isForcedLqDisplay(QnCamDisplay* display)
     return speed > 1 + kSpeedValueEpsilon || speed < 0;
 }
 
+QnVirtualCameraResourcePtr getCamera(QnCamDisplay* display)
+{
+    if (!display)
+        return QnVirtualCameraResourcePtr();
+
+    const auto reader = display->getArchiveReader();
+    NX_ASSERT(reader);
+    if (!reader)
+        return QnVirtualCameraResourcePtr();
+
+    return reader->getResource().dynamicCast<QnVirtualCameraResource>();
+}
+
 // Omit cameras without dual streaming.
 bool isSupportedDisplay(QnCamDisplay* display)
 {
-    if (!display || !display->getArchiveReader())
-        return false;
-
-    auto cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
-    return cam && cam->hasDualStreaming2();
+    return nx::client::desktop::isRadassSupported(getCamera(display));
 }
 
 bool isSmallItem(QnCamDisplay* display)
@@ -185,6 +196,8 @@ struct RadassController::Private
 
     std::vector<ConsumerInfo> consumers;
     using Consumer = decltype(consumers)::iterator;
+
+    QnCounterHash<QnVirtualCameraResourcePtr> cameras;
 
     Private():
         mutex(QnMutex::Recursive)
@@ -568,6 +581,30 @@ struct RadassController::Private
         }
     }
 
+    void reinitializeConsumersByCamera(const QnVirtualCameraResourcePtr& camera)
+    {
+        for (auto consumer = consumers.begin(); consumer != consumers.end(); ++consumer)
+        {
+            if (getCamera(consumer->display) != camera)
+                continue;
+
+            const bool isSupported = isRadassSupported(camera);
+            const bool wasSupported = (consumer->mode != RadassMode::Custom);
+            if (isSupported == wasSupported)
+                continue;
+
+            if (isSupported)
+            {
+                consumer->mode = RadassMode::Auto;
+                setupNewConsumer(consumer);
+            }
+            else
+            {
+                consumer->mode = RadassMode::Custom;
+            }
+        }
+    }
+
 };
 
 RadassController::RadassController(QObject* parent):
@@ -711,6 +748,32 @@ void RadassController::registerConsumer(QnCamDisplay* display)
         d->setupNewConsumer(consumer);
     }
     d->lastModeChangeTimer.restart();
+
+    // Listen to camera changes to make sure second stream will start working as soon as possible.
+    if (const auto camera = getCamera(display))
+    {
+        if (d->cameras.insert(camera))
+        {
+            auto updateHasDualStreaming =
+                [this, camera] { d->reinitializeConsumersByCamera(camera); };
+
+            connect(camera, &QnResource::propertyChanged, this,
+                [this, updateHasDualStreaming]
+                (const QnResourcePtr& /*resource*/, const QString& propertyName)
+                {
+                    if (propertyName == nx::media::kCameraMediaCapabilityParamName
+                        || propertyName == Qn::HAS_DUAL_STREAMING_PARAM_NAME)
+                    {
+                        updateHasDualStreaming();
+                    }
+                });
+
+            connect(camera, &QnSecurityCamResource::secondaryStreamQualityChanged, this,
+                updateHasDualStreaming);
+        }
+
+    }
+
 }
 
 void RadassController::unregisterConsumer(QnCamDisplay* display)
@@ -724,6 +787,12 @@ void RadassController::unregisterConsumer(QnCamDisplay* display)
     d->consumers.erase(consumer);
     d->addHqTry();
     d->lastModeChangeTimer.restart();
+
+    if (const auto camera = getCamera(display))
+    {
+        if (d->cameras.remove(camera))
+            camera->disconnect(this);
+    }
 }
 
 RadassMode RadassController::mode(QnCamDisplay* display) const

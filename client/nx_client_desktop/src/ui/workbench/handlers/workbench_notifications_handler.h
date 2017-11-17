@@ -77,5 +77,5 @@ private:
 private:
     QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
-    quint64 m_popupSystemHealthFilter;
+    QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
 };

@@ -526,7 +526,7 @@ void QnNavigationItem::updateSyncButtonState()
     m_syncButton->setEnabled(syncAllowed && !syncForced);
 
     m_syncButton->setToolTip(syncForced
-        ? tr("NVR channels cannot be played unsyncronously")
+        ? tr("NVR cameras do not support not-synchronized playback")
         : action(action::ToggleSyncAction)->toolTip());
 }
 

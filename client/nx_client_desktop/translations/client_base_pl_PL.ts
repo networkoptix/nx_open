@@ -1143,11 +1143,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Preset jest używany w niektórych cyklach. Czy na pewno go usunąć?</translation>
+      <translation>Preset jest używany w niektórych trasach. Czy na pewno go usunąć?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation>Te cykle staną się nieprawidłowe.</translation>
+      <translation>Te trasy staną się nieprawidłowe.</translation>
     </message>
   </context>
   <context>
@@ -4632,7 +4632,7 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>Jest to również wymagane do tworzenia/edycji presetów PTZ i cykli.</translation>
+      <translation>Jest to również wymagane do tworzenia/edycji presetów PTZ i tras.</translation>
     </message>
     <message>
       <source>Control video walls</source>
@@ -4716,7 +4716,7 @@ to %1</source>
     </message>
     <message>
       <source>Tours</source>
-      <translation>Cykle</translation>
+      <translation>Trasy</translation>
     </message>
     <message>
       <source>Positions</source>
@@ -4737,8 +4737,8 @@ to %1</source>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>Cykl ma %n identyczną pozycję</numerusform>
-        <numerusform>Cykl ma %n identyczne pozycje</numerusform>
+        <numerusform>Trasa ma %n identyczną pozycję</numerusform>
+        <numerusform>Trasa ma %n identyczne pozycje</numerusform>
         <numerusform>Cykl ma %n identycznych pozycji</numerusform>
       </translation>
     </message>
@@ -4756,11 +4756,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation>Nieprawidłowy cykl</translation>
+      <translation>Nieprawidłowa trasa</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation>Nowy cykl %1</translation>
+      <translation>Nowa trasa %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
@@ -4768,11 +4768,11 @@ to %1</source>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>Cykl powinien zawierać co najmniej 2 pozycje.</translation>
+      <translation>Trasa powinna zawierać co najmniej 2 pozycje.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>Czas cyklu: %1.</translation>
+      <translation>Czas trasy: %1.</translation>
     </message>
   </context>
   <context>
@@ -4802,7 +4802,7 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>Przycisk skrótu używany przez cykl &quot;%1&quot;</translation>
+      <translation>Przycisk skrótu używany przez trasę &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -6417,6 +6417,10 @@ to %1</source>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Zakończono synchronizację zdalnego archiwum dla następującego urządzenia:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -8202,16 +8206,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Usunąć układ cykliczny %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Sekwencja</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Sekwencja %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

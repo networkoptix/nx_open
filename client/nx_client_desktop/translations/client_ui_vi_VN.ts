@@ -1618,8 +1618,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>Chu trình ShowEel</translation>
+      <source>Tour cycle</source>
+      <translation type="unfinished">Tour cycle</translation>
     </message>
   </context>
   <context>

@@ -58,7 +58,7 @@ public:
     virtual QVariant readValueFromSettings(
             QSettings* settings,
             int id,
-            const QVariant& defaultValue) override;
+            const QVariant& defaultValue) const override;
 
     void save();
 

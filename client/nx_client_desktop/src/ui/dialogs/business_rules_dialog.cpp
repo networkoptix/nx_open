@@ -36,6 +36,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx_ec/dummy_handler.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -303,8 +304,12 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->testRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_testRuleButton_clicked);
 
-    connect(ui->eventLogButton, &QPushButton::clicked,
-        context()->action(action::OpenBusinessLogAction), &QAction::trigger);
+    connect(ui->eventLogButton, &QPushButton::clicked, this,
+        [this]
+        {
+            context()->menu()->trigger(action::OpenBusinessLogAction,
+                action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
+        });
 
     connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
         &QnBusinessRulesDialog::updateFilter);

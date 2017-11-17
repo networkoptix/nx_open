@@ -37,7 +37,6 @@ function setLanguage(lang){
     var userLang = getCookie("language");
     if(!userLang) {
         var match = window.location.href.match(/[?&]lang=([^&#]+)/i);
-        console.log(match);
         if(match){
             userLang = match[1];
         }
@@ -45,6 +44,9 @@ function setLanguage(lang){
     if(!userLang){
         userLang = navigator.language || navigator.userLanguage;
         userLang = userLang.replace('-','_');
+        userLang = _.find(Config.supportedLanguages, function(supportedLanguage){
+            return supportedLanguage.indexOf(userLang) == 0;
+        });
     }
     if(!userLang){
         userLang = Config.defaultLanguage;

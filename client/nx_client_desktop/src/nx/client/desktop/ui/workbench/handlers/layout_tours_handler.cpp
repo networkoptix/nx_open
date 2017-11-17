@@ -127,7 +127,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             {
                 QnSessionAwareMessageBox messageBox(mainWindowWidget());
                 messageBox.setIcon(QnMessageBoxIcon::Question);
-                messageBox.setText(tr("Delete layout tour %1?").arg(tour.name));
+                messageBox.setText(tr("Delete Showreel %1?").arg(tour.name));
                 messageBox.setStandardButtons(QDialogButtonBox::Cancel);
                 messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
                     QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);

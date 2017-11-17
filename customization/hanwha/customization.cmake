@@ -22,8 +22,8 @@ set(supportUrl "https://wavevms.com/content/support")
 set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail
-    "<br><a href=\"mailto:WAVElicense@hanwha.com\">support@hanwhasecurity.com</a> (for US customers),<br>
-    <a href=\"mailto:WAVElicense2@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers),<br>"
+    "<br><a href=\"mailto:support@hanwhasecurity.com\">support@hanwhasecurity.com</a> (for US customers),<br>
+    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers),<br>"
 )
 
 set(installer.name "wave")

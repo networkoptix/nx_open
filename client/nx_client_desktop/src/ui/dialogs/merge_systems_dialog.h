@@ -22,7 +22,7 @@ class QnMergeSystemsDialog : public QnButtonBoxDialog, public QnWorkbenchContext
 
     typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnMergeSystemsDialog(QWidget *parent = 0);
+    explicit QnMergeSystemsDialog(QWidget *parent);
     ~QnMergeSystemsDialog();
 
     nx::utils::Url url() const;

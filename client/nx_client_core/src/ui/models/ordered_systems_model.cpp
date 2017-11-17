@@ -146,15 +146,27 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 
 QString QnOrderedSystemsModel::minimalVersion() const
 {
-    if (auto systemsModel = dynamic_cast<QnSystemsModel*>(sourceModel()))
-        return systemsModel->minimalVersion();
+    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
+        return model->systemsModel()->minimalVersion();
+
+    NX_EXPECT(false, "Wrong source model!");
     return QString();
 }
 
 void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
 {
-    if (auto systemsModel = dynamic_cast<QnSystemsModel*>(sourceModel()))
-        systemsModel->setMinimalVersion(minimalVersion);
+    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
+        model->systemsModel()->setMinimalVersion(minimalVersion);
+    else
+        NX_EXPECT(false, "Wrong source model!");
+}
+
+void QnOrderedSystemsModel::forceUpdate()
+{
+    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
+        model->forceUpdate();
+    else
+        NX_EXPECT(false, "Wrong source model!");
 }
 
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
