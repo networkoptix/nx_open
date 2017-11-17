@@ -775,12 +775,24 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
     // Export selection
     if (m_centralItemRequired)
     {
-        const auto resource = parameters.resource();
+        auto resource = parameters.resource();
+
+        const bool hasBookmark = parameters.hasArgument(Qn::CameraBookmarkRole);
+        if (hasBookmark)
+        {
+            const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+            resource = context->resourcePool()->getResourceById(bookmark.cameraId);
+        }
+
         if (!resource.dynamicCast<QnMediaResource>())
             return InvisibleAction;
 
         if (!context->accessController()->hasPermissions(resource, Qn::ExportPermission))
             return DisabledAction;
+
+        // Keeping semantics as is was in 3.0. Possibly should be rethinked.
+        if (hasBookmark)
+            return EnabledAction;
 
         const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
 
