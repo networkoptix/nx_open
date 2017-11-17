@@ -32,6 +32,9 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    Filter filter() const;
+    void setFilter(Filter filter);
+
     void clear();
 
     bool canFetchMore() const;
@@ -49,6 +52,10 @@ private:
     void addOrUpdateBookmark(const QnCameraBookmark& bookmark);
     void addCameraEvent(const nx::vms::event::ActionData& event);
 
+    void reset();
+
+    bool accepted(Filter filter) const;
+
     static QPixmap eventPixmap(const nx::vms::event::EventParameters& event);
     static QColor eventColor(nx::vms::event::EventType eventType);
     static bool eventRequiresPreview(vms::event::EventType type);
@@ -56,6 +63,7 @@ private:
 private:
     UnifiedSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
+    Filter m_filter = Filter::all;
     QScopedPointer<QTimer> m_updateTimer;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     QHash<rest::Handle, QnRaiiGuardPtr> m_eventRequests;

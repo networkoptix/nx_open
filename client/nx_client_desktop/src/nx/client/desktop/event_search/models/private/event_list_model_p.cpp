@@ -91,6 +91,7 @@ void EventListModel::Private::clear()
 
     ScopedReset reset(q);
     m_events.clear();
+    m_sequentialNumberById.clear();
     m_nextFrontNumber = 0;
     m_nextBackNumber = -1;
 }
