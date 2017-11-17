@@ -82,6 +82,16 @@ def rename(request, system_id):
     return api_success(data)
 
 
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def merge(request):
+    require_params(request, ('master_system_id', 'slave_system_id',))
+    data = cloud_api.System.merge(request.session['login'], request.session['password'],
+                                  request.data['master_system_id'], request.data['slave_system_id'])
+    return api_success(data)
+
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions

@@ -187,6 +187,12 @@ angular.module('cloudApp')
                     name: name
                 });
             },
+            merge:function(masterSystemId, slaveSystemId){
+                return $http.post(apiBase + '/systems/merge', {
+                    master_system_id: masterSystemId,
+                    slave_system_id: slaveSystemId
+                });
+            },
             accessRoles: function(systemId){
                 console.error('This method must not be used');
                 return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
