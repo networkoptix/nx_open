@@ -18,6 +18,8 @@ public:
 
     void setMinimalVersion(const QString& minimalVersion);
 
+    virtual void forceUpdate() override;
+
 signals:
     void minimalVersionChanged();
 

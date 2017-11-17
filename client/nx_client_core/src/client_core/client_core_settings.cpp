@@ -94,7 +94,7 @@ void QnClientCoreSettings::writeValueToSettings(
 QVariant QnClientCoreSettings::readValueFromSettings(
     QSettings* settings,
     int id,
-    const QVariant& defaultValue)
+    const QVariant& defaultValue) const
 {
     auto baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
     switch (id)

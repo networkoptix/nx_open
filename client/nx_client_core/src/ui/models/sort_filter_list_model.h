@@ -29,7 +29,7 @@ public:
     using RolesSet = QSet<int>;
     void setTriggeringRoles(const RolesSet& roles);
 
-    void forceUpdate();
+    virtual void forceUpdate();
 
 public: //< Properties
     int sourceRowsCount() const;

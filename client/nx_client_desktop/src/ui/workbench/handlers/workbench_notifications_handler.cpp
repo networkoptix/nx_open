@@ -224,14 +224,9 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     addSystemHealthEvent(message, vms::event::AbstractActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const vms::event::AbstractActionPtr &action)
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message,
+    const vms::event::AbstractActionPtr &action)
 {
-    if (message == QnSystemHealth::StoragesAreFull)
-        return; //Bug #2308: Need to remove notification "Storages are full"
-
-    if (!(qnSettings->popupSystemHealth() & (1ull << message)))
-        return;
-
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
 }
 
@@ -295,13 +290,15 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
+    QnSystemHealth::MessageType message,
     const QVariant& params,
     bool visible)
 {
-    bool canShow = true;
+    // TODO: Need to remove notification "Storage is full".
+    bool canShow = message != QnSystemHealth::StoragesAreFull;
 
-    bool connected = !commonModule()->remoteGUID().isNull();
+    const bool connected = !commonModule()->remoteGUID().isNull();
 
     if (!connected)
     {
@@ -324,8 +321,18 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSyst
     /* Some messages are not to be displayed to users. */
     canShow &= (QnSystemHealth::isMessageVisible(message));
 
+    // TODO: remove this hack in VMS-7724
+    auto filterMessageKey = message;
+    if (message == QnSystemHealth::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::RemoteArchiveSyncProgress
+        || message == QnSystemHealth::RemoteArchiveSyncError)
+    {
+        filterMessageKey = QnSystemHealth::RemoteArchiveSyncStarted;
+    }
+
     /* Checking that we want to see this message */
-    bool isAllowedByFilter = qnSettings->popupSystemHealth() & (1ull << message);
+    const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(filterMessageKey);
+
     canShow &= isAllowedByFilter;
 
     if (visible && canShow)
@@ -481,15 +488,11 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
     if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
         return;
 
-    quint64 filter = qnSettings->popupSystemHealth();
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    auto filter = qnSettings->popupSystemHealth();
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageVisibleInSettings(messageType))
-            continue;
-
-        bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
-        bool newVisible = (filter &  (1ull << i));
+        bool oldVisible = m_popupSystemHealthFilter.contains(messageType);
+        bool newVisible = filter.contains(messageType);
         if (oldVisible == newVisible)
             continue;
 
