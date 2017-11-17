@@ -1,237 +1,237 @@
 {
-  "language_name":"עברית",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"אישור",
-    "cancelButton":"ביטול",
-    "loginTitle":"התחבר אל {{PRODUCT_NAME}}",
-    "loginButton":"התחבר",
-    "logoutAuthorisedTitle":"אתה כבר מחובר",
-    "logoutAuthorisedContinueButton":"המשך",
-    "logoutAuthorisedLogoutButton":"יציאה"
+  "language_name": "עברית",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "אישור",
+    "cancelButton": "ביטול",
+    "loginTitle": "התחבר אל {{PRODUCT_NAME}}",
+    "loginButton": "התחבר",
+    "logoutAuthorisedTitle": "אתה כבר מחובר",
+    "logoutAuthorisedContinueButton": "המשך",
+    "logoutAuthorisedLogoutButton": "יציאה"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"ברוכים הבאים ל",
-    "register":"צור חשבון ב-",
-    "changePassword":"שנה סיסמה -",
-    "account":"הגדרות חשבון -",
-    "systems":"מערכות -",
-    "system":"מערכת -",
-    "systemShare":"שתף מערכת -",
-    "activate":"הפעל חשבון",
-    "activateSent":"הפעל חשבון -",
-    "activateSuccess":"החשבון הופעל -",
-    "activateCode":"הפעל חשבון -",
-    "restorePassword":"איפוס סיסמה",
-    "restorePasswordSuccess":"הסיסמה נשמרה -",
-    "restorePasswordCode":"איפוס סיסמה -",
-    "view":"הצג מצלמות - ",
-    "debug":"איתור באגים",
-    "login":"התחבר -",
-    "download":"הורד את {{VMS_NAME}}",
-    "downloadPlatform":"הורד {{VMS_NAME}} עבור ",
-    "pageNotFound":"דף לא נמצא"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "ברוכים הבאים ל",
+    "register": "צור חשבון ב-",
+    "changePassword": "שנה סיסמא -",
+    "account": "הגדרות חשבון -",
+    "systems": "מערכות -",
+    "system": "מערכת -",
+    "systemShare": "שתף מערכת -",
+    "activate": "הפעל חשבון",
+    "activateSent": "הפעל חשבון -",
+    "activateSuccess": "החשבון הופעל -",
+    "activateCode": "הפעל חשבון -",
+    "restorePassword": "איפוס סיסמא -",
+    "restorePasswordSuccess": "הסיסמא נשמרה -",
+    "restorePasswordCode": "איפוס סיסמא -",
+    "view": "הצג מצלמות - ",
+    "debug": "איתור באגים",
+    "login": "התחבר -",
+    "download": "הורד את {{VMS_NAME}}",
+    "downloadPlatform": "הורד {{VMS_NAME}} עבור ",
+    "pageNotFound": "דף לא נמצא"
   },
-  "systemStatuses":{
-    "notActivated":"לא הופעל",
-    "activated":"הופעל",
-    "online":"מקוון",
-    "offline":"לא מקוון",
-    "unavailable":"לא זמין"
+  "systemStatuses": {
+    "notActivated": "לא הופעל",
+    "activated": "הופעל",
+    "online": "מקוון",
+    "offline": "לא מקוון",
+    "unavailable": "לא זמין"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"כבוי",
-      "description":"המשתמש מושבת ולא מצליח להיכנס למערכת"
+  "accessRoles": {
+    "disabled": {
+      "label": "כבוי",
+      "description": "המשתמש מושבת ואינו יכול להיכנס למערכת"
     },
-    "Owner":{
-      "label":"בעלים",
-      "description":"גישה בלתי מוגבלת כולל היכולת לשתף ולחבר / לנתק את המערכת מהענן"
+    "Owner": {
+      "label": "בעלים",
+      "description": "גישה בלתי מוגבלת כולל היכולת לשתף ולחבר / לנתק את המערכת מהענן"
     },
-    "Viewer":{
-      "label":"צופה",
-      "description":"יכול לצפות בוידאו חי ולעיין בארכיון"
+    "Viewer": {
+      "label": "צופה",
+      "description": "יכול לצפות בוידאו חי ולעיין בארכיון"
     },
-    "Live Viewer":{
-      "label":"צופה בשידור חי",
-      "description":"יכול לצפות רק בוידאו חי"
+    "Live Viewer": {
+      "label": "צופה בשידור חי",
+      "description": "יכול לצפות רק בוידאו חי"
     },
-    "Advanced Viewer":{
-      "label":"תצוגה מתקדמת",
-      "description":"יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
+    "Advanced Viewer": {
+      "label": "צופה מתקדם",
+      "description": "יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
     },
-    "Administrator":{
-      "label":"מנהל",
-      "description":"גישה בלתי מוגבלת כולל את היכולת לשתף"
+    "Administrator": {
+      "label": "מנהל",
+      "description": "גישה בלתי מוגבלת כולל את היכולת לשתף"
     },
-    "Custom":{
-      "label":"התאמה אישית",
-      "description":"השתמש ב {{PRODUCT_NAME}} כדי להגדיר הרשאות מותאמות אישית"
+    "Custom": {
+      "label": "התאמה אישית",
+      "description": "השתמש ב {{PRODUCT_NAME}} כדי להגדיר הרשאות מותאמות אישית"
     },
-    "cloudAdmin":{
-      "label":"מנהל",
-      "description":"יכול להגדיר מערכת ולשתף"
+    "cloudAdmin": {
+      "label": "מנהל",
+      "description": "יכול להגדיר מערכת ולשתף"
     },
-    "customRole":{
-      "label":"תפקיד מותאם אישית",
-      "description":"תפקיד משתמש מותאם אישית שצוין במערכת"
+    "customRole": {
+      "label": "תפקיד מותאם אישית",
+      "description": "תפקיד משתמש מותאם אישית שצוין במערכת"
     },
-    "owner":{
-      "label":"בעלים",
-      "description":"גישה בלתי מוגבלת כולל היכולת לשתף ולחבר / לנתק את המערכת מהענן"
+    "owner": {
+      "label": "בעלים",
+      "description": "גישה בלתי מוגבלת כולל היכולת לשתף ולחבר / לנתק את המערכת מהענן"
     },
-    "viewer":{
-      "label":"צופה",
-      "description":"ניתן להציג וידאו חי ולעיין בארכיון"
+    "viewer": {
+      "label": "צופה",
+      "description": "ניתן להציג וידאו חי ולעיין בארכיון"
     },
-    "liveViewer":{
-      "label":"צופה בוידאו חי",
-      "description":"יכול לצפות רק בוידאו חי"
+    "liveViewer": {
+      "label": "צופה בשידור חי",
+      "description": "יכול לצפות רק בוידאו חי"
     },
-    "advancedViewer":{
-      "label":"צופה מתקדם",
-      "description":"יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
+    "advancedViewer": {
+      "label": "צופה מתקדם",
+      "description": "יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
     },
-    "custom":{
-      "label":"התאמה אישית",
-      "description":"השתמש ב {{PRODUCT_NAME}} כדי להגדיר הרשאות מותאמות אישית"
+    "custom": {
+      "label": "התאמה אישית",
+      "description": "השתמש ב {{PRODUCT_NAME}} כדי להגדיר הרשאות מותאמות אישית"
     }
   },
-  "errorCodes":{
-    "ok":"אישור",
-    "cantSendActivationPrefix":"אין אפשרות לשלוח מייל אישור",
-    "cantDisconnectSystemPrefix":"לא ניתן למחוק את המערכת",
-    "cantUnshareWithMeSystemPrefix":"לא ניתן למחוק את המערכת",
-    "cantSharePrefix":"אין אפשרות לשתף את המערכת",
-    "cantGetUsersListPrefix":"רשימת המשתמשים אינה זמינה",
-    "cantGetSystemsListPrefix":"רשימת המערכת אינה זמינה",
-    "cantRegisterPrefix":"אירעה שגיאה",
-    "cantGetSystemInfoPrefix":"מידע מערכת לא זמין",
-    "cantChangeAccountPrefix":"לא ניתן לשמור שינויים",
-    "cantChangePasswordPrefix":"לא ניתן לשמור סיסמה",
-    "cantActivatePrefix":"לא ניתן להפעיל את החשבון שלך",
-    "cantSendConfirmationPrefix":"אין אפשרות לשלוח מייל אישור",
-    "cloudInvalidResponse":"בסיס הנתונים בענן החזיר תגובה לא צפויה",
-    "notAuthorized":"דוא\"ל או סיסמה שגויים",
-    "wrongParameters":"פרמטרים מסוימים בטופס אינם נכונים",
-    "wrongCode":"החשבון כבר הופעל או שקוד האישור שגוי",
-    "wrongCodeRestore":"קוד האישור כבר בשימוש או שגוי",
-    "forbidden":"אין לך הרשאות לביצוע פעולה זו",
-    "accountNotActivated":"חשבון זה אינו פעיל עדיין. <a href=\"/activate\"> שלח שוב קישור להפעלה </a>",
-    "accountBlocked":"חשבון זה חסום",
-    "notFound":"לא נמצא",
-    "alreadyExists":"חשבון זה כבר קיים",
-    "unknownError":"אירעה שגיאה בלתי צפויה",
-    "accountAlreadyActivated":"חשבון זה כבר פעיל",
-    "emailNotFound":"החשבון לא קיים",
-    "EmailAlreadyExists":"האימייל הזה כבר רשום",
-    "oldPasswordMistmatch":"הסיסמה הנוכחית אינה נכונה",
-    "passwordMismatch":"סיסמה שגויה",
-    "cantEditYourself":"שינוי הרשאות של המשתמש אינו מאופשר",
-    "cantEditAdmin":"למשתמש זה יש הרשאות מנהל",
-    "cantOpenClient":"{{VMS_NAME}} יישום לא אותר. <a href=\"/download\"> הורדה</a>",
-    "lostConnection":"החיבור ל- {{systemName}} אבד",
-    "thisSystem":"המערכת"
+  "errorCodes": {
+    "ok": "אישור",
+    "cantSendActivationPrefix": "אין אפשרות לשלוח מייל אישור",
+    "cantDisconnectSystemPrefix": "לא ניתן למחוק את המערכת",
+    "cantUnshareWithMeSystemPrefix": "לא ניתן למחוק את המערכת",
+    "cantSharePrefix": "אין אפשרות לשתף את המערכת",
+    "cantGetUsersListPrefix": "רשימת המשתמשים אינה זמינה",
+    "cantGetSystemsListPrefix": "רשימת המערכת אינה זמינה",
+    "cantRegisterPrefix": "אירעה שגיאה",
+    "cantGetSystemInfoPrefix": "מידע מערכת לא זמין",
+    "cantChangeAccountPrefix": "לא ניתן לשמור שינויים",
+    "cantChangePasswordPrefix": "לא ניתן לשמור סיסמא",
+    "cantActivatePrefix": "לא ניתן להפעיל את החשבון שלך",
+    "cantSendConfirmationPrefix": "אין אפשרות לשלוח מייל אישור",
+    "cloudInvalidResponse": "בסיס הנתונים בענן החזיר תגובה לא צפויה",
+    "notAuthorized": "דוא\"ל או סיסמא שגויים",
+    "wrongParameters": "פרמטרים מסוימים בטופס אינם נכונים",
+    "wrongCode": "החשבון כבר הופעל או שקוד האישור שגוי",
+    "wrongCodeRestore": "קוד האישור כבר בשימוש או שגוי",
+    "forbidden": "אין לך הרשאות לביצוע פעולה זו",
+    "accountNotActivated": "חשבון זה אינו פעיל עדיין. <a href=\"/activate\"> שלח שוב קישור להפעלה </a>",
+    "accountBlocked": "חשבון זה חסום",
+    "notFound": "לא נמצא",
+    "alreadyExists": "חשבון זה כבר קיים",
+    "unknownError": "אירעה שגיאה בלתי צפויה",
+    "accountAlreadyActivated": "חשבון זה כבר פעיל",
+    "emailNotFound": "החשבון לא קיים",
+    "EmailAlreadyExists": "האימייל הזה כבר רשום",
+    "oldPasswordMistmatch": "הסיסמא הנוכחית אינה נכונה",
+    "passwordMismatch": "סיסמא שגויה",
+    "cantEditYourself": "שינוי הרשאות של המשתמש אינו מאופשר",
+    "cantEditAdmin": "למשתמש זה יש הרשאות מנהל",
+    "cantOpenClient": "{{VMS_NAME}} יישום לא אותר. <a href=\"/download\"> הורדה</a>",
+    "lostConnection": "החיבור ל- {{systemName}} אבד",
+    "thisSystem": "המערכת"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"הסיסמה חייבת להכיל 8 תווים לפחות",
-    "requiredMessage":"השתמש רק באותיות לטיניות, מספרים וסמלים במקלדת, הימנע מרווחים בהתחלה ובסוף",
-    "weakMessage":"השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
-    "strongMessage":"סיסמה חזקה!",
-    "commonMessage":"סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם"
+  "passwordRequirements": {
+    "minLengthMessage": "הסיסמא חייבת להכיל 8 תווים לפחות",
+    "requiredMessage": "השתמש רק באותיות לטיניות, מספרים וסמלים במקלדת, הימנע מרווחים בהתחלה ובסוף",
+    "weakMessage": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמא שלך חזקה יותר",
+    "strongMessage": "סיסמה חזקה!",
+    "commonMessage": "סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם"
   },
-  "sharing":{
-    "confirmOwner":"אם תשנה את 'בעל המערכת', תשלול את הבעלות מהחשבון הנוכחי. פעולה זו היא בלתי הפיכה. האם להמשיך?",
-    "shareTitle":"שתף",
-    "shareConfirmButton":"שתף",
-    "editShareTitle":"ערוך הרשאות",
-    "editShareConfirmButton":"שמור",
-    "permissionsSaved":"הרשאות חדשות נשמרו"
+  "sharing": {
+    "confirmOwner": "אם תשנה את 'בעל המערכת', תשלול את הבעלות מהחשבון הנוכחי. פעולה זו היא בלתי הפיכה. האם להמשיך?",
+    "shareTitle": "שתף",
+    "shareConfirmButton": "שתף",
+    "editShareTitle": "ערוך הרשאות",
+    "editShareConfirmButton": "שמור",
+    "permissionsSaved": "הרשאות חדשות נשמרו"
   },
-  "system":{
-    "yourSystem":"המערכת שלך",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"המערכת אינה זמינה",
-    "offline":"השרת אינו זמין",
-    "openClient":"פתח ב {{VMS_NAME}}",
-    "confirmRenameTitle":"שם מערכת",
-    "confirmRenameAction":"שמור",
-    "successRename":"שם המערכת נשמר",
-    "confirmDisconnectTitle":"נתק את המערכת מ- {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction":"התנתק",
-    "confirmUnshareFromMe":"אתה עומד לנתק את המערכת מהחשבון שלך. לא תוכל עוד לגשת למערכת זו. האם להמשיך?",
-    "confirmUnshareFromMeTitle":"נתק מערכת?",
-    "confirmUnshareFromMeAction":"התנתק",
-    "confirmUnshare":"משתמש זה לא יוכל לגשת למערכת. האם אתה בטוח?",
-    "confirmUnshareTitle":"מחק משתמש?",
-    "confirmUnshareAction":"מחיקה",
-    "successDisconnected":"המערכת מנותקת בהצלחה מ- {{PRODUCT_NAME}}",
-    "successDeleted":"המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
-    "permissionsRemoved":"ההרשאות הוסרו מ- {{email}}"
+  "system": {
+    "yourSystem": "המערכת שלך",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "המערכת אינה זמינה",
+    "offline": "המערכת אינה מקוונת",
+    "openClient": "פתח ב {{VMS_NAME}}",
+    "confirmRenameTitle": "שם מערכת",
+    "confirmRenameAction": "שמור",
+    "successRename": "שם המערכת נשמר",
+    "confirmDisconnectTitle": "נתק את המערכת מ- {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "נתק",
+    "confirmUnshareFromMe": "אתה עומד לנתק את המערכת מהחשבון שלך. לא תוכל עוד לגשת למערכת זו. האם להמשיך?",
+    "confirmUnshareFromMeTitle": "נתק מערכת?",
+    "confirmUnshareFromMeAction": "התנתק",
+    "confirmUnshare": "משתמש זה לא יוכל לגשת למערכת. האם אתה בטוח?",
+    "confirmUnshareTitle": "מחק משתמש?",
+    "confirmUnshareAction": "מחיקה",
+    "successDisconnected": "המערכת מנותקת בהצלחה מ- {{PRODUCT_NAME}}",
+    "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
+    "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
   },
-  "account":{
-    "accountSavedSuccess":"החשבון שלך נשמר בהצלחה",
-    "activationLinkSent":"קישור הפעלה נשלח",
-    "passwordChangedSuccess":"החשבון שלך נשמר בהצלחה",
-    "changePassword":"שנה סיסמה",
-    "newPasswordLabel":"סיסמה חדשה",
-    "saveChanges":"שמור"
+  "account": {
+    "accountSavedSuccess": "החשבון שלך נשמר בהצלחה",
+    "activationLinkSent": "קישור הפעלה נשלח",
+    "passwordChangedSuccess": "החשבון שלך נשמר בהצלחה",
+    "changePassword": "שנה סיסמא",
+    "newPasswordLabel": "סיסמא חדשה",
+    "saveChanges": "שמור"
   },
-  "downloads":{
-    "noClientDetectedTitle":"להתקין {{VMS_NAME}} כדי לצפות במערכת שלך",
-    "action":"הורד את {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "התקן את {{VMS_NAME}} כדי לצפות במערכת שלך",
+    "action": "הורד את {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"לקוח בלבד",
-      "server":"שרת בלבד",
-      "bundle":"לקוח ושרת",
-      "servertool":"כלי תצורה"
+    "appTypes": {
+      "client": "לקוח בלבד",
+      "server": "שרת בלבד",
+      "bundle": "לקוח ושרת",
+      "servertool": "כלי תצורה"
     }
   },
-  "activeActions":{
-    "sendConfirm":"שלח את קישור ההפעלה שוב",
-    "resetPassword":"איפוס סיסמה",
-    "setNewPassword":"שמור סיסמה",
-    "setNewPasswordLabel":"סיסמה חדשה"
+  "activeActions": {
+    "sendConfirm": "שלח את קישור ההפעלה שוב",
+    "resetPassword": "איפוס סיסמא",
+    "setNewPassword": "שמור סיסמה",
+    "setNewPasswordLabel": "סיסמא חדשה"
   },
-  "regActions":{
-    "passwordLabel":"סיסמה",
-    "createAccount":"צור חשבון"
+  "regActions": {
+    "passwordLabel": "סיסמה",
+    "createAccount": "צור חשבון"
   },
-  "header":{
-    "allSystems":"כל המערכות",
-    "systems":"מערכות"
+  "header": {
+    "allSystems": "כל המערכות",
+    "systems": "מערכות"
   }
 }

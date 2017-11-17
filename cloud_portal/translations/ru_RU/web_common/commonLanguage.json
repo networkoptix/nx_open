@@ -1,27 +1,27 @@
 {
-  "cameraLinks":{
-    "highStream":"Выс. кач-во",
-    "lowStream":"Низ. кач-во",
-    "transcoding":"Перекодирование",
-    "unknown":"Неизвестный",
-    "copyToClipboard":"скопировать в буфер обмена",
-    "copyDefaultText":"копировать",
-    "copyActiveText":"скопировано в буфер обмена"
-  },
-  "systemOffline":"Система не в сети",
-  "cameraStates":{
-    "offline":"Не в сети",
-    "error":"Ошибка",
-    "unauthorized":"Требуется аутентификация",
-    "noData":"Нет данных",
-    "iosVideoTooLarge":"iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
-    "flashRequired":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM.",
-    "flashOrWebmRequired":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
-    "noArmSupport":"Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
-    "noFormat":"Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
-    "ieNoWebm":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
-    "ieWin10":"Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
-    "ubuntuNX":"Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
-  },
-  "searchCamPlaceholder":"поиск"
+    "cameraLinks": {
+        "highStream": "Выс. кач-во",
+        "lowStream": "Низ. кач-во",
+        "transcoding": "Перекодирование",
+        "unknown": "Неизвестный",
+        "copyToClipboard": "копировать в буфер",
+        "copyDefaultText": "копировать",
+        "copyActiveText": "скопировано в буфер обмена"
+    },
+    "systemOffline": "Система не в сети",
+    "cameraStates": {
+        "offline": "Не в сети",
+        "error": "Ошибка",
+        "unauthorized": "Требуется аутентификация",
+        "noData": "Нет данных",
+        "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+        "flashRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM.",
+        "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
+        "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+        "noFormat": "Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
+        "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+        "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+        "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
+    },
+    "searchCamPlaceholder": "поиск"
 }

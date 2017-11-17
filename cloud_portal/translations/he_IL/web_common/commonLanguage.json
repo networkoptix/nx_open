@@ -1,27 +1,27 @@
 {
-  "cameraLinks":{
-    "highStream":"תזרים ראשי",
-    "lowStream":"תזרים משני",
-    "transcoding":"המרה",
-    "unknown":"לא ידוע",
-    "copyToClipboard":"העתק ללוח",
-    "copyDefaultText":"העתק",
-    "copyActiveText":"הועתק ללוח"
-  },
-  "systemOffline":"השרת אינו זמין",
-  "cameraStates":{
-    "offline":"לא מקוון",
-    "error":"שגיאה",
-    "unauthorized":"נדרש אימות",
-    "noData":"אין נתונים",
-    "iosVideoTooLarge":"iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
-    "flashRequired":"אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי ARM.",
-    "flashOrWebmRequired":"יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
-    "noArmSupport":"דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
-    "noFormat":"דפדפן או התקן זה אינו תומך בהפעלת וידאו ממצלמה זו.",
-    "ieNoWebm":"התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
-    "ieWin10":"השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
-    "ubuntuNX":"דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת."
-  },
-  "searchCamPlaceholder":"חיפוש"
+    "cameraLinks": {
+        "highStream": "תזרים ראשי",
+        "lowStream": "תזרים משני",
+        "transcoding": "המרה",
+        "unknown": "לא ידוע",
+        "copyToClipboard": "העתק ללוח העריכה",
+        "copyDefaultText": "העתק",
+        "copyActiveText": "הועתק ללוח"
+    },
+    "systemOffline": "השרת אינו זמין",
+    "cameraStates": {
+        "offline": "לא מקוון",
+        "error": "שגיאה",
+        "unauthorized": "נדרש אימות",
+        "noData": "אין נתונים",
+        "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+        "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי ARM.",
+        "flashOrWebmRequired": "יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
+        "noArmSupport": "דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
+        "noFormat": "דפדפן או התקן זה אינו תומך בהפעלת וידאו ממצלמה זו.",
+        "ieNoWebm": "התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+        "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
+        "ubuntuNX": "דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת."
+    },
+    "searchCamPlaceholder": "חיפוש"
 }

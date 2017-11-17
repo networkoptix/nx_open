@@ -1,237 +1,237 @@
 {
-  "language_name":"Polski",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"OK",
-    "cancelButton":"Anuluj",
-    "loginTitle":"Zaloguj się do {{PRODUCT_NAME}}",
-    "loginButton":"Zaloguj",
-    "logoutAuthorisedTitle":"Jesteś już zalogowany",
-    "logoutAuthorisedContinueButton":"Kontynuuj",
-    "logoutAuthorisedLogoutButton":"Wyloguj"
+  "language_name": "Polski",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "OK",
+    "cancelButton": "Anuluj",
+    "loginTitle": "Zaloguj się do {{PRODUCT_NAME}}",
+    "loginButton": "Zaloguj",
+    "logoutAuthorisedTitle": "Jesteś już zalogowany",
+    "logoutAuthorisedContinueButton": "Kontynuuj",
+    "logoutAuthorisedLogoutButton": "Wyloguj"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Witamy w",
-    "register":"Utwórz konto w",
-    "changePassword":"Zmień hasło -",
-    "account":"Ustawienia konta -",
-    "systems":"Systemy -",
-    "system":"System -",
-    "systemShare":"Udostępnij system -",
-    "activate":"Aktywuj konto -",
-    "activateSent":"Aktywuj konto -",
-    "activateSuccess":"Konto aktywne -",
-    "activateCode":"Aktywuj konto -",
-    "restorePassword":"Resetuj hasło -",
-    "restorePasswordSuccess":"Hasło zapisane -",
-    "restorePasswordCode":"Resetuj hasło -",
-    "view":"Podgląd kamer -",
-    "debug":"Debugowanie",
-    "login":"Zaloguj się -",
-    "download":"Pobierz {{VMS_NAME}}",
-    "downloadPlatform":"Pobierz {{VMS_NAME}} dla",
-    "pageNotFound":"Nie znaleziono strony"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Witamy w",
+    "register": "Utwórz konto w",
+    "changePassword": "Zmień hasło -",
+    "account": "Ustawienia konta -",
+    "systems": "Systemy -",
+    "system": "System -",
+    "systemShare": "Udostępnij system -",
+    "activate": "Aktywuj konto -",
+    "activateSent": "Aktywuj konto -",
+    "activateSuccess": "Konto aktywne -",
+    "activateCode": "Aktywuj konto -",
+    "restorePassword": "Resetuj hasło -",
+    "restorePasswordSuccess": "Hasło zapisane -",
+    "restorePasswordCode": "Resetuj hasło -",
+    "view": "Podgląd kamer -",
+    "debug": "Debugowanie",
+    "login": "Zaloguj się -",
+    "download": "Pobierz {{VMS_NAME}}",
+    "downloadPlatform": "Pobierz {{VMS_NAME}} dla",
+    "pageNotFound": "Nie znaleziono strony"
   },
-  "systemStatuses":{
-    "notActivated":"nieaktywny",
-    "activated":"aktywny",
-    "online":"online",
-    "offline":"offline",
-    "unavailable":"niedostępny"
+  "systemStatuses": {
+    "notActivated": "nieaktywny",
+    "activated": "aktywny",
+    "online": "online",
+    "offline": "offline",
+    "unavailable": "niedostępny"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Wyłączone",
-      "description":"Użytkownik jest zablokowany i nie może zalogować się do systemu"
+  "accessRoles": {
+    "disabled": {
+      "label": "Wyłączone",
+      "description": "Użytkownik jest zablokowany i nie może zalogować się do systemu"
     },
-    "Owner":{
-      "label":"Właściciel",
-      "description":"Nieograniczony dostęp, w tym możliwość udostępniania i łączenia systemu z chmurą"
+    "Owner": {
+      "label": "Właściciel",
+      "description": "Nieograniczony dostęp, w tym możliwość udostępniania i łączenia systemu z chmurą"
     },
-    "Viewer":{
-      "label":"Użytkownik",
-      "description":"Podgląd wideo na żywo i przeglądanie archiwum"
+    "Viewer": {
+      "label": "Użytkownik",
+      "description": "Podgląd wideo na żywo i przeglądanie archiwum"
     },
-    "Live Viewer":{
-      "label":"Użytkownik podglądu na żywo",
-      "description":"Tylko podgląd wideo na żywo"
+    "Live Viewer": {
+      "label": "Użytkownik podglądu na żywo",
+      "description": "Tylko podgląd wideo na żywo"
     },
-    "Advanced Viewer":{
-      "label":"Zaawansowany użytkownik",
-      "description":"Podgląd wideo na żywo, przeglądanie archiwum, konfigurowanie kamer, sterowanie PTZ itp."
+    "Advanced Viewer": {
+      "label": "Zaawansowany użytkownik",
+      "description": "Podgląd wideo na żywo, przeglądanie archiwum, konfigurowanie kamer, sterowanie PTZ itp."
     },
-    "Administrator":{
-      "label":"Administrator",
-      "description":"Nieograniczony dostęp, w tym możliwość udostępniania"
+    "Administrator": {
+      "label": "Administrator",
+      "description": "Nieograniczony dostęp, w tym możliwość udostępniania"
     },
-    "Custom":{
-      "label":"Niestandardowa",
-      "description":"Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe"
+    "Custom": {
+      "label": "Niestandardowa",
+      "description": "Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe"
     },
-    "cloudAdmin":{
-      "label":"Administrator",
-      "description":"Konfiguracja i udostępnianie systemu"
+    "cloudAdmin": {
+      "label": "Administrator",
+      "description": "Konfiguracja i udostępnianie systemu"
     },
-    "customRole":{
-      "label":"Grupa niestandardowa",
-      "description":"Niestandardowa grupa określona w systemie"
+    "customRole": {
+      "label": "Grupa niestandardowa",
+      "description": "Niestandardowa grupa określona w systemie"
     },
-    "owner":{
-      "label":"Właściciel",
-      "description":"Nieograniczony dostęp, w tym możliwość udostępniania i łączenia systemu z chmurą"
+    "owner": {
+      "label": "Właściciel",
+      "description": "Nieograniczony dostęp, w tym możliwość udostępniania i łączenia systemu z chmurą"
     },
-    "viewer":{
-      "label":"Użytkownik",
-      "description":"Podgląd wideo na żywo i przeglądanie archiwum"
+    "viewer": {
+      "label": "Użytkownik",
+      "description": "Podgląd wideo na żywo i przeglądanie archiwum"
     },
-    "liveViewer":{
-      "label":"Użytkownik podglądu na żywo",
-      "description":"Tylko podgląd wideo na żywo"
+    "liveViewer": {
+      "label": "Użytkownik podglądu na żywo",
+      "description": "Tylko podgląd wideo na żywo"
     },
-    "advancedViewer":{
-      "label":"Zaawansowany użytkownik",
-      "description":"Podgląd wideo na żywo, przeglądanie archiwum, konfigurowanie kamer, sterowanie PTZ itp."
+    "advancedViewer": {
+      "label": "Zaawansowany użytkownik",
+      "description": "Podgląd wideo na żywo, przeglądanie archiwum, konfigurowanie kamer, sterowanie PTZ itp."
     },
-    "custom":{
-      "label":"Niestandardowa",
-      "description":"Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe"
+    "custom": {
+      "label": "Niestandardowa",
+      "description": "Użyj aplikacji klienckiej {{PRODUCT_NAME}}, aby skonfigurować uprawnienia niestandardowe"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Nie można wysłać e-maila z potwierdzeniem",
-    "cantDisconnectSystemPrefix":"Nie można usunąć systemu",
-    "cantUnshareWithMeSystemPrefix":"Nie można usunąć systemu",
-    "cantSharePrefix":"Nie można udostępnić systemu",
-    "cantGetUsersListPrefix":"Lista użytkowników jest niedostępna",
-    "cantGetSystemsListPrefix":"Lista systemów jest niedostępna",
-    "cantRegisterPrefix":"Wystąpił błąd",
-    "cantGetSystemInfoPrefix":"Informacje o systemie są niedostępne",
-    "cantChangeAccountPrefix":"Nie można zapisać zmian",
-    "cantChangePasswordPrefix":"Nie można zapisać hasła",
-    "cantActivatePrefix":"Nie można aktywować konta",
-    "cantSendConfirmationPrefix":"Nie można wysłać e-maila z potwierdzeniem",
-    "cloudInvalidResponse":"Baza danych chmury zwróciła nieoczekiwaną odpowiedź",
-    "notAuthorized":"Nieprawidłowy e-mail lub hasło",
-    "wrongParameters":"Niektóre parametry na formularzu są niepoprawne",
-    "wrongCode":"Konto jest już aktywne lub kod potwierdzenia jest nieprawidłowy",
-    "wrongCodeRestore":"Kod potwierdzenia został już użyty lub jest nieprawidłowy",
-    "forbidden":"Nie masz uprawnień do wykonania tej operacji",
-    "accountNotActivated":"To konto nie jest jeszcze aktywne. <a href=\"/activate\">Wyślij ponownie link aktywacyjny</a>",
-    "accountBlocked":"To konto jest zablokowane",
-    "notFound":"Nie znaleziono",
-    "alreadyExists":"To konto już istnieje",
-    "unknownError":"Wystąpił nieoczekiwany błąd",
-    "accountAlreadyActivated":"To konto jest już aktywne",
-    "emailNotFound":"Konto nie istnieje",
-    "EmailAlreadyExists":"Ten e-mail jest już zarejestrowany",
-    "oldPasswordMistmatch":"Bieżące hasło jest nieprawidłowe",
-    "passwordMismatch":"Nieprawidłowe hasło",
-    "cantEditYourself":"Zmiana własnych uprawnień nie jest dozwolona",
-    "cantEditAdmin":"Ten użytkownik ma uprawnienia administratora",
-    "cantOpenClient":"Nie wykryto aplikacji {{VMS_NAME}}. <a href=\"/download\">Pobierz</a>",
-    "lostConnection":"Utracono połączenie z {{systemName}}",
-    "thisSystem":"system"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Nie można wysłać e-maila z potwierdzeniem",
+    "cantDisconnectSystemPrefix": "Nie można usunąć systemu",
+    "cantUnshareWithMeSystemPrefix": "Nie można usunąć systemu",
+    "cantSharePrefix": "Nie można udostępnić systemu",
+    "cantGetUsersListPrefix": "Lista użytkowników jest niedostępna",
+    "cantGetSystemsListPrefix": "Lista systemów jest niedostępna",
+    "cantRegisterPrefix": "Wystąpił błąd",
+    "cantGetSystemInfoPrefix": "Informacje o systemie są niedostępne",
+    "cantChangeAccountPrefix": "Nie można zapisać zmian",
+    "cantChangePasswordPrefix": "Nie można zapisać hasła",
+    "cantActivatePrefix": "Nie można aktywować konta",
+    "cantSendConfirmationPrefix": "Nie można wysłać e-maila z potwierdzeniem",
+    "cloudInvalidResponse": "Baza danych chmury zwróciła nieoczekiwaną odpowiedź",
+    "notAuthorized": "Nieprawidłowy e-mail lub hasło",
+    "wrongParameters": "Niektóre parametry na formularzu są niepoprawne",
+    "wrongCode": "Konto jest już aktywne lub kod potwierdzenia jest nieprawidłowy",
+    "wrongCodeRestore": "Kod potwierdzenia został już użyty lub jest nieprawidłowy",
+    "forbidden": "Nie masz uprawnień do wykonania tej operacji",
+    "accountNotActivated": "To konto nie jest jeszcze aktywne. <a href=\"/activate\">Wyślij ponownie link aktywacyjny</a>",
+    "accountBlocked": "To konto jest zablokowane",
+    "notFound": "Nie znaleziono",
+    "alreadyExists": "To konto już istnieje",
+    "unknownError": "Wystąpił nieoczekiwany błąd",
+    "accountAlreadyActivated": "To konto jest już aktywne",
+    "emailNotFound": "Konto nie istnieje",
+    "EmailAlreadyExists": "Ten e-mail jest już zarejestrowany",
+    "oldPasswordMistmatch": "Bieżące hasło jest nieprawidłowe",
+    "passwordMismatch": "Nieprawidłowe hasło",
+    "cantEditYourself": "Zmiana własnych uprawnień nie jest dozwolona",
+    "cantEditAdmin": "Ten użytkownik ma uprawnienia administratora",
+    "cantOpenClient": "Nie wykryto aplikacji {{VMS_NAME}}. <a href=\"/download\">Pobierz</a>",
+    "lostConnection": "Utracono połączenie z {{systemName}}",
+    "thisSystem": "system"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"Hasło musi zawierać co najmniej 8 znaków",
-    "requiredMessage":"Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
-    "weakMessage":"Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
-    "strongMessage":"Bezpieczne hasło!",
-    "commonMessage":"To hasło znajduje się na liście najczęściej stosowanych haseł na świecie"
+  "passwordRequirements": {
+    "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",
+    "requiredMessage": "Używaj tylko liter łacińskich, cyfr i symboli z klawiatury, unikając spacji na początku i na końcu",
+    "weakMessage": "Użyj liczb, wielkich i małych liter oraz znaków specjalnych, aby ustawić bezpieczniejsze hasło",
+    "strongMessage": "Bezpieczne hasło!",
+    "commonMessage": "To hasło znajduje się na liście najczęściej stosowanych haseł na świecie"
   },
-  "sharing":{
-    "confirmOwner":"Jeśli zmienisz właściciela systemu, odbierzesz mu kontrolę nad bieżącym kontem. Ta operacja jest nieodwracalna. Czy na pewno kontynuować?",
-    "shareTitle":"Udostępnij",
-    "shareConfirmButton":"Udostępnij",
-    "editShareTitle":"Edytuj uprawnienia",
-    "editShareConfirmButton":"Zachowaj",
-    "permissionsSaved":"Zapisano nowe uprawnienia"
+  "sharing": {
+    "confirmOwner": "Jeśli zmienisz właściciela systemu, odbierzesz mu kontrolę nad bieżącym kontem. Ta operacja jest nieodwracalna. Czy na pewno kontynuować?",
+    "shareTitle": "Udostępnij",
+    "shareConfirmButton": "Udostępnij",
+    "editShareTitle": "Edytuj uprawnienia",
+    "editShareConfirmButton": "Zachowaj",
+    "permissionsSaved": "Zapisano nowe uprawnienia"
   },
-  "system":{
-    "yourSystem":"Twój system",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"System jest niedostępny",
-    "offline":"Serwer jest odłączony",
-    "openClient":"Otwórz w {{VMS_NAME}}",
-    "confirmRenameTitle":"Nazwa systemu",
-    "confirmRenameAction":"Zachowaj",
-    "successRename":"Zapisana nazwa systemu",
-    "confirmDisconnectTitle":"Odłączyć system od {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction":"Rozłącz",
-    "confirmUnshareFromMe":"Zamierzasz odłączyć ten system od swojego konta. Nie będziesz już mieć dostępu do tego systemu. Czy na pewno kontynuować?",
-    "confirmUnshareFromMeTitle":"Odłączyć system?",
-    "confirmUnshareFromMeAction":"Rozłącz",
-    "confirmUnshare":"Ten użytkownik nie będzie mógł uzyskać dostępu do systemu. Czy na pewno kontynuować?",
-    "confirmUnshareTitle":"Usunąć użytkownika?",
-    "confirmUnshareAction":"Usuń",
-    "successDisconnected":"System został pomyślnie odłączony od {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} został pomyślnie usunięty z Twojego konta",
-    "permissionsRemoved":"Uprawnienia zostały usunięte z {{email}}"
+  "system": {
+    "yourSystem": "Twój system",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "System jest niedostępny",
+    "offline": "Serwer jest odłączony",
+    "openClient": "Otwórz w {{VMS_NAME}}",
+    "confirmRenameTitle": "Nazwa systemu",
+    "confirmRenameAction": "Zachowaj",
+    "successRename": "Zapisana nazwa systemu",
+    "confirmDisconnectTitle": "Odłączyć system od {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "Rozłącz",
+    "confirmUnshareFromMe": "Zamierzasz odłączyć ten system od swojego konta. Nie będziesz już mieć dostępu do tego systemu. Czy na pewno kontynuować?",
+    "confirmUnshareFromMeTitle": "Odłączyć system?",
+    "confirmUnshareFromMeAction": "Rozłącz",
+    "confirmUnshare": "Ten użytkownik nie będzie mógł uzyskać dostępu do systemu. Czy na pewno kontynuować?",
+    "confirmUnshareTitle": "Usunąć użytkownika?",
+    "confirmUnshareAction": "Usuń",
+    "successDisconnected": "System został pomyślnie odłączony od {{PRODUCT_NAME}}",
+    "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
+    "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}"
   },
-  "account":{
-    "accountSavedSuccess":"Twoje konto zostało pomyślnie zapisane",
-    "activationLinkSent":"Wysłano link aktywacyjny",
-    "passwordChangedSuccess":"Twoje konto zostało pomyślnie zapisane",
-    "changePassword":"Zmień hasło",
-    "newPasswordLabel":"Nowe hasło",
-    "saveChanges":"Zachowaj"
+  "account": {
+    "accountSavedSuccess": "Twoje konto zostało pomyślnie zapisane",
+    "activationLinkSent": "Wysłano link aktywacyjny",
+    "passwordChangedSuccess": "Twoje konto zostało pomyślnie zapisane",
+    "changePassword": "Zmień hasło",
+    "newPasswordLabel": "Nowe hasło",
+    "saveChanges": "Zachowaj"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Zainstaluj {{VMS_NAME}}, aby przejrzeć swój system",
-    "action":"Pobierz {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Zainstaluj {{VMS_NAME}}, aby przejrzeć swój system",
+    "action": "Pobierz {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Tylko klient",
-      "server":"Tylko serwer",
-      "bundle":"Klient i serwer",
-      "servertool":"Narzędzie konfiguracji"
+    "appTypes": {
+      "client": "Tylko klient",
+      "server": "Tylko serwer",
+      "bundle": "Klient i serwer",
+      "servertool": "Narzędzie konfiguracji"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Wyślij ponownie link aktywacyjny",
-    "resetPassword":"Resetuj hasło",
-    "setNewPassword":"Zapisz hasło",
-    "setNewPasswordLabel":"Nowe hasło"
+  "activeActions": {
+    "sendConfirm": "Wyślij ponownie link aktywacyjny",
+    "resetPassword": "Resetuj hasło",
+    "setNewPassword": "Zapisz hasło",
+    "setNewPasswordLabel": "Nowe hasło"
   },
-  "regActions":{
-    "passwordLabel":"Hasło",
-    "createAccount":"Utwórz konto"
+  "regActions": {
+    "passwordLabel": "Hasło",
+    "createAccount": "Utwórz konto"
   },
-  "header":{
-    "allSystems":"Wszystkie systemy",
-    "systems":"Systemy"
+  "header": {
+    "allSystems": "Wszystkie systemy",
+    "systems": "Systemy"
   }
 }

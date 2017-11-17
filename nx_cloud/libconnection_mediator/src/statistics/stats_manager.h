@@ -15,12 +15,12 @@ class StatsManager
 public:
     StatsManager(const conf::Settings& settings);
 
-    Collector& collector();
-    const Collector& collector() const;
+    AbstractCollector& collector();
+    const AbstractCollector& collector() const;
 
 private:
-    dao::rdb::InstanceController m_instanceController;
-    std::unique_ptr<Collector> m_collector;
+    std::unique_ptr<dao::rdb::InstanceController> m_instanceController;
+    std::unique_ptr<AbstractCollector> m_collector;
 };
 
 } // namespace stats
