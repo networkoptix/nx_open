@@ -77,6 +77,11 @@ QRectF PainterTransformScaleStripper::mapRect(const QRectF& rect) const
     return m_alignable ? mapped.toAlignedRect() : mapped;
 }
 
+QPointF PainterTransformScaleStripper::mapPoint(const QPointF& point) const
+{
+    return m_transform.map(point);
+}
+
 const QTransform& PainterTransformScaleStripper::transform() const
 {
     return m_transform;
