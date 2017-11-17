@@ -43,6 +43,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
+#include <nx/client/desktop/utils/parameter_helper.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -290,10 +291,11 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindow());
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete %n bookmarks?", "", bookmarks.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        parent);
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 

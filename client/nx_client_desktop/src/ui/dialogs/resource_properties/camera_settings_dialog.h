@@ -20,7 +20,7 @@ class QnCameraSettingsDialog: public QnSessionAwareButtonBoxDialog {
 
     typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    QnCameraSettingsDialog(QWidget *parent = NULL);
+    QnCameraSettingsDialog(QWidget *parent);
     virtual ~QnCameraSettingsDialog();
 
     virtual bool tryClose(bool force) override;

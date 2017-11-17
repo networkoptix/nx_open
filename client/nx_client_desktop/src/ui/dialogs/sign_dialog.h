@@ -30,7 +30,7 @@ class SignDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit SignDialog(QnResourcePtr resource, QWidget *parent = 0);
+    explicit SignDialog(QnResourcePtr resource, QWidget *parent);
     virtual ~SignDialog();
 
     static QRect calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight);

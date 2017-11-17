@@ -22,7 +22,7 @@ class QnConnectionTestingDialog : public QnButtonBoxDialog {
     Q_OBJECT
 
 public:
-    explicit QnConnectionTestingDialog(QWidget *parent = NULL);
+    explicit QnConnectionTestingDialog(QWidget *parent);
     virtual ~QnConnectionTestingDialog();
 
     void testConnection(const QUrl &url);
