@@ -33,8 +33,8 @@ enum MessageType
     RemoteArchiveSyncFinished = 14,
     RemoteArchiveSyncProgress = 15,
     RemoteArchiveSyncError = 16,
-	
-	ArchiveIntegrityFailed = 17,
+
+    ArchiveIntegrityFailed = 17,
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
