@@ -1742,12 +1742,12 @@
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation>Utwórz cykl</translation>
+      <translation>Utwórz trasę</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Rozpocznij cykl</translation>
+      <translation>Rozpocznij trasę</translation>
     </message>
     <message>
       <location/>
@@ -1762,7 +1762,7 @@
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation>Nie wybrano cyklu</translation>
+      <translation>Nie wybrano trasy</translation>
     </message>
     <message>
       <location/>
