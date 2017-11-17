@@ -2,7 +2,6 @@
 
 
 function NativePlayer(){
-    'use strict';
 
     // requestAnimationFrame polyfill
     this.init = function(element,readyHandler) {
@@ -13,15 +12,18 @@ function NativePlayer(){
 }
 
 NativePlayer.prototype.play = function(){
-    if(this.video){
-        this.video.play().then().catch(function(){});
-    }
+    this.video.play().catch(function(error){
+        var errorString = error.toString();
+        //error.name is for Safari which returns an actual object. The errorString is used for chrome
+        if(error.name != 'AbortError' && errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0){
+            console.log(errorString);
+            throw error;
+        }
+    });
 };
 
 NativePlayer.prototype.pause = function(){
-    if(this.video){
-        return this.video.pause();
-    }
+    this.video.pause();
 };
 
 NativePlayer.prototype.addEventListener = function(event,handler){

@@ -18,7 +18,7 @@
         <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
             <li class="vertical-bar margin-right"></li>
             <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Instellingen</a></li>
-            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">Weergave</a></li>
+            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">Toon</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
@@ -57,10 +57,10 @@
 
                     <li><a href="/account/">Accountinstellingen</a></li>
                     <li><a href="/account/password/">Wijzig wachtwoord</a></li>
-                    <li><a href="" ng-click="logout()">Log uit</a></li>
+                    <li><a href="" ng-click="logout()">Uitloggen</a></li>
 
                     <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
-                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>
+                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portaal management</a></li>
                 </ul>
             </li>
             <li class="vertical-bar"></li>

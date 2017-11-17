@@ -1,237 +1,237 @@
 {
-  "language_name":"Türk",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Tamam",
-    "cancelButton":"İptal",
-    "loginTitle":"{{PRODUCT_NAME}}'e giriş yapın",
-    "loginButton":"Giriş yap",
-    "logoutAuthorisedTitle":"Zaten giriş yapılmış",
-    "logoutAuthorisedContinueButton":"Devam et",
-    "logoutAuthorisedLogoutButton":"Oturumu Kapat"
+  "language_name": "Türk",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Tamam",
+    "cancelButton": "İptal",
+    "loginTitle": "{{PRODUCT_NAME}}'e giriş yapın",
+    "loginButton": "Giriş yap",
+    "logoutAuthorisedTitle": "Zaten giriş yapılmış",
+    "logoutAuthorisedContinueButton": "Devam et",
+    "logoutAuthorisedLogoutButton": "Oturumu Kapat"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Hoş geldiniz",
-    "register":"Hesap Oluştur",
-    "changePassword":"Parola değiştir -",
-    "account":"Hesap ayarları -",
-    "systems":"Sistemler -",
-    "system":"Sistem -",
-    "systemShare":"Sistemi Paylaş -",
-    "activate":"Hesabı aktif et -",
-    "activateSent":"Hesabı aktif et -",
-    "activateSuccess":"Hesap aktif edildi -",
-    "activateCode":"Hesabı aktif et -",
-    "restorePassword":"Parolayı sıfırla -",
-    "restorePasswordSuccess":"Parola kaydedildi -",
-    "restorePasswordCode":"Parolayı sıfırla -",
-    "view":"Kameraları görüntüle - ",
-    "debug":"Hata ayıklama",
-    "login":"Giriş yap -",
-    "download":"İndir {{VMS_NAME}}",
-    "downloadPlatform":"İndir {{VMS_NAME}} ",
-    "pageNotFound":"Sayfa bulunamadı"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Hoş geldiniz",
+    "register": "Hesap Oluştur",
+    "changePassword": "Parola değiştir -",
+    "account": "Hesap ayarları -",
+    "systems": "Sistemler -",
+    "system": "Sistem -",
+    "systemShare": "Sistemi Paylaş -",
+    "activate": "Hesabı aktif et -",
+    "activateSent": "Hesabı aktif et -",
+    "activateSuccess": "Hesap aktif edildi -",
+    "activateCode": "Hesabı aktif et -",
+    "restorePassword": "Parolayı sıfırla -",
+    "restorePasswordSuccess": "Parola kaydedildi -",
+    "restorePasswordCode": "Parolayı sıfırla -",
+    "view": "Kameraları görüntüle - ",
+    "debug": "Hata ayıklama",
+    "login": "Giriş yap -",
+    "download": "İndir {{VMS_NAME}}",
+    "downloadPlatform": "İndir {{VMS_NAME}} ",
+    "pageNotFound": "Sayfa bulunamadı"
   },
-  "systemStatuses":{
-    "notActivated":"aktif edilmemiş",
-    "activated":"aktif edildi",
-    "online":"çevrimiçi",
-    "offline":"çevrimdışı",
-    "unavailable":"kullanılamaz"
+  "systemStatuses": {
+    "notActivated": "aktif edilmemiş",
+    "activated": "aktif edildi",
+    "online": "çevrimiçi",
+    "offline": "çevrimdışı",
+    "unavailable": "kullanılamaz"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Devre Dışı Bırak",
-      "description":"Kullanıcı devre dışı bırakılmış, sisteme giriş yapamaz"
+  "accessRoles": {
+    "disabled": {
+      "label": "Devre Dışı Bırak",
+      "description": "Kullanıcı devre dışı bırakılmış, sisteme giriş yapamaz"
     },
-    "Owner":{
-      "label":"Sahip",
-      "description":"Sistem'i buluttan paylaşma / bağlanma ve bağlantıyı kesme gibi sınırsız erişim"
+    "Owner": {
+      "label": "Sahip",
+      "description": "Sistem'i buluttan paylaşma / bağlanma ve bağlantıyı kesme gibi sınırsız erişim"
     },
-    "Viewer":{
-      "label":"İzleyici",
-      "description":"Canlı video görüntüleyebilir ve arşive gözatabilir"
+    "Viewer": {
+      "label": "İzleyici",
+      "description": "Canlı video görüntüleyebilir ve arşive gözatabilir"
     },
-    "Live Viewer":{
-      "label":"Canlı İzleyici",
-      "description":"Sadece canlı vidyo izleyebilir"
+    "Live Viewer": {
+      "label": "Canlı İzleyici",
+      "description": "Sadece canlı vidyo izleyebilir"
     },
-    "Advanced Viewer":{
-      "label":"Gelişmiş Görüntüleyici",
-      "description":"Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
+    "Advanced Viewer": {
+      "label": "Gelişmiş Görüntüleyici",
+      "description": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
     },
-    "Administrator":{
-      "label":"Yönetici",
-      "description":"Sınırsız erişim, paylaşma imkanı dahil"
+    "Administrator": {
+      "label": "Yönetici",
+      "description": "Sınırsız erişim, paylaşma imkanı dahil"
     },
-    "Custom":{
-      "label":"Özel Ayarlar",
-      "description":"Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
+    "Custom": {
+      "label": "Özel Ayarlar",
+      "description": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
     },
-    "cloudAdmin":{
-      "label":"Yönetici",
-      "description":"Sistemi yapılandırabilir ve paylaşabilir"
+    "cloudAdmin": {
+      "label": "Yönetici",
+      "description": "Sistemi yapılandırabilir ve paylaşabilir"
     },
-    "customRole":{
-      "label":"Özel rol",
-      "description":"Sisteminde belirtilen özel kullanıcı rolü"
+    "customRole": {
+      "label": "Özel rol",
+      "description": "Sisteminde belirtilen özel kullanıcı rolü"
     },
-    "owner":{
-      "label":"Sahip",
-      "description":"Sistem'i buluttan paylaşma / bağlanma ve bağlantıyı kesme gibi sınırsız erişim"
+    "owner": {
+      "label": "Sahip",
+      "description": "Sistem'i buluttan paylaşma / bağlanma ve bağlantıyı kesme gibi sınırsız erişim"
     },
-    "viewer":{
-      "label":"İzleyici",
-      "description":"Canlı video görüntüleyebilir ve arşive gözatabilir"
+    "viewer": {
+      "label": "İzleyici",
+      "description": "Canlı video görüntüleyebilir ve arşive gözatabilir"
     },
-    "liveViewer":{
-      "label":"Canlı İzleme",
-      "description":"Sadece canlı vidyo izleyebilir"
+    "liveViewer": {
+      "label": "Canlı İzleme",
+      "description": "Sadece canlı vidyo izleyebilir"
     },
-    "advancedViewer":{
-      "label":"Gelişmiş Görüntüleyici",
-      "description":"Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
+    "advancedViewer": {
+      "label": "Gelişmiş Görüntüleyici",
+      "description": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
     },
-    "custom":{
-      "label":"Özel Ayarlar",
-      "description":"Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
+    "custom": {
+      "label": "Özel Ayarlar",
+      "description": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
     }
   },
-  "errorCodes":{
-    "ok":"tamam",
-    "cantSendActivationPrefix":"Onay e-posta gönderemezsiniz",
-    "cantDisconnectSystemPrefix":"Sistem silinemiyor",
-    "cantUnshareWithMeSystemPrefix":"Sistem silinemiyor",
-    "cantSharePrefix":"Sistem paylaşılamıyor",
-    "cantGetUsersListPrefix":"Kullanıcı listesi kullanılamıyor",
-    "cantGetSystemsListPrefix":"Kullanıcı listesi kullanılamıyor",
-    "cantRegisterPrefix":"Hata oluştu",
-    "cantGetSystemInfoPrefix":"Kullanıcı listesi kullanılamıyor",
-    "cantChangeAccountPrefix":"Değişiklikler kaydedilemiyor",
-    "cantChangePasswordPrefix":"Parola kaydedilemiyor",
-    "cantActivatePrefix":"Hesabınız etkinleştirilemedi",
-    "cantSendConfirmationPrefix":"Onay e-posta gönderemezsiniz",
-    "cloudInvalidResponse":"Cloud DB, beklenmedik bir yanıt verdi",
-    "notAuthorized":"Hatalı e-posta veya parola",
-    "wrongParameters":"Formdaki bazı parametreler yanlış",
-    "wrongCode":"Hesap zaten etkinleştirildi veya onay kodu yanlış",
-    "wrongCodeRestore":"Onay kodu zaten kullanılmış veya yanlış",
-    "forbidden":"Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
-    "accountNotActivated":"Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
-    "accountBlocked":"Hesap kilitlenmiş",
-    "notFound":"Bulunamadı",
-    "alreadyExists":"Bu hesap zaten mevcut",
-    "unknownError":"Beklenmedik bir hata oluştu",
-    "accountAlreadyActivated":"Bu hesap zaten etkinleştirildi",
-    "emailNotFound":"Hesap mevcut değil",
-    "EmailAlreadyExists":"Bu e-posta adresi zaten kayıtlı",
-    "oldPasswordMistmatch":"Parola hatalı",
-    "passwordMismatch":"Hatalı parola",
-    "cantEditYourself":"Kendi izinlerini değiştirmeye izin verilmiyor",
-    "cantEditAdmin":"Bu kullanıcının yönetici izinleri var",
-    "cantOpenClient":"{{VMS_NAME}} uygulama algılanmadı. <a href=\"/download\">İndir</a>",
-    "lostConnection":"{{systemName}} ile bağlantı kayboldu",
-    "thisSystem":"sistem"
+  "errorCodes": {
+    "ok": "tamam",
+    "cantSendActivationPrefix": "Onay e-posta gönderemezsiniz",
+    "cantDisconnectSystemPrefix": "Sistem silinemiyor",
+    "cantUnshareWithMeSystemPrefix": "Sistem silinemiyor",
+    "cantSharePrefix": "Sistem paylaşılamıyor",
+    "cantGetUsersListPrefix": "Kullanıcı listesi kullanılamıyor",
+    "cantGetSystemsListPrefix": "Kullanıcı listesi kullanılamıyor",
+    "cantRegisterPrefix": "Hata oluştu",
+    "cantGetSystemInfoPrefix": "Kullanıcı listesi kullanılamıyor",
+    "cantChangeAccountPrefix": "Değişiklikler kaydedilemiyor",
+    "cantChangePasswordPrefix": "Parola kaydedilemiyor",
+    "cantActivatePrefix": "Hesabınız etkinleştirilemedi",
+    "cantSendConfirmationPrefix": "Onay e-posta gönderemezsiniz",
+    "cloudInvalidResponse": "Cloud DB, beklenmedik bir yanıt verdi",
+    "notAuthorized": "Hatalı e-posta veya parola",
+    "wrongParameters": "Formdaki bazı parametreler yanlış",
+    "wrongCode": "Hesap zaten etkinleştirildi veya onay kodu yanlış",
+    "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
+    "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
+    "accountNotActivated": "Bu hesap henüz etkinleştirilmedi. <a href=\"/activate\">Yalnızca etkinleştirme bağlantısını gönder</a>",
+    "accountBlocked": "Hesap kilitlenmiş",
+    "notFound": "Bulunamadı",
+    "alreadyExists": "Bu hesap zaten mevcut",
+    "unknownError": "Beklenmedik bir hata oluştu",
+    "accountAlreadyActivated": "Bu hesap zaten etkinleştirildi",
+    "emailNotFound": "Hesap mevcut değil",
+    "EmailAlreadyExists": "Bu e-posta adresi zaten kayıtlı",
+    "oldPasswordMistmatch": "Parola hatalı",
+    "passwordMismatch": "Hatalı parola",
+    "cantEditYourself": "Kendi izinlerini değiştirmeye izin verilmiyor",
+    "cantEditAdmin": "Bu kullanıcının yönetici izinleri var",
+    "cantOpenClient": "{{VMS_NAME}} uygulama algılanmadı. <a href=\"/download\">İndir</a>",
+    "lostConnection": "{{systemName}} ile bağlantı kayboldu",
+    "thisSystem": "sistem"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"Şifre en az 8 karakter içermelidir",
-    "requiredMessage":"Sadece alfanümerik ve klavye karakterleri kullanın",
-    "weakMessage":"Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
-    "strongMessage":"Güçlü parola!",
-    "commonMessage":"Dünyada en çok kullanılan parolayı seçtiniz"
+  "passwordRequirements": {
+    "minLengthMessage": "Parola en az 8 karakterden oluşmalıdır",
+    "requiredMessage": "Sadece alfanümerik ve klavye karakterleri kullanın",
+    "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
+    "strongMessage": "Güçlü parola!",
+    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz"
   },
-  "sharing":{
-    "confirmOwner":"Sistem sahibini değiştirirseniz, hesabınızdaki yetkileri iptal edersiniz. Bu eylem geri döndürülemez. Emin misiniz?",
-    "shareTitle":"Paylaş",
-    "shareConfirmButton":"Paylaş",
-    "editShareTitle":"İzinleri düzenle",
-    "editShareConfirmButton":"Kaydet",
-    "permissionsSaved":"Yeni izin kaydedildi"
+  "sharing": {
+    "confirmOwner": "Sistem sahibini değiştirirseniz, hesabınızdaki yetkileri iptal edersiniz. Bu eylem geri döndürülemez. Emin misiniz?",
+    "shareTitle": "Paylaş",
+    "shareConfirmButton": "Paylaş",
+    "editShareTitle": "İzinleri düzenle",
+    "editShareConfirmButton": "Kaydet",
+    "permissionsSaved": "Yeni izin kaydedildi"
   },
-  "system":{
-    "yourSystem":"Sistem",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"Sistem erişilebilir değil",
-    "offline":"Sistem çevrimdışı",
-    "openClient":"{{VMS_NAME}} içinde aç",
-    "confirmRenameTitle":"Sistem Adı",
-    "confirmRenameAction":"Kaydet",
-    "successRename":"Sistem ismi kaydedildi",
-    "confirmDisconnectTitle":"{{PRODUCT_NAME}} çıkış yapılsın mı?",
-    "confirmDisconnectAction":"Bağlantıyı kes",
-    "confirmUnshareFromMe":"Hesabınızın bu sistemle bağlantısını kesmek üzeresiniz. Bundan sonra bu sisteme erişim sağlayamayacaksınız. Emin misiniz?",
-    "confirmUnshareFromMeTitle":"Sistemle bağlantıyı kes?",
-    "confirmUnshareFromMeAction":"Bağlantıyı kes",
-    "confirmUnshare":"Bu kullanıcı Sistem'e erişemez. Emin misiniz?",
-    "confirmUnshareTitle":"Kullanıcıyı sil?",
-    "confirmUnshareAction":"Sil",
-    "successDisconnected":"Sistem {{PRODUCT_NAME}}'den başarıyla çıkarıldı",
-    "successDeleted":"{{systemName}} sistemi hesabınızdan başarıyla silindi",
-    "permissionsRemoved":"İzinler {{email}}'den kaldırıldı"
+  "system": {
+    "yourSystem": "Sistem",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "Sistem erişilebilir değil",
+    "offline": "Sistem çevrimdışı",
+    "openClient": "{{VMS_NAME}} içinde aç",
+    "confirmRenameTitle": "Sistem Adı",
+    "confirmRenameAction": "Kaydet",
+    "successRename": "Sistem ismi kaydedildi",
+    "confirmDisconnectTitle": "{{PRODUCT_NAME}} çıkış yapılsın mı?",
+    "confirmDisconnectAction": "Bağlantıyı kes",
+    "confirmUnshareFromMe": "Hesabınızın bu sistemle bağlantısını kesmek üzeresiniz. Bundan sonra bu sisteme erişim sağlayamayacaksınız. Emin misiniz?",
+    "confirmUnshareFromMeTitle": "Sistemle bağlantıyı kes?",
+    "confirmUnshareFromMeAction": "Bağlantıyı kes",
+    "confirmUnshare": "Bu kullanıcı Sistem'e erişemez. Emin misiniz?",
+    "confirmUnshareTitle": "Kullanıcıyı sil?",
+    "confirmUnshareAction": "Sil",
+    "successDisconnected": "Sistem {{PRODUCT_NAME}}'den başarıyla çıkarıldı",
+    "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
+    "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
-  "account":{
-    "accountSavedSuccess":"Hesabınız başarıyla kaydedildi",
-    "activationLinkSent":"Aktivasyon linki gönderildi",
-    "passwordChangedSuccess":"Hesabınız başarıyla kaydedildi",
-    "changePassword":"Parola Değiştir",
-    "newPasswordLabel":"Yeni Parola",
-    "saveChanges":"Kaydet"
+  "account": {
+    "accountSavedSuccess": "Hesabınız başarıyla kaydedildi",
+    "activationLinkSent": "Aktivasyon linki gönderildi",
+    "passwordChangedSuccess": "Hesabınız başarıyla kaydedildi",
+    "changePassword": "Parola Değiştir",
+    "newPasswordLabel": "Yeni Parola",
+    "saveChanges": "Kaydet"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Sisteminizi görüntülemek için {{VMS_NAME}}'i yükleyin",
-    "action":"İndir {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Sisteminizi görüntülemek için {{VMS_NAME}}'i yükleyin",
+    "action": "İndir {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Yalnızca istemci",
-      "server":"Yalnızca sunucu",
-      "bundle":"İstemci ve sunucu",
-      "servertool":"Konfigürasyon aracı"
+    "appTypes": {
+      "client": "Yalnızca istemci",
+      "server": "Yalnızca sunucu",
+      "bundle": "İstemci ve sunucu",
+      "servertool": "Konfigürasyon aracı"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Aktivasyon linki gönder",
-    "resetPassword":"Parolayı sıfırla",
-    "setNewPassword":"Parolayı kaydet",
-    "setNewPasswordLabel":"Yeni Parola"
+  "activeActions": {
+    "sendConfirm": "Aktivasyon linki gönder",
+    "resetPassword": "Parolayı sıfırla",
+    "setNewPassword": "Parolayı kaydet",
+    "setNewPasswordLabel": "Yeni Parola"
   },
-  "regActions":{
-    "passwordLabel":"Parola",
-    "createAccount":"Hesap oluştur"
+  "regActions": {
+    "passwordLabel": "Parola",
+    "createAccount": "Hesap oluştur"
   },
-  "header":{
-    "allSystems":"Tüm sistemler",
-    "systems":"Sistemler"
+  "header": {
+    "allSystems": "Tüm sistemler",
+    "systems": "Sistemler"
   }
 }

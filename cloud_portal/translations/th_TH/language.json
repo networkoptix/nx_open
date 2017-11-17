@@ -1,237 +1,237 @@
 {
-  "language_name":"ภาษาไทย",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"ตกลง",
-    "cancelButton":"ยกเลิก",
-    "loginTitle":"ยินดีต้อนรับสู่ {{PRODUCT_NAME}}",
-    "loginButton":"ลงชื่อเข้าสู่ระบบ",
-    "logoutAuthorisedTitle":"คุณกำลังอยู่ในระบบ",
-    "logoutAuthorisedContinueButton":"ดำเนิน​การ",
-    "logoutAuthorisedLogoutButton":"ออกจากระบบ"
+  "language_name": "ภาษาไทย",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "ตกลง",
+    "cancelButton": "ยกเลิก",
+    "loginTitle": "เข้าสู่ระบบ {{PRODUCT_NAME}}",
+    "loginButton": "ลงชื่อเข้าสู่ระบบ",
+    "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
+    "logoutAuthorisedContinueButton": "ดำเนิน​การ",
+    "logoutAuthorisedLogoutButton": "ออกจากระบบ"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"ขอต้อนรับสู่:",
-    "register":"สร้างบัญชี",
-    "changePassword":"เปลี่ยนรหัสผ่าน -",
-    "account":"การตั้งค่าบัญชี -",
-    "systems":"ระบบ -",
-    "system":"ระบบ -",
-    "systemShare":"ระบบใช้ร่วมกัน-",
-    "activate":"เปิดใช้งานบัญชี -",
-    "activateSent":"เปิดใช้งานบัญชี -",
-    "activateSuccess":"บัญชีที่เปิดใช้งาน-",
-    "activateCode":"บัญชีที่ใช้งานได้ -",
-    "restorePassword":"กำหนดรหัสผ่านใหม่ -",
-    "restorePasswordSuccess":"บันทึกรหัสผ่านแล้ว -",
-    "restorePasswordCode":"กำหนดรหัสผ่านใหม่ -",
-    "view":"ดูกล้อง - ",
-    "debug":"การ​แก้ไข​จุด​บกพร่อง",
-    "login":"ลงชื่อเข้าสู่ระบบ -",
-    "download":"ดาวน์โหลด {{VMS_NAME}}",
-    "downloadPlatform":"ดาวน์โหลด {{VMS_NAME}} สำหรับ ",
-    "pageNotFound":"ไม่พบหน้านี้"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "ขอต้อนรับสู่:",
+    "register": "สร้างบัญชี",
+    "changePassword": "เปลี่ยนรหัสผ่าน -",
+    "account": "การตั้งค่าบัญชี -",
+    "systems": "ระบบ -",
+    "system": "ระบบ -",
+    "systemShare": "ระบบใช้ร่วมกัน-",
+    "activate": "บัญชีที่ใช้งานได้ -",
+    "activateSent": "บัญชีที่ใช้งานได้ -",
+    "activateSuccess": "บัญชีที่เปิดใช้งาน-",
+    "activateCode": "เปิดใช้งานบัญชี -",
+    "restorePassword": "รีเซ็ตรหัสผ่าน -",
+    "restorePasswordSuccess": "บันทึกรหัสผ่านแล้ว -",
+    "restorePasswordCode": "กำหนดรหัสผ่านใหม่ -",
+    "view": "ดูกล้อง - ",
+    "debug": "การ​แก้ไข​จุด​บกพร่อง",
+    "login": "ลงชื่อเข้าสู่ระบบ -",
+    "download": "ดาวน์โหลด {{VMS_NAME}}",
+    "downloadPlatform": "ดาวน์โหลด {{VMS_NAME}} สำหรับ ",
+    "pageNotFound": "ไม่พบหน้านี้"
   },
-  "systemStatuses":{
-    "notActivated":"ยังไม่ถูกเปิดใช้งาน",
-    "activated":"เปิดใช้งาน",
-    "online":"ออนไลน์",
-    "offline":"ออฟไลน์",
-    "unavailable":"ไม่พร้อมใช้งาน"
+  "systemStatuses": {
+    "notActivated": "ยังไม่ถูกเปิดใช้งาน",
+    "activated": "เปิดใช้งาน",
+    "online": "ออนไลน์",
+    "offline": "ออฟไลน์",
+    "unavailable": "ไม่มี"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"ปิดใช้งาน",
-      "description":"ผู้ใช้ถูกปิดใช้งานและไม่สามารถเข้าสู่ระบบได้"
+  "accessRoles": {
+    "disabled": {
+      "label": "ปิดใช้งาน",
+      "description": "ผู้ใช้ถูกปิดใช้งานและไม่สามารถเข้าสู่ระบบได้"
     },
-    "Owner":{
-      "label":"เจ้าของ",
-      "description":"การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแชร์และเชื่อมต่อ / ตัดการเชื่อมต่อระบบจากระบบคลาวด์"
+    "Owner": {
+      "label": "เจ้าของ",
+      "description": "การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแชร์และเชื่อมต่อ / ตัดการเชื่อมต่อระบบจากระบบคลาวด์"
     },
-    "Viewer":{
-      "label":"ผู้ชม",
-      "description":"สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้"
+    "Viewer": {
+      "label": "ผู้ชม",
+      "description": "สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้"
     },
-    "Live Viewer":{
-      "label":"แสดงสด",
-      "description":"สามารถดูวิดีโอสดได้เท่านั้น"
+    "Live Viewer": {
+      "label": "แสดงสด",
+      "description": "สามารถดูวิดีโอสดได้เท่านั้น"
     },
-    "Advanced Viewer":{
-      "label":"แสดงขั้นสูง",
-      "description":"สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
+    "Advanced Viewer": {
+      "label": "แสดงขั้นสูง",
+      "description": "สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
     },
-    "Administrator":{
-      "label":"ผู้ดูแลระบบ",
-      "description":"การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแบ่งปัน"
+    "Administrator": {
+      "label": "ผู้ดูแลระบบ",
+      "description": "การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแบ่งปัน"
     },
-    "Custom":{
-      "label":"แบบกำหนดเอง",
-      "description":"ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
+    "Custom": {
+      "label": "แบบกำหนดเอง",
+      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     },
-    "cloudAdmin":{
-      "label":"ผู้ดูแลระบบ",
-      "description":"สามารถกำหนดค่าระบบและแชร์ได้"
+    "cloudAdmin": {
+      "label": "ผู้ดูแลระบบ",
+      "description": "สามารถกำหนดค่าระบบและแชร์ได้"
     },
-    "customRole":{
-      "label":"บทบาทที่กำหนดเอง",
-      "description":"บทบาทผู้ใช้แบบกำหนดเองที่ระบุในระบบ"
+    "customRole": {
+      "label": "บทบาทที่กำหนดเอง",
+      "description": "บทบาทผู้ใช้แบบกำหนดเองที่ระบุในระบบ"
     },
-    "owner":{
-      "label":"เจ้าของ",
-      "description":"การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแชร์และเชื่อมต่อ / ตัดการเชื่อมต่อระบบจากระบบคลาวด์"
+    "owner": {
+      "label": "เจ้าของ",
+      "description": "การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแชร์และเชื่อมต่อ / ตัดการเชื่อมต่อระบบจากระบบคลาวด์"
     },
-    "viewer":{
-      "label":"ผู้ชม",
-      "description":"สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้"
+    "viewer": {
+      "label": "ผู้ชม",
+      "description": "สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้"
     },
-    "liveViewer":{
-      "label":"แสดงสด",
-      "description":"สามารถดูวิดีโอสดได้เท่านั้น"
+    "liveViewer": {
+      "label": "แสดงสด",
+      "description": "สามารถดูวิดีโอสดได้เท่านั้น"
     },
-    "advancedViewer":{
-      "label":"แสดงขั้นสูง",
-      "description":"สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
+    "advancedViewer": {
+      "label": "แสดงขั้นสูง",
+      "description": "สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
     },
-    "custom":{
-      "label":"แบบกำหนดเอง",
-      "description":"ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
+    "custom": {
+      "label": "แบบกำหนดเอง",
+      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     }
   },
-  "errorCodes":{
-    "ok":"ตกลง",
-    "cantSendActivationPrefix":"ไม่สามารถส่งอีเมลยืนยัน",
-    "cantDisconnectSystemPrefix":"ไม่สามารถลบระบบได้",
-    "cantUnshareWithMeSystemPrefix":"ไม่สามารถลบระบบได้",
-    "cantSharePrefix":"ไม่สามารถแชร์ระบบ",
-    "cantGetUsersListPrefix":"รายการผู้ใช้ไม่พร้อมใช้งาน",
-    "cantGetSystemsListPrefix":"รายการระบบไม่พร้อมใช้งาน",
-    "cantRegisterPrefix":"เกิดข้อผิดพลาด",
-    "cantGetSystemInfoPrefix":"ข้อมูลระบบไม่พร้อมใช้งาน",
-    "cantChangeAccountPrefix":"ไม่สามารถบันทึกการเปลี่ยนแปลงได้",
-    "cantChangePasswordPrefix":"ไม่สามารถบันทึกรหัสผ่านได้",
-    "cantActivatePrefix":"ไม่สามารถเปิดใช้งานบัญชีของคุณได้",
-    "cantSendConfirmationPrefix":"ไม่สามารถส่งอีเมลยืนยัน",
-    "cloudInvalidResponse":"คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
-    "notAuthorized":"อีเมลหรือรหัสผ่านไม่ถูกต้อง",
-    "wrongParameters":"พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
-    "wrongCode":"บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
-    "wrongCodeRestore":"ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
-    "forbidden":"การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
-    "accountNotActivated":"บัญชีนี้ยังไม่เปิดใช้งาน <a href=\"/activate\"> ส่งลิงก์การเปิดใช้งานอีกครั้ง </a>",
-    "accountBlocked":"บัญชีนี้ถูกปิดแล้ว",
-    "notFound":"ไม่​พบ",
-    "alreadyExists":"มีบัญชีอยู่แล้ว",
-    "unknownError":"เกิดข้อผิดพลาดที่ไม่คาดคิด",
-    "accountAlreadyActivated":"บัญชีนี้เปิดใช้งานแล้ว",
-    "emailNotFound":"ไม่มีบัญชีนี้อยู่",
-    "EmailAlreadyExists":"ลงทะเบียนอีเมล์นี้แล้ว",
-    "oldPasswordMistmatch":"ต้องระบุรหัสผ่านปัจจุบัน",
-    "passwordMismatch":"รหัสผ่านผิด",
-    "cantEditYourself":"ไม่อนุญาตให้เปลี่ยนสิทธิ์ของตัวเอง",
-    "cantEditAdmin":"ผู้ใช้มีสิทธิ์ของผู้ดูแลระบบ",
-    "cantOpenClient":"ไม่พบแอ็พพลิเคชัน {{VMS_NAME}} <a href=\"/download\">Download</a>",
-    "lostConnection":"การเชื่อมต่อกับ {{systemName}} สูญหาย",
-    "thisSystem":"ระบบ"
+  "errorCodes": {
+    "ok": "ตกลง",
+    "cantSendActivationPrefix": "ไม่สามารถส่งอีเมลยืนยัน",
+    "cantDisconnectSystemPrefix": "ไม่สามารถลบระบบได้",
+    "cantUnshareWithMeSystemPrefix": "ไม่สามารถลบระบบได้",
+    "cantSharePrefix": "ไม่สามารถแชร์ระบบ",
+    "cantGetUsersListPrefix": "รายการผู้ใช้ไม่พร้อมใช้งาน",
+    "cantGetSystemsListPrefix": "รายการระบบไม่พร้อมใช้งาน",
+    "cantRegisterPrefix": "เกิดข้อผิดพลาด",
+    "cantGetSystemInfoPrefix": "ข้อมูลระบบไม่พร้อมใช้งาน",
+    "cantChangeAccountPrefix": "ไม่สามารถบันทึกการเปลี่ยนแปลงได้",
+    "cantChangePasswordPrefix": "ไม่สามารถบันทึกรหัสผ่านได้",
+    "cantActivatePrefix": "ไม่สามารถเปิดใช้งานบัญชีของคุณได้",
+    "cantSendConfirmationPrefix": "ไม่สามารถส่งอีเมลยืนยัน",
+    "cloudInvalidResponse": "คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
+    "notAuthorized": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "wrongParameters": "พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
+    "wrongCode": "บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
+    "wrongCodeRestore": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
+    "forbidden": "การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
+    "accountNotActivated": "บัญชีนี้ยังไม่เปิดใช้งาน <a href=\"/activate\"> ส่งลิงก์การเปิดใช้งานอีกครั้ง </a>",
+    "accountBlocked": "บัญชีนี้ถูกปิดแล้ว",
+    "notFound": "ไม่​พบ",
+    "alreadyExists": "มีบัญชีอยู่แล้ว",
+    "unknownError": "เกิดข้อผิดพลาดที่ไม่คาดคิด",
+    "accountAlreadyActivated": "บัญชีนี้เปิดใช้งานแล้ว",
+    "emailNotFound": "ไม่มีบัญชีนี้อยู่",
+    "EmailAlreadyExists": "ลงทะเบียนอีเมล์นี้แล้ว",
+    "oldPasswordMistmatch": "ต้องระบุรหัสผ่านปัจจุบัน",
+    "passwordMismatch": "รหัสผ่านผิด",
+    "cantEditYourself": "ไม่อนุญาตให้เปลี่ยนสิทธิ์ของตัวเอง",
+    "cantEditAdmin": "ผู้ใช้มีสิทธิ์ของผู้ดูแลระบบ",
+    "cantOpenClient": "ไม่พบแอ็พพลิเคชัน {{VMS_NAME}} <a href=\"/download\">Download</a>",
+    "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
+    "thisSystem": "ระบบ"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
-    "requiredMessage":"ใช้อักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์เท่านั้นหลีกเลี่ยงช่องว่างด้านบนและด้านหลัง",
-    "weakMessage":"ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
-    "strongMessage":"รหัสผ่านที่แข็งแกร่ง!",
-    "commonMessage":"รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก"
+  "passwordRequirements": {
+    "minLengthMessage": "รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
+    "requiredMessage": "ใช้อักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์เท่านั้นหลีกเลี่ยงช่องว่างด้านบนและด้านหลัง",
+    "weakMessage": "ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
+    "strongMessage": "รหัสผ่านที่แข็งแกร่ง!",
+    "commonMessage": "รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก"
   },
-  "sharing":{
-    "confirmOwner":"หากคุณเปลี่ยนเจ้าของระบบคุณจะยกเลิกการเป็นเจ้าของจากบัญชีปัจจุบัน การกระทำนี้ไม่สามารถย้อนกลับได้ คุณแน่ใจไหม?",
-    "shareTitle":"แชร์",
-    "shareConfirmButton":"แชร์",
-    "editShareTitle":"แก้ไขสิทธิ์",
-    "editShareConfirmButton":"บันทึก",
-    "permissionsSaved":"อนุญาตสิทธิ์ใหม่แล้ว"
+  "sharing": {
+    "confirmOwner": "หากคุณเปลี่ยนเจ้าของระบบคุณจะยกเลิกการเป็นเจ้าของจากบัญชีปัจจุบัน การกระทำนี้ไม่สามารถย้อนกลับได้ คุณแน่ใจไหม?",
+    "shareTitle": "แชร์",
+    "shareConfirmButton": "แชร์",
+    "editShareTitle": "แก้ไขสิทธิ์",
+    "editShareConfirmButton": "บันทึก",
+    "permissionsSaved": "อนุญาตสิทธิ์ใหม่แล้ว"
   },
-  "system":{
-    "yourSystem":"ระบบของคุณ",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"ระบบไม่สามารถเข้าถึงได้",
-    "offline":"ระบบออฟไลน์",
-    "openClient":"เปิดใน {{VMS_NAME}}",
-    "confirmRenameTitle":"ชื่อระบบ",
-    "confirmRenameAction":"บันทึก",
-    "successRename":"ระบบเปลี่ยนชื่อ",
-    "confirmDisconnectTitle":"ตัดการเชื่อมต่อระบบจาก {{PRODUCT_NAME}} หรือไม่?",
-    "confirmDisconnectAction":"ตัดการเชื่อมต่อ",
-    "confirmUnshareFromMe":"คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
-    "confirmUnshareFromMeTitle":"ยกเลิกการเชื่อมต่อระบบหรือไม่?",
-    "confirmUnshareFromMeAction":"ตัดการเชื่อมต่อ",
-    "confirmUnshare":"ผู้ใช้รายนี้จะไม่สามารถเข้าใช้งานระบบได้ คุณแน่ใจไหม?",
-    "confirmUnshareTitle":"ลบผู้ใช้หรือไม่?",
-    "confirmUnshareAction":"ลบ",
-    "successDisconnected":"ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก {{PRODUCT_NAME}}",
-    "successDeleted":"ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
-    "permissionsRemoved":"สิทธิ์ถูกนำออกจาก {{email}}"
+  "system": {
+    "yourSystem": "ระบบของคุณ",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "ระบบไม่สามารถเข้าถึงได้",
+    "offline": "ระบบออฟไลน์",
+    "openClient": "เปิดใน {{VMS_NAME}}",
+    "confirmRenameTitle": "ชื่อระบบ",
+    "confirmRenameAction": "บันทึก",
+    "successRename": "ระบบเปลี่ยนชื่อ",
+    "confirmDisconnectTitle": "ยกเลิกการเชื่อมต่อระบบจาก {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "ตัดการเชื่อมต่อ",
+    "confirmUnshareFromMe": "คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
+    "confirmUnshareFromMeTitle": "ยกเลิกการเชื่อมต่อระบบหรือไม่?",
+    "confirmUnshareFromMeAction": "ตัดการเชื่อมต่อ",
+    "confirmUnshare": "ผู้ใช้รายนี้จะไม่สามารถเข้าใช้งานระบบได้ คุณแน่ใจไหม?",
+    "confirmUnshareTitle": "ลบผู้ใช้หรือไม่?",
+    "confirmUnshareAction": "ลบ",
+    "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก {{PRODUCT_NAME}}",
+    "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
+    "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
   },
-  "account":{
-    "accountSavedSuccess":"บันทึกบัญชีของคุณเรียบร้อยแล้ว",
-    "activationLinkSent":"ส่งการเปิดใช้งานแล้ว",
-    "passwordChangedSuccess":"บันทึกบัญชีของคุณเรียบร้อยแล้ว",
-    "changePassword":"เปลี่ยนรหัสผ่าน",
-    "newPasswordLabel":"สร้างรหัสผ่านใหม่",
-    "saveChanges":"บันทึก"
+  "account": {
+    "accountSavedSuccess": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",
+    "activationLinkSent": "ส่งการเปิดใช้งานแล้ว",
+    "passwordChangedSuccess": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",
+    "changePassword": "เปลี่ยนรหัสผ่าน",
+    "newPasswordLabel": "สร้างรหัสผ่านใหม่",
+    "saveChanges": "บันทึก"
   },
-  "downloads":{
-    "noClientDetectedTitle":"ติดตั้ง {{VMS_NAME}} เพื่อดูระบบของคุณ",
-    "action":"ดาวน์โหลด {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "ติดตั้ง {{VMS_NAME}} เพื่อดูระบบของคุณ",
+    "action": "ดาวน์โหลด {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"วินโดวส์",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "วินโดวส์",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"ไคลเอ็นต์เท่านั้น",
-      "server":"เซิร์ฟเวอร์เท่านั้น",
-      "bundle":"ไคลเอ็นต์และเซิร์ฟเวอร์",
-      "servertool":"เครื่องมือกำหนดค่า"
+    "appTypes": {
+      "client": "ไคลเอ็นต์เท่านั้น",
+      "server": "เซิร์ฟเวอร์เท่านั้น",
+      "bundle": "ไคลเอ็นต์และเซิร์ฟเวอร์",
+      "servertool": "เครื่องมือกำหนดค่า"
     }
   },
-  "activeActions":{
-    "sendConfirm":"ส่งการเชื่อมโยงการเปิดใช้งานอีกครั้ง",
-    "resetPassword":"รีเซ็ตรหัสผ่าน",
-    "setNewPassword":"บันทึกรหัสผ่าน",
-    "setNewPasswordLabel":"สร้างรหัสผ่านใหม่"
+  "activeActions": {
+    "sendConfirm": "ส่งการเชื่อมโยงการเปิดใช้งานอีกครั้ง",
+    "resetPassword": "รีเซ็ตรหัสผ่าน",
+    "setNewPassword": "บันทึกรหัสผ่าน",
+    "setNewPasswordLabel": "สร้างรหัสผ่านใหม่"
   },
-  "regActions":{
-    "passwordLabel":"รหัสผ่าน",
-    "createAccount":"สร้างบัญชี"
+  "regActions": {
+    "passwordLabel": "รหัสผ่าน",
+    "createAccount": "สร้างบัญชี"
   },
-  "header":{
-    "allSystems":"ระบบทั้งหมด",
-    "systems":"ระบบ"
+  "header": {
+    "allSystems": "ระบบทั้งหมด",
+    "systems": "ระบบ"
   }
 }

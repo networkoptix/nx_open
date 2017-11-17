@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"確認您的帳號"
+  "activate_account": {
+    "emailSubject": "確認您的帳號"
   },
-  "restore_password":{
-    "emailSubject":"還原您的密碼"
+  "restore_password": {
+    "emailSubject": "還原您的密碼"
   },
-  "system_invite":{
-    "emailSubject":"有人分享影像 {{message.system_name}} 給您"
+  "system_invite": {
+    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
   },
-  "system_shared":{
-    "emailSubject":"有人分享影像 {{message.system_name}} 給您"
+  "system_shared": {
+    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
   },
-  "review_version":{
-    "emailSubject":"版本 {{message.id}} 已準備好審查"
+  "review_version": {
+    "emailSubject": "版本 {{message.id}} 已準備好審查"
   }
 }

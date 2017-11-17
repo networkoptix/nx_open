@@ -219,7 +219,7 @@ angular.module('nxCommon')
                     var date = sM.playedPosition;
                     var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;
                     var relativeSizeOfTimeLine = (sM.end - sM.visibleEnd) - (sM.start - sM.visibleStart);
-                    timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, true);
+                    timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, false);
                 }
 
                 function timelineClick(mouseX){
@@ -390,6 +390,8 @@ angular.module('nxCommon')
                         return;
                     }
                 }
+
+                var onReleaseCenter = false;
                 function viewportMouseDown(event){
                     updateMouseCoordinate(event);
 
@@ -409,9 +411,7 @@ angular.module('nxCommon')
                     }
 
                     //scrolls timeline to current time
-                    if(mouseOverElements.leftMarker || mouseOverElements.rightMarker){
-                        centerCurrentTime();
-                    }
+                    onReleaseCenter = mouseOverElements.leftMarker || mouseOverElements.rightMarker;
                 }
                 function viewportClick(event){
                     updateMouseCoordinate(event);
@@ -428,6 +428,11 @@ angular.module('nxCommon')
                     updateMouseCoordinate(null);
                     timelineActions.scrollingStop(false);
                     timelineActions.scrollingToCursorStop();
+
+                    if(onReleaseCenter){
+                        onReleaseCenter = false;
+                        centerCurrentTime();
+                    }
                 }
                 function viewportMouseMove(event){
                     updateMouseCoordinate(event);

@@ -1,237 +1,237 @@
 {
-  "language_name":"Русский",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"Отмена",
-    "loginTitle":"Войти в {{PRODUCT_NAME}}",
-    "loginButton":"Войти",
-    "logoutAuthorisedTitle":"Вы уже выполнили вход",
-    "logoutAuthorisedContinueButton":"Продолжить",
-    "logoutAuthorisedLogoutButton":"Выйти"
+  "language_name": "Русский",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Отмена",
+    "loginTitle": "Войти в {{PRODUCT_NAME}}",
+    "loginButton": "Войти",
+    "logoutAuthorisedTitle": "Вы уже выполнили вход",
+    "logoutAuthorisedContinueButton": "Продолжить",
+    "logoutAuthorisedLogoutButton": "Выйти"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Добро пожаловать в",
-    "register":"Зарегистрироваться в",
-    "changePassword":"Изменить пароль -",
-    "account":"Настройки учетной записи -",
-    "systems":"Системы -",
-    "system":"Система -",
-    "systemShare":"Общий доступ -",
-    "activate":"Активировать учетную запись -",
-    "activateSent":"Активировать учетную запись -",
-    "activateSuccess":"Учетная запись активирована -",
-    "activateCode":"Активировать учетную запись -",
-    "restorePassword":"Сброс пароля -",
-    "restorePasswordSuccess":"Пароль сохранен -",
-    "restorePasswordCode":"Сброс пароля -",
-    "view":"Просмотр камер - ",
-    "debug":"Отладка",
-    "login":"Войти -",
-    "download":"Скачать {{VMS_NAME}}",
-    "downloadPlatform":"Скачать {{VMS_NAME}} для ",
-    "pageNotFound":"Страница не найдена"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Добро пожаловать в",
+    "register": "Зарегистрироваться в",
+    "changePassword": "Изменить пароль -",
+    "account": "Настройки учетной записи -",
+    "systems": "Системы -",
+    "system": "Система -",
+    "systemShare": "Общий доступ -",
+    "activate": "Активировать учетную запись -",
+    "activateSent": "Активировать учетную запись -",
+    "activateSuccess": "Учетная запись активирована -",
+    "activateCode": "Активировать учетную запись -",
+    "restorePassword": "Сброс пароля -",
+    "restorePasswordSuccess": "Пароль сохранен -",
+    "restorePasswordCode": "Сброс пароля -",
+    "view": "Просмотр камер - ",
+    "debug": "Отладка",
+    "login": "Войти -",
+    "download": "Скачать {{VMS_NAME}}",
+    "downloadPlatform": "Скачать {{VMS_NAME}} для ",
+    "pageNotFound": "Страница не найдена"
   },
-  "systemStatuses":{
-    "notActivated":"не активирован",
-    "activated":"активирован",
-    "online":"в сети",
-    "offline":"не в сети",
-    "unavailable":"недоступен"
+  "systemStatuses": {
+    "notActivated": "не активирован",
+    "activated": "активирован",
+    "online": "в сети",
+    "offline": "не в сети",
+    "unavailable": "недоступен"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Отключен",
-      "description":"Пользователь отключен и не может войти в систему"
+  "accessRoles": {
+    "disabled": {
+      "label": "Отключен",
+      "description": "Пользователь отключен и не может войти в систему"
     },
-    "Owner":{
-      "label":"Владелец",
-      "description":"Неограниченный доступ, включая управление общим доступом и подключением системы к облаку"
+    "Owner": {
+      "label": "Владелец",
+      "description": "Неограниченный доступ, включая управление общим доступом и подключением системы к облаку"
     },
-    "Viewer":{
-      "label":"Видео с камер и архив",
-      "description":"Может смотреть видео в реальном времени и архив"
+    "Viewer": {
+      "label": "Видео с камер и архив",
+      "description": "Может смотреть видео в реальном времени и архив"
     },
-    "Live Viewer":{
-      "label":"Только видео в реальном времени",
-      "description":"Может смотреть только видео в реальном времени"
+    "Live Viewer": {
+      "label": "Только видео в реальном времени",
+      "description": "Может смотреть только видео в реальном времени"
     },
-    "Advanced Viewer":{
-      "label":"Просмотр и настройка",
-      "description":"Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+    "Advanced Viewer": {
+      "label": "Просмотр и настройка",
+      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
     },
-    "Administrator":{
-      "label":"Администратор",
-      "description":"Неограниченный доступ, включая управление общим доступом"
+    "Administrator": {
+      "label": "Администратор",
+      "description": "Неограниченный доступ, включая управление общим доступом"
     },
-    "Custom":{
-      "label":"Особые",
-      "description":"Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
+    "Custom": {
+      "label": "Особые",
+      "description": "Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
     },
-    "cloudAdmin":{
-      "label":"Администратор",
-      "description":"Может настраивать систему и общий доступ"
+    "cloudAdmin": {
+      "label": "Администратор",
+      "description": "Может настраивать систему и общий доступ"
     },
-    "customRole":{
-      "label":"Особая роль",
-      "description":"Особая роль, настроенная в Системе"
+    "customRole": {
+      "label": "Особая роль",
+      "description": "Особая роль, настроенная в Системе"
     },
-    "owner":{
-      "label":"Владелец",
-      "description":"Неограниченный доступ, включая управление общим доступом и подключением системы к облаку"
+    "owner": {
+      "label": "Владелец",
+      "description": "Неограниченный доступ, включая управление общим доступом и подключением системы к облаку"
     },
-    "viewer":{
-      "label":"Видео с камер и архив",
-      "description":"Может смотреть живое видео и архив"
+    "viewer": {
+      "label": "Видео с камер и архив",
+      "description": "Может смотреть живое видео и архив"
     },
-    "liveViewer":{
-      "label":"Только видео в реальном времени",
-      "description":"Может смотреть только видео в реальном времени"
+    "liveViewer": {
+      "label": "Только видео в реальном времени",
+      "description": "Может смотреть только видео в реальном времени"
     },
-    "advancedViewer":{
-      "label":"Просмотр и настройка",
-      "description":"Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+    "advancedViewer": {
+      "label": "Просмотр и настройка",
+      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
     },
-    "custom":{
-      "label":"Особые",
-      "description":"Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
+    "custom": {
+      "label": "Особые",
+      "description": "Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
     }
   },
-  "errorCodes":{
-    "ok":"ок",
-    "cantSendActivationPrefix":"Не удается отправить подтверждение по Email",
-    "cantDisconnectSystemPrefix":"Не удается удалить систему",
-    "cantUnshareWithMeSystemPrefix":"Не удается удалить систему",
-    "cantSharePrefix":"Невозможно объединить систему",
-    "cantGetUsersListPrefix":"Список пользователей недоступен",
-    "cantGetSystemsListPrefix":"Список систем недоступен",
-    "cantRegisterPrefix":"Произошла ошибка",
-    "cantGetSystemInfoPrefix":"Информация о системе недоступна",
-    "cantChangeAccountPrefix":"Не удается сохранить изменения",
-    "cantChangePasswordPrefix":"Не удается сохранить пароль",
-    "cantActivatePrefix":"Не удается активировать вашу учетную запись",
-    "cantSendConfirmationPrefix":"Не удается отправить подтверждение по Email",
-    "cloudInvalidResponse":"Облачная БД вернула неожиданный ответ",
-    "notAuthorized":"Неверный Email / пароль",
-    "wrongParameters":"Некоторые параметры в форме неверны",
-    "wrongCode":"Учетная запись уже активирована или неверный код подтверждения",
-    "wrongCodeRestore":"Код подтверждения уже используется или неверен",
-    "forbidden":"Отсутствуют полномочия на выполнение этого действия",
-    "accountNotActivated":"Эта учетная запись еще не активирована. <a href=\"/activate\">Отправить ссылку активации снова</a>",
-    "accountBlocked":"Эта учетная запись заблокирована",
-    "notFound":"Не найдено",
-    "alreadyExists":"Эта учетная запись уже существует",
-    "unknownError":"Произошла непредвиденная ошибка",
-    "accountAlreadyActivated":"Эта учетная запись уже активирована",
-    "emailNotFound":"Учетная запись не существует",
-    "EmailAlreadyExists":"Этот Email уже зарегистрирован",
-    "oldPasswordMistmatch":"Текущий пароль указан неверно",
-    "passwordMismatch":"Неправильный пароль",
-    "cantEditYourself":"Не допускается изменение собственных полномочий",
-    "cantEditAdmin":"Этот пользователь имеет полномочия администратора",
-    "cantOpenClient":"Приложение {{VMS_NAME}} не обнаружено. <a href=\"/download\">Скачать</a>",
-    "lostConnection":"Подключение к {{systemName}} потеряно",
-    "thisSystem":"система"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Не удается отправить подтверждение по Email",
+    "cantDisconnectSystemPrefix": "Не удается удалить систему",
+    "cantUnshareWithMeSystemPrefix": "Не удается удалить систему",
+    "cantSharePrefix": "Невозможно объединить систему",
+    "cantGetUsersListPrefix": "Список пользователей недоступен",
+    "cantGetSystemsListPrefix": "Список систем недоступен",
+    "cantRegisterPrefix": "Произошла ошибка",
+    "cantGetSystemInfoPrefix": "Информация о системе недоступна",
+    "cantChangeAccountPrefix": "Не удается сохранить изменения",
+    "cantChangePasswordPrefix": "Не удается сохранить пароль",
+    "cantActivatePrefix": "Не удается активировать вашу учетную запись",
+    "cantSendConfirmationPrefix": "Не удается отправить подтверждение по Email",
+    "cloudInvalidResponse": "Облачная БД вернула неожиданный ответ",
+    "notAuthorized": "Неверный Email / пароль",
+    "wrongParameters": "Некоторые параметры в форме неверны",
+    "wrongCode": "Учетная запись уже активирована или неверный код подтверждения",
+    "wrongCodeRestore": "Код подтверждения уже используется или неверен",
+    "forbidden": "Отсутствуют полномочия на выполнение этого действия",
+    "accountNotActivated": "Эта учетная запись еще не активирована. <a href=\"/activate\">Отправить ссылку активации снова</a>",
+    "accountBlocked": "Эта учетная запись заблокирована",
+    "notFound": "Не найдено",
+    "alreadyExists": "Эта учетная запись уже существует",
+    "unknownError": "Произошла непредвиденная ошибка",
+    "accountAlreadyActivated": "Эта учетная запись уже активирована",
+    "emailNotFound": "Учетная запись не существует",
+    "EmailAlreadyExists": "Этот Email уже зарегистрирован",
+    "oldPasswordMistmatch": "Текущий пароль указан неверно",
+    "passwordMismatch": "Неправильный пароль",
+    "cantEditYourself": "Не допускается изменение собственных полномочий",
+    "cantEditAdmin": "Этот пользователь имеет полномочия администратора",
+    "cantOpenClient": "Приложение {{VMS_NAME}} не обнаружено. <a href=\"/download\">Скачать</a>",
+    "lostConnection": "Подключение к {{systemName}} потеряно",
+    "thisSystem": "система"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"Пароль должен содержать не менее 8 символов",
-    "requiredMessage":"Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
-    "weakMessage":"Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
-    "strongMessage":"Надежный пароль!",
-    "commonMessage":"Этот пароль входит в список самых популярных паролей в мире"
+  "passwordRequirements": {
+    "minLengthMessage": "Пароль должен содержать по крайней мере 8 символов",
+    "requiredMessage": "Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
+    "weakMessage": "Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
+    "strongMessage": "Надежный пароль!",
+    "commonMessage": "Этот пароль входит в список самых популярных паролей в мире"
   },
-  "sharing":{
-    "confirmOwner":"Если изменить владельца системы, она больше не будет принадлежать текущей учетной записи. Это действие необратимо. Вы уверены?",
-    "shareTitle":"Общий доступ",
-    "shareConfirmButton":"Общий доступ",
-    "editShareTitle":"Изменить полномочия",
-    "editShareConfirmButton":"Сохранить",
-    "permissionsSaved":"Новые полномочия сохранены"
+  "sharing": {
+    "confirmOwner": "Если изменить владельца системы, она больше не будет принадлежать текущей учетной записи. Это действие необратимо. Вы уверены?",
+    "shareTitle": "Общий доступ",
+    "shareConfirmButton": "Общий доступ",
+    "editShareTitle": "Изменить полномочия",
+    "editShareConfirmButton": "Сохранить",
+    "permissionsSaved": "Новые полномочия сохранены"
   },
-  "system":{
-    "yourSystem":"Ваша система",
-    "mySystemSearch":"ЯМойМоя",
-    "unavailable":"Система недоступна",
-    "offline":"Система не в сети",
-    "openClient":"Открыть в {{VMS_NAME}}",
-    "confirmRenameTitle":"Имя системы",
-    "confirmRenameAction":"Сохранить",
-    "successRename":"Имя системы сохранено",
-    "confirmDisconnectTitle":"Отключить систему от {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction":"Отключить",
-    "confirmUnshareFromMe":"Вы собираетесь отключить эту систему от учетной записи. Вы не сможете больше иметь доступ к этой системе. Вы уверены?",
-    "confirmUnshareFromMeTitle":"Отключить систему?",
-    "confirmUnshareFromMeAction":"Отключить",
-    "confirmUnshare":"Этот пользователь не сможет получить доступ к системе. Вы уверены?",
-    "confirmUnshareTitle":"Удалить пользователя?",
-    "confirmUnshareAction":"Удалить",
-    "successDisconnected":"Система успешно отключена от {{PRODUCT_NAME}}",
-    "successDeleted":"Система {{systemName}} успешно удалена из вашей учетной записи",
-    "permissionsRemoved":"{{email}} был лишен полномочий"
+  "system": {
+    "yourSystem": "Ваша система",
+    "mySystemSearch": "ЯМойМоя",
+    "unavailable": "Система недоступна",
+    "offline": "Система не в сети",
+    "openClient": "Открыть в {{VMS_NAME}}",
+    "confirmRenameTitle": "Имя системы",
+    "confirmRenameAction": "Сохранить",
+    "successRename": "Имя системы сохранено",
+    "confirmDisconnectTitle": "Отключить систему от {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "Отключить",
+    "confirmUnshareFromMe": "Вы собираетесь отключить эту систему от учетной записи. Вы не сможете больше иметь доступ к этой системе. Вы уверены?",
+    "confirmUnshareFromMeTitle": "Отключить систему?",
+    "confirmUnshareFromMeAction": "Отключить",
+    "confirmUnshare": "Этот пользователь не сможет получить доступ к системе. Вы уверены?",
+    "confirmUnshareTitle": "Удалить пользователя?",
+    "confirmUnshareAction": "Удалить",
+    "successDisconnected": "Система успешно отключена от {{PRODUCT_NAME}}",
+    "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
+    "permissionsRemoved": "{{email}} был лишен полномочий"
   },
-  "account":{
-    "accountSavedSuccess":"Ваша учетная запись успешно сохранена",
-    "activationLinkSent":"Ссылка для активации отправлена",
-    "passwordChangedSuccess":"Ваша учетная запись успешно сохранена",
-    "changePassword":"Изменить пароль",
-    "newPasswordLabel":"Новый пароль",
-    "saveChanges":"Сохранить"
+  "account": {
+    "accountSavedSuccess": "Ваша учетная запись успешно сохранена",
+    "activationLinkSent": "Ссылка для активации отправлена",
+    "passwordChangedSuccess": "Ваша учетная запись успешно сохранена",
+    "changePassword": "Изменить пароль",
+    "newPasswordLabel": "Новый пароль",
+    "saveChanges": "Сохранить"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Установите {{VMS_NAME}} для работы с системой",
-    "action":"Скачать {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Установите {{VMS_NAME}} для работы с системой",
+    "action": "Скачать {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Только клиент",
-      "server":"Только сервер",
-      "bundle":"Клиент и сервер",
-      "servertool":"Инструмент настройки"
+    "appTypes": {
+      "client": "Только клиент",
+      "server": "Только сервер",
+      "bundle": "Клиент и сервер",
+      "servertool": "Инструмент настройки"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Повторно отправить ссылку активации",
-    "resetPassword":"Сброс пароля",
-    "setNewPassword":"Сохранить пароль",
-    "setNewPasswordLabel":"Новый пароль"
+  "activeActions": {
+    "sendConfirm": "Повторно отправить ссылку активации",
+    "resetPassword": "Сброс пароля",
+    "setNewPassword": "Сохранить пароль",
+    "setNewPasswordLabel": "Новый пароль"
   },
-  "regActions":{
-    "passwordLabel":"Пароль",
-    "createAccount":"Зарегистрироваться"
+  "regActions": {
+    "passwordLabel": "Пароль",
+    "createAccount": "Зарегистрироваться"
   },
-  "header":{
-    "allSystems":"Все системы",
-    "systems":"Системы"
+  "header": {
+    "allSystems": "Все системы",
+    "systems": "Системы"
   }
 }
