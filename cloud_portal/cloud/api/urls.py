@@ -19,8 +19,9 @@ urlpatterns = [
     url(r'^account/?$',                 account.index),
 
 
-    url(r'^systems/disconnect',                     systems.disconnect),
-    url(r'^systems/connect',                        systems.connect),
+    url(r'^systems/disconnect$',                    systems.disconnect),
+    url(r'^systems/connect$',                       systems.connect),
+    url(r'^systems/merge$',                         systems.list_systems),
     url(r'^systems/(?P<system_id>.+?)/accessRoles', systems.access_roles),
     url(r'^systems/(?P<system_id>.+?)/auth',        systems.get_auth),
     url(r'^systems/(?P<system_id>.+?)/name',        systems.rename),

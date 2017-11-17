@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Confirme su cuenta"
+  "activate_account": {
+    "emailSubject": "Confirme su cuenta"
   },
-  "restore_password":{
-    "emailSubject":"Restaurar su contraseña"
+  "restore_password": {
+    "emailSubject": "Restaurar su contraseña"
   },
-  "system_invite":{
-    "emailSubject":"Sistema de video {{message.system_name}} fue compartido con usted"
+  "system_invite": {
+    "emailSubject": "Sistema de video {{message.system_name}} fue compartido con usted"
   },
-  "system_shared":{
-    "emailSubject":"Sistema de video {{message.system_name}} fue compartido con usted"
+  "system_shared": {
+    "emailSubject": "Sistema de video {{message.system_name}} fue compartido con usted"
   },
-  "review_version":{
-    "emailSubject":"La versión {{message.id}} está lista para ser revisada"
+  "review_version": {
+    "emailSubject": "La versión {{message.id}} está lista para ser revisada"
   }
 }

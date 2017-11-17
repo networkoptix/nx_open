@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Activate your account"
+  "activate_account": {
+    "emailSubject": "Activate your account"
   },
-  "restore_password":{
-    "emailSubject":"Reset your password"
+  "restore_password": {
+    "emailSubject": "Reset your password"
   },
-  "system_invite":{
-    "emailSubject":"Video system {{message.system_name}} was shared with you"
+  "system_invite": {
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
-  "system_shared":{
-    "emailSubject":"Video system {{message.system_name}} was shared with you"
+  "system_shared": {
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
-  "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+  "review_version": {
+    "emailSubject": "Version {{message.id}} is ready to be reviewed"
   }
 }

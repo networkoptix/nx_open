@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Xác nhận tài khoản của bạn"
+  "activate_account": {
+    "emailSubject": "Xác nhận tài khoản của bạn"
   },
-  "restore_password":{
-    "emailSubject":"Khôi phục mật khẩu của bạn"
+  "restore_password": {
+    "emailSubject": "Khôi phục mật khẩu của bạn"
   },
-  "system_invite":{
-    "emailSubject":"Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
+  "system_invite": {
+    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
   },
-  "system_shared":{
-    "emailSubject":"Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
+  "system_shared": {
+    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
   },
-  "review_version":{
-    "emailSubject":"Phiên bản {{message.id}} đã sẵn sàng xem"
+  "review_version": {
+    "emailSubject": "Phiên bản {{message.id}} đã sẵn sàng xem"
   }
 }

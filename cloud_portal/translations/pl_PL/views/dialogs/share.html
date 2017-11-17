@@ -2,8 +2,8 @@
     <form name="shareForm" novalidate>
         <div class="modal-body">
             <div class="form-group" validate-field>
-                <label ng-if="!isNewShare" for="lockedEmail">Użytkownika</label>
-                <label ng-if="isNewShare" for="email">E-mail</label>
+                <label ng-if="!isNewShare" for="lockedEmail">Użytkownik</label>
+                <label ng-if="isNewShare" for="email">Email</label>
 
                 <input ng-hide="!isNewShare" type="email" class="form-control" ng-model="user.email" id="email" name="email"
                        validate-email maxlength="255"
