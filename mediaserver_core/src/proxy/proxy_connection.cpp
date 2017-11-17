@@ -494,11 +494,15 @@ void QnProxyConnectionProcessor::run()
     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
     if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
     {
+        NX_VERBOSE(this, lm("Smart proxy for %1").arg(d->request.requestLine));
         doSmartProxy();
     }
-    else {
+    else
+    {
+        NX_VERBOSE(this, lm("Raw proxy for %1").arg(d->request.requestLine));
         doRawProxy();
     }
+
     if (d->dstSocket)
         d->dstSocket->close();
     if (d->socket)

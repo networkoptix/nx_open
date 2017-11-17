@@ -45,8 +45,6 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         return;
     }
 
-    NX_VERBOSE(this) lm("Request: [%1]").arg(request->requestLine);
-
     if (isPathIgnored(request))
         return;
 
@@ -54,15 +52,15 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
     if (urlQuery.hasQueryItem(Qn::SERVER_GUID_HEADER_NAME)
         || request->headers.find(Qn::SERVER_GUID_HEADER_NAME) != request->headers.end())
     {
-        NX_VERBOSE(this) lm("Skipped: Header or param [%1] found")
-            .arg(Qn::SERVER_GUID_HEADER_NAME);
+        NX_VERBOSE(this, lm("Request [%1] is skipped: Header or param [%2] found")
+            .args(request->requestLine, Qn::SERVER_GUID_HEADER_NAME));
         return;
     }
     if (urlQuery.hasQueryItem(Qn::CAMERA_GUID_HEADER_NAME)
         || request->headers.find(Qn::CAMERA_GUID_HEADER_NAME) != request->headers.end())
     {
-        NX_VERBOSE(this) lm("Skipped: Header or param [%1] found")
-            .arg(Qn::CAMERA_GUID_HEADER_NAME);
+        NX_VERBOSE(this, lm("Request [%1] is skipped: Header or param [%2] found")
+            .args(request->requestLine, Qn::CAMERA_GUID_HEADER_NAME));
         return;
     }
 
@@ -78,13 +76,14 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         {
             if (addProxyToRequest(request, servers.front()))
             {
-                NX_VERBOSE(this) lm("Cloud request. Forwarding to server %2")
-                    .arg(servers.front()->getId().toString());
+                NX_VERBOSE(this, lm("Cloud request [%1]: Forwarding to server %2")
+                    .args(request->requestLine, servers.front()->getId()));
             }
         }
         else
         {
-            NX_VERBOSE(this) lm("Cloud request. Skipped: No servers found");
+            NX_VERBOSE(this, lm("Cloud request [%1] is skipped: No servers found")
+                .arg(request->requestLine));
         }
         return;
     }
@@ -120,12 +119,13 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
     }
     if (addProxyToRequest(request, server))
     {
-        NX_VERBOSE(this) lm("Forwarding to server %4 (camera %2, timestamp %3)")
-            .arg(camera->getId().toString())
-            .arg(timestampMs == -1
+        NX_VERBOSE(this, lm("Forwarding request [%1] to server %4 (camera %2, timestamp %3)").args(
+            request->requestLine,
+            camera->getId().toString(),
+            timestampMs == -1
                 ? QString::fromLatin1("live")
-                : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate))
-            .arg(server->getId().toString());
+                : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate),
+            server->getId().toString()));
     }
 }
 
@@ -135,13 +135,14 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 {
     if (!server)
     {
-        NX_VERBOSE(this) lm("Skipped: Server not found");
+        NX_VERBOSE(this, lm("Request [%1] is skipped: Server not found").arg(request->requestLine));
         return false;
     }
 
     if (server->getId() == commonModule()->moduleGUID())
     {
-        NX_VERBOSE(this) lm("Skipped: Target server is the current one");
+        NX_VERBOSE(this, lm("Request [%1] is skipped: Target server is the current one")
+            .arg(request->requestLine));
         return false;
     }
 
