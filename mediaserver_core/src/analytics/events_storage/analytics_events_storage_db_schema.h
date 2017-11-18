@@ -5,9 +5,6 @@ namespace mediaserver {
 namespace analytics {
 namespace storage {
 
-/**
- * #CLOUD-157. Gathering cloud connect session statistics.
- */
 static const char kCreateAnalyticsEventsSchema[] =
 R"sql(
 
