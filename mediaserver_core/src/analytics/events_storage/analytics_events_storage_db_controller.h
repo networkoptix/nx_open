@@ -7,13 +7,15 @@ namespace mediaserver {
 namespace analytics {
 namespace storage {
 
-class InstanceController:
+class DbController:
     public nx::utils::db::InstanceController
 {
     using base_type = nx::utils::db::InstanceController;
 
 public:
-    InstanceController(const nx::utils::db::ConnectionOptions& connectionOptions);
+    DbController(const nx::utils::db::ConnectionOptions& connectionOptions);
+
+    using base_type::initialize;
 };
 
 } // namespace storage

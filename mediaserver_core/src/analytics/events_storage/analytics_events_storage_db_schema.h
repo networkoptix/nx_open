@@ -12,27 +12,21 @@ static const char kCreateAnalyticsEventsSchema[] =
 R"sql(
 
 CREATE TABLE event(
-    id                   %bigint_primary_key_auto_increment%,
     timestamp_usec_utc   BIGINT,
     duration_usec        BIGINT,
     device_guid          BLOB(16) NOT NULL,
-    bounding_rectangle   VARCHAR(64),
     object_type_id       VARCHAR(1024),
-    object_id            VARCHAR(1024)
+    object_id            VARCHAR(1024),
+    attributes           TEXT,
+    box_top_left_x       INTEGER,
+    box_top_left_y       INTEGER,
+    box_bottom_right_x   INTEGER,
+    box_bottom_right_y   INTEGER
 );
 
 CREATE INDEX idx_event_timestamp ON event(timestamp_usec_utc);
 
-CREATE TABLE event_property(
-    id                   %bigint_primary_key_auto_increment%,
-    event_id             BIGINT,
-    name                 VARCHAR(1024),
-    value                VARCHAR(1024),
-    FOREIGN KEY(event_id) REFERENCES event(id) ON DELETE CASCADE
-);
-
-CREATE INDEX idx_event_property_name ON event_property(name);
-CREATE INDEX idx_event_property_value ON event_property(value);
+CREATE VIRTUAL TABLE event_properties USING fts4(content);
 
 )sql";
 

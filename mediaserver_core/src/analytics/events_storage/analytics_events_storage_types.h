@@ -1,26 +1,24 @@
 #pragma once
 
-#include <boost/optional.hpp>
+#include <vector>
+
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/db/types.h>
 
 #include <analytics/common/object_detection_metadata.h>
+#include <recording/time_period.h>
 
 namespace nx {
 namespace mediaserver {
 namespace analytics {
 namespace storage {
 
-struct TimestampRange
-{
-    qint64 startUsec = 0;
-    qint64 stopUsec = 0;
-};
-
 struct Filter
 {
-    boost::optional<QnUuid> objectTypeId;
-    boost::optional<QnUuid> objectId;
-    boost::optional<TimestampRange> timestampRange;
-    boost::optional<QRectF> boundingBox;
+    std::vector<QnUuid> objectTypeId;
+    QnUuid objectId;
+    QnTimePeriod timePeriod;
+    QRectF boundingBox;
     std::vector<common::metadata::Attribute> requiredAttributes;
     /**
      * Set of words separated by spaces, commas, etc...
@@ -32,10 +30,18 @@ struct Filter
 enum class ResultCode
 {
     ok,
+    retryLater,
     error,
 };
+
+ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult);
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
 } // namespace storage
 } // namespace analytics
 } // namespace mediaserver
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (nx::mediaserver::analytics::storage::ResultCode), (lexical))

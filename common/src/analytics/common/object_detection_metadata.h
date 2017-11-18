@@ -23,6 +23,11 @@ struct Attribute
 QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson));
 
 bool operator< (const Attribute& f, const Attribute& s);
+bool operator==(const Attribute& left, const Attribute& right);
+
+QString toString(const Attribute&);
+
+//-------------------------------------------------------------------------------------------------
 
 struct DetectedObject
 {
@@ -34,6 +39,10 @@ struct DetectedObject
 #define DetectedObject_Fields (objectTypeId)(objectId)(boundingBox)(labels)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
+bool operator==(const DetectedObject& left, const DetectedObject& right);
+
+//-------------------------------------------------------------------------------------------------
+
 struct DetectionMetadataPacket
 {
     QnUuid deviceId;
@@ -43,6 +52,10 @@ struct DetectionMetadataPacket
 };
 #define DetectionMetadataPacket_Fields (deviceId)(timestampUsec)(durationUsec)(objects)
 QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
+
+QString toString(const DetectionMetadataPacket&);
+
+bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right);
 
 #define QN_OBJECT_DETECTION_TYPES \
     (Attribute)\

@@ -7,7 +7,7 @@ namespace mediaserver {
 namespace analytics {
 namespace storage {
 
-InstanceController::InstanceController(
+DbController::DbController(
     const nx::utils::db::ConnectionOptions& connectionOptions)
     :
     base_type(connectionOptions)

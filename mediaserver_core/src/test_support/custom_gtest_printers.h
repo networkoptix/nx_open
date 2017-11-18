@@ -1,15 +1,13 @@
-#include "analytics_events_storage_cursor.h"
+#pragma once
+
+#include "../analytics/events_storage/analytics_events_storage_types.h"
 
 namespace nx {
 namespace mediaserver {
 namespace analytics {
 namespace storage {
 
-common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
-{
-    // TODO
-    return nullptr;
-}
+void PrintTo(ResultCode val, ::std::ostream* os);
 
 } // namespace storage
 } // namespace analytics

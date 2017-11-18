@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <analytics/common/object_detection_metadata.h>
 
 #include "analytics_events_storage_types.h"
@@ -19,7 +17,7 @@ public:
     /**
      * @return boost::none if at end or error has occured.
      */
-    virtual boost::optional<common::metadata::DetectionMetadataPacket> next() = 0;
+    virtual common::metadata::ConstDetectionMetadataPacketPtr next() = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -27,7 +25,7 @@ class Cursor:
     public AbstractCursor
 {
 public:
-    virtual boost::optional<common::metadata::DetectionMetadataPacket> next() override;
+    virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 };
 
 } // namespace storage
