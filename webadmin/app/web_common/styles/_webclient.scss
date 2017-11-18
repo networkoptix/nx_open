@@ -285,9 +285,9 @@ table.webclient-window>tbody>tr>td{
       background-color: $light2;
     }
 
-    &:active,
+    &.active,
     &:focus{
-      background-color: $light1;
+      background-color: $light1 !important;
     }
   }
 
