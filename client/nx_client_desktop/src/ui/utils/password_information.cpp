@@ -31,6 +31,20 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
             m_acceptance = Inacceptable;
             break;
 
+        case PasswordStrength::WeakAndFair:
+            m_text = tr("Weak");
+            m_hint = tr("Password should contain %1 different combinations of either characters, symbols, or digits")
+                .arg(PasswordLimitations::kPreferredCategories);
+            m_acceptance = Inacceptable;
+            break;
+
+        case PasswordStrength::WeakAndGood:
+            m_text = tr("Weak");
+            m_hint = tr("Password should contain %1 different combinations of either characters, symbols, or digits")
+                .arg(PasswordLimitations::kMinimumCategories);
+            m_acceptance = Inacceptable;
+            break;
+
         case PasswordStrength::Short:
             m_text = tr("Short");
             m_hint = tr("Password must be at least %1 characters long.")
