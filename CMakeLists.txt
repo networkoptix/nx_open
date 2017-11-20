@@ -36,7 +36,7 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 3.1.1)
+project(vms VERSION 4.0)
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
