@@ -33,43 +33,43 @@ QnPasswordInformation::QnPasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::WeakAndFair:
             m_text = tr("Weak");
-            m_hint = tr("Password should contain %1 different combinations of either characters, symbols, or digits")
-                .arg(PasswordLimitations::kPreferredCategories);
+            m_hint = tr("Password should contain %n different combinations of either characters, symbols, or digits",
+                "", PasswordLimitations::kPreferredCategories);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::WeakAndGood:
             m_text = tr("Weak");
-            m_hint = tr("Password should contain %1 different combinations of either characters, symbols, or digits")
-                .arg(PasswordLimitations::kMinimumCategories);
+            m_hint = tr("Password should contain %n different combinations of either characters, symbols, or digits",
+                "", PasswordLimitations::kMinimumCategories);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Short:
             m_text = tr("Short");
-            m_hint = tr("Password must be at least %1 characters long.")
-                .arg(PasswordLimitations::kMinimumLength);
+            m_hint = tr("Password must be at least %n characters long.",
+                "", PasswordLimitations::kMinimumLength);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Long:
             m_text = tr("Long");
-            m_hint = tr("Password must be no longer than %1 characters.")
-                .arg(PasswordLimitations::kMaximumLengthForCamera);
+            m_hint = tr("Password must be no longer than %n characters.",
+                "", PasswordLimitations::kMaximumLengthForCamera);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Conseq:
             m_text = tr("Weak");
-            m_hint = tr("Password should not contain %1 or more consecutive characters together.")
-                .arg(PasswordLimitations::kConsecutiveCharactersLimit);
+            m_hint = tr("Password should not contain %n or more consecutive characters together.",
+                "", PasswordLimitations::kConsecutiveCharactersLimit);
             m_acceptance = Inacceptable;
             break;
 
         case PasswordStrength::Repeat:
             m_text = tr("Weak");
-            m_hint = tr("Password should not contain %1 or more repeating characters.")
-                .arg(PasswordLimitations::kRepeatingCharactersLimit);
+            m_hint = tr("Password should not contain %n or more repeating characters.",
+                "", PasswordLimitations::kRepeatingCharactersLimit);
             m_acceptance = Inacceptable;
             break;
 
