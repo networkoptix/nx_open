@@ -12,7 +12,8 @@ const QByteArray IntegrityHashHelper::kIntegrityHashSalt = "408422e1-1b4c-498c-b
 
 QByteArray IntegrityHashHelper::generateIntegrityHash(const QByteArray& value)
 {
-    return hashWithSalt(value); }
+    return hashWithSalt(value);
+}
 
 bool IntegrityHashHelper::checkIntegrity(
     const QByteArray& initialValue,
