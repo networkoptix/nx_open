@@ -37,7 +37,7 @@ public:
     virtual bool hasMetadata() const override;
 
 private:
-    void processRectsFromAdditionalDetectors();
+    bool processRectsFromAdditionalDetectors();
 
     std::string m_id;
     std::string m_modelFile;
@@ -73,7 +73,6 @@ bool Impl::start(const Params& params)
     NX_OUTPUT << "    id: " << params.id;
     NX_OUTPUT << "    modelFile: " << params.modelFile;
     NX_OUTPUT << "    deployFile: " << params.deployFile;
-    NX_OUTPUT << "    cacheFile: " << params.cacheFile;
     NX_OUTPUT << "    cacheFile: " << params.cacheFile;
     NX_OUTPUT << "    netWidth: " << params.netWidth;
     NX_OUTPUT << "    netHeight: " << params.netHeight;
@@ -154,24 +153,26 @@ bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
 }
 
 /** Analyze rects from additional detectors (if any). */
-void Impl::processRectsFromAdditionalDetectors()
+bool Impl::processRectsFromAdditionalDetectors()
 {
     if (m_detectors.empty())
     {
         NX_PRINT << "INTERNAL ERROR: " << __func__ << "(): No detectors.";
-        return;
+        return false;
     }
 
     if (m_detectors.size() == 1)
-        return; //< No need to log rects.
+        return true; //< No need to log rects.
 
     for (int i = 0; i < m_detectors.size(); ++i)
     {
-#if 0
         NX_OUTPUT << "Detector #" << i << ": "
-            << (!m_detectors[i]->hasRectangles() ? 0 : m_detectors[i]->getRectangles().size())
-            << " rects";
-#endif // 0
+            << (
+                !m_detectors[i]->hasRectangles()
+                ? 0
+                : m_detectors[i]->getRectangles(nullptr).size()
+            ) << " rects";
+
         int64_t ptsUs;
         if (m_detectors[i]->hasRectangles())
         {
@@ -183,6 +184,8 @@ void Impl::processRectsFromAdditionalDetectors()
             }
         }
     }
+
+    return true;
 }
 
 bool Impl::pullRectsForFrame(
@@ -195,7 +198,8 @@ bool Impl::pullRectsForFrame(
         return false;
     }
 
-    processRectsFromAdditionalDetectors();
+    if (!processRectsFromAdditionalDetectors())
+        return false;
 
     if (!m_detectors.front()->hasRectangles())
     {
@@ -230,7 +234,18 @@ bool Impl::pullRectsForFrame(
 
 bool Impl::hasMetadata() const
 {
-    return m_detectors.front()->hasRectangles();
+    NX_OUTPUT << __func__ << "() BEGIN";
+
+    if (m_detectors.empty())
+    {
+        NX_PRINT << "INTERNAL ERROR: " << __func__ << "(): No detectors.";
+        NX_OUTPUT << __func__ << "() END -> false";
+        return false;
+    }
+
+    const bool result = m_detectors.front()->hasRectangles();
+    NX_OUTPUT << __func__ << "() END -> " << (result ? "true" : "false");
+    return result;
 }
 
 } // namespace
