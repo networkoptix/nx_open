@@ -271,6 +271,7 @@ namespace Qn
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
 		ShowSingleCameraRole,                       /**< Used for default password dialog. */
+        ParentWidgetRole,                           /** Used for dialg's parent widget*/
 
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */

@@ -65,6 +65,7 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
+        object.objectTypeId = nxpt::fromPluginGuidToQnUuid(item->eventTypeId());
         object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);

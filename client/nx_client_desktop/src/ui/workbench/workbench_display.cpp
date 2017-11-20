@@ -330,9 +330,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
         this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
-
-    /* Set up defaults. */
-    connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay()
@@ -1794,7 +1791,13 @@ void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate
         widget->hide(); /* So that it won't appear where it shouldn't. */
     }
 
-    emit geometryAdjustmentRequested(item, animate);
+    executeDelayedParented(
+        [this, item, animate]
+        {
+            adjustGeometry(item, animate);
+        },
+        kDefaultDelay,
+        item); //< Making item the parent to avoid call when it is deleted already.
 }
 
 void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
@@ -1973,7 +1976,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
     {
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         {
-            qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+            qint64 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
             if (timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 

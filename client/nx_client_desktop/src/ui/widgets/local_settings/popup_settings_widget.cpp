@@ -52,12 +52,8 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     static_assert(QnSystemHealth::Count < 64, "We are packing messages to single quint64");
 
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
-
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
         ui->systemHealthLayout->addWidget(checkbox);
@@ -98,18 +94,12 @@ void QnPopupSettingsWidget::loadDataToUi()
 
     bool all = true;
 
-    quint64 healthShown = qnSettings->popupSystemHealth();
-    quint64 healthFlag = 1;
+    QSet<QnSystemHealth::MessageType> messageTypes = qnSettings->popupSystemHealth();
 
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
-
-        bool checked = ((healthShown & healthFlag) == healthFlag);
+        const bool checked = messageTypes.contains(messageType);
         m_systemHealthCheckBoxes[messageType]->setChecked(checked);
-        healthFlag = healthFlag << 1;
 
         all &= checked;
     }
@@ -166,25 +156,14 @@ QList<vms::event::EventType> QnPopupSettingsWidget::watchedEvents() const
     return result;
 }
 
-quint64 QnPopupSettingsWidget::watchedSystemHealth() const
+QSet<QnSystemHealth::MessageType> QnPopupSettingsWidget::watchedSystemHealth() const
 {
-    quint64 result = qnSettings->popupSystemHealth();
-    quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::Count; i++)
-    {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
+    QSet<QnSystemHealth::MessageType> result;
 
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    {
         if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())
-        {
-            result |= healthFlag;
-        }
-        else
-        {
-            result &= ~healthFlag;
-        }
-        healthFlag = healthFlag << 1;
+            result.insert(messageType);
     }
 
     return result;

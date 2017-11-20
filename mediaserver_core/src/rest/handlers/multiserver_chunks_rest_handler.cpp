@@ -25,6 +25,8 @@
 
 namespace {
 
+static const nx::utils::log::Tag kTag{lit("multiserver_chunks_rest_handler")};
+
 static QString urlPath;
 
 typedef QnMultiserverRequestContext<QnChunksRequestData> QnChunksRequestContext;
@@ -60,7 +62,8 @@ static void loadRemoteDataAsync(
                     msgBody, MultiServerPeriodDataList(), &success);
             }
 
-            qDebug() << "In progress request QnMultiserverChunksRestHandler::loadRemoteDataAsync #"
+            NX_VERBOSE(kTag)
+                << "In progress request QnMultiserverChunksRestHandler::loadRemoteDataAsync #"
                 << requestNum << ". Got response from server" << server->getId()
                 << "osErrorCode=" << osErrorCode << "statusCode=" << statusCode
                 << "cameras=" << toString(ctx->request().resList)
@@ -124,11 +127,11 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     int requestNum = ++staticRequestNum;
     QElapsedTimer timer;
     timer.restart();
-    qDebug() << "Start executing request QnMultiserverChunksRestHandler::loadDataSync #"
+    NX_VERBOSE(kTag) << "Start executing request QnMultiserverChunksRestHandler::loadDataSync #"
         << requestNum << ". cameras=" << toString(request.resList);
 
     auto result = loadDataSync(request, owner, requestNum, timer);
-    qDebug() << "Finishing executing request QnMultiserverChunksRestHandler::loadDataSync #"
+    NX_VERBOSE(kTag) << "Finishing executing request QnMultiserverChunksRestHandler::loadDataSync #"
         << requestNum;
 
     return result;
@@ -146,7 +149,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     if (request.isLocal)
     {
         loadLocalData(owner->commonModule(), outputData, &ctx);
-        qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+        NX_VERBOSE(kTag) << " In progress request QnMultiserverChunksRestHandler::executeGet #"
             << requestNum << ". After loading local data timeout=" << timer.elapsed();
     }
     else
@@ -160,13 +163,15 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
             if (server->getId() == owner->commonModule()->moduleGUID())
             {
                 loadLocalData(owner->commonModule(), outputData, &ctx);
-                qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+                NX_VERBOSE(kTag)
+                    << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading local data. timeout=" << timer.elapsed();
             }
             else
             {
                 loadRemoteDataAsync(owner->commonModule(), outputData, server, &ctx, requestNum, timer);
-                qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+                NX_VERBOSE(kTag)
+                    << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading remote data from server" << server->getId()
                     << ". timeout=" << timer.elapsed();
             }
@@ -192,7 +197,7 @@ int QnMultiserverChunksRestHandler::executeGet(
     int requestNum = ++staticRequestNum;
     QElapsedTimer timer;
     timer.restart();
-    qDebug() << "Start executing request QnMultiserverChunksRestHandler::executeGet #"
+    NX_VERBOSE(kTag) << "Start executing request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". cameras=" << toString(request.resList);
 
     if (!request.isValid())
@@ -202,7 +207,7 @@ int QnMultiserverChunksRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
     outputData = loadDataSync(request, owner, requestNum, timer);
-    qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
+    NX_VERBOSE(kTag) << " In progress request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". After loading data. timeout=" << timer.elapsed();
 
     if (request.flat)
@@ -238,7 +243,7 @@ int QnMultiserverChunksRestHandler::executeGet(
         }
     }
 
-    qDebug() << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
+    NX_VERBOSE(kTag) << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". timeout=" << timer.elapsed();
 
     return nx_http::StatusCode::ok;

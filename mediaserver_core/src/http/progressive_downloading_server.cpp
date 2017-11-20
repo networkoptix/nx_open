@@ -651,9 +651,9 @@ void QnProgressiveDownloadingConsumer::run()
         auto camera = qnCameraPool->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
-
-        if (!isLive &&
-            !commonModule()->resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission))
+        auto requiredPermission = isLive
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+        if (!commonModule()->resourceAccessManager()->hasPermission(d->accessRights, resource, requiredPermission))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
@@ -708,7 +708,7 @@ void QnProgressiveDownloadingConsumer::run()
                         archive = new QnServerArchiveDelegate(); // default value
                 }
                 if (archive) {
-                    archive->open(resource);
+                    archive->open(resource, qnServerModule->archiveIntegrityWatcher());
                     archive->seek( timeUSec, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
                     int counter = 0;
@@ -752,7 +752,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
-            d->archiveDP->open();
+            d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
             d->archiveDP->jumpTo( timeUSec, timeUSec );
 
             if (!endPosition.isEmpty())

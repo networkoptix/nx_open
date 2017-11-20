@@ -10,6 +10,7 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <media_server/media_server_module.h>
 
 #include "streaming/streaming_chunk_cache_key.h"
 
@@ -56,7 +57,7 @@ namespace nx_hls
         if( !archiveDelegate )
         {
             archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate()); // default value
-            if( !archiveDelegate->open(m_camResource) )
+            if(!archiveDelegate->open(m_camResource, qnServerModule->archiveIntegrityWatcher()))
                 return false;
         }
         if( !archiveDelegate->setQuality(

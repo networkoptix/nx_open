@@ -30,7 +30,7 @@ class QnLayoutSettingsDialog : public QnSessionAwareButtonBoxDialog
 
     typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    explicit QnLayoutSettingsDialog(QWidget *parent = 0);
+    explicit QnLayoutSettingsDialog(QWidget *parent);
     ~QnLayoutSettingsDialog();
 
     void readFromResource(const QnLayoutResourcePtr &layout);

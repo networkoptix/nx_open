@@ -14,7 +14,7 @@ class QnLdapSettingsDialog: public QnSessionAwareButtonBoxDialog {
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnLdapSettingsDialog(QWidget *parent = 0);
+    explicit QnLdapSettingsDialog(QWidget *parent);
     ~QnLdapSettingsDialog();
 
     virtual void accept() override;

@@ -160,7 +160,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(this, &QnWorkbenchNavigator::hasArchiveChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
 
     m_cameraDataManager = qnClientModule->cameraDataManager();
-    connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
+    connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this,
+        &QnWorkbenchNavigator::updateLoaderPeriods);
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);
 
@@ -541,6 +542,7 @@ bool QnWorkbenchNavigator::isLiveSupported() const
 bool QnWorkbenchNavigator::isLive() const
 {
     return isLiveSupported()
+        && speed() > 0
         && m_timeSlider
         && m_timeSlider->isLive();
 }
@@ -615,7 +617,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing)
         if (reader->isRealTimeSource())
         {
             /* Media was paused while on live. Jump to archive when resumed. */
-            qint64 time = m_currentMediaWidget->display()->camera()->getCurrentTime();
+            qint64 time = m_currentMediaWidget->display()->camDisplay()->getExternalTime();
             reader->resumeMedia();
             if (time != (qint64)AV_NOPTS_VALUE && !reader->isReverseMode())
                 reader->directJumpToNonKeyFrame(time + 1);
@@ -757,7 +759,7 @@ qint64 QnWorkbenchNavigator::positionUsec() const
     if (!m_currentMediaWidget)
         return 0;
 
-    return m_currentMediaWidget->display()->camera()->getCurrentTime();
+    return m_currentMediaWidget->display()->camDisplay()->getExternalTime();
 }
 
 void QnWorkbenchNavigator::setPosition(qint64 positionUsec)
@@ -1042,7 +1044,7 @@ void QnWorkbenchNavigator::stepBackward()
     m_pausedOverride = false;
 
     /* Here we want to know real reader time. */
-    qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
+    qint64 currentTime = m_currentMediaWidget->display()->camDisplay()->getExternalTime();
 
     if (!reader->isSkippingFrames()
         && currentTime > reader->startTime()
@@ -1515,7 +1517,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             }
             else
             {
-                timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+                timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
             }
 
             if (timeUSec == AV_NOPTS_VALUE)
@@ -2176,6 +2178,12 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     if (footageServers.empty())
         return false;
 
+    if (const auto loader = m_cameraDataManager->loader(camera, /*createIfNotExists*/ false))
+    {
+        if (!loader->periods(Qn::RecordingContent).empty())
+            return true;
+    }
+
     if (camera->isDtsBased())
     {
         auto widget = std::find_if(m_syncedWidgets.cbegin(), m_syncedWidgets.cend(),
@@ -2195,7 +2203,9 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     return true;
 }
 
-void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs)
+void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr& resource,
+    Qn::TimePeriodContent type,
+    qint64 startTimeMs)
 {
     if (m_currentMediaWidget && m_currentMediaWidget->resource() == resource)
     {
@@ -2205,7 +2215,10 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resourc
     }
 
     if (m_syncedResources.contains(resource))
+    {
         updateSyncedPeriods(type, startTimeMs);
+        updateHasArchive();
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)

@@ -421,7 +421,9 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     connect(m_removeBookmarksAction, &QAction::triggered, this,
         [this, params]
         {
-            menu()->triggerIfPossible(action::RemoveBookmarksAction, params);
+            const auto parentWidget = QPointer<QWidget>(m_owner);
+            menu()->triggerIfPossible(action::RemoveBookmarksAction,
+                action::Parameters(params).withArgument(Qn::ParentWidgetRole, parentWidget));
         });
 
     connect(m_exportBookmarkAction, &QAction::triggered, this,

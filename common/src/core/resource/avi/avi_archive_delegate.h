@@ -36,7 +36,9 @@ public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
-    virtual bool open(const QnResourcePtr &resource);
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close();
     virtual qint64 startTime() const;
     virtual void setStartTimeUs(qint64 startTimeUs);
@@ -69,7 +71,7 @@ protected:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
-    void initMetadata();
+    bool initMetadata();
     AVFormatContext* getFormatContext();
 
 private:
@@ -106,6 +108,7 @@ private:
     bool m_hasVideo = true;
     qint64 m_lastSeekTime = AV_NOPTS_VALUE;
     qint64 m_firstDts = 0; //< DTS of the very first video packet
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

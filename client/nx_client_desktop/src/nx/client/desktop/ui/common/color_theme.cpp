@@ -123,6 +123,11 @@ QVariantMap ColorTheme::colors() const
     return d->colors;
 }
 
+QColor ColorTheme::color(const QString& name) const
+{
+    return d->colors.value(name).value<QColor>();
+}
+
 QColor ColorTheme::transparent(const QColor& color, qreal alpha)
 {
     auto newColor = color;

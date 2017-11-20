@@ -268,6 +268,7 @@
 #include <managers/discovery_manager.h>
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/remote_archive_synchronizer.h>
+#include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
@@ -2109,6 +2110,19 @@ void MediaServerProcess::serviceModeInit()
     }
 }
 
+void MediaServerProcess::connectArchiveIntegrityWatcher()
+{
+    using namespace nx::mediaserver;
+    auto serverArchiveIntegrityWatcher = static_cast<ServerArchiveIntegrityWatcher*>(
+        qnServerModule->archiveIntegrityWatcher());
+
+    connect(
+        serverArchiveIntegrityWatcher,
+        &ServerArchiveIntegrityWatcher::fileIntegrityCheckFailed,
+        qnEventRuleConnector,
+        &event::EventConnector::at_fileIntegrityCheckFailed);
+}
+
 void MediaServerProcess::run()
 {
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
@@ -2233,6 +2247,8 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
+
+    connectArchiveIntegrityWatcher();
 
     auto remoteArchiveSynchronizer =
         std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(qnServerModule);

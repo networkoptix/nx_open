@@ -6,7 +6,7 @@
 
 #include <string>
 
-#define NX_PRINT_PREFIX "[tegra_video_stub #" << m_id << "] "
+#define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
 #include <nx/kit/debug.h>
 
 #include "tegra_video_ini.h"
@@ -18,18 +18,19 @@ class Stub: public TegraVideo
 public:
     Stub()
     {
-        NX_OUTPUT << "Stub(): created";
+        NX_OUTPUT << __func__ << "()";
     }
 
     virtual ~Stub() override
     {
-        NX_OUTPUT << "~Stub(): destroyed";
+        NX_OUTPUT << __func__ << "()";
     }
 
     virtual bool start(const Params& params) override
     {
-        NX_OUTPUT << "Stub(): params:";
-        NX_OUTPUT << "{";
+        m_id = params.id; //< Used for logging, thus, assigned before logging.
+
+        NX_OUTPUT << __func__ << "({";
         NX_OUTPUT << "    id: " << params.id;
         NX_OUTPUT << "    modelFile: " << params.modelFile;
         NX_OUTPUT << "    deployFile: " << params.deployFile;
@@ -37,9 +38,8 @@ public:
         NX_OUTPUT << "    cacheFile: " << params.cacheFile;
         NX_OUTPUT << "    netWidth: " << params.netWidth;
         NX_OUTPUT << "    netHeight: " << params.netHeight;
-        NX_OUTPUT << "}";
+        NX_OUTPUT << "})";
 
-        m_id = params.id;
         m_modelFile = params.modelFile;
         m_deployFile = params.deployFile;
         m_cacheFile = params.cacheFile;
@@ -51,14 +51,14 @@ public:
 
     virtual bool stop() override
     {
-        NX_OUTPUT << "stop() -> true";
+        NX_OUTPUT << __func__ << "() -> true";
         return true;
     }
 
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override
     {
-        NX_OUTPUT << "pushCompressedFrame(data, dataSize: " << compressedFrame->dataSize
-                  << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
+        NX_OUTPUT << __func__ << "(data, dataSize: " << compressedFrame->dataSize
+            << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
 
         m_hasMetadata = true;
         return true;
@@ -67,14 +67,14 @@ public:
     virtual bool pullRectsForFrame(
         Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override
     {
-        NX_OUTPUT << "pullRectsForFrame() -> false";
+        NX_OUTPUT << __func__ << "() -> false";
 
         *outPtsUs = 0;
 
         // Produce 2 stub rects.
         if (maxRectsCount < 2)
         {
-            NX_PRINT << "ERROR: pullRectsForFrame(): "
+            NX_PRINT << __func__ << "(): ERROR: "
                 << "maxRectsCount expected >= 2, actual " << maxRectsCount;
             return false;
         }

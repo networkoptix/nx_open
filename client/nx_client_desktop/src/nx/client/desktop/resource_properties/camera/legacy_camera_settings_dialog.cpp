@@ -280,7 +280,7 @@ bool LegacyCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& c
         QnMessageBox messageBox(QnMessageBoxIcon::Question,
             tr("Apply changes before switching to another camera?"), extras,
             QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Apply, mainWindowWidget());
+            QDialogButtonBox::Apply, this);
 
         messageBox.addCustomWidget(new QnResourceListView(unsavedCameras, &messageBox));
         const auto result = messageBox.exec();

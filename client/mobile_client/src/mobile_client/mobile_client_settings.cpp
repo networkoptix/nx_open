@@ -75,7 +75,7 @@ void QnMobileClientSettings::updateValuesFromSettings(
 QVariant QnMobileClientSettings::readValueFromSettings(
         QSettings* settings,
         int id,
-        const QVariant& defaultValue)
+        const QVariant& defaultValue) const
 {
     auto baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
 
