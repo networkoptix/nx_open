@@ -454,7 +454,8 @@ Handle ServerConnection::changeCameraPassword(
         nx_http::Method::post,
         prepareUrl(lit("/api/changeCameraPassword"), params.toParams()));
     request.messageBody = QJson::serialized(std::move(data));
-    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray());
+    nx_http::insertOrReplaceHeader(&request.headers,
+        nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray()));
 
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
     trace(handle, request.url.toString());

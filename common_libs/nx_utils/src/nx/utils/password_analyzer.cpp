@@ -11,13 +11,6 @@
 
 namespace {
 
-/* Minimal acceptable number of character categories: */
-const int kMinimumCategories = 2;
-
-/* Preferred number of character categories: */
-const int kPreferredCategories = 3;
-
-
 int differentSign(int left, int right)
 {
     static const auto sign =
@@ -126,10 +119,10 @@ PasswordStrength passwordStrength(const QString& password)
         return PasswordStrength::Common;
 
     int numCategories = std::accumulate(categories.cbegin(), categories.cend(), 0);
-    if (numCategories < kMinimumCategories)
+    if (numCategories < PasswordLimitations::kMinimumCategories)
         return PasswordStrength::Weak;
 
-    if (numCategories < kPreferredCategories)
+    if (numCategories < PasswordLimitations::kPreferredCategories)
         return PasswordStrength::Fair;
 
     return PasswordStrength::Good;
@@ -172,12 +165,12 @@ PasswordStrength cameraPasswordStrength(const QString& password)
     const auto fairPasswordCategory = length <= kFairPasswordMaxLength;
     if (fairPasswordCategory)
     {
-        if (numCategories < kPreferredCategories)
-            return PasswordStrength::Weak;
+        if (numCategories < PasswordLimitations::kPreferredCategories)
+            return PasswordStrength::WeakAndFair;
     }
-    else if (numCategories < kMinimumCategories)
+    else if (numCategories < PasswordLimitations::kMinimumCategories)
     {
-        return PasswordStrength::Weak;
+        return PasswordStrength::WeakAndGood;
     }
 
     if (hasConsecutiveSequence(password))

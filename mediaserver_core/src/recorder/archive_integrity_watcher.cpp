@@ -41,6 +41,13 @@ bool ServerArchiveIntegrityWatcher::fileRequested(
     const QnAviArchiveMetadata& metadata,
     const QString& fileName)
 {
+    if (!checkFileName(metadata, fileName))
+    {
+        emitSignal(fileName);
+        NX_WARNING(this, lm("File metadata vs file name integrity problem: %1").args(fileName));
+        return false;
+    }
+
     if (metadata.version < QnAviArchiveMetadata::kIntegrityCheckVersion)
         return true;
 
@@ -48,13 +55,6 @@ bool ServerArchiveIntegrityWatcher::fileRequested(
     {
         emitSignal(fileName);
         NX_WARNING(this, lm("File metadata integrity problem: %1").args(fileName));
-        return false;
-    }
-
-    if (!checkFileName(metadata, fileName))
-    {
-        emitSignal(fileName);
-        NX_WARNING(this, lm("File metadata vs file name integrity problem: %1").args(fileName));
         return false;
     }
 

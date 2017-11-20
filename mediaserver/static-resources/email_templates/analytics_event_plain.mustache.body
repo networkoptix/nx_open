@@ -5,7 +5,12 @@
     {{event}} {{source}}
 {{/analyticsSdkEventType}}
 
+{{#count}}
 Trigger has been activated {{count}} times, first:
+{{/count}}
+{{^count}}
+    Trigger has been activated at:
+{{/count}}
 {{timestampDate}} {{timestampTime}}
 
 {{#urlint}}
