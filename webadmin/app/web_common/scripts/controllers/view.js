@@ -310,7 +310,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
-                screenfull.request($('.view-panel').get(0));
+                screenfull.request($('.fullscreen-area').get(0));
             }
         };
 
