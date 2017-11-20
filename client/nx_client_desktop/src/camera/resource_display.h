@@ -35,7 +35,7 @@ public:
      * \param resource                  Resource that this display is associated with. Must not be NULL.
      * \param parent                    Parent of this display.
      */
-    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent);
+    QnResourceDisplay(const QnResourcePtr& resource, QObject* parent = nullptr);
 
     /**
      * Virtual destructor.

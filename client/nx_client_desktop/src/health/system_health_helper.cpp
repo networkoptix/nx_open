@@ -28,8 +28,6 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("System is in safe mode");
         case QnSystemHealth::EmailSendError:
             return tr("Error while sending email");
-        case QnSystemHealth::StoragesAreFull:
-            return tr("Storage is full");
         case QnSystemHealth::StoragesNotConfigured:
             return tr("Storage is not configured");
         case QnSystemHealth::ArchiveRebuildFinished:
@@ -126,9 +124,6 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::SystemIsReadOnly:
             messageParts << tr("System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
-            break;
-        case QnSystemHealth::StoragesAreFull:
-            messageParts << tr("Storage is full on the following Server:") << resourceName;
             break;
         case QnSystemHealth::StoragesNotConfigured:
             messageParts << tr("Storage is not configured on the following Server:") << resourceName;

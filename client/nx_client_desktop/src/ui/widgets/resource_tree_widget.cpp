@@ -75,6 +75,10 @@ private:
     qreal nodeOrder(const QModelIndex &index) const
     {
         Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+        if (nodeType == Qn::EdgeNode)
+            return Qn::ServersNode;
+
         if (nodeType != Qn::ResourceNode)
             return nodeType;
 
@@ -85,9 +89,6 @@ private:
 
         const bool isServer = resource->hasFlags(Qn::server);
         if (isServer)
-            return Qn::ServersNode;
-
-        if (nodeType == Qn::EdgeNode)
             return Qn::ServersNode;
 
         return nodeType;

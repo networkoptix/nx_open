@@ -274,9 +274,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
 QnWorkbenchNavigator::~QnWorkbenchNavigator()
 {
-    m_thumbnailLoaderByResource.clear();
-    for (auto& value: m_threadedChunksMergeTool)
-        value.reset();
 }
 
 QnTimeSlider *QnWorkbenchNavigator::timeSlider() const
