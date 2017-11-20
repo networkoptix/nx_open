@@ -61,18 +61,32 @@
     </div>
 {{/screenshot}}
 
+{{#count}}
+
 <div class="date" style="padding: 0 20px;padding-top: 15px;line-height: 20px;font-size: 14px">
     Trigger has been activated {{count}} times, first:<br />
     <b>{{timestampDate}} {{timestampTime}}</b>
-
-    {{#urlint}}
-        <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0"><a href="{{urlint}}" style="color: #2FA2DB">Play archive from the local network</a></p>
-    {{/urlint}}
-
-    {{#urlext}}
-        <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0"><a href="{{urlext}}" style="color: #2FA2DB">Play archive from the web</a></p>
-    {{/urlext}}
 </div>
+
+{{/count}}
+
+{{^count}}
+
+<div class="date" style="padding: 0 20px;padding-top: 15px;line-height: 20px;font-size: 14px">
+    Trigger has been activated at:<br />
+    <b>{{timestampDate}} {{timestampTime}}</b>
+</div>
+
+{{/count}}
+
+{{#urlint}}
+    <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px"><a href="{{urlint}}" style="color: #2FA2DB">Play archive from the local network</a></p>
+{{/urlint}}
+
+{{#urlext}}
+    <p style="color: #263137;font-size: 15px;line-height: 20px;margin: 0;padding: 0 20px"><a href="{{urlext}}" style="color: #2FA2DB">Play archive from the web</a></p>
+{{/urlext}}
+
         </td>
         <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"></td>
     </tr>
