@@ -493,7 +493,7 @@ void QnMediaResourceWidget::initDisplay()
     const auto zoomTargetWidget = dynamic_cast<QnMediaResourceWidget *>(this->zoomTargetWidget());
     setDisplay(zoomTargetWidget
         ? zoomTargetWidget->display()
-        : QnResourceDisplayPtr(new QnResourceDisplay(d->resource, this)));
+        : QnResourceDisplayPtr(new QnResourceDisplay(d->resource)));
 }
 
 void QnMediaResourceWidget::initSoftwareTriggers()

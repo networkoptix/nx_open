@@ -227,7 +227,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
-        QN_DECLARE_RW_PROPERTY(QSet<QnSystemHealth::MessageType>, popupSystemHealth, setPopupSystemHealth,      POPUP_SYSTEM_HEALTH,        QnSystemHealth::allVisibleMessageTypes())
+        QN_DECLARE_RW_PROPERTY(QSet<QnSystemHealth::MessageType>, popupSystemHealth, setPopupSystemHealth,      POPUP_SYSTEM_HEALTH,        QnSystemHealth::allVisibleMessageTypes().toSet())
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        autoLogin,              setAutoLogin,               AUTO_LOGIN,                 false)
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)

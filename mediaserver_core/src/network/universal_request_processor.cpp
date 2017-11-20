@@ -16,6 +16,7 @@
 #include <nx/network/flash_socket/types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -267,7 +268,12 @@ bool QnUniversalRequestProcessor::isProxy(QnCommonModule* commonModule, const nx
         // is proxy to other media server
         QnUuid desiredServerGuid(xServerGuidIter->second);
         if (desiredServerGuid != commonModule->moduleGUID())
+        {
+            NX_VERBOSE(typeid(QnUniversalRequestProcessor),
+                lm("Need proxy to another server for request [%1]").arg(request.requestLine));
+
             return true;
+        }
     }
 
     return needStandardProxy(commonModule, request);
