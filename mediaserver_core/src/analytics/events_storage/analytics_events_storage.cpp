@@ -127,7 +127,7 @@ void EventsStorage::insertEventAttributes(
         INSERT INTO event_properties(docid, content)
         VALUES(:eventId, :content)
     )sql");
-    insertEventAttributesQuery.bindValue(":eventId", eventId);
+    insertEventAttributesQuery.bindValue(":eventId", static_cast<qint64>(eventId));
     insertEventAttributesQuery.bindValue(
         ":content",
         containerString(eventAttributes, "; ", "", "", ""));

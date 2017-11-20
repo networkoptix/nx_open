@@ -62,7 +62,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             return d->priority(index.row());
 
         case Qn::TimeoutRole:
-            return d->locked(index.row()) ? -1 : std::chrono::milliseconds(kDisplayTimeout).count();
+            return d->locked(index.row()) ? -1 : static_cast<qint64>(kDisplayTimeout.count());
 
         default:
             return base_type::data(index, role);
