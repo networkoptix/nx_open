@@ -3,7 +3,7 @@
 #include "../notification_list_model.h"
 
 #include <QtCore/QHash>
-#include <QtCore/QPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QScopedPointer>
 
 #include <nx/vms/event/event_fwd.h>
@@ -44,7 +44,7 @@ private:
     QScopedPointer<vms::event::StringsHelper> m_helper;
     QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
     QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
-    QHash<QnUuid, QPointer<AudioPlayer>> m_players;
+    QHash<QnUuid, QSharedPointer<AudioPlayer>> m_players;
 };
 
 } // namespace

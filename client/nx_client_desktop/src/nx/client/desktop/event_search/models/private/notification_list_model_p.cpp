@@ -38,11 +38,11 @@ QPixmap toPixmap(const QIcon& icon)
     return QnSkin::maximumSizePixmap(icon);
 }
 
-AudioPlayer* loopSound(const QString& filePath)
+QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
 {
     QScopedPointer<AudioPlayer> player(new AudioPlayer());
     if (!player->open(filePath))
-        return nullptr;
+        return QSharedPointer<AudioPlayer>();
 
     connect(player.data(), &AudioPlayer::done, player.data(),
         [filePath, player = player.data()]()
@@ -50,11 +50,10 @@ AudioPlayer* loopSound(const QString& filePath)
             player->close();
             if (player->open(filePath))
                 player->playAsync();
-            else
-                player->deleteLater();
         });
 
-    return player.take();
+    return QSharedPointer<AudioPlayer>(player.take(),
+        [](AudioPlayer* player) { player->deleteLater(); });
 }
 
 } // namespace
@@ -77,13 +76,6 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         {
             m_uuidHashes.clear();
             m_itemsByLoadingSound.clear();
-
-            for (auto player: m_players)
-            {
-                if (player)
-                    player->deleteLater();
-            }
-
             m_players.clear();
         });
 
@@ -95,10 +87,6 @@ NotificationListModel::Private::Private(NotificationListModel* q):
                 const auto& event = this->q->getEvent(row);
                 const auto extraData = Private::extraData(event);
                 m_uuidHashes[extraData.first][extraData.second].remove(event.id);
-
-                if (auto player = m_players.value(event.id))
-                    player->deleteLater();
-
                 m_players.remove(event.id);
             }
     });
@@ -109,13 +97,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         {
             const auto path = context()->instance<ServerNotificationCache>()->getFullPath(fileName);
             for (const auto& id: m_itemsByLoadingSound.values(fileName))
-            {
-                auto& player = m_players[id];
-                if (player)
-                    player->deleteLater();
-
-                player = loopSound(path);
-            }
+                m_players[id] = loopSound(path);
 
             m_itemsByLoadingSound.remove(fileName);
         });
