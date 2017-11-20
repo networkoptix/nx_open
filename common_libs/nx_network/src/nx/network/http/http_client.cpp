@@ -138,11 +138,14 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     return result;
 }
 
-BufferType HttpClient::fetchEntireMessageBody()
+boost::optional<BufferType> HttpClient::fetchEntireMessageBody()
 {
     QByteArray buffer;
     while (!eof())
         buffer += fetchMessageBodyBuffer();
+
+    if (m_error)
+        return boost::none;
 
     return buffer;
 }
