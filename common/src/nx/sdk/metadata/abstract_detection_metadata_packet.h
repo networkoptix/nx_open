@@ -52,9 +52,9 @@ static const nxpl::NX_GUID IID_DetectedObject
     = {{0x0f, 0xf4, 0xa4, 0x6f, 0xfd, 0x08, 0x4f, 0x4a, 0x97, 0x88, 0x16, 0xa0, 0x8c, 0xd6, 0x4a, 0x29}};
 
 /**
- * @brief The AbstarctDetectedObject struct represents the single detected on the scene object.
+ * Represents a single object detected on the scene.
  */
-class AbstarctDetectedObject: public AbstractMetadataItem
+class AbstarctDetectedObject: public AbstractMetadataItem //< TODO: #mike: Rename (typo).
 {
 public:
     /**

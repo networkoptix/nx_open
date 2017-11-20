@@ -19,6 +19,7 @@ namespace metadata {
 class EventHandler: public nx::sdk::metadata::AbstractMetadataHandler
 {
 public:
+    // TODO: #mike: Separate error handling from metadata handling.
     virtual void handleMetadata(
         nx::sdk::Error error,
         nx::sdk::metadata::AbstractMetadataPacket* metadata) override;
