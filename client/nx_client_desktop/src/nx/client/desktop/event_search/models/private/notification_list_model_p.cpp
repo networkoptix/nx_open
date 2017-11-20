@@ -141,7 +141,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     const auto timestampMs = params.eventTimestampUsec / 1000;
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
@@ -237,7 +237,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                     .withArgument(Qn::ItemTimeRole, timestampMs);
                 eventData.previewCamera = camera;
                 eventData.previewTimeMs = timestampMs;
-                setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
 
@@ -247,7 +246,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 eventData.actionId = action::OpenInNewTabAction;
                 eventData.actionParameters = camera;
                 eventData.previewCamera = camera;
-                setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
 
@@ -258,7 +256,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 eventData.actionId = action::CameraSettingsAction;
                 eventData.actionParameters = camera;
                 eventData.previewCamera = camera;
-                setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
 
@@ -300,7 +297,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                         eventData.previewCamera = sourceCameras[0];
                     eventData.cameras = sourceCameras;
                     eventData.previewTimeMs = timestampMs;
-                    setupAcknowledgeAction(eventData, sourceCameras.first(), action);
+                    camera = sourceCameras.first();
                 }
                 break;
             }
@@ -314,6 +311,9 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     if (eventData.removable && action->actionType() != vms::event::playSoundAction)
         eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
+
+    if (action->actionType() == vms::event::showPopupAction && camera)
+        setupAcknowledgeAction(eventData, camera, action);
 
     if (!q->addEvent(eventData))
         return;
@@ -366,7 +366,10 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     const nx::vms::event::AbstractActionPtr& action)
 {
     if (action->actionType() != vms::event::ActionType::showPopupAction)
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "Invalid action type");
         return;
+    }
 
     if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
         return;
