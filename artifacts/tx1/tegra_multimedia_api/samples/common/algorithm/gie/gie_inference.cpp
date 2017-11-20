@@ -508,14 +508,14 @@ GIE_Context::caffeToGIEModel(const string& deployfile, const string& modelfile)
 
 void
 GIE_Context::buildGieContext(const string& deployfile,
-        const string& modelfile, bool bUseCPUBuf)
+        const string& modelfile, const string& cachefile, bool bUseCPUBuf)
 {
     if (!parseNet(deployfile))
     {
         cout<<"parse net failed, exit!"<<endl;
         exit(0);
     }
-    ifstream gieModelFile("gieModel.cache");
+    ifstream gieModelFile(cachefile);
     if (gieModelFile.good())
     {
         cout<<"Using cached GIE model"<<endl;
@@ -525,7 +525,7 @@ GIE_Context::buildGieContext(const string& deployfile,
     {
         caffeToGIEModel(deployfile, modelfile);
         cout<<"Create GIE model cache"<<endl;
-        ofstream gieModelFile("gieModel.cache");
+        ofstream gieModelFile(cachefile);
         gieModelFile << gieModelStream.rdbuf();
         gieModelFile.close();
     }
@@ -733,7 +733,7 @@ GIE_Context::parsePed100Bbox(vector<cv::Rect>& rectList, int batch_th)
             const float coverage = output_cov_buf[ow * y + x];
 
 #if 0
-            if (y * ow + x < 100) 
+            if (y * ow + x < 100)
                 std::cout << "coverage: " << coverage << std::endl;
 #endif
 
@@ -848,8 +848,8 @@ GIE_Context::parseNet(const string& deployfile)
         if (!getline(readfile, line))
             return 0;
 
-        string::size_type index;        
-        
+        string::size_type index;
+
         index = line.find("input_dim");
         if (!input_shape_found && index ==std::string::npos)
         {

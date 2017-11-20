@@ -768,8 +768,8 @@ gieThread(void *arg)
                 for (int i = 0; i < rectList.size(); i++)
                 {
                     cv::Rect &r = rectList[i];
-                    cout <<"  x "<< r.x <<" y: " << r.y
-                         <<" width "<< r.width <<" height "<< r.height
+                    cout <<"    x " << r.x << ", y " << r.y
+                         << ", width " << r.width << ", height " << r.height
                          << endl;
                 }
             }
@@ -898,6 +898,7 @@ setDefaults(context_t * ctx)
     memset(ctx, 0, sizeof(context_t));
     ctx->deployfile = exeIni().deployFile;
     ctx->modelfile = exeIni().modelFile;
+    ctx->cachefile = exeIni().cacheFile;
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
@@ -918,6 +919,7 @@ setDefaultsNx(
     memset(ctx, 0, sizeof(context_t));
     ctx->deployfile = deployFileName;
     ctx->modelfile = modelFileName;
+    ctx->cachefile = cacheFileName;
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
@@ -992,7 +994,7 @@ mainOriginal(int argc, char *argv[])
     ctx.rectQueuePtr = new std::queue<std::vector<cv::Rect>>;
 
     // Step-3: Create GIE
-    ctx.gie_ctx->buildGieContext(ctx.deployfile, ctx.modelfile);
+    ctx.gie_ctx->buildGieContext(ctx.deployfile, ctx.modelfile, ctx.cachefile);
     pthread_create(&ctx.gie_thread_handle, NULL, gieThread, &ctx);
 
     // Start decoder after GIE
@@ -1298,7 +1300,7 @@ int Detector::startInference(
 
     std::cout << "Creating GIE thread" << std::endl;
     // Step-3: Create GIE
-    m_ctx.gie_ctx->buildGieContext(m_ctx.deployfile, m_ctx.modelfile);
+    m_ctx.gie_ctx->buildGieContext(m_ctx.deployfile, m_ctx.modelfile, m_ctx.cachefile);
     std::cout << "GIE context has been built" << std::endl;
     pthread_create(&m_ctx.gie_thread_handle, NULL, gieThread, &m_ctx);
 
@@ -1583,7 +1585,8 @@ std::vector<cv::Rect> Detector::getRectangles(int64_t* outPts)
     if (!m_ctx.m_ptsQueue.empty())
     {
         NX_PRINT << "POPPING FROM m_ptsQueue " << m_ctx.m_ptsQueue.size();
-        *outPts = m_ctx.m_ptsQueue.front();
+        if (outPts)
+            *outPts = m_ctx.m_ptsQueue.front();
         m_ctx.m_ptsQueue.pop();
     }
 
