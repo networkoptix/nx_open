@@ -77,7 +77,9 @@ Error Manager::startFetchingMetadata()
         {
             while (!m_stopping)
             {
-                m_handler->handleMetadata(Error::noError, cookSomeEvents());
+                const auto packet = cookSomeEvents();
+                m_handler->handleMetadata(Error::noError, packet);
+                packet->releaseRef();
                 std::this_thread::sleep_for(std::chrono::milliseconds(3000));
             }
         };
