@@ -107,7 +107,7 @@ void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         connect(m_camera, &QnResource::statusChanged, this,
-            &QnCameraAdvancedSettingsWidget::updatePage);
+            &CameraAdvancedSettingsWidget::updatePage);
     }
 
     m_cameraAdvancedSettingsWebPage->setCamera(m_camera);

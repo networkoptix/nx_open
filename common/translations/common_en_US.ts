@@ -486,6 +486,14 @@
         <source>Time Licenses</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bridge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bridge Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -654,6 +662,13 @@
     </message>
 </context>
 <context>
+    <name>QnSecurityCamResource</name>
+    <message>
+        <source>Operation is not permitted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSignHelper</name>
     <message>
         <source>Unknown</source>
@@ -773,6 +788,10 @@
     </message>
     <message>
         <source>Invalid resource type for data export.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No data was exported.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1503,6 +1522,15 @@
     </message>
     <message>
         <source>Acknowledge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 at %2</source>
+        <comment>Analytics Event at some camera</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

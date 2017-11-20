@@ -32,15 +32,6 @@ public:
     QScrollBar* scrollBar() const;
 
 private:
-    struct Tile
-    {
-        EventTile* widget = nullptr;
-        int position = 0;
-
-        Tile() = default;
-        Tile(EventTile* widget, int position = 0): widget(widget), position(position) {}
-    };
-
     void updateView();
     void updateScrollRange();
 
@@ -49,6 +40,8 @@ private:
     void insertNewTiles(int index, int count);
     void removeTiles(int first, int count);
     void clear();
+
+    int indexOf(EventTile* tile) const;
 
     // Creates a tile widget for a data model item using the following roles:
     //     Qt::UuidRole for unique id
@@ -68,7 +61,8 @@ private:
     QScrollBar* const m_scrollBar = nullptr;
     QWidget* const m_viewport = nullptr;
 
-    QList<Tile> m_tiles;
+    QList<EventTile*> m_tiles;
+    QHash<EventTile*, int> m_positions;
     int m_totalHeight = 0;
 
     nx::utils::IntegerRange m_visible;

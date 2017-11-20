@@ -2,7 +2,13 @@
 
 #include "../notification_list_model.h"
 
+#include <QtCore/QHash>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QScopedPointer>
+
 #include <nx/vms/event/event_fwd.h>
+
+class AudioPlayer;
 
 namespace nx {
 namespace client {
@@ -22,8 +28,6 @@ public:
     using ExtraData = QPair<QnUuid /*ruleId*/, QnResourcePtr>;
     static ExtraData extraData(const EventData& event);
 
-    void beforeRemove(const EventData& event);
-
 private:
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);
@@ -39,6 +43,8 @@ private:
     NotificationListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
+    QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
+    QHash<QnUuid, QSharedPointer<AudioPlayer>> m_players;
 };
 
 } // namespace

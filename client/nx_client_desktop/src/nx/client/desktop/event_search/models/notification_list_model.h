@@ -17,9 +17,7 @@ public:
     explicit NotificationListModel(QObject* parent = nullptr);
     virtual ~NotificationListModel() override;
 
-protected:
-    virtual void triggerDefaultAction(const EventData& event) override;
-    virtual void beforeRemove(const EventData& event) override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
 private:
     class Private;

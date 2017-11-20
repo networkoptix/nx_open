@@ -257,7 +257,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::ArchiveRebuildCanceled:
@@ -295,8 +294,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     const QVariant& params,
     bool visible)
 {
-    // TODO: Need to remove notification "Storage is full".
-    bool canShow = message != QnSystemHealth::StoragesAreFull;
+    bool canShow = true;
 
     const bool connected = !commonModule()->remoteGUID().isNull();
 
@@ -353,7 +351,6 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     switch (message)
     {
         case QnSystemHealth::EmailSendError:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:

@@ -3,12 +3,12 @@
     <parent>
         <artifactId>plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <artifactId>rpi_cam</artifactId>
     <packaging>pom</packaging>
     <name>Nx Witness Raspberry Pi Camera Plugin</name>

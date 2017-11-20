@@ -14,10 +14,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <utils/common/delayed.h>
+#include <utils/media/audio_player.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -36,6 +38,24 @@ QPixmap toPixmap(const QIcon& icon)
     return QnSkin::maximumSizePixmap(icon);
 }
 
+QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
+{
+    QScopedPointer<AudioPlayer> player(new AudioPlayer());
+    if (!player->open(filePath))
+        return QSharedPointer<AudioPlayer>();
+
+    connect(player.data(), &AudioPlayer::done, player.data(),
+        [filePath, player = player.data()]()
+        {
+            player->close();
+            if (player->open(filePath))
+                player->playAsync();
+        });
+
+    return QSharedPointer<AudioPlayer>(player.take(),
+        [](AudioPlayer* player) { player->deleteLater(); });
+}
+
 } // namespace
 
 NotificationListModel::Private::Private(NotificationListModel* q):
@@ -51,7 +71,36 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(handler, &QnWorkbenchNotificationsHandler::notificationRemoved,
         this, &Private::removeNotification);
 
-    connect(q, &EventListModel::modelReset, this, [this]() { m_uuidHashes.clear(); });
+    connect(q, &EventListModel::modelReset, this,
+        [this]()
+        {
+            m_uuidHashes.clear();
+            m_itemsByLoadingSound.clear();
+            m_players.clear();
+        });
+
+    connect(q, &EventListModel::rowsAboutToBeRemoved, this,
+        [this](const QModelIndex& /*parent*/, int first, int last)
+        {
+            for (int row = first; row <= last; ++row)
+            {
+                const auto& event = this->q->getEvent(row);
+                const auto extraData = Private::extraData(event);
+                m_uuidHashes[extraData.first][extraData.second].remove(event.id);
+                m_players.remove(event.id);
+            }
+    });
+
+    connect(context()->instance<ServerNotificationCache>(),
+        &ServerNotificationCache::fileDownloaded, this,
+        [this](const QString& fileName)
+        {
+            const auto path = context()->instance<ServerNotificationCache>()->getFullPath(fileName);
+            for (const auto& id: m_itemsByLoadingSound.values(fileName))
+                m_players[id] = loopSound(path);
+
+            m_itemsByLoadingSound.remove(fileName);
+        });
 }
 
 NotificationListModel::Private::~Private()
@@ -65,12 +114,6 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
     return event.extraData.value<ExtraData>();
 }
 
-void NotificationListModel::Private::beforeRemove(const EventData& event)
-{
-    const auto extraData = Private::extraData(event);
-    m_uuidHashes[extraData.first][extraData.second].remove(event.id);
-}
-
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
 {
     const auto& params = action->getRuntimeParams();
@@ -80,7 +123,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     const auto timestampMs = params.eventTimestampUsec / 1000;
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
@@ -143,25 +186,17 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.timestampMs = timestampMs;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
-    eventData.titleColor = QnNotificationLevel::notificationColor(
+    eventData.titleColor = QnNotificationLevel::notificationTextColor(
         QnNotificationLevel::valueOf(action));
 
-    // TODO: FIXME: #vkutin Restore functionality.
-#if 0
-    switch (action->actionType())
+    if (action->actionType() == vms::event::playSoundAction)
     {
-        // TODO: #GDM not the best place for it.
-        case vms::event::playSoundAction:
-        {
-            QString soundUrl = action->getParams().url;
-            m_itemsByLoadingSound.insert(soundUrl, item);
+        const auto soundUrl = action->getParams().url;
+        if (!m_itemsByLoadingSound.contains(soundUrl))
             context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
-            break;
-        }
-        default:
-            break;
-    };
-#endif
+
+        m_itemsByLoadingSound.insert(soundUrl, eventData.id);
+    }
 
     if (action->actionType() == vms::event::showOnAlarmLayoutAction)
     {
@@ -184,7 +219,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                     .withArgument(Qn::ItemTimeRole, timestampMs);
                 eventData.previewCamera = camera;
                 eventData.previewTimeMs = timestampMs;
-                setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
 
@@ -194,7 +228,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 eventData.actionId = action::OpenInNewTabAction;
                 eventData.actionParameters = camera;
                 eventData.previewCamera = camera;
-                setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
 
@@ -205,7 +238,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 eventData.actionId = action::CameraSettingsAction;
                 eventData.actionParameters = camera;
                 eventData.previewCamera = camera;
-                setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
 
@@ -247,7 +279,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                         eventData.previewCamera = sourceCameras[0];
                     eventData.cameras = sourceCameras;
                     eventData.previewTimeMs = timestampMs;
-                    setupAcknowledgeAction(eventData, sourceCameras.first(), action);
+                    camera = sourceCameras.first();
                 }
                 break;
             }
@@ -259,18 +291,17 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     eventData.icon = pixmapForAction(action, eventData.titleColor);
 
+    if (eventData.removable && action->actionType() != vms::event::playSoundAction)
+        eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
+
+    if (action->actionType() == vms::event::showPopupAction && camera)
+        setupAcknowledgeAction(eventData, camera, action);
+
     if (!q->addEvent(eventData))
         return;
 
     if (!actionHasId)
         m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
-
-    const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
-    if (!isPlaySoundAction && eventData.removable)
-    {
-        executeDelayedParented([this, id = eventData.id]() { q->removeEvent(id); },
-            std::chrono::milliseconds(kDisplayTimeout).count(), this);
-    }
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
@@ -318,7 +349,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 {
     if (action->actionType() != vms::event::ActionType::showPopupAction)
     {
-        NX_ASSERT(false, "Invalid action type.");
+        NX_ASSERT(false, Q_FUNC_INFO, "Invalid action type");
         return;
     }
 

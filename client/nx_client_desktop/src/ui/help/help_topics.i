@@ -167,7 +167,6 @@ QN_HELP_TOPIC(EventsActions_EmailNotSet_Help,					"e-mail_is_not_set_for_users.h
 QN_HELP_TOPIC(EventsActions_EmailServerNotSet_Help,				"e-mail_server_is_not_configure.htm")
 QN_HELP_TOPIC(EventsActions_SendMailError_Help,					"error_while_sending_e-mail.htm")
 QN_HELP_TOPIC(EventsActions_StoragesMisconfigured_Help,			"storages_misconfiguration.htm")
-QN_HELP_TOPIC(EventsActions_StorageFull_Help,					"storage_is_full.htm")
 
 QN_HELP_TOPIC(EventsActions_CameraMotion_Help,					"motion_on_camera.htm")
 QN_HELP_TOPIC(EventsActions_CameraDisconnected_Help,			"camera_disconnection_malfuncti.htm")

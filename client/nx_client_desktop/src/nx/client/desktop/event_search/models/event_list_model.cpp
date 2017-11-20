@@ -15,7 +15,6 @@ namespace desktop {
 
 EventListModel::EventListModel(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
 }
@@ -31,16 +30,13 @@ int EventListModel::rowCount(const QModelIndex& parent) const
 
 QVariant EventListModel::data(const QModelIndex& index, int role) const
 {
-    if (!d->isValid(index))
+    if (!isValid(index))
         return QVariant();
 
     const auto& event = d->getEvent(index.row());
     switch (role)
     {
         case Qt::DisplayRole:
-        case Qt::AccessibleTextRole:
-        case Qt::StatusTipRole:
-        case Qt::WhatsThisRole:
             return QVariant::fromValue(event.title);
 
         case Qt::DecorationRole:
@@ -55,23 +51,16 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::PreviewTimeRole:
             return QVariant::fromValue(event.previewTimeMs);
 
-        case Qn::TimestampTextRole:
-            return QVariant::fromValue(timestampText(event.timestampMs));
-
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);
 
         case Qn::DescriptionTextRole:
-        case Qt::AccessibleDescriptionRole:
             return QVariant::fromValue(event.description);
 
         case Qt::ForegroundRole:
             return event.titleColor.isValid()
                 ? QVariant::fromValue(event.titleColor)
                 : QVariant();
-
-        case Qn::ResourceSearchStringRole:
-            return lit("%1 %2").arg(event.title).arg(event.description);
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(d->previewCamera(event));
@@ -85,11 +74,11 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::CommandActionRole:
             return QVariant::fromValue(event.extraAction);
 
-        case Qn::PriorityRole:
-            return eventPriority(event);
+        case Qn::TimeoutRole:
+            return event.removable ? event.lifetimeMs : -1;
 
         default:
-            return QVariant();
+            return base_type::data(index, role);
     }
 }
 
@@ -105,21 +94,14 @@ bool EventListModel::updateEvent(const EventData& event)
     return d->updateEvent(event);
 }
 
-bool EventListModel::removeEvent(const QnUuid& id)
-{
-    return d->removeEvent(id);
-}
-
 QModelIndex EventListModel::indexOf(const QnUuid& id) const
 {
     return index(d->indexOf(id));
 }
 
-EventListModel::EventData EventListModel::getEvent(const QModelIndex& index) const
+EventListModel::EventData EventListModel::getEvent(int row) const
 {
-    return index.model() == this && index.isValid()
-        ? d->getEvent(index.row())
-        : EventData();
+    return d->getEvent(row);
 }
 
 void EventListModel::clear()
@@ -127,72 +109,39 @@ void EventListModel::clear()
     d->clear();
 }
 
-QString EventListModel::timestampText(qint64 timestampMs) const
+bool EventListModel::removeEvent(const QnUuid& id)
 {
-    if (timestampMs <= 0)
-        return QString();
-
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
-    if (qnSyncTime->currentDateTime().date() != dateTime.date())
-        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
-
-    return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+    return d->removeEvent(id);
 }
 
-void EventListModel::defaultAction(const QnUuid& id)
+bool EventListModel::removeRows(int row, int count, const QModelIndex& parent)
 {
-    d->defaultAction(id);
+    if (parent.isValid() || row < 0 || count < 0 || row + count > rowCount())
+        return false;
+
+    d->removeEvents(row, count);
+    return true;
 }
 
-void EventListModel::closeAction(const QnUuid& id)
+bool EventListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
 {
-    d->closeAction(id);
-}
+    if (!index.isValid() || index.model() != this)
+        return false;
 
-void EventListModel::linkAction(const QnUuid& id, const QString& link)
-{
-    d->linkAction(id, link);
-}
+    switch (role)
+    {
+        case Qn::DefaultNotificationRole:
+        case Qn::ActivateLinkRole:
+        {
+            const auto& event = getEvent(index.row());
+            if (event.actionId != ui::action::NoAction)
+                menu()->triggerIfPossible(event.actionId, event.actionParameters);
+            return true;
+        }
 
-void EventListModel::triggerDefaultAction(const EventData& event)
-{
-    if (event.actionId != ui::action::NoAction)
-        menu()->triggerIfPossible(event.actionId, event.actionParameters);
-}
-
-void EventListModel::triggerCloseAction(const EventData& event)
-{
-    NX_ASSERT(event.removable, Q_FUNC_INFO, "Event is not closeable");
-    if (event.removable)
-        removeEvent(event.id);
-}
-
-void EventListModel::triggerLinkAction(const EventData& event, const QString& link)
-{
-    triggerDefaultAction(event);
-}
-
-int EventListModel::eventPriority(const EventData& /*event*/) const
-{
-    return 0;
-}
-
-void EventListModel::beforeRemove(const EventData& /*event*/)
-{
-}
-
-bool EventListModel::canFetchMore(const QModelIndex& /*parent*/) const
-{
-    return false;
-}
-
-void EventListModel::fetchMore(const QModelIndex& /*parent*/)
-{
-}
-
-void EventListModel::finishFetch()
-{
-    executeDelayedParented([this]() { emit fetchFinished(QPrivateSignal()); }, 0, this);
+        default:
+            return false;
+    }
 }
 
 } // namespace

@@ -132,7 +132,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         [this](const QModelIndex& first, const QModelIndex& last)
         {
             for (int i = first.row(); i <= last.row(); ++i)
-                updateTile(m_tiles[i].widget, first.sibling(i, 0));
+                updateTile(m_tiles[i], first.sibling(i, 0));
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
@@ -146,29 +146,30 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
 
 EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 {
-    const auto id = index.data(Qn::UuidRole).value<QnUuid>();
-    if (id.isNull())
-        return nullptr;
-
-    auto tile = new EventTile(id, q);
+    auto tile = new EventTile(q);
     updateTile(tile, index);
 
     connect(tile, &EventTile::closeRequested, this,
         [this]()
         {
-            emit q->closeRequested(static_cast<EventTile*>(sender())->id());
+            if (m_model)
+                m_model->removeRow(indexOf(static_cast<EventTile*>(sender())));
         });
 
     connect(tile, &EventTile::linkActivated, this,
         [this](const QString& link)
         {
-            emit q->linkActivated(static_cast<EventTile*>(sender())->id(), link);
+            const auto tile = static_cast<EventTile*>(sender());
+            if (m_model)
+                m_model->setData(m_model->index(indexOf(tile)), link, Qn::ActivateLinkRole);
         });
 
     connect(tile, &EventTile::clicked, this,
         [this]()
         {
-            emit q->clicked(static_cast<EventTile*>(sender())->id());
+            const auto tile = static_cast<EventTile*>(sender());
+            if (m_model)
+                m_model->setData(m_model->index(indexOf(tile)), QVariant(), Qn::DefaultNotificationRole);
         });
 
     return tile;
@@ -184,6 +185,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
+    tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
@@ -227,7 +229,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count)
     }
 
     const auto position = (index > 0)
-        ? m_tiles[index - 1].position + m_tiles[index - 1].widget->height() + kDefaultTileSpacing
+        ? m_positions.value(m_tiles[index - 1]) + m_tiles[index - 1]->height() + kDefaultTileSpacing
         : 0;
 
     int currentPosition = position;
@@ -244,14 +246,15 @@ void EventRibbon::Private::insertNewTiles(int index, int count)
         tile->setVisible(false);
         tile->resize(qMax(1, m_viewport->width()), kApproximateTileHeight);
         tile->setParent(m_viewport);
-        m_tiles.insert(nextIndex++, Tile(tile, currentPosition));
+        m_tiles.insert(nextIndex++, tile);
+        m_positions[tile] = currentPosition;
         currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
     }
 
     const auto delta = currentPosition - position;
 
     for (int i = nextIndex; i < m_tiles.count(); ++i)
-        m_tiles[i].position += delta;
+        m_positions[m_tiles[i]] += delta;
 
     m_totalHeight += delta;
     q->updateGeometry();
@@ -277,13 +280,14 @@ void EventRibbon::Private::removeTiles(int first, int count)
     int delta = 0;
 
     const int last = first + count - 1;
-    const int nextPosition = m_tiles[last].position + m_tiles[last].widget->height()
+    const int nextPosition = m_positions.value(m_tiles[last]) + m_tiles[last]->height()
         + kDefaultTileSpacing;
 
     for (int i = first; i <= last; ++i)
     {
-        delta += m_tiles[first].widget->height() + kDefaultTileSpacing;
-        m_tiles[first].widget->deleteLater();
+        delta += m_tiles[first]->height() + kDefaultTileSpacing;
+        m_tiles[first]->deleteLater();
+        m_positions.remove(m_tiles[first]);
         m_tiles.removeAt(first);
     }
 
@@ -293,7 +297,7 @@ void EventRibbon::Private::removeTiles(int first, int count)
     m_visible = newVisible.left;
 
     for (int i = first; i < m_tiles.count(); ++i)
-        m_tiles[i].position -= delta;
+        m_positions[m_tiles[i]] -= delta;
 
     updateView();
 
@@ -304,9 +308,10 @@ void EventRibbon::Private::removeTiles(int first, int count)
 void EventRibbon::Private::clear()
 {
     for (auto& tile: m_tiles)
-        tile.widget->deleteLater();
+        tile->deleteLater();
 
     m_tiles.clear();
+    m_positions.clear();
     m_totalHeight = 0;
     m_visible = nx::utils::IntegerRange();
 
@@ -314,6 +319,17 @@ void EventRibbon::Private::clear()
     m_scrollBar->setValue(0);
 
     q->updateGeometry();
+}
+
+int EventRibbon::Private::indexOf(EventTile* tile) const
+{
+    const auto position = m_positions.value(tile);
+    const auto first = std::lower_bound(m_tiles.cbegin(), m_tiles.cend(), position,
+        [this](EventTile* left, int right) { return m_positions.value(left) < right; });
+
+    return first != m_tiles.cend() && m_positions.value(*first) == position
+        ? std::distance(m_tiles.cbegin(), first)
+        : -1;
 }
 
 int EventRibbon::Private::totalHeight() const
@@ -354,20 +370,20 @@ void EventRibbon::Private::updateView()
     const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
     const int height = m_viewport->height();
 
-    const auto first = std::upper_bound(m_tiles.begin(), m_tiles.end(), base,
-        [](int left, const Tile& right) { return left < right.position; }) - 1;
+    const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
+        [this](int left, EventTile* right) { return left < m_positions.value(right); }) - 1;
 
     auto iter = first;
-    int currentPosition = first->position;
+    int currentPosition = m_positions.value(*first);
     const auto positionLimit = base + height;
 
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
-        iter->position = currentPosition;
-        iter->widget->setVisible(true);
-        iter->widget->setGeometry(0, iter->position - base,
-            m_viewport->width(), calculateHeight(iter->widget));
-        currentPosition += iter->widget->height() + kDefaultTileSpacing;
+        m_positions[*iter] = currentPosition;
+        (*iter)->setVisible(true);
+        (*iter)->setGeometry(0, currentPosition - base,
+            m_viewport->width(), calculateHeight(*iter));
+        currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
 
@@ -375,8 +391,8 @@ void EventRibbon::Private::updateView()
 
     while (iter != m_tiles.end())
     {
-        iter->position = currentPosition;
-        currentPosition += iter->widget->height() + kDefaultTileSpacing;
+        m_positions[*iter] = currentPosition;
+        currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
 
@@ -386,12 +402,12 @@ void EventRibbon::Private::updateView()
         q->updateGeometry();
     }
 
-    nx::utils::IntegerRange newVisible(std::distance(m_tiles.begin(), first), visibleCount);
+    nx::utils::IntegerRange newVisible(std::distance(m_tiles.cbegin(), first), visibleCount);
 
     for (int i = m_visible.first(); i <= m_visible.last(); ++i)
     {
         if (!newVisible.contains(i))
-            m_tiles[i].widget->setVisible(false);
+            m_tiles[i]->setVisible(false);
     }
 
     m_visible = newVisible;

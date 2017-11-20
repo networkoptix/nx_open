@@ -415,7 +415,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
@@ -507,7 +507,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
-                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -520,7 +519,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     camera);
 
                 loadThumbnailForItem(item, camera);
-                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -534,7 +532,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     camera);
 
                 loadThumbnailForItem(item, camera);
-                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -587,7 +584,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                         action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
-                    addAcknoledgeButtonIfNeeded(item, sourceCameras.first(), action);
+                    camera = sourceCameras.first();
                 }
                 break;
             }
@@ -596,6 +593,9 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
         }
     }
+
+    if (action->actionType() == vms::event::showPopupAction && camera)
+        addAcknoledgeButtonIfNeeded(item, camera, action);
 
     m_itemsByEventRuleId.insert(ruleId, item);
 
@@ -824,7 +824,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             break;
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::ArchiveRebuildCanceled:

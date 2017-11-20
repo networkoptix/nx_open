@@ -68,6 +68,8 @@ public: // overrides section
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
+    virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+
 signals:
     void sourceRowsCountChanged();
     void filterRoleChanged();

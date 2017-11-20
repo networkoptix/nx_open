@@ -99,6 +99,49 @@ int ConcatenationListModel::sourceRowCount(const QAbstractItemModel* sourceModel
     return sourceModel != m_ignoredModel ? sourceModel->rowCount() : 0;
 }
 
+bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& parent)
+{
+    if (parent.isValid())
+        return false;
+
+    if (row < 0 || count < 0 || row + count > rowCount())
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "Rows are out of range");
+        return false;
+    }
+
+    if (count == 0)
+        return true;
+
+    int startRow = 0;
+    for (auto model: m_models)
+    {
+        const auto sourceRows = sourceRowCount(model);
+        if (row >= startRow + sourceRows)
+        {
+            startRow += sourceRows;
+            continue;
+        }
+
+        NX_EXPECT(row >= startRow);
+
+        const auto localFirst = row - startRow;
+        const auto localCount = qMin(localFirst + count, sourceRows) - localFirst;
+
+        if (!model->removeRows(localFirst, localCount))
+            return false;
+
+        count -= localCount;
+        if (count == 0)
+            break;
+
+        startRow += sourceRowCount(model); //< Changed after removal.
+        row = startRow;
+    }
+
+    return true;
+}
+
 void ConcatenationListModel::connectToModel(QAbstractListModel* model)
 {
     NX_EXPECT(model);

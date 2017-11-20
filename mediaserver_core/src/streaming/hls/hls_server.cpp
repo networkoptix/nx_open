@@ -286,6 +286,18 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
+        //parsing request parameters
+        const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
+        std::multimap<QString, QString> requestParams;
+        //moving params to map for more convenient use
+        for (QList<QPair<QString, QString> >::const_iterator
+            it = queryItemsList.begin();
+            it != queryItemsList.end();
+            ++it)
+        {
+            requestParams.insert(std::make_pair(it->first, it->second));
+        }
+
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
@@ -302,25 +314,15 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true, 0 );
+        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame(
+            requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME) == requestParams.end(),
+            0);
         if( lastVideoFrame && (lastVideoFrame->compressionType != AV_CODEC_ID_H264) && (lastVideoFrame->compressionType != AV_CODEC_ID_NONE) )
         {
             //video is not in h.264 format
             NX_LOG( lit("Error. HLS request to resource %1 with codec %2").
                 arg(camResource->getUniqueId()).arg(QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
-        }
-
-        //parsing request parameters
-        const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
-        std::multimap<QString, QString> requestParams;
-        //moving params to map for more convenient use
-        for( QList<QPair<QString, QString> >::const_iterator
-            it = queryItemsList.begin();
-            it != queryItemsList.end();
-            ++it )
-        {
-            requestParams.insert( std::make_pair( it->first, it->second ) );
         }
 
         bool isLive =

@@ -1,4 +1,4 @@
-function(_generate_pch_parameters target pch_dir)
+function(_generate_pch_parameters target parameters_file)
     set(flags
         "$<TARGET_PROPERTY:${target},COMPILE_OPTIONS>"
         "$<$<BOOL:$<TARGET_PROPERTY:${target},POSITION_INDEPENDENT_CODE>>:${CMAKE_CXX_COMPILE_OPTIONS_PIC}>"
@@ -38,7 +38,7 @@ function(_generate_pch_parameters target pch_dir)
     set(definitions
         "$<$<BOOL:${definitions}>:-D$<JOIN:${definitions},\n-D>\n>")
 
-    file(GENERATE OUTPUT "${pch_dir}.parameters" CONTENT
+    file(GENERATE OUTPUT "${parameters_file}" CONTENT
         "${flags}${include_directories}${framework_directories}${definitions}\n")
 endfunction()
 
@@ -92,7 +92,8 @@ function(_add_gcc_clang_precompiled_header target input)
     endif()
     set(pch_file "${pch_dir}/c++")
 
-    _generate_pch_parameters(${target} ${pch_dir})
+    set(parameters_file "${pch_dir}_${CMAKE_CXX_COMPILER_VERSION}.parameters")
+    _generate_pch_parameters(${target} ${parameters_file})
     _get_cxx_standard(${target} cxx_standard)
 
     file(MAKE_DIRECTORY "${pch_dir}")
@@ -110,9 +111,9 @@ function(_add_gcc_clang_precompiled_header target input)
     add_custom_command(
         OUTPUT "${pch_file}"
         COMMAND "${CMAKE_CXX_COMPILER}"
-            "@${pch_dir}.parameters" ${cxx_standard} -x c++-header "${input}" -o "${pch_file}"
+            "@${parameters_file}" ${cxx_standard} -x c++-header "${input}" -o "${pch_file}"
             ${depfile_cmd_args}
-        DEPENDS "${input}" "${pch_dir}.parameters"
+        DEPENDS "${input}" "${parameters_file}"
         IMPLICIT_DEPENDS CXX "${input}"
         ${depfile_args}
         COMMENT "Precompiling ${pch_dir}")

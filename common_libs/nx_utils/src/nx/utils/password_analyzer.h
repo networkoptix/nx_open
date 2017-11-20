@@ -19,6 +19,12 @@ struct NX_UTILS_API PasswordLimitations
     /** Maximal number of repating characters/ */
     static constexpr int kRepeatingCharactersLimit = 4;
 
+    /* Minimal acceptable number of character categories: */
+    static constexpr int kMinimumCategories = 2;
+
+    /* Preferred number of character categories: */
+    static constexpr int kPreferredCategories = 3;
+
     static const QByteArray kAllowedSymbols;
 
     static const QByteArray kCameraAllowedSymbols;
@@ -37,6 +43,8 @@ enum class PasswordStrength
     Long,           /**< Contains too much characters. */
     Incorrect,      /**< Contains invalid characters. */
     IncorrectCamera,/**< Contains invalid characters for camera. */
+    WeakAndFair,    /**< Weak, and still quite short. Actual for cameras. */
+    WeakAndGood,    /**< Weak, has good length. Actual for cameras. */
 };
 
 /** Function to analyze password strength. */

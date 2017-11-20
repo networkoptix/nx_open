@@ -109,7 +109,7 @@ void UnifiedSearchListModel::Private::periodicUpdate()
         return; //< If not live.
 
     NX_EXPECT(m_camera);
-    if (!m_camera)
+    if (!m_camera || !accepted(Filter::events))
         return;
 
     // TODO: FIXME: Don't do update if finite time interval is set
@@ -126,9 +126,14 @@ void UnifiedSearchListModel::Private::fetchAll(qint64 startMs, qint64 endMs,
     if (!m_camera)
         return;
 
-    fetchEvents(startMs, endMs, handler);
-    fetchBookmarks(startMs, endMs, handler);
-    fetchAnalytics(startMs, endMs, handler);
+    if (accepted(Filter::events))
+        fetchEvents(startMs, endMs, handler);
+
+    if (accepted(Filter::bookmarks))
+        fetchBookmarks(startMs, endMs, handler);
+
+    if (accepted(Filter::analytics))
+        fetchAnalytics(startMs, endMs, handler);
 }
 
 void UnifiedSearchListModel::Private::fetchEvents(qint64 startMs, qint64 endMs,
@@ -146,7 +151,7 @@ void UnifiedSearchListModel::Private::fetchEvents(qint64 startMs, qint64 endMs,
 
                 m_eventRequests.remove(handle);
 
-                if (!success)
+                if (!success || !accepted(Filter::events))
                     return;
 
                 for (const auto& event: data.data)
@@ -192,7 +197,7 @@ void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startMs, qint64 endM
     qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
         [this, handler](bool success, const QnCameraBookmarkList& bookmarks)
         {
-            if (!success)
+            if (!success || !accepted(Filter::bookmarks))
                 return;
 
             for (const auto& bookmark: bookmarks)
@@ -283,6 +288,11 @@ void UnifiedSearchListModel::Private::addCameraEvent(const nx::vms::event::Actio
     q->addEvent(data);
 }
 
+bool UnifiedSearchListModel::Private::accepted(Filter filter) const
+{
+    return m_filter == Filter::all || m_filter == filter;
+}
+
 QnVirtualCameraResourcePtr UnifiedSearchListModel::Private::camera() const
 {
     return m_camera;
@@ -294,7 +304,11 @@ void UnifiedSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr
         return;
 
     m_camera = camera;
+    reset();
+}
 
+void UnifiedSearchListModel::Private::reset()
+{
     q->clear(); //< Will call d->clear().
 
     m_startTimeMs = m_endTimeMs = 0;
@@ -311,6 +325,20 @@ void UnifiedSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr
     fetchMore();
 
     m_updateTimer->start();
+}
+
+UnifiedSearchListModel::Filter UnifiedSearchListModel::Private::filter() const
+{
+    return m_filter;
+}
+
+void UnifiedSearchListModel::Private::setFilter(Filter filter)
+{
+    if (filter == m_filter)
+        return;
+
+    m_filter = filter;
+    reset();
 }
 
 QPixmap UnifiedSearchListModel::Private::eventPixmap(const nx::vms::event::EventParameters& event)

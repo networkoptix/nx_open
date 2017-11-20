@@ -22,6 +22,17 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    enum class Filter
+    {
+        all,
+        events,
+        bookmarks,
+        analytics
+    };
+
+    Filter filter() const;
+    void setFilter(Filter filter);
+
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
