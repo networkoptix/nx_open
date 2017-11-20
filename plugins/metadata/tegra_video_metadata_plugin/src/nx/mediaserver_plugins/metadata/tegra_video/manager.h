@@ -37,8 +37,8 @@ public:
     virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
 
 private:
-    nx::sdk::Error stopFetchingMetadataUnsafe();
-    nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
+    nx::sdk::Error stopFetchingMetadataThreadUnsafe();
+
     nx::sdk::metadata::AbstractMetadataPacket* pushFrameAndGetRects(
         nx::sdk::metadata::AbstractDataPacket* mediaPacket);
 
@@ -46,8 +46,6 @@ private:
 
 private:
     mutable std::mutex m_mutex;
-    std::unique_ptr<std::thread> m_thread;
-    std::atomic<bool> m_stopping{false};
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
     int m_counter = 0;
     int m_counterObjects = 0;

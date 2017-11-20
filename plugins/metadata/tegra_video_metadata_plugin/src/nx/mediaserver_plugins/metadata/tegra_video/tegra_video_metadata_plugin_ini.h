@@ -21,12 +21,12 @@ struct TegraVideoMetadataPluginIniConfig: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableTime, "");
 
     NX_INI_STRING(
-        "/opt/networkoptix/mediaserver/bin/nvidia_models/carnet.prototxt",
+        "/opt/networkoptix/mediaserver/nvidia_models/carnet.prototxt",
         deployFile,
         "");
 
     NX_INI_STRING(
-        "/opt/networkoptix/mediaserver/bin/nvidia_models/carnet.caffemodel",
+        "/opt/networkoptix/mediaserver/nvidia_models/carnet.caffemodel",
         modelFile,
         "");
 
