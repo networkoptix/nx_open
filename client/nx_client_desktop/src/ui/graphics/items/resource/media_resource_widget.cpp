@@ -1329,7 +1329,7 @@ void QnMediaResourceWidget::updateDisplay()
     }
     else
     {
-        display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource->toResourcePtr(), this));
+        display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource->toResourcePtr()));
     }
 
     setDisplay(display);
