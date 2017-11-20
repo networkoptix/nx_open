@@ -17,22 +17,25 @@ enum MessageType
     NoLicenses = 1,
     SmtpIsNotSet = 2,
     UsersEmailIsEmpty = 3,      /**< Other user's email is empty. */
-    SystemIsReadOnly = 5,
-    CloudPromo = 12,            /**< Promo message. */
+    /* ConnectionLost = 4 */
+    /* NoPrimaryTimeServer = 5 */
+    SystemIsReadOnly = 6,
 
     // These messages are sent from server.
 
-    EmailSendError = 6,
-    StoragesNotConfigured = 7,
-    StoragesAreFull = 8,
-    ArchiveRebuildFinished = 9,
-    ArchiveRebuildCanceled = 10,
-    ArchiveFastScanFinished = 11,
+    EmailSendError = 7,
+    StoragesNotConfigured = 8,
+    /* StoragesAreFull = 9 */
+    ArchiveRebuildFinished = 10,
+    ArchiveRebuildCanceled = 11,
+    ArchiveFastScanFinished = 12,
 
-    RemoteArchiveSyncStarted = 13,
-    RemoteArchiveSyncFinished = 14,
-    RemoteArchiveSyncProgress = 15,
-    RemoteArchiveSyncError = 16,
+    CloudPromo = 13,            /**< Promo message. Generated on the client side. */
+
+    RemoteArchiveSyncStarted = 14,
+    RemoteArchiveSyncFinished = 15,
+    RemoteArchiveSyncProgress = 16,
+    RemoteArchiveSyncError = 17,
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
@@ -49,7 +52,7 @@ bool isMessageVisibleInSettings(MessageType message);
 /** Some messages must not be auto-hidden by timeout. */
 bool isMessageLocked(MessageType message);
 
-QSet<MessageType> allVisibleMessageTypes();
+QList<MessageType> allVisibleMessageTypes();
 
 QSet<MessageType> unpackVisibleInSettings(quint64 packed);
 

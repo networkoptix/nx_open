@@ -6,12 +6,15 @@ bool isMessageVisible(MessageType message)
 {
     switch (message)
     {
+        case /* ConnectionLost */ 4:
+        case /* NoPrimaryTimeServer */ 5:
+        case /* StoragesAreFull */ 9:
         case ArchiveFastScanFinished:
-        case 4 /*NoPrimaryTimeServer*/:
             return false;
-    }
 
-    return true;
+        default:
+            return true;
+    }
 }
 
 bool isMessageVisibleInSettings(MessageType message)
@@ -29,9 +32,10 @@ bool isMessageVisibleInSettings(MessageType message)
         case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
             return false;
-    }
 
-    return true;
+        default:
+            return true;
+    }
 }
 
 bool isMessageLocked(MessageType message)
@@ -45,24 +49,35 @@ bool isMessageLocked(MessageType message)
         case UsersEmailIsEmpty:
         case SystemIsReadOnly:
         case StoragesNotConfigured:
-        case StoragesAreFull:
             return true;
         default:
-            break;
+            return false;
     }
-    return false;
 }
 
-QSet<MessageType> allVisibleMessageTypes()
+QList<MessageType> allVisibleMessageTypes()
 {
-    QSet<MessageType> result;
-    for (int i = 0; i < Count; i++)
+    QList<MessageType> result;
+    for (int i = 0; i < Count; ++i)
     {
         const auto messageType = static_cast<MessageType>(i);
         if (isMessageVisibleInSettings(messageType))
-            result.insert(messageType);
+            result.push_back(messageType);
     }
     return result;
+}
+
+bool skipPackedFlag(MessageType message)
+{
+    switch (message)
+    {
+        case CloudPromo:
+        case ArchiveFastScanFinished:
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 QSet<MessageType> unpackVisibleInSettings(quint64 packed)
@@ -71,10 +86,17 @@ QSet<MessageType> unpackVisibleInSettings(quint64 packed)
 
     quint64 healthFlag = 1;
 
-    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    for (int i = 0; i < Count; ++i)
     {
-        if ((packed & healthFlag) == healthFlag)
-            result.insert(messageType);
+        const auto messageType = static_cast<MessageType>(i);
+        if (skipPackedFlag(messageType))
+            continue;
+
+        if (isMessageVisibleInSettings(messageType))
+        {
+            if ((packed & healthFlag) == healthFlag)
+                result.insert(messageType);
+        }
 
         healthFlag <<= 1;
     }
@@ -84,12 +106,20 @@ QSet<MessageType> unpackVisibleInSettings(quint64 packed)
 quint64 packVisibleInSettings(quint64 base, QSet<MessageType> messageTypes)
 {
     quint64 healthFlag = 1;
-    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    for (int i = 0; i < Count; ++i)
     {
-        if (messageTypes.contains(messageType))
-            base |= healthFlag;
-        else
-            base &= ~healthFlag;
+        const auto messageType = static_cast<MessageType>(i);
+        if (skipPackedFlag(messageType))
+            continue;
+
+        if (isMessageVisibleInSettings(messageType))
+        {
+            if (messageTypes.contains(messageType))
+                base |= healthFlag;
+            else
+                base &= ~healthFlag;
+        }
+
         healthFlag <<= 1;
     }
 
