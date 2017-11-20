@@ -455,7 +455,7 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
 QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
 {
     auto result = base_type::getNextData();
-    if (result)
+    if (result && result->dataType != QnAbstractMediaData::EMPTY_DATA)
     {
         m_lastTimestampUsec = result->timestamp;
         m_timeSinceLastFrame.restart();
