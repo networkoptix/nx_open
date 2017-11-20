@@ -130,7 +130,8 @@ void EventsStorage::insertEventAttributes(
     insertEventAttributesQuery.bindValue(":eventId", static_cast<qint64>(eventId));
     insertEventAttributesQuery.bindValue(
         ":content",
-        containerString(eventAttributes, "; ", "", "", ""));
+        containerString(eventAttributes, "; " /*delimiter*/,
+            "" /*prefix*/, "" /*suffix*/, "" /*empty*/));
     insertEventAttributesQuery.exec();
 }
 

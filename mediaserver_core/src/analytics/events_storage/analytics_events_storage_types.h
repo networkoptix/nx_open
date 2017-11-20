@@ -18,6 +18,9 @@ struct Filter
     std::vector<QnUuid> objectTypeId;
     QnUuid objectId;
     QnTimePeriod timePeriod;
+    /**
+     * Coordinates are in range [0;1].
+     */
     QRectF boundingBox;
     std::vector<common::metadata::Attribute> requiredAttributes;
     /**

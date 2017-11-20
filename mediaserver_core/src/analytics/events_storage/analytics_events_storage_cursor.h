@@ -14,9 +14,6 @@ class AbstractCursor
 public:
     virtual ~AbstractCursor() = default;
 
-    /**
-     * @return boost::none if at end or error has occured.
-     */
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() = 0;
 };
 
