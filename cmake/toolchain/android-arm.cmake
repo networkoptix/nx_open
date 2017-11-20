@@ -3,7 +3,7 @@ set(CMAKE_SYSTEM_NAME Android)
 if(NOT "$ENV{ANDROID_NDK}" STREQUAL "")
     set(CMAKE_ANDROID_NDK "$ENV{ANDROID_NDK}")
 else()
-    set(CMAKE_ANDROID_NDK "${PACKAGES_DIR}/android/android-ndk")
+    set(CMAKE_ANDROID_NDK "${PACKAGES_DIR}/android/android-ndk-r16")
 endif()
 
 if(NOT $ENV{ANDROID_HOME} STREQUAL "")
@@ -21,6 +21,3 @@ set(CMAKE_ANDROID_NDK_TOOLCHAIN_VERSION clang)
 # These macros are not required because they are declared by a compiler.
 # We declare them explicitly to improve code parsing by IDEs.
 add_definitions(-DANDROID -D__ANDROID__)
-
-# TODO: Remove after switching to Android NDK r16.
-add_definitions(-D__LP32__)
