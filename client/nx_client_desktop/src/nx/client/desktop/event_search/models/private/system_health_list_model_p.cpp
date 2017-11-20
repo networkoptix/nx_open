@@ -156,7 +156,6 @@ action::IDType SystemHealthListModel::Private::action(int index) const
             break;
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
             return action::ServerSettingsAction;
@@ -184,7 +183,6 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
             return action::Parameters(m_items[index].resource)
@@ -300,7 +298,6 @@ QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType messa
             return qnSkin->pixmap("events/email.png");
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
             return qnSkin->pixmap("events/storage.png");
