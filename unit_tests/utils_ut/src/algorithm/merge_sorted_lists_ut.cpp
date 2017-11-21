@@ -25,7 +25,7 @@ private:
     void check_deep_copy() const
     {
         const bool deep_copied = !empty();
-        ASSERT_TRUE(!deep_copied);
+        ASSERT_FALSE(deep_copied);
     }
 };
 
