@@ -111,7 +111,6 @@ def process_file(source_file, customization, product_id, preview, version_id):
         source_file, customization.name)
 
     branding_context = Context.objects.filter(name='branding')
-    language = None
     context = Context.objects.filter(
         file_path=context_name, product_id=product_id)
     language = None
@@ -124,7 +123,7 @@ def process_file(source_file, customization, product_id, preview, version_id):
     with open(source_file, 'r') as file:
         content = file.read()
 
-    if context.exists() and language:
+    if context.exists():
         content = process_context_structure(
             customization, context.first(), content, language, version_id, preview)
     if branding_context.exists():
