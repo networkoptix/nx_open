@@ -79,10 +79,16 @@ void RemoteArchiveSynchronizationTask::cancel()
 
 bool RemoteArchiveSynchronizationTask::execute()
 {
+    bool result = true;
     qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
-    bool result = synchronizeArchive();
-    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
+    for (auto i = 0; i < kNumberOfSynchronizationCycles; ++i)
+    {
+         result &= synchronizeArchive();
+         if (!result)
+             break;
+    }
 
+    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
     return result;
 }
 
