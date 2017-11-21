@@ -2004,6 +2004,8 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 #endif
 
     int bytesRead = m_tcpSock->recv( buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL );
+    if (bytesRead > 0)
+        m_lastReceivedDataTimer.restart();
     return bytesRead;
 #else
     const size_t bufSizeBak = bufSize;
