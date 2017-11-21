@@ -63,10 +63,13 @@ public:
     */
     void registerResourceData( const QString& path, QIODevice* data );
 
+    void setOwnIoDevice(bool ownIoDevice);
+
 private:
     std::map<QString, QIODevice*> m_urlToDevice;
     mutable QnMutex m_mutex;
     int m_capabilities;
+    bool m_ownIoDevice = true;
 };
 
 typedef QnSharedResourcePointer<QnExtIODeviceStorageResource> QnExtIODeviceStorageResourcePtr;

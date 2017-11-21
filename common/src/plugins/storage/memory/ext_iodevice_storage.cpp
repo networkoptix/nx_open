@@ -23,7 +23,8 @@ QnExtIODeviceStorageResource::~QnExtIODeviceStorageResource()
         it != m_urlToDevice.end();
         )
     {
-        delete it->second;
+        if (m_ownIoDevice)
+            delete it->second;
         m_urlToDevice.erase( it++ );
     }
 }
@@ -42,7 +43,9 @@ QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevic
     if( it == m_urlToDevice.end() )
         return NULL;
     QIODevice* dev = it->second;
-    m_urlToDevice.erase( it );
+
+    if (m_ownIoDevice)
+        m_urlToDevice.erase( it );
     return dev;
 }
 
@@ -81,7 +84,13 @@ void QnExtIODeviceStorageResource::registerResourceData( const QString& path, QI
         p = m_urlToDevice.insert( std::make_pair( path, data ) );
     if( !p.second )
     {
-        delete p.first->second;
+        if (m_ownIoDevice)
+            delete p.first->second;
         p.first->second = data;
     }
+}
+
+void QnExtIODeviceStorageResource::setOwnIoDevice(bool ownIoDevice)
+{
+    m_ownIoDevice = ownIoDevice;
 }
