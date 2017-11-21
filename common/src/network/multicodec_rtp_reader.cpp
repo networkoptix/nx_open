@@ -276,11 +276,24 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 m_gotData = false;
         }
 
+        m_RtpSession.sendKeepAliveIfNeeded(); //< RTSP GET_PARAMETER
+        // RTCP keep-alive packet
+        if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT)
+        {
+            for (const TrackInfo& track : m_tracks)
+            {
+                if (track.ioDevice)
+                    buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
+            }
+            m_rtcpReportTimer.restart();
+        }
+
         int bytesRead = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
         if (bytesRead < 0 &&
             SystemError::getLastOSErrorCode() == SystemError::timedOut &&
-            m_rtcpReportTimer.elapsed() < m_RtpSession.sessionTimeoutMs() &&
-            m_onSocketReadTimeoutCallback)
+            m_onSocketReadTimeoutCallback &&
+            m_RtpSession.lastReceivedDataTimer().isValid() &&
+            m_RtpSession.lastReceivedDataTimer().elapsed() < m_RtpSession.sessionTimeoutMs())
         {
             auto data = m_onSocketReadTimeoutCallback();
             if (data)
@@ -291,7 +304,6 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         if (bytesRead < 1)
             break; // error
-        m_RtpSession.sendKeepAliveIfNeeded();
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
@@ -335,14 +347,6 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else {
             m_demuxedData[rtpChannelNum]->clear();
-        }
-
-        if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
-            for(const TrackInfo& track: m_tracks) {
-                if (track.ioDevice)
-                    buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
-            }
-            m_rtcpReportTimer.restart();
         }
 
     }

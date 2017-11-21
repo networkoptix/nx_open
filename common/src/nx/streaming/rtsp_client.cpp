@@ -2155,3 +2155,8 @@ void QnRtspClient::addRequestHeader(const QString& requestName, const nx_http::H
 {
     nx_http::insertOrReplaceHeader(&m_additionalHeaders[requestName], header);
 }
+
+QElapsedTimer QnRtspClient::lastReceivedDataTimer() const
+{
+    return m_lastReceivedDataTimer;
+}

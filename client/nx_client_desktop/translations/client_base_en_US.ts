@@ -1163,28 +1163,47 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password must be at least %1 characters long.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Long</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password must be no longer than %1 characters.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password should not contain %1 or more consecutive characters together.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password should not contain %1 or more repeating characters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password must be at least %n characters long.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password must be no longer than %n characters.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password should not contain %n or more consecutive characters together.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password should not contain %n or more repeating characters.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6363,10 +6382,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage is full</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Storage is not configured</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6408,10 +6423,6 @@ to %1</source>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage is full on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

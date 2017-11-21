@@ -20,7 +20,7 @@ angular.module('webadminApp')
           '`': '&#x60;',
           '=': '&#x3D;'
         };
-        return function(text, phrase) {
+        return function(text) {
             return String(text).replace(/[&<>"'`=\/]/g, function (s) {
                 return entityMap[s];
             });

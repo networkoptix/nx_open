@@ -371,6 +371,7 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
+            case AV_CODEC_ID_H265:
             case AV_CODEC_ID_MPEG4:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;

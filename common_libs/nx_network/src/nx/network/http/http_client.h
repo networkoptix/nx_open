@@ -75,7 +75,7 @@ public:
     BufferType fetchMessageBodyBuffer();
 
     /** Blocks until entire message body is avaliable. */
-    BufferType fetchEntireMessageBody();
+    boost::optional<BufferType> fetchEntireMessageBody();
 
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const nx::utils::Url& url() const;
