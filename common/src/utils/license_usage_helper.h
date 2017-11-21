@@ -167,11 +167,13 @@ public:
         QnCommonModule* commonModule,
         QObject* parent = nullptr);
 
-public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenseUsed);
+
+    bool canEnableRecording(const QnVirtualCameraResourcePtr& proposedCamera);
+    bool canEnableRecording(const QnVirtualCameraResourceList& proposedCameras);
 
 signals:
     void licenseUsageChanged();
