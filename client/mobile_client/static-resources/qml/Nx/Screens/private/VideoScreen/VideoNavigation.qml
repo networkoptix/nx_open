@@ -496,7 +496,6 @@ Item
 
             anchors.top: navigator.top
             anchors.topMargin: 8
-            //anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
             loading: videoScreenController.mediaPlayer.loading || timeline.dragging
