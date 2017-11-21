@@ -100,6 +100,8 @@ struct EventParameters
     (reasonCode)(inputPortId)(caption)(description)(metadata)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
+bool checkForKeywords(const QString& value, const QString& keywords);
+
 } // namespace event
 } // namespace vms
 } // namespace nx
