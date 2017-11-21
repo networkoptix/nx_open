@@ -14,8 +14,9 @@ namespace algorithm {
 // Merge sorted lists using priority queue concept implemented via STL heap.
 // -------------------------------------------------------------------------
 
-// ListOfSortedLists type should be a sequentially iteratable container of sorted lists.
-//   Sorted lists should be random access iteratable with value_type and push_back.
+// ListOfSortedLists type should be a random access iteratable container of sorted lists.
+//   Sorted lists should be of sequentially iteratable container type
+//   with value_type type and push_back method defined.
 
 // SortFieldGetter should be a functor taking sorted list value_type and returning a value
 //   of type that can be compared with operator <
@@ -36,7 +37,7 @@ auto merge_sorted_lists(
     switch (sortedLists.size())
     {
         case 0: return SortedList();
-        case 1: return std::move(sortedLists.front());
+        case 1: return std::move(*sortedLists.begin());
         default: break;
     }
 
