@@ -33,15 +33,28 @@ public:
 protected:
     void whenSaveEvent()
     {
-        m_analyticsDataPacket = generateRandomPacket(1);
-        whenIssueSavePacket(m_analyticsDataPacket);
+        m_analyticsDataPackets.push_back(generateRandomPacket(1));
+        whenIssueSavePacket(m_analyticsDataPackets[0]);
         thenSaveSucceeded();
+    }
+
+    void whenSaveMultipleEventsConcurrently()
+    {
+        const int packetCount = 101;
+        for (int i = 0; i < packetCount; ++i)
+        {
+            m_analyticsDataPackets.push_back(generateRandomPacket(1));
+            whenIssueSavePacket(m_analyticsDataPackets.back());
+        }
+
+        for (int i = 0; i < packetCount; ++i)
+            thenSaveSucceeded();
     }
 
     void whenIssueSavePacket(common::metadata::ConstDetectionMetadataPacketPtr packet)
     {
         m_eventsStorage->save(
-            m_analyticsDataPacket,
+            packet,
             [this](ResultCode resultCode) { m_savePacketResultQueue.push(resultCode); });
     }
 
@@ -57,7 +70,7 @@ protected:
             filter,
             [this](
                 ResultCode resultCode,
-                std::vector<common::metadata::DetectionMetadataPacket> eventsFound)
+                std::vector<DetectionEvent> eventsFound)
             {
                 m_lookupResultQueue.push(LookupResult{resultCode, std::move(eventsFound)});
             });
@@ -68,11 +81,11 @@ protected:
         ASSERT_EQ(ResultCode::ok, m_savePacketResultQueue.pop());
     }
 
-    void thenEventCanBeRead()
+    void thenAllEventsCanBeRead()
     {
         whenLookupEvents(Filter());
         thenLookupSucceded();
-        andLookupResultEquals(*m_analyticsDataPacket);
+        andLookupResultEquals(toDetectionEvents(m_analyticsDataPackets));
     }
 
     void thenLookupSucceded()
@@ -82,24 +95,36 @@ protected:
     }
 
     void andLookupResultEquals(
-        const common::metadata::DetectionMetadataPacket& expected)
+        std::vector<DetectionEvent> expected)
     {
-        ASSERT_EQ(1U, m_prevLookupResult->eventsFound.size());
-        ASSERT_EQ(expected, m_prevLookupResult->eventsFound[0]);
+        auto sortCondition =
+            [](const DetectionEvent& left, const DetectionEvent& right)
+            {
+                return std::tie(left.deviceId, left.timestampUsec) <
+                    std::tie(right.deviceId, right.timestampUsec);
+            };
+
+        std::sort(expected.begin(), expected.end(), sortCondition);
+        std::sort(
+            m_prevLookupResult->eventsFound.begin(),
+            m_prevLookupResult->eventsFound.end(),
+            sortCondition);
+
+        ASSERT_EQ(expected, m_prevLookupResult->eventsFound);
     }
 
 private:
     struct LookupResult
     {
         ResultCode resultCode;
-        std::vector<common::metadata::DetectionMetadataPacket> eventsFound;
+        std::vector<DetectionEvent> eventsFound;
 
         LookupResult() = delete;
     };
 
     std::unique_ptr<EventsStorage> m_eventsStorage;
     Settings m_settings;
-    common::metadata::ConstDetectionMetadataPacketPtr m_analyticsDataPacket;
+    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_analyticsDataPackets;
     nx::utils::SyncQueue<ResultCode> m_savePacketResultQueue;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
     boost::optional<LookupResult> m_prevLookupResult;
@@ -136,6 +161,26 @@ private:
 
         return packet;
     }
+
+    std::vector<DetectionEvent> toDetectionEvents(
+        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& analyticsDataPackets)
+    {
+        std::vector<DetectionEvent> result;
+        for (const auto& packet: analyticsDataPackets)
+        {
+            for (const auto& object: packet->objects)
+            {
+                DetectionEvent event;
+                event.deviceId = packet->deviceId;
+                event.timestampUsec = packet->timestampUsec;
+                event.durationUsec = packet->durationUsec;
+                event.object = object;
+                result.push_back(std::move(event));
+            }
+        }
+
+        return result;
+    }
 };
 
 TEST_F(AnalyticsEventsStorage, event_saved_can_be_read_later)
@@ -143,10 +188,14 @@ TEST_F(AnalyticsEventsStorage, event_saved_can_be_read_later)
     whenSaveEvent();
     whenRestartStorage();
 
-    thenEventCanBeRead();
+    thenAllEventsCanBeRead();
 }
 
-// TEST_F(AnalyticsEventsStorage, storing_multiple_events_concurrently)
+TEST_F(AnalyticsEventsStorage, storing_multiple_events_concurrently)
+{
+    whenSaveMultipleEventsConcurrently();
+    thenAllEventsCanBeRead();
+}
 
 //-------------------------------------------------------------------------------------------------
 // Lookup.
