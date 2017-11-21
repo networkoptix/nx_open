@@ -52,7 +52,7 @@ void EventsStorage::lookup(
 {
     using namespace std::placeholders;
 
-    auto result = std::make_shared<std::vector<common::metadata::DetectionMetadataPacket>>();
+    auto result = std::make_shared<std::vector<DetectionEvent>>();
     m_dbController.queryExecutor().executeSelect(
         std::bind(&EventsStorage::selectEvents, this, _1, std::move(filter), result.get()),
         [this, result, completionHandler = std::move(completionHandler)](
@@ -138,7 +138,7 @@ void EventsStorage::insertEventAttributes(
 nx::utils::db::DBResult EventsStorage::selectEvents(
     nx::utils::db::QueryContext* queryContext,
     const Filter& /*filter*/,
-    std::vector<common::metadata::DetectionMetadataPacket>* result)
+    std::vector<DetectionEvent>* result)
 {
     SqlQuery selectEventsQuery(*queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
@@ -151,32 +151,31 @@ nx::utils::db::DBResult EventsStorage::selectEvents(
     )sql");
     selectEventsQuery.exec();
 
-    loadPackets(selectEventsQuery, result);
+    loadEvents(selectEventsQuery, result);
     return nx::utils::db::DBResult::ok;
 }
 
-void EventsStorage::loadPackets(
+void EventsStorage::loadEvents(
     SqlQuery& selectEventsQuery,
-    std::vector<common::metadata::DetectionMetadataPacket>* result)
+    std::vector<DetectionEvent>* result)
 {
     while (selectEventsQuery.next())
     {
-        result->push_back(common::metadata::DetectionMetadataPacket());
-        loadPacket(selectEventsQuery, &result->back());
+        result->push_back(DetectionEvent());
+        loadEvent(selectEventsQuery, &result->back());
     }
 }
 
-void EventsStorage::loadPacket(
+void EventsStorage::loadEvent(
     SqlQuery& selectEventsQuery,
-    common::metadata::DetectionMetadataPacket* packet)
+    DetectionEvent* event)
 {
-    packet->deviceId = QnSql::deserialized_field<QnUuid>(
+    event->deviceId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery.value("device_guid"));
-    packet->timestampUsec = selectEventsQuery.value("timestamp_usec_utc").toLongLong();
-    packet->durationUsec = selectEventsQuery.value("duration_usec").toLongLong();
+    event->timestampUsec = selectEventsQuery.value("timestamp_usec_utc").toLongLong();
+    event->durationUsec = selectEventsQuery.value("duration_usec").toLongLong();
 
-    packet->objects.push_back(common::metadata::DetectedObject());
-    common::metadata::DetectedObject& detectedObject = packet->objects.back();
+    common::metadata::DetectedObject& detectedObject = event->object;
     detectedObject.objectId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery.value("object_id"));
     detectedObject.objectTypeId = QnSql::deserialized_field<QnUuid>(

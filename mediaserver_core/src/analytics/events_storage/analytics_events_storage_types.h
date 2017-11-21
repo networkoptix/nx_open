@@ -13,6 +13,16 @@ namespace mediaserver {
 namespace analytics {
 namespace storage {
 
+struct DetectionEvent
+{
+    QnUuid deviceId;
+    qint64 timestampUsec = 0;
+    qint64 durationUsec = 0;
+    common::metadata::DetectedObject object;
+
+    bool operator==(const DetectionEvent& right) const;
+};
+
 struct Filter
 {
     std::vector<QnUuid> objectTypeId;

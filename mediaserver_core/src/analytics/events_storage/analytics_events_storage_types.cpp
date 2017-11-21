@@ -7,6 +7,14 @@ namespace mediaserver {
 namespace analytics {
 namespace storage {
 
+bool DetectionEvent::operator==(const DetectionEvent& right) const
+{
+    return deviceId == right.deviceId
+        && timestampUsec == right.timestampUsec
+        && durationUsec == right.durationUsec
+        && object == right.object;
+}
+
 ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult)
 {
     switch (dbResult)

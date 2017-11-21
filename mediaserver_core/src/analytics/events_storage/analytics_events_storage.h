@@ -24,7 +24,7 @@ using StoreCompletionHandler =
 using LookupCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
-        std::vector<common::metadata::DetectionMetadataPacket> /*eventsFound*/)>;
+        std::vector<DetectionEvent> /*eventsFound*/)>;
 
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
@@ -126,13 +126,13 @@ private:
     nx::utils::db::DBResult selectEvents(
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
-        std::vector<common::metadata::DetectionMetadataPacket>* result);
-    void loadPackets(
+        std::vector<DetectionEvent>* result);
+    void loadEvents(
         nx::utils::db::SqlQuery& selectEventsQuery,
-        std::vector<common::metadata::DetectionMetadataPacket>* result);
-    void loadPacket(
+        std::vector<DetectionEvent>* result);
+    void loadEvent(
         nx::utils::db::SqlQuery& selectEventsQuery,
-        common::metadata::DetectionMetadataPacket* result);
+        DetectionEvent* result);
 };
 
 //-------------------------------------------------------------------------------------------------
