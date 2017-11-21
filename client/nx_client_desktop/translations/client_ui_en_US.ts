@@ -112,6 +112,16 @@
         <source>Reset All Warnings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable blur</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AggregationWidget</name>
