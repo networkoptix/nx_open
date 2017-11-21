@@ -214,23 +214,25 @@ angular.module('nxCommon')
                     timelineActions.playPause();
                 }
 
-                function centerCurrentTime(){
+                function moveTimeToVisiblePosition(position){
                     var sM = scope.scaleManager;
                     var date = sM.playedPosition;
-                    var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;
-                    var relativeSizeOfTimeLine = (sM.end - sM.visibleEnd) - (sM.start - sM.visibleStart);
+                    var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart) * position;
+                    var relativeSizeOfTimeLine = sM.end - sM.start - (sM.visibleEnd - sM.visibleStart);
                     timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, false);
                 }
 
                 function timelineClick(mouseX){
                     var date = timelineActions.setClickedCoordinate(mouseX);
-                    var bufferZone = timelineConfig.edgeBufferZone * canvas.width;
+                    var bufferZone = timelineConfig.edgeBufferZone * pixelAspectRatio;
                     jumpToPosition(date);
                     mouseX *= pixelAspectRatio;
 
                     if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue()
                             && (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
-                        centerCurrentTime();
+                        var left = (bufferZone + timelineConfig.markerWidth)/canvas.width;
+                        var right = (canvas.width - (bufferZone + timelineConfig.markerWidth))/canvas.width;
+                        moveTimeToVisiblePosition(mouseX < bufferZone ? left: right);
                     }
                 }
 
@@ -431,7 +433,7 @@ angular.module('nxCommon')
 
                     if(onReleaseCenter){
                         onReleaseCenter = false;
-                        centerCurrentTime();
+                        moveTimeToVisiblePosition(0.5);
                     }
                 }
                 function viewportMouseMove(event){
