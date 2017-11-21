@@ -13,6 +13,7 @@ angular.module('cloudApp')
             $scope.account = account;
             $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();
+            loadUsers();
         });
 
         // Retrieve system info
