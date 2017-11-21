@@ -38,7 +38,13 @@ public:
         return m_items.generateReaderId();
     }
 
-    boost::optional<Item> pop(
+    /**
+     * Returns first item for which conditionFunc(...) condition is met.
+     * If none, blocks until new element is added or retestPopCondition is called.
+     */
+    template<typename ConditionFunc>
+    boost::optional<Item> popIf(
+        ConditionFunc conditionFunc,
         boost::optional<std::chrono::milliseconds> timeout = boost::none,
         QueueReaderId readerId = kInvalidQueueReaderId)
     {
@@ -56,7 +62,13 @@ public:
             auto popTimeout = milliseconds::zero();
             if (timeToWaitUntil)
                 popTimeout = duration_cast<milliseconds>(*timeToWaitUntil - currentTime);
-            auto itemContext = m_items.pop(popTimeout, readerId);
+            auto itemContext = m_items.popIf(
+                [&conditionFunc](const ItemContext& value)
+                {
+                    return conditionFunc(value.data);
+                },
+                popTimeout,
+                readerId);
             if (!itemContext)
                 return boost::none;
 
@@ -69,6 +81,18 @@ public:
             }
             return std::move(itemContext->data);
         }
+    }
+
+    boost::optional<Item> pop(
+        boost::optional<std::chrono::milliseconds> timeout = boost::none,
+        QueueReaderId readerId = kInvalidQueueReaderId)
+    {
+        return popIf([](const Item&) { return true; }, timeout, readerId);
+    }
+
+    void retestPopIfCondition()
+    {
+        m_items.retestPopIfCondition();
     }
 
     std::size_t size() const
