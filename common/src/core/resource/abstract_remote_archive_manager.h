@@ -41,7 +41,16 @@ struct RemoteArchiveChunk
         durationMs(_duration)
     {
     }
+
+    RemoteArchiveChunk(const RemoteArchiveChunk& other) = default;
 };
+
+inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& rhs)
+{
+    return lhs.id == rhs.id
+        && lhs.startTimeMs == rhs.startTimeMs
+        && lhs.durationMs == rhs.durationMs;
+}
 
 /**
  * Allows to control archive on remote device (e.g. on camera SD card).
