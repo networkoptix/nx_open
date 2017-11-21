@@ -202,6 +202,10 @@ public:
         Result<EventLogData>::type callback,
         QThread *targetThread = nullptr);
 
+    Handle getEvents(const QnEventLogMultiserverRequestData& request,
+        Result<EventLogData>::type callback,
+        QThread *targetThread = nullptr);
+
     /**
      * Change user's password on a camera. This method doesn't create new user.
      * Only cameras with capability Qn::SetUserPasswordCapability support it.

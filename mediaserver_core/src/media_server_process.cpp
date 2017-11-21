@@ -122,6 +122,7 @@
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/event_log_rest_handler.h>
 #include <rest/handlers/event_log2_rest_handler.h>
+#include <rest/handlers/multiserver_events_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
@@ -1585,6 +1586,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/backupControl", new QnBackupControlRestHandler());
     reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated, still used in the client
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
+    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());

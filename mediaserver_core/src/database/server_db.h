@@ -36,7 +36,8 @@ public:
     bool saveActionToDB(const nx::vms::event::AbstractActionPtr& action);
     bool removeLogForRes(const QnUuid& resId);
 
-    nx::vms::event::ActionDataList getActions(const QnEventLogFilterData& request) const;
+    nx::vms::event::ActionDataList getActions(const QnEventLogFilterData& request,
+        Qt::SortOrder order = Qt::AscendingOrder, int limit = std::numeric_limits<int>().max()) const;
 
     void getAndSerializeActions(const QnEventLogRequestData& request, QByteArray& result) const;
 
@@ -79,7 +80,9 @@ private:
     bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
 
-    QString getRequestStr(const QnEventLogFilterData& request) const;
+    QString getRequestStr(const QnEventLogFilterData& request,
+        Qt::SortOrder order = Qt::AscendingOrder, int limit = std::numeric_limits<int>().max()) const;
+
 private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;

@@ -66,7 +66,6 @@ private:
     Filter m_filter = Filter::all;
     QScopedPointer<QTimer> m_updateTimer;
     QScopedPointer<vms::event::StringsHelper> m_helper;
-    QHash<rest::Handle, QnRaiiGuardPtr> m_eventRequests;
     QHash<QPair<QnUuid, qint64>, QnUuid> m_eventIds;
     qint64 m_startTimeMs = 0;
     qint64 m_endTimeMs = -1;

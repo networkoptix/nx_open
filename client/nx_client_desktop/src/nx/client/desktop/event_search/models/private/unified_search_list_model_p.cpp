@@ -3,8 +3,9 @@
 #include <chrono>
 
 #include <api/server_rest_connection.h>
-#include <api/helpers/event_log_request_data.h>
+#include <api/helpers/event_log_multiserver_request_data.h>
 #include <camera/camera_bookmarks_manager.h>
+#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -64,11 +65,7 @@ UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
     watchBookmarkChanges();
 
     connect(q, &QAbstractItemModel::modelAboutToBeReset, this,
-        [this]()
-        {
-            m_eventRequests.clear();
-            m_eventIds.clear();
-        });
+        [this]() { m_eventIds.clear(); });
 }
 
 UnifiedSearchListModel::Private::~Private()
@@ -142,46 +139,27 @@ void UnifiedSearchListModel::Private::fetchEvents(qint64 startMs, qint64 endMs,
     if (!accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission))
         return;
 
-    const auto eventsReceived =
-        [this, guard = QPointer<QObject>(this)]
-            (bool success, rest::Handle handle, rest::EventLogData data)
-            {
-                if (!guard || !m_eventRequests.contains(handle))
-                    return;
-
-                m_eventRequests.remove(handle);
-
-                if (!success || !accepted(Filter::events))
-                    return;
-
-                for (const auto& event: data.data)
-                    addCameraEvent(event);
-            };
-
-    QnEventLogRequestData request;
+    QnEventLogMultiserverRequestData request;
     request.filter.cameras << m_camera;
     request.filter.period = QnTimePeriod::fromInterval(startMs, endMs);
 
-    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for (const auto& server: onlineServers)
-    {
-        const auto handle = server->restConnection()->getEvents(request, eventsReceived, thread());
-        if (handle <= 0)
-            continue;
+    const auto server = commonModule()->currentServer();
+    NX_ASSERT(server && server->restConnection());
+    if (!server || !server->restConnection())
+        return;
 
-        m_eventRequests[handle] = handler;
+    const auto eventsReceived =
+        [this, handler, guard = QPointer<QObject>(this)]
+            (bool success, rest::Handle /*handle*/, rest::EventLogData data)
+        {
+            if (!guard || !success || !accepted(Filter::events))
+                return;
 
-        // TODO: #vkutin Do we need it? Seems it's required only in case request is cancelled.
-        const auto timeoutCallback =
-            [this, handle, eventsReceived]
-            {
-                eventsReceived(false, handle, rest::EventLogData());
-            };
+            for (const auto& event: data.data)
+                addCameraEvent(event);
+        };
 
-        executeDelayedParented(timeoutCallback,
-            std::chrono::milliseconds(kEventsQueryTimeout).count(),
-            this);
-    }
+    server->restConnection()->getEvents(request, eventsReceived, thread());
 }
 
 void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startMs, qint64 endMs,
@@ -195,9 +173,10 @@ void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startMs, qint64 endM
     filter.endTimeMs = endMs;
 
     qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
-        [this, handler](bool success, const QnCameraBookmarkList& bookmarks)
+        [this, handler, guard = QPointer<QObject>(this)]
+            (bool success, const QnCameraBookmarkList& bookmarks)
         {
-            if (!success || !accepted(Filter::bookmarks))
+            if (!guard || !success || !accepted(Filter::bookmarks))
                 return;
 
             for (const auto& bookmark: bookmarks)
