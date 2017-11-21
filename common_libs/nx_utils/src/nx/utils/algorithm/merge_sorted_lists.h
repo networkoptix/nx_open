@@ -32,7 +32,7 @@ auto merge_sorted_lists(
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
     int totalLimit = std::numeric_limits<int>::max())
 {
-    using SortedList = std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
 
     switch (sortedLists.size())
     {
@@ -116,7 +116,7 @@ auto merge_sorted_lists(
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
     int totalLimit = std::numeric_limits<int>::max())
 {
-    using SortedList = std::remove_reference<decltype(*sortedLists.begin())>::type;
+    using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
 
     return merge_sorted_lists(std::move(sortedLists),
         [](typename SortedList::value_type& value) { return value; },
