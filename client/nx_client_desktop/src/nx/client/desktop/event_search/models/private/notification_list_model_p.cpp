@@ -31,7 +31,7 @@ using namespace ui;
 
 namespace {
 
-const auto kDisplayTimeout = std::chrono::milliseconds(12500);
+static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
 
 QPixmap toPixmap(const QIcon& icon)
 {
