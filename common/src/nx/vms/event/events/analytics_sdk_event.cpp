@@ -55,7 +55,9 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
     return m_driverId == params.analyticsDriverId()
-        && m_eventId == params.analyticsEventId();
+        && m_eventId == params.analyticsEventId()
+        && checkForKeywords(m_caption, params.caption)
+        && checkForKeywords(m_description, params.description);
 }
 
 QString AnalyticsSdkEvent::auxiliaryData() const

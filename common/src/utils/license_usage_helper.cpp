@@ -459,6 +459,47 @@ bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourceP
     return requiresLicense && !isValid(camera->licenseType());
 }
 
+bool QnCamLicenseUsageHelper::canEnableRecording(
+    const QnVirtualCameraResourcePtr& proposedCamera)
+{
+    return canEnableRecording(QnVirtualCameraResourceList() << proposedCamera);
+}
+
+bool QnCamLicenseUsageHelper::canEnableRecording(
+    const QnVirtualCameraResourceList& proposedCameras)
+{
+    const auto allLicenseTypes = calculateLicenseTypes();
+    std::array<bool, Qn::LC_Count> validTypes;
+    for (auto licenseType: allLicenseTypes)
+        validTypes[licenseType] = isValid(licenseType);
+
+    const auto proposedBackup = m_proposedToEnable;
+
+    QSet<Qn::LicenseType> camerasLicenses;
+    for (const auto& camera: proposedCameras)
+    {
+        if (camera->isLicenseUsed())
+            continue;
+
+        camerasLicenses.insert(camera->licenseType());
+        m_proposedToEnable.insert(camera);
+    }
+    invalidate();
+
+    const bool result = std::all_of(allLicenseTypes.cbegin(), allLicenseTypes.cend(),
+        [&](Qn::LicenseType licenseType)
+        {
+            if (camerasLicenses.contains(licenseType))
+                return isValid(licenseType);
+
+            return !validTypes[licenseType] || isValid(licenseType);
+        });
+
+    m_proposedToEnable = proposedBackup;
+    invalidate();
+
+    return result;
+}
 
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const
 {
