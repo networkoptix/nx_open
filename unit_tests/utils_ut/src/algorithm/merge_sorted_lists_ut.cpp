@@ -40,7 +40,7 @@ TEST(MergeSortedLists, AscendingOrder)
     lists.push_back({7});
     lists.push_back({});
 
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(std::move(lists));
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_EQ(result, Vector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
 }
 
@@ -55,7 +55,7 @@ TEST(MergeSortedLists, DescendingOrder)
     lists.push_back({7});
     lists.push_back({});
 
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(std::move(lists),
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists),
         [](int value) { return -value; }, Qt::DescendingOrder);
 
     ASSERT_EQ(result, Vector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
@@ -72,7 +72,7 @@ TEST(MergeSortedLists, Limit)
     lists.push_back({7});
     lists.push_back({});
 
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(std::move(lists),
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists),
         Qt::AscendingOrder, 5);
 
     ASSERT_EQ(result, Vector({1, 2, 3, 4, 5}));
@@ -80,14 +80,14 @@ TEST(MergeSortedLists, Limit)
 
 TEST(MergeSortedLists, NoLists)
 {
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(std::vector<Vector>());
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::vector<Vector>());
     ASSERT_TRUE(result.empty());
 }
 
 TEST(MergeSortedLists, EmptyLists)
 {
     std::vector<Vector> lists({Vector(), Vector(), Vector()});
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(lists);
+    const auto result = nx::utils::algorithm::merge_sorted_lists(lists);
     ASSERT_TRUE(result.empty());
 }
 
@@ -95,14 +95,14 @@ TEST(MergeSortedLists, OneList)
 {
     std::vector<Vector> lists;
     lists.push_back({10, 20, 30});
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(std::move(lists));
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_EQ(result, Vector({10, 20, 30}));
 }
 
 TEST(MergeSortedLists, OneEmptyList)
 {
     std::vector<Vector> lists({Vector()});
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(lists);
+    const auto result = nx::utils::algorithm::merge_sorted_lists(lists);
     ASSERT_TRUE(result.empty());
 }
 
@@ -112,7 +112,7 @@ TEST(MergeSortedLists, OneNonEmptyList)
     lists.push_back({});
     lists.push_back({});
     lists.push_back({10, 20, 30});
-    const auto result = nx::utils::algorithm::merge_sorted_lists<Vector>(std::move(lists));
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_EQ(result, Vector({10, 20, 30}));
 }
 

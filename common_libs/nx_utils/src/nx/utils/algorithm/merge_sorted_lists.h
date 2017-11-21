@@ -14,25 +14,25 @@ namespace algorithm {
 // Merge sorted lists using priority queue concept implemented via STL heap.
 // -------------------------------------------------------------------------
 
-// SortedList type should be a vector/deque type with value_type type, push_back function
-//   and random access iterators.
+// ListOfSortedLists type should be a sequentially iteratable container of sorted lists.
+//   Sorted lists should be random access iteratable with value_type and push_back.
 
-// ListOfLists type should be a sequentially iteratable container of SortedList items.
-
-// SortFieldGetter should be a functor taking SortedList::value_type and returning value that
-//   can be compared with operator <
+// SortFieldGetter should be a functor taking sorted list value_type and returning a value
+//   of type that can be compared with operator <
 
 // sortOrder must be consistent with actual sorting of each sorted list.
 
 // totalLimit is the maximal allowed number of items in the resulting list; ignored if <= 0.
 
-template<class SortedList, class ListOfLists, class SortFieldGetter>
-SortedList merge_sorted_lists(
-    ListOfLists sortedLists,
+template<class ListOfSortedLists, class SortFieldGetter>
+auto merge_sorted_lists(
+    ListOfSortedLists sortedLists,
     SortFieldGetter sortFieldGetter,
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
     int totalLimit = std::numeric_limits<int>::max())
 {
+    using SortedList = std::remove_reference<decltype(*sortedLists.begin())>::type;
+
     switch (sortedLists.size())
     {
         case 0: return SortedList();
@@ -109,13 +109,15 @@ SortedList merge_sorted_lists(
     return std::move(result);
 };
 
-template<class SortedList, class ListOfLists>
-SortedList merge_sorted_lists(
-    ListOfLists sortedLists,
+template<class ListOfSortedLists>
+auto merge_sorted_lists(
+    ListOfSortedLists sortedLists,
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
     int totalLimit = std::numeric_limits<int>::max())
 {
-    return merge_sorted_lists<SortedList>(std::move(sortedLists),
+    using SortedList = std::remove_reference<decltype(*sortedLists.begin())>::type;
+
+    return merge_sorted_lists(std::move(sortedLists),
         [](typename SortedList::value_type& value) { return value; },
         sortOrder, totalLimit);
 }
