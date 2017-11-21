@@ -18,8 +18,14 @@ public:
     Vector(const std::initializer_list<int>& init): base_type(init) {}
     Vector(const Vector& other): base_type(other)
     {
-        if (!other.empty())
-            GTEST_MESSAGE_("Unnecessary deep copy.", ::testing::TestPartResult::kFatalFailure);
+        check_deep_copy();
+    }
+
+private:
+    void check_deep_copy() const
+    {
+        const bool deep_copied = !empty();
+        ASSERT_TRUE(!deep_copied);
     }
 };
 
