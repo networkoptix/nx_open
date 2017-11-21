@@ -210,12 +210,12 @@ Item
 
             anchors.bottom: parent.bottom
             width: parent.width
-            height: 104
+            height: 96
 
             stickToEnd: d.liveMode && !paused
 
-            chunkBarHeight: 32
-            textY: height - chunkBarHeight - 16 - 24
+            chunkBarHeight: 16
+            textY: height - chunkBarHeight - 16 - 16
 
             chunkProvider: cameraChunkProvider
             startBound: cameraChunkProvider.bottomBound
@@ -343,7 +343,7 @@ Item
             id: navigationPanel
 
             width: parent.width
-            height: 64
+            height: 56
             anchors.top: timeline.bottom
             background: Rectangle { color: ColorTheme.base3 }
             padding: 4
@@ -432,10 +432,10 @@ Item
         {
             id: dateTimeLabel
 
-            height: 56
+            height: 48
             width: parent.width
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight + 16
+            anchors.bottomMargin: timeline.chunkBarHeight + 12
             opacity: d.controlsOpacity
 
             Text
@@ -444,8 +444,8 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                height: 24
-                font.pixelSize: 14
+                height: 20
+                font.pixelSize: 13
                 font.weight: Font.Normal
                 verticalAlignment: Text.AlignVCenter
 
@@ -462,6 +462,7 @@ Item
                 id: timeLiveLabel
 
                 anchors.horizontalCenter: parent.horizontalCenter
+
 
                 y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
                 Behavior on y { NumberAnimation { duration: 200 } }
@@ -480,7 +481,7 @@ Item
                 {
                     id: liveLabel
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 32
+                    font.pixelSize: 28
                     font.weight: Font.Normal
                     color: ColorTheme.windowText
                     text: qsTr("LIVE")
@@ -493,8 +494,9 @@ Item
         {
             id: playbackController
 
-            anchors.verticalCenter: timeline.bottom
-            anchors.verticalCenterOffset: -150
+            anchors.top: navigator.top
+            anchors.topMargin: 8
+            //anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
             loading: videoScreenController.mediaPlayer.loading || timeline.dragging
@@ -526,7 +528,7 @@ Item
         {
             color: ColorTheme.windowText
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: playbackController.bottom
+            anchors.top: playbackController.bottom
             width: 2
             height: 8
             visible: d.hasArchive

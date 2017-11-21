@@ -16,8 +16,8 @@ AbstractButton
 
     background: Rectangle
     {
-        implicitWidth: 76
-        implicitHeight: 76
+        implicitWidth: 56
+        implicitHeight: 56
         color: ColorTheme.transparent(ColorTheme.base3, 0.2)
         radius: height / 2
     }
@@ -25,7 +25,7 @@ AbstractButton
     label: Rectangle
     {
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 0
         radius: height / 2
         color: "transparent"
         border.width: 2
@@ -52,7 +52,6 @@ AbstractButton
                 }
             }
         }
-
         PlayPauseIcon
         {
             width: 18
@@ -63,6 +62,7 @@ AbstractButton
             opacity: control.loading ? 0.5 : 1.0
             Behavior on opacity { NumberAnimation { duration: 250 } }
         }
+
     }
 
     Rectangle
