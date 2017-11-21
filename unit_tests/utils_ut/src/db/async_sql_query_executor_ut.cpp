@@ -72,7 +72,9 @@ class DbAsyncSqlQueryExecutor:
 {
 public:
     DbAsyncSqlQueryExecutor():
-        m_eventsReceiver(nullptr)
+        m_eventsReceiver(nullptr),
+        m_maxNumberOfConcurrentDataModificationRequests(0),
+        m_concurrentDataModificationRequests(0)
     {
         using namespace std::placeholders;
         RequestExecutorFactory::setFactoryFunc(
@@ -255,8 +257,8 @@ private:
     nx::utils::SyncQueue<DBResult> m_queryResults;
     int m_issuedRequestCount = 0;
     nx::utils::promise<void> m_finishHangingQuery;
-    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
-    std::atomic<int> m_concurrentDataModificationRequests = 0;
+    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests;
+    std::atomic<int> m_concurrentDataModificationRequests;
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
@@ -312,8 +314,6 @@ private:
     DBResult insertSomeData(QueryContext* queryContext)
     {
         const auto concurrentDataModificationRequests = ++m_concurrentDataModificationRequests;
-        if (concurrentDataModificationRequests > 1)
-            int x = 0;
         if (concurrentDataModificationRequests >
             m_maxNumberOfConcurrentDataModificationRequests)
         {

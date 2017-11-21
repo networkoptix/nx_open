@@ -104,7 +104,7 @@ QueueReaderId SyncQueue<Result>::generateReaderId()
 template< typename Result>
 Result SyncQueue<Result>::pop()
 {
-    auto value = pop(std::chrono::milliseconds(0));
+    auto value = pop(std::chrono::milliseconds::zero());
     NX_ASSERT(value);
     return std::move(*value);
 }
@@ -123,7 +123,7 @@ boost::optional<Result> SyncQueue<Result>::pop(
     std::chrono::milliseconds timeout,
     QueueReaderId readerId)
 {
-    return popIf([](Result) { return true; }, timeout, readerId);
+    return popIf([](const Result&) { return true; }, timeout, readerId);
 }
 
 template<typename Result>
