@@ -842,7 +842,7 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     return rez;
 }
 
-QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
+QString QnServerDb::getRequestStr(const QnEventLogFilterData& request) const
 {
     QString requestStr(lit("SELECT * FROM runtime_actions where"));
     if (!request.period.isInfinite())
@@ -909,7 +909,7 @@ QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
     return requestStr;
 }
 
-vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& request) const
+vms::event::ActionDataList QnServerDb::getActions(const QnEventLogFilterData& request) const
 {
     vms::event::ActionDataList result;
     QString requestStr = getRequestStr(request);
@@ -978,7 +978,7 @@ inline void appendQnUuidToByteArray(QByteArray& byteArray, const QnUuid& value)
 void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
     QByteArray& result) const
 {
-    QString requestStr = getRequestStr(request);
+    QString requestStr = getRequestStr(request.filter);
 
     QnWriteLocker lock(&m_mutex);
 

@@ -13,6 +13,7 @@
 #include <common/common_module_aware.h>
 
 class QnTimePeriod;
+struct QnEventLogFilterData;
 struct QnEventLogRequestData;
 
 namespace pb {
@@ -35,7 +36,7 @@ public:
     bool saveActionToDB(const nx::vms::event::AbstractActionPtr& action);
     bool removeLogForRes(const QnUuid& resId);
 
-    nx::vms::event::ActionDataList getActions(const QnEventLogRequestData& request) const;
+    nx::vms::event::ActionDataList getActions(const QnEventLogFilterData& request) const;
 
     void getAndSerializeActions(const QnEventLogRequestData& request, QByteArray& result) const;
 
@@ -78,7 +79,7 @@ private:
     bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
 
-    QString getRequestStr(const QnEventLogRequestData& request) const;
+    QString getRequestStr(const QnEventLogFilterData& request) const;
 private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;

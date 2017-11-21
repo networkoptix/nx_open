@@ -159,8 +159,8 @@ void UnifiedSearchListModel::Private::fetchEvents(qint64 startMs, qint64 endMs,
             };
 
     QnEventLogRequestData request;
-    request.cameras << m_camera;
-    request.period = QnTimePeriod::fromInterval(startMs, endMs);
+    request.filter.cameras << m_camera;
+    request.filter.period = QnTimePeriod::fromInterval(startMs, endMs);
 
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const auto& server: onlineServers)

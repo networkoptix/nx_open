@@ -24,7 +24,7 @@ int QnEventLog2RestHandler::executeGet(
     nx::vms::event::ActionDataList outputData;
     if (request.isValid(&errStr))
     {
-        outputData = qnServerDb->getActions(request);
+        outputData = qnServerDb->getActions(request.filter);
     }
     else
     {
