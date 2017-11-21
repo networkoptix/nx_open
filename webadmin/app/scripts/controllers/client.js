@@ -1,6 +1,7 @@
 'use strict';
 
-angular.module('webadminApp').controller('ClientCtrl', function ($scope, nativeClient, $log, mediaserver) {
+angular.module('webadminApp').controller('ClientCtrl', ['$scope', 'nativeClient', '$log', 'mediaserver',
+function ($scope, nativeClient, $log, mediaserver) {
     $scope.Config = Config;
     $scope.port = window.location.port;
     $scope.IP = window.location.host;
@@ -17,4 +18,4 @@ angular.module('webadminApp').controller('ClientCtrl', function ($scope, nativeC
         $log.log("Calling cameras mode");
         nativeClient.startCamerasMode();
     };
-});
+}]);
