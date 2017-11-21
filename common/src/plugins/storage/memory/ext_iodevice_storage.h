@@ -69,7 +69,7 @@ private:
     std::map<QString, QIODevice*> m_urlToDevice;
     mutable QnMutex m_mutex;
     int m_capabilities;
-    bool m_ownIoDevice = true;
+    bool m_isIoDeviceOwner = true;
 };
 
 typedef QnSharedResourcePointer<QnExtIODeviceStorageResource> QnExtIODeviceStorageResourcePtr;

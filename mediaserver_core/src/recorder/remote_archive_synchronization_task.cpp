@@ -43,6 +43,7 @@ static const QString kReaderThreadName = lit("Remote archive sync task reader");
 } // namespace
 
 using namespace nx::core::resource;
+using namespace std::chrono;
 
 RemoteArchiveSynchronizationTask::RemoteArchiveSynchronizationTask(
     QnMediaServerModule* serverModule,
@@ -147,7 +148,7 @@ bool RemoteArchiveSynchronizationTask::synchronizeArchive()
         ->getTimePeriods(
             startTimeMs,
             endTimeMs,
-            kDetalizationLevel.count(),
+            duration_cast<milliseconds>(kDetalizationLevel).count(),
             false,
             std::numeric_limits<int>::max());
 
@@ -165,18 +166,21 @@ bool RemoteArchiveSynchronizationTask::synchronizeArchive()
     NX_DEBUG(
         this,
         lm("Total remote archive length to synchronize: %1")
-            .arg(m_totalDuration.count()));
+            .arg(m_totalDuration));
 
     for (const auto& timePeriod : deviceTimePeriods)
     {
         if (m_canceled)
             break;
 
-        if (timePeriod.durationMs >= kMinChunkDuration.count())
+        if (timePeriod.durationMs >= duration_cast<milliseconds>(kMinChunkDuration).count())
         {
             {
                 QnMutexLocker lock(&m_mutex);
-                m_wait.wait(&m_mutex, kWaitBeforeLoadNextChunk.count());
+                m_wait.wait(
+                    &m_mutex,
+                    duration_cast<milliseconds>(kWaitBeforeLoadNextChunk).count());
+
                 if (m_canceled)
                     return false;
             }
@@ -399,14 +403,17 @@ void RemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
             if (!needToReportProgress())
                 return;
 
-            auto progress = (double)m_importedDuration.count() / m_totalDuration.count();
+            auto progress =
+                (double) duration_cast<milliseconds>(m_importedDuration).count()
+                / duration_cast<milliseconds>(m_totalDuration).count();
+
             if (progress > 1.0)
             {
                 progress = 1.0;
                 NX_WARNING(
                     this,
                     lm("Wrong progress! Imported: %1, Total: %2")
-                        .args(m_importedDuration.count(), m_totalDuration.count()));
+                        .args(m_importedDuration, m_totalDuration));
             }
 
             qnEventRuleConnector->at_remoteArchiveSyncProgress(
