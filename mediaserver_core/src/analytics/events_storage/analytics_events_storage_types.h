@@ -7,6 +7,7 @@
 
 #include <analytics/common/object_detection_metadata.h>
 #include <recording/time_period.h>
+#include <utils/common/request_param.h>
 
 namespace nx {
 namespace mediaserver {
@@ -22,6 +23,11 @@ struct DetectionEvent
 
     bool operator==(const DetectionEvent& right) const;
 };
+
+#define DetectionEvent_analytics_storage_Fields (deviceId)(timestampUsec)(durationUsec)(object)
+QN_FUSION_DECLARE_FUNCTIONS(DetectionEvent, (json)(ubjson));
+
+//-------------------------------------------------------------------------------------------------
 
 struct Filter
 {
@@ -39,6 +45,11 @@ struct Filter
      */
     QString freeText;
 };
+
+void serializeToParams(const Filter& filter, QnRequestParamList* params);
+bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
+
+//-------------------------------------------------------------------------------------------------
 
 enum class ResultCode
 {

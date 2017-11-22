@@ -179,6 +179,7 @@
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/handlers/multiserver_statistics_rest_handler.h>
+#include <rest/handlers/multiserver_analytics_lookup_detected_objects.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
@@ -1635,6 +1636,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
+
+    reg(
+        "ec2/analyticsLookupDetectedObjects",
+        new QnMultiserverAnalyticsLookupDetectedObjects(
+            "ec2/analyticsLookupDetectedObjects",
+            qnServerModule->analyticsEventsStorage()));
 
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 

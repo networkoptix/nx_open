@@ -21,10 +21,10 @@ namespace storage {
 using StoreCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/)>;
 
+using LookupResult = std::vector<DetectionEvent>;
+
 using LookupCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(
-        ResultCode /*resultCode*/,
-        std::vector<DetectionEvent> /*eventsFound*/)>;
+    nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, LookupResult)>;
 
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(

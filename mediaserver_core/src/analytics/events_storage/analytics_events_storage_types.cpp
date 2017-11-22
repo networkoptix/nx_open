@@ -15,6 +15,26 @@ bool DetectionEvent::operator==(const DetectionEvent& right) const
         && object == right.object;
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (DetectionEvent),
+    (json)(ubjson),
+    _analytics_storage_Fields)
+
+//-------------------------------------------------------------------------------------------------
+
+void serializeToParams(const Filter& /*filter*/, QnRequestParamList* /*params*/)
+{
+    // TODO
+}
+
+bool deserializeFromParams(const QnRequestParamList& /*params*/, Filter* /*filter*/)
+{
+    // TODO
+    return false;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult)
 {
     switch (dbResult)
