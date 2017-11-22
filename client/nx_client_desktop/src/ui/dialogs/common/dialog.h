@@ -12,7 +12,7 @@ class QnDialog : public QDialog
     using base_type = QDialog;
 
 public:
-    QnDialog (QWidget* parent = nullptr, Qt::WindowFlags flags = 0);
+    QnDialog (QWidget* parent, Qt::WindowFlags flags = 0);
     virtual ~QnDialog();
 
     /// @brief Shows dialog and cancels drag action to prevent hang on

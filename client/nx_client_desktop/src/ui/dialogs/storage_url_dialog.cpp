@@ -225,7 +225,7 @@ void QnStorageUrlDialog::accept()
 
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,
             tr("Storage path used by another server"),
-            extras, QDialogButtonBox::Cancel);
+            extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
         messageBox.addButton(tr("Add Storage"),
             QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 

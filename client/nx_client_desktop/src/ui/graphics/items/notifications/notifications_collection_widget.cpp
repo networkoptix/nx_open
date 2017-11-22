@@ -710,7 +710,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             break;
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
             item->addActionButton(
@@ -773,15 +772,24 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     m_itemsByMessageType.insert(message, item);
 }
 
-void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
+void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message,
+    const QVariant& params)
 {
+    // TODO: remove this hack in VMS-7724
+    if (message == QnSystemHealth::RemoteArchiveSyncStarted)
+    {
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncFinished, params);
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncProgress, params);
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncError, params);
+    }
+
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
 
     if (!resource)
     {
-        for (QnNotificationWidget* item : m_itemsByMessageType.values(message))
+        for (auto item: m_itemsByMessageType.values(message))
             cleanUpItem(item);
 
         return;

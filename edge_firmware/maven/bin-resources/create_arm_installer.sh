@@ -23,15 +23,15 @@ INSTALL_PATH="opt/$CUSTOMIZATION"
 # If not empty, a symlink will be created from this path to $INSTALL_PATH.
 SYMLINK_INSTALL_PATH=""
 
-# To save storage space on the device, Qt .so files can be copied to an alternative location
-# defined by QT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
+# To save storage space on the device, some .so files can be copied to an alternative location
+# defined by ALT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
 # to these .so files will be created in the regular LIB_INSTALL_DIR.
-QT_LIB_INSTALL_PATH=""
+ALT_LIB_INSTALL_PATH=""
 
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
     SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION"
-    QT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service"
+    ALT_LIB_INSTALL_PATH="sdcard/${CUSTOMIZATION}_service"
 fi
 
 if [ "$BOX" = "bpi" ]; then
@@ -82,7 +82,7 @@ redirectOutput() # log-file
     exec 2>&1 #< Redirect stderr to stdout.
 }
 
-create_archive() # archive dir command...
+createArchive() # archive dir command...
 {
     local -r ARCHIVE="$1"; shift
     local -r DIR="$1"; shift
@@ -93,13 +93,35 @@ create_archive() # archive dir command...
     echo "  Done"
 }
 
+# Copy the specified file to the proper location, creating the symlink if necessary: if alt_lib_dir
+# is empty, or the file is a symlink, just copy it to lib_dir; otherwise, put it to alt_lib_dir,
+# and create a symlink from lib_dir to the file basename in symlink_target_dir.
+#
+copyLib() # file lib_dir alt_lib_dir symlink_target_dir
+{
+    local -r FILE="$1"; shift
+    local -r LIB_DIR="$1"; shift
+    local -r ALT_LIB_DIR="$1"; shift
+    local -r SYMLINK_TARGET_DIR="$1"; shift
+
+    if [ ! -z "$ALT_LIB_DIR" ] && [ ! -L "$FILE" ]; then
+        # FILE is not a symlink - put to the alt location, and create a symlink to it.
+        cp -r "$FILE" "$ALT_LIB_DIR/"
+        ln -s "$SYMLINK_TARGET_DIR/$(basename "$FILE")" \
+            "$LIB_DIR/$(basename "$FILE")"
+    else
+        # FILE is a symlink, or the alt location is not defined - put to the regular location.
+        cp -r "$FILE" "$LIB_DIR/"
+    fi
+}
+
 #--------------------------------------------------------------------------------------------------
 
 # [in] LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_PATH
 copyBuildLibs()
 {
-    mkdir -p "$LIB_INSTALL_DIR"
-
     local LIBS_TO_COPY=(
         # vms
         libappserver2
@@ -172,7 +194,7 @@ copyBuildLibs()
         for FILE in "$LIB_BUILD_DIR/$LIB"*; do
             if [[ $FILE != *.debug ]]; then
                 echo "Copying $(basename "$FILE")"
-                cp -r "$FILE" "$LIB_INSTALL_DIR/"
+                copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
             fi
         done
     done
@@ -181,22 +203,17 @@ copyBuildLibs()
         for FILE in "$LIB_BUILD_DIR/$LIB"*; do
             if [ -f "$FILE" ]; then
                 echo "Copying (optional) $(basename "$FILE")"
-                cp -r "$FILE" "$LIB_INSTALL_DIR/"
+                copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
             fi
         done
     done
 }
 
 # [in] LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_DIR
+# [in] ALT_LIB_INSTALL_PATH
 copyQtLibs()
 {
-    if [ ! -z "$QT_LIB_INSTALL_PATH" ]; then
-        local -r QT_LIB_INSTALL_DIR="$TAR_DIR/$QT_LIB_INSTALL_PATH"
-        mkdir -p "$QT_LIB_INSTALL_DIR"
-    fi
-
-    mkdir -p "$LIB_INSTALL_DIR"
-
     local QT_LIBS_TO_COPY=(
         Concurrent
         Core
@@ -231,15 +248,7 @@ copyQtLibs()
         echo "Copying (Qt) $LIB_FILENAME"
         local FILE
         for FILE in "$QT_DIR/lib/$LIB_FILENAME"*; do
-            if [ ! -z "$QT_LIB_INSTALL_PATH" ] && [ ! -L "$FILE" ]; then
-                # FILE is not a symlink - put to the Qt libs location, and create a symlink to it.
-                cp -r "$FILE" "$QT_LIB_INSTALL_DIR/"
-                ln -s "/$QT_LIB_INSTALL_PATH/$(basename "$FILE")" \
-                    "$LIB_INSTALL_DIR/$(basename "$FILE")"
-            else
-                # FILE is a symlink, or Qt libs location is not defined - put to install dir.
-                cp -r "$FILE" "$LIB_INSTALL_DIR/"
-            fi
+            copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
         done
     done
 }
@@ -465,7 +474,7 @@ buildInstaller()
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
     fi
-    create_archive "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
+    createArchive "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
 
     echo ""
     echo "Creating \"update\" .zip"
@@ -474,7 +483,7 @@ buildInstaller()
     cp -r "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/update.* "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/install.sh "$ZIP_DIR/"
-    create_archive "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
+    createArchive "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
     cp "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$CURRENT_BUILD_DIR/$ZIP_INSTALLER_FILENAME"
 }
 
@@ -505,7 +514,7 @@ buildDebugSymbolsArchive()
     if [ $DEBUG_FILES_EXIST = 0 ]; then
         echo "  No .debug files found"
     else
-        create_archive \
+        createArchive \
             "$CURRENT_BUILD_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
     fi
 }
@@ -533,6 +542,13 @@ main()
     fi
 
     mkdir -p "$INSTALL_DIR"
+    mkdir -p "$LIB_INSTALL_DIR"
+    if [ -z "$ALT_LIB_INSTALL_PATH" ]; then
+        local -r ALT_LIB_INSTALL_DIR=""
+    else
+        local -r ALT_LIB_INSTALL_DIR="$TAR_DIR/$ALT_LIB_INSTALL_PATH"
+        mkdir -p "$ALT_LIB_INSTALL_DIR"
+    fi
 
     echo "Creating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"

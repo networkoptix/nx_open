@@ -128,7 +128,9 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(ui->editRolesButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(action::UserRolesAction, {Qn::UuidRole, selectedUserRoleId()});
+            menu()->trigger(action::UserRolesAction, action::Parameters()
+                .withArgument(Qn::UuidRole, selectedUserRoleId())
+                .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
         });
 
     autoResizePagesToContents(ui->mainStackedWidget,

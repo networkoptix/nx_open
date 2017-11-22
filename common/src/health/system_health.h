@@ -1,40 +1,46 @@
 #pragma once
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QtCore/QMetaType>
 
 #include <nx/vms/event/event_fwd.h>
 
+// TODO: #GDM refactor settings storage - move to User Settings tab on server.
 namespace QnSystemHealth {
 
-// enum order change is forbidden as leads to stored settings failure.
-// TODO: #GDM refactor settings storage
+// IMPORTANT!!!
+// Enum order change is forbidden as leads to stored settings failure and protocol change.
 enum MessageType
 {
-    // These messages are generated on the client
-    EmailIsEmpty,       /*< Current user email is empty. */
-    NoLicenses,
-    SmtpIsNotSet,
-    UsersEmailIsEmpty,  /*< Other user's email is empty. */
-    NoPrimaryTimeServer, //< Message is not used any more. Leaving here to avoid protocol change.
-    SystemIsReadOnly,
+    // These messages are generated on the client.
 
-    /* These messages are sent from server */
-    EmailSendError,
-    StoragesNotConfigured,
-    StoragesAreFull,
-    ArchiveRebuildFinished,
-    ArchiveRebuildCanceled,
-    ArchiveFastScanFinished,
+    EmailIsEmpty = 0,           /**< Current user email is empty. */
+    NoLicenses = 1,
+    SmtpIsNotSet = 2,
+    UsersEmailIsEmpty = 3,      /**< Other user's email is empty. */
+    /* ConnectionLost = 4 */
+    /* NoPrimaryTimeServer = 5 */
+    SystemIsReadOnly = 6,
 
-    RemoteArchiveSyncStarted,
-    RemoteArchiveSyncFinished,
-    RemoteArchiveSyncProgress,
-    RemoteArchiveSyncError,
+    // These messages are sent from server.
 
-    CloudPromo, //local promo message
+    EmailSendError = 7,
+    StoragesNotConfigured = 8,
+    /* StoragesAreFull = 9 */
+    ArchiveRebuildFinished = 10,
+    ArchiveRebuildCanceled = 11,
+    ArchiveFastScanFinished = 12,
 
-    Count
+    CloudPromo = 13,            /**< Promo message. Generated on the client side. */
+
+    RemoteArchiveSyncStarted = 14,
+    RemoteArchiveSyncFinished = 15,
+    RemoteArchiveSyncProgress = 16,
+    RemoteArchiveSyncError = 17,
+
+    // IMPORTANT!!!
+    // Enum order change is forbidden as leads to stored settings failure and protocol change.
+
+    Count //< Must not be greater than 64 due to storage limitation
 };
 
 bool isRemoteArchiveMessage(MessageType);
@@ -43,11 +49,22 @@ bool isRemoteArchiveMessage(MessageType);
 bool isMessageVisible(MessageType message);
 
 /** Some messages must not be displayed in settings dialog, so user cannot disable them. */
-bool isMessageOptional(MessageType message);
+bool isMessageVisibleInSettings(MessageType message);
 
 /** Some messages must not be auto-hidden by timeout. */
 bool isMessageLocked(MessageType message);
 
-}
+QList<MessageType> allVisibleMessageTypes();
 
-Q_DECLARE_METATYPE(QnSystemHealth::MessageType);
+QSet<MessageType> unpackVisibleInSettings(quint64 packed);
+
+/**
+ * Store visible messages to settings. Original value is required to mantain client versions
+ * compatibility (until storage moved to server).
+ */
+quint64 packVisibleInSettings(quint64 base, QSet<MessageType> messageTypes);
+
+} // namespace QnSystemHealth
+
+Q_DECLARE_METATYPE(QnSystemHealth::MessageType)
+

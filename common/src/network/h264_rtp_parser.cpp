@@ -204,20 +204,22 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
     size_t spsNaluSize = 0;
     for (size_t i = 0; i < m_chunks.size(); ++i)
     {
-
         auto buffer = m_chunks[i].bufferStart ? m_chunks[i].bufferStart : rtpBuffer;
-
         if (m_chunks[i].nalStart)
         {
+            // Close previous SPS.
             if ((spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0))
                 spsNaluSize = result->m_data.size() - spsNaluStartOffset;
 
             result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
 
             auto nalType = *(buffer + m_chunks[i].bufferOffset) & 0x1f;
-
             if ((m_chunks[i].len > 0) && (nalType == nuSPS))
+            {
+                // More than one SPS is not supported, currently we analyze only the last one.
                 spsNaluStartOffset = result->m_data.size();
+                spsNaluSize = 0;
+            }
         }
 
         result->m_data.uncheckedWrite(
@@ -226,6 +228,9 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
 
     if (spsNaluStartOffset != (size_t) -1)
     {
+        if (spsNaluSize == 0)
+            spsNaluSize = result->m_data.size() - spsNaluStartOffset;
+
         // Decoding sps to detect stream resolution change.
         decodeSpsInfo(QByteArray::fromRawData(
             result->m_data.constData() + spsNaluStartOffset, (int) spsNaluSize));

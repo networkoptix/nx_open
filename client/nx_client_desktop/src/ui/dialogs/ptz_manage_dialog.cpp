@@ -46,7 +46,11 @@ class QnPtzToursDialogItemDelegate: public QStyledItemDelegate
 {
     typedef QStyledItemDelegate base_type;
 public:
-    explicit QnPtzToursDialogItemDelegate(QObject *parent = 0): base_type(parent) {}
+    explicit QnPtzToursDialogItemDelegate(QWidget* parent):
+        base_type(parent),
+        hotkeyDelegate(parent)
+
+    {}
     ~QnPtzToursDialogItemDelegate() {}
 
     virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
@@ -90,7 +94,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
-    m_hotkeysDelegate(nullptr),
+    m_hotkeysDelegate(),
     m_cache(new LocalFileCache(this)),
     m_submitting(false)
 {

@@ -6484,6 +6484,10 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>סינכרון הארכיון מרחוק הסתיים עבור ההתקן הבא:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -8306,16 +8310,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>מחק את סיור פריסה %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>סיור פריסות</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>סיור פריסות %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

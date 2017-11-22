@@ -94,8 +94,6 @@ int healthHelpId(QnSystemHealth::MessageType type)
             return Qn::EventsActions_SendMailError_Help;
         case QnSystemHealth::StoragesNotConfigured:
             return Qn::EventsActions_StoragesMisconfigured_Help;
-        case QnSystemHealth::StoragesAreFull:
-            return Qn::EventsActions_StorageFull_Help;
         default:
             return -1;
     }

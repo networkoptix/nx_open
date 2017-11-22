@@ -484,6 +484,8 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     if (files.empty())
         return;
 
+    NX_INFO(this, lm("[Scan] started for directory: %1").args(folder));
+
     QThreadPool tp;
     tp.setMaxThreadCount(4);
     QnMutex scanFilesMutex;
@@ -538,6 +540,8 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         );
     }
     tp.waitForDone();
+
+    NX_INFO(this, lm("[Scan] finished for directory: %1, %2 files processed").args(folder, allChunks.size()));
 }
 
 void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter)

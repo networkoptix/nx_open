@@ -1618,7 +1618,7 @@
     </message>
     <message>
         <location/>
-        <source>Showreel cycle</source>
+        <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -17,7 +17,7 @@ class QnLicenseDetailsDialog: public QnSessionAwareButtonBoxDialog {
 
     typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent = NULL);
+    QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent);
     virtual ~QnLicenseDetailsDialog();
 
 private:

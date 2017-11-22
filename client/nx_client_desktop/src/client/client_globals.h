@@ -284,6 +284,7 @@ namespace Qn
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
 
+        ParentWidgetRole,                           /** Used for dialg's parent widget*/
         RoleCount
     };
 

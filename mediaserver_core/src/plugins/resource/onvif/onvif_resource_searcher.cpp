@@ -24,6 +24,8 @@
 #include <onvif/soapStub.h>
 #include "gsoap_async_call_wrapper.h"
 
+#include <plugins/resource/hikvision/hikvision_resource.h>
+
 namespace {
 
 /*
@@ -150,7 +152,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, cons
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if (shouldStop())
         return QList<QnResourcePtr>();
@@ -173,6 +175,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
+
+    // TODO: Move out to some helper class, to remove direct link to hikvision.
+    if (isSearchAction)
+        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableOnvifSupport(deviceUrl, auth);
 
     // optimization. do not pull resource every time if resource already in pool
     if (rpResource)
@@ -278,7 +284,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                 .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
             // checking for multichannel encoders
-            if (doMultichannelCheck && !shouldAppearAsSingleChannel)
+            if (isSearchAction && !shouldAppearAsSingleChannel)
             {
                 if (resource->getMaxChannels() > 1)
                 {

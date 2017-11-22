@@ -4,6 +4,9 @@ CUSTOMIZATION="@deb.customization.company.name@"
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 KILL_MEDIASERVER_IF_HIGH_MEM_USAGE=1
+HIGH_MEM_USAGE_KEEP_FREE_KB=44272
+MEM_TOTAL_KB=$(cat /proc/meminfo |grep 'MemTotal' |awk '{print $2}')
+MAX_ALLOWED_MEM_USAGE=$(expr "$MEM_TOTAL_KB" - "$HIGH_MEM_USAGE_KEEP_FREE_KB")
 
 SERVICE_NAME="mediaserver"
 INSTALL_DIR="/opt/$CUSTOMIZATION"
@@ -14,6 +17,7 @@ BIN_FILE="$MEDIASERVER_DIR/bin/$BIN_NAME"
 LOGS_DIR="/sdcard/mserver.data/log"
 STORAGE_PATH="/sdcard"
 HTTP_LOG_LEVEL="none"
+CORE_PATH="$STORAGE_PATH/cores"
 
 # Touch .flag file to capture all mediaserver output to a file.
 MEDIASERVER_OUT_FLAG="$LOGS_DIR/mediaserver-out.flag"
@@ -73,6 +77,30 @@ logArgs() # "$@"
     echo ""
 }
 
+process_core_dump()
+{
+    if ! which gdb >/dev/null; then
+        return 0 # no gdb on the host
+    fi
+    if pidof gdb; then
+        return 0 # gdb is alrady engaged
+    fi
+
+    GDB="$(dirname "$BIN_FILE")/gdb"
+    CORE_ORIG="$CORE_PATH/core"
+    TIME=$(date +"%s")
+    CORE="$CORE_ORIG.$TIME"
+    if mv "$CORE_ORIG" "$CORE" 2>/dev/null; then
+        REPORT="${BIN_NAME}_$("$BIN_FILE" --version)_$TIME.gdb-bt"
+
+        echo "Generate crash report (in background) $REPORT"
+        echo "t apply all bt 25" |"$GDB" "$BIN_FILE" "$CORE" 2>/dev/null >"/tmp/$REPORT" && \
+            mv "/tmp/$REPORT" "/root/$REPORT" &
+
+        ls "$CORE_ORIG".* |grep -v "$CORE" |xargs rm 2>/dev/null
+    fi
+}
+
 checkSdCard()
 {
     # Make sure that STORAGE_PATH dir exists and is in /proc/mounts.
@@ -89,6 +117,8 @@ start()
        echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
        return 0
     fi
+
+    process_core_dump
 
     checkSdCard
 
@@ -191,10 +221,11 @@ kill_mediaserver_if_high_mem_usage()
         exit 0
     fi
 
-    MEM_USAGE=$(cat /proc/$MSERVER_PID/status \
+    MEM_USAGE_KB=$(cat /proc/$MSERVER_PID/status \
         |grep VmRSS |cut -d ":" -f2 |tr -d "\t " |cut -d "k" -f 1)
 
-    if [ "$MEM_USAGE" -gt 89000 ]; then
+    if [ "$MEM_USAGE_KB" -gt "$MAX_ALLOWED_MEM_USAGE" ]; then
+        echo "High mem usage detected: $MEM_USAGE_KB KB; killing mediaserver"
         kill -FPE "$MSERVER_PID"
     fi
 }
@@ -239,9 +270,9 @@ if [ -f "$OUT_FLAG" ]; then
     set -x #< Log each command.
 fi
 
-echo "$STORAGE_PATH/cores/core.%p" >/proc/sys/kernel/core_pattern
-if [ ! -e "$STORAGE_PATH/cores" ]; then
-    mkdir "$STORAGE_PATH/cores"
+echo "$CORE_PATH/core" >/proc/sys/kernel/core_pattern
+if [ ! -e "$CORE_PATH" ]; then
+    mkdir "$CORE_PATH"
 fi
 ulimit -c unlimited
 
