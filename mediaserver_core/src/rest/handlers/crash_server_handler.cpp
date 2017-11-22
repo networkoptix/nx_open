@@ -16,6 +16,9 @@ int QnCrashServerHandler::executeGet(
     QByteArray& /*contentType*/,
     const QnRestConnectionProcessor* )
 {
+    // Intended to appear both on stderr and in the log.
+    qWarning() << "Received dev-mod-key request";
+
     if( !params.contains(lit("razrazraz")) )
         return nx_http::StatusCode::forbidden;
 
@@ -29,7 +32,8 @@ int QnCrashServerHandler::executeGet(
     linux_exception::setSignalHandlingDisabled( createFullCrashDump );
 #endif
 
-    NX_LOG( lit("Received request to kill server. Killing..."), cl_logALWAYS );
+    // Intended to appear both on stderr and in the log.
+    qWarning() << "Intentionally crashing the server";
     int* x = nullptr;
     *x = 0;
     return *x;
