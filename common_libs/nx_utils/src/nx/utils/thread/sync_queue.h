@@ -196,7 +196,8 @@ void SyncQueue<Result>::clear()
 template< typename Result>
 void SyncQueue<Result>::retestPopIfCondition()
 {
-    QnMutexLocker lock(&m_mutex); //< Mutex is required here.
+    // Mutex is required here to be sure popIf does not miss notification.
+    QnMutexLocker lock(&m_mutex);
     m_condition.wakeAll();
 }
 
