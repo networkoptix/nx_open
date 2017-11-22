@@ -1,5 +1,3 @@
-message("Current bin dir: ${PROJECT_SOURCE_DIR}")
-
 nx_add_target(it930x_plugin LIBRARY
     ADDITIONAL_SOURCES
           "${PROJECT_SOURCE_DIR}/plugins/it930x_plugin/src/dtvapi_v15/DTVAPI_15.c"
