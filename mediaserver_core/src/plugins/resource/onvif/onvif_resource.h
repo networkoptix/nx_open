@@ -316,7 +316,7 @@ protected:
 
     void setMaxFps(int f);
     void setPrimaryResolution(const QSize& value);
-    CameraDiagnostics::Result fetchVideoSourceToken();
+    virtual CameraDiagnostics::Result fetchVideoSourceToken();
 private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
@@ -372,6 +372,7 @@ protected:
 
     bool createPullPointSubscription();
     bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
+    void setMaxChannels(int value);
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
