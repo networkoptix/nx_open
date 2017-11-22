@@ -89,7 +89,7 @@ std::int64_t EventsStorage::insertEvent(
     const common::metadata::DetectedObject& detectedObject)
 {
     SqlQuery insertEventQuery(*queryContext->connection());
-    insertEventQuery.prepare(lit(R"sql(
+    insertEventQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
             device_guid, object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
@@ -122,7 +122,7 @@ void EventsStorage::insertEventAttributes(
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
     SqlQuery insertEventAttributesQuery(*queryContext->connection());
-    insertEventAttributesQuery.prepare(lit(R"sql(
+    insertEventAttributesQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event_properties(docid, content)
         VALUES(:eventId, :content)
     )sql"));
@@ -141,7 +141,7 @@ nx::utils::db::DBResult EventsStorage::selectEvents(
 {
     SqlQuery selectEventsQuery(*queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
-    selectEventsQuery.prepare(lit(R"sql(
+    selectEventsQuery.prepare(QString::fromLatin1(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
