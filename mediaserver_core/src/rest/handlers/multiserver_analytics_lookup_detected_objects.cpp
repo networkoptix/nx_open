@@ -2,7 +2,7 @@
 
 #include <nx/utils/std/future.h>
 
-#include <analytics/events_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace {
 

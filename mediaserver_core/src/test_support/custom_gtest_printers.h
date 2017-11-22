@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../analytics/events_storage/analytics_events_storage_types.h"
+#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
 
 namespace nx {
 namespace mediaserver {

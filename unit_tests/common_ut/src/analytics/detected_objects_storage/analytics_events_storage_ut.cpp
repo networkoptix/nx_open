@@ -8,7 +8,7 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <analytics/events_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace nx {
 namespace mediaserver {

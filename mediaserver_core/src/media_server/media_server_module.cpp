@@ -49,7 +49,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
-#include <analytics/events_storage/analytics_events_storage.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace {
 

@@ -45,10 +45,16 @@ struct Filter
      * Search is done across all attributes (names and values).
      */
     QString freeText;
+
+    bool operator==(const Filter& right) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
+
+#define Filter_analytics_storage_Fields \
+    (objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 

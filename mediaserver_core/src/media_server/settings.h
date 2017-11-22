@@ -5,7 +5,7 @@
 
 #include <QtCore/QSettings>
 
-#include <analytics/events_storage/analytics_events_storage_settings.h>
+#include <analytics/detected_objects_storage/analytics_events_storage_settings.h>
 
 //!Contains constants with names of configuration parameters
 namespace nx_ms_conf

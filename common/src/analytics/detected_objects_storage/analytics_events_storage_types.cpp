@@ -22,6 +22,16 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+bool Filter::operator==(const Filter& right) const
+{
+    return objectTypeId == right.objectTypeId
+        && objectId == right.objectId
+        && timePeriod == right.timePeriod
+        && boundingBox == right.boundingBox
+        && requiredAttributes == right.requiredAttributes
+        && freeText == right.freeText;
+}
+
 void serializeToParams(const Filter& /*filter*/, QnRequestParamList* /*params*/)
 {
     // TODO
@@ -32,6 +42,11 @@ bool deserializeFromParams(const QnRequestParamList& /*params*/, Filter* /*filte
     // TODO
     return false;
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (Filter),
+    (json)(ubjson),
+    _analytics_storage_Fields)
 
 //-------------------------------------------------------------------------------------------------
 

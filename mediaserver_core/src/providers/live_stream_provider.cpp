@@ -22,7 +22,7 @@
 #include <utils/common/synctime.h>
 #include <camera/video_camera.h>
 #include <analytics/plugins/detection/config.h>
-#include <analytics/events_storage/analytics_events_receptor.h>
+#include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 
