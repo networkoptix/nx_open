@@ -140,15 +140,15 @@ private:
 using EventsStorageFactoryFunction =
     std::unique_ptr<AbstractEventsStorage>(const Settings&);
 
-class EventsStorageFuncionFactory:
+class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
 {
     using base_type = nx::utils::BasicFactory<EventsStorageFactoryFunction>;
 
 public:
-    EventsStorageFuncionFactory();
+    EventsStorageFactory();
 
-    static EventsStorageFuncionFactory& instance();
+    static EventsStorageFactory& instance();
 
 private:
     std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(const Settings&);

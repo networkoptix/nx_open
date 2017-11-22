@@ -194,19 +194,19 @@ void EventsStorage::loadEvent(
 
 //-------------------------------------------------------------------------------------------------
 
-EventsStorageFuncionFactory::EventsStorageFuncionFactory():
-    base_type(std::bind(&EventsStorageFuncionFactory::defaultFactoryFunction, this,
+EventsStorageFactory::EventsStorageFactory():
+    base_type(std::bind(&EventsStorageFactory::defaultFactoryFunction, this,
         std::placeholders::_1))
 {
 }
 
-EventsStorageFuncionFactory& EventsStorageFuncionFactory::instance()
+EventsStorageFactory& EventsStorageFactory::instance()
 {
-    static EventsStorageFuncionFactory staticInstance;
+    static EventsStorageFactory staticInstance;
     return staticInstance;
 }
 
-std::unique_ptr<AbstractEventsStorage> EventsStorageFuncionFactory::defaultFactoryFunction(
+std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunction(
     const Settings& settings)
 {
     return std::make_unique<EventsStorage>(settings);

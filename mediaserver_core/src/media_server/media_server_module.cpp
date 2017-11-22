@@ -181,7 +181,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPoolThread->start();
 
     m_analyticsEventsStorage =
-        nx::mediaserver::analytics::storage::EventsStorageFuncionFactory::instance()
+        nx::mediaserver::analytics::storage::EventsStorageFactory::instance()
             .create(m_settings->analyticEventsStorage());
     if (!m_analyticsEventsStorage->initialize())
     {
