@@ -152,7 +152,7 @@ void LicenseWatcher::processResponse(QByteArray responseData)
     {
         QByteArray licenseKey = itr.key().toUtf8();
         auto errorInfo = itr.value();
-        NX_INFO(this, lm("License %1 has been removed. Reason: '%2'. Error code: %3")
+        NX_ALWAYS(this, lm("License %1 has been removed. Reason: '%2'. Error code: %3")
             .args(licenseKey, errorInfo.text, errorInfo.code));
 
         auto licenseObject = QnLicense::createFromKey(licenseKey);
