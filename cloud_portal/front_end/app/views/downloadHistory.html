@@ -1,8 +1,5 @@
 <div class="container">
-
-
-
-    <uib-tabset>
+    <uib-tabset ng-if="downloadTypes">
         <uib-tab ng-repeat="type in downloadTypes">
             <uib-tab-heading>
                 <span class="tab-heading-hack">{{$root.L.downloads.releasesTypes[type] || type}}</span>
@@ -18,5 +15,4 @@
             </div>
         </uib-tab>
     </uib-tabset>
-
 </div>
