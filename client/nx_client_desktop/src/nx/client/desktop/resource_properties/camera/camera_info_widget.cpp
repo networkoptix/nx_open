@@ -30,6 +30,10 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
         { QSizePolicy::Preferred, QSizePolicy::Fixed },
         true);
 
+    autoResizePagesToContents(ui->controlsStackedWidget,
+        { QSizePolicy::Fixed, QSizePolicy::Preferred},
+        true);
+
     alignLabels();
     updatePageSwitcher();
     updatePalette();
@@ -83,8 +87,10 @@ void CameraInfoWidget::loadDataToUi()
 {
     const bool singleCamera = m_model->isSingleCameraMode();
     ui->nameLabel->setVisible(singleCamera);
-    ui->multipleNameLabel->setVisible(!singleCamera);
-    ui->toggleInfoButton->setVisible(singleCamera);
+    ui->controlsStackedWidget->setCurrentWidget(singleCamera
+        ? ui->toggleInfoPage
+        : ui->multipleCamerasNamePage);
+
     ui->stackedWidget->setVisible(singleCamera);
 
     ui->nameLabel->setText(m_model->name());

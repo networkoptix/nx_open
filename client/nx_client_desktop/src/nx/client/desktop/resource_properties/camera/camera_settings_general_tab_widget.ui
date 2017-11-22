@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>748</width>
-    <height>525</height>
+    <height>390</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1">
@@ -54,8 +54,17 @@
    </item>
    <item>
     <layout class="QGridLayout" name="generalGridLayout" columnstretch="1,1">
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
      <property name="topMargin">
       <number>12</number>
+     </property>
+     <property name="rightMargin">
+      <number>16</number>
+     </property>
+     <property name="bottomMargin">
+      <number>16</number>
      </property>
      <property name="horizontalSpacing">
       <number>24</number>
@@ -78,6 +87,19 @@
            <string>Enable Audio</string>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
