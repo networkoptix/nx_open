@@ -4030,7 +4030,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
 
     const auto onvifActive = m_isRelayOutputInversed ? !active : active;
     request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
-    
+
     _onvifDevice__SetRelayOutputStateResponse response;
     const int soapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND )
@@ -4274,7 +4274,12 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     m_audioTransmitter->setOutputFormat(format);
     m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
     audioTransmitter->setContentType(params.contentType.toUtf8());
-    audioTransmitter->setNoAuth(params.noAuth);
+    if (params.noAuth)
+        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::noAuth);
+    else if (params.useBasicAuth)
+        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::basicAuth);
+    else
+        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::digestAndBasicAuth);
 
     QUrl srcUrl(getUrl());
     QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
