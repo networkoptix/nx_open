@@ -110,7 +110,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     if (!m_hevcSupported)
         return base_type::initializeMedia(onvifCapabilities);
 
-    return CameraDiagnostics::NoErrorResult();
+    return base_type::fetchVideoSourceToken(); //< Fill channel count.
 }
 
 static std::unique_ptr<nx_http::HttpClient> makeHttpClient(const QAuthenticator& authenticator)
