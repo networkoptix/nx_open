@@ -1,6 +1,8 @@
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
@@ -9,6 +11,8 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/common/html.h>
 
@@ -23,7 +27,7 @@ namespace desktop {
 CameraSettingsDialog::CameraSettingsDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::CameraSettingsDialog()),
-    m_model(new CameraSettingsModel())
+    m_model(new CameraSettingsModel(context()))
 {
     ui->setupUi(this);
 
@@ -31,57 +35,50 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent) :
         new CameraSettingsGeneralTabWidget(m_model.data(), this),
         tr("General"));
 
-/*
-    connect(resourceAccessManager(), &QnResourceAccessManager::permissionsChanged, this,
-        [this](const QnResourceAccessSubject& subject)
+    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
+        [this](const QnResourceList& resources)
         {
-            if (m_user && subject.user() == m_user)
-                updatePermissions();
+            if (isHidden())
+                return;
+
+            auto cameras = resources.filtered<QnVirtualCameraResource>();
+            if (!cameras.isEmpty())
+                setCameras(cameras);
         });
 
-    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
-    connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
-    connect(m_camerasPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
-    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
 
-    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
-    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
-    {
-        if (isHidden())
-            return;
-
-        auto users = resources.filtered<QnUserResource>();
-        if (!users.isEmpty())
-            setUser(users.first());
-    });
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
-    {
-        if (resource != m_user)
+    // TODO: #GDM Should we handle current user permission to camera change?
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
         {
-            // TODO: #vkutin #GDM check if permissions change is correctly handled through a chain of signals
-            return;
-        }
-        setUser(QnUserResourcePtr());
-        tryClose(true);
-    });
+            const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+                return;
+
+            if (m_model->cameras().contains(camera))
+            {
+                auto camerasLeft = m_model->cameras();
+                camerasLeft.removeAll(camera);
+                setCameras(camerasLeft, true);
+                if (camerasLeft.empty())
+                    tryClose(true);
+            }
+        });
 
     ui->alertBar->setReservedSpace(false);
 
-    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
-    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(okButton,
+        QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 
     // Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code.
-    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
-    */
+    safeModeWatcher->addControlledWidget(applyButton,
+        QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()

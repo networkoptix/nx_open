@@ -1,8 +1,8 @@
 #pragma once
 
-#include <client_core/connection_context_aware.h>
-
 #include <core/resource/resource_fwd.h>
+
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 
@@ -10,13 +10,13 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsModel: public Connective<QObject>, public QnConnectionContextAware
+class CameraSettingsModel: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
 
 public:
-    explicit CameraSettingsModel(QObject* parent = nullptr);
+    explicit CameraSettingsModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~CameraSettingsModel() override;
 
     QnVirtualCameraResourceList cameras() const;
@@ -45,6 +45,11 @@ public:
         QString secondaryStream;
     };
     CameraNetworkInfo networkInfo() const;
+
+    void pingCamera();
+    void showCamerasOnLayout();
+    void openEventLog();
+    void openCameraRules();
 
 signals:
     void networkInfoChanged();

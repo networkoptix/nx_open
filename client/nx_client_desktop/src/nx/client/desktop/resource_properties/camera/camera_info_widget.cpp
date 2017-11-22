@@ -45,20 +45,10 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
             updatePageSwitcher();
         });
 
-    connect(ui->pingButton, &QPushButton::clicked, this, []{});
-    connect(ui->showOnLayoutButton, &QPushButton::clicked, this, []{});
-    connect(ui->eventLogButton, &QPushButton::clicked, this, []{});
-    connect(ui->cameraRulesButton, &QPushButton::clicked, this, []{});
     connect(ui->primaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
-        [this]
-        {
-            qApp->clipboard()->setText(ui->primaryStreamLabel->text());
-        });
+        [this] { qApp->clipboard()->setText(ui->primaryStreamLabel->text()); });
     connect(ui->secondaryStreamCopyButton, &ui::ClipboardButton::clicked, this,
-        [this]
-        {
-            qApp->clipboard()->setText(ui->secondaryStreamLabel->text());
-        });
+        [this] { qApp->clipboard()->setText(ui->secondaryStreamLabel->text()); });
 }
 
 CameraInfoWidget::~CameraInfoWidget()
@@ -67,15 +57,30 @@ CameraInfoWidget::~CameraInfoWidget()
 
 void CameraInfoWidget::setModel(CameraSettingsModel* model)
 {
-    NX_ASSERT(model && !m_model);
+    NX_EXPECT(model && !m_model);
 
     if (m_model)
+    {
         m_model->disconnect(this);
+        ui->pingButton->disconnect(m_model);
+        ui->showOnLayoutButton->disconnect(m_model);
+        ui->eventLogButton->disconnect(m_model);
+        ui->cameraRulesButton->disconnect(m_model);
+    }
 
     m_model = model;
 
     connect(m_model, &CameraSettingsModel::networkInfoChanged, this,
         &CameraInfoWidget::updateNetworkInfo);
+
+    connect(ui->pingButton, &QPushButton::clicked, m_model,
+        &CameraSettingsModel::pingCamera);
+    connect(ui->showOnLayoutButton, &QPushButton::clicked, m_model,
+        &CameraSettingsModel::showCamerasOnLayout);
+    connect(ui->eventLogButton, &QPushButton::clicked, m_model,
+        &CameraSettingsModel::openEventLog);
+    connect(ui->cameraRulesButton, &QPushButton::clicked, m_model,
+        &CameraSettingsModel::openCameraRules);
 }
 
 bool CameraInfoWidget::hasChanges() const

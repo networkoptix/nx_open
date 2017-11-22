@@ -4,6 +4,9 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource_display_info.h>
 
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -76,8 +79,9 @@ struct CameraSettingsModel::Private
     }
 };
 
-CameraSettingsModel::CameraSettingsModel(QObject* parent):
+CameraSettingsModel::CameraSettingsModel(QnWorkbenchContext* context, QObject* parent):
     base_type(parent),
+    QnWorkbenchContextAware(context),
     d(new Private())
 {
 
@@ -147,6 +151,26 @@ CameraSettingsModel::CameraPersistentInfo CameraSettingsModel::info() const
 CameraSettingsModel::CameraNetworkInfo CameraSettingsModel::networkInfo() const
 {
     return d->networkInfo;
+}
+
+void CameraSettingsModel::pingCamera()
+{
+    menu()->trigger(ui::action::PingAction, {Qn::TextRole, d->networkInfo.ipAddress});
+}
+
+void CameraSettingsModel::showCamerasOnLayout()
+{
+    menu()->trigger(ui::action::OpenInNewTabAction, d->cameras);
+}
+
+void CameraSettingsModel::openEventLog()
+{
+    menu()->trigger(ui::action::CameraIssuesAction, d->cameras);
+}
+
+void CameraSettingsModel::openCameraRules()
+{
+    menu()->trigger(ui::action::CameraBusinessRulesAction, d->cameras);
 }
 
 } // namespace desktop
