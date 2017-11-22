@@ -2625,37 +2625,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
 
 bool QnPlOnvifResource::detectVideoSourceCount()
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
-
-    _onvifMedia__GetVideoSources request;
-    _onvifMedia__GetVideoSourcesResponse response;
-    int soapRes = soapWrapper.getVideoSources(request, response);
-
-    if (soapRes != SOAP_OK) {
-#ifdef PL_ONVIF_DEBUG
-        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: can't receive data from camera (or data is empty) (URL: "
-            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-            << ". " << soapWrapper.getLastError();
-#endif
-        return false;
-    }
-    m_maxChannels = (int) response.VideoSources.size();
-
-    if (m_maxChannels > 1)
-    {
-        VideoConfigsReq confRequest;
-        VideoConfigsResp confResponse;
-        soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
-        if (soapRes != SOAP_OK)
-            return false;
-        int encoderCount = (int) confResponse.Configurations.size();
-        if (encoderCount > 0 && encoderCount < m_maxChannels)
-            m_maxChannels = encoderCount;
-    }
-
-    return true;
+    return (bool) fetchVideoSourceToken();
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
@@ -2675,10 +2645,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
             << ". " << soapWrapper.getLastError();
 #endif
         if (soapWrapper.isNotAuthenticated())
-        {
-            setStatus(Qn::Unauthorized);
             return CameraDiagnostics::NotAuthorisedResult( getMediaUrl() );
-        }
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), soapWrapper.getLastError());
 
     }
@@ -2702,7 +2669,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 
     QnMutexLocker lock( &m_mutex );
     m_videoSourceToken = QString::fromStdString(conf->token);
-    //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
 
     if (m_maxChannels > 1)
     {
@@ -2713,7 +2679,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
 
         int encoderCount = (int)confResponse.Configurations.size();
-        if (encoderCount > 0 && encoderCount < m_maxChannels)
+        if (encoderCount < m_maxChannels)
             m_maxChannels = encoderCount;
     }
 
@@ -2761,7 +2727,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 {
     CameraDiagnostics::Result result = fetchVideoSourceToken();
     if (!result)
+    {
+        if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+            setStatus(Qn::Unauthorized);
         return result;
+    }
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
@@ -4286,6 +4256,11 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     audioTransmitter->setTransmissionUrl(url);
 
     return true;
+}
+
+void QnPlOnvifResource::setMaxChannels(int value)
+{
+    m_maxChannels = value;
 }
 
 #endif //ENABLE_ONVIF
