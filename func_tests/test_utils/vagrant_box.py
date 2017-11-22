@@ -269,6 +269,7 @@ class VagrantBox(object):
             f.write(self._vagrant.ssh_config(self.name))
             f.flush()
             self._box_host('vagrant', f.name).run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
+            self._patch_sshd_config(self._box_host('root', f.name))
         self.is_running = True
 
     def destroy(self):
@@ -295,3 +296,17 @@ class VagrantBox(object):
             file_path = file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir)
             assert os.path.isfile(file_path), '%s is expected but is missing' % file_path
             self._vm_host.put_file(file_path, self._vagrant_dir)
+
+    @staticmethod
+    def _patch_sshd_config(root_ssh_host):
+        sshd_config_path = '/etc/ssh/sshd_config'
+        settings = root_ssh_host.read_file(sshd_config_path).split('\n')  # Preserve new line at the end!
+        old_setting = 'UsePAM yes'
+        new_setting = 'UsePAM no'
+        try:
+            old_setting_line_index = settings.index(old_setting)
+        except ValueError:
+            assert False, "Wanted to replace %s with %s but couldn't fine latter" % (old_setting, new_setting)
+        settings[old_setting_line_index] = new_setting
+        root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
+        root_ssh_host.run_command(['service', 'ssh', 'reload'])
