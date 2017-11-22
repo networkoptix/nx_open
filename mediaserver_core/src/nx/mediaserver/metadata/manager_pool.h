@@ -33,7 +33,7 @@ public:
     ResourceMetadataContext(
         nx::sdk::metadata::AbstractMetadataManager*,
         nx::sdk::metadata::AbstractMetadataHandler*);
-    
+
     std::unique_ptr<
         nx::sdk::metadata::AbstractMetadataManager,
         ManagerDeleter> manager;
@@ -41,7 +41,7 @@ public:
     std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
 };
 
-class ManagerPool final: 
+class ManagerPool final:
     public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
