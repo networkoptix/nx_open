@@ -55,7 +55,7 @@ private:
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
     qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
     PlaybackMode m_playbackMode = PlaybackMode::Archive;
-    CameraDiagnostics::Result m_lastErrorCode { CameraDiagnostics::NoErrorResult() };
+    CameraDiagnostics::Result m_lastOpenResult {CameraDiagnostics::NoErrorResult()};
 };
 
 } // namespace plugins
