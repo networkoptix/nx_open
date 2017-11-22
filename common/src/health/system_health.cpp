@@ -2,6 +2,12 @@
 
 namespace QnSystemHealth {
 
+bool QnSystemHealth::isRemoteArchiveMessage(MessageType message)
+{
+    return message >= QnSystemHealth::RemoteArchiveSyncStarted
+        && message <= QnSystemHealth::RemoteArchiveSyncError;
+}
+
 bool isMessageVisible(MessageType message)
 {
     switch (message)

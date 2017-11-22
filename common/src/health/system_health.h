@@ -43,6 +43,8 @@ enum MessageType
     Count //< Must not be greater than 64 due to storage limitation
 };
 
+bool isRemoteArchiveMessage(MessageType);
+
 /** Some messages are not to be displayed in any case. */
 bool isMessageVisible(MessageType message);
 

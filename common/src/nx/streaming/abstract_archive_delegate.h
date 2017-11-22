@@ -12,6 +12,15 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <motion/abstract_motion_archive.h>
 
+enum class PlaybackMode
+{
+    Default,
+    Live,
+    Archive,
+    ThumbNails,
+    Export,
+    Edge
+};
 
 class QnAbstractArchiveDelegate: public QObject
 {
@@ -106,6 +115,9 @@ public:
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
 
     virtual int getSequence() const { return 0;  }
+
+    virtual void setPlaybackMode(PlaybackMode value) {}
+
 protected:
     Flags m_flags;
 };
