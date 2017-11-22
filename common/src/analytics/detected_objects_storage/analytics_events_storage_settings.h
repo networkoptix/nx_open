@@ -5,7 +5,6 @@
 class QnSettings;
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -19,5 +18,4 @@ public:
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

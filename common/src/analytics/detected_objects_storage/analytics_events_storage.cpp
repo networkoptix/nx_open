@@ -5,7 +5,6 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -214,5 +213,4 @@ std::unique_ptr<AbstractEventsStorage> EventsStorageFactory::defaultFactoryFunct
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

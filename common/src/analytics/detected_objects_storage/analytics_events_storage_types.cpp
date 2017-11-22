@@ -3,7 +3,6 @@
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -98,12 +97,11 @@ ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode)
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx
 
-using namespace nx::mediaserver::analytics::storage;
+using namespace nx::analytics::storage;
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::analytics::storage, ResultCode,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::analytics::storage, ResultCode,
     (ResultCode::ok, "ok")
     (ResultCode::retryLater, "retryLater")
     (ResultCode::error, "error")

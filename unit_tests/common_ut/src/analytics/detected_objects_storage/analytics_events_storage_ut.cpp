@@ -11,7 +11,6 @@
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 namespace test {
@@ -219,5 +218,4 @@ TEST_F(AnalyticsEventsStorage, storing_multiple_events_concurrently)
 } // namespace test
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

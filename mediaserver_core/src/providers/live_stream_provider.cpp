@@ -96,7 +96,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     // Forwarding metadata to analytics events DB.
     m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-        new nx::mediaserver::analytics::storage::AnalyticsEventsReceptor(
+        new nx::analytics::storage::AnalyticsEventsReceptor(
             qnServerModule->analyticsEventsStorage()));
     pool->registerDataReceptor(getResource(), m_analyticsEventsSaver.toWeakRef());
 }

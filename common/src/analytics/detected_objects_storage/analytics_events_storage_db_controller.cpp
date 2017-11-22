@@ -3,7 +3,6 @@
 #include "analytics_events_storage_db_schema.h"
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -17,5 +16,4 @@ DbController::DbController(
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

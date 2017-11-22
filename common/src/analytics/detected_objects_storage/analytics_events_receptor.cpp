@@ -9,7 +9,6 @@
 #include "analytics_events_storage.h"
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -66,5 +65,4 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

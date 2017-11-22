@@ -5,7 +5,6 @@
 #include "analytics_events_storage_types.h"
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -27,5 +26,4 @@ public:
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

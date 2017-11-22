@@ -14,7 +14,6 @@
 #include "analytics_events_storage_db_controller.h"
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -156,5 +155,4 @@ private:
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

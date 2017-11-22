@@ -11,7 +11,6 @@
 #include <utils/common/request_param.h>
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -74,8 +73,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (nx::mediaserver::analytics::storage::ResultCode), (lexical))
+    (nx::analytics::storage::ResultCode), (lexical))

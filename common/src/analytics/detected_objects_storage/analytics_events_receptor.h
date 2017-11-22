@@ -3,7 +3,6 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -24,5 +23,4 @@ private:
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

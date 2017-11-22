@@ -181,7 +181,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPoolThread->start();
 
     m_analyticsEventsStorage =
-        nx::mediaserver::analytics::storage::EventsStorageFactory::instance()
+        nx::analytics::storage::EventsStorageFactory::instance()
             .create(m_settings->analyticEventsStorage());
     if (!m_analyticsEventsStorage->initialize())
     {
@@ -288,7 +288,7 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
     return m_archiveIntegrityWatcher;
 }
 
-nx::mediaserver::analytics::storage::AbstractEventsStorage*
+nx::analytics::storage::AbstractEventsStorage*
     QnMediaServerModule::analyticsEventsStorage() const
 {
     return m_analyticsEventsStorage.get();

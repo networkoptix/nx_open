@@ -12,7 +12,7 @@ static const char* kFormatParamName = "format";
 
 QnMultiserverAnalyticsLookupDetectedObjects::QnMultiserverAnalyticsLookupDetectedObjects(
     const QString& path,
-    nx::mediaserver::analytics::storage::AbstractEventsStorage* eventStorage)
+    nx::analytics::storage::AbstractEventsStorage* eventStorage)
     :
     m_requestPath(path),
     m_eventStorage(eventStorage)
@@ -26,14 +26,14 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    using namespace nx::mediaserver::analytics::storage;
+    using namespace nx::analytics::storage;
 
     Filter filter;
     Qn::SerializationFormat outputFormat = Qn::JsonFormat;
     if (!deserializeRequest(params, &filter, &outputFormat))
         return nx_http::StatusCode::badRequest;
 
-    nx::mediaserver::analytics::storage::LookupResult outputData;
+    nx::analytics::storage::LookupResult outputData;
 
     nx::utils::promise<ResultCode> lookupCompleted;
     m_eventStorage->lookup(
@@ -74,7 +74,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
 
 bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     const QnRequestParamList& params,
-    nx::mediaserver::analytics::storage::Filter* filter,
+    nx::analytics::storage::Filter* filter,
     Qn::SerializationFormat* outputFormat)
 {
     if (params.contains(kFormatParamName))

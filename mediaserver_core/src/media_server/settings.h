@@ -138,7 +138,7 @@ public:
 
     std::chrono::milliseconds delayBeforeSettingMasterFlag() const;
 
-    nx::mediaserver::analytics::storage::Settings analyticEventsStorage() const;
+    nx::analytics::storage::Settings analyticEventsStorage() const;
 
     static QString defaultROSettingsFilePath();
     static QString defaultRunTimeSettingsFilePath();
@@ -159,6 +159,6 @@ private:
 private:
     std::unique_ptr<QSettings> m_rwSettings;
     std::unique_ptr<QSettings> m_roSettings;
-    nx::mediaserver::analytics::storage::Settings m_analyticEventsStorage;
+    nx::analytics::storage::Settings m_analyticEventsStorage;
     QString m_dataDirectory;
 };

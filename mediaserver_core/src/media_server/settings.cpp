@@ -126,7 +126,7 @@ std::chrono::milliseconds MSSettings::delayBeforeSettingMasterFlag() const
             nx_ms_conf::DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG).toString());
 }
 
-nx::mediaserver::analytics::storage::Settings MSSettings::analyticEventsStorage() const
+nx::analytics::storage::Settings MSSettings::analyticEventsStorage() const
 {
     return m_analyticEventsStorage;
 }
