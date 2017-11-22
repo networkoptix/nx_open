@@ -316,6 +316,7 @@ protected:
 
     void setMaxFps(int f);
     void setPrimaryResolution(const QSize& value);
+    CameraDiagnostics::Result fetchVideoSourceToken();
 private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
@@ -325,7 +326,6 @@ private:
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
 
-    CameraDiagnostics::Result fetchVideoSourceToken();
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
