@@ -22,8 +22,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.storage = $localStorage;
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
         $scope.storage.serverStates = $scope.storage.serverStates || {};
-        
-        $scope.playerApi = false;
+
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
@@ -195,7 +194,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         function updateVideoSource(playingPosition) {
             if($scope.playerAPI) {
                 // Pause playing
-                $scope.playerAPI.pause();
+                $scope.playerAPI = null;
             }
             updateAvailableResolutions();
             var live = !playingPosition;
