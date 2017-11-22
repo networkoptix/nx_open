@@ -7,6 +7,7 @@ angular.module('cloudApp')
 
         $scope.downloads = Config.downloads;
         $scope.linkbase = "http://updates.networkoptix.com";
+        $scope.downloadTypes=["releases","patches","beta"];
 
         cloudApi.getDownloadsHistory($routeParams.build).then(function(data){
             $scope.downloadsData = data.data;
@@ -15,6 +16,7 @@ angular.module('cloudApp')
                 $scope.activeBuilds = data.data.releases;
             }else{
                 $scope.activeBuilds = [data.data];
+                $scope.downloadTypes = [data.data.type]
             }
             console.log($scope.activeBuilds);
         });

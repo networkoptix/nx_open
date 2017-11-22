@@ -8,7 +8,7 @@
             Release Notes
         </a>
     </h4>
-    <div collapse="!expandReleaseNotes" ng-bind-html="release.releaseNotes"></div>
+    <div uib-collapse="!expandReleaseNotes" ng-bind-html="release.releaseNotes"></div>
 </div>
 
 <h4>In-Client Upgrade:</h4>
@@ -21,11 +21,11 @@
 <div ng-repeat="platform in release.platforms">
     <h5>
         <a href ng-click="expand[platform.name] = !expand[platform.name]">
-            {{platform.name}}
+            {{$root.L.downloads.groups[platform.name].label}}
         </a>
     </h5>
 
-    <ul collapse="!expand[platform.name]">
+    <ul uib-collapse="!expand[platform.name]">
         <li ng-repeat="file in platform.files">
             {{file.niceName}}
             <a ng-href="{{linkbase}}/{{release.buildNumber}}/{{file.path}}">{{file.fileName}}</a>

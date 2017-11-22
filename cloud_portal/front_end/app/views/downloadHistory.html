@@ -1,5 +1,22 @@
 <div class="container">
-    <div ng-repeat="release in activeBuilds">
-        <ng-include src="$root.C.viewsDir + 'components/downloadRelease.html'"></ng-include>
-    </div>
+
+
+
+    <uib-tabset>
+        <uib-tab ng-repeat="type in downloadTypes">
+            <uib-tab-heading>
+                <span class="tab-heading-hack">{{$root.L.downloads.releasesTypes[type] || type}}</span>
+            </uib-tab-heading>
+            <div class="panel panel-default">
+                <div class="panel-body flex-md">
+
+                    <div ng-repeat="release in activeBuilds">
+                        <ng-include src="$root.C.viewsDir + 'components/downloadRelease.html'"></ng-include>
+                    </div>
+
+                </div>
+            </div>
+        </uib-tab>
+    </uib-tabset>
+
 </div>

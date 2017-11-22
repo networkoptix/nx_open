@@ -204,6 +204,11 @@
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
         "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms": {
@@ -218,6 +223,14 @@
       "server": "Server only",
       "bundle": "Client and Server",
       "servertool": "Configuration tool"
+    },
+    "releasesTypes":{
+      "beta": "Beta",
+      "rc": "Release Candidate",
+      "release": "Release",
+      "releases": "Releases",
+      "patch": "Patch",
+      "patches": "Patches"
     }
   },
   "activeActions":{
