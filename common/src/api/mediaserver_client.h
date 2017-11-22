@@ -182,15 +182,24 @@ protected:
     template<typename CreateHttpClientFunc, typename ... Output>
     void performGetRequest(
         CreateHttpClientFunc createHttpClientFunc,
-        const std::string& requestPath,
+        std::string requestPath,
         std::function<void(
             SystemError::ErrorCode,
             nx_http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
+        const auto queryPos = requestPath.find('?');
+        std::string query;
+        if (queryPos != std::string::npos)
+        {
+            query = requestPath.substr(queryPos+1);
+            requestPath.erase(queryPos, std::string::npos);
+        }
+
         nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath(QLatin1String("/"))
-            .appendPath(QString::fromStdString(requestPath)).toUrl();
+            .appendPath(QString::fromStdString(requestPath))
+            .setQuery(QString::fromStdString(query)).toUrl();
         if (!m_authenticationKey.isEmpty())
         {
             QUrlQuery query(requestUrl.query());

@@ -31,14 +31,72 @@ bool Filter::operator==(const Filter& right) const
         && freeText == right.freeText;
 }
 
-void serializeToParams(const Filter& /*filter*/, QnRequestParamList* /*params*/)
+void serializeToParams(const Filter& filter, QnRequestParamList* params)
 {
-    // TODO
+    if (!filter.deviceId.isNull())
+        params->insert(lit("deviceId"), filter.deviceId.toSimpleString());
+
+    for (const auto& objectTypeId: filter.objectTypeId)
+        params->insert(lit("objectTypeId"), objectTypeId.toSimpleString());
+
+    if (!filter.objectId.isNull())
+        params->insert(lit("objectId"), filter.objectId.toSimpleString());
+
+    // TODO: timePeriod
+
+    if (!filter.boundingBox.isNull())
+    {
+        params->insert(lit("x1"), QString::number(filter.boundingBox.topLeft().x()));
+        params->insert(lit("y1"), QString::number(filter.boundingBox.topLeft().y()));
+        params->insert(lit("x2"), QString::number(filter.boundingBox.bottomRight().x()));
+        params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
+    }
+
+    // TODO: requiredAttributes
+
+    if (!filter.freeText.isEmpty())
+    {
+        params->insert(
+            lit("freeText"),
+            QString::fromUtf8(QUrl::toPercentEncoding(filter.freeText)));
+    }
 }
 
-bool deserializeFromParams(const QnRequestParamList& /*params*/, Filter* /*filter*/)
+bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
-    // TODO
+    if (params.contains(lit("deviceId")))
+        filter->deviceId = QnUuid::fromStringSafe(params.value(lit("deviceId")));
+
+    for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
+        filter->objectTypeId.push_back(QnUuid::fromStringSafe(objectTypeId));
+
+    if (params.contains(lit("objectId")))
+        filter->objectId = QnUuid::fromStringSafe(params.value(lit("objectId")));
+
+    // TODO: timePeriod.
+
+    if (params.contains(lit("x1")))
+    {
+        if (!(params.contains(lit("y1")) && params.contains(lit("x2")) && params.contains(lit("y2"))))
+            return false;
+
+        filter->boundingBox.setTopLeft(QPointF(
+            params.value(lit("x1")).toDouble(),
+            params.value(lit("y1")).toDouble()));
+
+        filter->boundingBox.setBottomRight(QPointF(
+            params.value(lit("x2")).toDouble(),
+            params.value(lit("y2")).toDouble()));
+    }
+
+    // TODO: requiredAttributes.
+
+    if (params.contains(lit("freeText")))
+    {
+        filter->freeText = QUrl::fromPercentEncoding(
+            params.value(lit("freeText")).toUtf8());
+    }
+
     return true;
 }
 

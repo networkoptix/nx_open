@@ -6,6 +6,7 @@
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <api/mediaserver_client.h>
+#include <test_support/analytics/storage/analytics_storage_types.h>
 #include <test_support/mediaserver_launcher.h>
 
 namespace test {
@@ -122,6 +123,8 @@ protected:
     void whenIssueLookup()
     {
         using namespace std::placeholders;
+
+        m_filter = nx::analytics::storage::test::generateRandomFilter();
 
         m_mediaserverClient->ec2AnalyticsLookupDetectedObjects(
             m_filter,

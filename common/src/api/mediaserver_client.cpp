@@ -283,8 +283,20 @@ void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
     const nx::analytics::storage::Filter& request,
     std::function<void(ec2::ErrorCode, nx::analytics::storage::LookupResult)> completionHandler)
 {
+    QString requestPath(lit("ec2/analyticsLookupDetectedObjects"));
+
+    QnRequestParamList queryParams;
+    nx::analytics::storage::serializeToParams(request, &queryParams);
+    if (!queryParams.isEmpty())
+    {
+        QUrlQuery query;
+        for (const auto& param: queryParams)
+            query.addQueryItem(param.first, param.second);
+        requestPath += lit("?") + query.toString();
+    }
+
     performAsyncEc2Call(
-        "ec2/analyticsLookupDetectedObjects",
+        requestPath.toStdString(),
         std::move(completionHandler));
 }
 

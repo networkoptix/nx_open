@@ -31,6 +31,7 @@ QN_FUSION_DECLARE_FUNCTIONS(DetectionEvent, (json)(ubjson));
 
 struct Filter
 {
+    QnUuid deviceId;
     std::vector<QnUuid> objectTypeId;
     QnUuid objectId;
     QnTimePeriod timePeriod;
@@ -52,7 +53,7 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params);
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 
 #define Filter_analytics_storage_Fields \
-    (objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceId)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
