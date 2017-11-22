@@ -83,18 +83,7 @@ bool isLocalAppServer(const QString &host) {
 
 QString getDataDirectory()
 {
-    const QString& dataDirFromSettings = qnServerModule->roSettings()->value( "dataDir" ).toString();
-    if( !dataDirFromSettings.isEmpty() )
-        return dataDirFromSettings;
-
-#ifdef Q_OS_LINUX
-    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
-    QString varDirName = qnServerModule->roSettings()->value("varDir", defVarDirName).toString();
-    return varDirName;
-#else
-    const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
-    return dataDirList.isEmpty() ? QString() : dataDirList[0];
-#endif
+    return qnServerModule->settings()->getDataDirectory();
 }
 
 bool updateUserCredentials(
@@ -144,7 +133,7 @@ bool configureLocalSystem(
     const ConfigureSystemData& data,
     ec2::AbstractTransactionMessageBus* messageBus)
 {
-    // Duplicating localSystemId check so that connection are not dropped 
+    // Duplicating localSystemId check so that connection are not dropped
     // in case if this method has nothing to do.
     const auto& commonModule = messageBus->commonModule();
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
