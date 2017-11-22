@@ -37,8 +37,8 @@ static const int kNumberOfSynchronizationCycles = 2;
 static const std::chrono::milliseconds kWaitBeforeSynchronize(20000);
 static const std::chrono::milliseconds kWaitBeforeLoadNextChunk(0);
 
-static const QString kRecorderThreadName = lit("Remote archive sync task recorder");
-static const QString kReaderThreadName = lit("Remote archive sync task reader");
+static const QString kRecorderThreadName = lit("Edge recorder");
+static const QString kReaderThreadName = lit("Edge reader");
 
 } // namespace
 
@@ -318,7 +318,7 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
     const auto temporaryFilePath = QString::number(nx::utils::random::number());
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
     storage->registerResourceData(temporaryFilePath, ioDevice);
-    storage->setOwnIoDevice(false);
+    storage->setIsIoDeviceOwner(false);
 
     using namespace nx::mediaserver_core::plugins;
     auto archiveDelegate = new QnAviArchiveDelegate();

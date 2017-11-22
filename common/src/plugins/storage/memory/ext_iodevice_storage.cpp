@@ -90,7 +90,7 @@ void QnExtIODeviceStorageResource::registerResourceData( const QString& path, QI
     }
 }
 
-void QnExtIODeviceStorageResource::setOwnIoDevice(bool ownIoDevice)
+void QnExtIODeviceStorageResource::setIsIoDeviceOwner(bool isIoDeviceOwner)
 {
-    m_isIoDeviceOwner = ownIoDevice;
+    m_isIoDeviceOwner = isIoDeviceOwner;
 }

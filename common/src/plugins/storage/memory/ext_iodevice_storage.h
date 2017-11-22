@@ -63,7 +63,7 @@ public:
     */
     void registerResourceData( const QString& path, QIODevice* data );
 
-    void setOwnIoDevice(bool ownIoDevice);
+    void setIsIoDeviceOwner(bool isIoDeviceOwner);
 
 private:
     std::map<QString, QIODevice*> m_urlToDevice;
