@@ -442,8 +442,6 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
 int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType,
     QnLicenseValidator* validator) const
 {
-    return 200;
-
     if (licenseType == Qn::LC_Free)
         return std::numeric_limits<int>::max();
 
