@@ -23,7 +23,7 @@ set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail
     "<br><a href=\"mailto:WAVELicense@hanwha.com\">WAVELicense@hanwha.com</a> (for US customers),<br>
-    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers),<br>"
+    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers)<br>"
 )
 
 set(installer.name "wave")
