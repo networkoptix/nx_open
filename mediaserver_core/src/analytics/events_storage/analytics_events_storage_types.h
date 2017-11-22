@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/db/types.h>
 
 #include <analytics/common/object_detection_metadata.h>
@@ -59,6 +60,9 @@ enum class ResultCode
 };
 
 ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult);
+
+nx_http::StatusCode::Value toHttpStatusCode(ResultCode resultCode);
+ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
