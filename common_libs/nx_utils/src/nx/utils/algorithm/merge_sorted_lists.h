@@ -93,7 +93,7 @@ auto merge_sorted_lists(
 
     std::make_heap(queueData.begin(), queueData.end(), lessPriority);
 
-    while (!queueData.empty() && result.size() < totalLimit)
+    while (!queueData.empty() && ((int) result.size()) < totalLimit)
     {
         std::pop_heap(queueData.begin(), queueData.end(), lessPriority);
         auto& range = queueData.back();

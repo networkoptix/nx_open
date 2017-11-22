@@ -18,8 +18,8 @@ QnSettings::QnSettings(
 }
 
 QnSettings::QnSettings(QSettings* existingSettings):
-    m_systemSettings(existingSettings),
-    m_scope(existingSettings->scope())
+    m_scope(existingSettings->scope()),
+    m_systemSettings(existingSettings)
 {
 }
 
