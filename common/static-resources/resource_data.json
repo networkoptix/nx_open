@@ -56,7 +56,8 @@
                 "bitrateKbps": 64,
                 "sampleRate": 16,
                 "urlPath": "/audio-out/aac16_64.cgi",
-                "contentType": ""
+                "contentType": "",
+                "useBasicAuth": true
             }
         },
         {
