@@ -105,7 +105,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
     const auto openResult = m_rtpReader.openStream();
-    NX_VERBOSE(this, lm("RTP open %1 -> %2").args(streamUrlString, openResult.toString(nullptr)));
+    NX_VERBOSE(this, lm("RTP open %1 -> %2 (client id %3)").args(
+        streamUrlString, openResult.toString(nullptr), m_clientId));
+
     return openResult;
 }
 

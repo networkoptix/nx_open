@@ -1,8 +1,8 @@
 {{#analyticsSdkEventType}}
-    <h1>{{analyticsSdkEventType}}{{#source}} <b>{{source}}</b>{{/source}}</h1>
+    <h1>{{analyticsSdkEventType}}{{#source}} at <b>{{source}}</b>{{/source}}</h1>
 {{/analyticsSdkEventType}}
 {{^analyticsSdkEventType}}
-    <h1>{{event}}{{#source}} <b>{{source}}</b>{{/source}}</h1>
+    <h1>{{event}}{{#source}} at <b>{{source}}</b>{{/source}}</h1>
 {{/analyticsSdkEventType}}
 
 {{#screenshot}}
