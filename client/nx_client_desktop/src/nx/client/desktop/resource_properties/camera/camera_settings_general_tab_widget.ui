@@ -10,26 +10,30 @@
     <height>525</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QnAlertBar" name="topAlertBar" native="true">
-     <property name="text" stdset="0">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="nx::client::desktop::CameraInfoWidget" name="cameraInfoWidget" native="true"/>
    </item>
    <item>
-    <widget class="Line" name="line_2">
+    <widget class="Line" name="overLicensingLine">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -39,7 +43,10 @@
     <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
    </item>
    <item>
-    <widget class="Line" name="line">
+    <widget class="Line" name="overGridLine">
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -77,12 +84,6 @@
      </item>
      <item row="0" column="0">
       <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
        </property>
@@ -96,37 +97,17 @@
        <property name="flat">
         <bool>true</bool>
        </property>
-       <layout class="QFormLayout" name="authenticationFormLayout">
-        <property name="fieldGrowthPolicy">
-         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-        </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="loginLabel">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QPushButton" name="editCredentialsButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
-           <string>Login</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="loginEdit"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="passwordLabel">
-          <property name="text">
-           <string>Password</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="passwordEdit">
-          <property name="echoMode">
-           <enum>QLineEdit::PasswordEchoOnEdit</enum>
+           <string>Edit Credentials</string>
           </property>
          </widget>
         </item>
@@ -152,11 +133,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnAlertBar</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
-  </customwidget>
-  <customwidget>
    <class>nx::client::desktop::ImageControlWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/resource_properties/camera/image_control_widget.h</header>
@@ -176,8 +152,8 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>loginEdit</tabstop>
-  <tabstop>passwordEdit</tabstop>
   <tabstop>enableAudioCheckBox</tabstop>
  </tabstops>
+ <resources/>
+ <connections/>
 </ui>

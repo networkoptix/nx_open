@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <ui/widgets/common/abstract_preferences_widget.h>
+#include <QtCore/QPointer>
 
 namespace Ui {
 class CameraSettingsGeneralTabWidget;
@@ -10,17 +11,25 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsGeneralTabWidget: public QWidget
+class CameraSettingsModel;
+
+class CameraSettingsGeneralTabWidget: public QnAbstractPreferencesWidget
 {
     Q_OBJECT
-    using base_type = QWidget;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
-    CameraSettingsGeneralTabWidget(QWidget* parent = nullptr);
+    explicit CameraSettingsGeneralTabWidget(CameraSettingsModel* model,
+        QWidget* parent = nullptr);
     virtual ~CameraSettingsGeneralTabWidget() override;
+
+    virtual bool hasChanges() const override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
 private:
     QScopedPointer<Ui::CameraSettingsGeneralTabWidget> ui;
+    CameraSettingsModel* const m_model;
 };
 
 } // namespace desktop

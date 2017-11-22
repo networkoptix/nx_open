@@ -16,6 +16,13 @@
 
 #include "utils/common/event_processors.h"
 
+namespace {
+
+static constexpr int kDefaultFontSizePixels = 24;
+static constexpr int kDefaultFontWeight = QFont::DemiBold;
+
+} // namespace
+
 
 /* QnEditableLabelPrivate */
 
@@ -276,6 +283,12 @@ QnEditableLabel::QnEditableLabel(QWidget* parent):
     base_type(parent),
     d_ptr(new QnEditableLabelPrivate(this))
 {
+    QFont font;
+    font.setPixelSize(kDefaultFontSizePixels);
+    font.setWeight(kDefaultFontWeight);
+    setFont(font);
+    setButtonIcon(qnSkin->icon("system_settings/edit.png"));
+    setValidator([this](QString& text) { return !text.isEmpty(); });
 }
 
 QnEditableLabel::~QnEditableLabel()
