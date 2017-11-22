@@ -17,12 +17,10 @@ static const int kErrorDelayTimeoutMs = 100;
 
 static QnAbstractMediaDataPtr createMetadataPacket()
 {
-    QnCompressedMetadataPtr rez(new QnCompressedMetadata(MetadataType::MediaStreamEvent));
-    rez->timestamp = DATETIME_NOW;
+    QnAbstractMediaDataPtr rez = QnCompressedMetadata::createMediaEventPacket(
+        DATETIME_NOW,
+        Qn::MediaStreamEvent::TooManyOpenedConnections);
     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-    auto data = QnLexical::serialized(Qn::MediaStreamEvent::TooManyOpenedConnections).toUtf8();
-    rez->setData(data.data(), data.size());
-
     QnSleep::msleep(50);
     return rez;
 }

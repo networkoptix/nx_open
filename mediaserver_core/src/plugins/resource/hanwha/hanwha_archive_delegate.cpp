@@ -40,11 +40,11 @@ bool HanwhaArchiveDelegate::open(const QnResourcePtr &/*resource*/,
     AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 {
     m_streamReader->setRateControlEnabled(m_rateControlEnabled);
-    const auto result = (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());
-    if (!result && m_errorHandler)
+    m_lastErrorCode = m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+    if (!m_lastErrorCode && m_errorHandler)
         m_errorHandler(lit("Can not open stream"));
 
-    return result;
+    return (bool) m_lastErrorCode;
 }
 
 void HanwhaArchiveDelegate::close()
@@ -92,6 +92,12 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
             m_streamReader->setPositionUsec(m_currentPositionUsec);
         if (!open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr))
         {
+            if (m_lastErrorCode.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+            {
+                return QnCompressedMetadata::createMediaEventPacket(
+                    isForwardDirection() ? DATETIME_NOW : 0,
+                    Qn::MediaStreamEvent::TooManyOpenedConnections);
+            }
             if (m_errorHandler)
                 m_errorHandler(lit("Can not open stream."));
             return QnAbstractMediaDataPtr();
