@@ -277,9 +277,17 @@ int QnVMax480ArchiveDelegate::getChannel() const
     return m_res.dynamicCast<QnPhysicalCameraResource>()->getChannel();
 }
 
+void QnVMax480ArchiveDelegate::setPlaybackMode(PlaybackMode mode)
+{
+    m_playbackMode = mode;
+}
+
 void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
 {
-    m_groupId = data;
+    if (m_playbackMode == PlaybackMode::ThumbNails)
+        m_groupId = QnUuid::createUuid().toString().toUtf8();
+    else
+        m_groupId = data;
 }
 
 QnTimePeriodList QnVMax480ArchiveDelegate::chunks()

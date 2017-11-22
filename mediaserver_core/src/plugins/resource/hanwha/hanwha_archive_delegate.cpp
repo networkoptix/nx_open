@@ -214,9 +214,9 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
     }
 }
 
-void HanwhaArchiveDelegate::setClientId(const QnUuid& id)
+void HanwhaArchiveDelegate::setGroupId(const QByteArray& id)
 {
-    m_streamReader->setClientId(id);
+    m_streamReader->setClientId(QnUuid(id));
 }
 
 void HanwhaArchiveDelegate::beforeSeek(qint64 time)

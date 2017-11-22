@@ -37,7 +37,7 @@ public:
     virtual void beforeSeek(qint64 time) override;
 
     virtual void setPlaybackMode(PlaybackMode value) override;
-    virtual void setClientId(const QnUuid& id) override;
+    virtual void setGroupId(const QByteArray& id) override;
 
     void setRateControlEnabled(bool enabled);
     void setOverlappedId(int overlappedId);
