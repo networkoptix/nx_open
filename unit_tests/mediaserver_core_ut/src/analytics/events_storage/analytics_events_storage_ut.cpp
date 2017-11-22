@@ -118,8 +118,6 @@ private:
     {
         ResultCode resultCode;
         std::vector<DetectionEvent> eventsFound;
-
-        LookupResult() = delete;
     };
 
     std::unique_ptr<EventsStorage> m_eventsStorage;
