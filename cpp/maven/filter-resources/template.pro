@@ -13,6 +13,8 @@ ROOT_DIR = $$clean_path("${root.dir}")
 
 CONFIG += unversioned_soname unversioned_libname
 
+CONFIG += object_parallel_to_source
+
 ## GLOBAL CONFIGURATIONS
 !ios|equals(TEMPLATE, app) {
     CONFIG += precompile_header
