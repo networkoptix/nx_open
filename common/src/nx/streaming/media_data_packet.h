@@ -19,6 +19,7 @@
 #include <nx/streaming/media_context.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <common/common_globals.h>
 
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
@@ -204,6 +205,10 @@ struct QnCompressedMetadata: public QnAbstractCompressedMetadata
     virtual const char* data() const override;
     virtual size_t dataSize() const override;
     virtual bool setData(const char* data, std::size_t dataSize);
+
+    static QnCompressedMetadataPtr createMediaEventPacket(
+        qint64 timestampUs,
+        Qn::MediaStreamEvent value);
 };
 
 /**
