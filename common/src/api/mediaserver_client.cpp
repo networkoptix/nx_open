@@ -63,7 +63,7 @@ void MediaServerClient::getModuleInformation(
 
 QnJsonRestResult MediaServerClient::getModuleInformation(QnModuleInformation* moduleInformation)
 {
-    using GetModuleInformationAsyncFuncPointer = 
+    using GetModuleInformationAsyncFuncPointer =
         void(MediaServerClient::*)(std::function<void(QnJsonRestResult, QnModuleInformation)>);
 
     return syncCallWrapper(
@@ -276,6 +276,31 @@ ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
         this,
         static_cast<Ec2GetSystemMergeHistoryAsyncFuncPointer>(
             &MediaServerClient::ec2GetSystemMergeHistory),
+        result);
+}
+
+void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
+    const nx::analytics::storage::Filter& request,
+    std::function<void(ec2::ErrorCode, nx::analytics::storage::LookupResult)> completionHandler)
+{
+    performAsyncEc2Call(
+        "ec2/analyticsLookupDetectedObjects",
+        std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
+    const nx::analytics::storage::Filter& request,
+    nx::analytics::storage::LookupResult* result)
+{
+    using AsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const nx::analytics::storage::Filter&,
+            std::function<void(ec2::ErrorCode, nx::analytics::storage::LookupResult)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<AsyncFuncPointer>(&MediaServerClient::ec2AnalyticsLookupDetectedObjects),
+        request,
         result);
 }
 

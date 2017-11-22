@@ -48,6 +48,23 @@ private:
         nx::analytics::storage::Filter* filter,
         Qn::SerializationFormat* outputFormat);
 
+    bool deserializeOutputFormat(
+        const QnRequestParamList& params,
+        Qn::SerializationFormat* outputFormat);
+
+    bool deserializeRequest(
+        const QnRequestParamList& params,
+        const QByteArray& body,
+        const QByteArray& srcBodyContentType,
+        nx::analytics::storage::Filter* filter,
+        Qn::SerializationFormat* outputFormat);
+
+    nx_http::StatusCode::Value execute(
+        const nx::analytics::storage::Filter& filter,
+        Qn::SerializationFormat outputFormat,
+        QByteArray* body,
+        QByteArray* contentType);
+
     template<typename T>
     QByteArray serializeOutputData(
         const T& output,

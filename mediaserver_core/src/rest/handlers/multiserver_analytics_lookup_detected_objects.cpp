@@ -33,7 +33,104 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     if (!deserializeRequest(params, &filter, &outputFormat))
         return nx_http::StatusCode::badRequest;
 
-    nx::analytics::storage::LookupResult outputData;
+    return execute(filter, outputFormat, &result, &contentType);
+}
+
+int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QByteArray& srcBodyContentType,
+    QByteArray& result,
+    QByteArray& resultContentType,
+    const QnRestConnectionProcessor* /*owner*/)
+{
+    using namespace nx::analytics::storage;
+
+    Filter filter;
+    Qn::SerializationFormat outputFormat = Qn::JsonFormat;
+    if (!deserializeRequest(params, body, srcBodyContentType, &filter, &outputFormat))
+        return nx_http::StatusCode::badRequest;
+
+    return execute(filter, outputFormat, &result, &resultContentType);
+}
+
+bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
+    const QnRequestParamList& params,
+    nx::analytics::storage::Filter* filter,
+    Qn::SerializationFormat* outputFormat)
+{
+    if (!deserializeOutputFormat(params, outputFormat))
+        return false;
+
+    if (!deserializeFromParams(params, filter))
+    {
+        NX_INFO(this, lm("Failed to parse filter"));
+        return false;
+    }
+
+    return true;
+}
+
+bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeOutputFormat(
+    const QnRequestParamList& params,
+    Qn::SerializationFormat* outputFormat)
+{
+    if (params.contains(kFormatParamName))
+    {
+        bool isParsingSucceeded = false;
+        *outputFormat = QnLexical::deserialized<Qn::SerializationFormat>(
+            params.value(kFormatParamName), Qn::UnsupportedFormat, &isParsingSucceeded);
+        if (!isParsingSucceeded ||
+            !(*outputFormat == Qn::JsonFormat || *outputFormat == Qn::UbjsonFormat))
+        {
+            NX_INFO(this, lm("Unsupported output format %1")
+                .args(params.value(kFormatParamName)));
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QByteArray& srcBodyContentType,
+    nx::analytics::storage::Filter* filter,
+    Qn::SerializationFormat* outputFormat)
+{
+    if (!deserializeOutputFormat(params, outputFormat))
+        return false;
+
+    bool isParsingSucceded = false;
+    const auto inputFormat = Qn::serializationFormatFromHttpContentType(srcBodyContentType);
+    switch (inputFormat)
+    {
+        case Qn::JsonFormat:
+            *filter = QJson::deserialized(
+                body, nx::analytics::storage::Filter(), &isParsingSucceded);
+            return isParsingSucceded;
+
+        case Qn::UbjsonFormat:
+            *filter = QnUbjson::deserialized(
+                body, nx::analytics::storage::Filter(), &isParsingSucceded);
+            return isParsingSucceded;
+
+        default:
+            return false;
+    }
+}
+
+nx_http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
+    const nx::analytics::storage::Filter& filter,
+    Qn::SerializationFormat outputFormat,
+    QByteArray* body,
+    QByteArray* contentType)
+{
+    using namespace nx::analytics::storage;
+
+    LookupResult outputData;
 
     nx::utils::promise<ResultCode> lookupCompleted;
     m_eventStorage->lookup(
@@ -51,53 +148,12 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     {
         NX_DEBUG(this, lm("Lookup with filter %1 failed with error code %2")
             .args("TODO", QnLexical::serialized(resultCode)));
-        // TODO: #ak Introduce resultCode->HTTP status code conversion.
-        return nx_http::StatusCode::internalServerError;
+        return toHttpStatusCode(resultCode);
     }
 
-    result = serializeOutputData(outputData, outputFormat);
-    contentType = Qn::serializationFormatToHttpContentType(outputFormat);
+    *body = serializeOutputData(outputData, outputFormat);
+    *contentType = Qn::serializationFormatToHttpContentType(outputFormat);
     return nx_http::StatusCode::ok;
-}
-
-int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
-    const QByteArray& /*body*/,
-    const QByteArray& /*srcBodyContentType*/,
-    QByteArray& /*result*/,
-    QByteArray& /*resultContentType*/,
-    const QnRestConnectionProcessor* /*owner*/)
-{
-    return nx_http::StatusCode::forbidden;
-}
-
-bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
-    const QnRequestParamList& params,
-    nx::analytics::storage::Filter* filter,
-    Qn::SerializationFormat* outputFormat)
-{
-    if (params.contains(kFormatParamName))
-    {
-        bool isParsingSucceeded = false;
-        *outputFormat = QnLexical::deserialized<Qn::SerializationFormat>(
-            params.value(kFormatParamName), Qn::UnsupportedFormat, &isParsingSucceeded);
-        if (!isParsingSucceeded ||
-            !(*outputFormat == Qn::JsonFormat || *outputFormat == Qn::UbjsonFormat))
-        {
-            NX_INFO(this, lm("Unsupported output format %1")
-                .args(params.value(kFormatParamName)));
-            return false;
-        }
-    }
-
-    if (!deserializeFromParams(params, filter))
-    {
-        NX_INFO(this, lm("Failed to parse filter"));
-        return false;
-    }
-
-    return true;
 }
 
 template<typename T>

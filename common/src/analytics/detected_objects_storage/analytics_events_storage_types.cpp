@@ -39,7 +39,7 @@ void serializeToParams(const Filter& /*filter*/, QnRequestParamList* /*params*/)
 bool deserializeFromParams(const QnRequestParamList& /*params*/, Filter* /*filter*/)
 {
     // TODO
-    return false;
+    return true;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

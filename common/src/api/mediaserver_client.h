@@ -21,6 +21,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
 
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <network/module_information.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/ec_api.h>
@@ -40,7 +41,7 @@ class MediaServerClient:
 
 public:
     MediaServerClient(const nx::utils::Url &baseRequestUrl);
-    
+
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;
     MediaServerClient(MediaServerClient&&) = default;
@@ -119,8 +120,15 @@ public:
         std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler);
     ec2::ErrorCode ec2GetSystemMergeHistory(ec2::ApiSystemMergeHistoryRecordList* result);
 
+    void ec2AnalyticsLookupDetectedObjects(
+        const nx::analytics::storage::Filter& request,
+        std::function<void(ec2::ErrorCode, nx::analytics::storage::LookupResult)> completionHandler);
+    ec2::ErrorCode ec2AnalyticsLookupDetectedObjects(
+        const nx::analytics::storage::Filter& request,
+        nx::analytics::storage::LookupResult* result);
+
     /**
-     * NOTE: Can only be called within request completion handler. 
+     * NOTE: Can only be called within request completion handler.
      *   Otherwise, result is not defined.
      */
     nx_http::StatusCode::Value lastResponseHttpStatusCode() const;
@@ -224,7 +232,7 @@ protected:
                 auto client = std::move(*fusionClientIter);
                 m_activeClients.erase(fusionClientIter);
 
-                m_prevResponseHttpStatusCode = 
+                m_prevResponseHttpStatusCode =
                     response
                     ? (nx_http::StatusCode::Value)response->statusLine.statusCode
                     : nx_http::StatusCode::undefined;
