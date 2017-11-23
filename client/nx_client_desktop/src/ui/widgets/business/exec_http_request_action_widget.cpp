@@ -43,6 +43,7 @@ QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
 
     ui->authTypeComboBox->addItem(tr("Auto")); //< should have kAutoAuthTypeItemIndex position.
     ui->authTypeComboBox->addItem(lit("Digest"));
+    ui->authTypeComboBox->addItem(lit("Digest+PasswordHash"));
     ui->authTypeComboBox->addItem(lit("Basic"));
     NX_ASSERT(ui->authTypeComboBox->itemText(kAutoAuthTypeItemIndex) == tr("Auto"));
 

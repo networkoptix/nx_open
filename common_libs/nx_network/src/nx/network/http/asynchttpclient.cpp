@@ -187,8 +187,8 @@ SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
 
 void AsyncHttpClient::doGet(const QUrl& url)
 {
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
+//    NX_ASSERT(!url.host().isEmpty());
+//    NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;

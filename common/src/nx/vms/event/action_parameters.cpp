@@ -30,9 +30,9 @@ ActionParameters::ActionParameters():
     presetId(),
     useSource(false),
     recordBeforeMs(kDefaultRecordBeforeMs),
-    playToClient(true)
-    //authType(nx_http::AsyncHttpClient::AuthType::authBasicAndDigest),
-    //requestType()
+    playToClient(true),
+    authType(nx_http::AsyncHttpClient::AuthType::authBasicAndDigest),
+    requestType()
 {
 }
 

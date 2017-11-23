@@ -84,10 +84,10 @@ struct ActionParameters
     QString contentType;
 
     //HTTP action
-//    nx_http::AsyncHttpClient::AuthType authType;
+    nx_http::AsyncHttpClient::AuthType authType;
 
     //HTTP action (empty string means auto detection)
-//    nx_http::Method::ValueType requestType;
+    nx_http::Method::ValueType requestType;
 
     /**
      * \returns                        Whether all parameters have default values.
@@ -104,9 +104,7 @@ struct ActionParameters
 #define ActionParameters_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
-    (playToClient)(contentType)(actionId)
-
-//(authType)(requestType)
+    (playToClient)(contentType)(actionId)(authType)(requestType)
 
 /* Backward compatibility is not really important here as this class is stored in the DB as json. */
 QN_FUSION_DECLARE_FUNCTIONS(ActionParameters, (ubjson)(json)(eq)(xml)(csv_record));

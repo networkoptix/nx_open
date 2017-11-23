@@ -404,10 +404,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
     const nx::vms::event::ActionParameters& actionParameters=action->getParams();
 
     QUrl url(actionParameters.url);
-    //if ((actionParameters.requestType == nx_http::Method::get) ||
-    //    (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
-
-    if(actionParameters.text.isEmpty())
+    if ((actionParameters.requestType == nx_http::Method::get) ||
+        (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
         auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
         {
@@ -425,9 +423,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         nx_http::downloadFileAsync(
             url,
             callback,
-            nx_http::HttpHeaders());
-            //,
-            //actionParameters.authType);
+            nx_http::HttpHeaders(),
+            actionParameters.authType);
         return true;
     }
     else
@@ -452,9 +449,8 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             action->getParams().text.toUtf8(),
             contentType,
             nx_http::HttpHeaders(),
-            callback);
-            //,
-            //actionParameters.authType);
+            callback,
+            actionParameters.authType);
         return true;
     }
 }
