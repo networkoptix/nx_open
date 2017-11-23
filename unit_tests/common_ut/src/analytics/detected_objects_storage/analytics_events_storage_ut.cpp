@@ -221,6 +221,12 @@ protected:
         generateVariousEvents();
     }
 
+    void whenLookupByEmptyFilter()
+    {
+        m_filter = Filter();
+        whenLookupEvents(m_filter);
+    }
+
     void whenLookupByAnyDeviceId()
     {
         ASSERT_FALSE(m_allowedDeviceIds.empty());
@@ -329,6 +335,12 @@ private:
     }
 };
 
+TEST_F(AnalyticsEventsStorageLookup, empty_filter_matches_all_events)
+{
+    whenLookupByEmptyFilter();
+    thenResultMatchesExpectations();
+}
+
 TEST_F(AnalyticsEventsStorageLookup, lookup_by_deviceId)
 {
     whenLookupByAnyDeviceId();
@@ -339,7 +351,6 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_by_deviceId)
 
 // Advanced Lookup.
 
-// TEST_F(AnalyticsEventsStorage, empty_filter_matches_all_events)
 // TEST_F(AnalyticsEventsStorage, full_text_search)
 // TEST_F(AnalyticsEventsStorage, lookup_by_attribute_value)
 // TEST_F(AnalyticsEventsStorage, lookup_by_bounding_box)
