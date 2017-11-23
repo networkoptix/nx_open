@@ -55,6 +55,12 @@ static const GLfloat g_texture_data[] = {
     0.f, 1.f
 };
 
+bool isValidFrameSize(const QSize& size)
+{
+    static const auto kMinimumFrameSize = QSize(64, 64);
+    return size.width() >= kMinimumFrameSize.width()
+        && size.height() >= kMinimumFrameSize.height();
+}
 
 /**
  * Convert codec from ffmpeg enum to Android codec string representation.
@@ -508,7 +514,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
             return 0;
 
         d->frameSize = QSize(frame->width, frame->height);
-        if (d->frameSize.isEmpty())
+        if (!isValidFrameSize(d->frameSize))
             d->frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
         if (d->frameSize.isEmpty())
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
