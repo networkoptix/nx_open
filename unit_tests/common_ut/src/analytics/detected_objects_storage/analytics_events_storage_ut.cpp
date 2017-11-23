@@ -69,7 +69,7 @@ protected:
             filter,
             [this](
                 ResultCode resultCode,
-                std::vector<DetectionEvent> eventsFound)
+                std::vector<DetectedObject> eventsFound)
             {
                 m_lookupResultQueue.push(LookupResult{resultCode, std::move(eventsFound)});
             });
@@ -94,13 +94,12 @@ protected:
     }
 
     void andLookupResultEquals(
-        std::vector<DetectionEvent> expected)
+        std::vector<DetectedObject> expected)
     {
         auto sortCondition =
-            [](const DetectionEvent& left, const DetectionEvent& right)
+            [](const DetectedObject& left, const DetectedObject& right)
             {
-                return std::tie(left.deviceId, left.timestampUsec) <
-                    std::tie(right.deviceId, right.timestampUsec);
+                return left.objectId < right.objectId;
             };
 
         std::sort(expected.begin(), expected.end(), sortCondition);
@@ -116,7 +115,7 @@ private:
     struct LookupResult
     {
         ResultCode resultCode;
-        std::vector<DetectionEvent> eventsFound;
+        std::vector<DetectedObject> eventsFound;
     };
 
     std::unique_ptr<EventsStorage> m_eventsStorage;
@@ -159,20 +158,26 @@ private:
         return packet;
     }
 
-    std::vector<DetectionEvent> toDetectionEvents(
+    std::vector<DetectedObject> toDetectionEvents(
         const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& analyticsDataPackets)
     {
-        std::vector<DetectionEvent> result;
+        std::vector<DetectedObject> result;
         for (const auto& packet: analyticsDataPackets)
         {
             for (const auto& object: packet->objects)
             {
-                DetectionEvent event;
-                event.deviceId = packet->deviceId;
-                event.timestampUsec = packet->timestampUsec;
-                event.durationUsec = packet->durationUsec;
-                event.object = object;
-                result.push_back(std::move(event));
+                DetectedObject detectedObject;
+                detectedObject.objectId = object.objectId;
+                detectedObject.objectTypeId = object.objectTypeId;
+                detectedObject.attributes = object.labels;
+                detectedObject.track.push_back(ObjectPosition());
+                ObjectPosition& objectPosition = detectedObject.track.back();
+                objectPosition.boundingBox = object.boundingBox;
+                objectPosition.timestampUsec = packet->timestampUsec;
+                objectPosition.durationUsec = packet->durationUsec;
+                objectPosition.deviceId = packet->deviceId;
+
+                result.push_back(std::move(detectedObject));
             }
         }
 

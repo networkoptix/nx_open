@@ -14,18 +14,37 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-struct DetectionEvent
+struct ObjectPosition
 {
+    /** Device object has been detected on. */
     QnUuid deviceId;
     qint64 timestampUsec = 0;
     qint64 durationUsec = 0;
-    common::metadata::DetectedObject object;
+    QRectF boundingBox;
+    /** Variable object attributes. E.g., car speed. */
+    std::vector<common::metadata::Attribute> attributes;
 
-    bool operator==(const DetectionEvent& right) const;
+    bool operator==(const ObjectPosition& right) const;
 };
 
-#define DetectionEvent_analytics_storage_Fields (deviceId)(timestampUsec)(durationUsec)(object)
-QN_FUSION_DECLARE_FUNCTIONS(DetectionEvent, (json)(ubjson));
+#define ObjectPosition_analytics_storage_Fields \
+    (deviceId)(timestampUsec)(durationUsec)(boundingBox)(attributes)
+QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
+
+struct DetectedObject
+{
+    QnUuid objectId;
+    QnUuid objectTypeId;
+    /** Persistent object attributes. E.g., license plate number. */
+    std::vector<common::metadata::Attribute> attributes;
+    std::vector<ObjectPosition> track;
+
+    bool operator==(const DetectedObject& right) const;
+};
+
+#define DetectedObject_analytics_storage_Fields \
+    (objectId)(objectTypeId)(attributes)(track)
+QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 

@@ -20,7 +20,7 @@ namespace storage {
 using StoreCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/)>;
 
-using LookupResult = std::vector<DetectionEvent>;
+using LookupResult = std::vector<DetectedObject>;
 
 using LookupCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, LookupResult)>;
@@ -122,16 +122,16 @@ private:
         std::int64_t eventId,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
-    nx::utils::db::DBResult selectEvents(
+    nx::utils::db::DBResult selectObjects(
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
-        std::vector<DetectionEvent>* result);
-    void loadEvents(
+        std::vector<DetectedObject>* result);
+    void loadObjects(
         nx::utils::db::SqlQuery& selectEventsQuery,
-        std::vector<DetectionEvent>* result);
-    void loadEvent(
+        std::vector<DetectedObject>* result);
+    void loadObject(
         nx::utils::db::SqlQuery& selectEventsQuery,
-        DetectionEvent* result);
+        DetectedObject* object);
 };
 
 //-------------------------------------------------------------------------------------------------

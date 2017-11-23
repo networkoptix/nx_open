@@ -6,16 +6,25 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-bool DetectionEvent::operator==(const DetectionEvent& right) const
+bool ObjectPosition::operator==(const ObjectPosition& right) const
 {
     return deviceId == right.deviceId
         && timestampUsec == right.timestampUsec
         && durationUsec == right.durationUsec
-        && object == right.object;
+        && boundingBox == right.boundingBox
+        && attributes == right.attributes;
+}
+
+bool DetectedObject::operator==(const DetectedObject& right) const
+{
+    return objectId == right.objectId
+        && objectTypeId == right.objectTypeId
+        && attributes == right.attributes
+        && track == right.track;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (DetectionEvent),
+    (ObjectPosition)(DetectedObject),
     (json)(ubjson),
     _analytics_storage_Fields)
 
