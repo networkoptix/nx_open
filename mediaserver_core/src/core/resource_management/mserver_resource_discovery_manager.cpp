@@ -28,10 +28,12 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <media_server/media_server_module.h>
+#include <core/resource/general_attribute_pool.h>
+#include <core/resource/camera_user_attribute_pool.h>
 
 namespace {
 
-static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 1;
+static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
@@ -45,7 +47,6 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonMod
     m_serverOfflineTimeout = qnServerModule->roSettings()->value(
         "redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
-    m_foreignResourcesRetryCount = 0;
     m_startupTimer.restart();
 }
 
@@ -79,6 +80,38 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 }
 
+void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCamResourcePtr>& foreignResources)
+{
+    const QnUuid ownGuid = commonModule()->moduleGUID();
+    std::sort(foreignResources.begin(), foreignResources.end(),
+        [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
+    {
+        auto failoverPriority =
+            [](const QnSecurityCamResourcePtr& cam)
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock(
+                cam->commonModule()->cameraUserAttributesPool(),
+                ec2::ApiCameraData::physicalIdToId(cam->getPhysicalId()));
+            return (*userAttributesLock)->failoverPriority;
+        };
+        auto preferredServerId =
+            [](const QnSecurityCamResourcePtr& cam)
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock(
+                cam->commonModule()->cameraUserAttributesPool(),
+                ec2::ApiCameraData::physicalIdToId(cam->getPhysicalId()));
+            return (*userAttributesLock)->preferredServerId;
+        };
+
+        bool leftOwnServer = preferredServerId(leftCam) == ownGuid;
+        bool rightOwnServer = preferredServerId(rightCam) == ownGuid;
+        if (leftOwnServer != rightOwnServer)
+            return leftOwnServer > rightOwnServer;
+
+        return failoverPriority(leftCam) > failoverPriority(rightCam);
+    });
+}
+
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
 {
     // fill camera's ID
@@ -96,35 +129,33 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
-                m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
+                int index = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
+                while (m_tmpForeignResources.size() <= index)
+                    m_tmpForeignResources.push_back(ResourceList());
+                m_tmpForeignResources[index].insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
             else {
                 ++itr;
             }
         }
-        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
+        if (m_tmpForeignResources.size() == RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
             m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
-            m_foreignResourcesRetryCount = 0;
+            // Exclude duplicates
+            ResourceList foreignResourcesMap;
+            for (const auto& resList: m_tmpForeignResources)
+            {
+                for (auto itr = resList.begin(); itr != resList.end(); ++itr)
+                    foreignResourcesMap.insert(itr.key(), itr.value());
+            }
 
             // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
-            auto foreignResources = m_tmpForeignResources.values();
+            auto foreignResources = foreignResourcesMap.values();
             const QnUuid ownGuid = commonModule()->moduleGUID();
-            std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
-            {
-                bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
-                bool rightOwnServer = rightCam->preferredServerId() == ownGuid;
-                if (leftOwnServer != rightOwnServer)
-                    return leftOwnServer > rightOwnServer;
-
-                // arrange cameras by failover priority order
-                return leftCam->failoverPriority() > rightCam->failoverPriority();
-            });
-
+            sortForeignResources(foreignResources);
             for (const auto& res : foreignResources)
                 resources << res;
-            m_tmpForeignResources.clear();
         }
     }
 
@@ -219,6 +250,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 {
                     ec2::ApiCameraData apiCamera;
                     fromResourceToApi(existCamRes, apiCamera);
+                    apiCamera.id = ec2::ApiCameraData::physicalIdToId(apiCamera.physicalId);
 
                     ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
@@ -272,7 +304,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         NX_LOG( lit("Discovery----: after excluding existing resources we've got %1 new resources:").arg(resources.size()), cl_logINFO);
 
     printInLogNetResources(resources);
-
+    ++m_discoveryCounter;
     if (resources.isEmpty())
     {
         resources << extraResources;
