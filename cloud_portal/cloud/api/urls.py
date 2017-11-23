@@ -4,9 +4,11 @@ from django.conf.urls import url
 from api.views import account, systems, common, utils
 
 urlpatterns = [
-    url(r'^utils/visitedKey',           utils.visited_key),
-    url(r'^utils/language',             utils.language),
-    url(r'^utils/downloads',            utils.downloads),
+    url(r'^utils/visitedKey$',                  utils.visited_key),
+    url(r'^utils/language$',                    utils.language),
+    url(r'^utils/downloads/history$',           utils.downloads_history),
+    url(r'^utils/downloads/(?P<build>.+?)$',    utils.download_build),
+    url(r'^utils/downloads$',                   utils.downloads),
 
 
     url(r'^account/activate',           account.activate),
@@ -21,7 +23,7 @@ urlpatterns = [
 
     url(r'^systems/disconnect$',                    systems.disconnect),
     url(r'^systems/connect$',                       systems.connect),
-    url(r'^systems/merge$',                         systems.list_systems),
+    url(r'^systems/merge$',                         systems.merge),
     url(r'^systems/(?P<system_id>.+?)/accessRoles', systems.access_roles),
     url(r'^systems/(?P<system_id>.+?)/auth',        systems.get_auth),
     url(r'^systems/(?P<system_id>.+?)/name',        systems.rename),
