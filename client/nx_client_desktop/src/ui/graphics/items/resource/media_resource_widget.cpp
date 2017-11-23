@@ -66,6 +66,7 @@
 
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/client/core/utils/geometry.h>
+#include <nx/client/core/media/consuming_motion_metadata_provider.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -1405,6 +1406,13 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
     m_renderer->setChannelCount(display->videoLayout()->channelCount());
     updateCustomAspectRatio();
 
+    if (const auto provider =
+        d->motionMetadataProvider.dynamicCast<
+            client::core::ConsumingMotionMetadataProvider>())
+    {
+        display->addMetadataConsumer(provider->metadataConsumer());
+    }
+
     emit displayChanged();
 }
 
@@ -1538,8 +1546,6 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
-    QnMetaDataV1Ptr motionMetadata;
-
     const auto metadataList = m_renderer->lastFrameMetadata(channel);
     for (const auto& metadata: metadataList)
     {
@@ -1548,10 +1554,6 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
         switch (metadata->dataType)
         {
-            case QnAbstractMediaData::DataType::META_V1:
-                motionMetadata = std::dynamic_pointer_cast<QnMetaDataV1>(metadata);
-                break;
-
             case QnAbstractMediaData::DataType::GENERIC_METADATA:
             {
                 if (nx::client::desktop::ini().enableAnalytics)
@@ -1572,11 +1574,11 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     {
         ensureMotionSelectionCache();
 
-        paintMotionGrid(
-            painter,
-            channel,
-            rect,
-            motionMetadata);
+        if (const auto metadata = d->motionMetadataProvider->metadata(
+            m_renderer->lastDisplayedTimestampMs(channel), channel))
+        {
+            paintMotionGrid(painter, channel, rect, metadata);
+        }
 
         paintMotionSensitivity(painter, channel, rect);
 
