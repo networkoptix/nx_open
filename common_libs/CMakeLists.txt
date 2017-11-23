@@ -1,6 +1,7 @@
 add_subdirectory(nx_utils)
 add_subdirectory(nx_fusion)
 add_subdirectory(nx_network)
+add_subdirectory(nx_update)
 add_subdirectory(udt)
 
 if(withClouds)
