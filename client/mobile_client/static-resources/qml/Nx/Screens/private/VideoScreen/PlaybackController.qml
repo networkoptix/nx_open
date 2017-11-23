@@ -25,7 +25,6 @@ AbstractButton
     label: Rectangle
     {
         anchors.fill: parent
-        anchors.margins: 0
         radius: height / 2
         color: "transparent"
         border.width: 2
@@ -62,7 +61,6 @@ AbstractButton
             opacity: control.loading ? 0.5 : 1.0
             Behavior on opacity { NumberAnimation { duration: 250 } }
         }
-
     }
 
     Rectangle

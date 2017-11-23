@@ -457,9 +457,7 @@ PageBase
 
             Button
             {
-                anchors.verticalCenter: navigationLoader.item
-                    ? navigationLoader.item.top
-                    : undefined
+                anchors.verticalCenter: navigationLoader.item.top
                 anchors.verticalCenterOffset: 56 / 2 + 8
                 padding: 8
                 width: 56
@@ -473,9 +471,7 @@ PageBase
 
             Button
             {
-                anchors.verticalCenter: navigationLoader.item
-                    ? navigationLoader.item.top
-                    : undefined
+                anchors.verticalCenter: navigationLoader.item.top
                 anchors.verticalCenterOffset: 56 / 2 + 8
                 anchors.right: parent.right
                 padding: 8

@@ -463,7 +463,6 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-
                 y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
                 Behavior on y { NumberAnimation { duration: 200 } }
 
