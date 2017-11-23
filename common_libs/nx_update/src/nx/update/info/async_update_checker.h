@@ -6,14 +6,17 @@ namespace nx {
 namespace update {
 namespace info {
 
-class AbstractJsonProvider;
+class detail::AbstractAsyncRawDataProvider;
 using UpdateCheckHandler = utils::MoveOnlyFunc<void(const UpdateInformation& updateInformation)>;
 
 class AsyncUpdateChecker
 {
 public:
-    AsyncUpdateChecker(AbstractJsonProvider* jsonProvider);
+    AsyncUpdateChecker(AbstractAsyncRawDataProvider* dataProvider);
     void check(const QString& baseVersion, UpdateCheckHandler handler);
+
+private:
+
 };
 
 } // namespace info
