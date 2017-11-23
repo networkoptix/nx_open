@@ -483,8 +483,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
 
     bool isLiveAllowed = !camera->needsToChangeDefaultPassword();
-    bool isFootageAllowed = isLiveAllowed
-        && hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
+    bool isFootageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
     bool isExportAllowed = isFootageAllowed
         && hasGlobalPermission(subject, Qn::GlobalExportPermission);
 
