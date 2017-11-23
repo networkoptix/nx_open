@@ -297,7 +297,9 @@ angular.module('nxCommon')
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
-                    scope.mouseOverScroll = mouseOverElements.leftButton || mouseOverElements.rightButton;
+                    scope.isPointer = mouseOverElements.leftButton || mouseOverElements.rightButton
+                                                                   || mouseOverElements.leftMarker
+                                                                   || mouseOverElements.rightMarker;
 
                 }
 
