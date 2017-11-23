@@ -10,6 +10,7 @@ class AbstractCustomizationInfo;
 class AbstractCustomizationInfoList
 {
 public:
+    virtual ~AbstractCustomizationInfoList() {}
     virtual AbstractCustomizationInfo* next() = 0;
 };
 
