@@ -434,7 +434,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
     if (id != m_itemId)
         return;
 
-    switch(role)
+    switch (role)
     {
         case Qn::ItemPausedRole:
         {
@@ -462,7 +462,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
             break;
         }
         case Qn::ItemSpeedRole:
-                display()->archiveReader()->setSpeed(data.toDouble());
+            display()->archiveReader()->setSpeed(data.toDouble());
             break;
         default:
             break;
