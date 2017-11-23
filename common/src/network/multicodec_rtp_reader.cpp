@@ -91,11 +91,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (netRes)
-        m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
-    else
-        m_RtpSession.setTCPTimeout(1000 * 10);
+    m_RtpSession.setTCPTimeout(m_rtpFrameTimeoutMs);
 
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(resource);
     m_numberOfVideoChannels = 1;
