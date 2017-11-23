@@ -97,11 +97,6 @@ def assert_jsons_are_equal(json_one, json_two, json_name):
         assert json_one == json_two, json_name
 
 
-def store_json_data(filepath, json_data):
-    with open(filepath, 'wb') as f:
-        json.dump(json_data, f, sort_keys=True, indent=4, separators=(',', ': '))
-
-
 def wait_until_servers_have_same_full_info(one, two):
     start_time = datetime_utc_now()
     while True:

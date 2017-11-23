@@ -480,11 +480,6 @@ class Storage(object):
         self.dir = dir
         self.timezone = timezone or host.get_timezone()
 
-    def cleanup(self):
-        self.host.run_command(['rm', '-rf',
-                               os.path.join(self.dir, 'low_quality'),
-                               os.path.join(self.dir, 'hi_quality')])
-
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
         assert isinstance(start_time, datetime.datetime) and start_time.tzinfo, repr(start_time)

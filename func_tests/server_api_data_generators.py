@@ -57,10 +57,6 @@ def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
 
 
-def generate_user_name(id):
-    return "User_%s" % id
-
-
 def generate_uuid_from_string(salt):
     v = md5(salt).digest()
     return "{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}" % tuple(ord(b) for b in v)
