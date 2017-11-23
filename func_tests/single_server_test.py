@@ -175,8 +175,6 @@ def test_static_vulnerability(server):
 
 # https://networkoptix.atlassian.net/browse/VMS-7775
 def test_auth_with_time_changed(timeless_server):
-    timeless_server.set_system_settings(synchronizeTimeWithInternet=False)
-    TimeProtocolRestriction(timeless_server).enable()
     url = timeless_server.rest_api.url + 'ec2/getCurrentTime'
 
     timeless_server.host.set_time(datetime.now(pytz.utc))
