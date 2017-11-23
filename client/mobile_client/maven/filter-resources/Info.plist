@@ -6,6 +6,8 @@
 	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
