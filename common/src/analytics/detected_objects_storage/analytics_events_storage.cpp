@@ -136,9 +136,17 @@ void EventsStorage::insertEventAttributes(
 
 nx::utils::db::DBResult EventsStorage::selectObjects(
     nx::utils::db::QueryContext* queryContext,
-    const Filter& /*filter*/,
+    const Filter& filter,
     std::vector<DetectedObject>* result)
 {
+    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString sqlQueryFilterStr;
+    if (!sqlQueryFilter.empty())
+    {
+        sqlQueryFilterStr = lm("WHERE %1").args(
+            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+    }
+
     SqlQuery selectEventsQuery(*queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
     selectEventsQuery.prepare(QString::fromLatin1(R"sql(
@@ -146,12 +154,28 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
         FROM event
+        %1
         ORDER BY object_type_id, object_id, timestamp_usec_utc, device_guid;
-    )sql"));
+    )sql").arg(sqlQueryFilterStr));
+    nx::utils::db::bindFields(&selectEventsQuery, sqlQueryFilter);
     selectEventsQuery.exec();
 
     loadObjects(selectEventsQuery, result);
     return nx::utils::db::DBResult::ok;
+}
+
+nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
+    const Filter& filter)
+{
+    nx::utils::db::InnerJoinFilterFields sqlFilter;
+    if (!filter.deviceId.isNull())
+    {
+        nx::utils::db::SqlFilterField filterField{
+            "device_guid", ":deviceId", QnSql::serialized_field(filter.deviceId)};
+        sqlFilter.push_back(std::move(filterField));
+    }
+
+    return sqlFilter;
 }
 
 void EventsStorage::loadObjects(

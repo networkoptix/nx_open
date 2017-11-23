@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <nx/utils/basic_factory.h>
+#include <nx/utils/db/filter.h>
 #include <nx/utils/db/query.h>
 #include <nx/utils/move_only_func.h>
 
@@ -126,6 +127,7 @@ private:
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
         std::vector<DetectedObject>* result);
+    nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
     void loadObjects(
         nx::utils::db::SqlQuery& selectEventsQuery,
         std::vector<DetectedObject>* result);

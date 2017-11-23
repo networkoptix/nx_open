@@ -6,9 +6,14 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-void PrintTo(ResultCode val, ::std::ostream* os)
+void PrintTo(ResultCode value, ::std::ostream* os)
 {
-    *os << QnLexical::serialized(val).toStdString();
+    *os << QnLexical::serialized(value).toStdString();
+}
+
+void PrintTo(const std::vector<DetectedObject>& value, ::std::ostream* os)
+{
+    *os << "[" << value.size() << "]";
 }
 
 } // namespace storage

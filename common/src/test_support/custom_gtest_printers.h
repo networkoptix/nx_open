@@ -6,7 +6,8 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-void PrintTo(ResultCode val, ::std::ostream* os);
+void PrintTo(ResultCode value, ::std::ostream* os);
+void PrintTo(const std::vector<DetectedObject>& value, ::std::ostream* os);
 
 } // namespace storage
 } // namespace analytics
