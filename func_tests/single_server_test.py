@@ -194,3 +194,12 @@ def test_auth_with_time_changed(timeless_server):
     response = requests.get(url, headers={'Authorization': authorization_header_value})
     assert response.status_code != 401, "Cannot authenticate after time changed on server"
     response.raise_for_status()
+
+
+def test_uptime_is_monotonic(timeless_server):
+    timeless_server.host.set_time(datetime.now(pytz.utc))
+    first_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
+    new_time = timeless_server.host.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
+    assert wait_until(lambda: timeless_server.get_time().is_close_to(new_time))
+    second_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
+    assert first_uptime < second_uptime
