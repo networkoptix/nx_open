@@ -1,18 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <functional>
+#include <nx/update/info/info_fwd.h>
 
 namespace nx {
 namespace update {
 namespace info {
-
-namespace detail {
-class AbstractAsyncRawDataProvider;
-}
-
-using AbstractAsyncRawDataProviderPtr = std::unique_ptr<detail::AbstractAsyncRawDataProvider>;
-using AsyncRawDataProviderFactoryFunction = std::function<AbstractAsyncRawDataProviderPtr(const QString&)>;
 
 class AsyncRawDataProviderFactory
 {

@@ -1,22 +1,22 @@
 #pragma once
 
-#include <nx/utils/move_only_func.h>
+#include <nx/update/info/info_fwd.h>
 
 namespace nx {
 namespace update {
 namespace info {
 
-class detail::AbstractAsyncRawDataProvider;
-using UpdateCheckHandler = utils::MoveOnlyFunc<void(const UpdateInformation& updateInformation)>;
+class UpdateInformation;
+using UpdateCheckCallback = utils::MoveOnlyFunc<void(const UpdateInformation&)>;
 
 class AsyncUpdateChecker
 {
 public:
-    AsyncUpdateChecker(AbstractAsyncRawDataProvider* dataProvider);
-    void check(const QString& baseVersion, UpdateCheckHandler handler);
+    AsyncUpdateChecker(AbstractAsyncRawDataProviderPtr rawDataProvider);
+    void check(const QString& baseVersion, UpdateCheckCallback callback);
 
 private:
-
+    AbstractAsyncRawDataProviderPtr m_rawDataProvider;
 };
 
 } // namespace info
