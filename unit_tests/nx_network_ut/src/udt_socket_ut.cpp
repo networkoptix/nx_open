@@ -534,15 +534,7 @@ protected:
 
     static uint64_t selectTransferSize()
     {
-        switch (utils::TestOptions::getLoadMode())
-        {
-            case utils::TestOptions::LoadMode::light: return 100 * 1024 * 1024;
-            case utils::TestOptions::LoadMode::normal: return uint64_t(1) * 1024 * 1024 * 1024;
-            case utils::TestOptions::LoadMode::stress: return uint64_t(10) * 1024 * 1024 * 1024;
-        };
-
-        EXPECT_TRUE(false);
-        return 0;
+        return utils::TestOptions::applyLoadMode((uint64_t) 1024) * 1024 * 1024;
     }
 
     UdtSocketPerformance():
