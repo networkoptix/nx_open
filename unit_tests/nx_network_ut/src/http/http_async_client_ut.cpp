@@ -37,7 +37,7 @@ private:
     void sendResponse(AbstractStreamSocket* connection)
     {
         // Sending response.
-        const char* responseMessage = 
+        const char* responseMessage =
             "HTTP/1.1 101 Switching Protocols\r\n"
             "Upgrade: NXRELAY/0.1\r\n"
             "Connection: Upgrade\r\n"
@@ -107,7 +107,7 @@ protected:
     {
         nx::Buffer buf;
         buf.reserve(kNewProtocolMessage.size());
-        const int bytesRead = 
+        const int bytesRead =
             m_upgradedConnection->recv(buf.data(), buf.capacity(), MSG_WAITALL);
         buf.resize(bytesRead);
 
@@ -216,25 +216,25 @@ TEST_F(HttpAsyncClient, data_after_successfull_upgrade_is_not_lost)
 
 TEST(HttpAsyncClientTypes, numericSerialization)
 {
-    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncClient::AuthType::authBasicAndDigest).toStdString(),
+    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncHttpClient::AuthType::authBasicAndDigest).toStdString(),
         std::string("authBasicAndDigest"));
-    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncClient::AuthType::authBasic).toStdString(),
+    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncHttpClient::AuthType::authBasic).toStdString(),
         std::string("authBasic"));
-    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncClient::AuthType::authDigest).toStdString(),
+    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncHttpClient::AuthType::authDigest).toStdString(),
         std::string("authDigest"));
 
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("authBasicAndDigest"),
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("authBasicAndDigest"),
         nx_http::AsyncClient::AuthType::authBasicAndDigest);
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("authDigest"),
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("authDigest"),
         nx_http::AsyncClient::AuthType::authDigest);
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("authBasic"),
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("authBasic"),
         nx_http::AsyncClient::AuthType::authBasic);
 
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("0"),
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("0"),
         nx_http::AsyncClient::AuthType::authBasicAndDigest);
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("1"),
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("1"),
         nx_http::AsyncClient::AuthType::authDigest);
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("2"),
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("2"),
         nx_http::AsyncClient::AuthType::authBasic);
 }
 
