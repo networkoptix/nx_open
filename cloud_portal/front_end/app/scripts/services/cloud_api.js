@@ -152,10 +152,10 @@ angular.module('cloudApp')
                 });
             },
             getDownloads:function(){
-                return $http.get(apiBase + '/utils/downloads').catch(function(){
-                    $log.error("TODO: remove this hack before the release");
-                    return cacheGet('/static/downloads.json', true);
-                });
+                return $http.get(apiBase + '/utils/downloads');
+            },
+            getDownloadsHistory:function(build){
+                return $http.get(apiBase + '/utils/downloads/' + (build||'history'));
             },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){

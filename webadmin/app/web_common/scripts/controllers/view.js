@@ -22,8 +22,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.storage = $localStorage;
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
         $scope.storage.serverStates = $scope.storage.serverStates || {};
-        
-        $scope.playerApi = false;
+
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
@@ -196,6 +195,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if($scope.playerAPI) {
                 // Pause playing
                 $scope.playerAPI.pause();
+                $scope.playerAPI = null;
             }
             updateAvailableResolutions();
             var live = !playingPosition;
@@ -310,7 +310,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
-                screenfull.request($('.view-panel').get(0));
+                screenfull.request($('.fullscreen-area').get(0));
             }
         };
 

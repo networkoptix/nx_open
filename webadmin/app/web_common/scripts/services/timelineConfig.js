@@ -85,7 +85,7 @@ var TimelineConfig = {
     scrollBarMarksHeightOffset : 4,
     scrollBarMarksSpacing : 4,
 
-    edgeBufferZone: 0.1, //Uses 10% of the timeline's edges
+    edgeBufferZone: 64, //Uses 64px of the timeline's edges
 
     timeMarkerColor: [43,56,63, 0.9], // Timemarker color //$dark9
     timeMarkerActiveColor: [43,56,63], //$dark9 with no opacity

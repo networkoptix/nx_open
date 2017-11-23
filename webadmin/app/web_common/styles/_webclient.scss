@@ -285,9 +285,9 @@ table.webclient-window>tbody>tr>td{
       background-color: $light2;
     }
 
-    &:active,
+    &.active,
     &:focus{
-      background-color: $light1;
+      background-color: $light1 !important;
     }
   }
 
@@ -709,6 +709,11 @@ table.webclient-window>tbody>tr>td{
   padding: 0px !important;
 }
 
+.fullscreen-area{
+  height: 100%;
+  width: 100%;
+}
+
 .video-settings{
   &{
     right: -35px;
@@ -898,6 +903,7 @@ table.webclient-window>tbody>tr>td{
   margin-top: -1px;
   width: 40px;
   display: none !important;
+  cursor: pointer;
 }
 
 @media (max-width: 767px){

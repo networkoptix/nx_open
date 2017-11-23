@@ -196,9 +196,17 @@ angular.module('nxCommon')
                     resetPlayer();
                 }
 
-                function resetTimeout(event){
+                function cancelTimeoutNativeLoad(){
                     if(nativePlayerLoadError){
                         $timeout.cancel(nativePlayerLoadError);
+                        nativePlayerLoadError = null;
+                    }
+                }
+
+                function resetTimeout(event){
+                    if(nativePlayerLoadError){
+                        scope.loading = true;
+                        cancelTimeoutNativeLoad();
                         nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
                     }
                 }
@@ -214,6 +222,7 @@ angular.module('nxCommon')
                         nativePlayer.init(element.find(".videoplayer"), function (api) {
                             makingPlayer = false;
                             scope.vgApi = api;
+                            cancelTimeoutNativeLoad();
 
                             if (scope.vgSrc) {
                                 scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
@@ -223,13 +232,10 @@ angular.module('nxCommon')
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
-                                scope.vgApi.addEventListener("playing", function(event){
+                                scope.vgApi.addEventListener("loadeddata", function(event){
                                     scope.loading = false; // Video is playing - disable loading
                                     crashCount = 0;
-                                    if(nativePlayerLoadError){
-                                        $timeout.cancel(nativePlayerLoadError);
-                                        nativePlayerLoadError = null;
-                                    }
+                                    cancelTimeoutNativeLoad();
                                 });
 
                                 scope.vgApi.addEventListener("ended",function(event){
