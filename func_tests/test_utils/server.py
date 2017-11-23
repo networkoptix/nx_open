@@ -16,7 +16,7 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
 from .rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
 from .camera import make_schedule_task, Camera, SampleMediaFile
@@ -291,6 +291,12 @@ class Server(object):
     def get_uptime(self):
         response = self.rest_api.api.statistics.GET()
         return datetime.timedelta(seconds=int(response['uptimeMs'])/1000.)
+
+    def get_time(self):
+        started_at = datetime.datetime.now(pytz.utc)
+        time_response = self.rest_api.ec2.getCurrentTime.GET()
+        received = datetime.datetime.fromtimestamp(float(time_response['value']) / 1000., pytz.utc)
+        return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
 
     def reset_config(self, **kw):
         self._installation.reset_config(**kw)
