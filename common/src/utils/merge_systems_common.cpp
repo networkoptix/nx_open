@@ -85,7 +85,7 @@ public:
                     .arg(systemName);
             case dependentSystemBoundToCloud:
                 return tr("Cloud System can only be merged with non-Cloud. "
-                    "System name and password are taken from Cloud System.",
+                    "System name and password are taken from Cloud System."
                     "%1 is the cloud name (like 'Nx Cloud')")
                     .arg(nx::network::AppInfo::cloudName());
             case bothSystemBoundToCloud:
