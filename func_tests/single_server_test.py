@@ -5,7 +5,8 @@ import pytest
 import pytz
 import requests
 import logging
-from test_utils.utils import log_list
+from test_utils.internet_time import TimeProtocolRestriction
+from test_utils.utils import log_list, wait_until
 from test_utils.server import TimePeriod
 import server_api_data_generators as generator
 from test_utils.rest_api import HttpError
@@ -170,3 +171,28 @@ def test_static_vulnerability(server):
     url = server.rest_api.url + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403
+
+
+# https://networkoptix.atlassian.net/browse/VMS-7775
+def test_auth_with_time_changed(timeless_server):
+    timeless_server.set_system_settings(synchronizeTimeWithInternet=False)
+    TimeProtocolRestriction(timeless_server).enable()
+    url = timeless_server.rest_api.url + 'ec2/getCurrentTime'
+
+    timeless_server.host.set_time(datetime.now(pytz.utc))
+    assert wait_until(lambda: timeless_server.get_time().is_close_to(datetime.now(pytz.utc)))
+
+    shift = timedelta(days=3)
+
+    response = requests.get(url, auth=HTTPDigestAuth(timeless_server.user, timeless_server.password))
+    authorization_header_value = response.request.headers['Authorization']
+    log.info(authorization_header_value)
+    response = requests.get(url, headers={'Authorization': authorization_header_value})
+    response.raise_for_status()
+
+    timeless_server.host.set_time(datetime.now(pytz.utc) + shift)
+    assert wait_until(lambda: timeless_server.get_time().is_close_to(datetime.now(pytz.utc) + shift))
+
+    response = requests.get(url, headers={'Authorization': authorization_header_value})
+    assert response.status_code != 401, "Cannot authenticate after time changed on server"
+    response.raise_for_status()
