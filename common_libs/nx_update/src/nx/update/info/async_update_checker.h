@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/update/info/info_fwd.h>
+#include <nx/update/info/fwd.h>
 
 namespace nx {
 namespace update {

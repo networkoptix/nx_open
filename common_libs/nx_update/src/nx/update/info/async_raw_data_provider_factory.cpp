@@ -1,4 +1,5 @@
 #include "async_raw_data_provider_factory.h"
+#include "detail/abstract_async_raw_data_provider.h"
 #include "detail/async_http_json_provider.h"
 
 namespace nx {
@@ -15,7 +16,7 @@ static AbstractAsyncRawDataProviderPtr createHttpJsonProvider(const QString& bas
 } // namespace
 
 AsyncRawDataProviderFactory::AsyncRawDataProviderFactory():
-    m_defaultFactoryFunction(createHttpJsonProvider)
+    m_defaultFactoryFunction(&createHttpJsonProvider)
 {}
 
 AbstractAsyncRawDataProviderPtr AsyncRawDataProviderFactory::create(const QString& baseUrl)
@@ -28,7 +29,7 @@ AbstractAsyncRawDataProviderPtr AsyncRawDataProviderFactory::create(const QStrin
 
 void AsyncRawDataProviderFactory::setFactoryFunction(AsyncRawDataProviderFactoryFunction function)
 {
-    m_factoryFunction = function;
+    m_factoryFunction = std::move(function);
 }
 
 } // namespace info

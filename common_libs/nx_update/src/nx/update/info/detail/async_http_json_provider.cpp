@@ -11,15 +11,15 @@ AsyncHttpJsonProvider::AsyncHttpJsonProvider(const QString& baseUrl):
 
 }
 
-void AsyncHttpJsonProvider::getUpdatesMetaInformation(AbstractAsyncRawDataProviderHandler* handler)
+void AsyncHttpJsonProvider::getUpdatesMetaInformation(AbstractAsyncRawDataProviderHandler* /*handler*/)
 {
 
 }
 
 void AsyncHttpJsonProvider::getSpecific(
-    AbstractAsyncRawDataProviderHandler* handler,
-    const QString& customization,
-    const QString& version)
+    AbstractAsyncRawDataProviderHandler* /*handler*/,
+    const QString& /*customization*/,
+    const QString& /*version*/)
 {
 
 }
