@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <nx/utils/move_only_func.h>
+#include <nx/update/info/result_code.h>
 
 namespace detail {
 class AbstractAsyncRawDataProvider;
