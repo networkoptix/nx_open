@@ -203,3 +203,10 @@ def test_uptime_is_monotonic(timeless_server):
     assert wait_until(lambda: timeless_server.get_time().is_close_to(new_time))
     second_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
     assert first_uptime < second_uptime
+
+
+def test_frequent_restarts(server):
+    # Unfold to indicate which call failed.
+    server.restart()
+    server.restart()
+    server.restart()

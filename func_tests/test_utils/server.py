@@ -242,12 +242,6 @@ class Server(object):
         self.internal_ip_address = iflist[-1]['ipAddr']
         self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
-    def _safe_api_call(self, fn, *args, **kw):
-        try:
-            return fn(*args, **kw)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            return None
-
     def get_system_settings(self):
         response = self.rest_api.api.systemSettings.GET()
         return response['settings']
@@ -271,26 +265,37 @@ class Server(object):
         if was_started:
             self.start_service()
 
-    def restart(self, timeout=30):
-        t = time.time()
-        uptime = self.get_uptime()
+    def restart(self, stop_timeout_sec=1, start_timeout_sec=10, sleep_time_sec=0.1):
+        old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
+        log.info("Runtime id before restart: %s", old_runtime_id)
+        timestamp_before = time.time()
         self.rest_api.api.restart.GET()
-        while time.time() - t < timeout:
-            new_uptime = self._safe_api_call(self.get_uptime)
-            if new_uptime and new_uptime < uptime:
-                self.load_system_settings(log_settings=True)
-                return
-            log.debug('Server did not restart yet, waiting...')
-            time.sleep(0.5)
-        assert False, 'Server %r did not restart in %s seconds' % (self, timeout)
+        failed_connections = 0
+        while True:
+            try:
+                response = self.rest_api.api.moduleInformation.GET()
+            except requests.ConnectionError as e:
+                if time.time() - timestamp_before > start_timeout_sec:
+                    assert False, "Server restart timed out"
+                log.debug("Expected failed connection: %r", e)
+                failed_connections += 1
+                time.sleep(sleep_time_sec)
+                continue
+            new_runtime_id = response['runtimeId']
+            if new_runtime_id == old_runtime_id:
+                if failed_connections > 0:
+                    assert False, "Runtime id remains same after failed connections."
+                if time.time() - timestamp_before > stop_timeout_sec:
+                    assert False, "Server hasn't stopped yet, timed out."
+                log.warning("Server hasn't stopped yet, delay is acceptable.")
+                time.sleep(sleep_time_sec)
+                continue
+            log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
+            break
 
     def make_core_dump(self):
         self._server_ctl.make_core_dump()
         self._state = self._st_stopped
-
-    def get_uptime(self):
-        response = self.rest_api.api.statistics.GET()
-        return datetime.timedelta(seconds=int(response['uptimeMs'])/1000.)
 
     def get_time(self):
         started_at = datetime.datetime.now(pytz.utc)
