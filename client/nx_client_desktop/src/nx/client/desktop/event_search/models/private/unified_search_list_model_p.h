@@ -2,15 +2,13 @@
 
 #include "../unified_search_list_model.h"
 
-#include <QtCore/QHash>
-#include <QtCore/QTimer>
+#include <limits>
+
 #include <QtCore/QWeakPointer>
 
-#include <api/server_rest_connection_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/resource_fwd.h>
 
 #include <nx/utils/raii_guard.h>
-#include <nx/vms/event/event_fwd.h>
 
 class QnRaiiGuard;
 
@@ -18,9 +16,11 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class UnifiedSearchListModel::Private:
-    public QObject,
-    public QnWorkbenchContextAware
+class EventSearchListModel;
+class BookmarkSearchListModel;
+class ConcatenationListModel;
+
+class UnifiedSearchListModel::Private: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -32,8 +32,8 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    Filter filter() const;
-    void setFilter(Filter filter);
+    Types filter() const;
+    void setFilter(Types filter);
 
     void clear();
 
@@ -41,35 +41,22 @@ public:
     void fetchMore();
 
 private:
-    void fetchAll(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
-    void fetchEvents(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
-    void fetchBookmarks(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
-    void fetchAnalytics(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
-
-    void periodicUpdate();
-    void watchBookmarkChanges();
-
-    void addOrUpdateBookmark(const QnCameraBookmark& bookmark);
-    void addCameraEvent(const nx::vms::event::ActionData& event);
-
-    void reset();
-
-    bool accepted(Filter filter) const;
-
-    static QPixmap eventPixmap(const nx::vms::event::EventParameters& event);
-    static QColor eventColor(nx::vms::event::EventType eventType);
-    static bool eventRequiresPreview(vms::event::EventType type);
+    void updateModels();
 
 private:
     UnifiedSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    Filter m_filter = Filter::all;
-    QScopedPointer<QTimer> m_updateTimer;
-    QScopedPointer<vms::event::StringsHelper> m_helper;
-    QHash<QPair<QnUuid, qint64>, QnUuid> m_eventIds;
-    qint64 m_startTimeMs = 0;
-    qint64 m_endTimeMs = -1;
+    Types m_filter = Type::all;
+
+    EventSearchListModel* const m_eventsModel;
+    BookmarkSearchListModel* const m_bookmarksModel;
+
+    qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    qint64 m_latestTimeMs = -1;
+
     QWeakPointer<QnRaiiGuard> m_fetchInProgress;
+    Types m_fetchingTypes;
+    qint64 m_latestStartTimeMs = -1; //< Synchronization point used during fetch.
 };
 
 } // namespace

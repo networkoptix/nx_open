@@ -4,14 +4,13 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QAbstractProxyModel;
+class QAbstractListModel;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class EventRibbon;
-class AbstractEventListModel;
 
 namespace detail {
 
@@ -26,10 +25,7 @@ public:
     virtual ~EventSearchWidgetPrivateBase() override;
 
 protected:
-    void connectEventRibbonToModel(
-        EventRibbon* ribbon,
-        AbstractEventListModel* model,
-        QAbstractProxyModel* proxyModel = nullptr);
+    void setModel(QAbstractListModel* model);
 
 protected:
     QWidget* const m_headerWidget = nullptr;

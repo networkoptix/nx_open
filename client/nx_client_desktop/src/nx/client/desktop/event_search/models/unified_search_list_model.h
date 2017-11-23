@@ -4,16 +4,16 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/client/desktop/event_search/models/event_list_model.h>
+#include <nx/client/desktop/common/models/concatenation_list_model.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class UnifiedSearchListModel: public EventListModel
+class UnifiedSearchListModel: public ConcatenationListModel
 {
     Q_OBJECT
-    using base_type = EventListModel;
+    using base_type = ConcatenationListModel;
 
 public:
     explicit UnifiedSearchListModel(QObject* parent = nullptr);
@@ -22,24 +22,30 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    enum class Filter
+    enum class Type
     {
-        all,
-        events,
-        bookmarks,
-        analytics
+        events = 0x1,
+        bookmarks = 0x2,
+        analytics = 0x4,
+        all = events | bookmarks | analytics
     };
+    Q_DECLARE_FLAGS(Types, Type);
 
-    Filter filter() const;
-    void setFilter(Filter filter);
+    Types filter() const;
+    void setFilter(Types filter);
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
 private:
+    using base_type::setModels;
+
+private:
     class Private;
     QScopedPointer<Private> d;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(UnifiedSearchListModel::Types);
 
 } // namespace
 } // namespace client
