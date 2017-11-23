@@ -1,14 +1,12 @@
 <h1>
     <b>{{release.version}}</b> <small>{{release.productDescription}}</small><br>
-    <small>PUBLISHED {{release.formattedDate}}</small>
+    <small>PUBLISHED {{release.date}}</small>
 </h1>
 <div ng-if="release.releaseNotes">
     <h4>
-        <a href ng-click="expandReleaseNotes = !expandReleaseNotes">
-            Release Notes
-        </a>
+        Release Notes
     </h4>
-    <div uib-collapse="!expandReleaseNotes" ng-bind-html="release.releaseNotes"></div>
+    <div ng-bind-html="release.releaseNotes"></div>
 </div>
 
 <h4>In-Client Upgrade:</h4>
@@ -21,7 +19,7 @@
 <div ng-repeat="platform in release.platforms">
     <h5>
         <a href ng-click="expand[platform.name] = !expand[platform.name]">
-            {{$root.L.downloads.groups[platform.name].label}}
+            {{$root.L.downloads.groups[platform.name].label || platform.name}}
         </a>
     </h5>
 

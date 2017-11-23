@@ -2,9 +2,10 @@
 
 
 angular.module('cloudApp')
-    .controller('DownloadHistoryCtrl', ['$scope', '$routeParams', '$location', 'page', 'cloudApi',
-    function ($scope, $routeParams, $location, page, cloudApi) {
+    .controller('DownloadHistoryCtrl', ['$scope', '$routeParams', '$location', 'page', 'cloudApi', 'account',
+    function ($scope, $routeParams, $location, page, cloudApi, account) {
 
+        account.requireLogin();
         $scope.downloads = Config.downloads;
         $scope.linkbase = "http://updates.networkoptix.com";
 
@@ -13,11 +14,14 @@ angular.module('cloudApp')
 
             if(!$routeParams.build){ // only one build
                 $scope.activeBuilds = data.data.releases;
-                $scope.downloadTypes=["releases","patches","beta"];
+                $scope.downloadTypes=["releases","patches","betas"];
             }else{
                 $scope.activeBuilds = [data.data];
                 $scope.downloadTypes = [data.data.type]
             }
-            console.log($scope.activeBuilds);
         });
+
+        $scope.changeType = function (type){
+            $scope.activeBuilds = $scope.downloadsData[type];
+        }
     }]);
