@@ -40,6 +40,8 @@ public:
         // This flag resides here just because there are no other flag configs for logging.
         NX_INI_FLAG(0, moduleFinders, "Extra debug info for Qn*ModuleFinder classes");
         NX_INI_INT(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
+
+        NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
     };
 
     struct Ini: nx::kit::IniConfig
