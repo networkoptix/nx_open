@@ -3,9 +3,8 @@
 """
 
 from hashlib import md5
-from netaddr import IPAddress
-import uuid
 
+from netaddr import IPAddress
 
 BASE_CAMERA_IP_ADDRESS = IPAddress('192.168.0.0')
 BASE_SERVER_IP_ADDRESS = IPAddress('10.10.0.0')

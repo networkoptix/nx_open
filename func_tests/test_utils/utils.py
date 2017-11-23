@@ -1,10 +1,9 @@
+import calendar
 import logging
 import time
-import calendar
-import pytz
-import tzlocal
 from datetime import datetime, timedelta
 
+import pytz
 
 log = logging.getLogger(__name__)
 

@@ -2,15 +2,17 @@
 
    It tests that servers of the same system sinchronize its data correctly
 '''
-import logging
-import pytest
-import time
 import itertools
+import logging
+import time
 from multiprocessing.dummy import Pool as ThreadPool
-from test_utils.utils import SimpleNamespace, datetime_utc_now
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+
+import pytest
+
 import server_api_data_generators as generator
 import transaction_log
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import SimpleNamespace, datetime_utc_now
 
 log = logging.getLogger(__name__)
 

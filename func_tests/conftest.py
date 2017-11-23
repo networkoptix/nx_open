@@ -3,26 +3,26 @@
 Loaded by pytest before running all functional tests. Adds common fixtures used by tests.
 '''
 
-import sys
-import os.path
 import logging
+import os.path
+
 import pytest
 from netaddr import IPAddress
-from test_utils.internet_time import TimeProtocolRestriction
-from test_utils.utils import SimpleNamespace
-from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
+
 from test_utils.artifact import ArtifactFactory
-from test_utils.metrics_saver import MetricsSaver
+from test_utils.camera import SampleMediaFile, CameraFactory
+from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
+from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.customization import detect_customization_company_name
 from test_utils.host import SshHostConfig
-from test_utils.vagrant_box_config import BoxConfigFactory
-from test_utils.vagrant_box import VagrantBoxFactory
-from test_utils.server_physical_host import PhysicalInstallationCtl
-from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
-from test_utils.server_factory import ServerFactory
-from test_utils.camera import SampleMediaFile, CameraFactory
+from test_utils.internet_time import TimeProtocolRestriction
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
-
+from test_utils.metrics_saver import MetricsSaver
+from test_utils.server_factory import ServerFactory
+from test_utils.server_physical_host import PhysicalInstallationCtl
+from test_utils.utils import SimpleNamespace
+from test_utils.vagrant_box import VagrantBoxFactory
+from test_utils.vagrant_box_config import BoxConfigFactory
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 

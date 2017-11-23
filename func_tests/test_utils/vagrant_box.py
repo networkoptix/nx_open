@@ -1,22 +1,20 @@
 '''Vagrant wrappers classes'''
 
+import logging
 import os
 import os.path
-import logging
-import re
-import time
 import tempfile
-import shutil
-import pytz
+
 import jinja2
 import vagrant
 import vagrant.compat
+
 from .host import ProcessError, RemoteSshHost, host_from_config
-from .vbox_manage import VBoxManage
-from .vagrant_box_config import DEFAULT_NATNET1, BoxConfig
-from .server_installation import ServerInstallation
-from .server_ctl import VagrantBoxServerCtl
 from .server import Server
+from .server_ctl import VagrantBoxServerCtl
+from .server_installation import ServerInstallation
+from .vagrant_box_config import DEFAULT_NATNET1, BoxConfig
+from .vbox_manage import VBoxManage
 
 log = logging.getLogger(__name__)
 

@@ -12,16 +12,13 @@
    All necessary files are on the rsync://noptix.enk.me/buildenv/test
 '''
 
-import abc
-import logging
-import pytest
 import os
 import time
-import json
-from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-import server_api_data_generators as generator
 
+import pytest
+
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
 SERVER_CONFIG = dict(
     one=SimpleNamespace(

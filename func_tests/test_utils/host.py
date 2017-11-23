@@ -4,19 +4,20 @@ Allows running commands or working with files on local or remote hosts transpare
 '''
 
 import abc
-import os
-import os.path
 import datetime
-import logging
-import threading
-import subprocess
 import errno
 import glob
+import logging
+import os
+import os.path
 import shutil
+import subprocess
+import threading
+
 import pytz
 import tzlocal
-from .utils import quote, is_list_inst, RunningTime
 
+from .utils import quote, is_list_inst, RunningTime
 
 log = logging.getLogger(__name__)
 

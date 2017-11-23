@@ -1,16 +1,17 @@
-from datetime import datetime, timedelta
+import logging
 import os
 import time
+from datetime import datetime, timedelta
+
 import pytest
 import pytz
 import requests
-import logging
-from test_utils.internet_time import TimeProtocolRestriction
-from test_utils.utils import log_list, wait_until
-from test_utils.server import TimePeriod
+from requests.auth import HTTPDigestAuth
+
 import server_api_data_generators as generator
 from test_utils.rest_api import HttpError
-from requests.auth import HTTPDigestAuth
+from test_utils.server import TimePeriod
+from test_utils.utils import log_list, wait_until
 
 log = logging.getLogger(__name__)
 

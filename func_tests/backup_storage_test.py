@@ -3,13 +3,15 @@ Backup storage test
 '''
 
 import logging
-import pytest
-import time
-import pytz
 import os
+import time
+from datetime import datetime
+
+import pytest
+import pytz
+
 import server_api_data_generators as generator
 import test_utils.utils as utils
-from datetime import datetime
 from test_utils.host import ProcessError
 
 log = logging.getLogger(__name__)

@@ -3,27 +3,26 @@
 Allows working with servers from functional tests - start/stop, setup, configure, access rest api, storage, etc.
 '''
 
-import os.path
-import logging
 import base64
-import uuid
-import urllib
-import hashlib
-import time
 import datetime
-import calendar
-import pytz
-import tzlocal
-import requests.exceptions
-import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
-from .rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
-from .camera import make_schedule_task, Camera, SampleMediaFile
-from .media_stream import open_media_stream
-from .host import Host
-from .cloud_host import CloudAccount
+import hashlib
+import logging
+import os.path
+import time
+import urllib
+import uuid
 
+import pytest
+import pytz
+import requests.exceptions
+
+from .camera import make_schedule_task, Camera, SampleMediaFile
+from .cloud_host import CloudAccount
+from .host import Host
+from .media_stream import open_media_stream
+from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, ServerRestApi
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
+from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 

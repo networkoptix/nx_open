@@ -3,25 +3,24 @@
   Measure system synchronization time
 '''
 
-import pytest
-import yaml
-import logging
-import requests
 import datetime
-import traceback
 import json
-from requests.exceptions import ReadTimeout
+import logging
+import traceback
 from functools import wraps
-import test_utils.utils as utils
-from test_utils.utils import GrowingSleep
-from test_utils.compare import compare_values
+from multiprocessing import Pool as ThreadPool
+
+import pytest
+from requests.exceptions import ReadTimeout
+
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
-from test_utils.utils import SimpleNamespace
-from multiprocessing import Pool as ThreadPool
-from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT
+import test_utils.utils as utils
 import transaction_log
 from memory_usage_metrics import load_host_memory_usage
+from test_utils.compare import compare_values
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 

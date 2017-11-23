@@ -1,10 +1,8 @@
 import logging
-import time
-import pprint
-import pytest
-import pytz
-from test_utils.rest_api import HttpError, ServerRestApiError
 
+import pytest
+
+from test_utils.rest_api import HttpError, ServerRestApiError
 
 log = logging.getLogger(__name__)
 

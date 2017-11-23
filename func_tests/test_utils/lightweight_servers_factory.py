@@ -1,15 +1,17 @@
 # create lightweight servers (LWS) containers implemented by appserver2_ut with requested number of servers in them
 
-import os.path
-import logging
 import datetime
+import logging
+import os.path
+
 from requests.exceptions import ReadTimeout
-from .template_renderer import TemplateRenderer
+
 from . import utils
-from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
-from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server import Server
+from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
+from .template_renderer import TemplateRenderer
+from .utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 

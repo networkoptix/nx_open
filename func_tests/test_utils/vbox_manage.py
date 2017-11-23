@@ -1,9 +1,10 @@
 '''Virtual Box VBoxManage command wrapper'''
 
 import re
-from netaddr import IPNetwork
-from .host import Host
 
+from netaddr import IPNetwork
+
+from .host import Host
 
 INTERNAL_NETWORK_NAME_INFIX = 'net-'
 
