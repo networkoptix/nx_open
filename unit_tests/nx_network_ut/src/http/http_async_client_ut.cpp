@@ -5,6 +5,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx_http {
@@ -211,6 +212,30 @@ TEST_F(HttpAsyncClient, data_after_successfull_upgrade_is_not_lost)
     givenSynchronousServer();
     whenPerformedSuccessfulUpgrade();
     thenTrafficSentByServerAfterResponseIsAvailableOnSocket();
+}
+
+TEST(HttpAsyncClientTypes, numericSerialization)
+{
+    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncClient::AuthType::authBasicAndDigest).toStdString(),
+        std::string("authBasicAndDigest"));
+    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncClient::AuthType::authBasic).toStdString(),
+        std::string("authBasic"));
+    ASSERT_EQ(QnLexical::serialized(nx_http::AsyncClient::AuthType::authDigest).toStdString(),
+        std::string("authDigest"));
+
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("authBasicAndDigest"),
+        nx_http::AsyncClient::AuthType::authBasicAndDigest);
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("authDigest"),
+        nx_http::AsyncClient::AuthType::authDigest);
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("authBasic"),
+        nx_http::AsyncClient::AuthType::authBasic);
+
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("0"),
+        nx_http::AsyncClient::AuthType::authBasicAndDigest);
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("1"),
+        nx_http::AsyncClient::AuthType::authDigest);
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncClient::AuthType>("2"),
+        nx_http::AsyncClient::AuthType::authBasic);
 }
 
 } // namespace test

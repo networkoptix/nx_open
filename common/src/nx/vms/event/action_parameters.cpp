@@ -31,6 +31,8 @@ ActionParameters::ActionParameters():
     useSource(false),
     recordBeforeMs(kDefaultRecordBeforeMs),
     playToClient(true)
+    //authType(nx_http::AsyncHttpClient::AuthType::authBasicAndDigest),
+    //requestType()
 {
 }
 

@@ -401,9 +401,13 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    QUrl url(action->getParams().url);
+    const nx::vms::event::ActionParameters& actionParameters=action->getParams();
 
-    if (action->getParams().text.isEmpty())
+    QUrl url(actionParameters.url);
+    //if ((actionParameters.requestType == nx_http::Method::get) ||
+    //    (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
+
+    if(actionParameters.text.isEmpty())
     {
         auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
         {
@@ -420,7 +424,10 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
         nx_http::downloadFileAsync(
             url,
-            callback);
+            callback,
+            nx_http::HttpHeaders());
+            //,
+            //actionParameters.authType);
         return true;
     }
     else
@@ -437,15 +444,17 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             }
         };
 
-        QByteArray contentType = action->getParams().contentType.toUtf8();
+        QByteArray contentType = actionParameters.contentType.toUtf8();
         if (contentType.isEmpty())
-            contentType = autoDetectHttpContentType(action->getParams().text.toUtf8());
+            contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
 
         nx_http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             contentType,
             nx_http::HttpHeaders(),
             callback);
+            //,
+            //actionParameters.authType);
         return true;
     }
 }
