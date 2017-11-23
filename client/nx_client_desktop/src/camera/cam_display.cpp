@@ -256,6 +256,28 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
     }
 }
 
+void QnCamDisplay::addMetadataConsumer(
+    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    for (int i = 0; i < m_channelsCount; ++i)
+    {
+        NX_ASSERT(m_display[i]);
+        if (m_display[i])
+            m_display[i]->addMetadataConsumer(metadataConsumer);
+    }
+}
+
+void QnCamDisplay::removeMetadataConsumer(
+    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    for (int i = 0; i < m_channelsCount; ++i)
+    {
+        NX_ASSERT(m_display[i]);
+        if (m_display[i])
+            m_display[i]->removeMetadataConsumer(metadataConsumer);
+    }
+}
+
 QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams,
     bool anyQuality)
 {

@@ -4,6 +4,7 @@
 
 #include <licensing/license_fwd.h>
 
+#include <nx/client/core/media/abstract_motion_metadata_provider.h>
 #include <nx/client/desktop/camera/camera_fwd.h>
 
 #include <utils/common/connective.h>
@@ -32,6 +33,8 @@ public:
     const QnVirtualCameraResourcePtr camera;
     const bool hasVideo;
     const bool isIoModule;
+
+    QSharedPointer<nx::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
 
 public:
     explicit MediaResourceWidgetPrivate(const QnResourcePtr& resource, QObject* parent = nullptr);
