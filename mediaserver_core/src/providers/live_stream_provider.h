@@ -143,6 +143,7 @@ private:
 
     QWeakPointer<QnAbstractDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
+    QnAbstractDataReceptorPtr m_analyticsEventsSaver;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

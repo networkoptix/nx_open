@@ -283,7 +283,7 @@ static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 </User>
 )xml").trimmed();
 
-// TODO: Move out into separate file.
+// TODO: Move out into a separate file.
 class HikvisionRequestHelper
 {
 public:
@@ -291,26 +291,6 @@ public:
         m_url(url),
         m_client(makeHttpClient(authenticator))
     {
-    }
-
-    boost::optional<QDomDocument> getXml(const QString& path)
-    {
-        if (!m_client->doGet(nx::network::url::Builder(m_url).setPath(path))
-            || !isResponseOK(m_client.get()))
-        {
-            NX_VERBOSE(this, lm("Unable to send request %2").arg(m_client->url()));
-            return boost::none;
-        }
-
-        QDomDocument document;
-        QString error;
-        if (!document.setContent(m_client->fetchEntireMessageBody(), &error))
-        {
-            NX_VERBOSE(this, lm("Unable to parse response from %1: %2").args(m_client->url(), error));
-            return boost::none;
-        }
-
-        return document;
     }
 
     boost::optional<bool> isOnvifSupported()
@@ -328,7 +308,7 @@ public:
         if (value == lit("false"))
             return false;
 
-        NX_DEBUG(this, lm("Unexpect ONVIF.enable value '%1' on %2").args(value, m_client->url()));
+        NX_WARNING(this, lm("Unexpect ONVIF.enable value '%1' on %2").args(value, m_client->url()));
         return boost::none;
     }
 
@@ -380,6 +360,36 @@ public:
 
         NX_DEBUG(this, lm("Set ONVIF credentials result=%1 on %2").args(result, m_client->url()));
         return result;
+    }
+
+private:
+    boost::optional<QDomDocument> getXml(const QString& path)
+    {
+        if (!m_client->doGet(nx::network::url::Builder(m_url).setPath(path))
+            || !isResponseOK(m_client.get()))
+        {
+            NX_VERBOSE(this, lm("Unable to send request %2").arg(m_client->url()));
+            return boost::none;
+        }
+
+        const auto response = m_client->fetchEntireMessageBody();
+        if (!response)
+        {
+            NX_WARNING(this, lm("Unable to read response from %1: %2").args(
+                m_client->url(), SystemError::toString(m_client->lastSysErrorCode())));
+            return boost::none;
+        }
+
+        QDomDocument document;
+        QString parsingError;
+        if (!document.setContent(*response, &parsingError))
+        {
+            NX_WARNING(this, lm("Unable to parse response from %1: %2").args(
+                m_client->url(), parsingError));
+            return boost::none;
+        }
+
+        return document;
     }
 
 private:

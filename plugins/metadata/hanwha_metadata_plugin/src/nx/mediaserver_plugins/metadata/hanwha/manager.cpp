@@ -89,6 +89,7 @@ Error Manager::startFetchingMetadata()
 
             NX_PRINT;
             m_handler->handleMetadata(Error::noError, packet);
+            packet->releaseRef();
         };
 
     NX_ASSERT(m_plugin);

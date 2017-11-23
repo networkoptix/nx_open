@@ -22,6 +22,7 @@
 #include <utils/common/synctime.h>
 #include <camera/video_camera.h>
 #include <analytics/plugins/detection/config.h>
+#include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 
@@ -92,6 +93,12 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     auto pool = qnServerModule->metadataManagerPool();
     m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
     pool->registerDataReceptor(getResource(), m_metadataReceptor.toWeakRef());
+
+    // Forwarding metadata to analytics events DB.
+    m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
+        new nx::analytics::storage::AnalyticsEventsReceptor(
+            qnServerModule->analyticsEventsStorage()));
+    pool->registerDataReceptor(getResource(), m_analyticsEventsSaver.toWeakRef());
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()

@@ -11,7 +11,7 @@ namespace desktop {
 
 namespace {
 
-const auto kDisplayTimeout = std::chrono::milliseconds(12500);
+static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
 
 } // namespace
 

@@ -22,19 +22,21 @@ void EventHandler::handleMetadata(
     Error error,
     AbstractMetadataPacket* metadata)
 {
-    nxpt::ScopedRef<AbstractMetadataPacket> metadataPacket(metadata, false);
+    if (metadata == nullptr)
+        return;
+
     if (error != Error::noError)
         return;
 
     nxpt::ScopedRef<AbstractEventMetadataPacket> eventsPacket(
         (AbstractEventMetadataPacket*)
-        metadata->queryInterface(IID_EventMetadataPacket), false);
+        metadata->queryInterface(IID_EventMetadataPacket), /*increaseRef*/ false);
     if (eventsPacket)
         handleEventsPacket(std::move(eventsPacket));
 
     nxpt::ScopedRef<AbstractObjectsMetadataPacket> objectsPacket(
         (AbstractObjectsMetadataPacket*)
-        metadata->queryInterface(IID_DetectionMetadataPacket), false);
+        metadata->queryInterface(IID_DetectionMetadataPacket), /*increaseRef*/ false);
     if (objectsPacket)
         handleMetadataPacket(std::move(objectsPacket));
 }

@@ -3702,8 +3702,14 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
-    if (qobject_cast<QPushButton*>(widget) ||
-        qobject_cast<QToolButton*>(widget))
+    const auto nonFlatPushButton =
+        [](const QWidget* widget)
+        {
+            const auto button = qobject_cast<const QPushButton*>(widget);
+            return button && !button->isFlat();
+        };
+
+    if (nonFlatPushButton(widget) || qobject_cast<QToolButton*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {

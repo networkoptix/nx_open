@@ -6,19 +6,45 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>944</width>
-    <height>453</height>
+    <width>957</width>
+    <height>290</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>8</number>
+   </property>
+   <property name="topMargin">
+    <number>14</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
    <item>
-    <widget class="QnEditableLabel" name="nameLabel" native="true">
-    </widget>
+    <widget class="QnEditableLabel" name="nameLabel" native="true"/>
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="lessInfoPage">
       <layout class="QGridLayout" name="gridLayout" rowstretch="0,1" columnstretch="0,0,1">
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item row="0" column="1">
         <widget class="QLabel" name="modelTitleLabel">
          <property name="text">
@@ -36,14 +62,20 @@
        <item row="1" column="1">
         <widget class="QLabel" name="modelLabel">
          <property name="text">
-          <string/>
+          <string notr="true">&lt;E96&gt;</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="vendorLabel">
          <property name="text">
-          <string/>
+          <string notr="true">&lt;ACTI&gt;</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -57,23 +89,40 @@
        <item row="1" column="2">
         <widget class="QLabel" name="ipAddressLabel">
          <property name="text">
-          <string/>
+          <string notr="true">&lt;192.168.1.1&gt;</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="moreInfoPage">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="vendorDetailLabel">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <layout class="QFormLayout" name="detailInfoLayout">
+         <property name="horizontalSpacing">
+          <number>12</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="vendorDetailTitleLabel">
            <property name="text">
@@ -96,23 +145,50 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLabel" name="vendorDetailTitle">
+          <widget class="QLabel" name="vendorDetailLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">&lt;ACTI&gt;</string>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
           <widget class="QLabel" name="modelDetailLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">&lt;E96&gt;</string>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QLabel" name="frimwareLabel">
+          <widget class="QLabel" name="firmwareLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">&lt;A1D-500-V6.05.16-AC&gt;</string>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>
@@ -120,6 +196,12 @@
        </item>
        <item>
         <layout class="QFormLayout" name="networkInfoLayout">
+         <property name="horizontalSpacing">
+          <number>12</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="ipAddressDetailTitleLabel">
            <property name="text">
@@ -128,7 +210,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="webPageTileLabel">
+          <widget class="QLabel" name="webPageTitleLabel">
            <property name="text">
             <string>Web Page</string>
            </property>
@@ -141,42 +223,14 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <layout class="QHBoxLayout" name="ipAddressDetailLayout">
-           <item>
-            <widget class="QLabel" name="ipAddressDetailLabel">
-             <property name="text">
-              <string notr="true">&lt;192.168.1.1&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pingButton">
-             <property name="text">
-              <string>Ping</string>
-             </property>
-             <property name="flat">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
          <item row="1" column="1">
           <widget class="QLabel" name="webPageLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">&lt;http://192.168.1.1/&gt;</string>
            </property>
@@ -187,15 +241,96 @@
          </item>
          <item row="2" column="1">
           <widget class="QLabel" name="macAddressLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">&lt;00-0F-7C-0C-76-E9&gt;</string>
            </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QWidget" name="pingControlsWidget" native="true">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="ipAddressDetailLayout">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="ipAddressDetailLabel">
+              <property name="text">
+               <string notr="true">&lt;192.168.1.1&gt;</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pingButton">
+              <property name="text">
+               <string>Ping</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>1</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
        </item>
        <item>
         <layout class="QFormLayout" name="serviceInfoLayout">
+         <property name="horizontalSpacing">
+          <number>12</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="cameraIdTitleLabel">
            <property name="text">
@@ -219,93 +354,147 @@
          </item>
          <item row="0" column="1">
           <widget class="QLabel" name="cameraIdLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">&lt;cf5bac1d-6b93-e517-41ab-6f13bbc7a2af&gt;</string>
            </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QWidget" name="secondaryStreamControlWidget" native="true">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="secondaryStreamLayout">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="secondaryStreamLabel">
+              <property name="text">
+               <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="nx::client::desktop::ui::ClipboardButton" name="secondaryStreamCopyButton">
+              <property name="text">
+               <string notr="true">&lt;Copy&gt;</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="secondaryStreamSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>1</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </item>
          <item row="1" column="1">
-          <layout class="QHBoxLayout" name="primaryStreamLayout">
-           <item>
-            <widget class="QLabel" name="primaryStreamLabel">
-             <property name="text">
-              <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="nx::client::desktop::ui::ClipboardButton" name="primaryStreamCopyButton">
-             <property name="text">
-              <string notr="true">&lt;Copy&gt;</string>
-             </property>
-             <property name="flat">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="primaryStreamSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="1">
-          <layout class="QHBoxLayout" name="secondaryStreamLayout">
-           <item>
-            <widget class="QLabel" name="secondaryStreamLabel">
-             <property name="text">
-              <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="nx::client::desktop::ui::ClipboardButton" name="secondaryStreamCopyButton">
-             <property name="text">
-              <string notr="true">&lt;Copy&gt;</string>
-             </property>
-             <property name="flat">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="secondaryStreamSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+          <widget class="QWidget" name="primaryStreamControlWidget" native="true">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="primaryStreamLayout">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="primaryStreamLabel">
+              <property name="text">
+               <string notr="true">&lt;rtsp://192.168.0.18:554/axis-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="nx::client::desktop::ui::ClipboardButton" name="primaryStreamCopyButton">
+              <property name="text">
+               <string notr="true">&lt;Copy&gt;</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="primaryStreamSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -314,13 +503,55 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="toggleInfoButton">
-       <property name="text">
-        <string notr="true">&lt;More info&gt;</string>
+      <widget class="QStackedWidget" name="controlsStackedWidget">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
+       <widget class="QWidget" name="toggleInfoPage">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="toggleInfoButton">
+           <property name="text">
+            <string notr="true">&lt;More info&gt;</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="multipleCamerasNamePage">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QnEditableLabel" name="multipleNameLabel" native="true"/>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item>
@@ -383,4 +614,6 @@
    <header location="global">nx/client/desktop/ui/common/clipboard_button.h</header>
   </customwidget>
  </customwidgets>
+ <resources/>
+ <connections/>
 </ui>

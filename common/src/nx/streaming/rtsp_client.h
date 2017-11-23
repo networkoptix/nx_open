@@ -1,5 +1,6 @@
-#ifndef RTSP_CLIENT_H
-#define RTSP_CLIENT_H
+#pragma once
+
+#include <QtCore/QElapsedTimer>
 
 #include <fstream>
 #include <memory>
@@ -347,6 +348,8 @@ public:
     void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
 
     bool processTcpRtcpData(const quint8* data, int size);
+
+    QElapsedTimer lastReceivedDataTimer() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -449,6 +452,7 @@ private:
     bool m_scaleHeaderEnabled = true;
     using RequestName = QString;
     QMap<RequestName, nx_http::HttpHeaders> m_additionalHeaders;
+    QElapsedTimer m_lastReceivedDataTimer;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
@@ -462,5 +466,3 @@ private:
     */
     bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
 };
-
-#endif // RTSP_CLIENT_H

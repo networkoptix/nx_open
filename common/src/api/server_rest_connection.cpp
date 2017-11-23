@@ -13,6 +13,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
+#include <api/helpers/event_log_multiserver_request_data.h>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -431,6 +432,13 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
 {
     request.format = Qn::SerializationFormat::UbjsonFormat;
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
+}
+
+Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& request,
+    Result<EventLogData>::type callback,
+    QThread *targetThread)
+{
+    return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
 }
 
 Handle ServerConnection::changeCameraPassword(

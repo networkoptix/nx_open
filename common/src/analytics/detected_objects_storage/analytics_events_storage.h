@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <nx/utils/basic_factory.h>
+#include <nx/utils/db/filter.h>
 #include <nx/utils/db/query.h>
 #include <nx/utils/move_only_func.h>
 
@@ -14,17 +15,16 @@
 #include "analytics_events_storage_db_controller.h"
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
 using StoreCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/)>;
 
+using LookupResult = std::vector<DetectedObject>;
+
 using LookupCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(
-        ResultCode /*resultCode*/,
-        std::vector<common::metadata::DetectionMetadataPacket> /*eventsFound*/)>;
+    nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, LookupResult)>;
 
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
@@ -123,16 +123,17 @@ private:
         std::int64_t eventId,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
-    nx::utils::db::DBResult selectEvents(
+    nx::utils::db::DBResult selectObjects(
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
-        std::vector<common::metadata::DetectionMetadataPacket>* result);
-    void loadPackets(
+        std::vector<DetectedObject>* result);
+    nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
+    void loadObjects(
         nx::utils::db::SqlQuery& selectEventsQuery,
-        std::vector<common::metadata::DetectionMetadataPacket>* result);
-    void loadPacket(
+        std::vector<DetectedObject>* result);
+    void loadObject(
         nx::utils::db::SqlQuery& selectEventsQuery,
-        common::metadata::DetectionMetadataPacket* result);
+        DetectedObject* object);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -140,15 +141,15 @@ private:
 using EventsStorageFactoryFunction =
     std::unique_ptr<AbstractEventsStorage>(const Settings&);
 
-class EventsStorageFuncionFactory:
+class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
 {
     using base_type = nx::utils::BasicFactory<EventsStorageFactoryFunction>;
 
 public:
-    EventsStorageFuncionFactory();
+    EventsStorageFactory();
 
-    static EventsStorageFuncionFactory& instance();
+    static EventsStorageFactory& instance();
 
 private:
     std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(const Settings&);
@@ -156,5 +157,4 @@ private:
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

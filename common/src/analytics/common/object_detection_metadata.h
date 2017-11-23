@@ -33,6 +33,9 @@ struct DetectedObject
 {
     QnUuid objectTypeId;
     QnUuid objectId;
+    /**
+     * Coordinates are in range [0;1].
+     */
     QRectF boundingBox;
     std::vector<Attribute> labels;
 };

@@ -7,7 +7,7 @@ project(tegra_video)
 # Sources of the real libtegra_video.so implementation are registered here for IDE convenience.
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEGRA_VIDEO_API= -DTEGRA_VIDEO_STUB_ONLY=")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEGRA_VIDEO_STUB_ONLY=")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(NX_KIT_DIR "../../../open/artifacts/nx_kit")
@@ -31,13 +31,25 @@ file(GLOB_RECURSE SOURCE_FILES
 # The real libtegravideo.so is marked EXCLUDE_FROM_ALL because it is built on a Tegra device.
 add_executable(tegra_video EXCLUDE_FROM_ALL ${SOURCE_FILES})
 
-add_library(tegra_video_stub
+add_library(tegra_video_stub SHARED
     samples/04_video_dec_gie/tegra_video_ini.h
     samples/04_video_dec_gie/tegra_video.h
     samples/04_video_dec_gie/tegra_video.cpp
     samples/04_video_dec_gie/tegra_video_stub.cpp
 )
 target_link_libraries(tegra_video_stub nx_kit)
+if(WIN32)
+    set(TEGRA_VIDEO_API_IMPORT_MACRO "__declspec(dllimport)")
+    set(TEGRA_VIDEO_API_EXPORT_MACRO "__declspec(dllexport)")
+else()
+    set_target_properties(tegra_video_stub PROPERTIES CXX_VISIBILITY_PRESET hidden)
+    set(TEGRA_VIDEO_API_IMPORT_MACRO "")
+    set(TEGRA_VIDEO_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+endif()
+target_compile_definitions(tegra_video_stub
+    PRIVATE TEGRA_VIDEO_API=${TEGRA_VIDEO_API_EXPORT_MACRO}
+    INTERFACE TEGRA_VIDEO_API=${TEGRA_VIDEO_API_IMPORT_MACRO}
+)
 
 add_executable(tegra_video_ut
     samples/04_video_dec_gie/unit_tests/main.cpp

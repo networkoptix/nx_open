@@ -1,9 +1,11 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 
 #include <QtCore/QSettings>
-#include <memory>
+
+#include <analytics/detected_objects_storage/analytics_events_storage_settings.h>
 
 //!Contains constants with names of configuration parameters
 namespace nx_ms_conf
@@ -130,9 +132,13 @@ public:
     QSettings* runTimeSettings();
     const QSettings* runTimeSettings() const;
 
+    QString getDataDirectory() const;
+
     std::chrono::milliseconds hlsTargetDuration() const;
 
     std::chrono::milliseconds delayBeforeSettingMasterFlag() const;
+
+    nx::analytics::storage::Settings analyticEventsStorage() const;
 
     static QString defaultROSettingsFilePath();
     static QString defaultRunTimeSettingsFilePath();
@@ -142,7 +148,17 @@ private:
     void initializeROSettings();
     void initializeRunTimeSettingsFromConfFile( const QString& fileName );
     void initializeRunTimeSettings();
+
+    void loadSettings();
+
+    void loadGeneralSettings();
+    QString loadDataDirectory();
+
+    void loadAnalyticEventsStorageSettings();
+
 private:
     std::unique_ptr<QSettings> m_rwSettings;
     std::unique_ptr<QSettings> m_roSettings;
+    nx::analytics::storage::Settings m_analyticEventsStorage;
+    QString m_dataDirectory;
 };

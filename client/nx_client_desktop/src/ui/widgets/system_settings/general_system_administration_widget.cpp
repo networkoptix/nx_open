@@ -34,8 +34,6 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
-static const int kSystemNameFontSizePixels = 24;
-static const int kSystemNameFontWeight = QFont::DemiBold;
 static const int kMaxSystemNameLabelWidth = 1000;
 static const int kMaxSystemNameLength = 64;
 
@@ -51,11 +49,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 {
     ui->setupUi(this);
 
-    QFont font;
-    font.setPixelSize(kSystemNameFontSizePixels);
-    font.setWeight(kSystemNameFontWeight);
-    ui->systemNameLabel->setFont(font);
-    ui->systemNameLabel->setButtonIcon(qnSkin->icon("system_settings/edit.png"));
     ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
     ui->systemNameLabel->setValidator(
         [this](QString& text) -> bool

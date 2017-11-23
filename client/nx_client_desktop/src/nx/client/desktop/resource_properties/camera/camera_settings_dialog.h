@@ -4,8 +4,6 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-#include "camera_settings_tab.h"
-
 class QnUserProfileWidget;
 class QnUserSettingsWidget;
 class QnPermissionsWidget;
@@ -22,6 +20,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class CameraSettingsModel;
+
 class CameraSettingsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
@@ -34,9 +34,13 @@ public:
 
     bool setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
 
+protected:
+    virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)
     QScopedPointer<Ui::CameraSettingsDialog> ui;
+    QScopedPointer<CameraSettingsModel> m_model;
 };
 
 } // namespace desktop

@@ -49,6 +49,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace {
 
@@ -179,6 +180,16 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
 
+    m_analyticsEventsStorage =
+        nx::analytics::storage::EventsStorageFactory::instance()
+            .create(m_settings->analyticEventsStorage());
+    if (!m_analyticsEventsStorage->initialize())
+    {
+        // TODO: #ak Server should not start without this DB.
+        NX_ASSERT(false);
+        NX_WARNING(this, lm("Failed to initialize analytics events storage"));
+    }
+
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
 
@@ -275,4 +286,10 @@ nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContext
 AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() const
 {
     return m_archiveIntegrityWatcher;
+}
+
+nx::analytics::storage::AbstractEventsStorage*
+    QnMediaServerModule::analyticsEventsStorage() const
+{
+    return m_analyticsEventsStorage.get();
 }

@@ -4,6 +4,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <queue>
 
 #include <gtest/gtest.h>
 

@@ -85,9 +85,10 @@ typedef struct
 
     string deployfile;
     string modelfile;
+    string cachefile;
     std::queue<std::vector<cv::Rect>>* rectQueuePtr;
     bool needToStop;
-    std::chrono::high_resolution_clock::time_point m_firstFrameArrivalTime 
+    std::chrono::high_resolution_clock::time_point m_firstFrameArrivalTime
         = std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(0));
     int m_framesProcessed = 0;
 

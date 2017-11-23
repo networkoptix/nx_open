@@ -17,7 +17,10 @@ class CommonPluginContainer;
 class QThread;
 class AbstractArchiveIntegrityWatcher;
 
-namespace nx { 
+namespace nx {
+
+namespace analytics { namespace storage { class AbstractEventsStorage; } }
+
 namespace mediaserver {
 
 class UnusedWallpapersWatcher;
@@ -74,6 +77,7 @@ public:
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
+    nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
 
 private:
     QnCommonModule* m_commonModule;
@@ -97,6 +101,8 @@ private:
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
+    std::unique_ptr<nx::analytics::storage::AbstractEventsStorage>
+        m_analyticsEventsStorage;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

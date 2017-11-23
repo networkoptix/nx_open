@@ -1,7 +1,6 @@
 #pragma once
 
 namespace nx {
-namespace mediaserver {
 namespace analytics {
 namespace storage {
 
@@ -29,5 +28,4 @@ CREATE VIRTUAL TABLE event_properties USING fts4(content);
 
 } // namespace storage
 } // namespace analytics
-} // namespace mediaserver
 } // namespace nx

@@ -9,6 +9,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/db_instance_controller.h>
 #include <nx/utils/db/types.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
@@ -30,7 +31,7 @@ protected:
     const ConnectionOptions& connectionOptions() const;
     void initializeDatabase();
     void closeDatabase();
-    const std::unique_ptr<AsyncSqlQueryExecutor>& asyncSqlQueryExecutor();
+    AsyncSqlQueryExecutor& asyncSqlQueryExecutor();
     void executeUpdate(const QString& queryText);
 
     template<typename RecordStructure>
@@ -41,7 +42,7 @@ protected:
 
         std::vector<RecordStructure> records;
 
-        asyncSqlQueryExecutor()->executeSelect(
+        asyncSqlQueryExecutor().executeSelect(
             [queryText, &records](
                 nx::utils::db::QueryContext* queryContext)
             {
@@ -70,7 +71,7 @@ protected:
         nx::utils::promise<nx::utils::db::DBResult> queryCompletedPromise;
 
         //starting async operation
-        asyncSqlQueryExecutor()->executeUpdate(
+        asyncSqlQueryExecutor().executeUpdate(
             dbQueryFunc,
             [&queryCompletedPromise](
                 nx::utils::db::QueryContext* /*queryContext*/, DBResult dbResult)
@@ -85,7 +86,7 @@ protected:
 private:
     QString m_tmpDir;
     ConnectionOptions m_connectionOptions;
-    std::unique_ptr<AsyncSqlQueryExecutor> m_asyncSqlQueryExecutor;
+    std::unique_ptr<InstanceController> m_dbInstanceController;
 
     void init();
 };

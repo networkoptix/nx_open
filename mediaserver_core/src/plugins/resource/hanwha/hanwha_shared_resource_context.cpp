@@ -267,36 +267,35 @@ HanwhaResult<int> HanwhaSharedResourceContext::loadOverlappedId()
 
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 {
+    HanwhaInformation info;
+
     HanwhaRequestHelper helper(shared_from_this());
     helper.setIgnoreMutexAnalyzer(true);
 
     const auto deviceinfo = helper.view(lit("system/deviceinfo"));
     if (!deviceinfo.isSuccessful())
     {
-        return {error(
-            deviceinfo,
-            CameraDiagnostics::CameraInvalidParams(
-                lit("Can not fetch device information")))};
+        return {error(deviceinfo,
+            CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device information")))};
     }
 
-    HanwhaInformation info;
-    if (const auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
-        info.macAddress = *value;
+    const auto networkInfo = helper.view("network/interface", {{"interfaceName", "Network1"}});
+    if (networkInfo.isSuccessful())
+    {
+        if (const auto value = networkInfo.parameter<QString>("MACAddress"))
+            info.macAddress = *value;
+    }
 
     if (info.macAddress.isEmpty())
     {
-        const HanwhaRequestHelper::Parameters params = {{ "interfaceName", "Network1" }};
-        const auto networkInfo = helper.view("network/interface", params);
-        if (!networkInfo.isSuccessful())
-        {
-            return {error(
-                deviceinfo,
-                CameraDiagnostics::CameraInvalidParams(
-                    lit("Can not fetch device information")))};
-        }
-
-        if (const auto value = deviceinfo.parameter<QString>("MACAddress"))
+        if (const auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
             info.macAddress = *value;
+    }
+
+    if (info.macAddress.isEmpty())
+    {
+        return {error(deviceinfo,
+            CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device MAC address")))};
     }
 
     if (const auto value = deviceinfo.parameter<QString>("Model"))
