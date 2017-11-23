@@ -21,18 +21,20 @@ static const int kMaxAllowedChannelNumber = 64;
 static const QByteArray kStartTimeParamName("StartTime");
 static const QByteArray kEndTimeParamName("EndTime");
 
-static std::chrono::seconds kUpdateChunksDelay(60);
-static std::chrono::seconds kResendRequestIfFail(10);
+static const std::chrono::seconds kUpdateChunksDelay(60);
+static const std::chrono::seconds kResendRequestIfFail(10);
 
 static const QString kDateTimeFormat = lit("yyyy-MM-dd hh:mm:ss");
 
-static QDateTime kMinDateTime = QDateTime::fromString(
+static const QDateTime kMinDateTime = QDateTime::fromString(
     lit("2000-01-01 00:00:00"),
     kDateTimeFormat);
 
-static QDateTime kMaxDateTime = QDateTime::fromString(
+static const QDateTime kMaxDateTime = QDateTime::fromString(
     lit("2037-12-31 00:00:00"),
     kDateTimeFormat);
+
+static const std::chrono::milliseconds kHttpTimeout(8000);
 
 HanwhaChunkLoader::HanwhaChunkLoader():
     m_httpClient(new nx_http::AsyncClient())
@@ -517,6 +519,7 @@ void HanwhaChunkLoader::prepareHttpClient()
     QnMutexLocker lock(&m_mutex);
     m_httpClient->setUserName(authenticator.user());
     m_httpClient->setUserPassword(authenticator.password());
+    m_httpClient->setResponseReadTimeout(kHttpTimeout);
 }
 
 } // namespace plugins
