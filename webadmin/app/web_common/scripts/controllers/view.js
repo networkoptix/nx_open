@@ -194,6 +194,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         function updateVideoSource(playingPosition) {
             if($scope.playerAPI) {
                 // Pause playing
+                $scope.playerAPI.pause();
                 $scope.playerAPI = null;
             }
             updateAvailableResolutions();
