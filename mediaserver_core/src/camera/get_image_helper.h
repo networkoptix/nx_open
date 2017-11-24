@@ -12,7 +12,7 @@
 
 class CLVideoDecoderOutput;
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
-class QnServerArchiveDelegate;
+class QnAbstractArchiveDelegate;
 
 class QnGetImageHelper
 {
@@ -31,12 +31,13 @@ public:
 
 private:
     static QSharedPointer<CLVideoDecoderOutput> readFrame(
-          qint64 timeUsec
-        , bool useHQ
-        , QnThumbnailRequestData::RoundMethod roundMethod
-        , const QnSecurityCamResourcePtr &camera
-        , QnServerArchiveDelegate &serverDelegate
-        , int prefferedChannel);
+          qint64 timeUsec,
+          bool useHQ,
+          QnThumbnailRequestData::RoundMethod roundMethod,
+          const QnSecurityCamResourcePtr& camera,
+          QnAbstractArchiveDelegate* archiveDelegate,
+          int prefferedChannel,
+          bool& isOpened);
 
     static QSize updateDstSize(
         const QSharedPointer<QnSecurityCamResource>& res,
