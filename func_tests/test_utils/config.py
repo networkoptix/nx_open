@@ -24,8 +24,8 @@ def timedelta_constructor(loader, node):
     value = loader.construct_scalar(node)
     return str_to_timedelta(value)
 
-def str_to_timedelta(value):
-    match = TIMEDELTA_REGEXP.match(value)
+def str_to_timedelta(duration_str):
+    match = TIMEDELTA_REGEXP.match(duration_str)
     try:
         if not match: return datetime.timedelta(seconds=int(duration_str))
         timedelta_params = {k: int(v)

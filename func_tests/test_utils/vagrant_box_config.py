@@ -31,7 +31,7 @@ class ConfigCommand(object):
 
     def __eq__(self, other):
         if not isinstance(other, ConfigCommand):
-            return false
+            return False
         return (self.function == other.function and
                 self.args == other.args and
                 self.kwargs == other.kwargs)

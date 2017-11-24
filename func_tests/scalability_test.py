@@ -227,7 +227,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
         expected_result_dirty = get_response(servers[0], method, api_object, api_method)
         if expected_result_dirty is None:
             if utils.datetime_utc_now() - start_time >= merge_timeout:
-                message = 'server %r has not responded' % server[0]
+                message = 'server %r has not responded' % servers[0]
                 make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time)
             continue
         expected_result = clean_json(api_method, expected_result_dirty)

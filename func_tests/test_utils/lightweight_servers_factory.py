@@ -95,7 +95,7 @@ class LightweightServersInstallation(object):
         self._not_supported()
 
     def get_log_file(self):
-        if self.host.file_exists(self._log_path):
+        if self.host.file_exists(self.log_path_base):
             return self.host.read_file(self.log_path_base + '.log')
         else:
             return None
@@ -112,7 +112,7 @@ class LightweightServer(Server):
         self.internal_ip_address = host.host
         self._state = self._st_started
 
-    def load_system_settings(self):
+    def load_system_settings(self, log_settings=False):
         response = self.rest_api.api.ping.GET()
         self.local_system_id = response['localSystemId']
 

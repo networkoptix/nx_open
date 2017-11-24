@@ -15,7 +15,7 @@ import warnings
 import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from urllib3.exceptions import InsecureRequestWarning
 
 REST_API_USER = 'admin'
 REST_API_PASSWORD = 'admin'

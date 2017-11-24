@@ -93,10 +93,10 @@ def server(server_factory, system_backup_type):
     return server
 
 
-def wait_storage_ready(server, stotage_guid):
+def wait_storage_ready(server, storage_guid):
     start = time.time()
     while True:
-        status = server.rest_api.ec2.getStatusList.GET(id=stotage_guid)
+        status = server.rest_api.ec2.getStatusList.GET(id=storage_guid)
         if status and status[0]['status'] == 'Online':
             return
         if time.time() - start >= BACKUP_STORAGE_READY_TIMEOUT_SEC:
