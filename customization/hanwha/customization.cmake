@@ -1,4 +1,3 @@
-[basic]
 set(defaultSkin "dark_orange")
 set(parent.customization "digitalwatchdog")
 
