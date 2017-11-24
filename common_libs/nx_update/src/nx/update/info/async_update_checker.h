@@ -7,7 +7,7 @@ namespace update {
 namespace info {
 
 class UpdateInformation;
-using UpdateCheckCallback = utils::MoveOnlyFunc<void(ResultCode, const UpdateInformation&)>;
+using UpdateCheckCallback = utils::MoveOnlyFunc<void(ResultCode, const UpdateInformationRegistry&)>;
 
 class AsyncUpdateChecker
 {
