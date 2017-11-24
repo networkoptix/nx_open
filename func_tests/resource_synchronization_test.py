@@ -1,4 +1,4 @@
-'''Resource syncronization tests
+'''Resource synchronization tests
 
    It tests that servers of the same system sinchronize its data correctly
 '''
@@ -324,7 +324,7 @@ def test_api_get_methods(env):
             srv.rest_api.get_api_fn(method, api_object, api_method)()
 
 
-def test_camera_data_syncronization(env):
+def test_camera_data_synchronization(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     prepare_and_make_async_post_calls(env, 'saveCameraUserAttributes', cameras)
     merge_system_if_unmerged(env)
@@ -336,7 +336,7 @@ def test_camera_data_syncronization(env):
     check_transaction_log(env)
 
 
-def test_user_data_syncronization(env):
+def test_user_data_synchronization(env):
     prepare_and_make_async_post_calls(env, 'saveUser')
     merge_system_if_unmerged(env)
     check_api_calls(
@@ -345,7 +345,7 @@ def test_user_data_syncronization(env):
     check_transaction_log(env)
 
 
-def test_mediaserver_data_syncronization(env):
+def test_mediaserver_data_synchronization(env):
     servers = prepare_and_make_async_post_calls(env, 'saveMediaServer')
     prepare_and_make_async_post_calls(env, 'saveMediaServerUserAttributes', servers)
     merge_system_if_unmerged(env)
@@ -369,7 +369,7 @@ def test_storage_data_synchronization(env):
     check_transaction_log(env)
 
 
-def test_resource_params_data_syncronization(env):
+def test_resource_params_data_synchronization(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, 'saveUser')
     servers = prepare_and_make_async_post_calls(env, 'saveMediaServer')
@@ -383,7 +383,7 @@ def test_resource_params_data_syncronization(env):
     check_transaction_log(env)
 
 
-def test_remove_resource_params_data_syncronization(env):
+def test_remove_resource_params_data_synchronization(env):
     cameras = prepare_and_make_async_post_calls(env, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, 'saveUser')
     servers = prepare_and_make_async_post_calls(env, 'saveMediaServer')
@@ -398,7 +398,7 @@ def test_remove_resource_params_data_syncronization(env):
     check_transaction_log(env)
 
 
-def test_layout_data_syncronization(env):
+def test_layout_data_synchronization(env):
     admins = get_servers_admins(env)
     admins_seq = [admins[i % len(admins)] for i in range(env.test_size)]
     # A shared layout doesn't have a parent
