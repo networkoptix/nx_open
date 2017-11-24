@@ -38,6 +38,7 @@ MSSettings::MSSettings(
     else
         initializeRunTimeSettings();
 
+    loadSettings();
 }
 
 QString MSSettings::defaultROSettingsFilePath()
@@ -77,8 +78,6 @@ void MSSettings::initializeROSettings()
         QnServerAppInfo::applicationName()
 #endif
     ));
-
-    loadSettings();
 }
 
 QSettings* MSSettings::roSettings()

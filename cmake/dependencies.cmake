@@ -145,6 +145,7 @@ function(get_dependencies)
         nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
         set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
         nx_rdep_add_package("vmaxproxy-2.1")
+        nx_rdep_add_package(wix PATH_VARIABLE WIX)
     endif()
 
     if(box STREQUAL "edge1")
