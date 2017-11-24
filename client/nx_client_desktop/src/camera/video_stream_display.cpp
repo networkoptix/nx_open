@@ -508,7 +508,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     dec->setOutPictureSize(getMaxScreenSize());
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
-    if (dec->getWidth() > 0) 
+    if (dec->getWidth() > 0)
     {
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
@@ -551,10 +551,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             if (scaleFactor == QnFrameScaler::factor_unknown && dec->getWidth() > 0)
             {
                 scaleFactor = determineScaleFactor(
-                    m_renderList, 
-                    data->channelNumber, 
-                    dec->getWidth(), 
-                    dec->getHeight(), 
+                    m_renderList,
+                    data->channelNumber,
+                    dec->getWidth(),
+                    dec->getHeight(),
                     force_factor);
             }
 
@@ -1165,6 +1165,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
 
 QSize QnVideoStreamDisplay::getMaxScreenSize() const
 {
+    QnMutexLocker lock(&m_renderListMtx);
     int maxW = 0, maxH = 0;
     foreach(QnAbstractRenderer* render, m_renderList)
     {
