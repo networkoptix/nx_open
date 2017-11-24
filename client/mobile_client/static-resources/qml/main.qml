@@ -98,6 +98,19 @@ ApplicationWindow
             Workflow.startTest(initialTest)
     }
 
+    Connections
+    {
+        target: cloudStatusWatcher;
+        onStatusChanged:
+        {
+            if (connectedThroughTheCloud()
+                && cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
+            {
+                uiController.disconnectFromSystem();
+            }
+        }
+    }
+
     Component.onDestruction:
     {
         connectionManager.disconnectFromServer()

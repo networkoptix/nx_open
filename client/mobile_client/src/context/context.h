@@ -96,6 +96,9 @@ public:
     Q_INVOKABLE QUrl getLastUsedUrl() const;
     Q_INVOKABLE QUrl getInitialUrl() const;
 
+    // Checks if current (or last) connection was through the cloud
+    Q_INVOKABLE bool connectedThroughTheCloud();
+
     Q_INVOKABLE QUrl getWebSocketUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);

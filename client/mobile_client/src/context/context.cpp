@@ -24,6 +24,8 @@
 #include <settings/last_connection.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/address_resolver.h>
 
 using namespace nx::vms::utils;
 
@@ -244,6 +246,12 @@ QUrl QnContext::getLastUsedUrl() const
 QUrl QnContext::getInitialUrl() const
 {
     return qnSettings->startupParameters().url;
+}
+
+bool QnContext::connectedThroughTheCloud()
+{
+    return nx::network::SocketGlobals::addressResolver()
+        .isCloudHostName(getLastUsedUrl().host());
 }
 
 QUrl QnContext::getWebSocketUrl() const
