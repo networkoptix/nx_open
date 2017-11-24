@@ -1,22 +1,18 @@
 #pragma once
 
 #include <QtCore>
+#include <nx/update/info/file_information.h>
 
 namespace nx {
 namespace update {
 namespace info {
-
-struct FileInformation;
-
 namespace detail {
 namespace data_parser {
 
-class AbstractTargetUpdatesInfoList
+struct TargetUpdatesInformation
 {
-public:
-    virtual ~AbstractTargetUpdatesInfoList() {}
-    virtual QString targetName() = 0;
-    virtual FileInformation* next() = 0;
+    QString targetName;
+    QList<FileInformation> fileInformationList;
 };
 
 } // namespace data_parser

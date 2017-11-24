@@ -20,7 +20,7 @@
         <template>lib</template>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lnx_fusion -lnx_utils -lnx_network</global.libs>
+        <global.libs>-lnx_fusion -lnx_utils -lnx_network -lcommon</global.libs>
         <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>

@@ -1,4 +1,4 @@
-INCLUDEPATH -= $$ROOT_DIR/common/src
+INCLUDEPATH += $$ROOT_DIR/common/src
 
 win* {
     DEFINES += NX_NETWORK_API=__declspec(dllexport)

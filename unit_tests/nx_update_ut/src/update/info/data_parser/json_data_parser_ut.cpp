@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <nx/update/info/detail/data_parser/raw_data_parser_factory.h>
-#include <nx/update/info/detail/data_parser/json_data_parser.h>
+#include <nx/update/info/detail/data_parser/impl/json_data_parser.h>
 #include <nx/update/info/detail/fwd.h>
 
 extern const char* const updateJson;
@@ -22,23 +22,23 @@ protected:
     {
         m_parser = m_parserFactory.create();
         ASSERT_TRUE((bool) m_parser.get());
-        ASSERT_NE(nullptr, dynamic_cast<JsonDataParser*>(m_parser.get()));
+        ASSERT_NE(nullptr, dynamic_cast<impl::JsonDataParser*>(m_parser.get()));
     }
 
     void whenTestMetaDataParsed()
     {
-        customizationInfoList = m_parser->parseMetaData(metaDataJson);
+        m_updateMetaDataInfo = m_parser->parseMetaData(metaDataJson);
     }
 
     void thenCustomizationInfoListShouldBeCorrect()
     {
-        ASSERT_NE(nullptr, customizationInfoList);
+        ASSERT_NE(nullptr, m_updateMetaDataInfo);
     }
 
 private:
     AbstractRawDataParserPtr m_parser;
     RawDataParserFactory m_parserFactory;
-    AbstractCustomizationInfoList* customizationInfoList = nullptr;
+    AbstractUpdateMetaInfo* m_updateMetaDataInfo = nullptr;
 };
 
 TEST_F(JsonDataParser, MetaDataParsedCorrectly)

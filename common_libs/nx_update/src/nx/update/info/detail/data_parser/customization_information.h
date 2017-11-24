@@ -1,18 +1,17 @@
 #pragma once
 
+#include <QtCore>
+
 namespace nx {
 namespace update {
 namespace info {
 namespace detail {
 namespace data_parser {
 
-class AbstractCustomizationInfo;
-
-class AbstractCustomizationInfoList
+struct CustomizationInformation
 {
-public:
-    virtual ~AbstractCustomizationInfoList() {}
-    virtual AbstractCustomizationInfo* next() = 0;
+    QString name;
+    QList<QString> versions;
 };
 
 } // namespace data_parser

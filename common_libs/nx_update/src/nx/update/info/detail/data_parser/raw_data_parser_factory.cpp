@@ -1,6 +1,6 @@
 #include "raw_data_parser_factory.h"
 #include "abstract_raw_data_parser.h"
-#include "json_data_parser.h"
+#include "impl/json_data_parser.h"
 
 namespace nx {
 namespace update {
@@ -12,7 +12,7 @@ namespace {
 
 static AbstractRawDataParserPtr createJsonParser()
 {
-    return AbstractRawDataParserPtr(new JsonDataParser());
+    return AbstractRawDataParserPtr(new impl::JsonDataParser());
 }
 
 } // namespace
