@@ -13,7 +13,6 @@ angular.module('cloudApp')
             $scope.account = account;
             $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();
-            loadUsers();
         });
 
         // Retrieve system info
@@ -35,6 +34,7 @@ angular.module('cloudApp')
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
             $scope.systemNoAccess = false;
+            loadUsers();
             if($scope.system.permissions.editUsers){
                 $scope.gettingSystemUsers.run();
             }else{
