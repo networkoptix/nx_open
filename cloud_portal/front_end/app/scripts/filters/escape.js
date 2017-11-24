@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-.filter('escape', function($sce) {
+.filter('escape', function() {
   var entityMap = {
     '&': '&amp;',
     '<': '&lt;',
