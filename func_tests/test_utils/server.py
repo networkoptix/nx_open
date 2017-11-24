@@ -264,18 +264,19 @@ class Server(object):
         if was_started:
             self.start_service()
 
-    def restart(self, stop_timeout_sec=1, start_timeout_sec=10, sleep_time_sec=0.1):
+    def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
         old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
         log.info("Runtime id before restart: %s", old_runtime_id)
-        timestamp_before = time.time()
+        started_at = datetime.datetime.now(pytz.utc)
         self.rest_api.api.restart.GET()
+        sleep_time_sec = timeout.total_seconds() / 100.
         failed_connections = 0
         while True:
             try:
                 response = self.rest_api.api.moduleInformation.GET()
             except requests.ConnectionError as e:
-                if time.time() - timestamp_before > start_timeout_sec:
-                    assert False, "Server restart timed out"
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't started, caught %r, timed out." % e
                 log.debug("Expected failed connection: %r", e)
                 failed_connections += 1
                 time.sleep(sleep_time_sec)
@@ -284,8 +285,8 @@ class Server(object):
             if new_runtime_id == old_runtime_id:
                 if failed_connections > 0:
                     assert False, "Runtime id remains same after failed connections."
-                if time.time() - timestamp_before > stop_timeout_sec:
-                    assert False, "Server hasn't stopped yet, timed out."
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't stopped, timed out."
                 log.warning("Server hasn't stopped yet, delay is acceptable.")
                 time.sleep(sleep_time_sec)
                 continue

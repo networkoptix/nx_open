@@ -207,7 +207,8 @@ def test_uptime_is_monotonic(timeless_server):
 
 
 def test_frequent_restarts(server):
-    # Unfold to indicate which call failed.
-    server.restart()
-    server.restart()
-    server.restart()
+    """This API endpoint for restart and our wrapper for it."""
+    # Call in unfolded way to indicate which line failed.
+    server.restart_via_api(timeout=timedelta(seconds=10))
+    server.restart_via_api(timeout=timedelta(seconds=10))
+    server.restart_via_api(timeout=timedelta(seconds=10))
