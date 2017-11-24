@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/update/info/fwd.h>
+#include <nx/update/info/detail/fwd.h>
 
 namespace nx {
 namespace update {
@@ -12,11 +12,12 @@ using UpdateCheckCallback = utils::MoveOnlyFunc<void(ResultCode, const UpdateInf
 class AsyncUpdateChecker
 {
 public:
-    AsyncUpdateChecker(AbstractAsyncRawDataProviderPtr rawDataProvider);
-    void check(const QString& baseVersion, UpdateCheckCallback callback);
+    AsyncUpdateChecker();
+    void check(const QString& version, const QString& customization, UpdateCheckCallback callback);
+    void checkMeta();
 
 private:
-    AbstractAsyncRawDataProviderPtr m_rawDataProvider;
+    detail::AbstractAsyncRawDataProviderPtr m_rawDataProvider;
 };
 
 } // namespace info
