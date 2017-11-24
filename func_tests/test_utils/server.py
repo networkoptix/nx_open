@@ -11,6 +11,7 @@ import urllib
 import hashlib
 import time
 import datetime
+import tempfile
 import calendar
 import pytz
 import tzlocal
@@ -21,7 +22,7 @@ from .rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpEr
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
 from .camera import make_schedule_task, Camera, SampleMediaFile
 from .media_stream import open_media_stream
-from .host import Host
+from .host import Host, LocalHost
 from .cloud_host import CloudAccount
 
 
@@ -480,21 +481,40 @@ class Storage(object):
         assert start_time.tzinfo  # naive datetime are forbidden, use pytz.utc or tzlocal.get_localtimezone() for tz
         assert isinstance(sample, SampleMediaFile), repr(sample)
         camera_mac_addr = camera.mac_addr
-        contents = sample.get_contents()
-        lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, sample.duration)
-        hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, sample.duration)
+        unixtime_utc_ms = int(datetime_utc_to_timestamp(start_time) * 1000)
+
+        contents = self._read_with_start_time_metadata(sample, unixtime_utc_ms)
+
+        lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, unixtime_utc_ms, sample.duration)
+        hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
+
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
         self.host.write_file(lowq_fpath, contents)
         log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
         self.host.write_file(hiq_fpath,  contents)
 
+    def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
+        _, ext = os.path.splitext(sample.fpath)
+        _, path = tempfile.mkstemp(suffix=ext)
+        try:
+            LocalHost().run_command([
+                'ffmpeg',
+                '-i', sample.fpath,
+                '-codec', 'copy',
+                '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
+                '-y',
+                path])
+            with open(path, 'rb') as f:
+                return f.read()
+        finally:
+            os.remove(path)
+
     # server stores media data in this format, using local time for directory parts:
     # <data dir>/<{hi_quality,low_quality}>/<camera-mac>/<year>/<month>/<day>/<hour>/<start,unix timestamp ms>_<duration,ms>.mkv
     # for example:
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
-    def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
+    def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
         local_dt = start_time.astimezone(self.timezone)  # box local
-        unixtime_utc_ms = int(datetime_utc_to_timestamp(start_time) * 1000)
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,
