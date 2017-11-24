@@ -8,13 +8,14 @@
 
 namespace
 {
-
-static const int kAutoContentTypeItemIndex = 0;
-static const int kAutoAuthTypeItemIndex = 0;
-static const int kAutoRequestTypeItemIndex = 0;
-static const std::map <nx_http::Method::ValueType, int> kAutoRequestTypeItemIndexMap
-    { {"", 0}, {"GET", 1}, {"POST", 2} };
-
+static constexpr int kAutoContentTypeItemIndex = 0;
+static constexpr int kAutoAuthTypeItemIndex = 0;
+static constexpr int kAutoRequestTypeItemIndex = 0;
+static const QStringList kAutoRequestTypes{
+    QString(),
+    lit("GET"),
+    lit("POST")
+};
 } // namespace
 
 QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
@@ -41,16 +42,17 @@ QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
     ui->contentTypeComboBox->addItem(lit("application/xml"));
     NX_ASSERT(ui->contentTypeComboBox->itemText(kAutoContentTypeItemIndex) == tr("Auto"));
 
-    ui->authTypeComboBox->addItem(tr("Auto")); //< should have kAutoAuthTypeItemIndex position.
-    ui->authTypeComboBox->addItem(lit("Digest"));
-    ui->authTypeComboBox->addItem(lit("Digest+PasswordHash"));
-    ui->authTypeComboBox->addItem(lit("Basic"));
+    ui->authTypeComboBox->addItem(tr("Auto"));
+    ui->authTypeComboBox->addItem(tr("Basic"));
     NX_ASSERT(ui->authTypeComboBox->itemText(kAutoAuthTypeItemIndex) == tr("Auto"));
 
-    ui->requestTypeComboBox->addItem(tr("Auto")); //< should have kAutoRequestTypeItemIndex position.
-    ui->requestTypeComboBox->addItem(lit("GET"));
-    ui->requestTypeComboBox->addItem(lit("POST"));
-    NX_ASSERT(ui->requestTypeComboBox->itemText(kAutoRequestTypeItemIndex) == tr("Auto"));
+    for (const QString& requestType : kAutoRequestTypes)
+    {
+        if (requestType.isEmpty())
+            ui->requestTypeComboBox->addItem(tr("Auto"));
+        else
+            ui->requestTypeComboBox->addItem(requestType);
+    }
 }
 
 QnExecHttpRequestActionWidget::~QnExecHttpRequestActionWidget()
@@ -87,10 +89,25 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
     ui->loginLineEdit->setText(url.userName());
     ui->passwordLineEdit->setText(url.password());
 
-    ui->authTypeComboBox->setCurrentIndex(static_cast<int>(params.authType));
+    switch (params.authType)
+    {
+        case nx_http::AsyncHttpClient::AuthType::authBasicAndDigest:
+            ui->authTypeComboBox->setCurrentIndex(0);
+            break;
+        case nx_http::AsyncHttpClient::AuthType::authBasic:
+            ui->authTypeComboBox->setCurrentIndex(1);
+            break;
+        default:
+            NX_ASSERT(0, Q_FUNC_INFO, "Uxepected authType value in ActionParameters");
+            ui->authTypeComboBox->setCurrentIndex(0);
+    }
 
-    auto it=kAutoRequestTypeItemIndexMap.find(params.requestType);
-    int requestTypeComboBoxIndex = (it != kAutoRequestTypeItemIndexMap.end()) ? it->second : 0;
+    int requestTypeComboBoxIndex = kAutoRequestTypes.indexOf(QString::fromUtf8(params.requestType));
+    if (requestTypeComboBoxIndex < 0)
+    {
+        NX_ASSERT(0, Q_FUNC_INFO, "Uxepected requestType value in ActionParameters");
+        requestTypeComboBoxIndex = 0;
+    }
     ui->requestTypeComboBox->setCurrentIndex(requestTypeComboBoxIndex);
 }
 
@@ -115,7 +132,9 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     if (params.contentType == ui->contentTypeComboBox->itemText(kAutoContentTypeItemIndex))
         params.contentType.clear(); //< Auto value
 
-    params.authType = static_cast<nx_http::AsyncHttpClient::AuthType>(ui->authTypeComboBox->currentIndex());
+    params.authType = static_cast<nx_http::AsyncHttpClient::AuthType>(!ui->authTypeComboBox->currentIndex() ?
+        nx_http::AsyncHttpClient::AuthType::authBasicAndDigest :  //Auto
+        nx_http::AsyncHttpClient::AuthType::authBasic);           //Basic
 
     params.requestType = ui->requestTypeComboBox->currentText().toLatin1();
     if (params.requestType == ui->requestTypeComboBox->itemText(kAutoRequestTypeItemIndex).toLatin1())
