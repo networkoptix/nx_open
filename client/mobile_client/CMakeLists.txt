@@ -84,9 +84,9 @@ if(ANDROID)
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
         KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
-        KEYSTORE_ALIAS "hdwitness"
-        KEYSTORE_PASSWORD "hYCmvTDu"
-        KEYSTORE_KEY_PASSWORD "31O2zNNy"
+        KEYSTORE_ALIAS "${android.alias}"
+        KEYSTORE_PASSWORD "${android.storepass}"
+        KEYSTORE_KEY_PASSWORD "${android.keypass}"
     )
 endif()
 
