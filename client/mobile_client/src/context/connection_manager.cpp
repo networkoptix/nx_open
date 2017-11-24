@@ -38,20 +38,28 @@
 namespace {
 
     const QString kLiteClientConnectionScheme = lit("liteclient");
-
     enum { kInvalidHandle = -1 };
 
     QnConnectionManager::ConnectionType connectionTypeForUrl(const QUrl& url)
     {
-        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host())
+            || url.scheme() == QnConnectionManager::cloudConnectionScheme())
+        {
             return QnConnectionManager::CloudConnection;
-        else if (url.scheme() == kLiteClientConnectionScheme)
+        }
+
+        if (url.scheme() == kLiteClientConnectionScheme)
             return QnConnectionManager::LiteClientConnection;
-        else
-            return QnConnectionManager::NormalConnection;
+
+        return QnConnectionManager::NormalConnection;
     }
 
 } // namespace
+
+QString QnConnectionManager::cloudConnectionScheme()
+{
+    return lit("cloud");
+}
 
 class QnConnectionManagerPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
@@ -206,11 +214,14 @@ bool QnConnectionManager::connectToServer(const QUrl& url)
 bool QnConnectionManager::connectToServer(
     const QUrl &url,
     const QString& userName,
-    const QString& password)
+    const QString& password,
+    bool cloudConnection)
 {
     auto urlWithAuth = url;
     urlWithAuth.setUserName(userName);
     urlWithAuth.setPassword(password);
+    if (cloudConnection)
+        urlWithAuth.setScheme(QnConnectionManager::cloudConnectionScheme());
     return connectToServer(urlWithAuth);
 }
 
@@ -415,7 +426,7 @@ bool QnConnectionManagerPrivate::doConnect()
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
             using namespace nx::client::core::helpers;
-            if (!nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+            if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
             {
                 storeConnection(localId, connectionInfo.systemName, url);
                 storeCredentials(localId, QnEncodedCredentials(url));

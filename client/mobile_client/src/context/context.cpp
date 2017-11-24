@@ -250,8 +250,7 @@ QUrl QnContext::getInitialUrl() const
 
 bool QnContext::connectedThroughTheCloud()
 {
-    return nx::network::SocketGlobals::addressResolver()
-        .isCloudHostName(getLastUsedUrl().host());
+    return getLastUsedUrl().scheme() == QnConnectionManager::cloudConnectionScheme();
 }
 
 QUrl QnContext::getWebSocketUrl() const

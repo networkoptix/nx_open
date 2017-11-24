@@ -197,7 +197,7 @@ Pane
                 if (!connectionManager.connectToServer(
                     hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password))
+                    cloudStatusWatcher.credentials.password, true))
                 {
                     sessionsScreen.openConnectionWarningDialog(systemName)
                     return
