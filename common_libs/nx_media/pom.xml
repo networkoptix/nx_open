@@ -41,7 +41,7 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <profiles>
