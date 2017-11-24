@@ -6,12 +6,14 @@
 
 #include <api/app_server_connection.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
-#include <common/common_module.h>
 
 namespace {
 

@@ -9,6 +9,8 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <nx_ec/ec_api.h>
+
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
 #include <nx/utils/log/log.h>
