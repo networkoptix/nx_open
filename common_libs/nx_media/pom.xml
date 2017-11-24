@@ -34,6 +34,14 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>        
     </dependencies>
 
     <profiles>
