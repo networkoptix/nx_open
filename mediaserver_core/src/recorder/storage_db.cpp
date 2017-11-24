@@ -538,7 +538,7 @@ bool QnStorageDb::vacuumInternal()
 
     tmpFile.reset();
     res = m_storage->renameFile(tmpDbFileName, m_dbFileName);
-    //NX_ASSERT(res);
+    NX_ASSERT(res);
     if (!res)
         NX_LOG(lit("%1 temporary DB rename file error").arg(Q_FUNC_INFO), cl_logWARNING);
 
