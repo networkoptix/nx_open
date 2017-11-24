@@ -378,6 +378,8 @@ void EventRibbon::Private::updateScrollRange()
     m_scrollBar->setMaximum(qMax(m_totalHeight - viewHeight, 1));
     m_scrollBar->setPageStep(viewHeight);
     m_scrollBar->setVisible(m_totalHeight > viewHeight);
+    if (m_scrollBar->isHidden())
+        m_scrollBar->setValue(0);
 }
 
 void EventRibbon::Private::updateView()
