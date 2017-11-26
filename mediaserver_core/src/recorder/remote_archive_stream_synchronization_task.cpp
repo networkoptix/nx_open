@@ -22,10 +22,12 @@ namespace {
 static const std::chrono::milliseconds kDetalizationLevel(1);
 static const std::chrono::milliseconds kMinChunkDuration(1000);
 static const int kNumberOfSynchronizationCycles = 2;
-static const std::chrono::milliseconds kWaitBeforeSynchronize(20000);
+static const std::chrono::milliseconds kWaitBeforeSynchronize(30000);
 static const std::chrono::milliseconds kWaitBeforeLoadNextChunk(3000);
 
 } // namespace
+
+using namespace std::chrono;
 
 RemoteArchiveStreamSynchronizationTask::RemoteArchiveStreamSynchronizationTask(
     QnMediaServerModule* serverModule,
@@ -73,7 +75,7 @@ bool RemoteArchiveStreamSynchronizationTask::execute()
     {
         {
             QnMutexLocker lock(&m_mutex);
-            m_wait.wait(&m_mutex, kWaitBeforeSynchronize.count());
+            m_wait.wait(&m_mutex, duration_cast<milliseconds>(kWaitBeforeSynchronize).count());
         }
 
         if (m_canceled)
