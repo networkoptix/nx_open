@@ -61,6 +61,12 @@ void RemoteArchiveStreamSynchronizationTask::cancel()
 
 bool RemoteArchiveStreamSynchronizationTask::execute()
 {
+    auto archiveManager = m_resource->remoteArchiveManager();
+    NX_ASSERT(archiveManager);
+    if (!archiveManager)
+        return false;
+
+    archiveManager->beforeSynchronization();
     qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
     bool result = true;
     for (auto i = 0; i < kNumberOfSynchronizationCycles; ++i)
@@ -79,6 +85,7 @@ bool RemoteArchiveStreamSynchronizationTask::execute()
         result &= synchronizeArchive();
     }
 
+    archiveManager->afterSynchronization(result);
     qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
     return result;
 }

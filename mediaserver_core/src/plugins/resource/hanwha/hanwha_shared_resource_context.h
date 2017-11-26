@@ -132,11 +132,12 @@ public:
     QnTimePeriodList chunksSync(int channelNumber) const;
     qint64 chunksStartUsec(int channelNumber) const;
     qint64 chunksEndUsec(int channelNumber) const;
+    boost::optional<int> overlappedId() const;
 
     std::chrono::seconds timeZoneShift() const;
+    void setDateTime(const QDateTime& dateTime);
 
     // NOTE: function objects return HanwhaResult<T>.
-    HanwhaCachedData<int> currentOverlappedId;
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
@@ -144,7 +145,6 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
 
 private:
-    HanwhaResult<int> loadOverlappedId();
     HanwhaResult<HanwhaInformation> loadInformation();
     HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();

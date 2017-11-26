@@ -243,6 +243,16 @@ std::unique_ptr<QnAbstractArchiveDelegate> LilinRemoteArchiveManager::archiveDel
     return nullptr;
 }
 
+void LilinRemoteArchiveManager::beforeSynchronization()
+{
+    // Do nothing.
+}
+
+void LilinRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuccessful*/)
+{
+    // Do nothing.
+}
+
 } // namespace plugins
 } // namespace mediasever_core
 } // namespace nx

@@ -109,6 +109,8 @@ static const QString kHanwhaUdp = lit("UDP");
 static const QString kHanwhaPcClient = lit("PC");
 static const QString kHanwhaMobileClient = lit("Mobile");
 
+static const QString kHanwhaAll = lit("All");
+
 static const QString kHanwhaChannelPropertyTemplate = lit("Channel.%1");
 static const QString kHanwhaChannelProperty = lit("Channel");
 static const QString kHanwhaIsFixedProfileProperty = lit("IsFixedProfile");
@@ -146,6 +148,12 @@ static const QString kHanwhaDefaultCbrBitrateProperty = lit("DefaultCBRTargetBit
 static const QString kHanwhaMaxVbrBitrateProperty = lit("MaxVBRTargetBitrate");
 static const QString kHanwhaMinVbrBitrateProperty = lit("MinVBRTargetBitrate");
 static const QString kHanwhaDefaultVbrBitrateProperty = lit("DefaultVBRTargetBitrate");
+static const QString kHanwhaChannelIdListProperty = lit("ChannelIDList");
+static const QString kHanwhaFromDateProperty = lit("FromDate");
+static const QString kHanwhaToDateProperty = lit("ToDate");
+static const QString kHanwhaOverlappedIdProperty = lit("OverlappedID");
+static const QString kHanwhaResultsInUtcProperty = lit("ResultsInUTC");
+static const QString kHanwhaRecordingTypeProperty = lit("Type");
 
 static const QString kHanwhaNearFocusMove = lit("Near");
 static const QString kHanwhaFarFocusMove = lit("Far");

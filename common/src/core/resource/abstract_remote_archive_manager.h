@@ -95,6 +95,16 @@ public:
      * @return Remote archive capabilities.
      */
     virtual RemoteArchiveCapabilities capabilities() const = 0;
+
+    /*
+     * Is called before remote archive synchronization.
+     */
+    virtual void beforeSynchronization() = 0;
+
+    /*
+     * Is called after remote archive synchronization.
+     */
+    virtual void afterSynchronization(bool isSynchronizationSuccessful) = 0;
 };
 
 } // namespace resource

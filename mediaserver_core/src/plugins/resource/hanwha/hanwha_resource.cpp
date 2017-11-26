@@ -588,11 +588,7 @@ SessionContextPtr HanwhaResource::session(
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
 {
-    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
-    const auto overlappedId = sharedContext()->currentOverlappedId();
-    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
-
-    return std::move(delegate);
+    return std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
 }
 
 bool HanwhaResource::isVideoSourceActive()
