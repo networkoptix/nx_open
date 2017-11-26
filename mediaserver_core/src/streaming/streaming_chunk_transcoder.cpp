@@ -96,7 +96,15 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     auto camera = qnCameraPool->getVideoCamera(cameraResource);
-    NX_ASSERT(camera);
+    // Camera is inserted to this pool asynchronously. So it could be a race condition when
+    // camera already at resourcePool but still missing at qnCameraPool.
+    if (!camera)
+    {
+        NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
+            "Requested resource %1 is not completly registered yet")
+            .arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1);
+        return false;
+    }
 
     // If requested stream time range is in the future for not futher than MAX_CHUNK_TIMESTAMP_ADVANCE
     // then scheduling transcoding task.
