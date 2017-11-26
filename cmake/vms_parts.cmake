@@ -42,7 +42,7 @@ if(WINDOWS)
     set(_withTrayTool ON)
 endif()
 
-if("${platform}" STREQUAL "edge1")
+if("${box}" STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 
@@ -53,7 +53,7 @@ option(withMobileClient "Enable mobile client" ${_withMobileClient})
 option(withClouds "Enable cloud components" ${_withClouds})
 option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
-option(withPluginStabs "Enable plugin stabs" ON)
+option(withPluginStubs "Enable plugin stubs" ON)
 
 unset(_withMediaServer)
 unset(_withTrayTool)

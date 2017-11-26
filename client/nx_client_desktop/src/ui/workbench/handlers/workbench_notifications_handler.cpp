@@ -88,8 +88,6 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         });
 
     QnCommonMessageProcessor* messageProcessor = qnCommonMessageProcessor;
-    connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
-        &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
@@ -418,11 +416,6 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
         : QnSystemHealth::UsersEmailIsEmpty;
 
     setSystemHealthEventVisible(message, user, visible);
-}
-
-void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
-{
-    clear();
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(

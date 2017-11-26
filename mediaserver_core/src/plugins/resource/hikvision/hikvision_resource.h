@@ -32,6 +32,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
+
+    virtual CameraDiagnostics::Result fetchVideoSourceToken() override;
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,

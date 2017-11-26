@@ -8,12 +8,6 @@
 {{#screenshot}}
     <div class="description">
         <img alt="Screenshot" src="{{screenshot}}"/>
-        {{#caption}}
-            <h2>{{caption}}</h2>
-        {{/caption}}
-        {{#description}}
-            <p> {{description}}</p>
-        {{/description}}
     </div>
 {{/screenshot}}
 

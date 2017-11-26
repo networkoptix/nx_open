@@ -316,6 +316,7 @@ protected:
 
     void setMaxFps(int f);
     void setPrimaryResolution(const QSize& value);
+    virtual CameraDiagnostics::Result fetchVideoSourceToken();
 private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
@@ -325,7 +326,6 @@ private:
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
 
-    CameraDiagnostics::Result fetchVideoSourceToken();
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
@@ -372,6 +372,7 @@ protected:
 
     bool createPullPointSubscription();
     bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
+    void setMaxChannels(int value);
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 

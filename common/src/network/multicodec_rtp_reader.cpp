@@ -835,7 +835,7 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
         return boost::none;
 
     const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
-    if (extWords != kOnvifNtpExtensionWordsNumber)
+    if (extWords < kOnvifNtpExtensionWordsNumber)
         return boost::none;
 
     ptr += RtpHeaderExtension::kRtpExtensionHeaderLength;

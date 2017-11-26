@@ -434,7 +434,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
     if (id != m_itemId)
         return;
 
-    switch(role)
+    switch (role)
     {
         case Qn::ItemPausedRole:
         {
@@ -462,7 +462,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
             break;
         }
         case Qn::ItemSpeedRole:
-                display()->archiveReader()->setSpeed(data.toDouble());
+            display()->archiveReader()->setSpeed(data.toDouble());
             break;
         default:
             break;
@@ -2055,7 +2055,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (d->camera)
     {
-        if (d->camera->needsToChangeDefaultPassword())
+        if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
 
         const Qn::Permission requiredPermission = d->isPlayingLive()

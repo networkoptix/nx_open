@@ -29,9 +29,10 @@ struct TwoWayAudioParams
     QString urlPath;
     QString contentType;
     bool noAuth = false;
+    bool useBasicAuth = false;
 };
 Q_DECLARE_METATYPE(TwoWayAudioParams);
-#define TwoWayAudioParams_Fields (codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)
+#define TwoWayAudioParams_Fields (codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)(useBasicAuth)
 
 struct QnBounds
 {

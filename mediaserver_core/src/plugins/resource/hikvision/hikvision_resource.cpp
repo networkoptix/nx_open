@@ -68,7 +68,7 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 {
     if (m_hevcSupported)
         return new plugins::HikvisionHevcStreamReader(toSharedPointer(this));
-    
+
     return base_type::createLiveDataProvider();
 }
 
@@ -110,7 +110,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     if (!m_hevcSupported)
         return base_type::initializeMedia(onvifCapabilities);
 
-    return CameraDiagnostics::NoErrorResult();
+    return fetchVideoSourceToken(); //< Fill channel count.
 }
 
 static std::unique_ptr<nx_http::HttpClient> makeHttpClient(const QAuthenticator& authenticator)
@@ -422,6 +422,26 @@ bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenti
             ? existingUser->first //< Override user permissions and password.
             : (users->empty() ? 1 : users->rbegin()->first + 1), //< New user.
         authenticator.user(), authenticator.password());
+}
+
+CameraDiagnostics::Result HikvisionResource::fetchVideoSourceToken()
+{
+    QAuthenticator auth = getAuth();
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+
+    _onvifMedia__GetVideoSources request;
+    _onvifMedia__GetVideoSourcesResponse response;
+    int soapRes = soapWrapper.getVideoSources(request, response);
+
+    if (soapRes != SOAP_OK)
+    {
+        if (soapWrapper.isNotAuthenticated())
+            return CameraDiagnostics::NotAuthorisedResult(getMediaUrl());
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), soapWrapper.getLastError());
+    }
+
+    setMaxChannels((int)response.VideoSources.size());
+    return CameraDiagnostics::NoErrorResult();
 }
 
 } // namespace plugins
