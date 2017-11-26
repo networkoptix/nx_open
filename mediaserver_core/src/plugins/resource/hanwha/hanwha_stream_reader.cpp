@@ -321,7 +321,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         params.emplace(kHanwhaMediaTypeProperty, mediaType);
         params.emplace(
             kHanwhaOverlappedIdProperty,
-            *overlappedId);
+            QString::number(*overlappedId));
 
         if (profileNumber == kHanwhaInvalidProfile && !m_hanwhaResource->isNvr())
             profileNumber = 2; //< The actual number doesn't matter.
