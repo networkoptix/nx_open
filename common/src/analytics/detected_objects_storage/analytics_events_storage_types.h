@@ -66,10 +66,13 @@ struct Filter
     QString freeText;
 
     bool operator==(const Filter& right) const;
+    bool operator!=(const Filter& right) const;
 };
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params);
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
+
+::std::ostream& operator<<(::std::ostream& os, const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
     (deviceId)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
