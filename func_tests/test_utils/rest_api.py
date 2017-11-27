@@ -43,7 +43,7 @@ class HttpError(RuntimeError):
          self.json = json
 
 
-class ServerRestApiError(RuntimeError):
+class RestApiError(RuntimeError):
 
     def __init__(self, server_name, url, error, error_string):
         RuntimeError.__init__(self, 'Server %s at %s REST API request returned error: [%s] %s' % (server_name, url, error, error_string))
@@ -51,10 +51,10 @@ class ServerRestApiError(RuntimeError):
         self.error_string = error_string
 
 
-class ServerRestApiProxy(object):
+class _RestApiProxy(object):
     """
-    >>> api = RestApiBase('HTTP Request & Response Service', 'http://httpbin.org', '', '')
-    >>> directory = ServerRestApiProxy(api, '/')
+    >>> api = _RestApi('HTTP Request & Response Service', 'http://httpbin.org', '', '')
+    >>> directory = _RestApiProxy(api, '/')
     >>> directory.get.GET(wise='choice')  # doctest: +ELLIPSIS
     {...wise...choice...}
     >>> directory.post.POST(wise='choice')  # doctest: +ELLIPSIS
@@ -66,7 +66,7 @@ class ServerRestApiProxy(object):
         self._api = api
 
     def __getattr__(self, name):
-        return ServerRestApiProxy(self._api, self._path + '/' + name)
+        return _RestApiProxy(self._api, self._path + '/' + name)
 
     # noinspection PyPep8Naming
     def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
@@ -81,11 +81,11 @@ class ServerRestApiProxy(object):
         return self._api.request('POST', self._path, raise_exception, timeout, headers=headers, json=json)
 
 
-class RestApiBase(object):
+class _RestApi(object):
 
     """Mimic requests.Session.request.
 
-    >>> api = RestApiBase('HTTP Request & Response Service', 'http://httpbin.org', 'u', 'p')
+    >>> api = _RestApi('HTTP Request & Response Service', 'http://httpbin.org', 'u', 'p')
     >>> api.request('GET', '/get', params={'pure': 'juice'})  # doctest: +ELLIPSIS
     {...pure...juice...}
     >>> api.request('GET', '/digest-auth/md5/u/p')  # doctest: +ELLIPSIS
@@ -170,7 +170,7 @@ class RestApiBase(object):
             return response_data
         if error_code != 0:
             log.debug('%s', response_data)
-            raise ServerRestApiError(self.server_name, response.request.url, error_code, response_data['errorString'])
+            raise RestApiError(self.server_name, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
     def request(self, method, path, raise_exception=True, timeout=None, **kwargs):
@@ -193,17 +193,17 @@ class RestApiBase(object):
         return self._retrieve_data(response)
 
 
-class ServerRestApi(RestApiBase):
+class ServerRestApi(_RestApi):
 
     def __init__(self, server_name, root_url, username, password, timeout=None):
         super(ServerRestApi, self).__init__(server_name, root_url, username, password, timeout=timeout)
-        self.ec2 = ServerRestApiProxy(self, '/ec2')
-        self.api = ServerRestApiProxy(self, '/api')
+        self.ec2 = _RestApiProxy(self, '/ec2')
+        self.api = _RestApiProxy(self, '/api')
 
 
-class CloudRestApi(RestApiBase):
+class CloudRestApi(_RestApi):
 
     def __init__(self, server_name, root_url, username, password, timeout=None):
         super(CloudRestApi, self).__init__(server_name, root_url, username, password, timeout=timeout)
-        self.cdb = ServerRestApiProxy(self, '/cdb')
-        self.api = ServerRestApiProxy(self, '/api')
+        self.cdb = _RestApiProxy(self, '/cdb')
+        self.api = _RestApiProxy(self, '/api')
