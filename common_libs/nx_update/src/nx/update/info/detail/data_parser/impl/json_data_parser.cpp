@@ -134,6 +134,12 @@ private:
     }
 };
 
+class UpdateDataParser
+{
+public:
+private:
+};
+
 } // namespace
 
 ResultCode JsonDataParser::parseMetaData(
