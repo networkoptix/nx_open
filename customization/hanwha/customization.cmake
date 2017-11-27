@@ -1,4 +1,4 @@
-set(defaultSkin "dark_orange")
+set(defaultSkin "gray_orange")
 set(parent.customization "digitalwatchdog")
 
 # Components Namings

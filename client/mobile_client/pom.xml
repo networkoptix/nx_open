@@ -43,6 +43,8 @@
         <provisioning_profile>${provisioning_profiles_dir}/testing.mobileprovision</provisioning_profile>
         <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
+
+        <additionalQrcPaths>${basedir}/skins/${defaultSkin}</additionalQrcPaths>
     </properties>
 
 
