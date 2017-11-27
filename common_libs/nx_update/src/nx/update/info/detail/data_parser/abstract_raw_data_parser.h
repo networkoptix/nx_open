@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QtCore>
-#include <nx/update/info/detail/data_parser/update_meta_information.h>
-#include <nx/update/info/detail/data_parser/target_updates_information.h>
+#include <nx/update/info/detail/data_parser/update_data.h>
+#include <nx/update/info/detail/data_parser/updates_meta_data.h>
 #include <nx/update/info/result_code.h>
 
 namespace nx {
@@ -15,12 +15,8 @@ class AbstractRawDataParser
 {
 public:
     virtual ~AbstractRawDataParser() {}
-    virtual ResultCode parseMetaData(
-        const QByteArray& rawData,
-        UpdateMetaInformation* outUpdateMetaInformation) = 0;
-    virtual TargetUpdatesInformation parseVersionData(
-        const QByteArray& rawData,
-        TargetUpdatesInformation* outTargetUpdatesInformation) = 0;
+    virtual ResultCode parseMetaData(const QByteArray& rawData, UpdatesMetaData* outUpdatesMetaData) = 0;
+    virtual ResultCode parseUpdateData(const QByteArray& rawData, UpdateData* outUpdateData) = 0;
 };
 
 } // namespace data_parser

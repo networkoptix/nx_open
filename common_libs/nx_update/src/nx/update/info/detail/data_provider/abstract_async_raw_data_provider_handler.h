@@ -9,7 +9,6 @@ namespace info {
 namespace detail {
 namespace data_provider {
 
-
 class AbstractCustomizationInfoList;
 
 class AbstractAsyncRawDataProviderHandler

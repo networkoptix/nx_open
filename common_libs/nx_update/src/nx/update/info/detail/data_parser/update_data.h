@@ -1,19 +1,18 @@
 #pragma once
 
 #include <QtCore>
-#include "file_information.h"
+#include <nx/update/info/file_data.h>
 
 namespace nx {
 namespace update {
 namespace info {
 
-struct UpdateInformation
+struct UpdateData
 {
     QString version;
     QString cloudHost;
-    nx::utils::Url baseUrl;
-    QHash<QString, FileInformation> targetToPackage;
-    QHash<QString, FileInformation> targetToClientPackage;
+    QHash<QString, FileData> targetToPackage;
+    QHash<QString, FileData> targetToClientPackage;
 };
 
 } // namespace info

@@ -8,7 +8,9 @@ enum class ResultCode
 {
     ok,
     timeout,
-    transportError
+    transportError,
+    parseError,
+    noData
 };
 
 } // namespace info

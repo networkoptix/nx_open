@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstract_async_raw_data_provider.h"
+#include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider.h>
 
 namespace nx {
 namespace update {

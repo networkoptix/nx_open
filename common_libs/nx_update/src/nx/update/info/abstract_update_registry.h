@@ -1,16 +1,13 @@
 #pragma once
 
-#include <QtCore>
-
 namespace nx {
 namespace update {
 namespace info {
 
-struct FileInformation
+class UpdateRegistry
 {
-    QString name;
-    qint64 size;
-    QByteArray md5;
+public:
+private:
 };
 
 } // namespace info

@@ -5,17 +5,15 @@
 namespace nx {
 namespace update {
 namespace info {
-namespace detail {
-namespace data_parser {
 
-struct CustomizationInformation
+struct FileData
 {
     QString name;
-    QList<QString> versions;
+    QString url;
+    qint64 size;
+    QByteArray md5;
 };
 
-} // namespace data_parser
-} // namespace detail
 } // namespace info
 } // namespace update
 } // namespace nx

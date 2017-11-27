@@ -3,6 +3,7 @@
 #include <memory>
 #include <QtCore>
 #include <nx/update/info/detail/data_parser/abstract_raw_data_parser.h>
+#include <nx/update/info/result_code.h>
 
 namespace nx {
 namespace update {
@@ -16,10 +17,10 @@ class JsonDataParser: public AbstractRawDataParser
 public:
     virtual ResultCode parseMetaData(
         const QByteArray& rawData,
-        UpdateMetaInformation* outUpdateMetaInformation) override;
-    virtual TargetUpdatesInformation parseVersionData(
+        UpdatesMetaData* outUpdatesMetaData) override;
+    virtual ResultCode parseUpdateData(
         const QByteArray& rawData,
-        TargetUpdatesInformation* outTargetUpdatesInformation) override;
+        UpdateData* outUpdateData) override;
 };
 
 } // namespace impl

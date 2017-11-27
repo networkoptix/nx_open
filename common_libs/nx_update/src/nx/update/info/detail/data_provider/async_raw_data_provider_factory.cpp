@@ -1,6 +1,6 @@
 #include "async_raw_data_provider_factory.h"
 #include "abstract_async_raw_data_provider.h"
-#include "async_http_json_provider.h"
+#include "impl/async_http_json_provider.h"
 
 namespace nx {
 namespace update {

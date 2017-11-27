@@ -8,7 +8,7 @@ AsyncUpdateChecker::AsyncUpdateChecker()
 {
 }
 
-void AsyncUpdateChecker::check(const QString& /*version*/, const QString& /*customization*/, UpdateCheckCallback /*callback*/)
+void AsyncUpdateChecker::check(const QString& /*url*/, UpdateCheckCallback /*callback*/)
 {
 
 }
