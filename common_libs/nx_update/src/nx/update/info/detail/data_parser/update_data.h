@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore>
+#include <utils/common/software_version.h>
 #include <nx/update/info/file_data.h>
 
 namespace nx {
@@ -9,7 +10,7 @@ namespace info {
 
 struct UpdateData
 {
-    QString version;
+    QnSoftwareVersion version;
     QString cloudHost;
     QHash<QString, FileData> targetToPackage;
     QHash<QString, FileData> targetToClientPackage;

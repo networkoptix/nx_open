@@ -36,6 +36,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     (current_release)(updates_prefix)(release_notes)(description)(releases))
 
 const static QString kAlternativesServersKey = "__info";
+const static QString kVersionKey = "version";
+const static QString kCloudHostKey = "cloudHost";
+const static QString kServerPackagesKey = "packages";
+const static QString kClientPackagesKey = "clientPackages";
 
 class MetaDataParser
 {
@@ -82,7 +86,6 @@ private:
 
         NX_ERROR(this, "Alternative server list deserialization failed");
         m_ok = false;
-        return;
     }
 
     void parseCustomizationData()
@@ -137,7 +140,148 @@ private:
 class UpdateDataParser
 {
 public:
+    UpdateDataParser(const QJsonObject& topLevelObject):
+        m_topLevelObject(topLevelObject)
+    {
+        NX_ASSERT(!topLevelObject.isEmpty());
+        if (topLevelObject.isEmpty())
+        {
+            NX_WARNING(this, "Top level JSON is empty");
+            m_ok = false;
+            return;
+        }
+
+        parseVersionAndCloudHost();
+        parsePackages(kServerPackagesKey);
+        parsePackages(kClientPackagesKey);
+    }
+
+    bool ok() const
+    {
+        return m_ok;
+    }
+
+    UpdateData take()
+    {
+        return std::move(m_updateData);
+    }
+
 private:
+    enum class PackageType
+    {
+        server,
+        client
+    };
+
+    QJsonObject m_topLevelObject;
+    bool m_ok = true;
+    UpdateData m_updateData;
+
+    void parseVersionAndCloudHost()
+    {
+        if (!m_ok)
+            return;
+
+        m_updateData.version = QnSoftwareVersion(parseString(kVersionKey));
+        m_updateData.cloudHost = parseString(kCloudHostKey);
+    }
+
+    QString parseString(const QString& key)
+    {
+        QString result;
+        if (QJson::deserialize(m_topLevelObject, key, &result))
+            return result;
+
+        NX_ERROR(this, lm("%1 deserialization failed").args(key));
+        m_ok = false;
+
+        return result;
+    }
+
+    void parsePackages(const QString& key)
+    {
+        if (!m_ok)
+            return;
+
+        QJsonObject::const_iterator it = m_topLevelObject.find(key);
+        if (it == m_topLevelObject.constEnd())
+        {
+            NX_ERROR(this, lm("Failed to find %1").args(key));
+            m_ok = false;
+            return;
+        }
+
+        if (key == kServerPackagesKey)
+        {
+            parsePackagesObject(PackageType::server, it.value().toObject());
+            return;
+        }
+
+        parsePackagesObject(PackageType::client, it.value().toObject());
+    }
+
+    void parsePackagesObject(PackageType packageType, QJsonObject jsonObject)
+    {
+        if (!m_ok)
+            return;
+
+        if (jsonObject.isEmpty())
+        {
+            NX_WARNING(
+                this,
+                lm("No targets OS in packages for %1").args(packageTypeToString(packageType)));
+            return;
+        }
+
+        QJsonObject::const_iterator it = jsonObject.constBegin();
+        for (; it != jsonObject.constEnd(); ++it)
+            parseOsObject(packageType, it.key(), it.value().toObject());
+    }
+
+    QString packageTypeToString(PackageType packageType)
+    {
+        switch (packageType)
+        {
+        case PackageType::server: return "server";
+        case PackageType::client: return "client";
+        }
+    }
+
+    void parseOsObject(PackageType packageType, const QString& osTitle, const QJsonObject& osObject)
+    {
+        if (!m_ok)
+            return;
+
+
+    }
+
+    void parseFileDataObjects(PackageType packageType)
+    {
+        if (!m_ok)
+            return;
+
+        QJsonObject::const_iterator it = m_topLevelObject.constBegin();
+        for (; it != m_topLevelObject.constEnd(); ++it)
+            parseFileDataObj(it.key(), packageType);
+    }
+
+    void parseFileDataObj(const QString& key, PackageType packageType)
+    {
+        if (!m_ok)
+            return;
+
+        FileData fileData;
+        if (!QJson::deserialize(m_topLevelObject, key, &fileData))
+        {
+            NX_ERROR(this, lm("FileData json parsing failed: %1").args(key));
+            m_ok = false;
+            return;
+        }
+
+        CustomizationData customizationData = dataFromInfo(key, std::move(customizationInfo));
+        m_updatesMetaData.customizationDataList.append(customizationData);
+
+    }
 };
 
 } // namespace
