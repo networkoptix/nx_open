@@ -118,7 +118,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     {
         QnMutexLocker lock(&m_discoveryMutex);
-        // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
+        int foreignResourceIndex = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
+        while (m_tmpForeignResources.size() <= foreignResourceIndex)
+            m_tmpForeignResources.push_back(ResourceList());
+        m_tmpForeignResources[foreignResourceIndex].clear();
+
+        // Check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras.
         for (auto itr = resources.begin(); itr != resources.end();)
         {
             QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
@@ -129,10 +134,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
-                int index = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
-                while (m_tmpForeignResources.size() <= index)
-                    m_tmpForeignResources.push_back(ResourceList());
-                m_tmpForeignResources[index].insert(camRes->getUniqueId(), camRes);
+                m_tmpForeignResources[foreignResourceIndex].insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
             else {
