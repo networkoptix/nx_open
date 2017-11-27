@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <nx/update/info/detail/data_parser/raw_data_parser_factory.h>
 #include <nx/update/info/detail/data_parser/impl/json_data_parser.h>
@@ -16,7 +17,7 @@ namespace detail {
 namespace data_parser {
 namespace test {
 
-class JsonDataParser: public ::testing::Test
+class MetaDataParser: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
@@ -37,7 +38,6 @@ protected:
         thenCustomizationDataShouldBeCorrect();
     }
 
-
 private:
     AbstractRawDataParserPtr m_parser;
     RawDataParserFactory m_parserFactory;
@@ -54,10 +54,33 @@ private:
     void thenCustomizationDataShouldBeCorrect()
     {
         ASSERT_EQ(29, m_updatesMetaData.customizationDataList.size());
+        checkCustomizationContent("digitalwatchdog", 8, "17.2.3.15624");
+        checkCustomizationContent("win4net", 4, "2.5.0.11376");
+        checkCustomizationContent("cox", 4, "17.2.3.15624");
+    }
+
+    void checkCustomizationContent(
+        const QString& customizationName,
+        int versionsCount,
+        const QString& lastVersion)
+    {
+        auto customizationIt = std::find_if(
+            m_updatesMetaData.customizationDataList.cbegin(),
+            m_updatesMetaData.customizationDataList.cend(),
+            [&customizationName](const CustomizationData& data)
+            {
+                return data.name == customizationName;
+            });
+
+        ASSERT_NE(m_updatesMetaData.customizationDataList.cend(), customizationIt);
+        ASSERT_EQ(versionsCount, (int) customizationIt->versions.size());
+
+        const auto& versions = customizationIt->versions;
+        ASSERT_EQ(QnSoftwareVersion(lastVersion), versions[versions.size() - 1]);
     }
 };
 
-TEST_F(JsonDataParser, MetaDataParsedCorrectly)
+TEST_F(MetaDataParser, MetaDataParsedCorrectly)
 {
     whenTestMetaDataParsed();
     thenUpdatesMetaDataShouldBeCorrect();

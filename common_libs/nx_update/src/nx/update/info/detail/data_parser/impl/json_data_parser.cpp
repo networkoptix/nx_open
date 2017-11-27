@@ -128,6 +128,7 @@ private:
         {
             customizationData.versions.append(releasesIt.value());
         }
+        std::sort(customizationData.versions.begin(), customizationData.versions.end());
 
         return customizationData;
     }
