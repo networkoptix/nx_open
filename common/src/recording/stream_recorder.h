@@ -133,6 +133,14 @@ public:
 
     void setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler);
 
+    int64_t lastFileSize() const;
+
+    void setRecordingBounds(
+        const std::chrono::microseconds& startTime,
+        const std::chrono::microseconds& endTime);
+
+    void setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler);
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);

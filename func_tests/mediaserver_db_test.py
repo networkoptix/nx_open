@@ -12,16 +12,13 @@
    All necessary files are on the rsync://noptix.enk.me/buildenv/test
 '''
 
-import abc
-import logging
-import pytest
 import os
 import time
-import json
-from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-import server_api_data_generators as generator
 
+import pytest
+
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str
 
 SERVER_CONFIG = dict(
     one=SimpleNamespace(
@@ -95,11 +92,6 @@ def assert_jsons_are_equal(json_one, json_two, json_name):
             assert_jsons_are_equal(json_one[i], json_two[i], entity_name)
     else:
         assert json_one == json_two, json_name
-
-
-def store_json_data(filepath, json_data):
-    with open(filepath, 'wb') as f:
-        json.dump(json_data, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def wait_until_servers_have_same_full_info(one, two):

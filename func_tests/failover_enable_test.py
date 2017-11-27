@@ -6,13 +6,14 @@
   https://networkoptix.testrail.net/index.php?/suites/view/5&group_by=cases:section_id&group_id=13&group_order=asc
 '''
 
-import pytest
-import time
 import logging
-from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str, str_to_bool
+import time
+
+import pytest
+
 import server_api_data_generators as generator
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str, str_to_bool
 
 FAILOVER_SWITCHING_PERIOD_SEC = 4*60
 

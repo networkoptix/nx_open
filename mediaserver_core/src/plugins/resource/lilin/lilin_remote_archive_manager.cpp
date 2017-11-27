@@ -32,6 +32,8 @@ static const QString kDeleteOkResponse("del OK");
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
 static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
+static const std::chrono::minutes kMaxChunkDuration(1);
+
 } // namespace
 
 using namespace nx::core::resource;
@@ -46,13 +48,15 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
     int64_t startTimeMs,
     int64_t endTimeMs)
 {
+    using namespace std::chrono;
+
     auto dirs = getDirectoryList();
 
     std::vector<QString> files;
     for (const auto& dir : dirs)
         fetchFileList(dir, &files);
 
-    auto driftSeconds = m_resource->getTimeDrift();
+    auto driftMs = m_resource->getTimeDrift();
     auto fileCount = files.size();
     for (auto i = 0; i < files.size(); ++i)
     {
@@ -70,19 +74,23 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
                 continue;
         }
 
-        const int64_t kMillisecondsInMinute = 60000;
-
-        auto duration = nextChunkStartMs
+        auto durationMs = nextChunkStartMs
             ? nextChunkStartMs.get() - currentChunkStartMs.get()
-            : kMillisecondsInMinute;
+            : duration_cast<milliseconds>(kMaxChunkDuration).count();
 
         outArchiveEntries->emplace_back(
             files[i],
-            currentChunkStartMs.get() - driftSeconds,
-            duration);
+            currentChunkStartMs.get() - driftMs,
+            durationMs);
     }
 
     return true;
+}
+
+void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
+    std::function<void(const std::vector<RemoteArchiveEntry>&)> /*callback*/)
+{
+    // Do nothing.
 }
 
 void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(

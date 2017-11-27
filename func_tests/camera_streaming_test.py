@@ -1,6 +1,7 @@
+import json
 import logging
 import time
-import json
+
 import pytest
 
 log = logging.getLogger(__name__)

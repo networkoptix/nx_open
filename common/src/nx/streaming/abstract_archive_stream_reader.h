@@ -5,6 +5,8 @@
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/streaming/abstract_navigator.h>
 
+#include <nx/utils/move_only_func.h>
+
 class QnTimePeriod;
 class QnTimePeriodList;
 class AbstractArchiveIntegrityWatcher;
@@ -97,7 +99,7 @@ public:
     void setEnabled(bool value) { m_enabled = value; }
     virtual void setEndOfPlaybackHandler(std::function<void()> /*handler*/) {}
     virtual void setErrorHandler(std::function<void(const QString& errorString)> /*handler*/) {}
-
+    void setNoDataHandler(nx::utils::MoveOnlyFunc<void()> noDataHandler);
 protected:
 
     /**
@@ -124,6 +126,7 @@ protected:
     qint64 m_needToSleep;
     QnAbstractArchiveDelegate* m_delegate;
     QnAbstractNavigator* m_navDelegate;
+    nx::utils::MoveOnlyFunc<void()> m_noDataHandler;
 private:
     bool m_enabled;
 };

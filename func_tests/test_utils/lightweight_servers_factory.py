@@ -1,15 +1,17 @@
 # create lightweight servers (LWS) containers implemented by appserver2_ut with requested number of servers in them
 
-import os.path
-import logging
 import datetime
+import logging
+import os.path
+
 from requests.exceptions import ReadTimeout
-from .template_renderer import TemplateRenderer
+
 from . import utils
-from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
-from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server import Server
+from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
+from .template_renderer import TemplateRenderer
+from .utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +95,7 @@ class LightweightServersInstallation(object):
         self._not_supported()
 
     def get_log_file(self):
-        if self.host.file_exists(self._log_path):
+        if self.host.file_exists(self.log_path_base):
             return self.host.read_file(self.log_path_base + '.log')
         else:
             return None
@@ -110,7 +112,7 @@ class LightweightServer(Server):
         self.internal_ip_address = host.host
         self._state = self._st_started
 
-    def load_system_settings(self):
+    def load_system_settings(self, log_settings=False):
         response = self.rest_api.api.ping.GET()
         self.local_system_id = response['localSystemId']
 

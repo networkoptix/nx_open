@@ -293,7 +293,7 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 
     vms::event::SystemHealthActionPtr action(
         new vms::event::SystemHealthAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
-        serverGuid()));
+            serverGuid()));
 
     auto params = action->getRuntimeParams();
     params.description = lit("Remote archive synchronization has been started for resource %1")
@@ -372,8 +372,6 @@ void EventConnector::at_remoteArchiveSyncProgress(
     qDebug() << "Broadcasting sync progress business action";
     qnEventRuleProcessor->broadcastAction(action);
 }
-
-
 
 void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
     QnSystemHealth::MessageType msgType)
