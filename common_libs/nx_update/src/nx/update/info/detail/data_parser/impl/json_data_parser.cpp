@@ -198,6 +198,8 @@ private:
         return result;
     }
 
+    // TODO: try to generalize object parsing to avoid too many nesting levels!!
+
     void parsePackages(const QString& key)
     {
         if (!m_ok)
