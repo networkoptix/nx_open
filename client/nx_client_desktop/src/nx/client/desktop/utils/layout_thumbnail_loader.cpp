@@ -347,6 +347,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         const auto& resource = item.second;
         const auto& cellRect = data.combinedGeometry;
         const auto rotation = data.rotation;
+        const auto zoomRect = data.zoomRect;
 
         // Cell bounds.
         const QRectF scaledCellRect(
@@ -365,8 +366,6 @@ void LayoutThumbnailLoader::doLoadAsync()
             continue;
         }
 
-        const auto zoomRect = data.zoomRect;
-
         QSize thumbnailSize(0, scaledCellRect.height());
         if (!zoomRect.isEmpty())
             thumbnailSize /= zoomRect.height();
@@ -384,8 +383,12 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, loader, rotation, scaledCellRect, zoomRect](const QImage& tile)
             {
-                d->drawTile(tile, QnGeometry::aspectRatio(loader->sizeHint()),
-                    scaledCellRect, rotation, zoomRect);
+                const auto sourceAr = QnGeometry::aspectRatio(loader->sizeHint());
+                auto aspectRatio = zoomRect.isNull()
+                    ? sourceAr
+                    : sourceAr * QnGeometry::aspectRatio(zoomRect);
+
+                d->drawTile(tile, aspectRatio, scaledCellRect, rotation, zoomRect);
             });
 
         d->data.loaders.push_back(loader);
