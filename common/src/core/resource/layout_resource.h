@@ -87,6 +87,10 @@ public:
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
+    /** Helper to get the actual scene item coordinates of the layout background. */
+    QRect backgroundRect() const;
+    static QRect backgroundRect(const QSize& backgroundSize);
+
     /** Filename of background image on Server */
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);

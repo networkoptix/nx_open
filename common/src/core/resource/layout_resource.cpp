@@ -354,6 +354,18 @@ void QnLayoutResource::setBackgroundSize(QSize size)
     emit backgroundSizeChanged(::toSharedPointer(this));
 }
 
+QRect QnLayoutResource::backgroundRect() const
+{
+    return backgroundRect(backgroundSize());
+}
+
+QRect QnLayoutResource::backgroundRect(const QSize& backgroundSize)
+{
+    const int left = backgroundSize.width() / 2;
+    const int top =  backgroundSize.height() / 2;
+    return QRect(-left, -top, backgroundSize.width(), backgroundSize.height());
+}
+
 /********* Background image id property **********/
 QString QnLayoutResource::backgroundImageFilename() const
 {

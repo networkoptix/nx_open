@@ -7,6 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/client/desktop/utils/layout_background_image_provider.h>
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
@@ -21,6 +22,7 @@ namespace desktop {
 namespace {
 
 static const QMargins kMinIndicationMargins(4, 2, 4, 2);
+static const QSize kBackgroundPreviewSize(200, 200);
 
 // TODO: #vkutin #common Put into utility class/namespace. Get rid of duplicates.
 static inline bool isOdd(int value)
@@ -171,6 +173,24 @@ struct LayoutThumbnailLoader::Private
         emit q->imageChanged(data.image);
     }
 
+    void drawBackground(const QImage& background, const QRectF& targetRect)
+    {
+        if (background.isNull())
+            return;
+
+        const auto loaded = data.image;
+
+        data.image = QImage(loaded.size(), QImage::Format_ARGB32_Premultiplied);
+        data.image.fill(Qt::transparent);
+
+        QPainter painter(&data.image);
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
+        painter.setOpacity(layout->backgroundOpacity());
+        painter.drawImage(targetRect, background, background.rect());
+        painter.setOpacity(1.0);
+        painter.drawImage(0, 0, loaded);
+    }
+
     QPixmap specialPixmap(Qn::ThumbnailStatus status, const QSize& size) const
     {
         QPixmap pixmap(size * data.image.devicePixelRatio());
@@ -301,6 +321,12 @@ void LayoutThumbnailLoader::doLoadAsync()
         validItems << qMakePair(iter.key(),  resource);
     }
 
+    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
+    const auto backgroundRect = d->layout->backgroundRect();
+
+    if (hasBackground)
+        bounding = bounding.united(backgroundRect);
+
     if (bounding.isEmpty())
     {
         d->data.status = Qn::ThumbnailStatus::Loaded;
@@ -340,6 +366,24 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     emit sizeHintChanged(d->data.image.size());
     emit statusChanged(d->data.status);
+
+    if (hasBackground)
+    {
+        auto backgroundLoader = new LayoutBackgroundImageProvider(d->layout,
+            kBackgroundPreviewSize, this);
+        connect(backgroundLoader, &QnImageProvider::imageChanged, this,
+            [this, backgroundRect, xscale, yscale, bounding](const QImage& image)
+            {
+                const QRectF scaledBackgroundRect(
+                    (backgroundRect.left() - bounding.left()) * xscale,
+                    (backgroundRect.top() - bounding.top()) * yscale,
+                    backgroundRect.width() * xscale,
+                    backgroundRect.height() * yscale);
+
+                d->drawBackground(image, scaledBackgroundRect);
+            });
+        backgroundLoader->loadAsync();
+    }
 
     for (const auto& item: validItems)
     {
