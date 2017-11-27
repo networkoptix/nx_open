@@ -61,11 +61,13 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     onStreamReopen();
     m_FrameCnt = 0;
     bool isInitialized = m_resource->isInitialized();
-    if (!isInitialized) {
+    if (!isInitialized)
+    {
         if (m_openStreamResult)
             m_openStreamResult = CameraDiagnostics::InitializationInProgress();
     }
-    else {
+    else
+    {
         m_currentLiveParams = getLiveParams();
         m_openStreamResult = openStreamInternal(isControlRequired, m_currentLiveParams);
         m_needControlTimer.restart();
