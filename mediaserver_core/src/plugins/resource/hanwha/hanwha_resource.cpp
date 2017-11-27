@@ -2553,9 +2553,8 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
         ? kHanwhaPrimaryNxProfileSuffix
         : kHanwhaSecondaryNxProfileSuffix;
 
-    auto appName = QnAppInfo::productNameLong()
-        .mid(0, maxLength - suffix.length())
-        .remove(QRegExp("[^a-zA-Z]"));
+    auto appName = QnAppInfo::productNameLong().splitRef(' ').last().toString()
+        .remove(QRegExp("[^a-zA-Z]")).left(maxLength - suffix.length());
 
     return appName + suffix;
 }
