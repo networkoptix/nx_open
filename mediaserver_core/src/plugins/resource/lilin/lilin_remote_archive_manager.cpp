@@ -93,12 +93,6 @@ void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
     // Do nothing.
 }
 
-void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
-    std::function<void(const std::vector<RemoteArchiveEntry>&)> /*callback*/)
-{
-    // Do nothing.
-}
-
 bool LilinRemoteArchiveManager::fetchArchiveEntry(const QString& entryId, BufferType* outBuffer)
 {
     auto response = doRequest(kChunkDownloadTemplate.arg(entryId), true);

@@ -1260,17 +1260,4 @@ void QnStreamRecorder::setEndOfRecordingHandler(std::function<void()> endOfRecor
     m_endOfRecordingHandler = endOfRecordingHandler;
 }
 
-void QnStreamRecorder::setRecordingBounds(
-    const std::chrono::microseconds& startTime,
-    const std::chrono::microseconds& endTime)
-{
-    m_startRecordingBound = startTime;
-    m_endRecordingBound = endTime;
-}
-
-void QnStreamRecorder::setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler)
-{
-    m_endOfRecordingHandler = endOfRecordingHandler;
-}
-
 #endif // ENABLE_DATA_PROVIDERS
