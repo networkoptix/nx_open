@@ -353,7 +353,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
     auto rtspUri = response.response()[kHanwhaUriProperty];
     *outUrl = m_hanwhaResource->fromOnvifDiscoveredUrl(rtspUri.toStdString(), false);
 
-    if (!m_hanwhaResource->isNvr())
+    if (!m_hanwhaResource->isNvr() && role == Qn::ConnectionRole::CR_Archive)
     {
         QUrl url(*outUrl);
         // This path is not documented, but Samsung SmartViewer uses it.
