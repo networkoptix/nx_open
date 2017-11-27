@@ -68,6 +68,17 @@ DummyMessage
                 title: qsTr("Cannot play any video stream")
                 image: lp("/images/alert_alert.png")
             }
+        },
+        State
+        {
+            name: "noLicenses"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Not enough licenses")
+                image: lp("/images/alert_alert.png")
+            }
         }
+
     ]
 }
