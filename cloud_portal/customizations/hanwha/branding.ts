@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>mailto:support@hanwhasecurity.com</translation>
+      <translation>http://wavevms.com/support</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>support@hanwhasecurity.com</translation>
+      <translation>http://wavevms.com/support</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
