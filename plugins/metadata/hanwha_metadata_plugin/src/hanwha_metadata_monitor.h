@@ -50,13 +50,14 @@ private:
 
 private:
     const Hanwha::DriverManifest& m_manifest;
-    mutable QnMutex m_mutex;
     const QUrl m_url;
     const QAuthenticator m_auth;
+    nx::network::aio::Timer m_timer;
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
+
+    mutable QnMutex m_mutex;
     QMap<QString, Handler> m_handlers;
-    bool m_started = false;
 };
 
 } // namespace plugins

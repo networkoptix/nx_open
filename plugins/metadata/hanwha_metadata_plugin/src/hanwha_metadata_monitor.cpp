@@ -10,15 +10,12 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-namespace {
-    const QString kMonitorUrlTemplate(
-        "http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
+static const QString kMonitorUrlTemplate(
+    "http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
-    const int kDefaultHttpPort = 80;
-
-    const std::chrono::minutes kKeepAliveTimeout(7);
-} // namespace
-
+static const int kDefaultHttpPort = 80;
+static const std::chrono::minutes kKeepAliveTimeout(2);
+static const std::chrono::seconds kUpdateInterval(10);
 
 HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     const Hanwha::DriverManifest& manifest,
@@ -29,7 +26,6 @@ HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     m_url(buildMonitoringUrl(url)),
     m_auth(auth)
 {
-
 }
 
 HanwhaMetadataMonitor::~HanwhaMetadataMonitor()
@@ -39,27 +35,21 @@ HanwhaMetadataMonitor::~HanwhaMetadataMonitor()
 
 void HanwhaMetadataMonitor::startMonitoring()
 {
-    QnMutexLocker lock(&m_mutex);
-    if (m_started)
-        return;
-
-    m_started = true;
-
-    initMonitorUnsafe();
+    m_timer.post([this](){ initMonitorUnsafe(); });
 }
 
 void HanwhaMetadataMonitor::stopMonitoring()
 {
-    nx_http::AsyncHttpClientPtr httpClient;
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_started = false;
+    utils::promise<void> promose;
+    m_timer.post(
+        [this, &promose]()
+        {
+            m_httpClient->pleaseStopSync();
+            promose.set_value();
+        });
 
-        httpClient.swap(m_httpClient);
-    }
-
-    if (httpClient)
-        httpClient->pleaseStopSync(false);
+    promose.get_future().wait();
+    std::cout << "--------------" << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -89,7 +79,10 @@ QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
 
 void HanwhaMetadataMonitor::initMonitorUnsafe()
 {
+    std::cout << "--------------" << __PRETTY_FUNCTION__ << std::endl;
     auto httpClient = nx_http::AsyncHttpClient::create();
+    m_timer.pleaseStopSync();
+    httpClient->bindToAioThread(m_timer.getAioThread());
 
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
@@ -125,13 +118,16 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
     m_contentParser->setNextFilter(std::make_shared<HanwhaBytestreamFilter>(m_manifest, handler));
 
     httpClient->doGet(m_url);
-
     m_httpClient = httpClient;
 }
 
 void HanwhaMetadataMonitor::at_responseReceived(nx_http::AsyncHttpClientPtr httpClient)
 {
-    m_contentParser->setContentType(httpClient->contentType());
+    const auto response = httpClient->response();
+    if (response && response->statusLine.statusCode == nx_http::StatusCode::ok)
+        m_contentParser->setContentType(httpClient->contentType());
+    else
+        at_connectionClosed(httpClient);
 }
 
 void HanwhaMetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient)
@@ -142,11 +138,7 @@ void HanwhaMetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr ht
 
 void HanwhaMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_started)
-        return;
-
-    initMonitorUnsafe();
+    m_timer.start(kUpdateInterval, [this]() { initMonitorUnsafe(); });
 }
 
 } // namespace plugins
