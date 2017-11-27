@@ -34,19 +34,19 @@ def _to_get_param(python_value):
     assert False, "Object of type "
 
 
-class HttpError(RuntimeError):
+class HttpError(Exception):
 
     def __init__(self, server_name, url, status_code, reason, json=None):
-         RuntimeError.__init__(self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
+         super(HttpError, self).__init__(self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
          self.status_code = status_code
          self.reason = reason
          self.json = json
 
 
-class RestApiError(RuntimeError):
+class RestApiError(Exception):
 
     def __init__(self, server_name, url, error, error_string):
-        RuntimeError.__init__(self, 'Server %s at %s REST API request returned error: [%s] %s' % (server_name, url, error, error_string))
+        super(RestApiError, self).__init__(self, 'Server %s at %s REST API request returned error: [%s] %s' % (server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
 
