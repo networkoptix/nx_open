@@ -1,4 +1,5 @@
 # Components Namings
+set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(product.name "VMS Demonstration")
 set(display.product.name "VMS Demonstration")

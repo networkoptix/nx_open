@@ -1,4 +1,5 @@
 # Components Namings
+set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(display.product.name "SK VMS")
 set(display.mobile.name "SK VMS")

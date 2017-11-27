@@ -1,4 +1,5 @@
 set(supported "false")
+set(defaultSkin "dark_blue")
 
 # Components Namings
 set(parent.customization "default")

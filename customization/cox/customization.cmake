@@ -1,5 +1,6 @@
 # Components Namings
 set(parent.customization "default")
+set(defaultSkin "dark_blue")
 set(product.name "Cox Business Security Solutions")
 set(display.product.name "Cox Business Security Solutions")
 set(product.name.short "dwspectrum")

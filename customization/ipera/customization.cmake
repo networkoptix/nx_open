@@ -1,5 +1,6 @@
 # Components Namings
 set(parent.customization "default")
+set(defaultSkin "dark_blue")
 set(product.name "FlyView")
 set(display.product.name "FlyView")
 set(product.name.short "ipera_ru")

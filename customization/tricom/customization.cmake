@@ -1,4 +1,5 @@
 # Components Namings
+set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(display.product.name "Tricom MVSS")
 set(display.mobile.name "MVSS Mobile")
