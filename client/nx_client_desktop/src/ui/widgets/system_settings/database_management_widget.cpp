@@ -1,18 +1,14 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
-#include <QtCore/QFileInfo>
-
 #include <nx/utils/log/log.h>
 
 #include <common/common_module.h>
 
 #include "client/client_settings.h"
-#include "api/app_server_connection.h"
 
-#include <nx/client/desktop/ui/actions/actions.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx_ec/ec_api.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/progress_dialog.h>

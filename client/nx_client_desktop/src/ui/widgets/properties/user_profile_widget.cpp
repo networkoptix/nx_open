@@ -13,6 +13,8 @@
 #include <common/common_module.h>
 #include <helpers/system_helpers.h>
 
+#include <nx_ec/ec_api.h>
+
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/resource_properties/change_user_password_dialog.h>

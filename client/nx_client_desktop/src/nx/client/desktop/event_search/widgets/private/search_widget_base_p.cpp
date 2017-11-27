@@ -1,6 +1,6 @@
 #include "search_widget_base_p.h"
 
-#include <QtCore/QAbstractProxyModel>
+#include <QtCore/QAbstractListModel>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QVBoxLayout>
@@ -8,8 +8,6 @@
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
 
-#include <nx/client/desktop/common/models/subset_list_model.h>
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 
 namespace nx {
@@ -46,41 +44,31 @@ EventSearchWidgetPrivateBase::~EventSearchWidgetPrivateBase()
 {
 }
 
-void EventSearchWidgetPrivateBase::connectEventRibbonToModel(
-    EventRibbon* ribbon,
-    AbstractEventListModel* model,
-    QAbstractProxyModel* proxyModel)
+void EventSearchWidgetPrivateBase::setModel(QAbstractListModel* model)
 {
-    if (proxyModel)
-        ribbon->setModel(new SubsetListModel(proxyModel, 0, QModelIndex(), this));
-    else
-        ribbon->setModel(model);
+    m_ribbon->setModel(model);
 
     const auto fetchMoreIfNeeded =
-        [ribbon, model]()
+        [this]()
         {
-            if (!ribbon->isVisible())
+            if (!m_ribbon->isVisible())
                 return;
 
-            const auto scrollBar = ribbon->scrollBar();
+            const auto scrollBar = m_ribbon->scrollBar();
             if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
                 return;
 
-            if (!model->canFetchMore())
+            if (!m_ribbon->model()->canFetchMore(QModelIndex()))
                 return;
 
-            model->fetchMore();
+            m_ribbon->model()->fetchMore(QModelIndex());
         };
 
-    if (proxyModel)
-    {
-        connect(proxyModel, &QAbstractItemModel::rowsRemoved,
-            this, fetchMoreIfNeeded, Qt::QueuedConnection);
-    }
+    connect(model, &QAbstractItemModel::rowsRemoved,
+        this, fetchMoreIfNeeded, Qt::QueuedConnection);
 
-    connect(ribbon->scrollBar(), &QScrollBar::valueChanged, this, fetchMoreIfNeeded);
-    connect(model, &AbstractEventListModel::fetchFinished, this, fetchMoreIfNeeded);
-    installEventHandler(ribbon, QEvent::Show, this, fetchMoreIfNeeded);
+    connect(m_ribbon->scrollBar(), &QScrollBar::valueChanged, this, fetchMoreIfNeeded);
+    installEventHandler(m_ribbon, QEvent::Show, this, fetchMoreIfNeeded);
 }
 
 } // namespace detail

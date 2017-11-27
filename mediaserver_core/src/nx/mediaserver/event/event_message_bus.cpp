@@ -4,8 +4,11 @@
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
+
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
+
 #include <nx/fusion/serialization/binary.h>
 
 namespace nx {

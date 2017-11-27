@@ -25,12 +25,12 @@ void UnifiedSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camera)
     d->setCamera(camera);
 }
 
-UnifiedSearchListModel::Filter UnifiedSearchListModel::filter() const
+UnifiedSearchListModel::Types UnifiedSearchListModel::filter() const
 {
     return d->filter();
 }
 
-void UnifiedSearchListModel::setFilter(Filter filter)
+void UnifiedSearchListModel::setFilter(Types filter)
 {
     d->setFilter(filter);
 }

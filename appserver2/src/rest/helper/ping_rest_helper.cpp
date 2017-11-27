@@ -1,8 +1,9 @@
 #include "ping_rest_helper.h"
 
 #include <common/common_module.h>
-#include <api/app_server_connection.h>
 #include <api/global_settings.h>
+
+#include <nx_ec/ec_api.h>
 
 namespace rest {
 namespace helper {

@@ -1,18 +1,16 @@
-#ifndef WORKBENCH_VIDEOWALL_HANDLER_H
-#define WORKBENCH_VIDEOWALL_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <nx/utils/uuid.h>
 
-#include <api/app_server_connection.h>
-
-#include <client/client_model_types.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_control_message.h>
 #include <core/resource/videowall_pc_data.h>
+
+#include <nx_ec/ec_api_fwd.h>
+#include <nx_ec/data/api_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -201,5 +199,3 @@ private:
     QnVideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<QnUuidPool> m_uuidPool;
 };
-
-#endif // WORKBENCH_VIDEOWALL_HANDLER_H
