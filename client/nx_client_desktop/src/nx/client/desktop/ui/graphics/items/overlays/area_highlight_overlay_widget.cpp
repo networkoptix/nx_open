@@ -264,6 +264,8 @@ void AreaHighlightOverlayWidget::paint(
     painter->drawRect(QRectF(
         rect.left(), rect.bottom(), rect.width(), widgetSize.height() - rect.bottom()));
 
+    painter->setBrush(Qt::NoBrush);
+
     QPen pen(QBrush(highlightedArea->info.color), 2);
     pen.setJoinStyle(Qt::MiterJoin);
     painter->setPen(pen);
