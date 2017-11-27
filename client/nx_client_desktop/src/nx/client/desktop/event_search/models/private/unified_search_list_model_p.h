@@ -18,7 +18,7 @@ namespace desktop {
 
 class EventSearchListModel;
 class BookmarkSearchListModel;
-class ConcatenationListModel;
+class AnalyticsSearchListModel;
 
 class UnifiedSearchListModel::Private: public QObject
 {
@@ -50,6 +50,7 @@ private:
 
     EventSearchListModel* const m_eventsModel;
     BookmarkSearchListModel* const m_bookmarksModel;
+    AnalyticsSearchListModel* const m_analyticsModel;
 
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     qint64 m_latestTimeMs = -1;

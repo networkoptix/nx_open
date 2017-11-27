@@ -1,6 +1,7 @@
 #include "unified_search_list_model_p.h"
 
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
+#include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/utils/log/assert.h>
@@ -13,9 +14,10 @@ UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
     base_type(),
     q(q),
     m_eventsModel(new EventSearchListModel(q)),
-    m_bookmarksModel(new BookmarkSearchListModel(q))
+    m_bookmarksModel(new BookmarkSearchListModel(q)),
+    m_analyticsModel(new AnalyticsSearchListModel(q))
 {
-    q->setModels({m_eventsModel, m_bookmarksModel});
+    q->setModels({m_eventsModel, m_bookmarksModel, m_analyticsModel});
 }
 
 UnifiedSearchListModel::Private::~Private()
@@ -25,7 +27,8 @@ UnifiedSearchListModel::Private::~Private()
 bool UnifiedSearchListModel::Private::canFetchMore() const
 {
     return m_camera && !m_fetchInProgress
-        && (m_eventsModel->canFetchMore() || m_bookmarksModel->canFetchMore());
+        && (m_eventsModel->canFetchMore() || m_bookmarksModel->canFetchMore()
+            || m_analyticsModel->canFetchMore());
 }
 
 void UnifiedSearchListModel::Private::fetchMore()
@@ -48,6 +51,9 @@ void UnifiedSearchListModel::Private::fetchMore()
             if (m_fetchingTypes.testFlag(Type::bookmarks))
                 m_bookmarksModel->commitPrefetch(m_latestStartTimeMs);
 
+            if (m_fetchingTypes.testFlag(Type::analytics))
+                m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
+
             m_fetchingTypes = Types();
         };
 
@@ -69,6 +75,9 @@ void UnifiedSearchListModel::Private::fetchMore()
 
     if (m_bookmarksModel->prefetchAsync(prefetchCompletionHandler))
         m_fetchingTypes |= Type::bookmarks;
+
+    if (m_analyticsModel->prefetchAsync(prefetchCompletionHandler))
+        m_fetchingTypes |= Type::analytics;
 }
 
 QnVirtualCameraResourcePtr UnifiedSearchListModel::Private::camera() const
@@ -106,6 +115,10 @@ void UnifiedSearchListModel::Private::updateModels()
         : QnVirtualCameraResourcePtr());
 
     m_bookmarksModel->setCamera(m_filter.testFlag(Type::bookmarks)
+        ? m_camera
+        : QnVirtualCameraResourcePtr());
+
+    m_analyticsModel->setCamera(m_filter.testFlag(Type::analytics)
         ? m_camera
         : QnVirtualCameraResourcePtr());
 
