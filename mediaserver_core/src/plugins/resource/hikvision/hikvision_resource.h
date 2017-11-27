@@ -24,11 +24,16 @@ public:
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
     bool findDefaultPtzProfileToken();
+
+    static bool tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
+
+    virtual CameraDiagnostics::Result fetchVideoSourceToken() override;
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,

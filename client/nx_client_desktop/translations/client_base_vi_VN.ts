@@ -1149,6 +1149,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Phóng to</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Thu nhỏ</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Tập trung xa</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Tập trung gần</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Tự động lấy nét</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Thay đổi chế độ dewarping</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6260,6 +6287,10 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Đồng bộ hoá lưu trữ từ xa đã được hoàn tất cho thiết bị sau:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7968,16 +7999,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Xóa layout tour %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreels</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

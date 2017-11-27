@@ -1,7 +1,8 @@
 'Produce file names for storing artifacts'
 
-import os.path
 import logging
+import os.path
+
 from .utils import is_list_inst
 
 log = logging.getLogger(__name__)

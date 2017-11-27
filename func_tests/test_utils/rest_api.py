@@ -7,15 +7,15 @@ which automatically translated to
 But for POST method keyword parameters are translated to json request body.
 '''
 
+import datetime
 import json
 import logging
-import datetime
 import warnings
+
 import requests
 import requests.exceptions
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPDigestAuth
-
+from urllib3.exceptions import InsecureRequestWarning
 
 REST_API_USER = 'admin'
 REST_API_PASSWORD = 'admin'
@@ -34,7 +34,7 @@ class HttpError(RuntimeError):
          self.reason = reason
          self.json = json
 
-        
+
 class ServerRestApiError(RuntimeError):
 
     def __init__(self, server_name, url, error, error_string):

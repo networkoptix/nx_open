@@ -16,8 +16,8 @@ class QnLayoutNameDialog: public QnSessionAwareButtonBoxDialog {
 
     typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent = NULL);
-    QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent = NULL);
+    QnLayoutNameDialog(const QString &caption, const QString &text, const QString &name, QDialogButtonBox::StandardButtons buttons, QWidget *parent);
+    QnLayoutNameDialog(QDialogButtonBox::StandardButtons buttons, QWidget *parent);
 
     virtual ~QnLayoutNameDialog();
 

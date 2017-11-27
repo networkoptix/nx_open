@@ -1151,6 +1151,33 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Zoom be</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Zoom ki</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Fókusz távoli</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Fókusz közeli</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autófókusz</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Dewarping mód változtatása</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6329,6 +6356,10 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>A rögzített videók távoli szinkronizálása befejeződött a következő eszközön:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -8075,16 +8106,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>%1 elrendezés túra törlése?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>%1 showreel</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

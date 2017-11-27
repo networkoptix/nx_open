@@ -42,7 +42,7 @@ if(WINDOWS)
     set(_withTrayTool ON)
 endif()
 
-if("${platform}" STREQUAL "edge1")
+if("${box}" STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 

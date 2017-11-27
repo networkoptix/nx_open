@@ -56,7 +56,7 @@ protected:
     virtual void updateValuesFromSettings(
             QSettings* settings, const QList<int>& ids) override;
     virtual QVariant readValueFromSettings(
-            QSettings* settings, int id, const QVariant& defaultValue) override;
+            QSettings* settings, int id, const QVariant& defaultValue) const override;
     virtual void writeValueToSettings(
             QSettings* settings, int id, const QVariant& value) const override;
     virtual UpdateStatus updateValue(int id, const QVariant& value) override;

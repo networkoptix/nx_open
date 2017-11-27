@@ -1150,6 +1150,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Acercar el Zoom</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Alejar el Zoom</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Enfocar lejos</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Enfocar cerca</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Enfoque automático</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Cambiar el modo de Dewarping</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6328,6 +6355,10 @@ a %1</translation>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Se ha terminado la sincronización de archivos remotos para el siguiente dispositivo:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -8074,16 +8105,16 @@ a %1</translation>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>¿Desea eliminar el diseño de gira %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

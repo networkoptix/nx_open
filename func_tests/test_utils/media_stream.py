@@ -1,16 +1,17 @@
-import os
+import cv2
 import logging
-import time
-from datetime import datetime, timedelta
-import struct
 import math
+import os
+import struct
+import time
 import urllib
 import urlparse
+from datetime import datetime, timedelta
+
 import requests
 from requests.auth import HTTPDigestAuth
-import cv2
-from .utils import datetime_utc_to_timestamp
 
+from .utils import datetime_utc_to_timestamp
 
 log = logging.getLogger(__name__)
 

@@ -128,7 +128,7 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
 }
 
 QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
-{ 
+{
     QList<QByteArray> params;
     params << QByteArray("NAME=").append(value.name);
     params << QByteArray("SERIAL=").append(value.key);

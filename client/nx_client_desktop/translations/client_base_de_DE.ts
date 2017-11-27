@@ -1150,6 +1150,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Heranzoomen</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Herauszoomen</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Fokus fern</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Fokus nah</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autofokus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Ändern des Dewarping-Modus</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6326,6 +6353,10 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Die Remote-Archivsynchronisation wurde für folgendes Gerät abgeschlossen:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -8072,16 +8103,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Layout-Tour %1 löschen?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Demoband</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Demoband %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

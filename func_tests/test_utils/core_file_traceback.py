@@ -1,8 +1,8 @@
+import datetime
 import os
 import os.path
-import datetime
-from .template_renderer import TemplateRenderer
 
+from .template_renderer import TemplateRenderer
 
 GDB_TIMEOUT = datetime.timedelta(minutes=10)  # Error in gdb commands cause gdb to not quit
 WORK_DIR = '/tmp/gdb-extract-tb'

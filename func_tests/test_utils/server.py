@@ -3,28 +3,26 @@
 Allows working with servers from functional tests - start/stop, setup, configure, access rest api, storage, etc.
 '''
 
-import os.path
-import logging
 import base64
-import uuid
-import urllib
-import hashlib
-import time
 import datetime
-import calendar
-import pytz
-import tzlocal
-import requests.exceptions
-import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
-from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
-from .cloud_host import CloudHost
-from .camera import make_schedule_task, Camera, SampleMediaFile
-from .media_stream import open_media_stream
-from .host import Host
-from .cloud_host import CloudHost
+import hashlib
+import logging
+import os.path
+import time
+import urllib
+import uuid
 
+import pytest
+import pytz
+import requests.exceptions
+
+from .camera import make_schedule_task, Camera, SampleMediaFile
+from .cloud_host import CloudAccount
+from .host import Host
+from .media_stream import open_media_stream
+from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, ServerRestApi
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
+from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -69,17 +67,17 @@ def generate_auth_key(method, user, password, nonce, realm):
 class ServerConfig(object):
 
     def __init__(self, name, start=True, setup=True, leave_initial_cloud_host=False,
-                 box=None, config_file_params=None, setup_settings=None, setup_cloud_host=None,
+                 box=None, config_file_params=None, setup_settings=None, setup_cloud_account=None,
                  http_schema=None, rest_api_timeout=None):
         assert name, repr(name)
         assert type(setup) is bool, repr(setup)
         assert config_file_params is None or isinstance(config_file_params, dict), repr(config_file_params)
         assert setup_settings is None or isinstance(setup_settings, dict), repr(setup_settings)
-        assert setup_cloud_host is None or isinstance(setup_cloud_host, CloudHost), repr(setup_cloud_host)
+        assert setup_cloud_account is None or isinstance(setup_cloud_account, CloudAccount), repr(setup_cloud_account)
         assert http_schema in [None, 'http', 'https'], repr(http_schema)
         self.name = name
         self.start = start
-        self.setup = setup  # setup as local system if setup_cloud_host is None, to cloud if it is set
+        self.setup = setup  # setup as local system if setup_cloud_account is None, to cloud if it is set
         # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
         # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
         # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
@@ -88,7 +86,7 @@ class ServerConfig(object):
         self.box = box  # VagrantBox or None
         self.config_file_params = config_file_params  # dict or None
         self.setup_settings = setup_settings or {}  # dict
-        self.setup_cloud_host = setup_cloud_host  # CloudHost or None
+        self.setup_cloud_account = setup_cloud_account  # CloudAccount or None
         self.http_schema = http_schema or DEFAULT_HTTP_SCHEMA  # 'http' or 'https'
         self.rest_api_timeout = rest_api_timeout
 
@@ -112,9 +110,7 @@ class Server(object):
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
-        self.user = REST_API_USER
-        self.password = REST_API_PASSWORD
-        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password, rest_api_timeout)
+        self.rest_api = ServerRestApi(self.title, self.rest_api_url, REST_API_USER, REST_API_PASSWORD, rest_api_timeout)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
@@ -128,6 +124,14 @@ class Server(object):
 
     def __str__(self):
         return '%r@%s' % (self.name, self.rest_api_url)
+
+    @property
+    def user(self):
+        return self.rest_api.user
+
+    @property
+    def password(self):
+        return self.rest_api.password
 
     @property
     def internal_url(self):
@@ -237,12 +241,6 @@ class Server(object):
         self.internal_ip_address = iflist[-1]['ipAddr']
         self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
-    def _safe_api_call(self, fn, *args, **kw):
-        try:
-            return fn(*args, **kw)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            return None
-
     def get_system_settings(self):
         response = self.rest_api.api.systemSettings.GET()
         return response['settings']
@@ -266,26 +264,44 @@ class Server(object):
         if was_started:
             self.start_service()
 
-    def restart(self, timeout=30):
-        t = time.time()
-        uptime = self.get_uptime()
+    def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
+        old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
+        log.info("Runtime id before restart: %s", old_runtime_id)
+        started_at = datetime.datetime.now(pytz.utc)
         self.rest_api.api.restart.GET()
-        while time.time() - t < timeout:
-            new_uptime = self._safe_api_call(self.get_uptime)
-            if new_uptime and new_uptime < uptime:
-                self.load_system_settings(log_settings=True)
-                return
-            log.debug('Server did not restart yet, waiting...')
-            time.sleep(0.5)
-        assert False, 'Server %r did not restart in %s seconds' % (self, timeout)
+        sleep_time_sec = timeout.total_seconds() / 100.
+        failed_connections = 0
+        while True:
+            try:
+                response = self.rest_api.api.moduleInformation.GET()
+            except requests.ConnectionError as e:
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't started, caught %r, timed out." % e
+                log.debug("Expected failed connection: %r", e)
+                failed_connections += 1
+                time.sleep(sleep_time_sec)
+                continue
+            new_runtime_id = response['runtimeId']
+            if new_runtime_id == old_runtime_id:
+                if failed_connections > 0:
+                    assert False, "Runtime id remains same after failed connections."
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't stopped, timed out."
+                log.warning("Server hasn't stopped yet, delay is acceptable.")
+                time.sleep(sleep_time_sec)
+                continue
+            log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
+            break
 
     def make_core_dump(self):
         self._server_ctl.make_core_dump()
         self._state = self._st_stopped
 
-    def get_uptime(self):
-        response = self.rest_api.api.statistics.GET()
-        return datetime.timedelta(seconds=int(response['uptimeMs'])/1000.)
+    def get_time(self):
+        started_at = datetime.datetime.now(pytz.utc)
+        time_response = self.rest_api.ec2.getCurrentTime.GET()
+        received = datetime.datetime.fromtimestamp(float(time_response['value']) / 1000., pytz.utc)
+        return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
 
     def reset_config(self, **kw):
         self._installation.reset_config(**kw)
@@ -306,18 +322,18 @@ class Server(object):
         self.rest_api.api.setupLocalSystem.POST(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
         self.load_system_settings(log_settings=True)
 
-    def setup_cloud_system(self, cloud_host, **kw):
-        assert isinstance(cloud_host, CloudHost), repr(cloud_host)
-        bind_info = cloud_host.bind_system(self.name)
+    def setup_cloud_system(self, cloud_account, **kw):
+        assert isinstance(cloud_account, CloudAccount), repr(cloud_account)
+        bind_info = cloud_account.bind_system(self.name)
         setup_response = self.rest_api.api.setupCloudSystem.POST(
             systemName=self.name,
             cloudAuthKey=bind_info.auth_key,
             cloudSystemID=bind_info.system_id,
-            cloudAccountName=cloud_host.user,
+            cloudAccountName=cloud_account.user,
             timeout=datetime.timedelta(minutes=5),
             **kw)
         settings = setup_response['settings']
-        self.set_user_password(cloud_host.user, cloud_host.password)
+        self.set_user_password(cloud_account.user, cloud_account.password)
         self.load_system_settings(log_settings=True)
         assert self.settings['systemName'] == self.name
         return settings
@@ -371,9 +387,7 @@ class Server(object):
 
     def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
-        self.user = user
-        self.password = password
-        self.rest_api.set_credentials(self.user, self.password)
+        self.rest_api.set_credentials(user, password)
         if self.is_started():
             self._wait_for_credentials_accepted()
 
@@ -465,11 +479,6 @@ class Storage(object):
         self.host = host
         self.dir = dir
         self.timezone = timezone or host.get_timezone()
-
-    def cleanup(self):
-        self.host.run_command(['rm', '-rf',
-                               os.path.join(self.dir, 'low_quality'),
-                               os.path.join(self.dir, 'hi_quality')])
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)

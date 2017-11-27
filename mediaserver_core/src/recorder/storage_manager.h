@@ -78,8 +78,19 @@ public:
     void addStorage(const QnStorageResourcePtr &storage);
 
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr &netResource, const QString& prefix, const QnStorageResourcePtr& storage);
-    bool fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
-    bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
+    bool fileStarted(
+        const qint64& startDateMs,
+        int timeZone,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider* provider,
+        bool sideRecorder = false);
+
+    bool fileFinished(
+        int durationMs,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider* provider,
+        qint64 fileSize,
+        qint64 startTimeMs = AV_NOPTS_VALUE);
 
     /*
     * convert UTC time to folder name. Used for server archive catalog.

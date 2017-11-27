@@ -1,143 +1,143 @@
 {
-  "language_name":"繁体中文",
-  "dialogs":{
-    "okButton":"确定",
-    "openLink":"访问此链接",
-    "openLinkWithTitle":"到 {{title}} 访问此链接"
-  },
-  "setup":{
-    "createAccount":"创建帐户",
-    "errorNoHDD":"此设备只在硬盘上工作。<br>请关闭设备，然后安装硬盘。",
-    "errorNoNetwork":"这个设备需要网络连接才能工作。<br>请将它连接到本地网络或互联网"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"密码必须至少 为8 个字符长",
-    "requiredMessage":"允许只拉丁文字母、 数字和符号键盘。",
-    "weakMessage":"密码应该包含不同类型的符号。",
-    "strongMessage":"强密码 ！",
-    "commonMessage":"此密码是在最受欢迎的常用密码列表"
-  },
-  "settings":{
-    "tabs":{
-      "server":"服务器",
-      "system":"系统",
-      "device":"设备"
+    "language_name": "LANGUAGE_NAME",
+    "dialogs": {
+        "okButton": "确定",
+        "openLink": "访问此链接",
+        "openLinkWithTitle": "到 {{title}} 访问此链接"
     },
-    "confirmRestart":"重新启动服务器吗？",
-    "couldntCheckInternet":"不能检查云连接",
-    "confirmRestoreDefault":"清除数据库和设置？此过程将花费一些时间和会之后重新启动服务器。",
-    "confirmRestoreDefaultTitle":"恢复出厂默认值",
-    "unexpectedError":"失败︰ 发生了意外的错误",
-    "connnetionError":"连接错误",
-    "wrongPassword":"错误的密码。",
-    "error":"错误: ",
-    "restartNeeded":"保存的更改。重新启动服务器以应用新设置吗？",
-    "settingsSaved":"设置已保存",
-    "confirmHardwareRestart":"重新启动服务器操作系统？",
-    "confirmRestoreSettings":"还原所有服务器设置吗？档案将被保存，但网络设置将被重置。",
-    "confirmRestoreSettingsNotNetwork":"重置服务器配置？将保存存档和网络设置。",
-    "unavailable":"不可用",
-    "unsafePortConfirm":"端口号小于 1025 是不安全的。服务器可能不可访问。是否继续？",
-    "confirmDisconnectFromCloud":"系统断开 {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 云的所有用户将被都删除。</span><br><br>系统将可通过本地网络的本地管理员帐户。",
-    "confirmDisconnectFromCloudAction":"断开连接",
-    "disconnectedFromCloudSuccess":"系统已成功从{{CLOUD_NAME}} 断开连接",
-    "confirmDisconnectFromSystem":"从当前系统分离服务器",
-    "confirmDisconnectFromSystemAction":"分离",
-    "disconnectedFromSystemSuccess":"服务器已成功地从系统分离",
-    "connectedSuccess":"系统已成功连接",
-    "createLocalOwnerTitle":"创建本地管理员",
-    "confirmChangePassword":"更改管理员密码",
-    "confirmChangePasswordTitle":"更改系统密码吗？对于某些服务器会影响用户 '管理员' 和根用户密码",
-    "confirmChangePasswordAction":"保存新密码",
-    "nx1ControlHint":"客户端应用程序已启动。使用键盘/鼠标或移动应用程序来控制它。"
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"健康监测",
-      "storage":"存储设备",
-      "log":"日志"
-    }
-  },
-  "join":{
-    "systemIsUnreacheble":"系统无法访问或不存在。",
-    "incorrectCurrentPassword":"当前密码不正确。",
-    "incorrectRemotePassword":"登录名或密码不正确。",
-    "incompatibleVersion":"系统是遥不可及，不存在或有不兼容的版本。",
-    "wrongUrl":"无法连接到指定的服务器。",
-    "newSystemError":"不能合并的系统。没有配置远程系统。",
-    "safeMode":"不能合并的系统。远程系统是在安全模式下。",
-    "configError":"不能合并的系统。也许系统之一是在安全模式下。",
-    "cloudError":"不能合并的系统。依赖于系统被连接到云。你需要先断开它。",
-    "cloudBothError":"不能合并的系统。这两个系统连接到云。您需要断开一个第一。",
-    "cloudHostConflict":"不能合并系统，因为服务器构建与不同的云主机",
-    "licenceError":"警告! 您将要合并一个有 Starter license 的系统. 每个系统只能存在一个 Starter license, 所以第二个 Starter license 将被停用. 是否仍要合并?",
-    "connectionFailed":"连接失败︰ ",
-    "unknownError":"未知的错误",
-    "mergeFailed":"合并失败︰ ",
-    "mergeSucceed":"合并成功。",
-    "newSystemDisplayName":"新系统",
-    "incompatibleProtocol":"版本不兼容",
-    "incompatibleCloudHost":"云冲突",
-    "incompatibleCloudState":"云连接"
-  },
-  "login":{
-    "incorrectPassword":"登录名或密码不正确"
-  },
-  "navigaion":{
-    "cannotGetUser":"服务器故障︰ 无法检索当前用户数据"
-  },
-  "offlineDialog":{
-    "serverOffline":"服务器离线"
-  },
-  "restartDialog":{
-    "serverStarting":"启动服务器",
-    "serverRestarting":"服务器正在重新启动 ！",
-    "serverOffline":"服务器离线"
-  },
-  "fileUpload":{
-    "started":"成功更新。它将需要几分钟时间",
-    "upToDate":"更新失败。已安装的提供的版本。",
-    "invalidFile":"更新失败。提供的文件不是有效的更新档案。",
-    "incompatibleSystem":"更新失败。提供的文件被针对另一个系统。",
-    "extractionError":"更新失败。足够的空间来解压缩档案，检查可用的存储。",
-    "installationError":"更新失败。不能执行安装脚本。",
-    "selectFiles":"选择文件"
-  },
-  "advanced":{
-    "free":"可用",
-    "total":"总共",
-    "occupied":"正忙",
-    "reserved":"保留"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} 网页界面"
-  },
-  "common":{
-    "systemOffline":"系统处于离线状态",
-    "cameraLinks":{
-      "copyToClipboard":"复制到剪贴板",
-      "highStream":"高流",
-      "copyDefaultText":"复制",
-      "unknown":"未知的",
-      "lowStream":"低流",
-      "transcoding":"转码",
-      "copyActiveText":"已复制到剪贴板"
+    "setup": {
+        "createAccount": "创建帐户",
+        "errorNoHDD": "此设备只在硬盘上工作。<br>请关闭设备，然后安装硬盘。",
+        "errorNoNetwork": "这个设备需要网络连接才能工作。<br>请将它连接到本地网络或互联网"
     },
-    "searchCamPlaceholder":"搜索",
-    "cameraStates":{
-      "noFormat":"此浏览器或设备不支持本相机的视频播放。",
-      "ieWin10":"请使用Microsoft Edge或Google Chrome浏览器。",
-      "iosVideoTooLarge":"iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
-      "unauthorized":"需要身份验证",
-      "ubuntuNX":"此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。",
-      "ieNoWebm":"请为 Ie 安装 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a>。",
-      "flashOrWebmRequired":"请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
-      "noArmSupport":"此浏览器或设备不支持基于ARM的服务器的视频播放。",
-      "error":"错误",
-      "offline":"离线",
-      "noData":"无数据",
-      "flashRequired":"请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频从基于 ARM 的服务器。"
+    "passwordRequirements": {
+        "minLengthMessage": "密码必须至少 为8 个字符长",
+        "requiredMessage": "允许只拉丁文字母、 数字和符号键盘。",
+        "weakMessage": "密码应该包含不同类型的符号。",
+        "strongMessage": "强密码 ！",
+        "commonMessage": "此密码是在最受欢迎的常用密码列表"
+    },
+    "settings": {
+        "tabs": {
+            "server": "服务器",
+            "system": "系统",
+            "device": "设备"
+        },
+        "confirmRestart": "重新启动服务器吗？",
+        "couldntCheckInternet": "不能检查云连接",
+        "confirmRestoreDefault": "清除数据库和设置？此过程将花费一些时间和会之后重新启动服务器。",
+        "confirmRestoreDefaultTitle": "恢复出厂默认值",
+        "unexpectedError": "失败︰ 发生了意外的错误",
+        "connnetionError": "连接错误",
+        "wrongPassword": "错误的密码。",
+        "error": "错误: ",
+        "restartNeeded": "保存的更改。重新启动服务器以应用新设置吗？",
+        "settingsSaved": "设置已保存",
+        "confirmHardwareRestart": "重新启动服务器操作系统？",
+        "confirmRestoreSettings": "还原所有服务器设置吗？档案将被保存，但网络设置将被重置。",
+        "confirmRestoreSettingsNotNetwork": "重置服务器配置？将保存存档和网络设置。",
+        "unavailable": "不可用",
+        "unsafePortConfirm": "端口号小于 1025 是不安全的。服务器可能不可访问。是否继续？",
+        "confirmDisconnectFromCloud": "系统断开 {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 云的所有用户将被都删除。</span><br><br>系统将可通过本地网络的本地管理员帐户。",
+        "confirmDisconnectFromCloudAction": "断开连接",
+        "disconnectedFromCloudSuccess": "系统已成功从{{CLOUD_NAME}} 断开连接",
+        "confirmDisconnectFromSystem": "从当前系统分离服务器",
+        "confirmDisconnectFromSystemAction": "分离",
+        "disconnectedFromSystemSuccess": "服务器已成功地从系统分离",
+        "connectedSuccess": "系统已成功连接",
+        "createLocalOwnerTitle": "创建本地管理员",
+        "confirmChangePassword": "更改管理员密码",
+        "confirmChangePasswordTitle": "更改系统密码吗？对于某些服务器会影响用户 '管理员' 和根用户密码",
+        "confirmChangePasswordAction": "保存新密码",
+        "nx1ControlHint": "客户端应用程序已启动。使用键盘/鼠标或移动应用程序来控制它。"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "健康监测",
+            "storage": "存储设备",
+            "log": "日志"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "系统无法访问或不存在。",
+        "incorrectCurrentPassword": "当前密码不正确。",
+        "incorrectRemotePassword": "登录名或密码不正确。",
+        "incompatibleVersion": "系统是遥不可及，不存在或有不兼容的版本。",
+        "wrongUrl": "无法连接到指定的服务器。",
+        "newSystemError": "不能合并的系统。没有配置远程系统。",
+        "safeMode": "不能合并的系统。远程系统是在安全模式下。",
+        "configError": "不能合并的系统。也许系统之一是在安全模式下。",
+        "cloudError": "不能合并的系统。依赖于系统被连接到云。你需要先断开它。",
+        "cloudBothError": "不能合并的系统。这两个系统连接到云。您需要断开一个第一。",
+        "cloudHostConflict": "不能合并系统，因为服务器构建与不同的云主机",
+        "licenceError": "警告! 您将要合并一个有 Starter license 的系统. 每个系统只能存在一个 Starter license, 所以第二个 Starter license 将被停用. 是否仍要合并?",
+        "connectionFailed": "连接失败︰ ",
+        "unknownError": "未知的错误",
+        "mergeFailed": "合并失败︰ ",
+        "mergeSucceed": "合并成功。",
+        "newSystemDisplayName": "新系统",
+        "incompatibleProtocol": "版本不兼容",
+        "incompatibleCloudHost": "云冲突",
+        "incompatibleCloudState": "云连接"
+    },
+    "login": {
+        "incorrectPassword": "登录名或密码不正确"
+    },
+    "navigaion": {
+        "cannotGetUser": "服务器故障︰ 无法检索当前用户数据"
+    },
+    "offlineDialog": {
+        "serverOffline": "服务器离线"
+    },
+    "restartDialog": {
+        "serverStarting": "启动服务器",
+        "serverRestarting": "服务器正在重新启动 ！",
+        "serverOffline": "服务器离线"
+    },
+    "fileUpload": {
+        "started": "成功更新。它将需要几分钟时间",
+        "upToDate": "更新失败。已安装的提供的版本。",
+        "invalidFile": "更新失败。提供的文件不是有效的更新档案。",
+        "incompatibleSystem": "更新失败。提供的文件被针对另一个系统。",
+        "extractionError": "更新失败。足够的空间来解压缩档案，检查可用的存储。",
+        "installationError": "更新失败。不能执行安装脚本。",
+        "selectFiles": "选择文件"
+    },
+    "advanced": {
+        "free": "可用",
+        "total": "总共",
+        "occupied": "正忙",
+        "reserved": "保留"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} 网页界面"
+    },
+    "common": {
+        "systemOffline": "系统处于离线状态",
+        "cameraLinks": {
+            "copyToClipboard": "复制到剪贴板",
+            "highStream": "高流",
+            "copyDefaultText": "复制",
+            "unknown": "未知的",
+            "lowStream": "低流",
+            "transcoding": "转码",
+            "copyActiveText": "已复制到剪贴板"
+        },
+        "searchCamPlaceholder": "搜索",
+        "cameraStates": {
+            "noFormat": "此浏览器或设备不支持本相机的视频播放。",
+            "ieWin10": "请使用Microsoft Edge或Google Chrome浏览器。",
+            "iosVideoTooLarge": "iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
+            "unauthorized": "需要身份验证",
+            "ubuntuNX": "此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。",
+            "ieNoWebm": "请为 Ie 安装 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a>。",
+            "flashOrWebmRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
+            "noArmSupport": "此浏览器或设备不支持基于ARM的服务器的视频播放。",
+            "error": "错误",
+            "offline": "离线",
+            "noData": "无数据",
+            "flashRequired": "请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频从基于 ARM 的服务器。"
+        }
     }
-  }
 }

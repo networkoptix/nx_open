@@ -1151,6 +1151,33 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Zoom Avant</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Zoom Arrière</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focus Loin</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focus Près</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Auto Focus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Changer Mode Dérouler</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6331,6 +6358,10 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Synchronisation d'archive à distance a été terminée pour le périphérique suivant:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -8077,16 +8108,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Effacer le tour de mise en page %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

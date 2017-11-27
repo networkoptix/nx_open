@@ -175,15 +175,35 @@ void QnStorageDb::startVacuumAsync(Callback callback)
         return;
     }
 
-    if (m_vacuumThread.joinable())
-        m_vacuumThread.join();
+    try
+    {
+        if (m_vacuumThread.joinable())
+            m_vacuumThread.join();
+    }
+    catch (const std::exception& e)
+    {
+        NX_LOG(
+            lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())),
+            cl_logERROR);
+    }
 
-    m_vacuumThread = nx::utils::thread([this, callback]
-                                 {
-                                     m_vacuumThreadRunning = true;
-                                     callback(vacuum());
-                                     m_vacuumThreadRunning = false;
-                                 });
+    try
+    {
+        m_vacuumThread = nx::utils::thread(
+            [this, callback]()
+            {
+                m_vacuumThreadRunning = true;
+                callback(vacuum());
+                m_vacuumThreadRunning = false;
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_LOG(
+            lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())),
+            cl_logERROR);
+        m_vacuumThread = nx::utils::thread();
+    }
 }
 
 bool QnStorageDb::addRecord(const QString& cameraUniqueId,
@@ -369,7 +389,16 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
             .arg(m_dbFileName), cl_logINFO);
 
     if (!vacuum(&result))
-        NX_LOG("[StorageDb] vacuum failed", cl_logWARNING);
+    {
+        NX_LOG(lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
+                .arg(m_storage->getUrl())
+                .arg(m_dbFileName), cl_logWARNING);
+        return result;
+    }
+
+    NX_LOG(lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
+            .arg(m_storage->getUrl())
+            .arg(m_dbFileName), cl_logINFO);
 
     return result;
 }

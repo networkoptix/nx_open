@@ -21,6 +21,10 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <nx/utils/raii_guard.h>
+#include <nx/client/desktop/utils/parameter_helper.h>
+
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
@@ -48,9 +52,6 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
-     delete m_cameraSettingsDialog.data();
-     delete m_serverSettingsDialog.data();
-     delete m_userSettingsDialog.data();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
@@ -60,7 +61,9 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (cameras.isEmpty())
         return;
 
-    QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindow());
+    QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(
+        m_cameraSettingsDialog, parent);
     dialogConstructor.disableAutoFocus();
 
     if (!m_cameraSettingsDialog->setCameras(cameras))
@@ -95,7 +98,10 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(m_serverSettingsDialog, mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindow());
+    QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(
+        m_serverSettingsDialog, parent);
+
     dialogConstructor.disableAutoFocus();
 
     m_serverSettingsDialog->setServer(server);
@@ -109,12 +115,18 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
+    const auto params = menu()->currentParameters(sender());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindow());
+
     if (!m_userSettingsDialog)
-        m_userSettingsDialog = new QnUserSettingsDialog(mainWindow());
+        m_userSettingsDialog = new QnUserSettingsDialog(parent);
+    else
+        DialogUtils::setDialogParent(m_userSettingsDialog, parent);
 
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
     m_userSettingsDialog->forcedUpdate();
+
     m_userSettingsDialog->exec();
 }
 
@@ -130,8 +142,9 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog,
-        mainWindow());
+    const auto parent = nx::utils::extractParentWidget(params, mainWindow());
+    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(
+        m_userSettingsDialog, parent);
 
     // Navigating resource tree, we should not take focus. From System Administration - we must.
     bool force = params.argument(Qn::ForceRole, false);
@@ -147,9 +160,11 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindow());
+
     QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
-    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
+    QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(parent));
     if (!userRoleId.isNull())
         dialog->selectUserRole(userRoleId);
 

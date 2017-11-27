@@ -20,6 +20,12 @@
 #include "recording/time_period.h"
 #include "api/model/recording_stats_reply.h"
 
+extern "C" {
+
+#include <libavutil/avutil.h>
+
+} // extern "C"
+
 class QnTimePeriodList;
 class QnTimePeriod;
 class QnStorageManager;
@@ -131,8 +137,13 @@ public:
         QnServer::StoragePool   role
     );
     //void deserializeTitleFile();
-    void addRecord(const Chunk& chunk);
-    Chunk updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration);
+    void addRecord(const Chunk& chunk, bool sideRecorder = false);
+    Chunk updateDuration(
+        int durationMs,
+        qint64 fileSize,
+        bool indexWithDuration,
+        qint64 startTimeMs = AV_NOPTS_VALUE);
+
     qint64 lastChunkStartTime() const;
     qint64 lastChunkStartTime(int storageIndex) const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);

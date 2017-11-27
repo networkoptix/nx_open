@@ -16,7 +16,7 @@ class QnNotificationSoundManagerDialog: public QnSessionAwareButtonBoxDialog
 
     using base_type = QnSessionAwareButtonBoxDialog;
 public:
-    explicit QnNotificationSoundManagerDialog(QWidget *parent = 0);
+    explicit QnNotificationSoundManagerDialog(QWidget *parent);
     ~QnNotificationSoundManagerDialog();
     private slots:
     void enablePlayButton();

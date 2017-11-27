@@ -436,7 +436,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
     quint16 dri = 0;
     // 2. restart marker header (optional)
-    if (jpegType >= 64 && jpegType <= 127)
+    if (jpegType & 0x40)
     {
         if (bytesLeft < 4)
             return false;
@@ -444,6 +444,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
         curPtr += 4;
         bytesLeft -= 4;
+        jpegType &= ~0x40;
     }
 
     if (fragmentOffset == 0)

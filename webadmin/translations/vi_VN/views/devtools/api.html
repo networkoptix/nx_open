@@ -75,7 +75,7 @@
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
                                             <div class="label label-danger" ng-if="param.proprietary">độc quyền</div>
-                                            <div class="label label-danger" ng-if="param.optional=='false'">yêu cầu</div>
+                                            <div class="label label-danger" ng-if="!param.optional">yêu cầu</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">

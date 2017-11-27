@@ -1151,6 +1151,33 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation type="unfinished">Zoom In</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation type="unfinished">Zoom Out</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation type="unfinished">Focus Far</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation type="unfinished">Focus Near</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation type="unfinished">Auto Focus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation type="unfinished">Change Dewarping Mode</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6267,6 +6294,10 @@ to %1</translation>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7975,16 +8006,16 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation type="unfinished">Delete layout tour %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation type="unfinished">Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation type="unfinished">Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

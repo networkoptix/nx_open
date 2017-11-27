@@ -4,9 +4,10 @@ Functional tests define configuration required for them indirectly (via 'box' fi
 '''
 
 import os.path
-from netaddr import IPNetwork, IPAddress
-from .utils import is_list_inst, quote
 
+from netaddr import IPNetwork
+
+from .utils import is_list_inst, quote
 
 DEFAULT_NATNET1 = '10.10.0/24'
 DEFAULT_PRIVATE_NET = '10.10.1/24'
@@ -30,7 +31,7 @@ class ConfigCommand(object):
 
     def __eq__(self, other):
         if not isinstance(other, ConfigCommand):
-            return false
+            return False
         return (self.function == other.function and
                 self.args == other.args and
                 self.kwargs == other.kwargs)

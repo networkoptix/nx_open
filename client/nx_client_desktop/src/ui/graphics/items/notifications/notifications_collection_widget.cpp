@@ -645,8 +645,18 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         return;
 
     const QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    const QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
+    QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
     NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    if (messageText.isEmpty())
+        return;
+
+    if (action && isRemoteArchiveMessage(message))
+    {
+        auto description = action->getRuntimeParams().description;
+        if (!description.isEmpty())
+            messageText = description;
+    }
+
     if (messageText.isEmpty())
         return;
 
@@ -700,7 +710,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             break;
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
             item->addActionButton(
@@ -763,15 +772,24 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     m_itemsByMessageType.insert(message, item);
 }
 
-void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
+void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message,
+    const QVariant& params)
 {
+    // TODO: remove this hack in VMS-7724
+    if (message == QnSystemHealth::RemoteArchiveSyncStarted)
+    {
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncFinished, params);
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncProgress, params);
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncError, params);
+    }
+
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
 
     if (!resource)
     {
-        for (QnNotificationWidget* item : m_itemsByMessageType.values(message))
+        for (auto item: m_itemsByMessageType.values(message))
             cleanUpItem(item);
 
         return;

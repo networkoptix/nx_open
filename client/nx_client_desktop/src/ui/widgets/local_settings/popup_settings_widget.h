@@ -32,7 +32,7 @@ public:
 
 private:
     QList<nx::vms::event::EventType> watchedEvents() const;
-    quint64 watchedSystemHealth() const;
+    QSet<QnSystemHealth::MessageType> watchedSystemHealth() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;

@@ -286,7 +286,9 @@ void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
     m_dpFactory = dpFactory;
 }
 
-QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const {
+QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
+{
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId() );
     return (*userAttributesLock)->motionRegions;
 }
@@ -297,6 +299,7 @@ QRegion QnSecurityCamResource::getMotionMask(int channel) const {
 
 QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId() );
     const auto& regions = (*userAttributesLock)->motionRegions;
     if (regions.size() > channel)
@@ -307,6 +310,7 @@ QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const
 
 void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int channel)
 {
+    NX_ASSERT(!getId().isNull());
     Qn::MotionType motionType = Qn::MT_Default;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
@@ -325,7 +329,9 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
     emit motionRegionChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList) {
+void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList)
+{
+    NX_ASSERT(!getId().isNull());
     Qn::MotionType motionType = Qn::MT_Default;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
@@ -346,6 +352,7 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
 {
+    NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         if ((*userAttributesLock)->scheduleTasks == scheduleTasks)
@@ -355,7 +362,9 @@ void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleT
     emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
-QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
+QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
+{
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->scheduleTasks;
 }
@@ -611,6 +620,7 @@ Qn::MotionType QnSecurityCamResource::getMotionType() const {
 
 Qn::MotionType QnSecurityCamResource::calculateMotionType() const
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     Qn::MotionType value = (*userAttributesLock)->motionType;
     if (value == Qn::MT_NoMotion)
@@ -622,7 +632,9 @@ Qn::MotionType QnSecurityCamResource::calculateMotionType() const
     return value;
 }
 
-void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
+void QnSecurityCamResource::setMotionType(Qn::MotionType value)
+{
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     (*userAttributesLock)->motionType = value;
 }
@@ -700,6 +712,7 @@ void QnSecurityCamResource::setGroupName(const QString& value) {
 
 void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
 {
+    NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             userAttributesPool(),
@@ -762,41 +775,49 @@ void QnSecurityCamResource::setVendor(const QString& value) {
 
 void QnSecurityCamResource::setMaxDays(int value)
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     (*userAttributesLock)->maxDays = value;
 }
 
 int QnSecurityCamResource::maxDays() const
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->maxDays;
 }
 
 void QnSecurityCamResource::setPreferredServerId(const QnUuid& value)
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     (*userAttributesLock)->preferredServerId = value;
 }
 
 QnUuid QnSecurityCamResource::preferredServerId() const
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->preferredServerId;
 }
 
 void QnSecurityCamResource::setMinDays(int value)
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     (*userAttributesLock)->minDays = value;
 }
 
 int QnSecurityCamResource::minDays() const
 {
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->minDays;
 }
 
-void QnSecurityCamResource::setScheduleDisabled(bool value) {
+void QnSecurityCamResource::setScheduleDisabled(bool value)
+{
+    NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         if ((*userAttributesLock)->scheduleDisabled == value)
@@ -807,7 +828,9 @@ void QnSecurityCamResource::setScheduleDisabled(bool value) {
     emit scheduleDisabledChanged(::toSharedPointer(this));
 }
 
-bool QnSecurityCamResource::isScheduleDisabled() const {
+bool QnSecurityCamResource::isScheduleDisabled() const
+{
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->scheduleDisabled;
 }
@@ -850,12 +873,16 @@ bool QnSecurityCamResource::isLicenseUsed() const {
     return !isScheduleDisabled();
 }
 
-Qn::FailoverPriority QnSecurityCamResource::failoverPriority() const {
+Qn::FailoverPriority QnSecurityCamResource::failoverPriority() const
+{
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->failoverPriority;
 }
 
-void QnSecurityCamResource::setFailoverPriority(Qn::FailoverPriority value) {
+void QnSecurityCamResource::setFailoverPriority(Qn::FailoverPriority value)
+{
+    NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         if ((*userAttributesLock)->failoverPriority == value)
@@ -866,7 +893,9 @@ void QnSecurityCamResource::setFailoverPriority(Qn::FailoverPriority value) {
     emit failoverPriorityChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::setAudioEnabled(bool enabled) {
+void QnSecurityCamResource::setAudioEnabled(bool enabled)
+{
+    NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     (*userAttributesLock)->audioEnabled = enabled;
 }

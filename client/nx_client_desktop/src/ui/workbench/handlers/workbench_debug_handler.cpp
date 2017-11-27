@@ -87,7 +87,7 @@ class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
     typedef QnDialog base_type;
 
 public:
-    QnDebugControlDialog(QWidget *parent = NULL):
+    QnDebugControlDialog(QWidget *parent):
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {

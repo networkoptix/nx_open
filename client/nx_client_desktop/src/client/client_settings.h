@@ -6,6 +6,9 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
+
+#include <health/system_health.h>
+
 #include <utils/common/app_info.h>
 
 #include <core/resource/resource_display_info.h>
@@ -168,8 +171,10 @@ signals:
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
 
-    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id,
+        const QVariant& defaultValue) const override;
+    virtual void writeValueToSettings(QSettings *settings, int id,
+        const QVariant& value) const override;
 
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
@@ -210,7 +215,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
-        QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(QSet<QnSystemHealth::MessageType>, popupSystemHealth, setPopupSystemHealth,      POPUP_SYSTEM_HEALTH,        QnSystemHealth::allVisibleMessageTypes().toSet())
         QN_DECLARE_RW_PROPERTY(bool,                        autoStart,              setAutoStart,               AUTO_START,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        autoLogin,              setAutoLogin,               AUTO_LOGIN,                 false)
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)

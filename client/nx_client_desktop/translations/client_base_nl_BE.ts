@@ -706,11 +706,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Change Cell Aspect Ratio...</source>
-      <translation>Aanpassen van de aspect ratio van de cellen...</translation>
+      <translation>Aanpassen van de aspect ratio van de cameo's...</translation>
     </message>
     <message>
       <source>Change Cell Spacing...</source>
-      <translation>Ruimte tussen cellen wijzigen...</translation>
+      <translation>Ruimte tussen cameo's wijzigen...</translation>
     </message>
     <message>
       <source>None</source>
@@ -1147,6 +1147,33 @@ to view more bookmarks</source>
     <message>
       <source>These tours will become invalid.</source>
       <translation>Deze tours worden ongeldig.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Inzoomen</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Uitzoomen</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focus veraf</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focus dichtbij</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autofocus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Dewarping modus wijzigen</translation>
     </message>
   </context>
   <context>
@@ -6326,6 +6353,10 @@ to %1</source>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Externe archiefsynchronisatie is voltooid voor het volgende apparaat:</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation type="unfinished">Remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -8072,16 +8103,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Layout tour %1 verwijderen?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>
