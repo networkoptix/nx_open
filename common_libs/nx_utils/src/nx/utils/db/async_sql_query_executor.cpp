@@ -134,8 +134,12 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
 
 std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
 {
-    QnMutexLocker lock(&m_mutex);
     return m_queryQueue.size();
+}
+
+void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
+{
+    m_queryQueue.setConcurrentModificationQueryLimit(value);
 }
 
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const

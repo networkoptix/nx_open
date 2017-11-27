@@ -618,6 +618,7 @@ protected:
         constexpr std::size_t transactionCount = 5;
 
         persistentDbManager()->queryExecutor().reserveConnections(transactionCount);
+        persistentDbManager()->queryExecutor().setConcurrentModificationQueryLimit(0 /*no limit*/);
 
         auto dbTransactions = startDbTransactions(transactionCount);
         for (std::size_t i = 0; i < dbTransactions.size(); ++i)
