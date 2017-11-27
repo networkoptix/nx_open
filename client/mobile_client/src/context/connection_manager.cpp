@@ -428,8 +428,11 @@ bool QnConnectionManagerPrivate::doConnect()
             using namespace nx::client::core::helpers;
             if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
             {
+                const auto credentials = qnSettings->savePasswords()
+                    ? QnEncodedCredentials(url)
+                    : QnEncodedCredentials(url.userName(), QString());
+                storeCredentials(localId, credentials);
                 storeConnection(localId, connectionInfo.systemName, url);
-                storeCredentials(localId, QnEncodedCredentials(url));
                 updateWeightData(localId);
                 qnClientCoreSettings->save();
             }

@@ -13,6 +13,7 @@ namespace helpers {
 
 extern const nx::utils::log::Tag kCredentialsLogTag;
 
+void clearSavedPasswords();
 void storeConnection(const QnUuid& localSystemId, const QString& systemName, const QUrl& url);
 void removeConnection(const QnUuid& localSystemId, const QUrl& url = QUrl());
 void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials);

@@ -91,6 +91,7 @@ public:
     Q_INVOKABLE void removeSavedConnection(
         const QString& localSystemId, const QString& userName = QString());
 
+    Q_INVOKABLE void clearSavedPasswords();
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
     Q_INVOKABLE QUrl getLastUsedUrl() const;

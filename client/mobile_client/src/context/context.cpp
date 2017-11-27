@@ -228,6 +228,11 @@ void QnContext::removeSavedConnection(const QString& localSystemId, const QStrin
     qnClientCoreSettings->save();
 }
 
+void QnContext::clearSavedPasswords()
+{
+    nx::client::core::helpers::clearSavedPasswords();
+}
+
 void QnContext::clearLastUsedConnection()
 {
     qnSettings->setLastUsedConnection(LastConnectionData());
