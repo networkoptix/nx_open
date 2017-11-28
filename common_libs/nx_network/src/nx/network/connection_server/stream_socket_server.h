@@ -176,7 +176,7 @@ public:
     virtual ~StreamSocketServer()
     {
         pleaseStopSync(false);
-        closeAllConnections();
+        this->closeAllConnections();
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
