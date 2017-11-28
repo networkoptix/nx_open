@@ -134,22 +134,22 @@ public:
         measureTime(
             []()
             {
-                { static const Tag<0> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<1> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<2> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<3> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<4> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<5> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<6> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<7> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<8> t; NX_DEBUG(&t, "Test message"); }
-                { static const Tag<9> t; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<0> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<1> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<2> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<3> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<4> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<5> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<6> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<7> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<8> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<9> t{0}; NX_DEBUG(&t, "Test message"); }
             });
     }
 };
 
-template<int Id> struct EnabledTag {};
-template<int Id> struct DisabledTag {};
+template<int Id> struct EnabledTag { int i; };
+template<int Id> struct DisabledTag { int i; };
 
 TEST_F(LogMainPerformanceTest, EnabledTag) { measureTimeForTags<EnabledTag>(); }
 TEST_F(LogMainPerformanceTest, DisabledTag) { measureTimeForTags<DisabledTag>(); }

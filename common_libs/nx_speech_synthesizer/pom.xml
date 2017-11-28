@@ -75,6 +75,7 @@
                 </property>
             </activation>
             <properties>
+                <buildLib>sharedlib</buildLib>
                 <rdep.packages><!-- No festival support on edge1. --></rdep.packages>
             </properties>
         </profile>

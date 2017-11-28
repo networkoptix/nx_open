@@ -162,6 +162,7 @@ function(get_dependencies)
 
     if(box STREQUAL "edge1")
         nx_rdep_add_package(cpro-1.0.0)
+        nx_rdep_add_package(gdb)
     endif()
 
     if(haveDesktopClient)

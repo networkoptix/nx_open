@@ -500,7 +500,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         {
             resolutionWorkaroundLogged = true;
             NX_LOG(lit(
-                "[mjpeg_rtp_parser] Camera reports resolution 112 x 1792, assuming 3840 x 2160 (~4K)"),
+                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)"),
                 cl_logDEBUG1);
         }
         width = 3840 / 8;

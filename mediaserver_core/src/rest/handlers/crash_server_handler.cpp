@@ -17,7 +17,7 @@ int QnCrashServerHandler::executeGet(
     const QnRestConnectionProcessor* )
 {
     // Intended to appear both on stderr and in the log.
-    qWarning() << "Received dev-mod-key request";
+    qWarning() << "Received dev-mode-key request";
 
     if( !params.contains(lit("razrazraz")) )
         return nx_http::StatusCode::forbidden;

@@ -191,7 +191,7 @@ copyBuildLibs()
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*; do
+        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*; do
             if [[ $FILE != *.debug ]]; then
                 echo "Copying $(basename "$FILE")"
                 copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
@@ -200,7 +200,7 @@ copyBuildLibs()
     done
     for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"; do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*; do
+        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*; do
             if [ -f "$FILE" ]; then
                 echo "Copying (optional) $(basename "$FILE")"
                 copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
@@ -257,7 +257,7 @@ copyQtLibs()
 copyBins()
 {
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR"
-    local BINS_TO_COPY=(
+    local -r BINS_TO_COPY=(
         mediaserver
         external.dat
     )
@@ -415,6 +415,13 @@ copyBpiSpecificFiles()
     cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$CONF_FILE" "$TOOLS_DIR/"
 }
 
+copyEdge1SpecificFiles()
+{
+    local -r GDB_DIR="$INSTALL_DIR/mediaserver/bin"
+    echo "Copying gdb to $GDB_DIR/"
+    cp -r "$PACKAGES_DIR/gdb"/* "$GDB_DIR/"
+}
+
 # [in] INSTALL_DIR
 # [in] LIB_INSTALL_DIR
 copyAdditionalSysrootFilesIfNeeded()
@@ -460,7 +467,7 @@ copyLibcIfNeeded()
     # then be made in install.sh on the box.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
         echo "Copying libstdc++ (Banana Pi)"
-        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.s"* "$LIB_INSTALL_DIR/"
+        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.so"* "$LIB_INSTALL_DIR/"
     fi
 }
 
@@ -571,6 +578,8 @@ main()
         if [ $LITE_CLIENT = 1 ]; then
             copyBpiLiteClient
         fi
+    elif [ "$BOX" = "edge1" ]; then
+        copyEdge1SpecificFiles
     fi
 
     buildInstaller
