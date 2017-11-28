@@ -24,7 +24,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::Abstra
 
     switch (eventType)
     {
-        /* Green notifications */
+        // Gray notifications.
         case vms::event::cameraMotionEvent:
         case vms::event::cameraInputEvent:
         case vms::event::serverStartEvent:
@@ -32,13 +32,13 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::Abstra
         case vms::event::analyticsSdkEvent:
             return Value::CommonNotification;
 
-        /* Yellow notifications */
+        // Yellow notifications.
         case vms::event::networkIssueEvent:
         case vms::event::cameraIpConflictEvent:
         case vms::event::serverConflictEvent:
             return Value::ImportantNotification;
 
-        /* Red notifications */
+        // Red notifications.
         case vms::event::cameraDisconnectEvent:
         case vms::event::storageFailureEvent:
         case vms::event::serverFailureEvent:
@@ -48,17 +48,18 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::Abstra
         case vms::event::backupFinishedEvent:
         {
             vms::event::EventReason reason = static_cast<vms::event::EventReason>(params.reasonCode);
-            bool isCriticalNotification =
+            const bool failure =
                 reason == vms::event::EventReason::backupFailedChunkError ||
                 reason == vms::event::EventReason::backupFailedNoBackupStorageError ||
                 reason == vms::event::EventReason::backupFailedSourceFileError ||
                 reason == vms::event::EventReason::backupFailedSourceStorageError ||
                 reason == vms::event::EventReason::backupFailedTargetFileError;
 
-            if (isCriticalNotification)
+            if (failure)
                 return Value::CriticalNotification;
 
-            return Value::CommonNotification;
+            const bool success = reason == vms::event::EventReason::backupDone;
+            return success ? Value::SuccessNotification : Value::CommonNotification;
         }
 
         default:
@@ -74,26 +75,29 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::CloudPromo:
             return QnNotificationLevel::Value::OtherNotification;
 
-        /* Green notifications */
-        case QnSystemHealth::ArchiveRebuildFinished:
-        case QnSystemHealth::ArchiveFastScanFinished: //this one is never displayed though
+        // Gray notifications.
+        case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::RemoteArchiveSyncStarted:
-        case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return QnNotificationLevel::Value::CommonNotification;
 
-        /* Yellow notifications */
+        // Green notifications.
+        case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::ArchiveFastScanFinished: //< This one is never displayed though.
+            return QnNotificationLevel::Value::SuccessNotification;
+
+        // Yellow notifications.
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::RemoteArchiveSyncError:
             return QnNotificationLevel::Value::ImportantNotification;
 
-        /* Red notifications */
+        // Red notifications.
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::ArchiveIntegrityFailed:
             return QnNotificationLevel::Value::CriticalNotification;
@@ -114,6 +118,7 @@ QColor QnNotificationLevel::notificationColor(Value level)
         case Value::CommonNotification:    return qnGlobals->notificationColorCommon();
         case Value::ImportantNotification: return qnGlobals->notificationColorImportant();
         case Value::CriticalNotification:  return qnGlobals->notificationColorCritical();
+        case Value::SuccessNotification:   return qnGlobals->notificationColorCommon();
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
             break;
@@ -127,6 +132,7 @@ QColor QnNotificationLevel::notificationTextColor(Value level)
     {
         case Value::ImportantNotification: return qnGlobals->warningTextColor();
         case Value::CriticalNotification:  return qnGlobals->errorTextColor();
+        case Value::SuccessNotification:   return qnGlobals->successTextColor();
         case Value::OtherNotification:     return Qt::white;
         default: return QColor(); //< Undefined and should be treated as default.
     }

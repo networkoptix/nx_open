@@ -277,25 +277,34 @@ int SystemHealthListModel::Private::priority(QnSystemHealth::MessageType message
 
 QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType message)
 {
+    switch (QnNotificationLevel::valueOf(message))
+    {
+        case QnNotificationLevel::Value::CriticalNotification:
+            return qnSkin->pixmap("events/alert_red.png");
+
+        case QnNotificationLevel::Value::ImportantNotification:
+            return qnSkin->pixmap("events/alert_yellow.png");
+
+        case QnNotificationLevel::Value::SuccessNotification:
+            return qnSkin->pixmap("events/success_mark.png");
+
+        default:
+            break;
+    }
+
     switch (message)
     {
+        case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::EmailIsEmpty:
+        case QnSystemHealth::UsersEmailIsEmpty:
+        case QnSystemHealth::EmailSendError:
             return qnSkin->pixmap("events/email.png");
 
         case QnSystemHealth::NoLicenses:
             return qnSkin->pixmap("events/license.png");
 
-        case QnSystemHealth::SmtpIsNotSet:
-            return qnSkin->pixmap("events/email.png");
-
-        case QnSystemHealth::UsersEmailIsEmpty:
-            return qnSkin->pixmap("events/email.png");
-
         case QnSystemHealth::SystemIsReadOnly:
             return qnSkin->pixmap("tree/system.png");
-
-        case QnSystemHealth::EmailSendError:
-            return qnSkin->pixmap("events/email.png");
 
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
