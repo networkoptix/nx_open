@@ -194,13 +194,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
         d, &Private::setLayoutReadOnly);
 
-    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
+    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d,
+        &Private::setLayoutFilename);
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, this,
         [this](const Filename& fileName)
         {
             d->setMediaFilename(fileName);
-            ui->transcodingButtonsWidget->setHidden(
-                FileExtensionUtils::isExecutable(fileName.extension));
         });
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
@@ -257,24 +256,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
 
     connect(d, &Private::transcodingAllowedChanged, this,
-        [this](bool transcodingIsAllowed)
-        {
-            ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
-            if (transcodingIsAllowed)
-            {
-                ui->exportMediaSettingsPage->setApplyFilters(
-                    d->exportMediaPersistentSettings().applyFilters);
-            }
-            else
-            {
-                ui->cameraExportSettingsButton->click();
-            }
-        });
+        &ExportSettingsDialog::updateTranscodingWidgets);
+    updateTranscodingWidgets(d->isTranscodingAllowed());
 
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
         {
-
             setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
             setMaxOverlayWidth(ui->imageSettingsPage, size.width());
             setMaxOverlayWidth(ui->textSettingsPage, size.width());
@@ -558,6 +545,21 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
     // Set alert texts.
     for (int i = 0; i < newCount; ++i)
         setAlertText(i, texts[i]);
+}
+
+void ExportSettingsDialog::updateTranscodingWidgets(bool transcodingIsAllowed)
+{
+    ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
+    if (transcodingIsAllowed)
+    {
+        ui->exportMediaSettingsPage->setApplyFilters(
+            d->exportMediaPersistentSettings().applyFilters);
+    }
+    else
+    {
+        ui->cameraExportSettingsButton->click();
+    }
+    ui->transcodingButtonsWidget->setHidden(!transcodingIsAllowed);
 }
 
 void ExportSettingsDialog::setMediaParams(

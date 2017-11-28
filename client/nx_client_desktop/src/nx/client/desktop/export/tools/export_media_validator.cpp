@@ -109,11 +109,14 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     Results results;
 
-    if (FileExtensionUtils::isExecutable(settings.fileName.extension))
+    if (FileExtensionUtils::isLayout(settings.fileName.extension))
     {
-        results.set(int(Result::transcodingInBinaryIsNotSupported));
-        if (exeFileIsTooBig(settings.mediaResource, durationMs))
+        results.set(int(Result::transcodingInLayoutIsNotSupported));
+        if (FileExtensionUtils::isExecutable(settings.fileName.extension)
+            && exeFileIsTooBig(settings.mediaResource, durationMs))
+        {
             results.set(int(Result::tooBigExeFile));
+        }
         return results;
     }
 

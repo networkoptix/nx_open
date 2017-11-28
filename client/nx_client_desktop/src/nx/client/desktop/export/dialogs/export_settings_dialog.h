@@ -96,6 +96,7 @@ private:
     void updateTabWidgetSize();
     void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
+    void updateTranscodingWidgets(bool transcodingIsAllowed);
 
     void hideTab(Mode mode);
 

@@ -20,7 +20,7 @@ public:
         downscaling,
         tooLong,
         tooBigExeFile,
-        transcodingInBinaryIsNotSupported,
+        transcodingInLayoutIsNotSupported,
         nonCameraResources,
 
         count

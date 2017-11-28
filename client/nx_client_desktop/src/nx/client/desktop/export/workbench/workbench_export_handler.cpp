@@ -318,7 +318,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             const auto settings = dialog->exportMediaSettings();
             exportProcessId = d->initExport(settings.fileName);
 
-            if (FileExtensionUtils::isExecutable(settings.fileName.extension))
+            if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
                 ExportLayoutSettings layoutSettings;
                 layoutSettings.filename = settings.fileName;
