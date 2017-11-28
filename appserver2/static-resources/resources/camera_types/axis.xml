@@ -298,11 +298,19 @@
         <resource name = "AXISP1368" public = "AXISM3104"/>
         <resource name = "AXISXF40-Q1765" public = "AXISM3104"/>
         <resource name = "AXISXP40-Q1765" public = "AXISM3104"/>
-        <resource name = "AXISFA54" public = "AXISM3104"/>
+        <resource name = "AXISFA54" public = "AXISM3104">
+            <params>
+                <param name = "channelsAmount" default_value = "4"/>
+            </params>
+        </resource>    
         <resource name = "AXISM5525" public = "AXISM3104"/>
-        <resource name = "AXISQ8742" public = "AXISM3104"/>
+        <resource name = "AXISQ8742" public = "AXISM3104">
+            <params>
+                <param name = "channelsAmount" default_value = "2"/>
+            </params>
+        </resource>         
         <resource name = "AXISP1275" public = "AXISM3104"/>
-        <resource name = "AXISQ8741" public = "AXISM3104"/>
+        <resource name = "AXISQ8741" public = "AXISQ8742"/>
         <resource name = "AXISFA1105" public = "AXISM3104"/>
         <resource name = "AXISP1265" public = "AXISM3104"/>
         <resource name = "AXISF1004" public = "AXISM3104"/>
@@ -310,8 +318,8 @@
         <resource name = "AXISXF60-Q1765" public = "AXISM3104"/>
         <resource name = "AXISP1245" public = "AXISM3104"/>
         <resource name = "AXISFA4115" public = "AXISM3104"/>
-        <resource name = "AXISF34" public = "AXISM3104"/>
-        <resource name = "AXISF8804" public = "AXISM3104"/>
+        <resource name = "AXISF34" public = "AXISFA54"/>
+        <resource name = "AXISF8804" public = "AXISQ8742"/>
         <resource name = "AXISP3375" public = "AXISQ1615"/>
         <resource name = "AXISF4005" public = "AXISQ1615"/>
         <resource name = "AXISF1025" public = "AXISQ1615"/>
@@ -319,7 +327,11 @@
         <resource name = "AXISQ3517" public = "AXISQ1615"/>
         <resource name = "AXISQ8685" public = "AXISQ1615"/>
         <resource name = "AXISP3374" public = "AXISQ1615"/>
-        <resource name = "AXISFA1125" public = "AXISQ1615"/>
+        <resource name = "AXISFA1125" public = "AXISQ1615">
+            <params>
+                <param name = "channelsAmount" default_value = "2"/>
+            </params>
+        </resource>           
         <resource name = "AXISF1015" public = "AXISQ1615"/>
         <resource name = "AXISF1035" public = "AXISQ1615"/>
         <resource name = "AXISQ3504" public = "AXISQ1615"/>
