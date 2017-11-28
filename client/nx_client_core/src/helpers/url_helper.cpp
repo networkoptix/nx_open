@@ -1,7 +1,5 @@
 #include "url_helper.h"
 
-const QString QnUrlHelper::cloudConnectionScheme = lit("cloud");
-
 QnUrlHelper::QnUrlHelper(const QUrl& url):
     m_url(url)
 {

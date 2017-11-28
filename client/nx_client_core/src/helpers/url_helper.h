@@ -9,8 +9,6 @@ class QnUrlHelper
 public:
     QnUrlHelper(const QUrl& url = QUrl());
 
-    static const QString cloudConnectionScheme;
-
     Q_INVOKABLE QUrl url() const;
 
     Q_INVOKABLE QString scheme() const;

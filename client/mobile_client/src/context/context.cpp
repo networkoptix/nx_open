@@ -250,7 +250,7 @@ QUrl QnContext::getLastUsedUrl() const
 
 bool QnContext::isCloudConnectionUrl(const QUrl& url)
 {
-    return url.scheme() == QnUrlHelper::cloudConnectionScheme;
+    return url.scheme() == QnConnectionManager::cloudConnectionScheme;
 }
 
 QUrl QnContext::getInitialUrl() const

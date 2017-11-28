@@ -27,6 +27,8 @@ class QnConnectionManager: public QObject, public QnConnectionContextAware
     Q_ENUM(Qn::ConnectionResult)
 
 public:
+    static const QString cloudConnectionScheme;
+
     enum State
     {
         Disconnected = static_cast<int>(QnConnectionState::Disconnected),
