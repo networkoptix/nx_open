@@ -3,19 +3,15 @@
 #include <QtCore/QSharedPointer>
 
 #include "abstract_motion_metadata_provider.h"
+#include "abstract_metadata_consumer_owner.h"
 
 namespace nx {
-
-namespace media {
-
-class AbstractMetadataConsumer;
-
-} // namespace media
-
 namespace client {
 namespace core {
 
-class ConsumingMotionMetadataProvider: public AbstractMotionMetadataProvider
+class ConsumingMotionMetadataProvider:
+    public AbstractMotionMetadataProvider,
+    public AbstractMetadataConsumerOwner
 {
     using base_type = AbstractMotionMetadataProvider;
 
@@ -24,7 +20,7 @@ public:
 
     virtual MetaDataV1Ptr metadata(const qint64 timestamp, int channel) override;
 
-    QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const;
+    virtual QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const override;
 
 private:
     class Private;
