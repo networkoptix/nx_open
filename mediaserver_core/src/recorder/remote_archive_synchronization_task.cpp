@@ -12,12 +12,10 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
-#include <core/resource/dummy_resource.h>
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/utils/avi_motion_archive_delegate.h>
 #include <plugins/storage/memory/ext_iodevice_storage.h>
-#include <plugins/utils/avi_motion_archive_delegate.h>
+#include <plugins/utils/motion_delegate_wrapper.h>
 #include <plugins/resource/avi/avi_resource.h>
 
 #include <nx/utils/log/log.h>
@@ -321,17 +319,29 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
     storage->setIsIoDeviceOwner(false);
 
     using namespace nx::mediaserver_core::plugins;
-    auto archiveDelegate = new QnAviArchiveDelegate();
-    archiveDelegate->setStorage(storage);
-    archiveDelegate->setAudioChannel(0);
-    archiveDelegate->setStartTimeUs(timePeriod.startTimeMs * 1000);
-    archiveDelegate->setUseAbsolutePos(false);
+    auto aviDelegate = std::make_unique<QnAviArchiveDelegate>();
+    aviDelegate->setStorage(storage);
+    aviDelegate->setAudioChannel(0);
+    aviDelegate->setStartTimeUs(timePeriod.startTimeMs * 1000);
+    aviDelegate->setUseAbsolutePos(false);
+
+    std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate = std::move(aviDelegate);
+    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+        if (m_resource->isRemoteArchiveMotionDetectionEnabled())
+        {
+            auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
+                std::move(archiveDelegate));
+
+            motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
+            archiveDelegate = std::move(motionDelegate);
+        }
+    #endif
 
     QnAviResourcePtr aviResource(new QnAviResource(temporaryFilePath));
 
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(aviResource);
     m_archiveReader->setObjectName(kReaderThreadName);
-    m_archiveReader->setArchiveDelegate(archiveDelegate);
+    m_archiveReader->setArchiveDelegate(archiveDelegate.release());
     m_archiveReader->setPlaybackMask(timePeriod);
 
     m_archiveReader->setErrorHandler(
@@ -376,12 +386,13 @@ void RemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
 
-    auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
-    m_recorder->setSaveMotionHandler(saveMotionHandler);
     m_recorder->setObjectName(kRecorderThreadName);
     m_recorder->setRecordingBounds(
         duration_cast<microseconds>(milliseconds(timePeriod.startTimeMs)),
         duration_cast<microseconds>(milliseconds(timePeriod.endTimeMs())));
+
+    m_recorder->setSaveMotionHandler(
+        [this](const QnConstMetaDataV1Ptr& motion){return saveMotion(motion);});
 
     m_recorder->setOnFileWrittenHandler(
         [this](
@@ -454,6 +465,22 @@ RemoteArchiveSynchronizationTask::remoteArchiveChunkByTimePeriod(const QnTimePer
         return boost::none;
 
     return *chunkItr;
+}
+
+bool RemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr& motion)
+{
+    if (motion)
+    {
+        auto helper = QnMotionHelper::instance();
+        QnMotionArchive* archive = helper->getArchive(
+            m_resource,
+            motion->channelNumber);
+
+        if (archive)
+            archive->saveToArchive(motion);
+    }
+
+    return true;
 }
 
 } // namespace recorder

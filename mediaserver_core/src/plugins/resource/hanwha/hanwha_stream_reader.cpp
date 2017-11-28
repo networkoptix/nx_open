@@ -365,8 +365,6 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
 
         *outUrl = url.toString();
         qDebug() << "============ GOT PLAYBACK URL!!! (EDGE RECORDING)" << *outUrl;
-
-        return CameraDiagnostics::NoErrorResult();
     }
 
     return CameraDiagnostics::NoErrorResult();

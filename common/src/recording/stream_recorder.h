@@ -213,6 +213,7 @@ protected:
     std::vector<StreamRecorderContext> m_recordingContextVector;
     boost::optional<std::chrono::microseconds> m_startRecordingBound;
     boost::optional<std::chrono::microseconds> m_endRecordingBound;
+    MotionHandler m_motionHandler;
 
 private:
     bool m_waitEOF;
@@ -260,7 +261,6 @@ private:
 
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
-    MotionHandler m_motionHandler;
     int64_t m_lastFileSize = 0;
 
     std::function<void()> m_endOfRecordingHandler;

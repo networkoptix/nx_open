@@ -3,6 +3,8 @@
 #include <core/resource/security_cam_resource.h>
 
 #include <recorder/storage_manager.h>
+#include <plugins/utils/motion_delegate_wrapper.h>
+#include <motion/motion_helper.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/elapsed_timer.h>
@@ -245,6 +247,17 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
         duration_cast<microseconds>(endTime).count(),
         /*frameStep*/ 1);
 
+    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+        if (m_resource->isRemoteArchiveMotionDetectionEnabled())
+        {
+            auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
+                std::move(archiveDelegate));
+
+            motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
+            archiveDelegate = std::move(motionDelegate);
+        }
+    #endif
+
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
     m_archiveReader->setArchiveDelegate(archiveDelegate.release());
     m_archiveReader->setPlaybackRange(QnTimePeriod(startTime, endTime - startTime));
@@ -277,14 +290,14 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
 {
     using namespace std::chrono;
 
-    auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
-
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
         m_resource,
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
 
-    m_recorder->setSaveMotionHandler(saveMotionHandler);
+    m_recorder->setSaveMotionHandler(
+        [this](const QnConstMetaDataV1Ptr& motion) { return saveMotion(motion); });
+
     m_recorder->setRecordingBounds(
         duration_cast<microseconds>(startTime),
         duration_cast<microseconds>(endTime));
@@ -295,7 +308,6 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
             std::chrono::milliseconds duration)
         {
             m_importedDuration += duration;
-
 
             NX_VERBOSE(
                 this,
@@ -372,6 +384,22 @@ std::chrono::milliseconds RemoteArchiveStreamSynchronizationTask::totalDuration(
 bool RemoteArchiveStreamSynchronizationTask::needToReportProgress() const
 {
     return true; //< For now let's report progress for each recorded file.
+}
+
+bool RemoteArchiveStreamSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr& motion)
+{
+    if (motion)
+    {
+        auto helper = QnMotionHelper::instance();
+        QnMotionArchive* archive = helper->getArchive(
+            m_resource,
+            motion->channelNumber);
+
+        if (archive)
+            archive->saveToArchive(motion);
+    }
+
+    return true;
 }
 
 } // namespace recorder

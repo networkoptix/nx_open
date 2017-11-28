@@ -344,7 +344,14 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     return Qn::LC_Professional;
 }
 
-void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory) {
+bool QnSecurityCamResource::isRemoteArchiveMotionDetectionEnabled() const
+{
+    return QnMediaResource::edgeStreamValue()
+        == getProperty(QnMediaResource::motionStreamKey()).toLower();
+}
+
+void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
+{
     m_dpFactory = dpFactory;
 }
 

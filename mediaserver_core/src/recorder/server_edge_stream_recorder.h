@@ -48,6 +48,7 @@ public:
     void setOnFileWrittenHandler(FileWrittenHandler handler);
 
 protected:
+    virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
     virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override;
 

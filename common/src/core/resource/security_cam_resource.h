@@ -322,6 +322,12 @@ public:
      * Returns true if camera credential was auto detected by media server.
      */
     bool isDefaultAuth() const;
+
+    /**
+     * @return true if remote archive motion analysis is enabled by user.
+     */
+    virtual bool isRemoteArchiveMotionDetectionEnabled() const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -408,6 +414,7 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
+
 protected:
 #ifdef ENABLE_DATA_PROVIDERS
     QnAudioTransmitterPtr m_audioTransmitter;

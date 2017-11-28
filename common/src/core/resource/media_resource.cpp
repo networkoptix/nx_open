@@ -24,6 +24,7 @@ namespace {
 
     const QString primaryStreamValue            = lit("primary");
     const QString secondaryStreamValue          = lit("secondary");
+    const QString edgeStreamValue               = lit("edge");
 
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
@@ -166,7 +167,6 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
     return (*userAttributesLock)->dewarpingParams;
 }
 
-
 void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 {
     {
@@ -241,6 +241,12 @@ QString QnMediaResource::secondaryStreamValue()
     return ::secondaryStreamValue;
 }
 
-QString QnMediaResource::rotationKey() {
+QString QnMediaResource::edgeStreamValue()
+{
+    return ::edgeStreamValue;
+}
+
+QString QnMediaResource::rotationKey()
+{
     return ::rotationKey;
 }
