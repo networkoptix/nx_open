@@ -76,7 +76,7 @@ DummyMessage
             {
                 target: dummyMessage
                 title: qsTr("Not enough licenses")
-                image: lp("/images/alert_alert.png")
+                image: lp("/images/alert_license.png")
             }
         }
     ]
