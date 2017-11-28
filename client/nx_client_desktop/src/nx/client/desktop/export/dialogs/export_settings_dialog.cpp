@@ -12,6 +12,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <ui/common/palette.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
@@ -125,6 +127,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     isFileNameValid(isFileNameValid)
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Exporting_Help);
 
     ui->mediaPreviewWidget->setMaximumSize(kPreviewSize);
     ui->layoutPreviewWidget->setMaximumSize(kPreviewSize);
