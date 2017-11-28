@@ -5,10 +5,7 @@
 #include <nx/update/info/detail/data_parser/updates_meta_data.h>
 #include <nx/update/info/detail/fwd.h>
 
-extern const char* const updateJson;
-extern const char* const metaDataJson;
-
-#include "test_json_data.inl"
+#include "../../../inl.h"
 
 namespace nx {
 namespace update {

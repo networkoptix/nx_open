@@ -1,4 +1,4 @@
-const char* const metaDataJson = R"JSON(
+extern const char* const metaDataJson = R"JSON(
 {
     "__info": [
         {
@@ -400,7 +400,7 @@ const char* const metaDataJson = R"JSON(
 }
 )JSON";
 
-const char* const updateJson = R"JSON(
+extern const char* const updateJson = R"JSON(
 {
     "version": "3.1.0.16975",
     "cloudHost": "nxvms.com",
