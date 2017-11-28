@@ -20,10 +20,9 @@ class MetadataAnalyticsController:
     Q_OBJECT
 
 public:
-    void gotMetadataPacket(
-        const QnResourcePtr& resource, const QnCompressedMetadataPtr& metadata);
     void gotMetadata(
-        const QnResourcePtr& resource, const nx::common::metadata::DetectionMetadataPacket& metadata);
+        const QnResourcePtr& resource,
+        const common::metadata::DetectionMetadataPacketPtr& metadata);
     void gotFrame(const QnResourcePtr& resource, qint64 timestampUs);
 
 signals:

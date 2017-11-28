@@ -25,6 +25,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <nx/client/desktop/camera/camera_fwd.h>
+#include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
 #include <utils/color_space/image_correction.h>
@@ -167,6 +168,11 @@ public:
 
     bool isLicenseUsed() const;
 
+    bool isAnalyticsEnabled() const;
+    void setAnalyticsEnabled(bool analyticsEnabled);
+
+    nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -249,6 +255,7 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
+    void at_analyticsButton_toggled(bool checked);
 
     void at_entropixEnhancementButton_clicked();
     void at_entropixImageLoaded(const QImage& image);
