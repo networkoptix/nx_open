@@ -43,10 +43,13 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
             > std::chrono::minutes::zero())
     {
-        m_requestQueue.enableItemStayTimeoutEvent(
+        m_queryQueue.enableItemStayTimeoutEvent(
             m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection,
             std::bind(&AsyncSqlQueryExecutor::reportQueryCancellation, this, _1));
     }
+
+    if (m_connectionOptions.driverType == RdbmsDriverType::sqlite)
+        m_queryQueue.setConcurrentModificationQueryLimit(1);
 }
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
@@ -109,11 +112,38 @@ DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
 
 bool AsyncSqlQueryExecutor::init()
 {
-    QnMutexLocker lk(&m_mutex);
-    openNewConnection(lk);
-    // TODO: Waiting for connection to change state
+    {
+        QnMutexLocker lk(&m_mutex);
+        openNewConnection(lk);
+    }
 
-    return true;
+    // Waiting for connection to change state.
+    for (;;)
+    {
+        ConnectionState connectionState = ConnectionState::initializing;
+        {
+            QnMutexLocker lk(&m_mutex);
+            connectionState = m_dbThreadPool.empty()
+                ? ConnectionState::closed //< Connection has been closed due to some problem.
+                : m_dbThreadPool.front()->state();
+        }
+
+        switch (connectionState)
+        {
+            case ConnectionState::initializing:
+                // TODO: #ak Replace with a "state changed" event from the thread.
+                // But, delay is not a big problem because connection to a DB is not a quick thing.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+
+            case ConnectionState::opened:
+                return true;
+
+            case ConnectionState::closed:
+            default:
+                return false;
+        }
+    }
 }
 
 void AsyncSqlQueryExecutor::setStatisticsCollector(
@@ -131,20 +161,26 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
 
 std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_requestQueue.size();
+    return m_queryQueue.size();
+}
+
+void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
+{
+    m_queryQueue.setConcurrentModificationQueryLimit(value);
 }
 
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const
 {
+    // TODO: #ak Check for non-busy threads.
+
     const auto effectiveDBConnectionCount = m_dbThreadPool.size();
-    const auto queueSize = static_cast< size_t >(m_requestQueue.size());
+    const auto queueSize = static_cast< size_t >(m_queryQueue.size());
     const auto maxDesiredQueueSize =
         effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
     if (queueSize < maxDesiredQueueSize)
-        return false;    //< Task number is not too high.
+        return false; //< Task number is not too high.
     if (effectiveDBConnectionCount >= static_cast<size_t>(m_connectionOptions.maxConnectionCount))
-        return false;    //< Pool size is already at maximum.
+        return false; //< Pool size is already at maximum.
 
     return true;
 }
@@ -153,7 +189,7 @@ void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& /*lk*/)
 {
     auto executorThread = RequestExecutorFactory::create(
         m_connectionOptions,
-        &m_requestQueue);
+        &m_queryQueue);
     auto executorThreadPtr = executorThread.get();
 
     m_dbThreadPool.push_back(std::move(executorThread));

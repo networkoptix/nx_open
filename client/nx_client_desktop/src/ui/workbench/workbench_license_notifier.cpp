@@ -119,10 +119,10 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
         licenseWarningStates[license->key()].lastWarningTime = currentTime;
     }
 
-    if (warn && mainWindow())
+    if (warn && mainWindowWidget())
     {
         QScopedPointer<QnLicenseNotificationDialog> dialog(
-            new QnLicenseNotificationDialog(mainWindow()));
+            new QnLicenseNotificationDialog(mainWindowWidget()));
         dialog->setLicenses(licenses);
         dialog->exec();
 

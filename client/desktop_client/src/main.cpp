@@ -253,6 +253,9 @@ int main(int argc, char** argv)
     textToWaveServer->waitForStarted();
 #endif
 
+    // This attribute is needed to embed QQuickWidget into other QWidgets.
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)
     {

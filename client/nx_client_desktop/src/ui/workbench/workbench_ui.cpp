@@ -1368,7 +1368,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             /// If tour mode is going to be turned on, focus should be forced to main window
             /// because otherwise we can't cancel tour mode by clicking any key (in some cases)
             if (toggled)
-                mainWindow()->setFocus();
+                mainWindowWidget()->setFocus();
         });
 
     connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,

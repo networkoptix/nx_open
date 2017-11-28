@@ -36,7 +36,7 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 3.1.1)
+project(vms VERSION 4.0.0)
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
@@ -144,6 +144,7 @@ endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/client/nx_client_desktop/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
     CACHE STRING "Extra QML import paths")
 

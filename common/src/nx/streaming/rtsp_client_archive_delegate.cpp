@@ -262,7 +262,9 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 
 }
 
-bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
+bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
+{
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(camera);
     if (!camera)

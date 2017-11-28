@@ -3,23 +3,22 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <client_core/connection_context_aware.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
-#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/workbench/watchers/workbench_safemode_watcher.h>
-#include <ui/workbench/watchers/workbench_selection_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
+#include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/common/html.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
+
+#include "camera_settings_tab.h"
+#include "camera_settings_model.h"
+#include "camera_settings_general_tab_widget.h"
 
 namespace nx {
 namespace client {
@@ -27,66 +26,59 @@ namespace desktop {
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::CameraSettingsDialog())
+    ui(new Ui::CameraSettingsDialog()),
+    m_model(new CameraSettingsModel(context()))
 {
     ui->setupUi(this);
-/*
-    addPage(QnUserSettingsDialog::ProfilePage, m_profilePage, tr("User Information"));
-    addPage(SettingsPage, m_settingsPage, tr("User Information"));
-    addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
-    addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
-    addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(resourceAccessManager(), &QnResourceAccessManager::permissionsChanged, this,
-        [this](const QnResourceAccessSubject& subject)
-        {
-            if (m_user && subject.user() == m_user)
-                updatePermissions();
-        });
-
-    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
-    connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
-    connect(m_camerasPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
-    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
-        this, &CameraSettingsDialog::updatePermissions);
+    addPage(int(CameraSettingsTab::general),
+        new CameraSettingsGeneralTabWidget(m_model.data(), this),
+        tr("General"));
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
-    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
-    {
-        if (isHidden())
-            return;
-
-        auto users = resources.filtered<QnUserResource>();
-        if (!users.isEmpty())
-            setUser(users.first());
-    });
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
-    {
-        if (resource != m_user)
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
+        [this](const QnResourceList& resources)
         {
-            // TODO: #vkutin #GDM check if permissions change is correctly handled through a chain of signals
-            return;
-        }
-        setUser(QnUserResourcePtr());
-        tryClose(true);
-    });
+            if (isHidden())
+                return;
+
+            auto cameras = resources.filtered<QnVirtualCameraResource>();
+            if (!cameras.isEmpty())
+                setCameras(cameras);
+        });
+
+
+    // TODO: #GDM Should we handle current user permission to camera change?
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+                return;
+
+            if (m_model->cameras().contains(camera))
+            {
+                auto camerasLeft = m_model->cameras();
+                camerasLeft.removeAll(camera);
+                setCameras(camerasLeft, true);
+                if (camerasLeft.empty())
+                    tryClose(true);
+            }
+        });
 
     ui->alertBar->setReservedSpace(false);
 
-    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
-    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(okButton,
+        QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 
     // Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code.
-    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
-    */
+    safeModeWatcher->addControlledWidget(applyButton,
+        QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()
@@ -95,52 +87,41 @@ CameraSettingsDialog::~CameraSettingsDialog()
 
 bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
+    if (m_model->cameras() == cameras)
+        return true;
+
+    if (!tryClose(force))
+        return false;
+
+    m_model->setCameras(cameras);
+    loadDataToUi();
     return true;
-
 }
+
+QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
+{
+    const auto oldCameras = m_model->cameras();
+    if (oldCameras.empty())
+        return QDialogButtonBox::Discard;
+
+    const auto extras = QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
+        QnCameraDeviceStringSet(
+            tr("Changes to the following %n devices are not saved:", "", oldCameras.size()),
+            tr("Changes to the following %n cameras are not saved:", "", oldCameras.size()),
+            tr("Changes to the following %n I/O Modules are not saved:", "", oldCameras.size())
+        ), oldCameras);
+
+    QnMessageBox messageBox(QnMessageBoxIcon::Question,
+        tr("Apply changes before switching to another camera?"), extras,
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply, this);
+
+    messageBox.addCustomWidget(new QnResourceListView(oldCameras, &messageBox));
+    return QDialogButtonBox::StandardButton(messageBox.exec());
+}
+
 /*
-QnUserResourcePtr CameraSettingsDialog::user() const
-{
-    return m_user;
-}
-
-void CameraSettingsDialog::setUser(const QnUserResourcePtr &user)
-{
-    if (m_user == user)
-        return;
-
-    if (!tryClose(false))
-        return;
-
-    if (m_user)
-        m_user->disconnect(this);
-
-    m_user = user;
-    m_model->setUser(user);
-
-    if (m_user)
-    {
-        connect(m_user, &QnResource::propertyChanged, this,
-            [this](const QnResourcePtr& resource, const QString& propertyName)
-            {
-                if (resource == m_user && propertyName == cloudAuthInfoPropertyName)
-                    forcedUpdate();
-            });
-    }
-
-    // Hide Apply button if cannot apply changes.
-    bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile
-                           || m_model->mode() == QnUserSettingsModel::OtherSettings;
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setVisible(applyButtonVisible);
-
-    // Hide Cancel button if we cannot edit user.
-    bool cancelButtonVisible = m_model->mode() != QnUserSettingsModel::OtherProfile
-                            && m_model->mode() != QnUserSettingsModel::Invalid;
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(cancelButtonVisible);
-
-    forcedUpdate();
-}
-
 void CameraSettingsDialog::loadDataToUi()
 {
     ui->alertBar->setText(QString());

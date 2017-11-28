@@ -23,6 +23,8 @@ namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
+static const int kNvrSocketReadTimeoutMs = 500;
+static const std::chrono::milliseconds kTimeoutToExtrapolateTimeMs(1000 * 3);
 
 } // namespace
 
@@ -82,13 +84,19 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
     m_rtpReader.setRole(role);
+    if (m_hanwhaResource->isNvr() && getRole() == Qn::CR_Archive)
+    {
+        m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
+        m_rtpReader.setOnSocketReadTimeoutCallback([this]() { return createEmptyPacket(); });
+        m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
+    }
 
     if (m_hanwhaResource->isNvr())
-        m_rtpReader.setTimePolicy(TimePolicy::ForceCameraTime);
+        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
     else if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(TimePolicy::OnvifExtension);
+        m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
     else
-        m_rtpReader.setTimePolicy(TimePolicy::IgnoreCameraTimeIfBigJitter);
+        m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
 
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx_http::HttpHeader("Rate-Control", "no"));
@@ -411,6 +419,48 @@ void HanwhaStreamReader::setSessionType(HanwhaSessionType value)
 void HanwhaStreamReader::setClientId(const QnUuid& id)
 {
     m_clientId = id;
+}
+
+QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
+{
+    if (!m_timeSinceLastFrame.isValid())
+        return QnAbstractMediaDataPtr();
+
+    const auto context = m_hanwhaResource->sharedContext();
+    const int speed = m_rtpReader.rtspClient().getScale();
+    qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsedMs() * speed;
+    const bool isForwardSearch = speed >= 0;
+    const auto chunks = context->chunks(m_hanwhaResource->getChannel());
+    if (chunks.containTime(currentTimeMs))
+    {
+        if (m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTimeMs)
+            return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+    }
+    else
+    {
+        auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
+        if (itr == chunks.end())
+            currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
+        else
+            currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
+    }
+
+    QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
+    rez->timestamp = currentTimeMs * 1000;
+    if (speed < 0)
+        rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+    return rez;
+}
+
+QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
+{
+    auto result = base_type::getNextData();
+    if (result && result->dataType != QnAbstractMediaData::EMPTY_DATA)
+    {
+        m_lastTimestampUsec = result->timestamp;
+        m_timeSinceLastFrame.restart();
+    }
+    return result;
 }
 
 } // namespace plugins

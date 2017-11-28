@@ -164,12 +164,12 @@ QnControlsStatisticsModule* QnWorkbenchContext::statisticsModule() const
     return m_statisticsModule.data();
 }
 
-QWidget* QnWorkbenchContext::mainWindow() const
+MainWindow* QnWorkbenchContext::mainWindow() const
 {
     return m_mainWindow.data();
 }
 
-void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
+void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
     if (m_mainWindow == mainWindow)
         return;
@@ -306,11 +306,8 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     * * we have opened exported exe-file
     * Otherwise we should try to connect or show welcome page.
     */
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
         welcomeScreen->setVisibleControls(true);
-    }
 
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()

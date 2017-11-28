@@ -27,7 +27,7 @@ static constexpr int kInvalidStartTime = -1;
 
 } // namespace
 
-void QnEventLogRequestData::loadFromParams(QnResourcePool* resourcePool,
+void QnEventLogFilterData::loadFromParams(QnResourcePool* resourcePool,
     const QnRequestParamList& params)
 {
     nx::camera_id_helper::findAllCamerasByFlexibleIds(
@@ -57,10 +57,9 @@ void QnEventLogRequestData::loadFromParams(QnResourcePool* resourcePool,
         actionType);
 
     ruleId = QnLexical::deserialized<QnUuid>(params.value(kRuleIdParam));
-    format = QnLexical::deserialized(params.value(kFormatParam), format);
 }
 
-QnRequestParamList QnEventLogRequestData::toParams() const
+QnRequestParamList QnEventLogFilterData::toParams() const
 {
     QnRequestParamList result;
 
@@ -84,12 +83,10 @@ QnRequestParamList QnEventLogRequestData::toParams() const
     if (!ruleId.isNull())
         result.insert(kRuleIdParam, QnLexical::serialized(ruleId));
 
-    result.insert(kFormatParam, QnLexical::serialized(format));
-
     return result;
 }
 
-bool QnEventLogRequestData::isValid(QString* errorString) const
+bool QnEventLogFilterData::isValid(QString* errorString) const
 {
     auto error =
         [errorString](const QString& text)
@@ -116,4 +113,23 @@ bool QnEventLogRequestData::isValid(QString* errorString) const
     }
 
     return true;
+}
+
+void QnEventLogRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
+{
+    filter.loadFromParams(resourcePool, params);
+    format = QnLexical::deserialized(params.value(kFormatParam), format);
+}
+
+QnRequestParamList QnEventLogRequestData::toParams() const
+{
+    QnRequestParamList result = filter.toParams();
+    result.insert(kFormatParam, QnLexical::serialized(format));
+    return result;
+}
+
+bool QnEventLogRequestData::isValid(QString* errorString) const
+{
+    return filter.isValid(errorString);
 }

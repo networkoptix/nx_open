@@ -286,8 +286,17 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
-            return nx_http::StatusCode::forbidden;
+        //parsing request parameters
+        const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
+        std::multimap<QString, QString> requestParams;
+        //moving params to map for more convenient use
+        for (QList<QPair<QString, QString> >::const_iterator
+            it = queryItemsList.begin();
+            it != queryItemsList.end();
+            ++it)
+        {
+            requestParams.insert(std::make_pair(it->first, it->second));
+        }
 
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
@@ -305,7 +314,9 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true, 0 );
+        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame(
+            requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME) == requestParams.end(),
+            0);
         if( lastVideoFrame && (lastVideoFrame->compressionType != AV_CODEC_ID_H264) && (lastVideoFrame->compressionType != AV_CODEC_ID_NONE) )
         {
             //video is not in h.264 format
@@ -314,17 +325,12 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        //parsing request parameters
-        const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
-        std::multimap<QString, QString> requestParams;
-        //moving params to map for more convenient use
-        for( QList<QPair<QString, QString> >::const_iterator
-            it = queryItemsList.begin();
-            it != queryItemsList.end();
-            ++it )
-        {
-            requestParams.insert( std::make_pair( it->first, it->second ) );
-        }
+        bool isLive =
+            requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME) == requestParams.end();
+        auto requiredPermission = isLive
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
+            return nx_http::StatusCode::forbidden;
 
         if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
         {

@@ -14,6 +14,8 @@ StatisticsCalculator::StatisticsCalculator():
 
 Statistics StatisticsCalculator::statistics(int aliveConnectionCount) const
 {
+    QnMutexLocker lock(&m_mutex);
+
     Statistics result;
     result.connectionCount = aliveConnectionCount;
     result.connectionsAcceptedPerMinute =
@@ -29,6 +31,8 @@ void StatisticsCalculator::saveConnectionStatistics(
     std::chrono::milliseconds lifeDuration,
     int requestsServed)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_requestsServedPerMinuteCalculator.add(
         requestsServed, lifeDuration);
     m_requestsAveragePerConnectionCalculator.add(requestsServed);
@@ -36,6 +40,7 @@ void StatisticsCalculator::saveConnectionStatistics(
 
 void StatisticsCalculator::connectionAccepted()
 {
+    QnMutexLocker lock(&m_mutex);
     m_connectionsPerMinuteCalculator.add(1);
 }
 

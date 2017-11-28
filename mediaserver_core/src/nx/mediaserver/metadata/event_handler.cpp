@@ -22,19 +22,21 @@ void EventHandler::handleMetadata(
     Error error,
     AbstractMetadataPacket* metadata)
 {
-    nxpt::ScopedRef<AbstractMetadataPacket> metadataPacket(metadata, false);
+    if (metadata == nullptr)
+        return;
+
     if (error != Error::noError)
         return;
 
     nxpt::ScopedRef<AbstractEventMetadataPacket> eventsPacket(
         (AbstractEventMetadataPacket*)
-        metadata->queryInterface(IID_EventMetadataPacket), false);
+        metadata->queryInterface(IID_EventMetadataPacket), /*increaseRef*/ false);
     if (eventsPacket)
         handleEventsPacket(std::move(eventsPacket));
 
     nxpt::ScopedRef<AbstractObjectsMetadataPacket> objectsPacket(
         (AbstractObjectsMetadataPacket*)
-        metadata->queryInterface(IID_DetectionMetadataPacket), false);
+        metadata->queryInterface(IID_DetectionMetadataPacket), /*increaseRef*/ false);
     if (objectsPacket)
         handleMetadataPacket(std::move(objectsPacket));
 }
@@ -65,6 +67,7 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
+        object.objectTypeId = nxpt::fromPluginGuidToQnUuid(item->eventTypeId());
         object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);

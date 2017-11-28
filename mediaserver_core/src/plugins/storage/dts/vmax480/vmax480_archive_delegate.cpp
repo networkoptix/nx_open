@@ -25,7 +25,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(const QnResourcePtr& res):
     m_lastMediaTime(0),
     m_noDataCounter(0)
 {
-    m_groupId = FIXED_GROUP_ID; 
+    m_groupId = FIXED_GROUP_ID;
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
@@ -41,7 +41,9 @@ QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
     close();
 }
 
-bool QnVMax480ArchiveDelegate::open(const QnResourcePtr &resource)
+bool QnVMax480ArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher* /*archiveIntegrityWatcher*/)
 {
     Q_UNUSED(resource)
 
@@ -72,7 +74,7 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
     m_beforeSeek = false;
     m_lastMediaTime = time;
     if (!m_isOpened) {
-        open(m_res);
+        open(m_res, nullptr /*archiveIntegrityWatcher*/);
     }
 
     if (m_ignoreNextSeek) {
@@ -124,7 +126,7 @@ qint64 QnVMax480ArchiveDelegate::endTime() const
 void QnVMax480ArchiveDelegate::reconnect()
 {
     close();
-    open(m_res);
+    open(m_res, nullptr /*archiveIntegrityWatcher*/);
     if (!m_maxStream->isPlaying())
         m_maxStream->vmaxArchivePlay(this, m_lastMediaTime, m_reverseMode ? -1 : 1);
 }
@@ -133,9 +135,9 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
 
-    
+
     if (!m_isOpened) {
-        open(m_res);
+        open(m_res, nullptr /*archiveIntegrityWatcher*/);
     }
 
     if (m_maxStream->isEOF()) {
@@ -224,7 +226,7 @@ QnConstResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
 void QnVMax480ArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
     bool reverseMode = value < 0;
-    if (m_reverseMode != reverseMode) 
+    if (m_reverseMode != reverseMode)
     {
         m_reverseMode = reverseMode;
         m_ignoreNextSeek = false;
@@ -236,7 +238,7 @@ void QnVMax480ArchiveDelegate::calcSeekPoints(qint64 startTime, qint64 endTime, 
 {
     qint64 curTime = startTime;
     QnTimePeriodList chunks = m_res->getChunks();
-    while (1) 
+    while (1)
     {
         qint64 seekRez = chunks.roundTimeToPeriodUSec(curTime, true);
         if (seekRez > endTime)
@@ -280,13 +282,13 @@ void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
     m_groupId = data;
 }
 
-QnTimePeriodList QnVMax480ArchiveDelegate::chunks() 
-{ 
+QnTimePeriodList QnVMax480ArchiveDelegate::chunks()
+{
     return m_res->getChunks();
 }
 
-void QnVMax480ArchiveDelegate::beforeSeek(qint64 time) 
-{ 
+void QnVMax480ArchiveDelegate::beforeSeek(qint64 time)
+{
     Q_UNUSED(time)
     m_beforeSeek = true;
 }

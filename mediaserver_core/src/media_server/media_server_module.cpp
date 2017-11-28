@@ -33,6 +33,7 @@
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
+#include <recorder/archive_integrity_watcher.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -48,6 +49,7 @@
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 namespace {
 
@@ -178,7 +180,18 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
 
+    m_analyticsEventsStorage =
+        nx::analytics::storage::EventsStorageFactory::instance()
+            .create(m_settings->analyticEventsStorage());
+    if (!m_analyticsEventsStorage->initialize())
+    {
+        // TODO: #ak Server should not start without this DB.
+        NX_ASSERT(false);
+        NX_WARNING(this, lm("Failed to initialize analytics events storage"));
+    }
+
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
+    m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -268,4 +281,15 @@ nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWa
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
 {
     return m_sharedContextPool;
+}
+
+AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() const
+{
+    return m_archiveIntegrityWatcher;
+}
+
+nx::analytics::storage::AbstractEventsStorage*
+    QnMediaServerModule::analyticsEventsStorage() const
+{
+    return m_analyticsEventsStorage.get();
 }

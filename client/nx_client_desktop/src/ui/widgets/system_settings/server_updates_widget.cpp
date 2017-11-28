@@ -198,7 +198,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged,
-        this, &QnAbstractPreferencesWidget::loadDataToUi);
+        this, &QnServerUpdatesWidget::loadDataToUi);
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
 

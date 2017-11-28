@@ -49,8 +49,8 @@ LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
 {
     setMinimumWidth(kMinimumWidth);
 
-    int maximumHeight = mainWindow()->geometry().height();
-    if (auto windowHandle = mainWindow()->windowHandle())
+    int maximumHeight = mainWindowWidget()->geometry().height();
+    if (auto windowHandle = mainWindowWidget()->windowHandle())
     {
         if (auto currentScreen = windowHandle->screen())
             maximumHeight = currentScreen->size().height();
@@ -60,7 +60,7 @@ LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
 
     QSize optimalSize(kOptimalSize.width(), optimalHeight);
     QRect targetGeometry(QPoint(0, 0), optimalSize);
-    targetGeometry.moveCenter(mainWindow()->geometry().center());
+    targetGeometry.moveCenter(mainWindowWidget()->geometry().center());
     setGeometry(targetGeometry);
 
     m_settingsWidget = new CameraSettingsWidget(this);
@@ -280,7 +280,7 @@ bool LegacyCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& c
         QnMessageBox messageBox(QnMessageBoxIcon::Question,
             tr("Apply changes before switching to another camera?"), extras,
             QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Apply, mainWindow());
+            QDialogButtonBox::Apply, this);
 
         messageBox.addCustomWidget(new QnResourceListView(unsavedCameras, &messageBox));
         const auto result = messageBox.exec();

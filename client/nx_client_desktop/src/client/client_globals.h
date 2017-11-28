@@ -271,6 +271,7 @@ namespace Qn
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
 		ShowSingleCameraRole,                       /**< Used for default password dialog. */
+        ParentWidgetRole,                           /** Used for dialg's parent widget*/
 
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
@@ -279,6 +280,12 @@ namespace Qn
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
         PreviewTimeRole,                            /**< Role for camera preview time in milliseconds since epoch (qint64). */
+        TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (int). */
+
+        // Model notification roles. Do not necessarily pass any data but implement
+        // item-related view-to-model notifications via setData which can be proxied.
+        DefaultNotificationRole,                    /**< Role to perform default item action (no data). */
+        ActivateLinkRole,                           /**< Role to parse and follow hyperlink (QString). */
 
         RoleCount
     };

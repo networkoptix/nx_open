@@ -11,33 +11,13 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-void MetadataAnalyticsController::gotMetadataPacket(
+void MetadataAnalyticsController::gotMetadata(
     const QnResourcePtr& resource,
-    const QnCompressedMetadataPtr& serializedData)
-{
-    if (!resource)
-        return;
-
-    const auto metadataIsOk = serializedData
-        && serializedData->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA
-        && serializedData->metadataType == MetadataType::ObjectDetection;
-
-    if (!metadataIsOk)
-        return;
-
-    auto objectDetectionMetadata =
-        QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(
-            QByteArray::fromRawData(serializedData->data(), serializedData->dataSize()));
-
-    gotMetadata(resource, objectDetectionMetadata);
-}
-
-void MetadataAnalyticsController::gotMetadata(const QnResourcePtr& resource,
-    const nx::common::metadata::DetectionMetadataPacket& metadata)
+    const nx::common::metadata::DetectionMetadataPacketPtr& metadata)
 {
     std::map<QnUuid, QRectF> rectangles;
     auto& prevRectangles = m_rectMap[resource->getId()];
-    auto detectedObjects = metadata.objects;
+    auto detectedObjects = metadata->objects;
 
     for (const auto& obj: detectedObjects)
         rectangles[obj.objectId] = QRectF(obj.boundingBox);

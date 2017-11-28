@@ -137,6 +137,18 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     return result;
 }
 
+boost::optional<BufferType> HttpClient::fetchEntireMessageBody()
+{
+    QByteArray buffer;
+    while (!eof())
+        buffer += fetchMessageBodyBuffer();
+
+    if (m_error)
+        return boost::none;
+
+    return buffer;
+}
+
 void HttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
 {
     m_additionalHeaders.emplace_back(key, value);

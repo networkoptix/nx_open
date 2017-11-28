@@ -10,7 +10,6 @@
 #include <QtWidgets/private/qwidget_p.h>
 
 #include <nx/utils/math/fuzzy.h>
-#include <ui/common/geometry.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
 namespace {

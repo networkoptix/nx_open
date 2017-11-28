@@ -17,7 +17,7 @@ class QnEditableLabel: public QWidget
     using base_type = QWidget;
 
 public:
-    QnEditableLabel(QWidget* parent = nullptr);
+    explicit QnEditableLabel(QWidget* parent = nullptr);
     virtual ~QnEditableLabel();
 
     QString text() const;

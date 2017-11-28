@@ -757,16 +757,13 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
-        .requiredTargetPermissions(Qn::ExportPermission)
-        .condition((ConditionWrapper(new ExportCondition(true))
-            || condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition(ConditionWrapper(new ExportCondition(true))
             && condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
-        .condition((ConditionWrapper(new ExportCondition(true))
-            || condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition(ConditionWrapper(new ExportCondition(true))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportLayoutAction)
@@ -778,8 +775,7 @@ void initialize(Manager* manager, Action* root)
     factory(ExportRapidReviewAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
-        .condition((ConditionWrapper(new ExportCondition(true))
-            || condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition(ConditionWrapper(new ExportCondition(true))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ThumbnailsSearchAction)
@@ -1762,6 +1758,11 @@ void initialize(Manager* manager, Action* root)
 
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
+
+    factory(OpenNewSceneAction)
+        .flags(GlobalHotkey | DevMode)
+        .shortcut(lit("Ctrl+Shift+E"))
+        .autoRepeat(false);
 }
 
 } // namespace action

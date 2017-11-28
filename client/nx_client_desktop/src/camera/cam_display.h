@@ -18,6 +18,7 @@
 
 // TODO: #GDM use forward declaration
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/utils/elapsed_timer.h>
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
@@ -58,6 +59,9 @@ public:
     void removeVideoRenderer(QnAbstractRenderer* vw);
     int channelsCount() const;
 
+    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual void pleaseStop() override;
@@ -81,10 +85,10 @@ public:
      * \returns                         Current time in microseconds.
      */
 
-    virtual qint64 getCurrentTime() const;
-    virtual qint64 getDisplayedTime() const;
-    virtual qint64 getExternalTime() const;
-    virtual qint64 getNextTime() const;
+    virtual qint64 getCurrentTime() const override;
+    virtual qint64 getDisplayedTime() const override;
+    virtual qint64 getExternalTime() const override;
+    virtual qint64 getNextTime() const override;
 
     void setMTDecoding(bool value);
 
@@ -271,6 +275,7 @@ protected:
     bool m_liveMaxLenReached;
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
+    nx::utils::ElapsedTimer m_lastMediaEventTimeout;
 };
 
 #endif //QN_CAM_DISPLAY_H

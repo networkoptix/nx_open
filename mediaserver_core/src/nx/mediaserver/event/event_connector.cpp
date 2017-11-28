@@ -383,6 +383,15 @@ void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
     qnEventRuleProcessor->broadcastAction(action);
 }
 
+void EventConnector::at_fileIntegrityCheckFailed(const QnResourcePtr& resource)
+{
+    vms::event::SystemHealthActionPtr action(
+        new vms::event::SystemHealthAction(
+            QnSystemHealth::ArchiveIntegrityFailed,
+            resource->getId()));
+    qnEventRuleProcessor->broadcastAction(action);
+}
+
 bool EventConnector::createEventFromParams(const vms::event::EventParameters& params,
     vms::event::EventState eventState, const QnUuid& userId, QString* errorMessage)
 {

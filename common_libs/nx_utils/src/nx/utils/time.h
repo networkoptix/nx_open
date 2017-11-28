@@ -2,6 +2,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QDateTime>
 
 #include <chrono>
 
@@ -46,6 +47,11 @@ NX_UTILS_API QString getCurrentTimeZoneId();
  * @return false on error or unsupported platform, true on success.
  */
 NX_UTILS_API bool setDateTime(qint64 millisecondsSinceEpoch);
+
+/**
+ * @return QDateTime object corresponding to the given offset from Unix epoch.
+ */
+NX_UTILS_API QDateTime fromOffsetSinceEpoch(const std::chrono::nanoseconds& offset);
 
 /**
  * Rounds timePoint down to DurationTypeToRoundTo type.

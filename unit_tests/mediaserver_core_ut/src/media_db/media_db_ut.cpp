@@ -33,6 +33,8 @@
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
+#include "../media_server_module_fixture.h"
+
 struct ErrorStream
 {
     QnMutex mutex;
@@ -522,7 +524,19 @@ void reopenDbFile(QFile *dbFile, const QString& fileName)
         << strerror(errno);
 }
 
-TEST(MediaDbTest, SimpleFileWriteTest)
+class MediaDbTest:
+    public MediaServerModuleFixture
+{
+public:
+    MediaDbTest()
+    {
+        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
+    }
+
+    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+};
+
+TEST_F(MediaDbTest, SimpleFileWriteTest)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -560,7 +574,7 @@ TEST(MediaDbTest, SimpleFileWriteTest)
     }
 }
 
-TEST(MediaDbTest, BitsTwiddling)
+TEST_F(MediaDbTest, BitsTwiddling)
 {
     const size_t kTestBufSize = 10000;
     std::vector<TestFileHeader> fhVector;
@@ -626,11 +640,11 @@ TEST(MediaDbTest, BitsTwiddling)
     }
 }
 
-TEST(MediaDbTest, MediaFileOP_ResetValues)
+TEST_F(MediaDbTest, MediaFileOP_ResetValues)
 {
     nx::media_db::MediaFileOperation mfop;
     mfop.setCameraId(65535);
-    quint64 newCameraId = nx::utils::random::number(0, 65534);
+    qint64 newCameraId = nx::utils::random::number<qint64>(0, 65534);
     mfop.setCameraId(newCameraId);
     ASSERT_EQ(newCameraId, mfop.getCameraId());
 
@@ -646,7 +660,7 @@ TEST(MediaDbTest, MediaFileOP_ResetValues)
     mfop.setFileSize(std::pow(2, 39));
     quint64 newFileSize = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 39) - 1));
     mfop.setFileSize(newFileSize);
-    ASSERT_EQ(newFileSize, mfop.getFileSize());
+    ASSERT_EQ((qint64) newFileSize, mfop.getFileSize());
 
     mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_NONE);
     mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
@@ -662,7 +676,7 @@ TEST(MediaDbTest, MediaFileOP_ResetValues)
     ASSERT_EQ(newStartTime, mfop.getStartTime());
 }
 
-TEST(MediaDbTest, CameraOP_ResetValues)
+TEST_F(MediaDbTest, CameraOP_ResetValues)
 {
     nx::media_db::CameraOperation cop;
     cop.setCameraId(std::pow(2, 16));
@@ -676,7 +690,7 @@ TEST(MediaDbTest, CameraOP_ResetValues)
     ASSERT_EQ(newCameraUniqueIdLen, cop.getCameraUniqueIdLen());
 }
 
-TEST(MediaDbTest, ReadWrite_Simple)
+TEST_F(MediaDbTest, ReadWrite_Simple)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -730,7 +744,7 @@ TEST(MediaDbTest, ReadWrite_Simple)
     ASSERT_TRUE(readRecords == tdm.dataVector.size());
 }
 
-TEST(MediaDbTest, DbFileTruncate)
+TEST_F(MediaDbTest, DbFileTruncate)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -800,7 +814,7 @@ TEST(MediaDbTest, DbFileTruncate)
     }
 }
 
-TEST(MediaDbTest, ReadWrite_MT)
+TEST_F(MediaDbTest, ReadWrite_MT)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
@@ -917,21 +931,15 @@ TEST(MediaDbTest, ReadWrite_MT)
     QFile::remove(fileName);
 }
 
-TEST(MediaDbTest, StorageDB)
+TEST_F(MediaDbTest, StorageDB)
 {
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
 
-    const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(moduleGuid);
-
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule().commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
@@ -1054,19 +1062,13 @@ TEST(MediaDbTest, StorageDB)
     ASSERT_EQ(allVisited, true);
 }
 
-TEST(MediaDbTest, Migration_from_sqlite)
+TEST_F(MediaDbTest, Migration_from_sqlite)
 {
-    const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(moduleGuid);
-
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = moduleGuid.toSimpleString();
+    QString simplifiedGUID = serverModule().commonModule()->moduleGUID().toSimpleString();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
     auto sqlDb = std::unique_ptr<QSqlDatabase>(
@@ -1123,7 +1125,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     }
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule().commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);

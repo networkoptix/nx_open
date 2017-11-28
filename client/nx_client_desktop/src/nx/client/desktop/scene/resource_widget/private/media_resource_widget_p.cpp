@@ -4,12 +4,26 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
+#include <nx/client/core/media/consuming_motion_metadata_provider.h>
+#include <nx/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
+#include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
 
 #include <utils/license_usage_helper.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+template<typename T>
+nx::media::AbstractMetadataConsumerPtr getMetadataConsumer(T* provider)
+{
+    const auto consumingProvider =
+        dynamic_cast<nx::client::core::AbstractMetadataConsumerOwner*>(provider);
+
+    return consumingProvider
+        ? consumingProvider->metadataConsumer()
+        : nx::media::AbstractMetadataConsumerPtr();
+}
 
 MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& resource,
     QObject* parent)
@@ -19,7 +33,11 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
     mediaResource(resource.dynamicCast<QnMediaResource>()),
     camera(resource.dynamicCast<QnVirtualCameraResource>()),
     hasVideo(mediaResource->hasVideo(nullptr)),
-    isIoModule(camera && camera->hasFlags(Qn::io_module))
+    isIoModule(camera && camera->hasFlags(Qn::io_module)),
+    motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider()),
+    analyticsMetadataProvider(
+        AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
+    analyticsController(new WidgetAnalyticsController())
 {
     QSignalBlocker blocker(this);
 
@@ -42,6 +60,10 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
 
 MediaResourceWidgetPrivate::~MediaResourceWidgetPrivate()
 {
+    if (const auto consumer = motionMetadataConsumer())
+        m_display->removeMetadataConsumer(consumer);
+    if (const auto consumer = analyticsMetadataConsumer())
+        m_display->removeMetadataConsumer(consumer);
 }
 
 QnResourceDisplayPtr MediaResourceWidgetPrivate::display() const
@@ -82,6 +104,18 @@ bool MediaResourceWidgetPrivate::isUnauthorized() const
 QnLicenseUsageStatus MediaResourceWidgetPrivate::licenseStatus() const
 {
     return m_licenseStatusHelper->status();
+}
+
+QSharedPointer<media::AbstractMetadataConsumer>
+    MediaResourceWidgetPrivate::motionMetadataConsumer() const
+{
+    return getMetadataConsumer(motionMetadataProvider.data());
+}
+
+QSharedPointer<media::AbstractMetadataConsumer>
+    MediaResourceWidgetPrivate::analyticsMetadataConsumer() const
+{
+    return getMetadataConsumer(analyticsMetadataProvider.data());
 }
 
 void MediaResourceWidgetPrivate::updateIsPlayingLive()

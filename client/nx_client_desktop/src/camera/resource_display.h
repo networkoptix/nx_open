@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
+#include <nx/media/abstract_metadata_consumer.h>
 #include <nx/client/desktop/camera/camera_fwd.h>
 
 #include <utils/common/connective.h>
@@ -35,7 +36,7 @@ public:
      * \param resource                  Resource that this display is associated with. Must not be NULL.
      * \param parent                    Parent of this display.
      */
-    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent);
+    QnResourceDisplay(const QnResourcePtr& resource, QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -115,6 +116,9 @@ public:
      */
     void addRenderer(QnAbstractRenderer *renderer);
     void removeRenderer(QnAbstractRenderer *renderer);
+
+    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
 
 protected:
     virtual void beforeDisconnectFromResource() override;

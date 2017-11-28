@@ -13,6 +13,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
+#include <api/helpers/event_log_multiserver_request_data.h>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -433,6 +434,13 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& request,
+    Result<EventLogData>::type callback,
+    QThread *targetThread)
+{
+    return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
+}
+
 Handle ServerConnection::changeCameraPassword(
     const QnUuid& id,
     const QAuthenticator& auth,
@@ -454,11 +462,27 @@ Handle ServerConnection::changeCameraPassword(
         nx_http::Method::post,
         prepareUrl(lit("/api/changeCameraPassword"), params.toParams()));
     request.messageBody = QJson::serialized(std::move(data));
-    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray());
+    nx_http::insertOrReplaceHeader(&request.headers,
+        nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray()));
 
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
     trace(handle, request.url.toString());
     return handle;
+}
+
+Handle ServerConnection::lookupDetectedObjects(
+    const nx::analytics::storage::Filter& request,
+    Result<nx::analytics::storage::LookupResult>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList queryParams;
+    nx::analytics::storage::serializeToParams(request, &queryParams);
+
+    return executeGet(
+        lit("/ec2/analyticsLookupDetectedObjects"),
+        queryParams,
+        callback,
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

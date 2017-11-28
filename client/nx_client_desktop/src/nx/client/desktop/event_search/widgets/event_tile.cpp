@@ -2,6 +2,7 @@
 #include "ui_event_tile.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QTimer>
 
 #include <QtGui/QPainter>
 #include <QtGui/QDesktopServices>
@@ -11,6 +12,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace client {
@@ -30,11 +32,10 @@ static constexpr int kDescriptionFontWeight = QFont::Normal;
 
 } // namespace
 
-EventTile::EventTile(const QnUuid& id, QWidget* parent):
+EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this)),
-    m_id(id)
+    m_closeButton(new QPushButton(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
@@ -93,14 +94,13 @@ EventTile::EventTile(const QnUuid& id, QWidget* parent):
 }
 
 EventTile::EventTile(
-    const QnUuid& id,
     const QString& title,
     const QPixmap& icon,
     const QString& timestamp,
     const QString& description,
     QWidget* parent)
     :
-    EventTile(id, parent)
+    EventTile(parent)
 {
     setTitle(title);
     setIcon(icon);
@@ -110,11 +110,6 @@ EventTile::EventTile(
 
 EventTile::~EventTile()
 {
-}
-
-QnUuid EventTile::id() const
-{
-    return m_id;
 }
 
 bool EventTile::closeable() const
@@ -221,7 +216,7 @@ void EventTile::paintEvent(QPaintEvent* /*event*/)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(palette().window());
+    painter.setBrush(palette().brush(backgroundRole()));
     painter.drawRoundedRect(rect(), kRoundingRadius, kRoundingRadius);
 }
 
@@ -237,6 +232,11 @@ bool EventTile::event(QEvent* event)
         case QEvent::Leave:
         case QEvent::HoverLeave:
             handleHoverChanged(false);
+            break;
+
+        case QEvent::MouseMove:
+        case QEvent::HoverMove:
+            updateBackgroundRole(!m_closeButton->underMouse());
             break;
 
         case QEvent::MouseButtonPress:
@@ -260,6 +260,60 @@ void EventTile::handleHoverChanged(bool hovered)
     const auto showCloseButton = hovered & m_closeable;
     ui->timestampLabel->setHidden(showCloseButton);
     m_closeButton->setVisible(showCloseButton);
+    updateBackgroundRole(hovered && !m_closeButton->underMouse());
+
+    if (m_autoCloseTimer)
+    {
+        if (hovered)
+            m_autoCloseTimer->stop();
+        else
+            m_autoCloseTimer->start();
+    }
+}
+
+void EventTile::updateBackgroundRole(bool hovered)
+{
+    setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
+}
+
+bool EventTile::hasAutoClose() const
+{
+    return closeable() && m_autoCloseTimer;
+}
+
+int EventTile::autoCloseTimeMs() const
+{
+    return hasAutoClose() ? m_autoCloseTimer->interval() : -1;
+}
+
+int EventTile::autoCloseRemainingMs() const
+{
+    return hasAutoClose() ? m_autoCloseTimer->remainingTime() : -1;
+}
+
+void EventTile::setAutoCloseTimeMs(int value)
+{
+    if (value <= 0)
+    {
+        if (!m_autoCloseTimer)
+            return;
+
+        m_autoCloseTimer->deleteLater();
+        m_autoCloseTimer = nullptr;
+        return;
+    }
+
+    const auto autoClose =
+        [this]()
+        {
+            if (closeable())
+                emit closeRequested();
+        };
+
+    if (m_autoCloseTimer)
+        m_autoCloseTimer->setInterval(value);
+    else
+        m_autoCloseTimer = executeDelayedParented(autoClose, value, this);
 }
 
 } // namespace

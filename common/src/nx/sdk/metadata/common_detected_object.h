@@ -35,7 +35,9 @@ public:
     void setBoundingBox(const Rect& rect);
 
 private:
+    // TODO: #mike: Rename to m_typeId.
     nxpl::NX_GUID m_eventTypeId;
+
     float m_confidence = 1.0;
 
     nxpl::NX_GUID m_id;
@@ -44,7 +46,6 @@ private:
     std::string m_auxilaryData;
     Rect m_rect;
 };
-
 
 } // namespace nx
 } // namespace sdk

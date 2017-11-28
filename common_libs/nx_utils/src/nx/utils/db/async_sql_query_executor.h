@@ -16,6 +16,7 @@
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
 #include "base_request_executor.h"
+#include "detail/query_queue.h"
 #include "request_executor.h"
 #include "types.h"
 #include "query_context.h"
@@ -88,7 +89,7 @@ public:
      * @throws nx::utils::db::Exception.
      */
     template<typename QueryFunc>
-    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type 
+    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type
         executeSelectQuerySync(QueryFunc queryFunc)
     {
         typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type result;
@@ -153,7 +154,13 @@ public:
 
     void reserveConnections(int count);
 
+    /**
+     * @param value Zero - no limit. By default, zero.
+     */
+    void setConcurrentModificationQueryLimit(int value);
+
     std::size_t pendingQueryCount() const;
+
 
     /**
      * Executes data modification request that spawns some output data.
@@ -202,8 +209,7 @@ public:
 private:
     const ConnectionOptions m_connectionOptions;
     mutable QnMutex m_mutex;
-    nx::utils::SyncQueueWithItemStayTimeout<std::unique_ptr<AbstractExecutor>>
-        m_requestQueue;
+    detail::QueryQueue m_queryQueue;
     std::vector<std::unique_ptr<BaseRequestExecutor>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
@@ -240,7 +246,7 @@ private:
         if (m_statisticsCollector)
             executor->setStatisticsCollector(m_statisticsCollector);
 
-        m_requestQueue.push(std::move(executor));
+        m_queryQueue.push(std::move(executor));
     }
 };
 

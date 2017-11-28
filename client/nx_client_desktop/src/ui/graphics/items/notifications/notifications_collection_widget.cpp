@@ -29,7 +29,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
@@ -89,42 +88,52 @@ const char* kItemTimeStampPropertyName = "_qn_itemTimeStamp";
 
 } //anonymous namespace
 
-QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
+QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent,
+    Qt::WindowFlags flags,
+    QnWorkbenchContext* context)
+    :
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
     m_headerWidget(new GraphicsWidget(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    auto newButton = [this, maxIconSize](action::IDType actionId, int helpTopicId)
-    {
-        QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
-        button->setDefaultAction(action(actionId));
-        button->setFixedSize(button->defaultAction()->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr,
+        nullptr);
 
-        if (helpTopicId != Qn::Empty_Help)
-            setHelpTopic(button, helpTopicId);
-
-        connect(this->context(), &QnWorkbenchContext::userChanged, this, [this, button, actionId]
+    auto newButton =
+        [this, maxIconSize](action::IDType actionId, int helpTopicId = Qn::Empty_Help)
         {
+            QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
+            button->setDefaultAction(action(actionId));
+            button->setFixedSize(button->defaultAction()->icon().actualSize(
+                QSize(maxIconSize, maxIconSize)));
+
+            if (helpTopicId != Qn::Empty_Help)
+                setHelpTopic(button, helpTopicId);
+
+            connect(this->context(), &QnWorkbenchContext::userChanged, this,
+                [this, button, actionId]
+                {
+                    button->setVisible(this->menu()->canTrigger(actionId));
+                });
             button->setVisible(this->menu()->canTrigger(actionId));
-        });
-        button->setVisible(this->menu()->canTrigger(actionId));
 
-        const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"), QnLexical::serialized(actionId));
-        this->context()->statisticsModule()->registerButton(statAlias, button);
+            const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget"),
+                QnLexical::serialized(actionId));
+            this->context()->statisticsModule()->registerButton(statAlias, button);
 
-        return button;
-    };
+            return button;
+        };
 
     QGraphicsLinearLayout* controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
     controlsLayout->setContentsMargins(2.0, 1.0, 2.0, 0.0);
     controlsLayout->addStretch();
 
-    controlsLayout->addItem(newButton(action::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));
-    controlsLayout->addItem(newButton(action::BusinessEventsAction, -1));
-    controlsLayout->addItem(newButton(action::PreferencesNotificationTabAction, -1));
+    controlsLayout->addItem(newButton(action::OpenBusinessLogAction,
+        Qn::MainWindow_Notifications_EventLog_Help));
+    controlsLayout->addItem(newButton(action::BusinessEventsAction));
+    controlsLayout->addItem(newButton(action::PreferencesNotificationTabAction));
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -243,7 +252,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
 
     NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
 
-    const auto requiredPermission = msecSinceEpoch < 0
+    const auto requiredPermission = msecSinceEpoch == QnThumbnailRequestData::kLatestThumbnail
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
@@ -268,7 +277,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     const QnVirtualCameraResourceList& cameraList,
     qint64 msecSinceEpoch)
 {
-    const auto requiredPermission = msecSinceEpoch < 0
+    const auto requiredPermission = msecSinceEpoch == QnThumbnailRequestData::kLatestThumbnail
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
@@ -406,7 +415,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     const bool hasViewPermission = resource && accessController()->hasPermissions(resource,
         Qn::ViewContentPermission);
@@ -498,7 +507,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
-                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -511,7 +519,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     camera);
 
                 loadThumbnailForItem(item, camera);
-                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -525,7 +532,6 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                     camera);
 
                 loadThumbnailForItem(item, camera);
-                addAcknoledgeButtonIfNeeded(item, camera, action);
                 break;
             }
 
@@ -578,7 +584,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                         action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
-                    addAcknoledgeButtonIfNeeded(item, sourceCameras.first(), action);
+                    camera = sourceCameras.first();
                 }
                 break;
             }
@@ -587,6 +593,9 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
                 break;
         }
     }
+
+    if (action->actionType() == vms::event::showPopupAction && camera)
+        addAcknoledgeButtonIfNeeded(item, camera, action);
 
     m_itemsByEventRuleId.insert(ruleId, item);
 
@@ -815,8 +824,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             break;
 
         case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::ArchiveRebuildCanceled:
             item->addActionButton(
                 qnSkin->icon("events/storage.png"),
@@ -878,15 +887,24 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     m_itemsByMessageType.insert(message, item);
 }
 
-void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
+void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message,
+    const QVariant& params)
 {
+    // TODO: remove this hack in VMS-7724
+    if (message == QnSystemHealth::RemoteArchiveSyncStarted)
+    {
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncFinished, params);
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncProgress, params);
+        hideSystemHealthMessage(QnSystemHealth::RemoteArchiveSyncError, params);
+    }
+
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
 
     if (!resource)
     {
-        for (QnNotificationWidget* item : m_itemsByMessageType.values(message))
+        for (auto item: m_itemsByMessageType.values(message))
             cleanUpItem(item);
 
         return;

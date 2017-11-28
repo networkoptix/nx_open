@@ -20,10 +20,10 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
-#include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
 #include <ui/common/palette.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
@@ -292,7 +292,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
-        imageRect = QnGeometry::eroded(imageRect, m_imageMargins);
+        imageRect = nx::client::core::Geometry::eroded(imageRect, m_imageMargins);
 
     if (!m_initialized)
         initializeVao(imageRect);
@@ -644,12 +644,12 @@ void QnImageButtonWidget::setFixedSize(const QSizeF &size)
     setMaximumSize(size);
 }
 
-MarginsF QnImageButtonWidget::imageMargins() const
+QMarginsF QnImageButtonWidget::imageMargins() const
 {
     return m_imageMargins;
 }
 
-void QnImageButtonWidget::setImageMargins(const MarginsF &margins)
+void QnImageButtonWidget::setImageMargins(const QMarginsF& margins)
 {
     if (m_imageMargins == margins)
         return;

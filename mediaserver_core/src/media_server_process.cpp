@@ -122,6 +122,7 @@
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/event_log_rest_handler.h>
 #include <rest/handlers/event_log2_rest_handler.h>
+#include <rest/handlers/multiserver_events_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
@@ -178,6 +179,7 @@
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/handlers/multiserver_statistics_rest_handler.h>
+#include <rest/handlers/multiserver_analytics_lookup_detected_objects.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
@@ -268,6 +270,7 @@
 #include <managers/discovery_manager.h>
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/remote_archive_synchronizer.h>
+#include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
@@ -1584,6 +1587,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/backupControl", new QnBackupControlRestHandler());
     reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated, still used in the client
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
+    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -1632,6 +1636,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
+
+    reg(
+        "ec2/analyticsLookupDetectedObjects",
+        new QnMultiserverAnalyticsLookupDetectedObjects(
+            "ec2/analyticsLookupDetectedObjects",
+            qnServerModule->analyticsEventsStorage()));
 
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 
@@ -2109,6 +2119,19 @@ void MediaServerProcess::serviceModeInit()
     }
 }
 
+void MediaServerProcess::connectArchiveIntegrityWatcher()
+{
+    using namespace nx::mediaserver;
+    auto serverArchiveIntegrityWatcher = static_cast<ServerArchiveIntegrityWatcher*>(
+        qnServerModule->archiveIntegrityWatcher());
+
+    connect(
+        serverArchiveIntegrityWatcher,
+        &ServerArchiveIntegrityWatcher::fileIntegrityCheckFailed,
+        qnEventRuleConnector,
+        &event::EventConnector::at_fileIntegrityCheckFailed);
+}
+
 void MediaServerProcess::run()
 {
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
@@ -2233,6 +2256,8 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
+
+    connectArchiveIntegrityWatcher();
 
     auto remoteArchiveSynchronizer =
         std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(qnServerModule);

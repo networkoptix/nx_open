@@ -20,7 +20,6 @@
 #include <utils/math/math.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
-#include <ui/common/geometry.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/cloud_status_panel.h>
@@ -140,7 +139,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     QnWorkbenchContext* context)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(context),
     d_ptr(new QnMainWindowTitleBarWidgetPrivate(this))
 {
     Q_D(QnMainWindowTitleBarWidget);

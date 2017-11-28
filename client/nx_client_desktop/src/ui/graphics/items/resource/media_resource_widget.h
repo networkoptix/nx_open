@@ -25,6 +25,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <nx/client/desktop/camera/camera_fwd.h>
+#include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
 #include <utils/color_space/image_correction.h>
@@ -36,8 +37,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class RecordingStatusHelper;
 class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
+class AreaHighlightOverlayWidget;
 
 namespace ui {
 namespace graphics {
@@ -165,6 +168,11 @@ public:
 
     bool isLicenseUsed() const;
 
+    bool isAnalyticsEnabled() const;
+    void setAnalyticsEnabled(bool analyticsEnabled);
+
+    nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -247,6 +255,7 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
+    void at_analyticsButton_toggled(bool checked);
 
     void at_entropixEnhancementButton_clicked();
     void at_entropixImageLoaded(const QImage& image);
@@ -276,6 +285,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
+    Q_SLOT void updateAreaHighlightVisibility();
 
     void updateCompositeOverlayMode();
 
@@ -322,7 +332,7 @@ private:
     void initDisplay();
     void initSoftwareTriggers();
     void initIoModuleOverlay();
-    void initIconButton();
+    void initAreaHighlightOverlay();
     void initStatusOverlayController();
 
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
@@ -378,6 +388,8 @@ private:
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
+    nx::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
+
     QnPtzControllerPtr m_ptzController;
     QnFisheyeHomePtzController* m_homePtzController = nullptr;
 
@@ -396,6 +408,8 @@ private:
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 

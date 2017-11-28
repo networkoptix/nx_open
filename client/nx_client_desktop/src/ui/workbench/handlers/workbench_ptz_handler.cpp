@@ -43,8 +43,9 @@ const QString kPtzHotkeysPropertyName = lit("ptzHotkeys");
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware
 {
 public:
-    QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
+    QnSingleCameraPtzHotkeysDelegate(QWidget* parent, const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
+        m_parent(parent),
         m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
         m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>())
@@ -87,6 +88,7 @@ public:
     }
 
 private:
+    QWidget* m_parent;
     QnVirtualCameraResourcePtr m_camera;
     QnUuid m_resourceId;
     std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>> m_propertyHandler;
@@ -167,15 +169,16 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     // TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        messages::Ptz::failedToGetPosition(mainWindow(),
+        messages::Ptz::failedToGetPosition(mainWindowWidget(),
         QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
 
-    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindowWidget()));
     dialog->setController(widget->ptzController());
+    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(
+        new QnSingleCameraPtzHotkeysDelegate(dialog.data(), resource, context()));
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
     dialog->exec();
 }
@@ -297,14 +300,14 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     if (!dialog)
-        dialog = new QnPtzManageDialog(mainWindow());
+        dialog = new QnPtzManageDialog(mainWindowWidget());
 
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
     auto res = widget->resource()->toResourcePtr();
     auto hotkeysDelegate =
-        new QnSingleCameraPtzHotkeysDelegate(res, context());
+        new QnSingleCameraPtzHotkeysDelegate(dialog, res, context());
 
     dialog->setWidget(widget);
     dialog->setHotkeysDelegate(hotkeysDelegate);
@@ -374,7 +377,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        messages::Ptz::failedToSetPosition(mainWindow(),
+        messages::Ptz::failedToSetPosition(mainWindowWidget(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     // TODO: #GDM #PTZ check other cases

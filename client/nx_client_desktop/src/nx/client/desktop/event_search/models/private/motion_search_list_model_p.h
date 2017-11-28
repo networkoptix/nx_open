@@ -2,6 +2,8 @@
 
 #include "../motion_search_list_model.h"
 
+#include <deque>
+
 #include <camera/camera_data_manager.h>
 #include <recording/time_period_list.h>
 
@@ -20,19 +22,21 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    int count() const;
+    const QnTimePeriod& period(int index) const;
+
     bool canFetchMore() const;
     void fetchMore();
 
 private:
-    void periodsChanged(qint64 startTimeMs);
-    void addPeriod(const QnTimePeriod& period, Position where);
-    qint64 firstTimeMs() const;
-    qint64 lastTimeMs() const;
+    void updateMotionPeriods(qint64 startTimeMs);
+    void reset();
 
 private:
     MotionSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     QnCachingCameraDataLoaderPtr m_loader;
+    std::deque<QnTimePeriod> m_data; //< Reversed list.
 };
 
 } // namespace

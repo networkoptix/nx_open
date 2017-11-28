@@ -75,8 +75,11 @@ public:
 
     GIE_Context();
 
-    void buildGieContext(const string& deployfile,
-            const string& modelfile, bool bUseCPUBuf = false);
+    void buildGieContext(
+        const string& deployfile,
+        const string& modelfile,
+        const string& cachefile,
+        bool bUseCPUBuf = false);
 
     void doInference(
         queue< vector<cv::Rect> >& rectList_queue,

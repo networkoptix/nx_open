@@ -16,6 +16,16 @@ class QnStaticCommonModule;
 class QnCloudStatusWatcher;
 class QnCameraDataManager;
 
+namespace nx {
+namespace client {
+namespace desktop {
+
+class AnalyticsMetadataProviderFactory;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
     Q_OBJECT
@@ -32,6 +42,9 @@ public:
     QnCameraDataManager* cameraDataManager() const;
 
     nx::client::desktop::RadassController* radassController() const;
+
+    QnStartupParameters startupParameters() const;
+
 private:
     void initApplication();
     void initThread();
@@ -45,8 +58,11 @@ private:
     void initLocalInfo(const QnStartupParameters& startupParams);
 
 private:
+    QnStartupParameters m_startupParameters;
     QScopedPointer<QnStaticCommonModule> m_staticCommon;
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
+    QScopedPointer<nx::client::desktop::AnalyticsMetadataProviderFactory>
+        m_analyticsMetadataProviderFactory;
     QnNetworkProxyFactory* m_networkProxyFactory;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
     QnCameraDataManager* m_cameraDataManager;

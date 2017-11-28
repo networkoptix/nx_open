@@ -6,7 +6,7 @@
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
-#include <nx/client/desktop/analytics/drivers/analytics_drivers_factory.h>
+#include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <nx/client/desktop/layout_templates/layout_template_manager.h>
 
 namespace nx {
@@ -86,7 +86,7 @@ ui::action::ConditionWrapper AnalyticsActionFactory::condition()
     return new ui::action::ResourceCondition(
         [](const QnResourcePtr& resource)
         {
-            return AnalyticsDriversFactory::supportsAnalytics(resource);
+            return AnalyticsMetadataProviderFactory::instance()->supportsAnalytics(resource);
         },
         MatchMode::All);
 }

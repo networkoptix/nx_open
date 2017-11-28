@@ -16,7 +16,6 @@
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/image_processing.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -28,6 +27,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/threaded_image_loader.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -351,8 +351,14 @@ void QnLayoutSettingsDialog::updateControls() {
     qreal targetAspectRatio = bestAspectRatioForCells();
     // TODO: #GDM #Common do not change if values were changed manually?
     if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
-        QSize minSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMinSize(), Qt::KeepAspectRatioByExpanding).toSize();
-        QSize maxSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMaxSize(), Qt::KeepAspectRatio).toSize();
+        QSize minSize = nx::client::core::Geometry::expanded(
+            targetAspectRatio,
+            qnGlobals->layoutBackgroundMinSize(),
+            Qt::KeepAspectRatioByExpanding).toSize();
+        QSize maxSize = nx::client::core::Geometry::expanded(
+            targetAspectRatio,
+            qnGlobals->layoutBackgroundMaxSize(),
+            Qt::KeepAspectRatio).toSize();
 
         ui->widthSpinBox->setRange(minSize.width(), maxSize.width());
         ui->heightSpinBox->setRange(minSize.height(), maxSize.height());
@@ -517,7 +523,7 @@ void QnLayoutSettingsDialog::viewFile() {
     if (QDesktopServices::openUrl(QUrl(path)))
         return;
 
-    QnImagePreviewDialog dialog;
+    QnImagePreviewDialog dialog(this);
     dialog.openImage(d->imageSourcePath);
     dialog.exec();
 }

@@ -429,11 +429,11 @@ void QnEventLogDialog::query(qint64 fromMsec,
     m_allEvents.clear();
 
     QnEventLogRequestData request;
-    request.cameras = cameras(m_filterCameraList);
-    request.period = QnTimePeriod(fromMsec, toMsec - fromMsec);
-    request.eventType = eventType;
-    request.eventSubtype = eventSubtype;
-    request.actionType = actionType;
+    request.filter.cameras = cameras(m_filterCameraList);
+    request.filter.period = QnTimePeriod(fromMsec, toMsec - fromMsec);
+    request.filter.eventType = eventType;
+    request.filter.eventSubtype = eventSubtype;
+    request.filter.actionType = actionType;
 
     QPointer<QnEventLogDialog> guard(this);
     auto callback =

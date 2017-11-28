@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
+#include <QtQml/QQmlEngine>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -86,6 +87,7 @@
 #include <nx/client/desktop/utils/applauncher_guard.h>
 #include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/client/desktop/layout_templates/layout_template_manager.h>
+#include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -113,6 +115,7 @@
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
+static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
@@ -169,7 +172,8 @@ namespace
 }
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    m_startupParameters(startupParams)
 {
     ini().reload();
 
@@ -376,6 +380,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new LayoutTemplateManager());
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
+
+    m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
+    m_analyticsMetadataProviderFactory->registerMetadataProviders();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -431,6 +438,17 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     if (mac_isSandboxed())
         qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
 #endif
+
+    auto qmlRoot = startupParams.qmlRoot.isEmpty() ? kQmlRoot : startupParams.qmlRoot;
+    if (!qmlRoot.endsWith(L'/'))
+        qmlRoot.append(L'/');
+    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+
+    m_clientCoreModule->mainQmlEngine()->setBaseUrl(
+        qmlRoot.startsWith(lit("qrc:"))
+            ? QUrl(qmlRoot)
+            : QUrl::fromLocalFile(qmlRoot));
+    m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
 }
 
 void QnClientModule::initLog(const QnStartupParameters& startupParams)
@@ -625,6 +643,11 @@ QnCameraDataManager* QnClientModule::cameraDataManager() const
 nx::client::desktop::RadassController* QnClientModule::radassController() const
 {
     return m_radassController;
+}
+
+QnStartupParameters QnClientModule::startupParameters() const
+{
+    return m_startupParameters;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

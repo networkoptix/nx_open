@@ -12,7 +12,6 @@ QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& re
     m_request(request),
     m_rtpTransport(RtpTransport::_auto)
 {
-
 }
 
 QnRtpStreamReader::~QnRtpStreamReader()
@@ -34,14 +33,16 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 {
     if (!isStreamOpened())
     {
-        NX_VERBOSE(this, "Next data: stream is closed");
+        NX_VERBOSE(this, lm("Next data: stream %1 is closed")
+            .args(m_rtpReader.getCurrentStreamUrl()));
         return QnAbstractMediaDataPtr(0);
     }
 
     if (needMetaData())
     {
         const auto metaData = getMetaData();
-        NX_VERBOSE(this, lm("Next data: meta at %1").args(metaData->timestamp));
+        NX_VERBOSE(this, lm("Next data: meta at %1 from %2")
+            .args(metaData->timestamp, m_rtpReader.getCurrentStreamUrl()));
         return metaData;
     }
 
@@ -51,13 +52,17 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 
     if (!result)
     {
-        NX_VERBOSE(this, "Next data: end of stream");
+        NX_VERBOSE(this, lm("Next data: end of stream %1")
+            .args(m_rtpReader.getCurrentStreamUrl()));
         closeStream();
     }
     else
     {
         if (m_dataPassed++ % kPacketCountToOmitLog == 0)
-            NX_VERBOSE(this, lm("Next data: timestamp %1").arg(result->timestamp));
+        {
+            NX_VERBOSE(this, lm("Next data: media timestamp %1 from %2")
+                .args(result->timestamp, m_rtpReader.getCurrentStreamUrl()));
+        }
     }
 
     return result;
@@ -77,7 +82,11 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraCon
 	if (virtRes)
 		virtRes->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 
-    return m_rtpReader.openStream();
+    const auto result = m_rtpReader.openStream();
+    NX_VERBOSE(this, lm("Role %1, open stream %2 -> %3")
+        .args((int) getRole(), m_rtpReader.getCurrentStreamUrl(), result.toString(nullptr)));
+
+    return result;
 }
 
 void QnRtpStreamReader::closeStream()

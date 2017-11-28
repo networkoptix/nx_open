@@ -27,6 +27,18 @@ class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
 class QnControlsStatisticsModule;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
+class MainWindow;
+
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 /**
  * This is a class that ties together all objects comprising the global visual scene state
  */
@@ -50,8 +62,8 @@ public:
     QnWorkbenchNavigator* navigator() const;
     QnControlsStatisticsModule* statisticsModule() const;
 
-    QWidget* mainWindow() const;
-    void setMainWindow(QWidget* mainWindow);
+    nx::client::desktop::ui::MainWindow* mainWindow() const;
+    void setMainWindow(nx::client::desktop::ui::MainWindow* mainWindow);
 
     QAction *action(const nx::client::desktop::ui::action::IDType id) const;
 
@@ -97,7 +109,7 @@ private:
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
     QScopedPointer<QnControlsStatisticsModule> m_statisticsModule;
 
-    QPointer<QWidget> m_mainWindow;
+    QPointer<nx::client::desktop::ui::MainWindow> m_mainWindow;
 
     QnWorkbenchAccessController* m_accessController;
     QnWorkbenchUserWatcher *m_userWatcher;

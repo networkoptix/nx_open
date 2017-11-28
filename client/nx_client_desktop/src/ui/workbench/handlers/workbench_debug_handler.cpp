@@ -26,6 +26,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/widgets/main_window.h>
 
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
@@ -96,7 +97,7 @@ class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
     typedef QnDialog base_type;
 
 public:
-    QnDebugControlDialog(QWidget *parent = NULL):
+    QnDebugControlDialog(QWidget *parent):
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
@@ -152,7 +153,7 @@ public:
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
                 w->setPalette(qApp->palette());
-                auto messageBox = new QnMessageBox(mainWindow());
+                auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
                 messageBox->addButton(QDialogButtonBox::Ok);
@@ -186,7 +187,7 @@ public:
 
         addButton(lit("Resource Pool"), [this]
             {
-                auto messageBox = new QnMessageBox(mainWindow());
+                auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
 
                 messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(),
@@ -309,7 +310,7 @@ private:
 
             m_tilesTests = new QnSystemTilesTestCase(testSystemsFinder, this);
 
-            const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+            const auto welcomeScreen = mainWindow()->welcomeScreen();
 
             connect(m_tilesTests, &QnSystemTilesTestCase::openTile,
                 welcomeScreen, &QnWorkbenchWelcomeScreen::openTile);
@@ -387,7 +388,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
 {
-    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindow()));
+    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindowWidget()));
     dialog->show();
 }
 

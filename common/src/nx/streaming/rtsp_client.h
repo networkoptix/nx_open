@@ -1,5 +1,6 @@
-#ifndef RTSP_CLIENT_H
-#define RTSP_CLIENT_H
+#pragma once
+
+#include <QtCore/QElapsedTimer>
 
 #include <fstream>
 #include <memory>
@@ -61,11 +62,11 @@ public:
 
 enum class TimePolicy
 {
-    BindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
-    IgnoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
-    ForceLocalTime, //< Use local time only.
-    ForceCameraTime, //< Use camera NPT time only.
-    OnvifExtension //< Use timestamps from Onvif streaming spec extension.
+    bindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
+    ignoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
+    forceLocalTime, //< Use local time only.
+    forceCameraTime, //< Use camera NPT time only.
+    onvifExtension, //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper
@@ -108,7 +109,7 @@ private:
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
-    TimePolicy m_timePolicy = TimePolicy::BindCameraTimeToLocalTime;
+    TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
@@ -347,6 +348,8 @@ public:
     void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
 
     bool processTcpRtcpData(const quint8* data, int size);
+
+    QElapsedTimer lastReceivedDataTimer() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -449,6 +452,7 @@ private:
     bool m_scaleHeaderEnabled = true;
     using RequestName = QString;
     QMap<RequestName, nx_http::HttpHeaders> m_additionalHeaders;
+    QElapsedTimer m_lastReceivedDataTimer;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
@@ -462,5 +466,3 @@ private:
     */
     bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
 };
-
-#endif // RTSP_CLIENT_H

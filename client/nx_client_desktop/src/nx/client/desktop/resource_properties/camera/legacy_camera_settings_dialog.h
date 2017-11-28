@@ -24,7 +24,7 @@ class LegacyCameraSettingsDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    LegacyCameraSettingsDialog(QWidget *parent = NULL);
+    LegacyCameraSettingsDialog(QWidget* parent);
     virtual ~LegacyCameraSettingsDialog();
 
     virtual bool tryClose(bool force) override;

@@ -22,10 +22,9 @@ set(supportUrl "https://wavevms.com/content/support")
 set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail
-    "<table>
-        <tr><td>US-<a href=\"mailto:WAVElicense@hanwha.com\">support@hanwhasecurity.com</a></td><td></td></tr>
-        <tr><td>Europe-<a href=\"mailto:WAVElicense2@hanwha.com\">eucctv.help@hanwha.com</a></td><td></td></tr>
-    </table>")
+    "<br><a href=\"mailto:WAVELicense@hanwha.com\">WAVELicense@hanwha.com</a> (for US customers),<br>
+    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers),<br>"
+)
 
 set(installer.name "wave")
 set(android.packageName "com.hanwhasecurity.wavemobile")

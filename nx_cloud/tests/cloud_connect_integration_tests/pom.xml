@@ -5,12 +5,12 @@
     <parent>
         <artifactId>build_cloud_tests</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.1-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
         <relativePath>../build_cloud_tests</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.1-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_connect_integration_tests</artifactId>
     <packaging>pom</packaging>

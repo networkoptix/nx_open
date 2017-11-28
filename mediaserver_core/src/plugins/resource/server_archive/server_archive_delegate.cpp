@@ -121,10 +121,13 @@ void QnServerArchiveDelegate::setCatalogs() const
                                            QnServer::LowQualityCatalog);
 }
 
-bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
+bool QnServerArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher *archiveIntegrityWatcher)
 {
     QnMutexLocker lk( &m_mutex );
 
+    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
     if (m_opened)
         return true;
     m_resource = resource;
@@ -512,7 +515,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
 
     NX_LOG(lit("Switching to chunk %1").arg(url), cl_logDEBUG2);
     
-    bool rez = m_aviDelegate->open(m_fileRes);
+    bool rez = m_aviDelegate->open(m_fileRes, m_archiveIntegrityWatcher);
     if (rez)
         m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
     return rez;
@@ -572,7 +575,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
                 QnStorageManager::getStorageByUrl(m_newQualityFileRes->getUrl(),
                                                   QnServer::StoragePool::Both));
 
-            if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
+            if (!m_newQualityAviDelegate->open(m_newQualityFileRes, m_archiveIntegrityWatcher))
                 continue;
             m_newQualityAviDelegate->setAudioChannel(m_selectedAudioChannel);
             qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;

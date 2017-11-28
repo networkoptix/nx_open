@@ -42,9 +42,11 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 #define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
     (supportedHandleTypes)(supportedPixelFormats)(capabilities)
 
+// TODO: #mike: Eliminate the class.
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
    QList<AnalyticsEventType> outputEventTypes;
+   // TODO: #mike: Add outputObjectTypes list.
 };
 #define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
 

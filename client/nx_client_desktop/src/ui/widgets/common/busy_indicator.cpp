@@ -5,7 +5,9 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/animation/animation_timer.h>
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::Geometry;
 
 /*
 * QnBusyIndicatorBase
@@ -530,7 +532,7 @@ QSizeF QnBusyIndicatorGraphicsWidget::sizeHint(Qt::SizeHint which, const QSizeF&
         case Qt::MinimumSize:
         case Qt::PreferredSize:
         {
-            MarginsF margins = contentsMargins();
+            QMarginsF margins = contentsMargins();
             QSizeF sizeOfMargins(margins.left() + margins.right(), margins.top() + margins.bottom());
             return QSizeF(m_indicator->size() + sizeOfMargins).expandedTo(constraint);
         }
@@ -549,5 +551,5 @@ void QnBusyIndicatorGraphicsWidget::updateIndicator()
 
 QRectF QnBusyIndicatorGraphicsWidget::indicatorRect() const
 {
-    return QnGeometry::aligned(QSizeF(m_indicator->size()), contentsRect());
+    return Geometry::aligned(QSizeF(m_indicator->size()), contentsRect());
 }

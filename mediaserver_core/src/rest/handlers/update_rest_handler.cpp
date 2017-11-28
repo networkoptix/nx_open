@@ -15,7 +15,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include <common/static_common_module.h>
-#include <rest/helpers/request_helpers.h>
+#include <nx/utils/file_system.h>
 
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
@@ -70,7 +70,7 @@ int QnUpdateRestHandler::executePost(
 
     // TODO: updateId is not a path, so verification must be a bit tougher.
     // It may be verified to be a file name.
-    if (!verifySimpleRelativePath(updateId))
+    if (!nx::utils::file_system::isRelativePathSafe(updateId))
     {
         result.setError(QnRestResult::InvalidParameter, lit("updateId"));
         return nx_http::StatusCode::ok;

@@ -112,7 +112,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
             Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
         if (ignoreCameraTimeIfBigJitter)
-            m_timeHelper.setTimePolicy(TimePolicy::IgnoreCameraTimeIfBigJitter);
+            m_timeHelper.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
     }
 }
 
@@ -276,9 +276,33 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                 m_gotData = false;
         }
 
-        int readed = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
-        m_RtpSession.sendKeepAliveIfNeeded();
-        if (readed < 1)
+        m_RtpSession.sendKeepAliveIfNeeded(); //< RTSP GET_PARAMETER
+        // RTCP keep-alive packet
+        if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT)
+        {
+            for (const TrackInfo& track : m_tracks)
+            {
+                if (track.ioDevice)
+                    buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
+            }
+            m_rtcpReportTimer.restart();
+        }
+
+        int bytesRead = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
+        if (bytesRead < 0 &&
+            SystemError::getLastOSErrorCode() == SystemError::timedOut &&
+            m_onSocketReadTimeoutCallback &&
+            m_RtpSession.lastReceivedDataTimer().isValid() &&
+            m_RtpSession.lastReceivedDataTimer().elapsed() < m_RtpSession.sessionTimeoutMs())
+        {
+            auto data = m_onSocketReadTimeoutCallback();
+            if (data)
+                return data;
+            else
+                continue;
+        }
+
+        if (bytesRead < 1)
             break; // error
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
@@ -288,12 +312,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         if (m_tracks.size() < trackNum || !parser)
             continue;
 
-        int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
+        int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - bytesRead;
 
         if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO)
         {
             const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
-            const auto length = readed - kInterleavedRtpOverTcpPrefixLength;
+            const auto length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
 
             const auto rtcpStaticstics = rtspStatistics(offset, length, trackNum, rtpChannelNum);
 
@@ -318,19 +342,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
         else if (format == QnRtspClient::TT_VIDEO_RTCP || format == QnRtspClient::TT_AUDIO_RTCP)
         {
-            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), readed, m_demuxedData[rtpChannelNum]->capacity());
+            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), bytesRead, m_demuxedData[rtpChannelNum]->capacity());
             m_demuxedData[rtpChannelNum]->clear();
         }
         else {
             m_demuxedData[rtpChannelNum]->clear();
-        }
-
-        if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
-            for(const TrackInfo& track: m_tracks) {
-                if (track.ioDevice)
-                    buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
-            }
-            m_rtcpReportTimer.restart();
         }
 
     }
@@ -778,7 +794,7 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
 
 void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
 {
-    m_timeHelper.setTimePolicy(TimePolicy::ForceCameraTime);
+    m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
 }
 
 void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
@@ -863,6 +879,16 @@ bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
 {
     return id == kOnvifNtpExtensionId
         || id == kOnvifNtpExtensionAltId;
+}
+
+void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(OnSocketReadTimeoutCallback callback)
+{
+    m_onSocketReadTimeoutCallback = std::move(callback);
+}
+
+void QnMulticodecRtpReader::setRtpFrameTimeoutMs(int value)
+{
+    m_rtpFrameTimeoutMs = value;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

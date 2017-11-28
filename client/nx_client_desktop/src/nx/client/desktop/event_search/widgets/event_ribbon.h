@@ -3,9 +3,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/utils/uuid.h>
-
 class QAbstractListModel;
+class QModelIndex;
 class QScrollBar;
 
 namespace nx {
@@ -29,11 +28,6 @@ public:
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;
-
-signals:
-    void closeRequested(const QnUuid& id);
-    void linkActivated(const QnUuid& id, const QString& link);
-    void clicked(const QnUuid& id);
 
 protected:
     virtual bool event(QEvent* event) override;

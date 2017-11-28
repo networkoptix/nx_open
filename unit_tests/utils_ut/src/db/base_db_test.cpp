@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
+#include <nx/utils/db/query.h>
 #include <nx/utils/test_support/utils.h>
 
 namespace nx {
@@ -35,18 +36,18 @@ void BaseDbTest::initializeDatabase()
     m_connectionOptions.driverType = RdbmsDriverType::sqlite;
     m_connectionOptions.dbName = m_tmpDir + "/db.sqlite";
 
-    m_asyncSqlQueryExecutor = std::make_unique<AsyncSqlQueryExecutor>(m_connectionOptions);
-    ASSERT_TRUE(m_asyncSqlQueryExecutor->init());
+    m_dbInstanceController = std::make_unique<InstanceController>(m_connectionOptions);
+    ASSERT_TRUE(m_dbInstanceController->initialize());
 }
 
 void BaseDbTest::closeDatabase()
 {
-    m_asyncSqlQueryExecutor.reset();
+    m_dbInstanceController.reset();
 }
 
-const std::unique_ptr<AsyncSqlQueryExecutor>& BaseDbTest::asyncSqlQueryExecutor()
+AsyncSqlQueryExecutor& BaseDbTest::asyncSqlQueryExecutor()
 {
-    return m_asyncSqlQueryExecutor;
+    return m_dbInstanceController->queryExecutor();
 }
 
 void BaseDbTest::executeUpdate(const QString& queryText)
@@ -54,10 +55,9 @@ void BaseDbTest::executeUpdate(const QString& queryText)
     const auto dbResult = executeQuery(
         [queryText](nx::utils::db::QueryContext* queryContext)
         {
-            QSqlQuery query(*queryContext->connection());
+            SqlQuery query(*queryContext->connection());
             query.prepare(queryText);
-            if (!query.exec())
-                return DBResult::ioError;
+            query.exec();
             return DBResult::ok;
         });
     NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);

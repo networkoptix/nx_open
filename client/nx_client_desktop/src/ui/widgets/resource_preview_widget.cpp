@@ -11,7 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/autoscaled_plain_text.h>
@@ -19,6 +19,8 @@
 
 #include <utils/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -41,7 +43,7 @@ public:
         auto sourceRect = indicatorRect();
         auto targetRect = contentsRect();
 
-        qreal scale = QnGeometry::scaleFactor(sourceRect.size(), targetRect.size(),
+        qreal scale = Geometry::scaleFactor(sourceRect.size(), targetRect.size(),
             Qt::KeepAspectRatio);
 
         QnScopedPainterTransformRollback transformRollback(painter);
@@ -163,7 +165,7 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
     else
     {
         const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
-        const auto paintSize = QnGeometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
+        const auto paintSize = Geometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
         const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
             paintSize.toSize(), QRect(QPoint(), size()));
         painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -264,7 +266,8 @@ void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 
 void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
 {
-    const auto maxHeight = qMin(maximumHeight(), maximumWidth() / QnGeometry::aspectRatio(sizeHint()));
+    const auto maxHeight =
+        qMin(maximumHeight(), maximumWidth() / Geometry::aspectRatio(sizeHint()));
     m_preview = QPixmap::fromImage(image.size().height() > maxHeight
         ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
         : image);

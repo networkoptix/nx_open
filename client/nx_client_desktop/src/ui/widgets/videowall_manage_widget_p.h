@@ -1,5 +1,4 @@
-#ifndef VIDEOWALL_MANAGE_WIDGET_PRIVATE_H
-#define VIDEOWALL_MANAGE_WIDGET_PRIVATE_H
+#pragma once
 
 #include <QtCore/QRect>
 
@@ -10,12 +9,12 @@
 #include <core/resource/resource_fwd.h>
 #include <core/misc/screen_snap.h>
 
-#include <ui/common/geometry.h>
-
 class QnVideowallManageWidget;
 
-class QnVideowallManageWidgetPrivate : public QObject, private QnGeometry {
+class QnVideowallManageWidgetPrivate: public QObject
+{
     Q_OBJECT
+
 public:
     QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q);
 
@@ -135,7 +134,7 @@ private:
 
         QString name;
     protected:
-        Q_DECLARE_PUBLIC(QnVideowallManageWidget);
+        Q_DECLARE_PUBLIC(QnVideowallManageWidget)
         QnVideowallManageWidget *q_ptr;
     };
 
@@ -187,7 +186,7 @@ private:
     };
 
 private:
-    Q_DECLARE_PUBLIC(QnVideowallManageWidget);
+    Q_DECLARE_PUBLIC(QnVideowallManageWidget)
 
     /** 
      * Utility function that iterates over all items and calls handler to each of them. 
@@ -224,10 +223,8 @@ private:
 
 /* 
  * If we allow this function in windows, 'case expression not constant' will be raised. MSVS 2012 does not support constexpr yet.
- * Without this function we have an error: invalid conversion from ‘int’ to ‘QnVideowallManageWidgetPrivate::ItemTransformation’ [-fpermissive] in GCC
+ * Without this function we have an error: invalid conversion from int to QnVideowallManageWidgetPrivate::ItemTransformation [-fpermissive] in GCC
  */
 #ifdef __GNUC__
     Q_DECLARE_OPERATORS_FOR_FLAGS(QnVideowallManageWidgetPrivate::ItemTransformations)
 #endif
-
-#endif // VIDEOWALL_MANAGE_WIDGET_PRIVATE_H

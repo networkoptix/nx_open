@@ -4,6 +4,7 @@
 
 #include <nx/utils/math/average_per_period.h>
 #include <nx/utils/math/sum_per_period.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "../server_statistics.h"
 
@@ -30,6 +31,7 @@ private:
     nx::utils::math::SumPerPeriod<int> m_connectionsPerMinuteCalculator;
     nx::utils::math::SumPerPeriod<int> m_requestsServedPerMinuteCalculator;
     nx::utils::math::AveragePerPeriod<int> m_requestsAveragePerConnectionCalculator;
+    mutable QnMutex m_mutex;
 };
 
 } // namespace detail

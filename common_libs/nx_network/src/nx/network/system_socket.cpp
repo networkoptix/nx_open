@@ -413,7 +413,7 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
         return false;
 
-#if !defined(Q_OS_WIN)
+#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
     if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
         return false;
 #endif

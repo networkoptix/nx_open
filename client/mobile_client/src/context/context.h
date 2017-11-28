@@ -12,7 +12,6 @@ class QnCloudStatusWatcher;
 class QnMobileClientUiController;
 class QnUserWatcher;
 class QnCloudUrlHelper;
-class NxGlobalsObject;
 
 namespace nx {
 namespace client {
@@ -31,7 +30,6 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_OBJECT
     typedef QObject base_type;
 
-    Q_PROPERTY(NxGlobalsObject* Nx MEMBER m_nxGlobals CONSTANT)
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
     Q_PROPERTY(nx::client::mobile::QmlSettingsAdaptor* settings MEMBER m_settings CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
@@ -110,7 +108,6 @@ signals:
     void deviceStatusBarHeightChanged();
 
 private:
-    NxGlobalsObject* m_nxGlobals;
     QnConnectionManager *m_connectionManager;
     QmlSettingsAdaptor* m_settings;
     QnMobileAppInfo *m_appInfo;

@@ -30,7 +30,7 @@
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE(libvms_gateway_core);
+    Q_INIT_RESOURCE(vms_gateway_core);
     return 0;
 }
 

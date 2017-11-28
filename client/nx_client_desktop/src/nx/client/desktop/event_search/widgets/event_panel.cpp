@@ -11,7 +11,7 @@ EventPanel::EventPanel(QWidget* parent): EventPanel(nullptr, parent)
 
 EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(context),
     d(new Private(this))
 {
 }

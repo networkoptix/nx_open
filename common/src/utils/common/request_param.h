@@ -80,6 +80,11 @@ public:
         base_type::push_back(qMakePair(key, value));
     }
 
+    void insert(const QnListMap &other) {
+        for (const auto &pair: other)
+            insert(pair.first, pair.second);
+    }
+
     QHash<Key, Value> toHash() const {
         QHash<Key, Value> result;
         for(const QPair<Key, Value> &pair: *this)

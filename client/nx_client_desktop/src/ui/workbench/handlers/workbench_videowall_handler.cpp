@@ -688,7 +688,7 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
         return;
 
     bool closeCurrentInstance = false;
-    if (!messages::Videowall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+    if (!messages::Videowall::switchToVideoWallMode(mainWindowWidget(), &closeCurrentInstance))
         return;
 
     if (closeCurrentInstance)
@@ -1116,7 +1116,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Video Wall license required"),
             tr("To enable this feature, please activate a Video Wall license."));
         return false;
@@ -1150,12 +1150,12 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 
 void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
 {
-    QnMessageBox::critical(mainWindow(), tr("Failed to apply changes"));
+    QnMessageBox::critical(mainWindowWidget(), tr("Failed to apply changes"));
 }
 
 void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
-    QnMessageBox::warning(mainWindow(),
+    QnMessageBox::warning(mainWindowWidget(),
         tr("Screen is being controlled by another user"),
         tr("Control session cannot be started."));
 }
@@ -1470,7 +1470,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     QnLicenseListHelper licenseList(licensePool()->getLicenses());
     if (licenseList.totalLicenseByType(Qn::LC_VideoWall, licensePool()->validator()) == 0)
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Video Wall license required"),
             tr("To enable Video Wall, please activate a Video Wall license."));
         return;
@@ -1483,7 +1483,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     // TODO: #GDM #VW refactor to corresponding dialog
     QString proposedName = nx::utils::generateUniqueString(usedNames, tr("Video Wall"), tr("Video Wall %1"));
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindowWidget()));
     dialog->setWindowTitle(tr("New Video Wall..."));
     dialog->setText(tr("Enter the name of Video Wall to create:"));
     dialog->setName(proposedName);
@@ -1500,7 +1500,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            messages::Videowall::anotherVideoWall(mainWindow());
+            messages::Videowall::anotherVideoWall(mainWindowWidget());
             continue;
         }
 
@@ -1539,7 +1539,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     if (videoWall.isNull())
         return;
 
-    QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindow()));
+    QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindowWidget()));
     dialog->loadFromResource(videoWall);
     if (!dialog->exec())
         return;
@@ -1602,7 +1602,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n items?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
@@ -1649,7 +1649,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
         tr("Stop Video Wall?"),
         tr("To start it again, you should have physical access to its computer."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
 
     dialog.addButton(tr("Stop"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     if (dialog.exec() == QDialogButtonBox::Cancel)
@@ -2041,7 +2041,7 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered()
     if (!videowall)
         return;
 
-    QScopedPointer<QnVideowallSettingsDialog> dialog(new QnVideowallSettingsDialog(mainWindow()));
+    QScopedPointer<QnVideowallSettingsDialog> dialog(new QnVideowallSettingsDialog(mainWindowWidget()));
     dialog->loadFromResource(videowall);
 
     if (!dialog->exec())
@@ -2070,7 +2070,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
     if (matrix.layoutByItem.isEmpty())
     {
-        QnMessageBox::warning(mainWindow(), tr("Cannot save empty matrix"));
+        QnMessageBox::warning(mainWindowWidget(), tr("Cannot save empty matrix"));
         return;
     }
 
@@ -2144,7 +2144,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n matrices?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
@@ -2912,7 +2912,7 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &
     for (int i = 0; i < desktop->screenCount(); ++i)
         screens << desktop->screenGeometry(i);
     QRect targetGeometry = screenSnaps.geometry(screens);
-    mainWindow()->setGeometry(targetGeometry);
+    mainWindowWidget()->setGeometry(targetGeometry);
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action)
@@ -3099,7 +3099,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
     if (!layout)
         return true;
 
-    return messages::Videowall::checkLocalFiles(mainWindow(), index,
+    return messages::Videowall::checkLocalFiles(mainWindowWidget(), index,
         layout->layoutResources().toList());
 }
 
@@ -3108,7 +3108,7 @@ bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const
     // TODO: #GDM add "Licenses" button
     if (!m_licensesHelper->isValid())
     {
-        QnMessageBox::warning(mainWindow(), tr("More Video Wall licenses required"), detail);
+        QnMessageBox::warning(mainWindowWidget(), tr("More Video Wall licenses required"), detail);
         return false;
     }
     return true;

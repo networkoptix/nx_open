@@ -56,14 +56,32 @@ bool EventListModel::Private::removeEvent(const QnUuid& id)
     if (index < 0)
         return false;
 
-    q->beforeRemove(m_events[index].data);
-
     ScopedRemoveRows removeRows(q, QModelIndex(), index, index);
     m_sequentialNumberById.remove(m_events[index].data.id);
     m_events.removeAt(index);
     m_nextFrontNumber = m_events.empty() ? 0 : m_events.front().sequentialNumber + 1;
     m_nextBackNumber = m_events.empty() ? -1 : m_events.back().sequentialNumber - 1;
     return true;
+}
+
+void EventListModel::Private::removeEvents(int first, int count)
+{
+    NX_ASSERT(first >= 0 && count >= 0 && first + count <= m_events.size(),
+        Q_FUNC_INFO, "Rows are out of range");
+
+    if (count == 0)
+        return;
+
+    ScopedRemoveRows removeRows(q, QModelIndex(), first, first + count - 1);
+
+    for (int i = 0; i < count; ++i)
+    {
+        m_sequentialNumberById.remove(m_events[first].data.id);
+        m_events.removeAt(first);
+    }
+
+    m_nextFrontNumber = m_events.empty() ? 0 : m_events.front().sequentialNumber + 1;
+    m_nextBackNumber = m_events.empty() ? -1 : m_events.back().sequentialNumber - 1;
 }
 
 void EventListModel::Private::clear()
@@ -73,6 +91,7 @@ void EventListModel::Private::clear()
 
     ScopedReset reset(q);
     m_events.clear();
+    m_sequentialNumberById.clear();
     m_nextFrontNumber = 0;
     m_nextBackNumber = -1;
 }
@@ -119,42 +138,6 @@ int EventListModel::Private::indexOf(const QnUuid& id) const
     return found != m_events.cend()
         ? std::distance(m_events.cbegin(), found)
         : -1;
-}
-
-bool EventListModel::Private::isValid(const QModelIndex& index) const
-{
-    return index.model() == q && !index.parent().isValid() && index.column() == 0
-        && index.row() >= 0 && index.row() < count();
-}
-
-void EventListModel::Private::defaultAction(const QnUuid& id)
-{
-    const auto index = indexOf(id);
-    NX_ASSERT(index >= 0, Q_FUNC_INFO, "Unknown event id");
-    if (index < 0)
-        return;
-
-    q->triggerDefaultAction(m_events[index].data);
-}
-
-void EventListModel::Private::closeAction(const QnUuid& id)
-{
-    const auto index = indexOf(id);
-    NX_ASSERT(index >= 0, Q_FUNC_INFO, "Unknown event id");
-    if (index < 0)
-        return;
-
-    q->triggerCloseAction(m_events[index].data);
-}
-
-void EventListModel::Private::linkAction(const QnUuid& id, const QString& link)
-{
-    const auto index = indexOf(id);
-    NX_ASSERT(index >= 0, Q_FUNC_INFO, "Unknown event id");
-    if (index < 0)
-        return;
-
-    q->triggerLinkAction(m_events[index].data, link);
 }
 
 QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventData& event) const

@@ -1,15 +1,9 @@
 #include "motion_search_list_model_p.h"
 
-#include <limits>
-
 #include <core/resource/camera_resource.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <ui/help/business_help.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <nx/client/core/utils/human_readable.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -18,7 +12,7 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kFetchBatchSize = 20;
+static constexpr int kFetchBatchSize = 25;
 
 } // namespace
 
@@ -51,101 +45,119 @@ void MotionSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr&
         ? q->navigator()->cameraDataManager()->loader(m_camera, false)
         : QnCachingCameraDataLoaderPtr();
 
+    reset();
+
     if (!m_loader)
         return;
 
-    connect(m_loader.data(), &QnCachingCameraDataLoader::periodsChanged, this,
+    const auto updatePeriods =
         [this](Qn::TimePeriodContent type, qint64 startTimeMs)
         {
             if (type == Qn::MotionContent)
-                periodsChanged(startTimeMs);
-        });
+                updateMotionPeriods(startTimeMs);
+        };
+
+    connect(m_loader.data(), &QnCachingCameraDataLoader::periodsChanged,
+        this, updatePeriods, Qt::DirectConnection);
 }
 
-void MotionSearchListModel::Private::periodsChanged(qint64 startTimeMs)
+int MotionSearchListModel::Private::count() const
 {
-    if (startTimeMs == 0 || q->rowCount() == 0)
-    {
-        q->clear();
-        q->fetchMore();
-        return;
-    }
+    return int(m_data.size());
+}
 
+const QnTimePeriod& MotionSearchListModel::Private::period(int index) const
+{
+    return *(m_data.crbegin() + index); //< Reverse!
+}
+
+void MotionSearchListModel::Private::reset()
+{
+    ScopedReset reset(q);
+    m_data.clear();
+
+    if (!m_loader)
+        return;
+
+    const auto& periods = m_loader->periods(Qn::MotionContent);
+    m_data.insert(m_data.end(), periods.cbegin() + qMax(periods.size() - kFetchBatchSize, 0),
+        periods.cend());
+}
+
+void MotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeMs)
+{
     const auto periods = m_loader->periods(Qn::MotionContent);
-    const auto rangeBegin = std::upper_bound(periods.cbegin(), periods.cend(), lastTimeMs(),
-        [](qint64 left, const QnTimePeriod& right) { return left < right.startTimeMs; });
 
-    const auto count = std::distance(rangeBegin, periods.end());
-    static constexpr int kIncrementalUpdateLimit = 1000;
-
-    NX_ASSERT(count <= kIncrementalUpdateLimit);
-    if (count > kIncrementalUpdateLimit)
+    if (startTimeMs == 0 || m_data.empty() || periods.empty())
     {
-        q->clear();
-        q->fetchMore();
+        reset();
         return;
     }
 
-    for (auto iter = rangeBegin; iter != periods.end(); ++iter)
-        addPeriod(*iter, Position::front);
-}
+    const auto pred =
+        [](const QnTimePeriod& left, qint64 right) { return left.startTimeMs < right; };
 
-void MotionSearchListModel::Private::addPeriod(const QnTimePeriod& period, Position where)
-{
-    const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
-    const auto start = timeWatcher->displayTime(period.startTimeMs);
+    auto removeBegin = std::lower_bound(m_data.begin(), m_data.end(), startTimeMs, pred);
+    auto newChunksBegin = std::lower_bound(periods.cbegin(), periods.cend(), startTimeMs, pred);
 
-    EventData eventData;
-    eventData.id = QnUuid::createUuid();
-    eventData.title = tr("Motion on camera");
-    eventData.description = lit("%1: %2<br>%3: %4")
-        .arg(tr("Start"))
-        .arg(start.toString(Qt::RFC2822Date))
-        .arg(tr("Duration"))
-        .arg(core::HumanReadable::timeSpan(std::chrono::milliseconds(period.durationMs)));
+    // Skip and keep chunks that weren't changed.
+    while (removeBegin != m_data.end() && newChunksBegin != periods.cend())
+    {
+        if (!(*removeBegin == *newChunksBegin))
+            break;
 
-    eventData.helpId = QnBusiness::eventHelpId(vms::event::cameraMotionEvent);
-    eventData.timestampMs = period.startTimeMs;
-    eventData.previewTimeMs = eventData.timestampMs;
-    eventData.previewCamera = m_camera;
-    //eventData.icon = ;
+        ++removeBegin;
+        ++newChunksBegin;
+    }
 
-    q->addEvent(eventData, where);
+    const auto removeCount = std::distance(removeBegin, m_data.end());
+    if (removeCount > 0)
+    {
+        ScopedRemoveRows removeRows(q, QModelIndex(), 0, removeCount - 1);
+        m_data.resize(m_data.size() - removeCount);
+    }
+
+    const auto newChunksCount = std::distance(newChunksBegin, periods.end());
+    if (newChunksCount > 0)
+    {
+        static constexpr int kIncrementalUpdateLimit = 1000;
+        if (newChunksCount > kIncrementalUpdateLimit)
+        {
+            reset();
+            return;
+        }
+
+        ScopedInsertRows insertRows(q, QModelIndex(), 0, newChunksCount - 1);
+        for (auto chunk = newChunksBegin; chunk != periods.cend(); ++chunk)
+            m_data.push_back(*chunk);
+    }
 }
 
 bool MotionSearchListModel::Private::canFetchMore() const
 {
-    const auto periods = m_loader->periods(Qn::MotionContent);
-    return !periods.empty() && firstTimeMs() > periods[0].startTimeMs;
+    return m_loader && count() < m_loader->periods(Qn::MotionContent).size();
 }
 
 void MotionSearchListModel::Private::fetchMore()
 {
+    if (!m_loader)
+        return;
+
     const auto periods = m_loader->periods(Qn::MotionContent);
-    const auto rangeBegin = std::upper_bound(periods.crbegin(), periods.crend(), firstTimeMs(),
-        [](qint64 left, const QnTimePeriod& right) { return left > right.startTimeMs; });
+    const auto oldCount = count();
 
-    const auto remaining = std::distance(rangeBegin, periods.crend());
-    const auto rangeEnd = rangeBegin + qMin(ptrdiff_t(kFetchBatchSize), remaining);
+    const auto remaining = periods.size() - oldCount;
+    if (remaining == 0)
+        return;
 
-    for (auto iter = rangeBegin; iter != rangeEnd; ++iter)
-        addPeriod(*iter, Position::back);
+    const auto delta = qMin(remaining, kFetchBatchSize);
+    const auto newCount = oldCount + delta;
 
-    q->finishFetch();
-}
+    ScopedInsertRows insertRows(q, QModelIndex(), oldCount, newCount - 1);
+    const auto range = std::make_pair(periods.crbegin() + oldCount, periods.crbegin() + newCount);
 
-qint64 MotionSearchListModel::Private::firstTimeMs() const
-{
-    return q->rowCount() > 0
-        ? q->getEvent(q->index(q->rowCount() - 1)).timestampMs
-        : std::numeric_limits<qint64>::max();
-}
-
-qint64 MotionSearchListModel::Private::lastTimeMs() const
-{
-    return q->rowCount() > 0
-        ? q->getEvent(q->index(0)).timestampMs
-        : 0;
+    for (auto chunk = range.first; chunk != range.second; ++chunk)
+        m_data.push_front(*chunk);
 }
 
 } // namespace

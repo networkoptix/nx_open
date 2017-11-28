@@ -14,7 +14,7 @@ struct QnMobileClientStartupParameters
     QnMobileClientStartupParameters();
     QnMobileClientStartupParameters(const QCoreApplication& application);
 
-    QString basePath;
+    QString qmlRoot;
     bool liteMode = false;
     QnUuid videowallInstanceGuid;
     nx::utils::Url url;

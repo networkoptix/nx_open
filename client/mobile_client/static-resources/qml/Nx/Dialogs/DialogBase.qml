@@ -113,6 +113,6 @@ Popup
     function ensureActiveItemVisible()
     {
         if (activeItem)
-            Nx.ensureFlickableChildVisible(activeItem)
+            NxGlobals.ensureFlickableChildVisible(activeItem)
     }
 }

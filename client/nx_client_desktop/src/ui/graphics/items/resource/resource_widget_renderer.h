@@ -78,6 +78,7 @@ public:
     qint64 isLowQualityImage(int channel) const;
     bool isHardwareDecoderUsed(int channel) const;
 
+    qint64 lastDisplayedTimestampUsec(int channel) const;
     FrameMetadata lastFrameMetadata(int channel) const;
 
     QSize sourceSize() const;

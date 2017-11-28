@@ -107,7 +107,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
         }
         if (!video) {
             if (!serverDelegate.isOpened()) {
-                serverDelegate.open(res);
+                serverDelegate.open(res, /*archiveIntegrityWatcher*/ nullptr);
                 serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
             }
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
@@ -119,7 +119,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
         isArchiveVideoPacket = true;
         // get archive data
         if (!serverDelegate.isOpened()) {
-            serverDelegate.open(res);
+            serverDelegate.open(res, /*archiveIntegrityWatcher*/ nullptr);
             serverDelegate.seek(time, true);
         }
         // todo: getNextArchiveVideoPacket should be refactored to videoSequence interface

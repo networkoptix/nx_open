@@ -342,6 +342,7 @@ signals:
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
     void capabilitiesChanged(const QnResourcePtr& resource);
+    void secondaryStreamQualityChanged(const QnResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 

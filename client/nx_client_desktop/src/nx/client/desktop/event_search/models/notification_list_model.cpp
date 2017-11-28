@@ -30,21 +30,20 @@ NotificationListModel::~NotificationListModel()
 {
 }
 
-void NotificationListModel::triggerDefaultAction(const EventData& event)
+bool NotificationListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    base_type::triggerDefaultAction(event);
+    const auto result = base_type::setData(index, value, role);
+    if (role != Qn::DefaultNotificationRole || !result)
+        return result;
 
+    const auto& event = getEvent(index.row());
     if (event.actionId != ui::action::NoAction)
     {
         context()->statisticsModule()->registerClick(
             getStatisticsAlias(QnLexical::serialized(event.actionId)));
     }
-}
 
-void NotificationListModel::beforeRemove(const EventData& event)
-{
-    base_type::beforeRemove(event);
-    d->beforeRemove(event);
+    return result;
 }
 
 } // namespace

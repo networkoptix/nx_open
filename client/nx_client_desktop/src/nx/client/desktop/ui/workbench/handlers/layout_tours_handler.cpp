@@ -102,7 +102,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
                 if (other.name == name)
                 {
-                    if (!ui::messages::Resources::overrideLayoutTour(mainWindow()))
+                    if (!ui::messages::Resources::overrideLayoutTour(mainWindowWidget()))
                         return;
 
                     layoutTourManager()->removeTour(other.id);
@@ -125,9 +125,9 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             const auto tour = layoutTourManager()->tour(id);
             if (!tour.name.isEmpty())
             {
-                QnSessionAwareMessageBox messageBox(mainWindow());
+                QnSessionAwareMessageBox messageBox(mainWindowWidget());
                 messageBox.setIcon(QnMessageBoxIcon::Question);
-                messageBox.setText(tr("Delete layout tour %1?").arg(tour.name));
+                messageBox.setText(tr("Delete Showreel %1?").arg(tour.name));
                 messageBox.setStandardButtons(QDialogButtonBox::Cancel);
                 messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
                     QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);

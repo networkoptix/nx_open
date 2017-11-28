@@ -54,6 +54,9 @@ namespace desktop {
 class MimeData;
 
 namespace ui {
+
+namespace experimental { class MainWindow; }
+
 namespace workbench {
 
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
@@ -198,6 +201,8 @@ protected slots:
 
     void at_changeDefaultCameraPassword_triggered();
 
+    void at_openNewScene_triggered();
+
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
     void showMultipleCamerasErrorMessage(
@@ -248,6 +253,8 @@ private:
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
+
+    QPointer<experimental::MainWindow> m_mainWindow;
 
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once

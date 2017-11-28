@@ -13,6 +13,7 @@
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 #include "api/app_server_connection.h"
+#include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include <nx/fusion/serialization/json_functions.h>

@@ -1,74 +1,23 @@
 #include "unified_search_list_model_p.h"
 
-#include <chrono>
-
-#include <api/server_rest_connection.h>
-#include <api/helpers/event_log_request_data.h>
-#include <camera/camera_bookmarks_manager.h>
-#include <core/resource/camera_bookmark.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <ui/help/help_topics.h>
-#include <ui/style/globals.h>
-#include <ui/style/skin.h>
-#include <ui/style/software_trigger_pixmaps.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <utils/common/delayed.h>
-#include <utils/common/synctime.h>
-
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/client/desktop/common/models/concatenation_list_model.h>
+#include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
+#include <nx/client/desktop/event_search/models/event_search_list_model.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-
-// Period of time displayed by default when a new camera is selected.
-static constexpr auto kDefaultEventsPeriod = std::chrono::hours(24);
-
-// In "live mode", every kUpdateTimerInterval events are fetched for the last kEventsUpdatePeriod.
-static constexpr auto kEventsUpdatePeriod = std::chrono::seconds(30);
-static constexpr auto kUpdateTimerInterval = kEventsUpdatePeriod - std::chrono::seconds(10);
-
-static constexpr auto kEventsQueryTimeout = std::chrono::seconds(15);
-
-static QPixmap bookmarkPixmap(const QColor& color)
-{
-    static QColor bookmarkColor;
-    static QPixmap bookmarkPixmap;
-
-    if (bookmarkColor != color)
-    {
-        bookmarkColor = color;
-        bookmarkPixmap = QnSkin::colorize(
-            qnSkin->pixmap(lit("buttons/acknowledge.png")), bookmarkColor);
-    }
-
-    return bookmarkPixmap;
-}
-
-} // namespace
-
 UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
     base_type(),
-    QnWorkbenchContextAware(q),
     q(q),
-    m_updateTimer(new QTimer()),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_eventsModel(new EventSearchListModel(q)),
+    m_bookmarksModel(new BookmarkSearchListModel(q)),
+    m_analyticsModel(new AnalyticsSearchListModel(q))
 {
-    m_updateTimer->setInterval(std::chrono::milliseconds(kUpdateTimerInterval).count());
-    connect(m_updateTimer.data(), &QTimer::timeout, this, &Private::periodicUpdate);
-    watchBookmarkChanges();
-
-    connect(q, &QAbstractItemModel::modelAboutToBeReset, this,
-        [this]()
-        {
-            m_eventRequests.clear();
-            m_eventIds.clear();
-        });
+    q->setModels({m_eventsModel, m_bookmarksModel, m_analyticsModel});
 }
 
 UnifiedSearchListModel::Private::~Private()
@@ -77,210 +26,58 @@ UnifiedSearchListModel::Private::~Private()
 
 bool UnifiedSearchListModel::Private::canFetchMore() const
 {
-    // TODO: #vkutin Hopefully in the future it won't be always true.
-    return true;
+    return m_camera && !m_fetchInProgress
+        && (m_eventsModel->canFetchMore() || m_bookmarksModel->canFetchMore()
+            || m_analyticsModel->canFetchMore());
 }
 
 void UnifiedSearchListModel::Private::fetchMore()
 {
-    if (!m_camera || !m_fetchInProgress.isNull())
+    if (!canFetchMore())
         return;
 
-    // TODO: #vkutin This is a temporary implementation of infinite scroll which loads events for
-    // previous 24 hours. Actual implementation will request entire period with result count limit.
+    NX_ASSERT(m_fetchingTypes == Types());
 
-    const auto endTimeMs = m_startTimeMs;
-    m_startTimeMs = endTimeMs - std::chrono::milliseconds(kDefaultEventsPeriod).count();
-
-    auto finishHandler = QnRaiiGuard::createDestructible(
-        [q = QPointer<UnifiedSearchListModel>(q)]()
+    // Will be called after all prefetches are complete.
+    auto totalCompletionHandler =
+        [this, guard = QPointer<Private>(this)]()
         {
-            if (q)
-                q->finishFetch();
-        });
-
-    m_fetchInProgress = finishHandler;
-    fetchAll(m_startTimeMs, endTimeMs, finishHandler);
-}
-
-void UnifiedSearchListModel::Private::periodicUpdate()
-{
-    if (m_endTimeMs >= 0)
-        return; //< If not live.
-
-    NX_EXPECT(m_camera);
-    if (!m_camera)
-        return;
-
-    // TODO: FIXME: Don't do update if finite time interval is set
-
-    const auto endTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    const auto startTimeMs = endTimeMs - std::chrono::milliseconds(kDefaultEventsPeriod).count();
-    fetchEvents(startTimeMs, endTimeMs);
-}
-
-void UnifiedSearchListModel::Private::fetchAll(qint64 startMs, qint64 endMs,
-    QnRaiiGuardPtr handler)
-{
-    NX_EXPECT(m_camera);
-    if (!m_camera)
-        return;
-
-    fetchEvents(startMs, endMs, handler);
-    fetchBookmarks(startMs, endMs, handler);
-    fetchAnalytics(startMs, endMs, handler);
-}
-
-void UnifiedSearchListModel::Private::fetchEvents(qint64 startMs, qint64 endMs,
-    QnRaiiGuardPtr handler)
-{
-    if (!accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission))
-        return;
-
-    const auto eventsReceived =
-        [this, guard = QPointer<QObject>(this)]
-            (bool success, rest::Handle handle, rest::EventLogData data)
-            {
-                if (!guard || !m_eventRequests.contains(handle))
-                    return;
-
-                m_eventRequests.remove(handle);
-
-                if (!success)
-                    return;
-
-                for (const auto& event: data.data)
-                    addCameraEvent(event);
-            };
-
-    QnEventLogRequestData request;
-    request.cameras << m_camera;
-    request.period = QnTimePeriod::fromInterval(startMs, endMs);
-
-    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    for (const auto& server: onlineServers)
-    {
-        const auto handle = server->restConnection()->getEvents(request, eventsReceived, thread());
-        if (handle <= 0)
-            continue;
-
-        m_eventRequests[handle] = handler;
-
-        // TODO: #vkutin Do we need it? Seems it's required only in case request is cancelled.
-        const auto timeoutCallback =
-            [this, handle, eventsReceived]
-            {
-                eventsReceived(false, handle, rest::EventLogData());
-            };
-
-        executeDelayedParented(timeoutCallback,
-            std::chrono::milliseconds(kEventsQueryTimeout).count(),
-            this);
-    }
-}
-
-void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startMs, qint64 endMs,
-    QnRaiiGuardPtr handler)
-{
-    if (!accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission))
-        return;
-
-    QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = startMs;
-    filter.endTimeMs = endMs;
-
-    qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
-        [this, handler](bool success, const QnCameraBookmarkList& bookmarks)
-        {
-            if (!success)
+            if (!guard)
                 return;
 
-            for (const auto& bookmark: bookmarks)
-                addOrUpdateBookmark(bookmark);
-        });
-}
+            if (m_fetchingTypes.testFlag(Type::events))
+                m_eventsModel->commitPrefetch(m_latestStartTimeMs);
 
-void UnifiedSearchListModel::Private::fetchAnalytics(qint64 startMs, qint64 endMs,
-    QnRaiiGuardPtr handler)
-{
-    // TODO: FIXME: IMPLEMENTME: #vkutin
-}
+            if (m_fetchingTypes.testFlag(Type::bookmarks))
+                m_bookmarksModel->commitPrefetch(m_latestStartTimeMs);
 
-void UnifiedSearchListModel::Private::watchBookmarkChanges()
-{
-    // TODO: #vkutin Check whether qnCameraBookmarksManager won't emit these signals
-    // if current user has no Qn::GlobalViewBookmarksPermission
+            if (m_fetchingTypes.testFlag(Type::analytics))
+                m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkAdded, this,
-        [this](const QnCameraBookmark& bookmark) { addOrUpdateBookmark(bookmark); });
+            m_fetchingTypes = Types();
+        };
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
-        [this](const QnCameraBookmark& bookmark) { addOrUpdateBookmark(bookmark); });
+    auto completionGuard = QnRaiiGuard::createDestructible(totalCompletionHandler);
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
-        [this](const QnUuid& bookmarkId) { q->removeEvent(bookmarkId); });
-}
+    // Will be called after a single prefetch is complete.
+    const auto prefetchCompletionHandler =
+        [this, completionGuard](qint64 earliestTimeMs)
+        {
+            m_latestStartTimeMs = qMax(m_latestStartTimeMs, earliestTimeMs);
+        };
 
-void UnifiedSearchListModel::Private::addOrUpdateBookmark(const QnCameraBookmark& bookmark)
-{
-    if (bookmark.startTimeMs < m_startTimeMs
-        || m_endTimeMs >= 0 && bookmark.startTimeMs > m_endTimeMs)
-    {
-        // Skip bookmarks outside of time range.
-        return;
-    }
+    m_latestStartTimeMs = 0;
+    m_fetchInProgress = completionGuard;
+    m_fetchingTypes = Types();
 
-    EventData data;
-    data.id = bookmark.guid;
-    data.title = bookmark.name;
-    data.description = bookmark.description;
-    data.timestampMs = bookmark.startTimeMs;
-    data.helpId = Qn::Bookmarks_Usage_Help;
-    data.previewCamera = m_camera;
-    data.previewTimeMs = bookmark.startTimeMs;
+    if (m_eventsModel->prefetchAsync(prefetchCompletionHandler))
+        m_fetchingTypes |= Type::events;
 
-    // TODO: #vkutin Make color customized properly. Replace icon with pre-colorized one.
-    data.titleColor = QPalette().linkVisited().color();
-    data.icon = bookmarkPixmap(data.titleColor);
+    if (m_bookmarksModel->prefetchAsync(prefetchCompletionHandler))
+        m_fetchingTypes |= Type::bookmarks;
 
-    if (!q->updateEvent(data))
-        q->addEvent(data);
-}
-
-void UnifiedSearchListModel::Private::addCameraEvent(const nx::vms::event::ActionData& event)
-{
-    const auto eventTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::microseconds(event.eventParams.eventTimestampUsec)).count();
-
-    if (eventTimeMs < m_startTimeMs || (m_endTimeMs >= 0 && eventTimeMs > m_endTimeMs))
-        return; // Skip events outside of time range.
-
-    const auto eventId = qMakePair(event.businessRuleId, event.eventParams.eventTimestampUsec);
-    if (m_eventIds.contains(eventId))
-        return; //< Event already added.
-
-    const auto id = QnUuid::createUuid();
-    m_eventIds[eventId] = id;
-
-    EventData data;
-    data.id = id;
-    data.title = m_helper->eventName(event.eventParams.eventType);
-    data.description = m_helper->eventDetails(event.eventParams).join(lit("<br>"));
-    data.timestampMs = eventTimeMs;
-    data.icon = eventPixmap(event.eventParams);
-    data.titleColor = eventColor(event.eventParams.eventType);
-
-    if (eventRequiresPreview(event.eventParams.eventType))
-    {
-        data.previewCamera = m_camera;
-        data.previewTimeMs = eventTimeMs;
-    }
-
-    //data.helpId =
-    //data.actionId =
-    //data.actionParameters =
-
-    q->addEvent(data);
+    if (m_analyticsModel->prefetchAsync(prefetchCompletionHandler))
+        m_fetchingTypes |= Type::analytics;
 }
 
 QnVirtualCameraResourcePtr UnifiedSearchListModel::Private::camera() const
@@ -294,110 +91,38 @@ void UnifiedSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr
         return;
 
     m_camera = camera;
+    updateModels();
+}
 
-    q->clear(); //< Will call d->clear().
+UnifiedSearchListModel::Types UnifiedSearchListModel::Private::filter() const
+{
+    return m_filter;
+}
 
-    m_startTimeMs = m_endTimeMs = 0;
-    m_updateTimer->stop();
-
-    if (!m_camera)
+void UnifiedSearchListModel::Private::setFilter(Types filter)
+{
+    if (filter == m_filter)
         return;
 
-    // TODO: #vkutin #gdm #common Think of some means to prevent overwhelming server
-    // with queries if current camera is quickly switched many times.
+    m_filter = filter;
+    updateModels();
+}
 
-    m_startTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    m_endTimeMs = -1; //< Reset to live.
+void UnifiedSearchListModel::Private::updateModels()
+{
+    m_eventsModel->setCamera(m_filter.testFlag(Type::events)
+        ? m_camera
+        : QnVirtualCameraResourcePtr());
+
+    m_bookmarksModel->setCamera(m_filter.testFlag(Type::bookmarks)
+        ? m_camera
+        : QnVirtualCameraResourcePtr());
+
+    m_analyticsModel->setCamera(m_filter.testFlag(Type::analytics)
+        ? m_camera
+        : QnVirtualCameraResourcePtr());
+
     fetchMore();
-
-    m_updateTimer->start();
-}
-
-QPixmap UnifiedSearchListModel::Private::eventPixmap(const nx::vms::event::EventParameters& event)
-{
-    switch (event.eventType)
-    {
-        case nx::vms::event::EventType::cameraMotionEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::cameraInputEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::cameraDisconnectEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::storageFailureEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::networkIssueEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::cameraIpConflictEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::serverFailureEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::serverConflictEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::serverStartEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::licenseIssueEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::backupFinishedEvent:
-            return QPixmap();
-
-        case nx::vms::event::EventType::softwareTriggerEvent:
-            return QnSoftwareTriggerPixmaps::colorizedPixmap(
-                event.description, QPalette().light().color());
-
-        case nx::vms::event::EventType::analyticsSdkEvent:
-            return QPixmap();
-
-        default:
-            return QPixmap();
-    }
-}
-
-QColor UnifiedSearchListModel::Private::eventColor(nx::vms::event::EventType eventType)
-{
-    switch (eventType)
-    {
-        case nx::vms::event::EventType::cameraDisconnectEvent:
-        case nx::vms::event::EventType::storageFailureEvent:
-        case nx::vms::event::EventType::serverFailureEvent:
-            return qnGlobals->errorTextColor();
-
-        case nx::vms::event::EventType::networkIssueEvent:
-        case nx::vms::event::EventType::cameraIpConflictEvent:
-        case nx::vms::event::EventType::serverConflictEvent:
-            return qnGlobals->warningTextColor();
-
-        case nx::vms::event::EventType::backupFinishedEvent:
-            return qnGlobals->successTextColor();
-
-        //case nx::vms::event::EventType::licenseIssueEvent: //< TODO: normal or warning?
-        default:
-            return QColor();
-    }
-}
-
-bool UnifiedSearchListModel::Private::eventRequiresPreview(vms::event::EventType type)
-{
-    switch (type)
-    {
-        case vms::event::cameraMotionEvent:
-        case vms::event::analyticsSdkEvent:
-        case vms::event::cameraInputEvent:
-        case vms::event::userDefinedEvent:
-            return true;
-
-        default:
-            return false;
-    }
 }
 
 } // namespace
