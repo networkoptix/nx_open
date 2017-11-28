@@ -55,8 +55,10 @@ public:
     /**
      * Layout export mode. Will have only "Layout" tabs. Actual when we have no permissions to
      * export currently selected 'central' widget.
+     * @param mediaForbiddenReason Reason of disabling 'Single camera' tab. Displayed as tooltip.
      */
     ExportSettingsDialog(const QnLayoutResourcePtr& layout,
+        const QString& mediaForbiddenReason,
         const QnTimePeriod& timePeriod,
         FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);
@@ -109,6 +111,7 @@ private:
     void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
     void updateTranscodingWidgets(bool transcodingIsAllowed);
 
+    void disableTab(Mode mode, const QString& reason);
     void hideTab(Mode mode);
 
     Filename suggestedFileName(const Filename& baseName) const;

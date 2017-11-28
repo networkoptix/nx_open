@@ -64,13 +64,14 @@ ExportSettingsDialog::ExportSettingsDialog(
 }
 
 ExportSettingsDialog::ExportSettingsDialog(const QnLayoutResourcePtr& layout,
+    const QString& mediaForbiddenReason,
     const QnTimePeriod& timePeriod,
     FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
-    hideTab(Mode::Media);
+    disableTab(Mode::Media, mediaForbiddenReason);
     setLayout(layout);
 }
 
@@ -482,10 +483,12 @@ void ExportSettingsDialog::updateTabWidgetSize()
 
 void ExportSettingsDialog::updateMode()
 {
-    const auto currentMode = ui->tabWidget->currentWidget() == ui->cameraTab
-        ? Mode::Media
-        : Mode::Layout;
+    const auto cameraTabIndex = ui->tabWidget->indexOf(ui->cameraTab);
 
+    const auto isCameraMode = ui->tabWidget->currentIndex() == cameraTabIndex
+        && ui->tabWidget->isTabEnabled(cameraTabIndex);
+
+    const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
 }
 
@@ -624,9 +627,22 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
+void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
+{
+    NX_EXPECT(ui->tabWidget->count() > 1);
+
+    const auto tabIndex = mode == Mode::Media
+        ? ui->tabWidget->indexOf(ui->cameraTab)
+        : ui->tabWidget->indexOf(ui->layoutTab);
+
+    ui->tabWidget->setTabEnabled(tabIndex, false);
+    ui->tabWidget->setTabToolTip(tabIndex, reason);
+    updateMode();
+}
+
 void ExportSettingsDialog::hideTab(Mode mode)
 {
-    NX_ASSERT(ui->tabWidget->count() > 1);
+    NX_EXPECT(ui->tabWidget->count() > 1);
     ui->tabWidget->removeTab(mode == Mode::Media
         ? ui->tabWidget->indexOf(ui->cameraTab)
         : ui->tabWidget->indexOf(ui->layoutTab));
