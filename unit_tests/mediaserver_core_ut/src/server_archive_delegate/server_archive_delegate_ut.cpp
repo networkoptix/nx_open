@@ -37,7 +37,7 @@ extern "C" {
 #include <stdio.h>
 
 #include <test_support/utils.h>
-#include "media_server/media_server_module.h"
+#include "media_server_module_fixture.h"
 
 const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
@@ -386,7 +386,12 @@ private:
     std::vector<QnStorageResourcePtr> m_storages;
 };
 
-TEST(ServerArchiveDelegate_playback_test, TestHelper)
+class ServerArchiveDelegatePlaybackTest:
+    public MediaServerModuleFixture
+{
+};
+
+TEST_F(ServerArchiveDelegatePlaybackTest, TestHelper)
 {
     TestHelper::TimePeriod tp1(0, 10);
     TestHelper::TimePeriod tp2(5, 30);
@@ -443,7 +448,7 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
     ASSERT_TRUE(timeLine.checkTime(28));
 }
 
-TEST(ServerArchiveDelegate_playback_test, Main)
+TEST_F(ServerArchiveDelegatePlaybackTest, Main)
 {
     nx::ut::utils::WorkDirResource storageWorkDir1;
     nx::ut::utils::WorkDirResource storageWorkDir2;
@@ -456,19 +461,17 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     auto storageUrl_2 = *storageWorkDir2.getDirName();
 
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     qnNormalStorageMan->stopAsyncTasks();
 
     qnBackupStorageMan->stopAsyncTasks();
 
-    serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
-    serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
+    serverModule().roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
+    serverModule().roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 #if defined (__arm__)
-    TestHelper testHelper(serverModule->commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
+    TestHelper testHelper(serverModule().commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
 #else
-    TestHelper testHelper(serverModule->commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
+    TestHelper testHelper(serverModule().commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
 #endif
     testHelper.print();
 

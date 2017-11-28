@@ -36,41 +36,40 @@
 
 #include <core/resource_management/resource_properties.h>
 #include <test_support/utils.h>
-#include <media_server/media_server_module.h>
 
-namespace
-{
+#include "media_server_module_fixture.h"
 
-class AbstractStorageResourceTest: public ::testing::Test, public QnMediaServerModule
+namespace {
+
+class AbstractStorageResourceTest:
+    public MediaServerModuleFixture
 {
-public:
-    AbstractStorageResourceTest():
-        QnMediaServerModule()
-    {
-    }
+    using base_type = MediaServerModuleFixture;
+
 protected:
-
     virtual void SetUp() override
     {
+        base_type::SetUp();
+
         prepare();
 
         ASSERT_TRUE((bool)workDirResource.getDirName());
 
         QString fileStorageUrl = *workDirResource.getDirName();
-        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), fileStorageUrl));
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
         qnNormalStorageMan->addStorage(fileStorage);
 
         if (!nx::ut::cfg::configInstance().ftpUrl.isEmpty())
         {
-            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!nx::ut::cfg::configInstance().smbUrl.isEmpty())
         {
-            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), nx::ut::cfg::configInstance().smbUrl));
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), nx::ut::cfg::configInstance().smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
             qnNormalStorageMan->addStorage(smbStorage);
@@ -82,14 +81,12 @@ protected:
         this->ftpStorageUrl = nx::ut::cfg::configInstance().ftpUrl;
         this->smbStorageUrl = nx::ut::cfg::configInstance().smbUrl;
 
-        commonModule()->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
-
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager(nullptr));
 
         platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
-        pluginManager->loadPlugins(roSettings());
+        pluginManager->loadPlugins(serverModule().roSettings());
 
         for (const auto storagePlugin : pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
