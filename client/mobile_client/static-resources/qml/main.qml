@@ -100,13 +100,13 @@ ApplicationWindow
 
     Connections
     {
-        target: cloudStatusWatcher;
+        target: cloudStatusWatcher
         onStatusChanged:
         {
-            if (connectedThroughTheCloud()
+            if (isCloudConnectionUrl(getLastUsedUrl())
                 && cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
             {
-                uiController.disconnectFromSystem();
+                uiController.disconnectFromSystem()
             }
         }
     }

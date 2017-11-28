@@ -188,7 +188,8 @@ Pane
                 if (!connectionManager.connectToServer(
                     hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password, true))
+                    cloudStatusWatcher.credentials.password,
+                    true))
                 {
                     sessionsScreen.openConnectionWarningDialog(systemName)
                     return
@@ -206,7 +207,8 @@ Pane
                     if (!connectionManager.connectToServer(
                         hostsModelAccessor.defaultAddress,
                         authenticationDataModel.defaultCredentials.user,
-                        authenticationDataModel.defaultCredentials.password, false))
+                        authenticationDataModel.defaultCredentials.password,
+                        false))
                     {
                         sessionsScreen.openConnectionWarningDialog(systemName)
                         return

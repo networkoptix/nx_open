@@ -248,14 +248,14 @@ QUrl QnContext::getLastUsedUrl() const
     return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
+bool QnContext::isCloudConnectionUrl(const QUrl& url)
+{
+    return url.scheme() == QnUrlHelper::cloudConnectionScheme;
+}
+
 QUrl QnContext::getInitialUrl() const
 {
     return qnSettings->startupParameters().url;
-}
-
-bool QnContext::connectedThroughTheCloud()
-{
-    return getLastUsedUrl().scheme() == QnConnectionManager::cloudConnectionScheme();
 }
 
 QUrl QnContext::getWebSocketUrl() const
