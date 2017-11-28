@@ -175,7 +175,7 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
     return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
-qint64 QnResourceWidgetRenderer::lastDisplayedTimestampMs(int channel) const
+qint64 QnResourceWidgetRenderer::lastDisplayedTimestampUsec(int channel) const
 {
     if (m_channelRenderers.size() <= static_cast<size_t>(channel))
         return -1;

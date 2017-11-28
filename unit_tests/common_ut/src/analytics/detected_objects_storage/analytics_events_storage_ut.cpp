@@ -202,6 +202,8 @@ TEST_F(AnalyticsEventsStorage, storing_multiple_events_concurrently)
 //-------------------------------------------------------------------------------------------------
 // Basic Lookup condition.
 
+static const auto kUsecInMs = 1000;
+
 class AnalyticsEventsStorageLookup:
     public AnalyticsEventsStorage
 {
@@ -209,7 +211,9 @@ class AnalyticsEventsStorageLookup:
 
 public:
     AnalyticsEventsStorageLookup():
-        m_timeRange(0, 0)
+        m_allowedTimeRange(
+            std::chrono::system_clock::from_time_t(0),
+            std::chrono::system_clock::from_time_t(0))
     {
     }
 
@@ -227,22 +231,66 @@ protected:
         whenLookupEvents(m_filter);
     }
 
-    void whenLookupByAnyDeviceId()
+    void whenLookupByRandomKnownDeviceId()
     {
         ASSERT_FALSE(m_allowedDeviceIds.empty());
         m_filter.deviceId = nx::utils::random::choice(m_allowedDeviceIds);
         whenLookupEvents(m_filter);
     }
 
+    void whenLookupByRandomNonEmptyTimePeriod()
+    {
+        using namespace std::chrono;
+
+        m_filter.timePeriod.startTimeMs = duration_cast<milliseconds>(
+            (m_allowedTimeRange.first + (m_allowedTimeRange.second - m_allowedTimeRange.first) / 2)
+                .time_since_epoch()).count();
+        m_filter.timePeriod.durationMs = duration_cast<milliseconds>(
+            (m_allowedTimeRange.second - m_allowedTimeRange.first) /
+                nx::utils::random::number<int>(3, 10)).count();
+
+        whenLookupEvents(m_filter);
+    }
+
+    void whenLookupByEmptyTimePeriod()
+    {
+        using namespace std::chrono;
+
+        m_filter.timePeriod.startTimeMs = duration_cast<milliseconds>(
+            (m_allowedTimeRange.first - std::chrono::hours(2)).time_since_epoch()).count();
+        m_filter.timePeriod.durationMs =
+            duration_cast<milliseconds>(std::chrono::hours(1)).count();
+
+        whenLookupEvents(m_filter);
+    }
+
+    void whenLookupWithLimit()
+    {
+        m_filter.maxObjectsToSelect =
+            filterObjects(toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
+
+        whenLookupEvents(m_filter);
+    }
+
     void thenResultMatchesExpectations()
     {
+        auto objects = toDetectedObjects(m_analyticsDataPackets);
+        std::sort(
+            objects.begin(), objects.end(),
+            [](const DetectedObject& left, const DetectedObject& right)
+            {
+                return std::tie(left.objectTypeId, left.objectId) <
+                    std::tie(right.objectTypeId, right.objectId);
+            });
+
         thenLookupSucceded();
-        andLookupResultEquals(toDetectedObjects(filterPackets(m_filter)));
+        andLookupResultEquals(filterObjects(objects, m_filter));
     }
 
 private:
     std::vector<QnUuid> m_allowedDeviceIds;
-    std::pair<qint64, qint64> m_timeRange;
+    std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
+        m_allowedTimeRange;
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_analyticsDataPackets;
     Filter m_filter;
 
@@ -253,7 +301,9 @@ private:
             deviceIds.push_back(QnUuid::createUuid());
         setAllowedDeviceIds(deviceIds);
 
-        setAllowedTimeRange(100, 100000);
+        setAllowedTimeRange(
+            std::chrono::system_clock::now() - std::chrono::hours(24),
+            std::chrono::system_clock::now());
 
         generateEventsByCriteria();
     }
@@ -263,14 +313,18 @@ private:
         m_allowedDeviceIds = std::move(deviceIds);
     }
 
-    void setAllowedTimeRange(qint64 start, qint64 end)
+    void setAllowedTimeRange(
+        std::chrono::system_clock::time_point start,
+        std::chrono::system_clock::time_point end)
     {
-        m_timeRange.first = start;
-        m_timeRange.second = end;
+        m_allowedTimeRange.first = start;
+        m_allowedTimeRange.second = end;
     }
 
     void generateEventsByCriteria()
     {
+        using namespace std::chrono;
+
         const int eventsPerDevice = 11;
 
         std::vector<common::metadata::ConstDetectionMetadataPacketPtr> analyticsDataPackets;
@@ -280,10 +334,13 @@ private:
             {
                 auto packet = generateRandomPacket(1);
                 packet->deviceId = deviceId;
-                if (m_timeRange.first != 0 || m_timeRange.second != 0)
+                if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
                     packet->timestampUsec = nx::utils::random::number<qint64>(
-                        m_timeRange.first, m_timeRange.second);
+                        duration_cast<microseconds>(
+                            m_allowedTimeRange.first.time_since_epoch()).count(),
+                        duration_cast<microseconds>(
+                            m_allowedTimeRange.second.time_since_epoch()).count());
                 }
 
                 analyticsDataPackets.push_back(packet);
@@ -311,25 +368,46 @@ private:
             thenSaveSucceeded();
     }
 
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filterPackets(
+    std::vector<DetectedObject> filterObjects(
+        std::vector<DetectedObject> objects,
         const Filter& filter)
     {
-        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> result;
-        for (const auto& packet: m_analyticsDataPackets)
+        for (auto objectIter = objects.begin(); objectIter != objects.end(); )
         {
-            if (satisfiesFilter(filter, packet))
-                result.push_back(packet);
+            for (auto objectPositionIter = objectIter->track.begin();
+                objectPositionIter != objectIter->track.end();
+                )
+            {
+                if (satisfiesFilter(filter, *objectPositionIter))
+                    ++objectPositionIter;
+                else
+                    objectPositionIter = objectIter->track.erase(objectPositionIter);
+            }
+
+            if (objectIter->track.empty())
+                objectIter = objects.erase(objectIter);
+            else
+                ++objectIter;
         }
 
-        return result;
+        if (filter.maxObjectsToSelect > 0 && (int) objects.size() > filter.maxObjectsToSelect)
+            objects.erase(objects.begin() + filter.maxObjectsToSelect, objects.end());
+
+        return objects;
     }
 
     bool satisfiesFilter(
         const Filter& filter,
-        common::metadata::ConstDetectionMetadataPacketPtr packet)
+        const nx::analytics::storage::ObjectPosition& objectPosition)
     {
-        if (!filter.deviceId.isNull() && packet->deviceId != filter.deviceId)
+        if (!filter.deviceId.isNull() && objectPosition.deviceId != filter.deviceId)
             return false;
+
+        if (!filter.timePeriod.isNull() &&
+            !filter.timePeriod.contains(objectPosition.timestampUsec / kUsecInMs))
+        {
+            return false;
+        }
 
         return true;
     }
@@ -343,11 +421,27 @@ TEST_F(AnalyticsEventsStorageLookup, empty_filter_matches_all_events)
 
 TEST_F(AnalyticsEventsStorageLookup, lookup_by_deviceId)
 {
-    whenLookupByAnyDeviceId();
+    whenLookupByRandomKnownDeviceId();
     thenResultMatchesExpectations();
 }
 
-// TEST_F(AnalyticsEventsStorageLookup, lookup_by_time_period)
+TEST_F(AnalyticsEventsStorageLookup, lookup_by_non_empty_time_period)
+{
+    whenLookupByRandomNonEmptyTimePeriod();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_by_empty_time_period)
+{
+    whenLookupByEmptyTimePeriod();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_result_limit)
+{
+    whenLookupWithLimit();
+    thenResultMatchesExpectations();
+}
 
 // Advanced Lookup.
 

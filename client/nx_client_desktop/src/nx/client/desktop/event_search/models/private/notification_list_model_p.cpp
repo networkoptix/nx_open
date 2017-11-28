@@ -289,13 +289,13 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         }
     }
 
-    eventData.icon = pixmapForAction(action, eventData.titleColor);
-
     if (eventData.removable && action->actionType() != vms::event::playSoundAction)
         eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
 
     if (action->actionType() == vms::event::showPopupAction && camera)
         setupAcknowledgeAction(eventData, camera, action);
+
+    eventData.icon = pixmapForAction(action, eventData.titleColor);
 
     if (!q->addEvent(eventData))
         return;
@@ -395,6 +395,21 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 QPixmap NotificationListModel::Private::pixmapForAction(
     const vms::event::AbstractActionPtr& action, const QColor& color) const
 {
+    switch (QnNotificationLevel::valueOf(action))
+    {
+        case QnNotificationLevel::Value::CriticalNotification:
+            return qnSkin->pixmap("events/alert_red.png");
+
+        case QnNotificationLevel::Value::ImportantNotification:
+            return qnSkin->pixmap("events/alert_yellow.png");
+
+        case QnNotificationLevel::Value::SuccessNotification:
+            return qnSkin->pixmap("events/success_mark.png");
+
+        default:
+            break;
+    }
+
     if (action->actionType() == vms::event::playSoundAction)
         return qnSkin->pixmap("events/sound.png");
 

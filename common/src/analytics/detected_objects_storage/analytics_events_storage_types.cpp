@@ -1,6 +1,10 @@
 #include "analytics_events_storage_types.h"
 
+#include <cmath>
+
 #include <nx/fusion/model_functions.h>
+
+#include <utils/math/math.h>
 
 namespace nx {
 namespace analytics {
@@ -35,9 +39,14 @@ bool Filter::operator==(const Filter& right) const
     return objectTypeId == right.objectTypeId
         && objectId == right.objectId
         && timePeriod == right.timePeriod
-        && boundingBox == right.boundingBox
+        && equalWithPrecision(boundingBox, right.boundingBox, 6)
         && requiredAttributes == right.requiredAttributes
         && freeText == right.freeText;
+}
+
+bool Filter::operator!=(const Filter& right) const
+{
+    return !(*this == right);
 }
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params)
@@ -69,6 +78,9 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
             lit("freeText"),
             QString::fromUtf8(QUrl::toPercentEncoding(filter.freeText)));
     }
+
+    if (filter.maxObjectsToSelect > 0)
+        params->insert(lit("limit"), QString::number(filter.maxObjectsToSelect));
 }
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
@@ -83,6 +95,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         filter->objectId = QnUuid::fromStringSafe(params.value(lit("objectId")));
 
     // TODO: timePeriod.
+
+    //Qt::SortOrder order;
+    //QnLexical::deserialize(params.value(lit("sortOrder")), &order);
 
     if (params.contains(lit("x1")))
     {
@@ -106,7 +121,26 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
             params.value(lit("freeText")).toUtf8());
     }
 
+    if (params.contains(lit("limit")))
+        filter->maxObjectsToSelect = params.value(lit("limit")).toInt();
+
     return true;
+}
+
+::std::ostream& operator<<(::std::ostream& os, const Filter& filter)
+{
+    return os <<
+        "deviceId " << filter.deviceId.toSimpleString().toStdString() << "; " <<
+        "objectTypeId " << lm("%1").container(filter.objectTypeId).toStdString() << "; " <<
+        "objectId " << filter.objectId.toSimpleString().toStdString() << "; " <<
+        "timePeriod [" << filter.timePeriod.startTimeMs << ", " <<
+            filter.timePeriod.durationMs << "]; " <<
+        "boundingBox [" <<
+            filter.boundingBox.topLeft().x() << ", " <<
+            filter.boundingBox.topLeft().y() << ", " <<
+            filter.boundingBox.bottomRight().x() << ", " <<
+            filter.boundingBox.bottomRight().y() << "]; " <<
+        "freeText \"" << filter.freeText.toStdString() << "\"; ";
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

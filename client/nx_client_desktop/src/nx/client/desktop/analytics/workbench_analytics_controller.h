@@ -5,8 +5,6 @@
 
 #include <client_core/connection_context_aware.h>
 
-#include <nx/client/desktop/analytics/analytics_fwd.h>
-
 #include <utils/common/connective.h>
 
 namespace nx {
@@ -26,13 +24,11 @@ public:
     WorkbenchAnalyticsController(
         int matrixSize,
         const QnResourcePtr& resource,
-        const AbstractAnalyticsDriverPtr& driver,
         QObject* parent = nullptr);
 
     WorkbenchAnalyticsController(
         const LayoutTemplate& layoutTemplate,
         const QnResourcePtr& resource,
-        const AbstractAnalyticsDriverPtr& driver,
         QObject* parent = nullptr);
 
     virtual ~WorkbenchAnalyticsController() override;

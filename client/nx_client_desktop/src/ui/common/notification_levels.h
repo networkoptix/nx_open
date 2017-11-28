@@ -17,6 +17,7 @@ enum class Value
     CommonNotification,
     ImportantNotification,
     CriticalNotification,
+    SuccessNotification,
     LevelCount
 };
 

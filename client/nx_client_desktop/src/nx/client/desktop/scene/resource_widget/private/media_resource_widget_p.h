@@ -5,6 +5,8 @@
 #include <licensing/license_fwd.h>
 
 #include <nx/client/core/media/abstract_motion_metadata_provider.h>
+#include <nx/client/core/media/abstract_analytics_metadata_provider.h>
+#include <nx/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/client/desktop/camera/camera_fwd.h>
 
 #include <utils/common/connective.h>
@@ -14,6 +16,8 @@ class QnSingleCamLicenseStatusHelper;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class WidgetAnalyticsController;
 
 class MediaResourceWidgetPrivate: public Connective<QObject>
 {
@@ -34,7 +38,10 @@ public:
     const bool hasVideo;
     const bool isIoModule;
 
-    QSharedPointer<nx::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
+    QScopedPointer<nx::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
+    nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
+
+    QScopedPointer<WidgetAnalyticsController> analyticsController;
 
 public:
     explicit MediaResourceWidgetPrivate(const QnResourcePtr& resource, QObject* parent = nullptr);
@@ -48,6 +55,9 @@ public:
     bool isUnauthorized() const;
 
     QnLicenseUsageStatus licenseStatus() const;
+
+    QSharedPointer<nx::media::AbstractMetadataConsumer> motionMetadataConsumer() const;
+    QSharedPointer<nx::media::AbstractMetadataConsumer> analyticsMetadataConsumer() const;
 
 signals:
     void stateChanged();

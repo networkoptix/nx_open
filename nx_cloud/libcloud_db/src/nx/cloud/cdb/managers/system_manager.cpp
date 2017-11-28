@@ -572,7 +572,8 @@ nx::utils::db::DBResult SystemManager::fetchSystemById(
     data::SystemData* const system)
 {
     const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {{ "system.id", ":systemId", QnSql::serialized_field(systemId) }};
+        {nx::utils::db::SqlFilterFieldEqual(
+            "system.id", ":systemId", QnSql::serialized_field(systemId))};
 
     std::vector<data::SystemData> systems;
     auto dbResult = m_systemDao->fetchSystems(queryContext, sqlFilter, &systems);
@@ -990,7 +991,8 @@ nx::utils::db::DBResult SystemManager::deleteSharing(
     const auto dbResult = m_systemSharingDao.deleteSharing(
         queryContext,
         systemId,
-        {{"account_id", ":accountId", QnSql::serialized_field(inviteeAccount.id)}});
+        {nx::utils::db::SqlFilterFieldEqual(
+            "account_id", ":accountId", QnSql::serialized_field(inviteeAccount.id))});
     if (dbResult != nx::utils::db::DBResult::ok)
         return dbResult;
 
@@ -1896,9 +1898,11 @@ nx::utils::db::DBResult SystemManager::processEc2SaveUser(
     ec2::convert(vmsUser, systemSharingData);
 
     const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {{"vms_user_id", ":vmsUserId",
-           QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())},
-         { "system_id", ":systemId", QnSql::serialized_field(systemId) } };
+        {nx::utils::db::SqlFilterFieldEqual(
+            "vms_user_id", ":vmsUserId",
+            QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())),
+         nx::utils::db::SqlFilterFieldEqual(
+             "system_id", ":systemId", QnSql::serialized_field(systemId))};
     api::SystemSharingEx grantorInfo;
     auto dbResult = m_systemSharingDao.fetchSharing(
         queryContext,
@@ -1971,8 +1975,8 @@ nx::utils::db::DBResult SystemManager::processEc2RemoveUser(
     const auto dbResult = m_systemSharingDao.deleteSharing(
         queryContext,
         systemId.toStdString(),
-        {{"vms_user_id", ":vmsUserId",
-          QnSql::serialized_field(systemSharingData->vmsUserId)}});
+        {nx::utils::db::SqlFilterFieldEqual("vms_user_id", ":vmsUserId",
+            QnSql::serialized_field(systemSharingData->vmsUserId))});
     if (dbResult != nx::utils::db::DBResult::ok)
     {
         NX_LOGX(

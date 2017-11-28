@@ -9,6 +9,7 @@
 #include <QtCore/QtEndian>
 #include <QtCore/QtGlobal>
 #include <QtCore/QtNumeric>
+#include <QtCore/QRect>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
@@ -253,5 +254,18 @@ inline double qSign(double value) {
     return value >= 0.0 ? 1.0 : -1.0;
 }
 
+inline bool equalWithPrecision(double one, double two, int precision) {
+    return abs(two - one) < (1.0 / std::pow(10.0, precision));
+}
+
+inline bool equalWithPrecision(const QPointF& one, const QPointF& two, int precision) {
+    return equalWithPrecision(one.x(), two.x(), precision)
+        && equalWithPrecision(one.y(), two.y(), precision);
+}
+
+inline bool equalWithPrecision(const QRectF& one, const QRectF& two, int precision) {
+    return equalWithPrecision(one.topLeft(), two.topLeft(), precision)
+        && equalWithPrecision(one.bottomRight(), two.bottomRight(), precision);
+}
 
 #endif // QN_MATH_H

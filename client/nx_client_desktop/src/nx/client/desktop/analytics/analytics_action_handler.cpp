@@ -10,7 +10,6 @@
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/analytics/drivers/analytics_drivers_factory.h>
 #include <nx/client/desktop/analytics/workbench_analytics_controller.h>
 #include <nx/client/desktop/layout_templates/layout_template.h>
 
@@ -46,9 +45,6 @@ void AnalyticsActionHandler::startAnalytics()
 {
     auto parameters = menu()->currentParameters(sender());
     const auto resource = parameters.resource();
-    const auto driver = AnalyticsDriversFactory::createAnalyticsDriver(resource);
-    if (!driver)
-        return;
 
     const auto& layoutTemplate =
         parameters.argument(Qn::LayoutTemplateRole).value<LayoutTemplate>();
@@ -78,8 +74,8 @@ void AnalyticsActionHandler::startAnalytics()
     }
 
     const ControllerPtr controller(layoutTemplate.isValid()
-        ? new WorkbenchAnalyticsController(layoutTemplate, resource, driver)
-        : new WorkbenchAnalyticsController(size, resource, driver));
+        ? new WorkbenchAnalyticsController(layoutTemplate, resource)
+        : new WorkbenchAnalyticsController(size, resource));
 
     m_controllers.append(controller);
     menu()->trigger(ui::action::OpenInNewTabAction, controller->layout());

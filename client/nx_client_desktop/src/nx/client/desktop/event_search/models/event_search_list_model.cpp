@@ -74,7 +74,7 @@ QVariant EventSearchListModel::data(const QModelIndex& index, int role) const
                 : QVariant();
 
         case Qn::HelpTopicIdRole:
-            return QVariant(); // TODO: #vkutin Implement me!
+            return Qn::Empty_Help;
 
         default:
             return base_type::data(index, role);

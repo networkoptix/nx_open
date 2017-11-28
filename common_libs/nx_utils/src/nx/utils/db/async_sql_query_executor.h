@@ -154,7 +154,13 @@ public:
 
     void reserveConnections(int count);
 
+    /**
+     * @param value Zero - no limit. By default, zero.
+     */
+    void setConcurrentModificationQueryLimit(int value);
+
     std::size_t pendingQueryCount() const;
+
 
     /**
      * Executes data modification request that spawns some output data.

@@ -272,41 +272,43 @@ std::vector<nx::utils::db::SqlFilterField> AccountDataObject::prepareAccountFiel
     const api::AccountUpdateData& accountData,
     bool activateAccountIfNotActive)
 {
-    std::vector<nx::utils::db::SqlFilterField> fieldsToSet;
+    using namespace nx::utils::db;
+
+    std::vector<SqlFilterField> fieldsToSet;
 
     if (accountData.passwordHa1)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "password_ha1", ":passwordHa1",
-            QnSql::serialized_field(accountData.passwordHa1.get()) });
+            QnSql::serialized_field(accountData.passwordHa1.get())));
     }
 
     if (accountData.passwordHa1Sha256)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "password_ha1_sha256", ":passwordHa1Sha256",
-            QnSql::serialized_field(accountData.passwordHa1Sha256.get()) });
+            QnSql::serialized_field(accountData.passwordHa1Sha256.get())));
     }
 
     if (accountData.fullName)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "full_name", ":fullName",
-            QnSql::serialized_field(accountData.fullName.get()) });
+            QnSql::serialized_field(accountData.fullName.get())));
     }
 
     if (accountData.customization)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "customization", ":customization",
-            QnSql::serialized_field(accountData.customization.get()) });
+            QnSql::serialized_field(accountData.customization.get())));
     }
 
     if (activateAccountIfNotActive)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "status_code", ":status_code",
-            QnSql::serialized_field(static_cast<int>(api::AccountStatus::activated)) });
+            QnSql::serialized_field(static_cast<int>(api::AccountStatus::activated))));
     }
 
     return fieldsToSet;

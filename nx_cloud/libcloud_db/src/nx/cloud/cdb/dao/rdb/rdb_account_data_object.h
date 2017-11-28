@@ -68,6 +68,7 @@ private:
     std::vector<nx::utils::db::SqlFilterField> prepareAccountFieldsToUpdate(
         const api::AccountUpdateData& accountData,
         bool activateAccountIfNotActive);
+
     void executeUpdateAccountQuery(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
