@@ -113,22 +113,10 @@ auto merge_sorted_lists(
     using SortedList = typename std::remove_reference<decltype(*sortedLists.begin())>::type;
     using Item = typename SortedList::value_type;
 
-    if (sortOrder == Qt::AscendingOrder)
-    {
-        const auto less =
-            [sortFieldGetter](const Item& left, const Item& right)
-            {
-                return sortFieldGetter(left) < sortFieldGetter(right);
-            };
-
-        return merge_sorted_lists(std::move(sortedLists), less, totalLimit);
-    }
-
-    const auto less =
-        [sortFieldGetter](const Item& left, const Item& right)
-        {
-            return sortFieldGetter(left) > sortFieldGetter(right);
-        };
+    using Less = std::function<bool(const Item&, const Item&)>;
+    const auto less = sortOrder == Qt::AscendingOrder
+        ? Less([key = sortFieldGetter](const Item& l, const Item& r) { return key(l) < key(r); })
+        : Less([key = sortFieldGetter](const Item& l, const Item& r) { return key(l) > key(r); });
 
     return merge_sorted_lists(std::move(sortedLists), less, totalLimit);
 };
