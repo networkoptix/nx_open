@@ -17,7 +17,7 @@ public:
 
 private:
     RawDataParserFactoryFunction m_defaultFactoryFunction;
-    RawDataParserFactoryFunction m_factoryFunction;
+    RawDataParserFactoryFunction m_factoryFunction = nullptr;
 };
 
 } // namespace data_parser

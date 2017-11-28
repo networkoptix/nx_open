@@ -23,7 +23,7 @@ RawDataParserFactory::RawDataParserFactory():
 
 AbstractRawDataParserPtr RawDataParserFactory::create()
 {
-    if (m_factoryFunction)
+    if (m_factoryFunction != nullptr)
         return m_factoryFunction();
 
     return m_defaultFactoryFunction();

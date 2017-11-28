@@ -11,6 +11,11 @@
 namespace nx {
 namespace update {
 namespace info {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    FileData, (json),
+    (file)(size)(md5))
+
 namespace detail {
 namespace data_parser {
 
@@ -156,21 +161,77 @@ public:
         parsePackages(kClientPackagesKey);
     }
 
-    bool ok() const
-    {
-        return m_ok;
-    }
-
-    UpdateData take()
-    {
-        return std::move(m_updateData);
-    }
+    bool ok() const { return m_ok; }
+    UpdateData take() { return std::move(m_updateData); }
 
 private:
-    enum class PackageType
+    class PackagesParser
     {
-        server,
-        client
+    public:
+        struct FileDataWithTarget
+        {
+            FileData fileData;
+            QString targetName;
+
+            FileDataWithTarget(FileData fileData, QString targetName):
+                fileData(std::move(fileData)),
+                targetName(std::move(targetName))
+            {}
+        };
+
+        PackagesParser(const QString& packagesHeader, QJsonObject packagesObject):
+            m_packagesObject(packagesObject)
+        {
+            if (m_packagesObject.isEmpty())
+            {
+                NX_WARNING(
+                    this,
+                    lm("No targets OS in packages for %1").args(packagesHeader));
+                return;
+            }
+
+            parsePackagesObjects();
+        }
+
+        bool ok() const { return m_ok; }
+        QList<FileDataWithTarget> take() { return std::move(m_fileDataList); }
+
+    private:
+        QJsonObject m_packagesObject;
+        bool m_ok = true;
+        QList<FileDataWithTarget> m_fileDataList;
+
+        void parsePackagesObjects()
+        {
+            for (auto it = m_packagesObject.constBegin(); it != m_packagesObject.constEnd(); ++it)
+                parseOsObject(it.key(), it.value().toObject());
+        }
+
+        void parseOsObject(const QString& osName, QJsonObject osObject)
+        {
+            for (auto it = osObject.constBegin(); it != osObject.constEnd(); ++it)
+                processTargetObject(osName, it.key(), osObject);
+        }
+
+        void processTargetObject(
+            const QString& osName,
+            const QString& targetName,
+            QJsonObject osObjet)
+        {
+            if (!m_ok)
+                return;
+
+            FileData fileData;
+            QString fullTargetName = osName + "." + targetName;
+            if (QJson::deserialize(osObjet, targetName, &fileData))
+            {
+                m_fileDataList.append(FileDataWithTarget(fileData, fullTargetName));
+                return;
+            }
+
+            NX_ERROR(this, lm("Target json parsing failed: %1").args(fullTargetName));
+            m_ok = false;
+        }
     };
 
     QJsonObject m_topLevelObject;
@@ -198,8 +259,6 @@ private:
         return result;
     }
 
-    // TODO: try to generalize object parsing to avoid too many nesting levels!!
-
     void parsePackages(const QString& key)
     {
         if (!m_ok)
@@ -213,78 +272,54 @@ private:
             return;
         }
 
-        if (key == kServerPackagesKey)
+        PackagesParser packagesParser(key, it.value().toObject());
+        if (!packagesParser.ok())
         {
-            parsePackagesObject(PackageType::server, it.value().toObject());
-            return;
-        }
-
-        parsePackagesObject(PackageType::client, it.value().toObject());
-    }
-
-    void parsePackagesObject(PackageType packageType, QJsonObject jsonObject)
-    {
-        if (!m_ok)
-            return;
-
-        if (jsonObject.isEmpty())
-        {
-            NX_WARNING(
-                this,
-                lm("No targets OS in packages for %1").args(packageTypeToString(packageType)));
-            return;
-        }
-
-        QJsonObject::const_iterator it = jsonObject.constBegin();
-        for (; it != jsonObject.constEnd(); ++it)
-            parseOsObject(packageType, it.key(), it.value().toObject());
-    }
-
-    QString packageTypeToString(PackageType packageType)
-    {
-        switch (packageType)
-        {
-        case PackageType::server: return "server";
-        case PackageType::client: return "client";
-        }
-    }
-
-    void parseOsObject(PackageType packageType, const QString& osTitle, const QJsonObject& osObject)
-    {
-        if (!m_ok)
-            return;
-
-
-    }
-
-    void parseFileDataObjects(PackageType packageType)
-    {
-        if (!m_ok)
-            return;
-
-        QJsonObject::const_iterator it = m_topLevelObject.constBegin();
-        for (; it != m_topLevelObject.constEnd(); ++it)
-            parseFileDataObj(it.key(), packageType);
-    }
-
-    void parseFileDataObj(const QString& key, PackageType packageType)
-    {
-        if (!m_ok)
-            return;
-
-        FileData fileData;
-        if (!QJson::deserialize(m_topLevelObject, key, &fileData))
-        {
-            NX_ERROR(this, lm("FileData json parsing failed: %1").args(key));
             m_ok = false;
             return;
         }
 
-        CustomizationData customizationData = dataFromInfo(key, std::move(customizationInfo));
-        m_updatesMetaData.customizationDataList.append(customizationData);
+        if (key == kServerPackagesKey)
+        {
+            fillServerPackages(packagesParser.take());
+            return;
+        }
 
+        fillClientPackages(packagesParser.take());
+    }
+
+    void fillServerPackages(QList<PackagesParser::FileDataWithTarget> serverPackages)
+    {
+        for (const auto& fileDataWithTarget: serverPackages)
+        {
+            m_updateData.targetToPackage.insert(
+                fileDataWithTarget.targetName,
+                fileDataWithTarget.fileData);
+        }
+    }
+
+    void fillClientPackages(QList<PackagesParser::FileDataWithTarget> clientPackages)
+    {
+        for (const auto& fileDataWithTarget: clientPackages)
+        {
+            m_updateData.targetToClientPackage.insert(
+                fileDataWithTarget.targetName,
+                fileDataWithTarget.fileData);
+        }
     }
 };
+
+
+template<typename ParserType, typename OutData>
+ResultCode applyParser(const QByteArray& rawData, OutData* outData)
+{
+    ParserType parser(QJsonDocument::fromJson(rawData).object());
+    if (!parser.ok())
+        return ResultCode::parseError;
+
+    *outData = parser.take();
+    return ResultCode::ok;
+}
 
 } // namespace
 
@@ -292,20 +327,12 @@ ResultCode JsonDataParser::parseMetaData(
     const QByteArray& rawData,
     UpdatesMetaData* outUpdatesMetaData)
 {
-    MetaDataParser metaDataParser(QJsonDocument::fromJson(rawData).object());
-    if (!metaDataParser.ok())
-        return ResultCode::parseError;
-
-    *outUpdatesMetaData = metaDataParser.take();
-
-    return ResultCode::ok;
+    return applyParser<MetaDataParser>(rawData, outUpdatesMetaData);
 }
 
-ResultCode JsonDataParser::parseUpdateData(
-    const QByteArray& /*rawData*/,
-    UpdateData* /*outUpdateData*/)
+ResultCode JsonDataParser::parseUpdateData(const QByteArray& rawData, UpdateData* outUpdateData)
 {
-    return ResultCode::parseError;
+    return applyParser<UpdateDataParser>(rawData, outUpdateData);
 }
 
 } // namespace impl

@@ -80,10 +80,70 @@ private:
     }
 };
 
+class UpdateDataParser: public ::testing::Test
+{
+protected:
+    UpdateDataParser(): m_parser(m_parserFactory.create()) {}
+
+    void whenUpdateDataParsed()
+    {
+        ASSERT_EQ(ResultCode::ok, m_parser->parseUpdateData(updateJson, &m_updateData));
+    }
+
+    void thenUpdateDataShouldBeCorrect()
+    {
+        thenVersionAndCloudHostShoudBeCorrect();
+        thenServerPackagesShouldBeCorrect();
+        thenClientPackagesShouldBeCorrect();
+    }
+
+private:
+    RawDataParserFactory m_parserFactory;
+    AbstractRawDataParserPtr m_parser;
+    UpdateData m_updateData;
+
+    void thenVersionAndCloudHostShoudBeCorrect()
+    {
+        ASSERT_EQ(QnSoftwareVersion("3.1.0.16975"), m_updateData.version);
+        ASSERT_EQ("nxvms.com", m_updateData.cloudHost);
+
+    }
+
+    void thenServerPackagesShouldBeCorrect()
+    {
+        ASSERT_EQ(7, m_updateData.targetToPackage.size());
+        checkFileData(m_updateData.targetToPackage, "linux.arm_rpi", 80605107);
+        checkFileData(m_updateData.targetToPackage, "windows.x86_winxp", 65677361);
+    }
+
+    void checkFileData(const QHash<QString, FileData>& targetToFileData, const QString& target, qint64 size)
+    {
+        auto fileDataIt = targetToFileData.find(target);
+        ASSERT_NE(targetToFileData.constEnd(), fileDataIt);
+        ASSERT_EQ(size, fileDataIt->size);
+        ASSERT_FALSE(fileDataIt->file.isEmpty());
+        ASSERT_FALSE(fileDataIt->md5.isEmpty());
+    }
+
+    void thenClientPackagesShouldBeCorrect()
+    {
+        ASSERT_EQ(5, m_updateData.targetToClientPackage.size());
+        checkFileData(m_updateData.targetToClientPackage, "linux.x64_ubuntu", 103335409);
+        checkFileData(m_updateData.targetToClientPackage, "macosx.x64_macosx", 77903157);
+        checkFileData(m_updateData.targetToClientPackage, "windows.x64_winxp", 86289814);
+    }
+};
+
 TEST_F(MetaDataParser, MetaDataParsedCorrectly)
 {
     whenTestMetaDataParsed();
     thenUpdatesMetaDataShouldBeCorrect();
+}
+
+TEST_F(UpdateDataParser, UpdateDataParsedCorrectly)
+{
+    whenUpdateDataParsed();
+    thenUpdateDataShouldBeCorrect();
 }
 
 } // namespace test

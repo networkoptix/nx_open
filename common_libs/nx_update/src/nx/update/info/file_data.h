@@ -8,7 +8,7 @@ namespace info {
 
 struct FileData
 {
-    QString name;
+    QString file;
     QString url;
     qint64 size;
     QByteArray md5;
