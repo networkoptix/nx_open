@@ -116,7 +116,7 @@ Pane
         anchors.right: parent.right
         icon: lp("/images/edit.png")
         visible: !cloudSystem && authenticationDataModel.hasData
-        onClicked: d.openSavedSession();
+        onClicked: d.openSavedSession()
     }
 
     IssueLabel
@@ -146,7 +146,7 @@ Pane
         text:
         {
             if (!compatible)
-                return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE");
+                return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE")
 
             if (!running)
                 return qsTr("OFFLINE")
@@ -216,7 +216,7 @@ Pane
                 }
                 else
                 {
-                    d.openSavedSession();
+                    d.openSavedSession()
                 }
             }
             else
@@ -243,7 +243,6 @@ Pane
                 informationBlock.address,
                 informationBlock.user,
                 authenticationDataModel.defaultCredentials.password)
-
         }
     }
 

@@ -59,7 +59,7 @@ Page
                         function(buttonId)
                         {
                             if (buttonId == "DELETE")
-                                clearSavedPasswords();
+                                clearSavedPasswords()
                         })
 
                 }

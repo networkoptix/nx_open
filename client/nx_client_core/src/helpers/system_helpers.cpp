@@ -32,11 +32,11 @@ void clearSavedPasswords()
 {
     QnClientCoreSettings::SystemAuthenticationDataHash result;
 
-    auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    const auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
     for (auto it = credentialsHash.begin(); it != credentialsHash.end(); ++it)
     {
         QList<QnEncodedCredentials> credentials;
-        for (auto currentCredential: it.value())
+        for (const auto& currentCredential: it.value())
             credentials.append(QnEncodedCredentials(currentCredential.user, QString()));
         result[it.key()] = credentials;
     }
