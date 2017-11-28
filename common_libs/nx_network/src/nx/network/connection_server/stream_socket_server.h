@@ -46,20 +46,7 @@ public:
 
     virtual ~StreamServerConnectionHolder()
     {
-        // We MUST be sure to remove all connections.
-        std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
-        {
-            QnMutexLocker lk(&m_mutex);
-            connections.swap(m_connections);
-        }
-        for (auto& connection: connections)
-            connection.first->pleaseStopSync();
-        connections.clear();
-
-        // Waiting connections being cancelled through closeConnection call to finish...
-        QnMutexLocker lk(&m_mutex);
-        while (m_connectionsBeingClosedCount > 0)
-            m_cond.wait(lk.mutex());
+        closeAllConnections();
     }
 
     virtual void closeConnection(
@@ -102,6 +89,24 @@ public:
         QnMutexLocker lk(&m_mutex);
         for (const auto& connection: m_connections)
             func(connection.first);
+    }
+
+    void closeAllConnections()
+    {
+        // We MUST be sure to remove all connections.
+        std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
+        {
+            QnMutexLocker lk(&m_mutex);
+            connections.swap(m_connections);
+        }
+        for (auto& connection : connections)
+            connection.first->pleaseStopSync();
+        connections.clear();
+
+        // Waiting connections being cancelled through closeConnection call to finish...
+        QnMutexLocker lk(&m_mutex);
+        while (m_connectionsBeingClosedCount > 0)
+            m_cond.wait(lk.mutex());
     }
 
 private:
@@ -171,6 +176,7 @@ public:
     virtual ~StreamSocketServer()
     {
         pleaseStopSync(false);
+        closeAllConnections();
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
