@@ -48,15 +48,15 @@ void HanwhaMetadataMonitor::startMonitoring()
 
 void HanwhaMetadataMonitor::stopMonitoring()
 {
-    utils::promise<void> promose;
+    utils::promise<void> promise;
     m_timer.post(
-        [this, &promose]()
+        [this, &promise]()
         {
             m_httpClient->pleaseStopSync();
-            promose.set_value();
+            promise.set_value();
         });
 
-    promose.get_future().wait();
+    promise.get_future().wait();
     std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
 }
 
