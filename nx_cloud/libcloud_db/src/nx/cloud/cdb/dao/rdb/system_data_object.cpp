@@ -247,7 +247,8 @@ boost::optional<data::SystemData> SystemDataObject::fetchSystemById(
     const std::string& systemId)
 {
     const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {{"system.id", ":systemId", QnSql::serialized_field(systemId)}};
+        {nx::utils::db::SqlFilterFieldEqual(
+            "system.id", ":systemId", QnSql::serialized_field(systemId))};
 
     std::vector<data::SystemData> systems;
     const auto result = fetchSystems(queryContext, sqlFilter, &systems);

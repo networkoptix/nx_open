@@ -10,6 +10,8 @@ namespace storage {
 
 using namespace nx::utils::db;
 
+static const int kUsecInMs = 1000;
+
 EventsStorage::EventsStorage(const Settings& settings):
     m_settings(settings),
     m_dbController(settings.dbConnectionOptions)
@@ -170,9 +172,25 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
     nx::utils::db::InnerJoinFilterFields sqlFilter;
     if (!filter.deviceId.isNull())
     {
-        nx::utils::db::SqlFilterField filterField{
-            "device_guid", ":deviceId", QnSql::serialized_field(filter.deviceId)};
+        nx::utils::db::SqlFilterFieldEqual filterField(
+            "device_guid", ":deviceId", QnSql::serialized_field(filter.deviceId));
         sqlFilter.push_back(std::move(filterField));
+    }
+
+    if (!filter.timePeriod.isNull())
+    {
+        nx::utils::db::SqlFilterFieldGreaterOrEqual startTimeFilterField(
+            "timestamp_usec_utc",
+            ":startTimeUsec",
+            QnSql::serialized_field(filter.timePeriod.startTimeMs * kUsecInMs));
+        sqlFilter.push_back(std::move(startTimeFilterField));
+
+        const auto endTimeMs = filter.timePeriod.startTimeMs + filter.timePeriod.durationMs;
+        nx::utils::db::SqlFilterFieldLess endTimeFilterField(
+            "timestamp_usec_utc",
+            ":endTimeUsec",
+            QnSql::serialized_field(endTimeMs * kUsecInMs));
+        sqlFilter.push_back(std::move(endTimeFilterField));
     }
 
     return sqlFilter;

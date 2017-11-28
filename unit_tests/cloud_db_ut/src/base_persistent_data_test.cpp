@@ -90,11 +90,11 @@ void DaoHelper::insertSystemSharing(const api::SystemSharingEx& sharing)
 
 void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
 {
-    const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {{"account_id", ":accountId",
-           QnSql::serialized_field(sharing.accountId)}};
-
     using namespace std::placeholders;
+
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
+        {nx::utils::db::SqlFilterFieldEqual("account_id", ":accountId",
+            QnSql::serialized_field(sharing.accountId))};
 
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::deleteSharing,
