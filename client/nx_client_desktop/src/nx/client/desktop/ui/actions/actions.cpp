@@ -757,7 +757,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition(ConditionWrapper(new ExportCondition(false))
             && condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportTimeSelectionAction)

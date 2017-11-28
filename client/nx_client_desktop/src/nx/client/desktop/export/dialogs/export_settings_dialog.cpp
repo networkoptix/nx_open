@@ -57,23 +57,21 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
     setMediaParams(widget->resource(), widget->item()->data(), widget->context());
-    if (!allowLayoutExport)
+    if (allowLayoutExport)
+        setLayout(widget->item()->layout()->resource());
+    else
         hideTab(Mode::Layout);
+}
 
-    const auto layout = widget->item()->layout()->resource();
-    d->setLayout(layout);
-    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
-
-    const auto palette = ui->layoutPreviewWidget->palette();
-    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
-    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
-
-    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
-    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
-        baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
-    baseFileName.name = baseName;
-    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
+ExportSettingsDialog::ExportSettingsDialog(const QnLayoutResourcePtr& layout,
+    const QnTimePeriod& timePeriod,
+    FileNameValidator isFileNameValid,
+    QWidget* parent)
+    :
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
+{
+    hideTab(Mode::Media);
+    setLayout(layout);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -607,6 +605,23 @@ void ExportSettingsDialog::setMediaParams(
         namePart + L'_' + timePart, L'_');
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
+}
+
+void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
+{
+    d->setLayout(layout);
+    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
+
+    const auto palette = ui->layoutPreviewWidget->palette();
+    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
+    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
+
+    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
+    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+        baseName = tr("exported");
+    Filename baseFileName = d->exportLayoutSettings().filename;
+    baseFileName.name = baseName;
+    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
 void ExportSettingsDialog::hideTab(Mode mode)

@@ -52,6 +52,15 @@ public:
         FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);
 
+    /**
+     * Layout export mode. Will have only "Layout" tabs. Actual when we have no permissions to
+     * export currently selected 'central' widget.
+     */
+    ExportSettingsDialog(const QnLayoutResourcePtr& layout,
+        const QnTimePeriod& timePeriod,
+        FileNameValidator isFileNameValid,
+        QWidget* parent = nullptr);
+
     /** Not opened media mode. Will have only "Single camera" tab. */
     ExportSettingsDialog(const QnMediaResourcePtr& mediaResource,
         QnWorkbenchContext* context,
@@ -89,6 +98,8 @@ private:
 
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
+
+    void setLayout(const QnLayoutResourcePtr& layout);
 
     void setupSettingsButtons();
     void updateSettingsWidgets();
