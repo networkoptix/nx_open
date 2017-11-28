@@ -212,15 +212,15 @@ void HanwhaResourceSearcher::createResource(
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
 
-    resource->setDefaultAuth(getDefaultAuth());
-
-    result << resource;
-
     auto resPool = commonModule()->resourcePool();
     auto rpRes = resPool->getNetResourceByPhysicalId(
         resource->getUniqueId()).dynamicCast<HanwhaResource>();
 
-    addMultichannelResources(result, rpRes ? rpRes->getAuth() : getDefaultAuth());
+    auto auth = rpRes ? rpRes->getAuth() : getDefaultAuth();
+    resource->setDefaultAuth(auth);
+    result << resource;
+
+    addMultichannelResources(result, auth);
 }
 
 template <typename T>
@@ -250,7 +250,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
 
-            resource->setDefaultAuth(getDefaultAuth());
+            resource->setDefaultAuth(auth);
 
             resource->setUrl(firstResource->getUrl());
             resource->updateToChannel(i);
