@@ -534,7 +534,7 @@ main()
     local -i VERBOSE
     parseArgs "$@"
 
-    local -r WORK_DIR=$(mktemp -d)
+    local -r WORK_DIR="$BUILD_DIR/arm_installer"
     rm -rf "$WORK_DIR"
 
     local -r TAR_DIR="$WORK_DIR/tar"
@@ -542,7 +542,7 @@ main()
     local -r LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
     local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
 
-    echo "Creating installer in $WORK_DIR (please delete it on failure)."
+    echo "Creating installer in $WORK_DIR (will be deleted on success)."
 
     if [ $VERBOSE = 0 ]; then
         redirectOutput "$BUILD_DIR/create_arm_installer.log"
