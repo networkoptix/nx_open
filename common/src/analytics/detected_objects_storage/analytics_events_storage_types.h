@@ -64,6 +64,10 @@ struct Filter
      * Search is done across all attributes (names and values).
      */
     QString freeText;
+    /**
+     * Zero value is treated as no limit.
+     */
+    int maxObjectsToSelect = 0;
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;

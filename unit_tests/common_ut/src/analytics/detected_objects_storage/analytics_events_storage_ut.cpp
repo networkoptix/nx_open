@@ -264,10 +264,27 @@ protected:
         whenLookupEvents(m_filter);
     }
 
+    void whenLookupWithLimit()
+    {
+        m_filter.maxObjectsToSelect =
+            filterObjects(toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
+
+        whenLookupEvents(m_filter);
+    }
+
     void thenResultMatchesExpectations()
     {
+        auto objects = toDetectedObjects(m_analyticsDataPackets);
+        std::sort(
+            objects.begin(), objects.end(),
+            [](const DetectedObject& left, const DetectedObject& right)
+            {
+                return std::tie(left.objectTypeId, left.objectId) <
+                    std::tie(right.objectTypeId, right.objectId);
+            });
+
         thenLookupSucceded();
-        andLookupResultEquals(toDetectedObjects(filterPackets(m_filter)));
+        andLookupResultEquals(filterObjects(objects, m_filter));
     }
 
 private:
@@ -320,8 +337,10 @@ private:
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
                     packet->timestampUsec = nx::utils::random::number<qint64>(
-                        duration_cast<microseconds>(m_allowedTimeRange.first.time_since_epoch()).count(),
-                        duration_cast<microseconds>(m_allowedTimeRange.second.time_since_epoch()).count());
+                        duration_cast<microseconds>(
+                            m_allowedTimeRange.first.time_since_epoch()).count(),
+                        duration_cast<microseconds>(
+                            m_allowedTimeRange.second.time_since_epoch()).count());
                 }
 
                 analyticsDataPackets.push_back(packet);
@@ -349,28 +368,43 @@ private:
             thenSaveSucceeded();
     }
 
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filterPackets(
+    std::vector<DetectedObject> filterObjects(
+        std::vector<DetectedObject> objects,
         const Filter& filter)
     {
-        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> result;
-        for (const auto& packet: m_analyticsDataPackets)
+        for (auto objectIter = objects.begin(); objectIter != objects.end(); )
         {
-            if (satisfiesFilter(filter, packet))
-                result.push_back(packet);
+            for (auto objectPositionIter = objectIter->track.begin();
+                objectPositionIter != objectIter->track.end();
+                )
+            {
+                if (satisfiesFilter(filter, *objectPositionIter))
+                    ++objectPositionIter;
+                else
+                    objectPositionIter = objectIter->track.erase(objectPositionIter);
+            }
+
+            if (objectIter->track.empty())
+                objectIter = objects.erase(objectIter);
+            else
+                ++objectIter;
         }
 
-        return result;
+        if (filter.maxObjectsToSelect > 0 && (int) objects.size() > filter.maxObjectsToSelect)
+            objects.erase(objects.begin() + filter.maxObjectsToSelect, objects.end());
+
+        return objects;
     }
 
     bool satisfiesFilter(
         const Filter& filter,
-        common::metadata::ConstDetectionMetadataPacketPtr packet)
+        const nx::analytics::storage::ObjectPosition& objectPosition)
     {
-        if (!filter.deviceId.isNull() && packet->deviceId != filter.deviceId)
+        if (!filter.deviceId.isNull() && objectPosition.deviceId != filter.deviceId)
             return false;
 
         if (!filter.timePeriod.isNull() &&
-            !filter.timePeriod.contains(packet->timestampUsec / kUsecInMs))
+            !filter.timePeriod.contains(objectPosition.timestampUsec / kUsecInMs))
         {
             return false;
         }
@@ -400,6 +434,12 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_by_non_empty_time_period)
 TEST_F(AnalyticsEventsStorageLookup, lookup_by_empty_time_period)
 {
     whenLookupByEmptyTimePeriod();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_result_limit)
+{
+    whenLookupWithLimit();
     thenResultMatchesExpectations();
 }
 
