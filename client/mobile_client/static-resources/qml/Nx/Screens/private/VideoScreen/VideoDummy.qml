@@ -79,6 +79,5 @@ DummyMessage
                 image: lp("/images/alert_alert.png")
             }
         }
-
     ]
 }
