@@ -289,13 +289,13 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         }
     }
 
-    eventData.icon = pixmapForAction(action, eventData.titleColor);
-
     if (eventData.removable && action->actionType() != vms::event::playSoundAction)
         eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
 
     if (action->actionType() == vms::event::showPopupAction && camera)
         setupAcknowledgeAction(eventData, camera, action);
+
+    eventData.icon = pixmapForAction(action, eventData.titleColor);
 
     if (!q->addEvent(eventData))
         return;
@@ -395,6 +395,21 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
 QPixmap NotificationListModel::Private::pixmapForAction(
     const vms::event::AbstractActionPtr& action, const QColor& color) const
 {
+    switch (QnNotificationLevel::valueOf(action))
+    {
+        case QnNotificationLevel::Value::CriticalNotification:
+            return qnSkin->pixmap("events/alert_red.png");
+
+        case QnNotificationLevel::Value::ImportantNotification:
+            return qnSkin->pixmap("events/alert_yellow.png");
+
+        case QnNotificationLevel::Value::SuccessNotification:
+            return qnSkin->pixmap("events/success_mark.png");
+
+        default:
+            break;
+    }
+
     if (action->actionType() == vms::event::playSoundAction)
         return qnSkin->pixmap("events/sound.png");
 
@@ -416,9 +431,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     {
         case vms::event::cameraMotionEvent:
         case vms::event::cameraInputEvent:
-        case vms::event::cameraDisconnectEvent:
         case vms::event::cameraIpConflictEvent:
-        case vms::event::networkIssueEvent:
         case vms::event::analyticsSdkEvent:
         {
             const auto resource = resourcePool()->getResourceById(params.eventResourceId);
@@ -437,11 +450,15 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case vms::event::storageFailureEvent:
             return qnSkin->pixmap("events/storage.png");
 
+        case vms::event::cameraDisconnectEvent:
+        case vms::event::networkIssueEvent:
+            return qnSkin->pixmap("events/connection.png");
+
         case vms::event::serverStartEvent:
         case vms::event::serverFailureEvent:
         case vms::event::serverConflictEvent:
         case vms::event::backupFinishedEvent:
-            return toPixmap(qnResIconCache->icon(QnResourceIconCache::Server));
+            return qnSkin->pixmap("events/server.png");
 
         case vms::event::licenseIssueEvent:
             return qnSkin->pixmap("events/license.png");

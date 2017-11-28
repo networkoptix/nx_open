@@ -78,6 +78,9 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
             lit("freeText"),
             QString::fromUtf8(QUrl::toPercentEncoding(filter.freeText)));
     }
+
+    if (filter.maxObjectsToSelect > 0)
+        params->insert(lit("limit"), QString::number(filter.maxObjectsToSelect));
 }
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
@@ -92,6 +95,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         filter->objectId = QnUuid::fromStringSafe(params.value(lit("objectId")));
 
     // TODO: timePeriod.
+
+    //Qt::SortOrder order;
+    //QnLexical::deserialize(params.value(lit("sortOrder")), &order);
 
     if (params.contains(lit("x1")))
     {
@@ -114,6 +120,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         filter->freeText = QUrl::fromPercentEncoding(
             params.value(lit("freeText")).toUtf8());
     }
+
+    if (params.contains(lit("limit")))
+        filter->maxObjectsToSelect = params.value(lit("limit")).toInt();
 
     return true;
 }

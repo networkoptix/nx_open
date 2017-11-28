@@ -65,8 +65,11 @@
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
+#include <nx/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
+#include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/core/media/consuming_motion_metadata_provider.h>
+#include <nx/client/core/media/consuming_analytics_metadata_provider.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -390,6 +393,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(m_recordingStatusHelper, &RecordingStatusHelper::recordingModeChanged,
         this, &QnMediaResourceWidget::updateIconButton);
+
+    d->analyticsController->setAreaHighlightOverlayWidget(m_areaHighlightOverlayWidget);
+    d->analyticsController->setAnalyticsMetadataProvider(d->analyticsMetadataProvider);
 
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
@@ -774,6 +780,17 @@ void QnMediaResourceWidget::createButtons()
                     .withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
             });
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
+    }
+
+    {
+        auto analyticsButton =
+            createStatisticAwareButton(lit("media_widget_analytics"));
+        analyticsButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        analyticsButton->setCheckable(true);
+        analyticsButton->setToolTip(lit("Analytics"));
+        connect(analyticsButton, &QnImageButtonWidget::toggled, this,
+            &QnMediaResourceWidget::at_analyticsButton_toggled);
+        titleBar()->rightButtonsBar()->addButton(Qn::AnalyticsButton, analyticsButton);
     }
 
     {
@@ -1406,12 +1423,10 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
     m_renderer->setChannelCount(display->videoLayout()->channelCount());
     updateCustomAspectRatio();
 
-    if (const auto provider =
-        d->motionMetadataProvider.dynamicCast<
-            client::core::ConsumingMotionMetadataProvider>())
-    {
-        display->addMetadataConsumer(provider->metadataConsumer());
-    }
+    if (const auto consumer = d->motionMetadataConsumer())
+        display->addMetadataConsumer(consumer);
+    if (const auto consumer = d->analyticsMetadataConsumer())
+        display->addMetadataConsumer(consumer);
 
     emit displayChanged();
 }
@@ -1546,39 +1561,14 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
-    const auto metadataList = m_renderer->lastFrameMetadata(channel);
-    for (const auto& metadata: metadataList)
-    {
-        if (!metadata)
-            continue;
-
-        switch (metadata->dataType)
-        {
-            case QnAbstractMediaData::DataType::GENERIC_METADATA:
-            {
-                if (nx::client::desktop::ini().enableAnalytics)
-                {
-                    qnMetadataAnalyticsController->gotMetadataPacket(
-                        d->resource,
-                        std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
-                }
-                break;
-            }
-
-            default:
-                break;
-        }
-    }
+    const auto timestamp = m_renderer->lastDisplayedTimestampUsec(channel);
 
     if (options().testFlag(DisplayMotion))
     {
         ensureMotionSelectionCache();
 
-        if (const auto metadata = d->motionMetadataProvider->metadata(
-            m_renderer->lastDisplayedTimestampMs(channel), channel))
-        {
+        if (const auto metadata = d->motionMetadataProvider->metadata(timestamp, channel))
             paintMotionGrid(painter, channel, rect, metadata);
-        }
 
         paintMotionSensitivity(painter, channel, rect);
 
@@ -1588,6 +1578,17 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
+    }
+
+    if (isAnalyticsEnabled())
+        d->analyticsController->updateAreas(timestamp, channel);
+
+    if (const auto provider = d->analyticsMetadataProvider)
+    {
+        // TODO: Rewrite old-style analytics visualization (via zoom windows) with metadata
+        // providers.
+        if (const auto metadata = provider->metadata(timestamp, channel))
+            qnMetadataAnalyticsController->gotMetadata(d->resource, metadata);
     }
 
     if (m_entropixProgress >= 0)
@@ -2074,6 +2075,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             result |= Qn::ZoomWindowButton;
     }
 
+    if (d->analyticsMetadataProvider)
+        result |= Qn::AnalyticsButton;
+
     return result;
 }
 
@@ -2368,6 +2372,11 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
 
     if (fields & (Qn::ActiveObjectPtzField | Qn::ToursPtzField))
         updateTitleText();
+}
+
+void QnMediaResourceWidget::at_analyticsButton_toggled(bool checked)
+{
+    setAnalyticsEnabled(checked);
 }
 
 void QnMediaResourceWidget::at_entropixEnhancementButton_clicked()
@@ -2668,6 +2677,32 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 bool QnMediaResourceWidget::isLicenseUsed() const
 {
     return d->licenseStatus() == QnLicenseUsageStatus::used;
+}
+
+bool QnMediaResourceWidget::isAnalyticsEnabled() const
+{
+    return d->analyticsMetadataProvider
+        && titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->isChecked();
+}
+
+void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
+{
+    if (!d->analyticsMetadataProvider)
+        return;
+
+    if (analyticsEnabled == isAnalyticsEnabled())
+        return;
+
+    if (!analyticsEnabled)
+        d->analyticsController->clearAreas();
+
+    titleBar()->rightButtonsBar()->button(Qn::AnalyticsButton)->setChecked(analyticsEnabled);
+}
+
+client::core::AbstractAnalyticsMetadataProviderPtr
+    QnMediaResourceWidget::analyticsMetadataProvider() const
+{
+    return d->analyticsMetadataProvider;
 }
 
 /*

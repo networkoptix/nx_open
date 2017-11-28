@@ -14,13 +14,14 @@
 
 #include <nx/client/core/utils/grid_walker.h>
 
-#include <nx/client/desktop/analytics/drivers/abstract_analytics_driver.h>
 #include <nx/client/desktop/layout_templates/layout_template.h>
 #include <nx/client/desktop/layout_templates/template_layout_builder.h>
 
 #include <nx/client/core/utils/geometry.h>
 #include <ui/graphics/items/resource/resource_widget.h> //TODO: #GDM move enum to client globals
 #include <ui/style/skin.h>
+
+#include "camera_metadata_analytics_controller.h"
 
 using nx::client::core::Geometry;
 
@@ -80,7 +81,6 @@ public:
     LayoutTemplate layoutTemplate;
     QnResourcePtr resource;
     QnLayoutResourcePtr layout;
-    AbstractAnalyticsDriverPtr driver;
 
     ElementMapping mainMapping;
     ElementMapping enhancedMapping;
@@ -103,7 +103,7 @@ public:
 
     QnUuid addSlaveItem(ElementMapping& source, const QPoint& position);
 
-    void connectToDriver();
+    void connectToCameraAnalyticsController();
 };
 
 WorkbenchAnalyticsController::Private::Private(WorkbenchAnalyticsController* parent):
@@ -382,15 +382,31 @@ QnUuid WorkbenchAnalyticsController::Private::addSlaveItem(
     return item.uuid;
 }
 
-void WorkbenchAnalyticsController::Private::connectToDriver()
+void WorkbenchAnalyticsController::Private::connectToCameraAnalyticsController()
 {
-    if (!driver)
-        return;
+    connect(
+        qnMetadataAnalyticsController,
+        &MetadataAnalyticsController::rectangleAddedOrChanged,
+        this,
+        [this](const QnResourcePtr& resource, const QnUuid& rectId, const QRectF& rect)
+        {
+            if (this->resource != resource)
+                return;
 
-    connect(driver, &AbstractAnalyticsDriver::regionAddedOrChanged, q,
-        &WorkbenchAnalyticsController::addOrChangeRegion);
-    connect(driver, &AbstractAnalyticsDriver::regionRemoved, q,
-        &WorkbenchAnalyticsController::removeRegion);
+            q->addOrChangeRegion(rectId, rect);
+        });
+
+    connect(
+        qnMetadataAnalyticsController,
+        &MetadataAnalyticsController::rectangleRemoved,
+        this,
+        [this](const QnResourcePtr& resource, const QnUuid& rectId)
+    {
+        if (this->resource != resource)
+            return;
+
+        q->removeRegion(rectId);
+    });
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -398,7 +414,6 @@ void WorkbenchAnalyticsController::Private::connectToDriver()
 WorkbenchAnalyticsController::WorkbenchAnalyticsController(
     int matrixSize,
     const QnResourcePtr& resource,
-    const AbstractAnalyticsDriverPtr& driver,
     QObject* parent)
     :
     base_type(parent),
@@ -406,16 +421,14 @@ WorkbenchAnalyticsController::WorkbenchAnalyticsController(
 {
     d->matrixSize = matrixSize;
     d->resource = resource;
-    d->driver = driver;
 
     d->constructLayout();
-    d->connectToDriver();
+    d->connectToCameraAnalyticsController();
 }
 
 WorkbenchAnalyticsController::WorkbenchAnalyticsController(
     const LayoutTemplate& layoutTemplate,
     const QnResourcePtr& resource,
-    const AbstractAnalyticsDriverPtr& driver,
     QObject* parent)
     :
     base_type(parent),
@@ -423,10 +436,9 @@ WorkbenchAnalyticsController::WorkbenchAnalyticsController(
 {
     d->layoutTemplate = layoutTemplate;
     d->resource = resource;
-    d->driver = driver;
 
     d->constructLayoutFromTemplate();
-    d->connectToDriver();
+    d->connectToCameraAnalyticsController();
 }
 
 WorkbenchAnalyticsController::~WorkbenchAnalyticsController()

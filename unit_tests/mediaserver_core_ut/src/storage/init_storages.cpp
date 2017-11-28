@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "media_server/settings.h"
 #include "storage/storage_test_helper.h"
 #include "media_server_process.h"
@@ -8,6 +10,7 @@
 #include "media_server_process.h"
 #include "common/common_module.h"
 #include <test_support/mediaserver_launcher.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -15,6 +18,8 @@
 #include <sstream>
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
+
+#include "../media_server_module_fixture.h"
 
 TEST(InitStoragesTest, main)
 {
@@ -54,16 +59,9 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
 }
 
 class UnmountedLocalStoragesFilterTest:
-    public ::testing::Test,
-    public QnMediaServerModule
+    public MediaServerModuleFixture
 {
 protected:
-    UnmountedLocalStoragesFilterTest() :
-        mediaFolderName(lit("HD Witness Media")),
-        unmountedFilter(mediaFolderName),
-        spaceLimit(10 * 1024 * 1024 * 1024ll)
-    {}
-
     enum class PathFound
     {
         yes,
@@ -82,6 +80,13 @@ protected:
         no
     };
 
+    UnmountedLocalStoragesFilterTest():
+        mediaFolderName(lit("HD Witness Media")),
+        unmountedFilter(mediaFolderName),
+        spaceLimit(10 * 1024 * 1024 * 1024ll)
+    {
+    }
+
     void when(PathFound isPathFound, MediaFolderSuffix isSuffix)
     {
         QString url = basePath;
@@ -89,7 +94,7 @@ protected:
             url += "/" + mediaFolderName;
 
         unmountedStorages = unmountedFilter.getUnmountedStorages(
-              QnStorageResourceList() << storageTestHelper.createStorage(commonModule(), url, spaceLimit),
+              QnStorageResourceList() << storageTestHelper.createStorage(serverModule().commonModule(), url, spaceLimit),
               isPathFound == PathFound::yes ? QStringList() << url : QStringList());
     }
 
@@ -109,7 +114,7 @@ protected:
     QnStorageResourceList unmountedStorages;
 };
 
-TEST_F(UnmountedLocalStoragesFilterTest , main)
+TEST_F(UnmountedLocalStoragesFilterTest, main)
 {
     when(PathFound::yes, MediaFolderSuffix::yes);
     then(StorageUnmounted::no);

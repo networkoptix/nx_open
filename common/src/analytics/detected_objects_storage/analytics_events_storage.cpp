@@ -162,7 +162,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
     nx::utils::db::bindFields(&selectEventsQuery, sqlQueryFilter);
     selectEventsQuery.exec();
 
-    loadObjects(selectEventsQuery, result);
+    loadObjects(selectEventsQuery, filter, result);
     return nx::utils::db::DBResult::ok;
 }
 
@@ -198,12 +198,16 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
 
 void EventsStorage::loadObjects(
     SqlQuery& selectEventsQuery,
+    const Filter& filter,
     std::vector<DetectedObject>* result)
 {
     while (selectEventsQuery.next())
     {
         result->push_back(DetectedObject());
         loadObject(selectEventsQuery, &result->back());
+
+        if (filter.maxObjectsToSelect > 0 && result->size() >= filter.maxObjectsToSelect)
+            break;
     }
 }
 

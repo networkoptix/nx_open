@@ -470,6 +470,21 @@ Handle ServerConnection::changeCameraPassword(
     return handle;
 }
 
+Handle ServerConnection::lookupDetectedObjects(
+    const nx::analytics::storage::Filter& request,
+    Result<nx::analytics::storage::LookupResult>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList queryParams;
+    nx::analytics::storage::serializeToParams(request, &queryParams);
+
+    return executeGet(
+        lit("/ec2/analyticsLookupDetectedObjects"),
+        queryParams,
+        callback,
+        targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const

@@ -25,19 +25,20 @@ namespace Qn
         , EnhancementButton         = 0x00200
         , DbgScreenshotButton       = 0x00400
         , IoModuleButton            = 0x00800
-        , EntropixEnhancementButton = 0x01000
+        , AnalyticsButton           = 0x01000
+        , EntropixEnhancementButton = 0x02000
 
         // QnServerResourceWidget
-        , ShowLogButton             = 0x02000
-        , CheckIssuesButton         = 0x04000
+        , ShowLogButton             = 0x04000
+        , CheckIssuesButton         = 0x08000
 
         // Buttons for left panel
 
         // QnResourceWidget
-        , RecordingStatusIconButton = 0x08000
+        , RecordingStatusIconButton = 0x10000
 
         // QnWebResourceWidget
-        , ReloadPageButton          = 0x10000
-        , BackButton                = 0x20000
+        , ReloadPageButton          = 0x20000
+        , BackButton                = 0x40000
     };
 }

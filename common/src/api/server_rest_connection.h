@@ -18,6 +18,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -217,6 +218,11 @@ public:
         const QAuthenticator& auth,
         Result<QnRestResult>::type callback,
         QThread *targetThread = nullptr);
+
+    Handle lookupDetectedObjects(
+        const nx::analytics::storage::Filter& request,
+        Result<nx::analytics::storage::LookupResult>::type callback,
+        QThread* targetThread = nullptr);
 
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.

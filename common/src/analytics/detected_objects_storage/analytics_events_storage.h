@@ -127,10 +127,14 @@ private:
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
         std::vector<DetectedObject>* result);
+
     nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
+
     void loadObjects(
         nx::utils::db::SqlQuery& selectEventsQuery,
+        const Filter& filter,
         std::vector<DetectedObject>* result);
+
     void loadObject(
         nx::utils::db::SqlQuery& selectEventsQuery,
         DetectedObject* object);

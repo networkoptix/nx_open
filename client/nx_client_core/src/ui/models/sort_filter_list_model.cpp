@@ -604,6 +604,7 @@ bool QnSortFilterListModel::removeRows(int row, int count, const QModelIndex& /*
         return false;
 
     // This is slightly changed implementation of QSortFilterProxyModel::removeRows.
+    // The same logic with some optimizations and coding style fixes.
 
     if (count == 1)
         return model->removeRow(d->m_mapped[row]);
