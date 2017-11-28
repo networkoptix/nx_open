@@ -6,6 +6,14 @@
 
 #include <nx/utils/std/cpp14.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+    #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+    #define NX_PRETTY_FUNCTION __FUNCSIG__
+#else
+    #define NX_PRETTY_FUNCTION __func__
+#endif
+
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -49,7 +57,7 @@ void HanwhaMetadataMonitor::stopMonitoring()
         });
 
     promose.get_future().wait();
-    std::cout << "--------------" << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
 }
 
 void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -79,7 +87,7 @@ QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
 
 void HanwhaMetadataMonitor::initMonitorUnsafe()
 {
-    std::cout << "--------------" << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
     auto httpClient = nx_http::AsyncHttpClient::create();
     m_timer.pleaseStopSync();
     httpClient->bindToAioThread(m_timer.getAioThread());
