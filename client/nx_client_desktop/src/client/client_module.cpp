@@ -87,6 +87,7 @@
 #include <nx/client/desktop/utils/applauncher_guard.h>
 #include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
 #include <nx/client/desktop/layout_templates/layout_template_manager.h>
+#include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -379,6 +380,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new LayoutTemplateManager());
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
+
+    m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
+    m_analyticsMetadataProviderFactory->registerMetadataProviders();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
