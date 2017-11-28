@@ -43,7 +43,7 @@ namespace {
     QnConnectionManager::ConnectionType connectionTypeForUrl(const QUrl& url)
     {
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host())
-            || url.scheme() == QnConnectionManager::cloudConnectionScheme)
+            || url.scheme() == QnConnectionManager::kCloudConnectionScheme)
         {
             return QnConnectionManager::CloudConnection;
         }
@@ -56,7 +56,7 @@ namespace {
 
 } // namespace
 
-const QString QnConnectionManager::cloudConnectionScheme = lit("cloud");
+const QString QnConnectionManager::kCloudConnectionScheme = lit("cloud");
 
 class QnConnectionManagerPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
@@ -218,7 +218,7 @@ bool QnConnectionManager::connectToServer(
     urlWithAuth.setUserName(userName);
     urlWithAuth.setPassword(password);
     if (cloudConnection)
-        urlWithAuth.setScheme(cloudConnectionScheme);
+        urlWithAuth.setScheme(kCloudConnectionScheme);
     return connectToServer(urlWithAuth);
 }
 

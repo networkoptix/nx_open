@@ -27,7 +27,7 @@ class QnConnectionManager: public QObject, public QnConnectionContextAware
     Q_ENUM(Qn::ConnectionResult)
 
 public:
-    static const QString cloudConnectionScheme;
+    static const QString kCloudConnectionScheme;
 
     enum State
     {
