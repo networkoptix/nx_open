@@ -5,6 +5,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/help/business_help.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
@@ -51,8 +52,8 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return tr("Motion on camera");
 
-//        case Qt::DecorationRole:
-//            return qnSkin->pixmap(lit(""));
+        case Qt::DecorationRole:
+            return qnSkin->pixmap(lit("tree/camera.png"));
 
         case Qn::HelpTopicIdRole:
             return QnBusiness::eventHelpId(vms::event::cameraMotionEvent);
