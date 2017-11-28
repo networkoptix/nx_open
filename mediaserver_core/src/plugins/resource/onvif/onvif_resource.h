@@ -263,7 +263,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    bool detectVideoSourceCount();
+    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
@@ -316,7 +316,7 @@ protected:
 
     void setMaxFps(int f);
     void setPrimaryResolution(const QSize& value);
-    virtual CameraDiagnostics::Result fetchVideoSourceToken();
+
 private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();

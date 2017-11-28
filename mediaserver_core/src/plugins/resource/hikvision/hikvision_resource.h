@@ -33,7 +33,7 @@ protected:
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
 
-    virtual CameraDiagnostics::Result fetchVideoSourceToken() override;
+    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,
