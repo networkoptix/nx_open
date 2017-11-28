@@ -1,11 +1,11 @@
-<?xml version='1.0' encoding='windows-1252'?>
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <?include BuildVars.wxi ?>
-        
+
     <Fragment>
         <DirectoryRef Id="AxClientParentDir">
-                       
+
             <Directory Id="$(var.paxtonDirId)" Name="$(var.releaseVersionFull)">
                 <Component Id="AxClass">
                     <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.SourceDir)\ax${ax.className}${parsedVersion.majorVersion}.dll">
