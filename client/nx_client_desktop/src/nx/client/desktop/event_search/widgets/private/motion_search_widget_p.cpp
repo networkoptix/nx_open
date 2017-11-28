@@ -13,8 +13,7 @@ MotionSearchWidget::Private::Private(MotionSearchWidget* q):
 {
     // TODO: #vkutin This is temporary. The header will be used soon.
     m_headerWidget->setHidden(true);
-
-    connectEventRibbonToModel(m_ribbon, m_model);
+    setModel(m_model);
 }
 
 MotionSearchWidget::Private::~Private()

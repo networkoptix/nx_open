@@ -175,6 +175,15 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
     return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
+qint64 QnResourceWidgetRenderer::lastDisplayedTimestampMs(int channel) const
+{
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
+        return -1;
+
+    const RenderingTools& ctx = m_channelRenderers[static_cast<size_t>(channel)];
+    return ctx.renderer ? ctx.renderer->lastDisplayedTime() : -1;
+}
+
 FrameMetadata QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 {
     if (m_channelRenderers.size() <= static_cast<size_t>(channel))

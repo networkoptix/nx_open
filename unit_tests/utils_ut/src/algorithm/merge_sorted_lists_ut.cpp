@@ -1,12 +1,15 @@
 #include <gtest/gtest.h>
 
 #include <vector>
+#include <QtCore/QScopedValueRollback>
 
 #include <nx/utils/algorithm/merge_sorted_lists.h>
 
 namespace nx {
 namespace utils {
 namespace test {
+
+namespace {
 
 class Vector: public std::vector<int>
 {
@@ -18,8 +21,11 @@ public:
     Vector(const std::initializer_list<int>& init): base_type(init) {}
     Vector(const Vector& other): base_type(other)
     {
-        check_deep_copy();
+        if (detectCopy)
+            check_deep_copy();
     }
+
+    static thread_local bool detectCopy;
 
 private:
     void check_deep_copy() const
@@ -29,53 +35,56 @@ private:
     }
 };
 
+thread_local bool Vector::detectCopy = true;
+
+std::vector<Vector> testLists()
+{
+    QScopedValueRollback<bool> rollback(Vector::detectCopy, false);
+    return std::vector<Vector>{
+        {1, 3, 5},
+        {2, 4},
+        {},
+        {8, 9, 10, 11, 12, 13},
+        {6},
+        {7},
+        {}};
+}
+
+Vector testResult()
+{
+    return Vector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});
+}
+
+Vector singleTestVector()
+{
+    return Vector({10, 20, 30});
+}
+
+} // namespace
+
 TEST(MergeSortedLists, AscendingOrder)
 {
-    std::vector<Vector> lists;
-    lists.push_back({1, 3, 5});
-    lists.push_back({2, 4});
-    lists.push_back({});
-    lists.push_back({8, 9, 10, 11, 12, 13});
-    lists.push_back({6});
-    lists.push_back({7});
-    lists.push_back({});
-
-    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
-    ASSERT_EQ(result, Vector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
+    const auto result = nx::utils::algorithm::merge_sorted_lists(testLists());
+    ASSERT_EQ(result, testResult());
 }
 
 TEST(MergeSortedLists, DescendingOrder)
 {
-    std::vector<Vector> lists;
-    lists.push_back({1, 3, 5});
-    lists.push_back({2, 4});
-    lists.push_back({});
-    lists.push_back({8, 9, 10, 11, 12, 13});
-    lists.push_back({6});
-    lists.push_back({7});
-    lists.push_back({});
-
-    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists),
+    const auto result = nx::utils::algorithm::merge_sorted_lists(testLists(),
         [](int value) { return -value; }, Qt::DescendingOrder);
 
-    ASSERT_EQ(result, Vector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
+    ASSERT_EQ(result, testResult());
 }
 
 TEST(MergeSortedLists, Limit)
 {
-    std::vector<Vector> lists;
-    lists.push_back({1, 3, 5});
-    lists.push_back({2, 4});
-    lists.push_back({});
-    lists.push_back({8, 9, 10, 11, 12, 13});
-    lists.push_back({6});
-    lists.push_back({7});
-    lists.push_back({});
+    const auto limit = 5;
+    const auto result = nx::utils::algorithm::merge_sorted_lists(testLists(),
+        Qt::AscendingOrder, limit);
 
-    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists),
-        Qt::AscendingOrder, 5);
-
-    ASSERT_EQ(result, Vector({1, 2, 3, 4, 5}));
+    auto expected = testResult();
+    expected.resize(limit);
+    ASSERT_EQ(result, expected);
 }
 
 TEST(MergeSortedLists, NoLists)
@@ -87,16 +96,17 @@ TEST(MergeSortedLists, NoLists)
 TEST(MergeSortedLists, EmptyLists)
 {
     std::vector<Vector> lists({Vector(), Vector(), Vector()});
-    const auto result = nx::utils::algorithm::merge_sorted_lists(lists);
+    const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_TRUE(result.empty());
 }
 
 TEST(MergeSortedLists, OneList)
 {
-    std::vector<Vector> lists;
-    lists.push_back({10, 20, 30});
+    Vector::detectCopy = false;
+    std::vector<Vector> lists({singleTestVector()});
+    Vector::detectCopy = true;
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
-    ASSERT_EQ(result, Vector({10, 20, 30}));
+    ASSERT_EQ(result, singleTestVector());
 }
 
 TEST(MergeSortedLists, OneEmptyList)
@@ -108,12 +118,11 @@ TEST(MergeSortedLists, OneEmptyList)
 
 TEST(MergeSortedLists, OneNonEmptyList)
 {
-    std::vector<Vector> lists;
-    lists.push_back({});
-    lists.push_back({});
-    lists.push_back({10, 20, 30});
+    Vector::detectCopy = false;
+    std::vector<Vector> lists({{}, {}, singleTestVector()});
+    Vector::detectCopy = true;
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
-    ASSERT_EQ(result, Vector({10, 20, 30}));
+    ASSERT_EQ(result, singleTestVector());
 }
 
 } // namespace test

@@ -9,8 +9,10 @@ extern "C"
 
 #include "decoders/video/abstract_video_decoder.h"
 #include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/mutex.h>
 #include "frame_scaler.h"
 #include "transcoding/filters/filter_helper.h"
+#include <nx/media/abstract_metadata_consumer.h>
 
 
 class QnAbstractVideoDecoder;
@@ -18,7 +20,7 @@ class QnCompressedVideoData;
 class QnAbstractRenderer;
 class QnBufferedFrameDisplayer;
 
-static const int MAX_FRAME_QUEUE_SIZE = 6;
+static const int kMaxFrameQueueSize = 6;
 static const int MAX_QUEUE_TIME = 1000 * 200;
 
 /**
@@ -33,13 +35,16 @@ public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
     QnVideoStreamDisplay(bool can_downscale, int channelNumber);
-    ~QnVideoStreamDisplay();
+    virtual ~QnVideoStreamDisplay() override;
 
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
 
     int addRenderer(QnAbstractRenderer* draw);
     int removeRenderer(QnAbstractRenderer* draw);
+
+    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
 
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,
@@ -103,7 +108,7 @@ private:
       * to reduce image size for weak video cards
       */
 
-    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[kMaxFrameQueueSize];
     int m_frameQueueIndex;
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
@@ -143,6 +148,10 @@ private:
     bool m_isPaused;
     qreal m_overridenAspectRatio;
 
+    mutable QnMutex m_metadataConsumersHashMutex;
+    QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
+        m_metadataConsumerByType;
+
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
@@ -156,6 +165,7 @@ private:
         int srcHeight,
         QnFrameScaler::DownscaleFactor force_factor);
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
+    void processMetadata(const FrameMetadata& metadataList, int channel);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
     /*!

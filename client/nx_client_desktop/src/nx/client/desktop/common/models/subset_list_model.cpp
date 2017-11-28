@@ -151,6 +151,13 @@ void SubsetListModel::connectToModel(QAbstractItemModel* model)
                 emit dataChanged(index(topLeft.row()), index(bottomRight.row()), roles);
             }
         });
+
+    *m_modelConnections << connect(model, &QAbstractItemModel::headerDataChanged, this,
+        [this](Qt::Orientation orientation, int first, int last)
+        {
+            if (orientation == Qt::Vertical || (m_sourceColumn >= first && m_sourceColumn <= last))
+                emit headerDataChanged(orientation, first, last);
+        });
 }
 
 void SubsetListModel::sourceRowsAboutToBeInserted(const QModelIndex& parent, int first, int last)

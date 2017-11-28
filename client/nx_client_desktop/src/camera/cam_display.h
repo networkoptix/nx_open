@@ -59,6 +59,9 @@ public:
     void removeVideoRenderer(QnAbstractRenderer* vw);
     int channelsCount() const;
 
+    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
+
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual void pleaseStop() override;

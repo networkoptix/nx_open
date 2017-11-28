@@ -12,6 +12,7 @@
 #include <ldap/ldap_manager.h>
 #include "api/app_server_connection.h"
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/data/api_user_data.h>
 

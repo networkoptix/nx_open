@@ -54,7 +54,8 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchUserSharingsByAccountEmail
 {
     return fetchUserSharings(
         queryContext,
-        {{"email", ":accountEmail", QnSql::serialized_field(accountEmail)}},
+        {nx::utils::db::SqlFilterFieldEqual(
+            "email", ":accountEmail", QnSql::serialized_field(accountEmail))},
         sharings);
 }
 
@@ -66,8 +67,10 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchSharing(
 {
     const auto dbResult = fetchSharing(
         queryContext,
-        { { "email", ":accountEmail", QnSql::serialized_field(accountEmail) },
-        { "system_id", ":systemId", QnSql::serialized_field(systemId) } },
+        {nx::utils::db::SqlFilterFieldEqual(
+            "email", ":accountEmail", QnSql::serialized_field(accountEmail)),
+         nx::utils::db::SqlFilterFieldEqual(
+            "system_id", ":systemId", QnSql::serialized_field(systemId))},
         sharing);
     if (dbResult != nx::utils::db::DBResult::ok &&
         dbResult != nx::utils::db::DBResult::notFound)

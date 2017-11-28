@@ -38,6 +38,7 @@ MSSettings::MSSettings(
     else
         initializeRunTimeSettings();
 
+    loadSettings();
 }
 
 QString MSSettings::defaultROSettingsFilePath()
@@ -77,8 +78,6 @@ void MSSettings::initializeROSettings()
         QnServerAppInfo::applicationName()
 #endif
     ));
-
-    loadSettings();
 }
 
 QSettings* MSSettings::roSettings()
@@ -175,7 +174,7 @@ QString MSSettings::loadDataDirectory()
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
-    QString varDirName = qnServerModule->roSettings()->value("varDir", defVarDirName).toString();
+    QString varDirName = m_roSettings->value("varDir", defVarDirName).toString();
     return varDirName;
 #else
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);

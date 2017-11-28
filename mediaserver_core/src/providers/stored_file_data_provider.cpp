@@ -3,6 +3,9 @@
 #include <api/app_server_connection.h>
 #include <core/resource/local_audio_file_resource.h>
 #include <core/resource/resource.h>
+
+#include <nx_ec/ec_api.h>
+
 #include <nx/utils/random.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/sleep.h>

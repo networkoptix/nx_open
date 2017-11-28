@@ -229,3 +229,17 @@ void QnResourceDisplay::removeRenderer(QnAbstractRenderer *renderer) {
             m_camera->getCamDisplay()->removeVideoRenderer(renderer);
     }
 }
+
+void QnResourceDisplay::addMetadataConsumer(
+    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (m_camera)
+        m_camera->getCamDisplay()->addMetadataConsumer(metadataConsumer);
+}
+
+void QnResourceDisplay::removeMetadataConsumer(
+    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
+{
+    if (m_camera)
+        m_camera->getCamDisplay()->removeMetadataConsumer(metadataConsumer);
+}

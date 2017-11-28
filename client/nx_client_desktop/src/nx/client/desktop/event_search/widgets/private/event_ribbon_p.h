@@ -53,6 +53,8 @@ private:
     EventTile* createTile(const QModelIndex& index);
     static void updateTile(EventTile* tile, const QModelIndex& index);
 
+    void debugCheckGeometries();
+
 private:
     EventRibbon* const q = nullptr;
     QAbstractListModel* m_model = nullptr;

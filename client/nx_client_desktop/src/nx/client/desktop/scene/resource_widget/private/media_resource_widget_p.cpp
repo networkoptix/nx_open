@@ -4,6 +4,7 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
+#include <nx/client/core/media/consuming_motion_metadata_provider.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -19,7 +20,8 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
     mediaResource(resource.dynamicCast<QnMediaResource>()),
     camera(resource.dynamicCast<QnVirtualCameraResource>()),
     hasVideo(mediaResource->hasVideo(nullptr)),
-    isIoModule(camera && camera->hasFlags(Qn::io_module))
+    isIoModule(camera && camera->hasFlags(Qn::io_module)),
+    motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider())
 {
     QSignalBlocker blocker(this);
 

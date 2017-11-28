@@ -12,11 +12,45 @@ namespace nx {
 namespace utils {
 namespace db {
 
-struct SqlFilterField
+struct NX_UTILS_API SqlFilterField
 {
     const char* name;
     const char* placeHolderName;
     QVariant value;
+    const char* comparisonOperator;
+
+    SqlFilterField(
+        const char* name,
+        const char* placeHolderName,
+        QVariant value,
+        const char* comparisonOperator);
+};
+
+struct NX_UTILS_API SqlFilterFieldEqual:
+    SqlFilterField
+{
+    SqlFilterFieldEqual(
+        const char* name,
+        const char* placeHolderName,
+        QVariant value);
+};
+
+struct NX_UTILS_API SqlFilterFieldGreaterOrEqual:
+    SqlFilterField
+{
+    SqlFilterFieldGreaterOrEqual(
+        const char* name,
+        const char* placeHolderName,
+        QVariant value);
+};
+
+struct NX_UTILS_API SqlFilterFieldLess:
+    SqlFilterField
+{
+    SqlFilterFieldLess(
+        const char* name,
+        const char* placeHolderName,
+        QVariant value);
 };
 
 using InnerJoinFilterFields = std::vector<SqlFilterField>;

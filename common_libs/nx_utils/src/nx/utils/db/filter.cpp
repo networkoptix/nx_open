@@ -6,6 +6,48 @@ namespace nx {
 namespace utils {
 namespace db {
 
+SqlFilterField::SqlFilterField(
+    const char* name,
+    const char* placeHolderName,
+    QVariant value,
+    const char* comparisonOperator)
+    :
+    name(name),
+    placeHolderName(placeHolderName),
+    value(std::move(value)),
+    comparisonOperator(comparisonOperator)
+{
+}
+
+SqlFilterFieldEqual::SqlFilterFieldEqual(
+    const char* name,
+    const char* placeHolderName,
+    QVariant value)
+    :
+    SqlFilterField(name, placeHolderName, std::move(value), "=")
+{
+}
+
+SqlFilterFieldGreaterOrEqual::SqlFilterFieldGreaterOrEqual(
+    const char* name,
+    const char* placeHolderName,
+    QVariant value)
+    :
+    SqlFilterField(name, placeHolderName, std::move(value), ">=")
+{
+}
+
+SqlFilterFieldLess::SqlFilterFieldLess(
+    const char* name,
+    const char* placeHolderName,
+    QVariant value)
+    :
+    SqlFilterField(name, placeHolderName, std::move(value), "<")
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QString joinFields(
     const InnerJoinFilterFields& fields,
     const QString& separator)
@@ -27,7 +69,7 @@ void bindFields(QSqlQuery* const query, const InnerJoinFilterFields& fields)
 
 void bindFields(SqlQuery* const query, const InnerJoinFilterFields& fields)
 {
-    for (const auto& field : fields)
+    for (const auto& field: fields)
         query->bindValue(QLatin1String(field.placeHolderName), field.value);
 }
 
@@ -38,7 +80,10 @@ QString generateWhereClauseExpression(const InnerJoinFilterFields& filter)
     {
         if (!result.isEmpty())
             result += " AND ";
-        result += lm("%1=%2").args(filterField.name, filterField.placeHolderName).toQString();
+        result += lm("%1%2%3").args(
+            filterField.name,
+            filterField.comparisonOperator,
+            filterField.placeHolderName).toQString();
     }
     return result;
 }

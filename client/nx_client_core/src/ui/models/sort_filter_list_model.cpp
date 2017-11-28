@@ -337,7 +337,7 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     if (parent.isValid())
         return;
 
-    const auto kRemoveDifference = -(first - last + 1);
+    const auto kRemoveDifference = -(last - first + 1);
     shiftMappedRows(last + 1, kRemoveDifference);
 }
 

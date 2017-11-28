@@ -63,9 +63,9 @@ EventRibbon::Private::Private(EventRibbon* q):
     viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
     const auto updateViewportMargins =
-        [this, viewportAnchor = QPointer<QnWidgetAnchor>(viewportAnchor)]()
+        [this, viewportAnchor, guard = QPointer<Private>(this)]()
         {
-            if (!viewportAnchor)
+            if (!guard)
                 return;
 
             const auto margin = style::Metrics::kStandardPadding;
@@ -73,7 +73,9 @@ EventRibbon::Private::Private(EventRibbon* q):
             viewportAnchor->setMargins(margin, 0, margin + extra, 0);
         };
 
-    installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide}, this, updateViewportMargins);
+    installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide},
+        this, updateViewportMargins, Qt::QueuedConnection);
+
     updateViewportMargins();
 
     installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest},
@@ -217,6 +219,20 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->preview()->loadAsync();
 }
 
+void EventRibbon::Private::debugCheckGeometries()
+{
+#if defined(_DEBUG)
+    int pos = 0;
+    for (int i = 0; i < m_tiles.size(); ++i)
+    {
+        NX_ASSERT(pos == m_positions[m_tiles[i]]);
+        pos += m_tiles[i]->height() + kDefaultTileSpacing;
+    }
+
+    NX_ASSERT(pos == m_totalHeight);
+#endif
+}
+
 void EventRibbon::Private::insertNewTiles(int index, int count)
 {
     if (!m_model || count == 0)
@@ -259,6 +275,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count)
     m_totalHeight += delta;
     q->updateGeometry();
 
+    debugCheckGeometries();
+
     updateView();
 
     if (position < m_scrollBar->value())
@@ -298,6 +316,10 @@ void EventRibbon::Private::removeTiles(int first, int count)
 
     for (int i = first; i < m_tiles.count(); ++i)
         m_positions[m_tiles[i]] -= delta;
+
+    m_totalHeight -= delta;
+
+    debugCheckGeometries();
 
     updateView();
 
@@ -356,6 +378,8 @@ void EventRibbon::Private::updateScrollRange()
     m_scrollBar->setMaximum(qMax(m_totalHeight - viewHeight, 1));
     m_scrollBar->setPageStep(viewHeight);
     m_scrollBar->setVisible(m_totalHeight > viewHeight);
+    if (m_scrollBar->isHidden())
+        m_scrollBar->setValue(0);
 }
 
 void EventRibbon::Private::updateView()
@@ -401,6 +425,8 @@ void EventRibbon::Private::updateView()
         m_totalHeight = currentPosition;
         q->updateGeometry();
     }
+
+    debugCheckGeometries();
 
     nx::utils::IntegerRange newVisible(std::distance(m_tiles.cbegin(), first), visibleCount);
 

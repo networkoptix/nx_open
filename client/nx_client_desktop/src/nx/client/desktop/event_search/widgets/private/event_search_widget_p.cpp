@@ -1,5 +1,7 @@
 #include "event_search_widget_p.h"
 
+#include <chrono>
+
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>
@@ -9,6 +11,7 @@
 #include <ui/style/skin.h>
 #include <ui/widgets/common/search_line_edit.h>
 
+#include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
 
 namespace nx {
@@ -48,10 +51,11 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     typeFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
     typeFilterMenu->setWindowFlags(typeFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    using Filter = UnifiedSearchListModel::Filter;
+    using Type = UnifiedSearchListModel::Type;
+    using Types = UnifiedSearchListModel::Types;
 
     auto addMenuAction =
-        [this, typeFilterMenu](const QString& title, const QIcon& icon, Filter filter)
+        [this, typeFilterMenu](const QString& title, const QIcon& icon, Types filter)
         {
             return typeFilterMenu->addAction(icon, title,
                 [this, icon, title, filter]()
@@ -63,10 +67,10 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         };
 
     // TODO: #vkutin Specify icons when they're available.
-    auto defaultAction = addMenuAction(tr("All types"), QIcon(), Filter::all);
-    addMenuAction(tr("Events"), QIcon(), Filter::events);
-    addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("buttons/bookmark.png")), Filter::bookmarks);
-    addMenuAction(tr("Detected objects"), QIcon(), Filter::analytics);
+    auto defaultAction = addMenuAction(tr("All types"), QIcon(), Type::all);
+    addMenuAction(tr("Events"), QIcon(), Type::events);
+    addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("buttons/bookmark.png")), Type::bookmarks);
+    addMenuAction(tr("Detected objects"), QIcon(), Type::analytics);
     defaultAction->trigger();
 
     m_typeButton->setMenu(typeFilterMenu);
@@ -84,7 +88,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
         sortModel, &EventSortFilterModel::setFilterWildcard);
 
-    connectEventRibbonToModel(m_ribbon, m_model, sortModel);
+    setModel(new SubsetListModel(sortModel, 0, QModelIndex(), this));
 }
 
 EventSearchWidget::Private::~Private()

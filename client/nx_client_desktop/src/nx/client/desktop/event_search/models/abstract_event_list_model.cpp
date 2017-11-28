@@ -56,9 +56,13 @@ void AbstractEventListModel::fetchMore(const QModelIndex& /*parent*/)
 {
 }
 
-void AbstractEventListModel::finishFetch()
+bool AbstractEventListModel::prefetchAsync(PrefetchCompletionHandler /*completionHandler*/)
 {
-    executeDelayedParented([this]() { emit fetchFinished(QPrivateSignal()); }, 0, this);
+    return false;
+}
+
+void AbstractEventListModel::commitPrefetch(qint64 /*keyLimitFromSync*/)
+{
 }
 
 bool AbstractEventListModel::isValid(const QModelIndex& index) const
