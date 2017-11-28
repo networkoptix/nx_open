@@ -62,6 +62,20 @@
         </profile>
 
         <profile>
+            <id>arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>
+
+        <profile>
             <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -75,7 +89,6 @@
                 </property>
             </activation>
             <properties>
-                <buildLib>sharedlib</buildLib>
                 <rdep.packages><!-- No festival support on edge1. --></rdep.packages>
             </properties>
         </profile>
