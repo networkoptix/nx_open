@@ -343,6 +343,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_autoUpdateThumbnailsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoUpdateThumbnails, true, this);
+    m_maxSceneItemsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kMaxSceneItemsOverrideKey, 0, this);
     m_useTextEmailFormatAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kUseTextEmailFormat, false, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
     m_auditTrailPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -419,6 +420,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_eventLogPeriodDaysAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::eventLogPeriodDaysChanged,           Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_autoUpdateThumbnailsAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoUpdateThumbnailsChanged,         Qt::QueuedConnection);
+    connect(m_maxSceneItemsAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::maxSceneItemsChanged, Qt::DirectConnection); //< I need this one now :)
     connect(m_useTextEmailFormatAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::useTextEmailFormatChanged,           Qt::QueuedConnection);
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
@@ -439,6 +441,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_autoUpdateThumbnailsAdaptor
+        << m_maxSceneItemsAdaptor
         << m_useTextEmailFormatAdaptor
         << m_auditTrailEnabledAdaptor
         << m_auditTrailPeriodDaysAdaptor
@@ -496,6 +499,16 @@ bool QnGlobalSettings::isAutoUpdateThumbnailsEnabled() const
 void QnGlobalSettings::setAutoUpdateThumbnailsEnabled(bool value)
 {
     m_autoUpdateThumbnailsAdaptor->setValue(value);
+}
+
+int QnGlobalSettings::maxSceneItemsOverride() const
+{
+    return m_maxSceneItemsAdaptor->value();
+}
+
+void QnGlobalSettings::setMaxSceneItemsOverride(int value)
+{
+    m_maxSceneItemsAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isUseTextEmailFormat() const
