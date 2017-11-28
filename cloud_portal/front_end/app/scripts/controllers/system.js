@@ -155,7 +155,7 @@ angular.module('cloudApp')
         };
 
         $scope.$watch('system.info.name',function(value){
-            page.title(value + ' -');
+            page.title(value ? value + ' -' : '');
             systemsProvider.forceUpdateSystems();
         });
 
