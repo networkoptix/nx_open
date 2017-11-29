@@ -28,6 +28,8 @@ SYMLINK_INSTALL_PATH=""
 # to these .so files will be created in the regular LIB_INSTALL_DIR.
 ALT_LIB_INSTALL_PATH=""
 
+OUTPUT_DIR=${DISTRIB_OUTPUT_DIR:-"$CURRENT_BUILD_DIR"}
+
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
     SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION"
@@ -473,6 +475,7 @@ copyLibcIfNeeded()
 
 # [in] WORK_DIR
 # [in] TAR_DIR
+# [in] OUTPUT_DIR
 buildInstaller()
 {
     echo ""
@@ -481,21 +484,21 @@ buildInstaller()
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
     fi
-    createArchive "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
+    createArchive "$OUTPUT_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
 
     echo ""
     echo "Creating \"update\" .zip"
     local -r ZIP_DIR="$WORK_DIR/zip"
     mkdir -p "$ZIP_DIR"
-    cp -r "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$ZIP_DIR/"
+    cp -r "$OUTPUT_DIR/$TAR_FILENAME" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/update.* "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/install.sh "$ZIP_DIR/"
-    createArchive "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
-    cp "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$CURRENT_BUILD_DIR/$ZIP_INSTALLER_FILENAME"
+    createArchive "$OUTPUT_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
+    cp "$OUTPUT_DIR/$ZIP_FILENAME" "$OUTPUT_DIR/$ZIP_INSTALLER_FILENAME"
 }
 
 # [in] WORK_DIR
-# [in] TAR_DIR
+# [in] OUTPUT_DIR
 buildDebugSymbolsArchive()
 {
     echo ""
@@ -522,7 +525,7 @@ buildDebugSymbolsArchive()
         echo "  No .debug files found"
     else
         createArchive \
-            "$CURRENT_BUILD_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
+            "$OUTPUT_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
     fi
 }
 
