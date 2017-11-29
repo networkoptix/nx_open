@@ -147,6 +147,29 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation type="unfinished">Keywords separated by space</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation type="unfinished">Caption contains:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation type="unfinished">Description contains:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation type="unfinished">Event Type:</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -331,6 +354,34 @@
       <location/>
       <source>Post-recording:</source>
       <translation type="unfinished">Post-recording:</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation type="unfinished">Bookmark Info</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation type="unfinished">Area Width</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation type="unfinished">Include description</translation>
     </message>
   </context>
   <context>
@@ -578,58 +629,8 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation type="unfinished">I have read the manual and understand the risks</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation type="unfinished">Camera Settings Control</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation type="unfinished">Secondary Stream Control</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation type="unfinished">Override secondary stream quality</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation type="unfinished">Do not use</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation type="unfinished">Low quality</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation type="unfinished">Medium quality</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation type="unfinished">High quality</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
       <translation type="unfinished">Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation type="unfinished">Archive control</translation>
     </message>
     <message>
       <location/>
@@ -640,11 +641,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation type="unfinished">Do not archive secondary stream</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation type="unfinished">Media streaming control</translation>
     </message>
     <message>
       <location/>
@@ -678,38 +674,8 @@
     </message>
     <message>
       <location/>
-      <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation type="unfinished">Force motion detection for stream:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation type="unfinished">Keep camera streams and profiles settings</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation type="unfinished">Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
     </message>
     <message>
       <location/>
@@ -720,6 +686,71 @@
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation type="unfinished">Camera Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation type="unfinished">Keep camera stream and profile settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation type="unfinished">It will increase bitrate for camera.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation type="unfinished">Secondary Stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation type="unfinished">Disable secondary stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality</source>
+      <translation type="unfinished">Quality</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation type="unfinished">Motion Detection</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation type="unfinished">Archive</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation type="unfinished">Media Streaming</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation type="unfinished">PTZ</translation>
     </message>
   </context>
   <context>
@@ -867,6 +898,11 @@
       <location/>
       <source>Motion + Lo-Res</source>
       <translation type="unfinished">Motion + Lo-Res</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation type="unfinished">Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1027,6 +1063,42 @@
     </message>
   </context>
   <context>
+    <name>ExportLayoutSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Make read-only</source>
+      <translation type="unfinished">Make read-only</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Apply Filters</source>
+      <translation type="unfinished">Apply Filters</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportRapidReviewDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
@@ -1052,6 +1124,37 @@
       <location/>
       <source>Rapid Review speed</source>
       <translation type="unfinished">Rapid Review speed</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation type="unfinished">Export Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation type="unfinished">Single Camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation type="unfinished">Multi Video</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
@@ -1199,6 +1302,39 @@
       <location/>
       <source>Rotation</source>
       <translation type="unfinished">Rotation</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation type="unfinished">Image</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation type="unfinished">Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation type="unfinished">Opacity</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation type="unfinished">Default</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
@@ -2125,6 +2261,39 @@
     </message>
   </context>
   <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation type="unfinished">Rapid Review</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation type="unfinished">Initial video length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation type="unfinished">Exported video length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation type="unfinished">Speed</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation type="unfinished">Frames interval</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation type="unfinished">Reset Speed</translation>
+    </message>
+  </context>
+  <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
@@ -2778,6 +2947,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation type="unfinished">Text</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation type="unfinished">Enter plain text or HTML</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation type="unfinished">Area Width</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2788,6 +2985,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation type="unfinished">Sync time with the Internet</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation type="unfinished">Timestamp</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation type="unfinished">Format</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
