@@ -114,6 +114,18 @@ def test_non_existent_endpoint_via_proxy_with_auth_same_connection(env):
     assert dummy_response.status_code == 404, "Expected 404 but got: %r." % dummy_response
 
 
+@pytest.mark.xfail("https://networkoptix.atlassian.net/browse/VMS-7819")
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_direct_after_proxy_same_connection(env):
+    # Use requests directly, so REST API wrapper doesn't catch errors.
+    front_url = env.in_front.rest_api.url.rstrip('/') + '/api/ping'
+    with requests.Session() as session:
+        session.get(front_url, headers={'X-server-guid': env.behind.ecs_guid})
+        direct_response = session.get(front_url)
+    assert direct_response.status_code == 200, "Expected 200 but got: %r." % direct_response
+
+
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
     assert TimePeriod(start_time, sample_media_file.duration) in server.get_recorded_time_periods(camera)
     stream = server.get_media_stream(stream_type, camera)
