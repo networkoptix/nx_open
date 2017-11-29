@@ -224,18 +224,18 @@ TEST(HttpAsyncClientTypes, numericSerialization)
         std::string("authDigest"));
 
     ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("authBasicAndDigest"),
-        nx_http::AsyncClient::AuthType::authBasicAndDigest);
+        nx_http::AsyncHttpClient::AuthType::authBasicAndDigest);
     ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("authDigest"),
-        nx_http::AsyncClient::AuthType::authDigest);
+        nx_http::AsyncHttpClient::AuthType::authDigest);
     ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("authBasic"),
-        nx_http::AsyncClient::AuthType::authBasic);
+        nx_http::AsyncHttpClient::AuthType::authBasic);
 
     ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("0"),
-        nx_http::AsyncClient::AuthType::authBasicAndDigest);
+        nx_http::AsyncHttpClient::AuthType::authBasicAndDigest);
     ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("1"),
-        nx_http::AsyncClient::AuthType::authDigest);
+        nx_http::AsyncHttpClient::AuthType::authDigest);
     ASSERT_EQ(QnLexical::deserialized<nx_http::AsyncHttpClient::AuthType>("2"),
-        nx_http::AsyncClient::AuthType::authBasic);
+        nx_http::AsyncHttpClient::AuthType::authBasic);
 }
 
 } // namespace test
