@@ -48,9 +48,14 @@ protected:
 private:
     bool synchronizeArchive();
     bool saveMotion(const QnConstMetaDataV1Ptr& motion);
+    bool fetchChunks(std::vector<nx::core::resource::RemoteArchiveChunk>* outChunks);
+    bool writeAllTimePeriods(const QnTimePeriodList& timePeriods);
     bool writeTimePeriodToArchive(
         const QnTimePeriod& timePeriod,
         const nx::core::resource::RemoteArchiveChunk& chunk);
+
+    void onFileHasBeenWritten(const std::chrono::milliseconds& fileDuration);
+    void onEndOfRecording();
 
 protected:
     mutable QnMutex m_mutex;
@@ -62,6 +67,7 @@ protected:
     std::atomic<bool> m_canceled{false};
     std::chrono::milliseconds m_totalDuration{0};
     std::chrono::milliseconds m_importedDuration{0};
+    double m_progress = 0;
 
     std::vector<nx::core::resource::RemoteArchiveChunk> m_chunks;
 

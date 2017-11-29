@@ -50,21 +50,9 @@ struct RemoteArchiveChunk
  */
 struct RemoteArchiveSynchronizationSettings
 {
-    RemoteArchiveSynchronizationSettings() = default;
-    RemoteArchiveSynchronizationSettings(
-        const std::chrono::milliseconds& waitBeforeSync,
-        const std::chrono::milliseconds& waitBetweenChunks,
-        int syncCyclesNumber)
-        :
-        waitBeforeSync(waitBeforeSync),
-        waitBetweenChunks(waitBetweenChunks),
-        syncCyclesNumber(syncCyclesNumber)
-    {
-    };
-
     std::chrono::milliseconds waitBeforeSync;
     std::chrono::milliseconds waitBetweenChunks;
-    int syncCyclesNumber = 1;
+    int syncCyclesNumber;
 };
 
 inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& rhs)

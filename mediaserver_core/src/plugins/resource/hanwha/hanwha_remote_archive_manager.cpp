@@ -99,10 +99,11 @@ void HanwhaRemoteArchiveManager::afterSynchronization(bool isSynchronizationSucc
 
 RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() const
 {
-    return RemoteArchiveSynchronizationSettings(
+    return {
         kWaitBeforeSync,
         kWaitBeforeNextChunk,
-        kNumberOfSyncCycles);
+        kNumberOfSyncCycles
+    };
 }
 
 } // namespace plugins

@@ -260,10 +260,11 @@ void LilinRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuc
 
 RemoteArchiveSynchronizationSettings LilinRemoteArchiveManager::settings() const
 {
-    return RemoteArchiveSynchronizationSettings(
+    return {
         kWaitBeforeSync,
         std::chrono::milliseconds::zero(),
-        kNumberOfSyncCycles);
+        kNumberOfSyncCycles
+    };
 }
 
 } // namespace plugins

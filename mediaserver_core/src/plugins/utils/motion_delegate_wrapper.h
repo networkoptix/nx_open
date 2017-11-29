@@ -2,7 +2,7 @@
 
 #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
-#include <plugins/utils/archive_delegate_wrapper.h>
+#include <nx/streaming/archive_delegate_wrapper.h>
 #include <motion/motion_estimation.h>
 
 namespace nx {

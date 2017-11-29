@@ -104,51 +104,23 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
         lm("Starting archive synchronization. Resource: %1 %2")
         .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
 
-    auto manager = m_resource->remoteArchiveManager();
-    if (!manager)
-    {
-        NX_ERROR(
-            this,
-            lm("Resource %1 %2 has no remote archive manager")
-            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
-
+    if (!fetchChunks(&m_chunks))
         return false;
-    }
-
-    m_chunks.clear();
-    auto result = manager->listAvailableArchiveEntries(&m_chunks);
-    if (!result)
-    {
-        NX_ERROR(
-            this,
-            lm("Can not fetch chunks from camera %1 %2")
-                .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
-
-        return false;
-    }
 
     if (m_chunks.empty())
-    {
-        NX_DEBUG(
-            this,
-            lm("Device chunks list is empty for resource %1")
-                .arg(m_resource->getUserDefinedName()));
-
         return true;
-    }
 
-    const auto lastDeviceChunkIndex = m_chunks.size() - 1;
-    const auto startTimeMs = m_chunks[0].startTimeMs;
-    const auto endTimeMs = m_chunks[lastDeviceChunkIndex].startTimeMs
-        + m_chunks[lastDeviceChunkIndex].durationMs;
+    const auto startTimeMs = m_chunks.front().startTimeMs;
+    const auto endTimeMs = m_chunks.back().startTimeMs + m_chunks.back().durationMs;
 
+    NX_CRITICAL(qnNormalStorageMan);
     auto serverTimePeriods = qnNormalStorageMan
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,
             endTimeMs,
             duration_cast<milliseconds>(kDetalizationLevel).count(),
-            false,
+            /*keepSmallChunks*/ true,
             std::numeric_limits<int>::max());
 
     auto deviceTimePeriods = toTimePeriodList(m_chunks);
@@ -161,14 +133,112 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
     if (deviceTimePeriods.isEmpty())
         return true;
 
-    m_totalDuration = totalDuration(deviceTimePeriods, kMinChunkDuration);
+    m_totalDuration += totalDuration(deviceTimePeriods, kMinChunkDuration);
     NX_DEBUG(
         this,
         lm("Total remote archive length to synchronize: %1")
             .arg(m_totalDuration));
 
+    if (m_totalDuration == std::chrono::milliseconds::zero())
+        return true;
+
+    return writeAllTimePeriods(deviceTimePeriods);
+}
+
+void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
+    const QnTimePeriod& timePeriod)
+{
+    NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
+    m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+        m_resource,
+        QnServer::ChunksCatalog::HiQualityCatalog,
+        m_archiveReader.get());
+
+    m_recorder->setObjectName(kRecorderThreadName);
+    m_recorder->setRecordingBounds(
+        duration_cast<microseconds>(milliseconds(timePeriod.startTimeMs)),
+        duration_cast<microseconds>(milliseconds(timePeriod.endTimeMs())));
+
+    m_recorder->setSaveMotionHandler(
+        [this](const QnConstMetaDataV1Ptr& motion){ return saveMotion(motion); });
+
+    m_recorder->setOnFileWrittenHandler(
+        [this](
+            milliseconds /*startTime*/,
+            milliseconds duration)
+        {
+            onFileHasBeenWritten(duration);
+        });
+
+    m_recorder->setEndOfRecordingHandler([this](){ onEndOfRecording(); });
+}
+
+bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr& motion)
+{
+    if (motion)
+    {
+        auto helper = QnMotionHelper::instance();
+        QnMotionArchive* archive = helper->getArchive(
+            m_resource,
+            motion->channelNumber);
+
+        if (archive)
+            archive->saveToArchive(motion);
+    }
+
+    return true;
+}
+
+bool BaseRemoteArchiveSynchronizationTask::fetchChunks(
+    std::vector<nx::core::resource::RemoteArchiveChunk>* outChunks)
+{
+    NX_ASSERT(outChunks);
+    if (!outChunks)
+        return false;
+
+    auto manager = m_resource->remoteArchiveManager();
+    if (!manager)
+    {
+        NX_ERROR(
+            this,
+            lm("Resource %1 %2 has no remote archive manager")
+            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
+
+        return false;
+    }
+
+    m_chunks.clear();
+    auto result = manager->listAvailableArchiveEntries(outChunks);
+    if (!result)
+    {
+        NX_ERROR(
+            this,
+            lm("Can not fetch chunks from camera %1 %2")
+            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
+
+        return false;
+    }
+
+    if (outChunks->empty())
+    {
+        NX_DEBUG(
+            this,
+            lm("Device chunks list is empty for resource %1")
+            .arg(m_resource->getUserDefinedName()));
+    }
+
+    return true;
+}
+
+bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(const QnTimePeriodList& timePeriods)
+{
+    auto manager = m_resource->remoteArchiveManager();
+    NX_ASSERT(manager);
+    if (!manager)
+        return false;
+
     const auto settings = manager->settings();
-    for (const auto& timePeriod : deviceTimePeriods)
+    for (const auto& timePeriod : timePeriods)
     {
         if (m_canceled)
             break;
@@ -192,89 +262,6 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
 
             writeTimePeriodToArchive(timePeriod, *chunk);
         }
-    }
-
-    return true;
-}
-
-void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
-    const QnTimePeriod& timePeriod)
-{
-    NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
-    m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
-        m_resource,
-        QnServer::ChunksCatalog::HiQualityCatalog,
-        m_archiveReader.get());
-
-    m_recorder->setObjectName(kRecorderThreadName);
-    m_recorder->setRecordingBounds(
-        duration_cast<microseconds>(milliseconds(timePeriod.startTimeMs)),
-        duration_cast<microseconds>(milliseconds(timePeriod.endTimeMs())));
-
-    m_recorder->setSaveMotionHandler(
-        [this](const QnConstMetaDataV1Ptr& motion) { return saveMotion(motion); });
-
-    m_recorder->setOnFileWrittenHandler(
-        [this](
-            milliseconds /*startTime*/,
-            milliseconds duration)
-        {
-            m_importedDuration += duration;
-            NX_VERBOSE(
-                this,
-                lm("Resource %1. File has been written. Duration: %1,"
-                    "Current duration of imported remote archive: %2,"
-                    "Total duration to import: %3")
-                .args(
-                    m_resource->getUserDefinedName(),
-                    duration,
-                    m_importedDuration,
-                    m_totalDuration));
-
-            if (!needToReportProgress())
-                return;
-
-            auto progress =
-                (double)duration_cast<milliseconds>(m_importedDuration).count()
-                / duration_cast<milliseconds>(m_totalDuration).count();
-
-            if (progress > 1.0)
-            {
-                progress = 1.0;
-                NX_WARNING(
-                    this,
-                    lm("Wrong progress! Imported: %1, Total: %2")
-                    .args(m_importedDuration, m_totalDuration));
-            }
-
-            qnEventRuleConnector->at_remoteArchiveSyncProgress(
-                m_resource,
-                progress);
-
-        });
-
-    m_recorder->setEndOfRecordingHandler(
-        [this]()
-        {
-            NX_DEBUG(this, lit("Stopping recording from recorder. Got out of bounds packet."));
-            if (m_archiveReader)
-                m_archiveReader->pleaseStop();
-
-            m_recorder->pleaseStop();
-        });
-}
-
-bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr& motion)
-{
-    if (motion)
-    {
-        auto helper = QnMotionHelper::instance();
-        QnMotionArchive* archive = helper->getArchive(
-            m_resource,
-            motion->channelNumber);
-
-        if (archive)
-            archive->saveToArchive(motion);
     }
 
     return true;
@@ -315,7 +302,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
     NX_ASSERT(
         m_archiveReader && m_recorder,
         lm("Can not create archive reader and/or recorder. Resource %1")
-        .arg(m_resource->getUserDefinedName()));
+            .arg(m_resource->getUserDefinedName()));
 
     if (!m_archiveReader || !m_recorder)
         return false;
@@ -347,6 +334,63 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
     return true;
 }
 
+void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
+    const std::chrono::milliseconds& duration)
+{
+    m_importedDuration += duration;
+    NX_VERBOSE(
+        this,
+        lm("Resource %1. File has been written. Duration: %1,"
+            "Current duration of imported remote archive: %2,"
+            "Total duration to import: %3")
+            .args(
+                m_resource->getUserDefinedName(),
+                duration,
+                m_importedDuration,
+                m_totalDuration));
+
+    if (!needToReportProgress())
+        return;
+
+    NX_ASSERT(m_totalDuration != std::chrono::milliseconds::zero());
+    if (m_totalDuration == std::chrono::milliseconds::zero())
+        return;
+
+    auto progress =
+        (double)duration_cast<milliseconds>(m_importedDuration).count()
+        / duration_cast<milliseconds>(m_totalDuration).count();
+
+    NX_ASSERT(
+        progress >= 0 && progress <= 1.0,
+        lm("Wrong progress! Imported: %1, Total: %2")
+            .args(m_importedDuration, m_totalDuration));
+
+    if (progress > 0.99)
+        progress = 0.99;
+
+    if (progress < 0)
+        return;
+
+    if (progress < m_progress)
+        progress = m_progress;
+
+    m_progress = progress;
+
+    NX_CRITICAL(qnEventRuleConnector);
+    qnEventRuleConnector->at_remoteArchiveSyncProgress(
+        m_resource,
+        progress);
+}
+
+void BaseRemoteArchiveSynchronizationTask::onEndOfRecording()
+{
+    NX_DEBUG(this, lit("Stopping recording from recorder. Got out of bounds packet."));
+    if (m_archiveReader)
+        m_archiveReader->pleaseStop();
+
+    m_recorder->pleaseStop();
+}
+
 bool BaseRemoteArchiveSynchronizationTask::needToReportProgress() const
 {
     return true; //< Report progress for each written file.
@@ -374,15 +418,15 @@ BaseRemoteArchiveSynchronizationTask::remoteArchiveChunkByTimePeriod(
 
     if (chunkItr == m_chunks.cend())
     {
-        NX_ERROR(
-            this,
+        NX_ASSERT(
+            false,
             lm("No chunk for time period %1 (%2) - %3 (%4). Resource %5")
-            .args(
-                QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
-                timePeriod.startTimeMs,
-                QDateTime::fromMSecsSinceEpoch(timePeriod.endTimeMs()),
-                timePeriod.endTimeMs(),
-                m_resource->getUserDefinedName()));
+                .args(
+                    QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
+                    timePeriod.startTimeMs,
+                    QDateTime::fromMSecsSinceEpoch(timePeriod.endTimeMs()),
+                    timePeriod.endTimeMs(),
+                    m_resource->getUserDefinedName()));
 
         return boost::none;
     }
