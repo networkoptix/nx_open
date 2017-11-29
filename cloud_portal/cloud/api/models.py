@@ -20,8 +20,8 @@ class Account(PermissionsMixin):
     objects = AccountManager()
 
     email = models.CharField(unique=True, max_length=255)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=191)
+    last_name = models.CharField(max_length=191)
     created_date = models.DateTimeField(auto_now_add=True)
     activated_date = models.DateTimeField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
