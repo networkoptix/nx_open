@@ -20,7 +20,7 @@ from .camera import make_schedule_task, Camera, SampleMediaFile
 from .cloud_host import CloudAccount
 from .host import Host
 from .media_stream import open_media_stream
-from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, ServerRestApi
+from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, RestApi
 from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
 
@@ -110,7 +110,7 @@ class Server(object):
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
-        self.rest_api = ServerRestApi(self.title, self.rest_api_url, REST_API_USER, REST_API_PASSWORD, rest_api_timeout)
+        self.rest_api = RestApi(self.title, self.rest_api_url, REST_API_USER, REST_API_PASSWORD, rest_api_timeout)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None

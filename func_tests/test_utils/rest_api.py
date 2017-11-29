@@ -57,7 +57,7 @@ class RestApiError(Exception):
 
 class _RestApiProxy(object):
     """
-    >>> api = _RestApi('HTTP Request & Response Service', 'http://httpbin.org', '', '')
+    >>> api = RestApi('HTTP Request & Response Service', 'http://httpbin.org', '', '')
     >>> directory = _RestApiProxy(api, '/')
     >>> directory.get.GET(wise='choice')  # doctest: +ELLIPSIS
     {...wise...choice...}
@@ -85,10 +85,10 @@ class _RestApiProxy(object):
         return self._api.request('POST', self._path, raise_exception, timeout, headers=headers, json=json)
 
 
-class _RestApi(object):
+class RestApi(object):
     """Mimic requests.Session.request.
 
-    >>> api = _RestApi('HTTP Request & Response Service', 'http://httpbin.org', 'u', 'p')
+    >>> api = RestApi('HTTP Request & Response Service', 'http://httpbin.org', 'u', 'p')
     >>> api.request('GET', '/get', params={'pure': 'juice'})  # doctest: +ELLIPSIS
     {...pure...juice...}
     >>> api.request('GET', '/digest-auth/md5/u/p')  # doctest: +ELLIPSIS
@@ -113,6 +113,9 @@ class _RestApi(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._session.__exit__(exc_type, exc_val, exc_tb)
+
+    def __getattr__(self, name):
+        return _RestApiProxy(self, '/' + name)
 
     def __repr__(self):
         return self.__class__.__name__ + str((
@@ -194,29 +197,3 @@ class _RestApi(object):
             return response.content
         self._raise_for_status(response)
         return self._retrieve_data(response)
-
-
-class ServerRestApi(_RestApi):
-    """Server API, with hard-coded API objects ec2 and api.
-
-    >>> ServerRestApi("", 'http://httpbin.org/anything', '', '').ec2.hello.GET()  # doctest: +ELLIPSIS
-    {...hello...}
-    """
-
-    def __init__(self, server_name, root_url, username, password, timeout=None):
-        super(ServerRestApi, self).__init__(server_name, root_url, username, password, timeout=timeout)
-        self.ec2 = _RestApiProxy(self, '/ec2')
-        self.api = _RestApiProxy(self, '/api')
-
-
-class CloudRestApi(_RestApi):
-    """Cloud API, with hard-coded API objects cdb and api.
-
-    >>> CloudRestApi("", 'http://httpbin.org/anything', '', '').cdb.hello.GET()  # doctest: +ELLIPSIS
-    {...hello...}
-    """
-
-    def __init__(self, server_name, root_url, username, password, timeout=None):
-        super(CloudRestApi, self).__init__(server_name, root_url, username, password, timeout=timeout)
-        self.cdb = _RestApiProxy(self, '/cdb')
-        self.api = _RestApiProxy(self, '/api')
