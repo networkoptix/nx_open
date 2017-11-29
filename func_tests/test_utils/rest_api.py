@@ -180,15 +180,25 @@ class RestApi(object):
             raise RestApiError(self.server_name, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
-    def request(self, method, path, raise_exception=True, timeout=None, **kwargs):
+    def request(self, method, path, raise_exception=True, new_connection=False, timeout=None, **kwargs):
         log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs))
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', InsecureRequestWarning)
-            response = self._session.request(
-                method, self._root_url + path,
-                auth=self._auth,
-                timeout=(timeout or self._default_timeout).total_seconds(),
-                verify=False, **kwargs)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', InsecureRequestWarning)
+                make_request = requests.request if new_connection else self._session.request
+                response = make_request(
+                    method, self._root_url + path,
+                    auth=self._auth,
+                    timeout=(timeout or self._default_timeout).total_seconds(),
+                    verify=False, **kwargs)
+        except requests.ConnectionError as e:
+            if not new_connection:
+                log.error("Try new connection after %r.", e)
+                return self.request(
+                    method, path,
+                    raise_exception=raise_exception, new_connection=True,
+                    timeout=timeout, **kwargs)
+            raise
         if not raise_exception:
             return response.content
         self._raise_for_status(response)
