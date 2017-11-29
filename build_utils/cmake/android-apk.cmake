@@ -16,7 +16,7 @@ endfunction()
 
 function(add_android_apk target)
     set(options)
-    set(oneValueArgs TARGET FILE_NAME PACKAGE_SOURCE QML_ROOT_PATH
+    set(oneValueArgs TARGET APK_NAME PACKAGE_SOURCE QML_ROOT_PATH
         KEYSTORE_FILE KEYSTORE_ALIAS KEYSTORE_PASSWORD KEYSTORE_KEY_PASSWORD)
     set(multiValueArgs QML_IMPORT_PATHS EXTRA_LIBS)
 
@@ -79,9 +79,8 @@ function(add_android_apk target)
 
     set(apk_dir "${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}_apk")
 
-    add_custom_command(
-        OUTPUT ${APK_FILE_NAME}
-        DEPENDS ${APK_TARGET}
+    add_custom_target(${APK_APK_NAME} DEPENDS ${APK_TARGET})
+    add_custom_command(TARGET ${APK_APK_NAME} PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${APK_TARGET}>"
             "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
@@ -89,7 +88,7 @@ function(add_android_apk target)
             --input "${settings_file}" --output "${apk_dir}" --gradle --verbose
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${apk_dir}/build/outputs/apk/${APK_TARGET}_apk-${apk_suffix}.apk"
-            ${APK_FILE_NAME}
+            "${CMAKE_BINARY_DIR}/${APK_APK_NAME}"
     )
-    add_custom_target(${target} ALL DEPENDS ${APK_FILE_NAME})
+    add_custom_target(${target} ALL DEPENDS ${APK_APK_NAME})
 endfunction()

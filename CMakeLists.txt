@@ -150,8 +150,6 @@ endif()
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
-add_custom_target(distribution_clean)
-
 add_subdirectory(common_libs)
 add_subdirectory(common)
 add_subdirectory(appserver2)
