@@ -35,6 +35,10 @@ function(set_output_directories)
         list(APPEND affected_variables "CMAKE_LIBRARY_OUTPUT_DIRECTORY${CONFIG}")
     endforeach()
 
+    set(distribution_output_dir "${CMAKE_BINARY_DIR}/distrib")
+    file(MAKE_DIRECTORY ${distribution_output_dir})
+    set(distribution_output_dir ${distribution_output_dir} PARENT_SCOPE)
+
     if(DIR_AFFECTED_VARIABLES_RESULT)
         set(${DIR_AFFECTED_VARIABLES_RESULT} ${affected_variables} PARENT_SCOPE)
     endif()
