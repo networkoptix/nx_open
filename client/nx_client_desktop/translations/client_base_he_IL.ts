@@ -6363,10 +6363,6 @@ to %1</source>
       <translation>המערכת במצב בטוח</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>האיחסון מלא</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>האיחסון אינו מוגדר</translation>
     </message>
@@ -6409,10 +6405,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>בניית אינדקס הארכיון בוטלה על ידי משתמש בשרתים הבאים:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>האיחסון מלא בשרת הבא:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

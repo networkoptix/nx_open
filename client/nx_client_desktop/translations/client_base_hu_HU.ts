@@ -6235,10 +6235,6 @@ to %1</source>
       <translation>A rendszer biztonsági módban fut</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Tároló megtelt</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Nincs tároló beállítva</translation>
     </message>
@@ -6281,10 +6277,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Az archív indexek újraépítését a felhasználó megszakította a következő szerveren:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Tároló megtelt a következő szerveren:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

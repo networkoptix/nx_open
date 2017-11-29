@@ -6166,10 +6166,6 @@ to %1</source>
       <translation>ระบบในเซฟโหมด</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>ที่จัดเก็บข้อมูลเต็ม</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>การจัดเก็บข้อมูลไม่ได้กำหนดค่า</translation>
     </message>
@@ -6212,10 +6208,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>ดัชนีเก็บสร้างใหม่จะถูกยกเลิกโดยผู้ใช้บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>ที่จัดเก็บข้อมูลเต็มบนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

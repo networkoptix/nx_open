@@ -6232,10 +6232,6 @@ to %1</source>
       <translation>Systeem is in de veilige modus</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Opslag is vol</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Opslag is niet geconfigureerd</translation>
     </message>
@@ -6278,10 +6274,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>De archiefindex herbouwen wordt door de gebruiker op de volgende server geannuleerd:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Opslag is vol op de volgende server:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6355,7 +6347,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Externe archief synchronisatie</translation>
     </message>
   </context>
   <context>
@@ -8112,7 +8104,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Show Voorbeeld %1 verwijderen?</translation>
     </message>
   </context>
   <context>
