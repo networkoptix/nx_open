@@ -11,6 +11,7 @@ import datetime
 import json
 import logging
 import warnings
+import pprint
 
 import requests
 import requests.exceptions
@@ -164,35 +165,30 @@ class RestApi(object):
         try:
             response_data = response.json()
         except ValueError:
-            log.warning("Got non-JSON response:\n%r", response.content)
+            log.warning("Non-JSON response:\n%r", response.content)
             return response.content
+
+        log.debug("Response data:\n%s", pprint.pformat(response_data))
+
         if not isinstance(response_data, dict):
-            log.warning("Got %s as response data:\n%r", type(response_data).__name__, response_data)
             return response_data
         try:
             error_code = int(response_data['error'])
-        except KeyError as e:
-            log.warning("No %r key in response data:\n%r", e.message, response_data)
+        except KeyError:
             return response_data
         if error_code != 0:
-            log.debug('%s', response_data)
             raise RestApiError(self.server_name, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
     def request(self, method, path, raise_exception=True, timeout=None, **kwargs):
         log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs))
-        try:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', InsecureRequestWarning)
-                response = self._session.request(
-                    method, self._root_url + path,
-                    auth=self._auth,
-                    timeout=(timeout or self._default_timeout).total_seconds(),
-                    verify=False, **kwargs)
-        except requests.exceptions.RequestException as x:
-            log.debug('\t--> %s: %s', x.__class__.__name__, x)
-            raise
-        log.debug('\t--> [%d] %s', response.status_code, response.content)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', InsecureRequestWarning)
+            response = self._session.request(
+                method, self._root_url + path,
+                auth=self._auth,
+                timeout=(timeout or self._default_timeout).total_seconds(),
+                verify=False, **kwargs)
         if not raise_exception:
             return response.content
         self._raise_for_status(response)
