@@ -108,15 +108,10 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
             m_prefetch = success ? data : analytics::storage::LookupResult();
             m_success = success;
 
-            if (m_prefetch.size() < kFetchBatchSize)
-            {
-                completionHandler(0);
-            }
-            else
-            {
-                NX_ASSERT(!m_prefetch.front().track.empty());
-                completionHandler(startTimeMs(m_prefetch.front()) + 1/*discard last ms*/);
-            }
+            NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
+            completionHandler(m_prefetch.size() >= kFetchBatchSize
+                ? startTimeMs(m_prefetch.front()) + 1/*discard last ms*/
+                : 0);
         };
 
     const auto server = q->commonModule()->currentServer();
