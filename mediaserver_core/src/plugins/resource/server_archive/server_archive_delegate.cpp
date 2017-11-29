@@ -10,7 +10,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include <nx/utils/log/log.h>
-#include "motion/meta_data_multiplexer.h"
+#include "motion/metadata_multiplexer.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
