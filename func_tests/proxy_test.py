@@ -2,8 +2,6 @@
 Proxy test. It tests proxy request feature (request with X-server-guid HTTP header)
 '''
 
-import pytest
-
 
 def test_proxy_light_request(server_factory, http_schema):
     one = server_factory('one', http_schema=http_schema)

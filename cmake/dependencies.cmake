@@ -158,10 +158,13 @@ function(get_dependencies)
         nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
         set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
         nx_rdep_add_package("vmaxproxy-2.1")
+        nx_rdep_add_package(windows/wix PATH_VARIABLE wix_directory)
+        set(wix_directory ${wix_directory} PARENT_SCOPE)
     endif()
 
     if(box STREQUAL "edge1")
         nx_rdep_add_package(cpro-1.0.0)
+        nx_rdep_add_package(gdb)
     endif()
 
     if(haveDesktopClient)

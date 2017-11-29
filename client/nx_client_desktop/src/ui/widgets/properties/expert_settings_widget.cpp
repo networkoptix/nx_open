@@ -159,6 +159,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     int arecontCamerasCount = 0;
     m_hasDualStreaming = false;
+    m_hasRemoteArchiveCapability = false;
 
     bool isFirstQuality = true;
     bool isFirstControl = true;
@@ -179,6 +180,8 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     const int kPrimaryStreamMdIndex = 0;
     const int kSecondaryStreamMdIndex = 1;
+    const int kEdgeStreamMdIndex = 2;
+
     int forcedMotionStreamIndex = -1;
     bool allCamerasSupportForceMotion = true;
 
@@ -199,6 +202,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
         const bool qualityEditable = camera->cameraMediaCapability().isNull();
         m_hasDualStreaming |= camera->hasDualStreaming();
+        m_hasRemoteArchiveCapability |= camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
 
         m_qualityEditable &= qualityEditable;
 
@@ -267,6 +271,12 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
                 && forcedMotionStreamIndex != kPrimaryStreamMdIndex)
             {
                 forcedMotionStreamIndex = kSecondaryStreamMdIndex;
+            }
+            else if(forcedMotionStreamProperty == QnMediaResource::edgeStreamValue()
+                && forcedMotionStreamIndex != kPrimaryStreamMdIndex
+                && forcedMotionStreamIndex != kSecondaryStreamMdIndex)
+            {
+                forcedMotionStreamIndex = kEdgeStreamMdIndex;
             }
         }
 
@@ -339,6 +349,9 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     if (m_hasDualStreaming)
         ui->comboBoxForcedMotionStream->addItem(tr("Secondary"), QnMediaResource::secondaryStreamValue());
+
+    if (m_hasRemoteArchiveCapability)
+        ui->comboBoxForcedMotionStream->addItem(tr("Edge"), QnMediaResource::edgeStreamValue());
 
     bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
 
@@ -499,11 +512,13 @@ bool QnCameraExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResource
 
 bool QnCameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
 {
-    bool hasDualStreaming  = camera->hasDualStreaming();
+    const bool hasDualStreaming  = camera->hasDualStreaming();
+    const bool hasRemoteArchive = camera->hasCameraCapabilities(Qn::RemoteArchiveCapability);
 
     return mdPolicy.isEmpty() //< Do not force MD policy
         || mdPolicy == QnMediaResource::primaryStreamValue()
-        || (mdPolicy == QnMediaResource::secondaryStreamValue() && hasDualStreaming);
+        || (mdPolicy == QnMediaResource::secondaryStreamValue() && hasDualStreaming)
+        || (mdPolicy == QnMediaResource::edgeStreamValue() && hasRemoteArchive);
 }
 
 void QnCameraExpertSettingsWidget::at_dataChanged()

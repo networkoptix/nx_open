@@ -8,10 +8,14 @@
 namespace nx {
 namespace analytics {
 
-class MetadataPluginFactory: public QnCommonModuleAware
+class MetadataPluginFactory:
+    public QObject,
+    public QnCommonModuleAware
 {
+    Q_OBJECT;
+
 public:
-    MetadataPluginFactory(QnCommonModule* commonModule);
+    MetadataPluginFactory(QObject* parent);
 
     std::unique_ptr<AbstractMetadataPlugin> createMetadataPlugin(
         const QnResourcePtr& resource,

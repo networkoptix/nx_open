@@ -3,11 +3,12 @@
    It tests servers disconnection if one of them change local system id
 '''
 
-import uuid
-import pytest
 import logging
-from test_utils.utils import SimpleNamespace
+
+import pytest
+
 import server_api_data_generators as generator
+from test_utils.utils import SimpleNamespace
 
 log = logging.getLogger(__name__)
 

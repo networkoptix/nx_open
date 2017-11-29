@@ -31,9 +31,6 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 
-static const QString kMinOverlappedDateTime = lit("2000-01-01 00:00:00");
-static const QString kMaxOverlappedDateTime = lit("2038-01-01 00:00:00");
-
 static const QUrl cleanUrl(QUrl url)
 {
     url.setPath(QString());
@@ -49,7 +46,6 @@ using namespace nx::mediaserver::resource;
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
-    currentOverlappedId([this](){ return loadOverlappedId(); }, kCacheDataTimeout),
     information([this](){ return loadInformation(); }, kCacheDataTimeout),
     cgiParamiters([this](){ return loadCgiParamiters(); }, kCacheDataTimeout),
     eventStatuses([this](){ return loadEventStatuses(); }, kCacheDataTimeout),
@@ -231,40 +227,6 @@ qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
     return AV_NOPTS_VALUE;
 }
 
-HanwhaResult<int> HanwhaSharedResourceContext::loadOverlappedId()
-{
-    HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-    const auto response = helper.view(
-        lit("recording/overlapped"),
-        {
-            {lit("FromDate"), kMinOverlappedDateTime},
-            {lit("ToDate"), kMaxOverlappedDateTime}
-        }); //< TODO: #dmishin it looks pretty hardcoded. Get actual time range from the camera.
-
-    if (!response.isSuccessful())
-    {
-        return {error(
-            response,
-            CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                response.errorString()))};
-    }
-
-    const auto overlappedIdListString = response.parameter<QString>(lit("OverlappedIDList"));
-    if (!overlappedIdListString.is_initialized())
-        return {CameraDiagnostics::CameraInvalidParams(lit("Can not fetch overlapped id list"))};
-
-    const auto overlappedIds = overlappedIdListString->split(L',');
-    if (overlappedIds.isEmpty())
-        return {CameraDiagnostics::CameraInvalidParams(lit("Overlapped id list is empty"))};
-
-    return {
-        CameraDiagnostics::NoErrorResult(),
-        overlappedIds.first().toInt() //< Check if it the first or the greatest value in the list
-    };
-}
-
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 {
     HanwhaInformation info;
@@ -383,6 +345,20 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
 std::chrono::seconds HanwhaSharedResourceContext::timeZoneShift() const
 {
     return m_timeZoneShift;
+}
+
+boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
+{
+    QnMutexLocker lock(&m_servicesMutex);
+    if (!m_chunkLoader)
+        return boost::none;
+
+    return m_chunkLoader->overlappedId();
+}
+
+void HanwhaSharedResourceContext::setDateTime(const QDateTime& dateTime)
+{
+    m_timeSynchronizer->setDateTime(dateTime);
 }
 
 } // namespace plugins

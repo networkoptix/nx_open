@@ -1,9 +1,9 @@
 'Server controller: setup/start/stop server on vagrant boxes, remote or local hosts'
 
-import os.path
 import abc
-from .host import Host
+import os.path
 
+from .host import Host
 
 MEDIASERVER_DIR = 'opt/{customization_company_name}/mediaserver'
 MEDIASERVER_SERVICE_NAME = '{customization_company_name}-mediaserver'

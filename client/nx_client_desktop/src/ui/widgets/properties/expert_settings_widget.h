@@ -53,4 +53,5 @@ private:
 
     bool m_hasDualStreaming = false;
     bool m_qualityEditable = false;
+    bool m_hasRemoteArchiveCapability = false;
 };

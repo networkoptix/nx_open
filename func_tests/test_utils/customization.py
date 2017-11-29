@@ -3,8 +3,6 @@
 load information related to [current] customization
 '''
 
-import os.path
-import ConfigParser
 import debian.debfile
 
 

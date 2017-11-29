@@ -924,8 +924,11 @@ void QnRtspClient::addAuth(QByteArray& request)
 
 void QnRtspClient::addCommonHeaders(nx_http::HttpHeaders& headers)
 {
-    headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+
+    nx_http::insertOrReplaceHeader(
+        &headers, nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
+    nx_http::insertOrReplaceHeader(
+        &headers, nx_http::HttpHeader("User-Agent", m_userAgent ));
 }
 
 void QnRtspClient::addAdditionalHeaders(
@@ -2114,6 +2117,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
                 return true;
         }
 
+        addCommonHeaders(request.headers); //< Update sequence after unauthorized response.
         const auto authResult = QnClientAuthHelper::authenticate(
             m_auth, response, &request, &m_rtspAuthCtx);
         if (authResult != Qn::Auth_OK)

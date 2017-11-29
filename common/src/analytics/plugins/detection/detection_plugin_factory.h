@@ -13,10 +13,13 @@
 namespace nx {
 namespace analytics {
 
-class DetectionPluginFactory: public QnCommonModuleAware
+class DetectionPluginFactory:
+    public QObject,
+    public QnCommonModuleAware
 {
+    Q_OBJECT;
 public:
-    DetectionPluginFactory(QnCommonModule* commonModule);
+    DetectionPluginFactory(QObject* parent);
     std::unique_ptr<AbstractDetectionPlugin> createDetectionPlugin(const QString& id);
 
 private:

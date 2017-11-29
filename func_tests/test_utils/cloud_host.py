@@ -1,8 +1,10 @@
-import logging
 import datetime
+import logging
+
 import requests
-from .rest_api import HttpError, CloudRestApi
+
 from .imap import IMAPConnection
+from .rest_api import HttpError, CloudRestApi
 
 log = logging.getLogger(__name__)
 

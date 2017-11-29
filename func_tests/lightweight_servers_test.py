@@ -1,6 +1,7 @@
-import os
-import logging
 import datetime
+import logging
+import os
+
 import pytest
 
 log = logging.getLogger(__name__)
