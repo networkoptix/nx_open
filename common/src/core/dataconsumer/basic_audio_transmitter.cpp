@@ -12,6 +12,11 @@ QnBasicAudioTransmitter::QnBasicAudioTransmitter(QnSecurityCamResource* res):
 {
 }
 
+QnBasicAudioTransmitter::~QnBasicAudioTransmitter()
+{
+    stop();
+}
+
 bool QnBasicAudioTransmitter::sendData(
     const QnAbstractMediaDataPtr& data)
 {
@@ -30,7 +35,8 @@ void QnBasicAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPt
     httpClient->setUserPassword(auth.password());
     if (m_authPolicy == AuthPolicy::basicAuth)
         httpClient->setAuthType(nx_http::AsyncHttpClient::AuthType::authBasic);
-    httpClient->setDisablePrecalculatedAuthorization(true);
+    else
+        httpClient->setDisablePrecalculatedAuthorization(true);
 }
 
 bool QnBasicAudioTransmitter::isReadyForTransmission(
@@ -39,7 +45,8 @@ bool QnBasicAudioTransmitter::isReadyForTransmission(
 {
     auto auth = m_resource->getAuth();
     bool noAuth = (auth.user().isEmpty() && auth.password().isEmpty()) ||
-        m_authPolicy == AuthPolicy::noAuth;
+        m_authPolicy == AuthPolicy::noAuth ||
+        m_authPolicy == AuthPolicy::basicAuth;
     return isRetryAfterUnauthorizedResponse || noAuth;
 }
 

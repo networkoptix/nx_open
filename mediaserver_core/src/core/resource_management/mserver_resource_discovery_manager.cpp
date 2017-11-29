@@ -84,31 +84,31 @@ void QnMServerResourceDiscoveryManager::sortForeignResources(QList<QnSecurityCam
 {
     const QnUuid ownGuid = commonModule()->moduleGUID();
     std::sort(foreignResources.begin(), foreignResources.end(),
-        [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
+        [&ownGuid](const QnSecurityCamResourcePtr& left, const QnSecurityCamResourcePtr& right)
     {
         auto failoverPriority =
-            [](const QnSecurityCamResourcePtr& cam)
-        {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock(
-                cam->commonModule()->cameraUserAttributesPool(),
-                ec2::ApiCameraData::physicalIdToId(cam->getPhysicalId()));
-            return (*userAttributesLock)->failoverPriority;
-        };
+            [](const QnSecurityCamResourcePtr& camera)
+            {
+                QnCameraUserAttributePool::ScopedLock userAttributesLock(
+                    camera->commonModule()->cameraUserAttributesPool(),
+                    ec2::ApiCameraData::physicalIdToId(camera->getPhysicalId()));
+                return (*userAttributesLock)->failoverPriority;
+            };
         auto preferredServerId =
-            [](const QnSecurityCamResourcePtr& cam)
-        {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock(
-                cam->commonModule()->cameraUserAttributesPool(),
-                ec2::ApiCameraData::physicalIdToId(cam->getPhysicalId()));
-            return (*userAttributesLock)->preferredServerId;
-        };
+            [](const QnSecurityCamResourcePtr& camera)
+            {
+                QnCameraUserAttributePool::ScopedLock userAttributesLock(
+                    camera->commonModule()->cameraUserAttributesPool(),
+                    ec2::ApiCameraData::physicalIdToId(camera->getPhysicalId()));
+                return (*userAttributesLock)->preferredServerId;
+            };
 
-        bool leftOwnServer = preferredServerId(leftCam) == ownGuid;
-        bool rightOwnServer = preferredServerId(rightCam) == ownGuid;
-        if (leftOwnServer != rightOwnServer)
-            return leftOwnServer > rightOwnServer;
+        bool isLeftOwnServer = preferredServerId(left) == ownGuid;
+        bool isRightOwnServer = preferredServerId(right) == ownGuid;
+        if (isLeftOwnServer != isRightOwnServer)
+            return isLeftOwnServer > isRightOwnServer;
 
-        return failoverPriority(leftCam) > failoverPriority(rightCam);
+        return failoverPriority(left) > failoverPriority(right);
     });
 }
 
@@ -118,7 +118,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     {
         QnMutexLocker lock(&m_discoveryMutex);
-        // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
+        int foreignResourceIndex = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
+        while (m_tmpForeignResources.size() <= foreignResourceIndex)
+            m_tmpForeignResources.push_back(ResourceList());
+        m_tmpForeignResources[foreignResourceIndex].clear();
+
+        // Check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras.
         for (auto itr = resources.begin(); itr != resources.end();)
         {
             QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
@@ -129,10 +134,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
-                int index = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
-                while (m_tmpForeignResources.size() <= index)
-                    m_tmpForeignResources.push_back(ResourceList());
-                m_tmpForeignResources[index].insert(camRes->getUniqueId(), camRes);
+                m_tmpForeignResources[foreignResourceIndex].insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
             else {
@@ -142,7 +144,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (m_tmpForeignResources.size() == RETRY_COUNT_FOR_FOREIGN_RESOURCES &&
             m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
-            // Exclude duplicates
+            // Exclude duplicates.
             ResourceList foreignResourcesMap;
             for (const auto& resList: m_tmpForeignResources)
             {
@@ -150,7 +152,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     foreignResourcesMap.insert(itr.key(), itr.value());
             }
 
-            // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
+            // Sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order.
             auto foreignResources = foreignResourcesMap.values();
             const QnUuid ownGuid = commonModule()->moduleGUID();
             sortForeignResources(foreignResources);
@@ -162,11 +164,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QnResourceList extraResources;
     QSet<QString> discoveredResources;
 
-    //assemble list of existing ip
+    // Assemble list of existing ip.
     QMap<quint32, QSet<QnNetworkResourcePtr> > ipsList;
 
 
-    //excluding already existing resources
+    // Excluding already existing resources.
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())
     {
@@ -261,7 +263,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        // seems like resource is in the pool and has OK ip
+        // Seems like resource is in the pool and has OK ip.
         updateResourceStatus(rpNetRes);
 
         discoveredResources.insert(rpNetRes->getUniqueId());

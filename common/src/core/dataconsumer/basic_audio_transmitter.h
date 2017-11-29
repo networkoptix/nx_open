@@ -19,6 +19,7 @@ public:
     };
 
     QnBasicAudioTransmitter(QnSecurityCamResource* res);
+    virtual ~QnBasicAudioTransmitter() override;
     void setTransmissionUrl(const QUrl& url);
     void setContentType(const nx_http::StringType& contentType);
     void setAuthPolicy(AuthPolicy value);
