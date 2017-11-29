@@ -2623,12 +2623,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlOnvifResource::detectVideoSourceCount()
-{
-    return (bool) fetchVideoSourceToken();
-}
-
-CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
+CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEncoders)
 {
     QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
@@ -2670,7 +2665,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
     QnMutexLocker lock( &m_mutex );
     m_videoSourceToken = QString::fromStdString(conf->token);
 
-    if (m_maxChannels > 1)
+    if (limitedByEncoders && m_maxChannels > 1)
     {
         VideoConfigsReq confRequest;
         VideoConfigsResp confResponse;
@@ -2725,7 +2720,7 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 {
-    CameraDiagnostics::Result result = fetchVideoSourceToken();
+    CameraDiagnostics::Result result = fetchChannelCount();
     if (!result)
     {
         if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)

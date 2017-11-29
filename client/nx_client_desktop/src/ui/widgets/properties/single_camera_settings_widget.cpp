@@ -448,7 +448,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
-        ui->enableAudioCheckBox->setEnabled(hasAudio && !m_camera->isAudioForced());
+        ui->enableAudioCheckBox->setEnabled(hasAudio);
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
 

@@ -39,7 +39,7 @@ static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTimeout;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
-    
+
 constexpr int kMaxNumberOfRedirects = 5;
 
 AsyncHttpClient::Timeouts::Timeouts(
@@ -178,7 +178,7 @@ SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
 {
     if (m_lastSysErrorCode != SystemError::noError)
         return m_lastSysErrorCode;
-    // Ensuring system error code is always non-zero in case of failure 
+    // Ensuring system error code is always non-zero in case of failure
     //  to simplify AsyncHttpClient user's life.
     return failed() ? SystemError::connectionReset : SystemError::noError;
 }
@@ -1029,7 +1029,7 @@ bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
 
             break;
         }
-            
+
         case StatusCode::proxyAuthenticationRequired:
         {
             if (!m_proxyAuthorizationTried &&
@@ -1040,7 +1040,7 @@ bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
             }
             break;
         }
-            
+
         case StatusCode::found:
         case StatusCode::movedPermanently:
             return sendRequestToNewLocation(response);
@@ -1390,7 +1390,7 @@ struct SharedState
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
 };
 
-} // namespace 
+} // namespace
 
 template<typename ... Args>
 void AsyncHttpClient::doHttpOperation(
