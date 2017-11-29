@@ -453,7 +453,6 @@ void QnVirtualCameraResource::unLockDTSFactory()
     m_mutex.unlock();
 }
 
-
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
     QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;

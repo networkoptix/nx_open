@@ -29,6 +29,8 @@
 #include <motion/motion_detection.h>
 #include <common/static_common_module.h>
 
+#include <algorithm>
+
 using namespace std;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
@@ -468,7 +470,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     readMotionInfo();
 
-    // determin camera max resolution
+    // determine camera max resolution
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
@@ -547,7 +549,6 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
             m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
 
-    enableDuplexMode();
 
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
@@ -557,8 +558,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     if (!initializeIOPorts( &http ))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
-    if(!initialize2WayAudio(&http))
+
+    if(!initializeAudio(&http))
         return CameraDiagnostics::UnknownErrorResult();
+
+    enableDuplexMode();
 
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
@@ -913,22 +917,31 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
     return status;
 }
 
-bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
+bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
 {
     QString duplexModeList;
     auto status = readAxisParameter(http, AXIS_TWO_WAY_AUDIO_MODES, &duplexModeList);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-        return true;
-    bool twoWayAudioFound = false;
-    for (auto value: duplexModeList.split(','))
     {
-        value = value.toLower().trimmed();
-        if (value.contains("full") || value.contains("half") || value.contains("speaker"))
-            twoWayAudioFound = true;
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
+        return true;
     }
+    const QStringList supportedModes = duplexModeList.split(',');
+    const QStringList toCameraModes = {"full","half","get","speaker"};
+    const QStringList fromCameraModes = {"full","half","post"};
+
+    const bool twoWayAudioFound = std::find_first_of(supportedModes.cbegin(), supportedModes.cend(),
+        toCameraModes.cbegin(), toCameraModes.cend())!= supportedModes.cend();
+
+    const bool fromCameraAudioFound = std::find_first_of(supportedModes.cbegin(), supportedModes.cend(),
+        fromCameraModes.cbegin(), fromCameraModes.cend()) != supportedModes.cend();
+
+    if (fromCameraAudioFound)
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("1")));
+
     if (!twoWayAudioFound)
         return true;
-    
+
     QString outputFormats;
     status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)

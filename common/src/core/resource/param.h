@@ -17,7 +17,6 @@ namespace Qn
     static const QString IS_AUDIO_SUPPORTED_PARAM_NAME = lit("isAudioSupported");
     static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
     static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
-    static const QString FORCED_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString MOTION_WINDOW_CNT_PARAM_NAME = lit("motionWindowCnt");
     static const QString MOTION_MASK_WINDOW_CNT_PARAM_NAME = lit("motionMaskWindowCnt");
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
@@ -73,7 +72,6 @@ namespace Qn
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
-    static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
 	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
