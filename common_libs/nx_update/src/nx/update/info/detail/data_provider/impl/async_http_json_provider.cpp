@@ -32,10 +32,10 @@ void AsyncHttpJsonProvider::getUpdatesMetaInformation()
     urlBuilder.appendPath(kUpdatesUrlPostfix);
 
     m_asyncHttpClient.doGet(
-                urlBuilder.toUrl(),
-                std::bind(
-                    &AsyncHttpJsonProvider::onGetMetaUpdatesInformationDone,
-                    this));
+        urlBuilder.toUrl(),
+        std::bind(
+            &AsyncHttpJsonProvider::onGetMetaUpdatesInformationDone,
+            this));
 }
 
 void AsyncHttpJsonProvider::getSpecificUpdateData(const QString& customization, const QString& version)
@@ -46,10 +46,10 @@ void AsyncHttpJsonProvider::getSpecificUpdateData(const QString& customization, 
     urlBuilder.appendPath(kUpdateUrlPostfix);
 
     m_asyncHttpClient.doGet(
-                urlBuilder.toUrl(),
-                std::bind(
-                    &AsyncHttpJsonProvider::onGetSpecificUpdateInformationDone,
-                    this));
+        urlBuilder.toUrl(),
+        std::bind(
+            &AsyncHttpJsonProvider::onGetSpecificUpdateInformationDone,
+            this));
 
 }
 

@@ -4,10 +4,10 @@ namespace nx {
 namespace update {
 namespace info {
 
-class UpdateRegistry
+class AbstractUpdateRegistry
 {
 public:
-private:
+    virtual ~AbstractUpdateRegistry() {}
 };
 
 } // namespace info
