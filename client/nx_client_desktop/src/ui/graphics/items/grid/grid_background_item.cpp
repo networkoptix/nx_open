@@ -485,7 +485,7 @@ void QnGridBackgroundItem::setImage(const QImage& image)
     if (!d->imagesMemCache.contains(d->imageData.fileName))
         d->imagesMemCache.insert(d->imageData.fileName, image);
 
-    d->imageAspectRatio = Geometry::aspectRatio(image.size());
+    d->imageAspectRatio = Geometry::aspectRatio(image.size(), 0.0);
 
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
