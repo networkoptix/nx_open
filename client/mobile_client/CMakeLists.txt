@@ -78,8 +78,10 @@ if(ANDROID)
     get_target_property(FFMPEG_LIBS ffmpeg INTERFACE_LINK_LIBRARIES)
     get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
 
-    add_android_apk(mobile_client.apk TARGET mobile_client
-        APK_NAME "${mobile_client_distribution_name}.apk"
+    set(apk_file_name "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.apk")
+
+    add_android_apk(mobile_client_apk TARGET mobile_client
+        FILE_NAME ${apk_file_name}
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
@@ -138,6 +140,7 @@ if(IOS)
         Qt5WebView
     )
 
-    add_ios_ipa(mobile_client_ipa TARGET mobile_client
-        FILE_NAME "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
+    set(ipa_file_name "${CMAKE_BINARY_DIR}/${mobile_client_distribution_name}.ipa")
+
+    add_ios_ipa(mobile_client_ipa TARGET mobile_client FILE_NAME ${ipa_file_name})
 endif()
