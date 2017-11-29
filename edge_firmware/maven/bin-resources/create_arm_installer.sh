@@ -355,14 +355,16 @@ copyDebs()
 # [in] LIB_INSTALL_DIR
 copyBpiLiteClient()
 {
+    local -r LITE_CLIENT_BIN_DIR="$INSTALL_DIR/lite_client/bin"
+
     if [ -d "$LIB_BUILD_DIR/ffmpeg" ]; then
         echo "Copying libs of a dedicated ffmpeg for Lite Client's proxydecoder"
         cp -r "$LIB_BUILD_DIR/ffmpeg" "$LIB_INSTALL_DIR/"
     fi
 
     echo "Copying lite_client bin"
-    mkdir -p "$INSTALL_DIR/lite_client/bin"
-    cp "$BIN_BUILD_DIR/mobile_client" "$INSTALL_DIR/lite_client/bin/"
+    mkdir -p "$LITE_CLIENT_BIN_DIR"
+    cp "$BIN_BUILD_DIR/mobile_client" "$LITE_CLIENT_BIN_DIR/"
 
     echo "Creating symlink for rpath needed by mediaserver binary"
     ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
@@ -371,30 +373,33 @@ copyBpiLiteClient()
     ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
 
     echo "Creating symlink for rpath needed by Qt plugins"
-    ln -s "../../lib" "$INSTALL_DIR/lite_client/bin/lib"
+    ln -s "../../lib" "$LITE_CLIENT_BIN_DIR/lib"
 
     # Copy directories needed for lite client.
     local DIRS_TO_COPY=(
-        fonts # packages/any/roboto-fonts/bin/
-        egldeviceintegrations # $QT_DIR/plugins/
-        imageformats # $QT_DIR/plugins/
-        platforms # $QT_DIR/plugins/
-        qml # $QT_DIR/
-        libexec # $QT_DIR/
+        fonts #< packages/any/roboto-fonts/bin/
+        egldeviceintegrations #< $QT_DIR/plugins/
+        imageformats #< $QT_DIR/plugins/
+        platforms #< $QT_DIR/plugins/
+        qml #< $QT_DIR/
+        libexec #< $QT_DIR/
     )
     local DIR
     for DIR in "${DIRS_TO_COPY[@]}"; do
         echo "Copying directory (to Lite Client bin/) $DIR"
-        cp -r "$BIN_BUILD_DIR/$DIR" "$INSTALL_DIR/lite_client/bin/"
+        cp -r "$BIN_BUILD_DIR/$DIR" "$LITE_CLIENT_BIN_DIR/"
     done
 
-    mkdir -p "$INSTALL_DIR/lite_client/bin/translations"
-    echo "Copying (to lite_client/bin/) Qt translations"
-    cp -r "$QT_DIR/translations" "$INSTALL_DIR/lite_client/bin/"
+    echo "Copying Qt translations"
+    cp -r "$QT_DIR/translations" "$LITE_CLIENT_BIN_DIR/"
+
     # TODO: Investigate how to get rid of "resources" duplication.
-    echo "Copying (to lite_client/bin/ and lite_client/libexec/) Qt resources"
-    cp -r "$QT_DIR/resources" "$INSTALL_DIR/lite_client/bin/"
-    cp -r "$QT_DIR/resources/"* "$INSTALL_DIR/lite_client/bin/libexec/"
+    echo "Copying Qt resources"
+    cp -r "$QT_DIR/resources" "$LITE_CLIENT_BIN_DIR/"
+    cp -r "$QT_DIR/resources/"* "$LITE_CLIENT_BIN_DIR/libexec/"
+
+    echo "Copying qt.conf"
+    cp -r "$SOURCE_DIR/common/static-resources/qt/etc/qt.conf" "$LITE_CLIENT_BIN_DIR/"
 }
 
 # [in] TAR_DIR
