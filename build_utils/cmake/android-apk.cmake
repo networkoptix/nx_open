@@ -90,5 +90,5 @@ function(add_android_apk target)
             "${apk_dir}/build/outputs/apk/${APK_TARGET}_apk-${apk_suffix}.apk"
             "${CMAKE_BINARY_DIR}/${APK_APK_NAME}"
     )
-add_custom_target(${target} ALL DEPENDS ${APK_APK_NAME})
+    add_custom_target(${target} ALL DEPENDS ${APK_APK_NAME})
 endfunction()
