@@ -731,7 +731,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     }
 
     // 2. find packet inside archive
-    QnServerArchiveDelegate archive;
+    QnServerArchiveDelegate archive(qnServerModule);
     if (!archive.open(getResource()->toResourcePtr(), qnServerModule->archiveIntegrityWatcher()))
         return rez;
     if (d->startTime != DATETIME_NOW)
@@ -754,7 +754,7 @@ QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audio
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnServerArchiveDelegate archive;
+    QnServerArchiveDelegate archive(qnServerModule);
     QnConstResourceAudioLayoutPtr layout;
 
     if (d->startTime == DATETIME_NOW)
@@ -1165,7 +1165,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             }
         }
         if (!archiveDelegate)
-            archiveDelegate = new QnServerArchiveDelegate(); // default value
+            archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
         archiveDelegate->setClientId(authSession().id);
         archiveDelegate->setPlaybackMode(d->playbackMode);
         d->thumbnailsDP.reset(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr(), archiveDelegate));

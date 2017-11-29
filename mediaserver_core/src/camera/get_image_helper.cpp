@@ -9,6 +9,7 @@
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/utils/log/log_main.h>
+#include "media_server/media_server_module.h"
 
 static const int MAX_GOP_LEN = 100;
 static const nx::utils::log::Tag kLogTag(lit("QnGetImageHelper"));
@@ -303,7 +304,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
 
     QnConstResourceVideoLayoutPtr layout = res->getVideoLayout();
 
-    QnServerArchiveDelegate serverDelegate;
+    QnServerArchiveDelegate serverDelegate(qnServerModule);
     if( !useHQ )
         serverDelegate.setQuality( MEDIA_Quality_Low, true, QSize() );
 

@@ -935,7 +935,7 @@ begin_label:
         if (!m_motionConnection[channel])
             m_motionConnection[channel] = m_delegate->getMotionConnection(channel);
         if (m_motionConnection[channel]) {
-            QnMetaDataV1Ptr motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
+            auto motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
             if (motion)
             {
                 motion->flags = m_currentData->flags;

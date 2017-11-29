@@ -56,7 +56,7 @@ namespace nx_hls
         QnAbstractArchiveDelegatePtr archiveDelegate( m_camResource->createArchiveDelegate() );
         if( !archiveDelegate )
         {
-            archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate()); // default value
+            archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate(qnServerModule)); // default value
             if(!archiveDelegate->open(m_camResource, qnServerModule->archiveIntegrityWatcher()))
                 return false;
         }
@@ -142,7 +142,7 @@ namespace nx_hls
             if( !nextData )
             {
                 //end of archive reached
-                //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay 
+                //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay
                 m_eof = true;
                 return false;
             }
@@ -161,7 +161,7 @@ namespace nx_hls
         if( nextData->flags & QnAbstractMediaData::MediaFlags_BOF )
         {
             //gap in archive detected
-            if( m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec && 
+            if( m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec &&
                 m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec) )
             {
                 chunkData.duration = m_currentArchiveChunk.durationUsec - (m_prevChunkEndTimestamp - m_currentArchiveChunk.startTimeUsec);

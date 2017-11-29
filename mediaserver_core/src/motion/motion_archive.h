@@ -1,5 +1,4 @@
-#ifndef __MOTION_WRITER_H__
-#define __MOTION_WRITER_H__
+#pragma once
 
 #include <QtGui/QRegion>
 #include <QtCore/QFile>
@@ -37,12 +36,14 @@ struct IndexHeader
 class QnMotionArchiveConnection: public QnAbstractMotionArchiveConnection
 {
 public:
-    QnMetaDataV1Ptr getMotionData(qint64 timeUsec);
+    QnAbstractCompressedMetadataPtr getMotionData(qint64 timeUsec);
     virtual ~QnMotionArchiveConnection();
+
 private:
     QnMotionArchiveConnection(QnMotionArchive* owner);
 
     friend class QnMotionArchive;
+
 private:
     QnMotionArchive* m_owner;
     qint64 m_minDate;
@@ -60,7 +61,7 @@ private:
     QnMetaDataV1Ptr m_lastResult;
 };
 
-typedef QSharedPointer<QnMotionArchiveConnection> QnMotionArchiveConnectionPtr;
+typedef std::shared_ptr<QnMotionArchiveConnection> QnMotionArchiveConnectionPtr;
 
 class QnMotionArchive: public QObject
 {
@@ -113,5 +114,3 @@ private:
     QVector<IndexRecord> m_index;
     IndexHeader m_indexHeader;
 };
-
-#endif // __MOTION_WRITER_H__

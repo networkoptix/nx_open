@@ -678,7 +678,7 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
     if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
         archiveDelegate = camRes->createArchiveDelegate();
     if (!archiveDelegate)
-        archiveDelegate = new QnServerArchiveDelegate(); // default value
+        archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
     if (!archiveDelegate)
         return nullptr;
 
