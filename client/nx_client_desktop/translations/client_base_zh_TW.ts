@@ -6173,10 +6173,6 @@ to %1</source>
       <translation>系統正處於安全模式</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>儲存裝置已滿</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>儲存裝置尚未設定</translation>
     </message>
@@ -6219,10 +6215,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>以下伺服器的錄影資料索引檔重建已被使用者取消:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>以下伺服器的儲存裝置已滿:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

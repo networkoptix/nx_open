@@ -127,7 +127,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Serververbindung getrennt</translation>
+      <translation>Serververbindung trennen</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -6232,10 +6232,6 @@ to %1</source>
       <translation>System ist im abgesicherten Modus</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Speicher ist voll</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Speicher ist nicht konfiguriert</translation>
     </message>
@@ -6278,10 +6274,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Wiederherstellung des Archivindex wurde vom Benutzer auf folgendem Server abgebrochen:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Speicher ist auf folgendem Server voll:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6355,7 +6347,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Remote-Archivsynchronisation</translation>
     </message>
   </context>
   <context>
@@ -8112,7 +8104,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Demoband %1 löschen?</translation>
     </message>
   </context>
   <context>

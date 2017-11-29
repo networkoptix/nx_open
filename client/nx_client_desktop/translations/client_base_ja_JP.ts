@@ -6167,10 +6167,6 @@ to %1</source>
       <translation>セーフモード</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>ストレージが一杯</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>ストレージが設定されていません</translation>
     </message>
@@ -6213,10 +6209,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>アーカイブインデックスのリビルドキャンセル　サーバー:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>ストレージが一杯のサーバー:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
