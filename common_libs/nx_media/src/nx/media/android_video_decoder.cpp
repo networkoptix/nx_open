@@ -70,6 +70,8 @@ static QString codecToString(AVCodecID codecId)
 {
     switch(codecId)
     {
+        case AV_CODEC_ID_H265:
+            return lit("video/hevc");
         case AV_CODEC_ID_H264:
             return lit("video/avc");
         case AV_CODEC_ID_H263:
