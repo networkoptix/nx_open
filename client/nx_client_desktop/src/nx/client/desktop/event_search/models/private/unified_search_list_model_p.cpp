@@ -108,11 +108,34 @@ void UnifiedSearchListModel::Private::setFilter(Types filter)
     updateModels();
 }
 
+vms::event::EventType UnifiedSearchListModel::Private::selectedEventType() const
+{
+    return m_selectedEventType;
+}
+
+void UnifiedSearchListModel::Private::setSelectedEventType(vms::event::EventType value)
+{
+    if (selectedEventType() == value)
+        return;
+
+    m_selectedEventType = value;
+
+    if (m_filter != Types(Type::events))
+        return;
+
+    m_eventsModel->setSelectedEventType(m_selectedEventType);
+    fetchMore();
+}
+
 void UnifiedSearchListModel::Private::updateModels()
 {
     m_eventsModel->setCamera(m_filter.testFlag(Type::events)
         ? m_camera
         : QnVirtualCameraResourcePtr());
+
+    m_eventsModel->setSelectedEventType(m_filter == Types(Type::events)
+        ? m_selectedEventType
+        : vms::event::undefinedEvent);
 
     m_bookmarksModel->setCamera(m_filter.testFlag(Type::bookmarks)
         ? m_camera
@@ -121,6 +144,8 @@ void UnifiedSearchListModel::Private::updateModels()
     m_analyticsModel->setCamera(m_filter.testFlag(Type::analytics)
         ? m_camera
         : QnVirtualCameraResourcePtr());
+
+    if (m_filter == int(Type::all))
 
     fetchMore();
 }

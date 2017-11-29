@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace nx {
 namespace client {
@@ -21,6 +22,9 @@ public:
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
+
+    vms::event::EventType selectedEventType() const;
+    void setSelectedEventType(vms::event::EventType value);
 
     void clear();
 

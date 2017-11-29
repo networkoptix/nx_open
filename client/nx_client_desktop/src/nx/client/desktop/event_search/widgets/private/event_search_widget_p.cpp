@@ -13,6 +13,8 @@
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/strings_helper.h>
 
 namespace nx {
 namespace client {
@@ -21,6 +23,7 @@ namespace desktop {
 namespace {
 
 static const auto kFilterDelay = std::chrono::milliseconds(250);
+static const auto kTextButtonHeight = 24;
 
 class EventSortFilterModel: public QnSortFilterListModel
 {
@@ -41,44 +44,27 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     q(q),
     m_model(new UnifiedSearchListModel(this)),
     m_searchLineEdit(new QnSearchLineEdit(m_headerWidget)),
-    m_typeButton(new QPushButton(m_headerWidget))
+    m_superTypeButton(new QPushButton(m_headerWidget)),
+    m_eventTypeButton(new QPushButton(m_headerWidget)),
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     m_searchLineEdit->setTextChangedSignalFilterMs(std::chrono::milliseconds(kFilterDelay).count());
-    m_typeButton->setFlat(true);
-    m_typeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    auto typeFilterMenu = new QMenu(m_headerWidget);
-    typeFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    typeFilterMenu->setWindowFlags(typeFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    setupSuperTypeButton();
+    setupEventTypeButton();
 
-    using Type = UnifiedSearchListModel::Type;
-    using Types = UnifiedSearchListModel::Types;
+    auto buttonsHolder = new QWidget(m_headerWidget);
+    auto buttonsLayout = new QVBoxLayout(buttonsHolder);
+    buttonsLayout->setSpacing(0);
+    buttonsLayout->addWidget(m_superTypeButton);
+    buttonsLayout->setAlignment(m_superTypeButton, Qt::AlignLeft);
+    buttonsLayout->addWidget(m_eventTypeButton);
+    buttonsLayout->setAlignment(m_eventTypeButton, Qt::AlignLeft);
 
-    auto addMenuAction =
-        [this, typeFilterMenu](const QString& title, const QIcon& icon, Types filter)
-        {
-            return typeFilterMenu->addAction(icon, title,
-                [this, icon, title, filter]()
-                {
-                    m_typeButton->setIcon(icon);
-                    m_typeButton->setText(title);
-                    m_model->setFilter(filter);
-                });
-        };
-
-    // TODO: #vkutin Specify icons when they're available.
-    auto defaultAction = addMenuAction(tr("All types"), QIcon(), Type::all);
-    addMenuAction(tr("Events"), QIcon(), Type::events);
-    addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("buttons/bookmark.png")), Type::bookmarks);
-    addMenuAction(tr("Detected objects"), QIcon(), Type::analytics);
-    defaultAction->trigger();
-
-    m_typeButton->setMenu(typeFilterMenu);
-
-    const auto layout = m_headerWidget->layout();
+    auto layout = m_headerWidget->layout();
     layout->addWidget(m_searchLineEdit);
-    layout->addWidget(m_typeButton);
-    layout->setAlignment(m_typeButton, Qt::AlignLeft);
+    layout->addWidget(buttonsHolder);
+    layout->setAlignment(buttonsHolder, Qt::AlignLeft);
 
     auto sortModel = new EventSortFilterModel(this);
     sortModel->setSourceModel(m_model);
@@ -93,6 +79,91 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
 EventSearchWidget::Private::~Private()
 {
+}
+
+void EventSearchWidget::Private::setupSuperTypeButton()
+{
+    m_superTypeButton->setFlat(true);
+    m_superTypeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_superTypeButton->setFixedHeight(kTextButtonHeight);
+
+    auto typeFilterMenu = new QMenu(m_headerWidget);
+    typeFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+    typeFilterMenu->setWindowFlags(typeFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    using Type = UnifiedSearchListModel::Type;
+    using Types = UnifiedSearchListModel::Types;
+
+    auto addMenuAction =
+        [this, typeFilterMenu](const QString& title, const QIcon& icon, Types filter)
+        {
+            return typeFilterMenu->addAction(icon, title,
+                [this, icon, title, filter]()
+                {
+                    m_superTypeButton->setIcon(icon);
+                    m_superTypeButton->setText(title);
+                    m_model->setFilter(filter);
+                    updateEventTypeButtonVisibility();
+            });
+        };
+
+    // TODO: #vkutin Specify icons when they're available.
+    auto defaultAction = addMenuAction(tr("All types"), QIcon(), Type::all);
+    addMenuAction(tr("Events"), QIcon(), Type::events);
+    addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("buttons/bookmark.png")), Type::bookmarks);
+    addMenuAction(tr("Detected objects"), QIcon(), Type::analytics);
+    defaultAction->trigger();
+
+    m_superTypeButton->setMenu(typeFilterMenu);
+}
+
+void EventSearchWidget::Private::setupEventTypeButton()
+{
+    m_eventTypeButton->setFlat(true);
+    m_eventTypeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_eventTypeButton->setFixedHeight(kTextButtonHeight);
+    m_eventTypeButton->setHidden(true);
+
+    auto eventFilterMenu = new QMenu(m_headerWidget);
+    eventFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+    eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    auto addMenuAction =
+        [this, eventFilterMenu](const QString& title, vms::event::EventType type)
+        {
+            return eventFilterMenu->addAction(title,
+                [this, title, type]()
+                {
+                    m_eventTypeButton->setText(title);
+                    m_model->setSelectedEventType(type);
+                });
+        };
+
+    // TODO: #vkutin Specify icons when they're available.
+    auto defaultAction = addMenuAction(tr("All events"), vms::event::undefinedEvent);
+    for (const auto type: vms::event::allEvents())
+    {
+        if (vms::event::isSourceCameraRequired(type))
+            addMenuAction(m_helper->eventName(type), type);
+    }
+
+    defaultAction->trigger();
+
+    m_eventTypeButton->setMenu(eventFilterMenu);
+}
+
+void EventSearchWidget::Private::updateEventTypeButtonVisibility()
+{
+    const bool hidden = m_model->filter() != int(UnifiedSearchListModel::Type::events);
+    if (m_eventTypeButton->isHidden() == hidden)
+        return;
+
+    m_eventTypeButton->setHidden(hidden);
+    for (auto w = m_eventTypeButton->parentWidget(); w != nullptr; w = w->parentWidget())
+    {
+        if (w->layout())
+            w->layout()->activate();
+    }
 }
 
 QnVirtualCameraResourcePtr EventSearchWidget::Private::camera() const

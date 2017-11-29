@@ -69,6 +69,20 @@ void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& 
     clear();
 }
 
+vms::event::EventType EventSearchListModel::Private::selectedEventType() const
+{
+    return m_selectedEventType;
+}
+
+void EventSearchListModel::Private::setSelectedEventType(vms::event::EventType value)
+{
+    if (m_selectedEventType == value)
+        return;
+
+    m_selectedEventType = value;
+    clear();
+}
+
 int EventSearchListModel::Private::count() const
 {
     return int(m_data.size());
@@ -237,6 +251,7 @@ bool EventSearchListModel::Private::getEvents(qint64 startMs, qint64 endMs,
     QnEventLogMultiserverRequestData request;
     request.filter.cameras.push_back(m_camera);
     request.filter.period = QnTimePeriod::fromInterval(startMs, endMs);
+    request.filter.eventType = m_selectedEventType;
     request.order = Qt::DescendingOrder;
     request.limit = limit;
 

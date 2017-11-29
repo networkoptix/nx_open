@@ -18,7 +18,7 @@ class QnUuid;
 
 namespace nx {
 
-namespace vms { namespace event { class StringsHelper;  } }
+namespace vms { namespace event { class StringsHelper; }}
 
 namespace client {
 namespace desktop {
@@ -34,6 +34,9 @@ public:
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
+
+    vms::event::EventType selectedEventType() const;
+    void setSelectedEventType(vms::event::EventType value);
 
     int count() const;
     const vms::event::ActionData& getEvent(int index) const;
@@ -61,6 +64,7 @@ private:
 private:
     EventSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
+    vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
     QScopedPointer<QTimer> m_updateTimer;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     qint64 m_latestTimeMs = 0;

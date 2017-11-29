@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace nx {
 namespace client {
@@ -33,6 +34,9 @@ public:
 
     Types filter() const;
     void setFilter(Types filter);
+
+    vms::event::EventType selectedEventType() const;
+    void setSelectedEventType(vms::event::EventType value);
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
