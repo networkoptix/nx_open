@@ -13,7 +13,7 @@ QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
     m_setPasswordButton(new QPushButton(this))
 {
     m_setPasswordButton->setFlat(true);
-    m_setPasswordButton->setIcon(qnSkin->icon(lit("buttons/password.png")));
+    m_setPasswordButton->setIcon(qnSkin->icon(lit("text_buttons/password.png")));
 
     getOverlayLayout()->setContentsMargins(0, 0, style::Metrics::kDefaultTopLevelMargin, 0);
     getOverlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);

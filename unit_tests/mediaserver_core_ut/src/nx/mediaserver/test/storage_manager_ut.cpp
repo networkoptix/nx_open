@@ -5,7 +5,8 @@
 #include <nx/core/access/access_types.h>
 #include <server/server_globals.h>
 #include <common/common_module.h>
-#include <media_server/media_server_module.h>
+
+#include "media_server_module_fixture.h"
 
 namespace nx {
 namespace mediaserver {
@@ -22,10 +23,13 @@ void addChunk(
     chunks.push_back(chunk);
 };
 
-TEST(StorageManager, deleteRecordsToTime)
+class StorageManager:
+    public MediaServerModuleFixture
 {
-    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
+};
 
+TEST_F(StorageManager, deleteRecordsToTime)
+{
     std::deque<DeviceFileCatalog::Chunk> chunks;
     addChunk(chunks, 5, 10);
     addChunk(chunks, 20, 5);

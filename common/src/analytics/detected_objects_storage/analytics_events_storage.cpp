@@ -151,18 +151,21 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
 
     SqlQuery selectEventsQuery(*queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
-    selectEventsQuery.prepare(QString::fromLatin1(R"sql(
+    selectEventsQuery.prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
         FROM event
         %1
-        ORDER BY object_type_id, object_id, timestamp_usec_utc, device_guid;
-    )sql").arg(sqlQueryFilterStr));
+        ORDER BY timestamp_usec_utc %2, object_id %2;
+    )sql").args(
+        sqlQueryFilterStr,
+        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     nx::utils::db::bindFields(&selectEventsQuery, sqlQueryFilter);
     selectEventsQuery.exec();
 
     loadObjects(selectEventsQuery, filter, result);
+
     return nx::utils::db::DBResult::ok;
 }
 
@@ -201,13 +204,26 @@ void EventsStorage::loadObjects(
     const Filter& filter,
     std::vector<DetectedObject>* result)
 {
+    std::map<QnUuid, std::vector<DetectedObject>::size_type> objectIdToPosition;
+
     while (selectEventsQuery.next())
     {
-        result->push_back(DetectedObject());
-        loadObject(selectEventsQuery, &result->back());
+        DetectedObject detectedObject;
+        loadObject(selectEventsQuery, &detectedObject);
 
-        if (filter.maxObjectsToSelect > 0 && result->size() >= filter.maxObjectsToSelect)
-            break;
+        auto iterAndIsInsertedFlag =
+            objectIdToPosition.emplace(detectedObject.objectId, result->size());
+        if (iterAndIsInsertedFlag.second)
+        {
+            if (filter.maxObjectsToSelect > 0 && result->size() >= filter.maxObjectsToSelect)
+                break;
+            result->push_back(std::move(detectedObject));
+        }
+        else
+        {
+            DetectedObject& existingObject = result->at(iterAndIsInsertedFlag.first->second);
+            mergeObjects(std::move(detectedObject), &existingObject);
+        }
     }
 }
 
@@ -237,6 +253,16 @@ void EventsStorage::loadObject(
     objectPosition.boundingBox.setBottomRight(QPointF(
         selectEventsQuery.value(lit("box_bottom_right_x")).toInt(),
         selectEventsQuery.value(lit("box_bottom_right_y")).toInt()));
+}
+
+void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
+{
+    to->track.insert(
+        to->track.end(),
+        std::make_move_iterator(from.track.begin()),
+        std::make_move_iterator(from.track.end()));
+
+    // TODO: #ak moving attributes.
 }
 
 //-------------------------------------------------------------------------------------------------

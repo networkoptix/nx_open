@@ -69,6 +69,20 @@ void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& 
     clear();
 }
 
+vms::event::EventType EventSearchListModel::Private::selectedEventType() const
+{
+    return m_selectedEventType;
+}
+
+void EventSearchListModel::Private::setSelectedEventType(vms::event::EventType value)
+{
+    if (m_selectedEventType == value)
+        return;
+
+    m_selectedEventType = value;
+    clear();
+}
+
 int EventSearchListModel::Private::count() const
 {
     return int(m_data.size());
@@ -237,6 +251,7 @@ bool EventSearchListModel::Private::getEvents(qint64 startMs, qint64 endMs,
     QnEventLogMultiserverRequestData request;
     request.filter.cameras.push_back(m_camera);
     request.filter.period = QnTimePeriod::fromInterval(startMs, endMs);
+    request.filter.eventType = m_selectedEventType;
     request.order = Qt::DescendingOrder;
     request.limit = limit;
 
@@ -264,23 +279,39 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
 {
     switch (parameters.eventType)
     {
-        // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
-        case nx::vms::event::EventType::cameraMotionEvent:
-        case nx::vms::event::EventType::cameraInputEvent:
-        case nx::vms::event::EventType::cameraDisconnectEvent:
         case nx::vms::event::EventType::storageFailureEvent:
+            return qnSkin->pixmap(lit("events/storage_red.png"));
+
+        case nx::vms::event::EventType::backupFinishedEvent:
+            return qnSkin->pixmap(lit("events/storage_green.png"));
+
+        case nx::vms::event::EventType::serverStartEvent:
+            return qnSkin->pixmap(lit("events/server.png"));
+
+        case nx::vms::event::EventType::serverFailureEvent:
+            return qnSkin->pixmap(lit("events/server_red.png"));
+
+        case nx::vms::event::EventType::serverConflictEvent:
+            return qnSkin->pixmap(lit("events/server_yellow.png"));
+
+        case nx::vms::event::EventType::licenseIssueEvent:
+            return qnSkin->pixmap(lit("events/license_red.png"));
+
+        case nx::vms::event::EventType::cameraDisconnectEvent:
+            return qnSkin->pixmap(lit("events/connection_red.png"));
+
         case nx::vms::event::EventType::networkIssueEvent:
         case nx::vms::event::EventType::cameraIpConflictEvent:
-        case nx::vms::event::EventType::serverFailureEvent:
-        case nx::vms::event::EventType::serverConflictEvent:
-        case nx::vms::event::EventType::serverStartEvent:
-        case nx::vms::event::EventType::licenseIssueEvent:
-        case nx::vms::event::EventType::backupFinishedEvent:
-            return QPixmap();
+            return qnSkin->pixmap(lit("events/connection_yellow.png"));
 
         case nx::vms::event::EventType::softwareTriggerEvent:
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 parameters.description, QPalette().light().color());
+
+        // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
+        case nx::vms::event::EventType::cameraMotionEvent:
+        case nx::vms::event::EventType::cameraInputEvent:
+            return qnSkin->pixmap(lit("tree/camera.png"));
 
         case nx::vms::event::EventType::analyticsSdkEvent:
             return QPixmap();

@@ -79,6 +79,26 @@ public:
     Q_INVOKABLE static qreal aspectRatio(const QRectF& rect);
 
     /**
+     * @return Aspect ratio of the given size or defaultValue if height is equal to 0.
+     */
+    Q_INVOKABLE static qreal aspectRatio(const QSize& size, qreal defaultValue);
+
+    /**
+     * @return Aspect ratio of the given size or defaultValue if height is equal to 0.
+     */
+    Q_INVOKABLE static qreal aspectRatio(const QSizeF& size, qreal defaultValue);
+
+    /**
+     * @return Aspect ratio of the given rect or defaultValue if height is equal to 0.
+     */
+    Q_INVOKABLE static qreal aspectRatio(const QRect& rect, qreal defaultValue);
+
+    /**
+     * @return Aspect ratio of the given rect or defaultValue if height is equal to 0.
+     */
+    Q_INVOKABLE static qreal aspectRatio(const QRectF& rect, qreal defaultValue);
+
+    /**
      * @return Given size converted to a point.
      */
     Q_INVOKABLE static QPointF toPoint(const QSizeF& size)

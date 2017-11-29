@@ -41,7 +41,8 @@ bool Filter::operator==(const Filter& right) const
         && timePeriod == right.timePeriod
         && equalWithPrecision(boundingBox, right.boundingBox, 6)
         && requiredAttributes == right.requiredAttributes
-        && freeText == right.freeText;
+        && freeText == right.freeText
+        && sortOrder == right.sortOrder;
 }
 
 bool Filter::operator!=(const Filter& right) const
@@ -60,7 +61,8 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     if (!filter.objectId.isNull())
         params->insert(lit("objectId"), filter.objectId.toSimpleString());
 
-    // TODO: timePeriod
+    params->insert(lit("startTime"), QnLexical::serialized(filter.timePeriod.startTimeMs));
+    params->insert(lit("endTime"), QnLexical::serialized(filter.timePeriod.endTimeMs()));
 
     if (!filter.boundingBox.isNull())
     {
@@ -81,6 +83,8 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
 
     if (filter.maxObjectsToSelect > 0)
         params->insert(lit("limit"), QString::number(filter.maxObjectsToSelect));
+
+    params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
@@ -94,10 +98,11 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     if (params.contains(lit("objectId")))
         filter->objectId = QnUuid::fromStringSafe(params.value(lit("objectId")));
 
-    // TODO: timePeriod.
+    filter->timePeriod = QnTimePeriod::fromInterval(
+        QnLexical::deserialized<qint64>(params.value(lit("startTime"))),
+        QnLexical::deserialized<qint64>(params.value(lit("endTime"))));
 
-    //Qt::SortOrder order;
-    //QnLexical::deserialize(params.value(lit("sortOrder")), &order);
+    QnLexical::deserialize(params.value(lit("sortOrder")), &filter->sortOrder);
 
     if (params.contains(lit("x1")))
     {

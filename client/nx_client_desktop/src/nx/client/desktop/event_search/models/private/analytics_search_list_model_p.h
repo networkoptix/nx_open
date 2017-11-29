@@ -27,12 +27,16 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     int count() const;
+    const analytics::storage::DetectedObject& object(int index) const;
 
     void clear();
 
     bool canFetchMore() const;
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commitPrefetch(qint64 latestStartTimeMs);
+
+    static QString description(const analytics::storage::DetectedObject& object);
+    static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 
 private:
     AnalyticsSearchListModel* const q = nullptr;

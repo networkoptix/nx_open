@@ -128,8 +128,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
-    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 

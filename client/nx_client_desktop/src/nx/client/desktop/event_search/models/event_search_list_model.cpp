@@ -35,6 +35,16 @@ void EventSearchListModel::clear()
     d->clear();
 }
 
+vms::event::EventType EventSearchListModel::selectedEventType() const
+{
+    return d->selectedEventType();
+}
+
+void EventSearchListModel::setSelectedEventType(vms::event::EventType value)
+{
+    d->setSelectedEventType(value);
+}
+
 int EventSearchListModel::rowCount(const QModelIndex& parent) const
 {
     return parent.isValid() ? 0 : d->count();

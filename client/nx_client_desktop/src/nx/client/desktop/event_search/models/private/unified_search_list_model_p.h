@@ -35,6 +35,9 @@ public:
     Types filter() const;
     void setFilter(Types filter);
 
+    vms::event::EventType selectedEventType() const;
+    void setSelectedEventType(vms::event::EventType value);
+
     void clear();
 
     bool canFetchMore() const;
@@ -47,6 +50,7 @@ private:
     UnifiedSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     Types m_filter = Type::all;
+    vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
 
     EventSearchListModel* const m_eventsModel;
     BookmarkSearchListModel* const m_bookmarksModel;

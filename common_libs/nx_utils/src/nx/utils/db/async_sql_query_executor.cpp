@@ -112,11 +112,38 @@ DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
 
 bool AsyncSqlQueryExecutor::init()
 {
-    QnMutexLocker lk(&m_mutex);
-    openNewConnection(lk);
-    // TODO: Waiting for connection to change state
+    {
+        QnMutexLocker lk(&m_mutex);
+        openNewConnection(lk);
+    }
 
-    return true;
+    // Waiting for connection to change state.
+    for (;;)
+    {
+        ConnectionState connectionState = ConnectionState::initializing;
+        {
+            QnMutexLocker lk(&m_mutex);
+            connectionState = m_dbThreadPool.empty()
+                ? ConnectionState::closed //< Connection has been closed due to some problem.
+                : m_dbThreadPool.front()->state();
+        }
+
+        switch (connectionState)
+        {
+            case ConnectionState::initializing:
+                // TODO: #ak Replace with a "state changed" event from the thread.
+                // But, delay is not a big problem because connection to a DB is not a quick thing.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+
+            case ConnectionState::opened:
+                return true;
+
+            case ConnectionState::closed:
+            default:
+                return false;
+        }
+    }
 }
 
 void AsyncSqlQueryExecutor::setStatisticsCollector(

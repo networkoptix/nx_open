@@ -92,9 +92,9 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class BasicDbStructureUpdaterTestSetup:
-    public BaseDbTest
+    public FixtureWithQueryExecutorOnly
 {
-    using base_type = BaseDbTest;
+    using base_type = FixtureWithQueryExecutorOnly;
 
 public:
     BasicDbStructureUpdaterTestSetup()

@@ -10,9 +10,9 @@
 #include <analytics/common/object_detection_metadata.h>
 
 #include "analytics_events_storage_cursor.h"
+#include "analytics_events_storage_db_controller.h"
 #include "analytics_events_storage_settings.h"
 #include "analytics_events_storage_types.h"
-#include "analytics_events_storage_db_controller.h"
 
 namespace nx {
 namespace analytics {
@@ -59,7 +59,8 @@ public:
         CreateCursorCompletionHandler completionHandler) = 0;
 
     /**
-     * Selects all events that satisfy to the filter.
+     * Selects all objects with non-empty track that satisfy to the filter.
+     * Output is sorted by timestamp with order defined by filter.sortOrder.
      */
     virtual void lookup(
         Filter filter,
@@ -138,6 +139,8 @@ private:
     void loadObject(
         nx::utils::db::SqlQuery& selectEventsQuery,
         DetectedObject* object);
+
+    void mergeObjects(DetectedObject from, DetectedObject* to);
 };
 
 //-------------------------------------------------------------------------------------------------

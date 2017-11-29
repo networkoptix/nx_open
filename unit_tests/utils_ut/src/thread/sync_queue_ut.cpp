@@ -95,14 +95,17 @@ TEST_F(SyncQueue, conditional_pop_blocks_if_no_element_satisfies_condition)
 
     std::atomic<int> limit(8);
 
-    std::async(
-        [&limit]()
+    std::thread t(
+        [this, &limit]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             limit = 4;
+            queue.retestPopIfCondition();
         });
 
     ASSERT_EQ(4, queue.popIf([&limit](int val) { return val >= limit.load(); }));
+
+    t.join();
 }
 
 //-------------------------------------------------------------------------------------------------

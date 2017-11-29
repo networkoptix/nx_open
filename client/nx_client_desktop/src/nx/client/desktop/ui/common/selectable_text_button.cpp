@@ -110,7 +110,7 @@ void SelectableTextButton::setDeactivatable(bool value)
     if (value)
     {
         d->deactivateButton.reset(new QToolButton(this));
-        d->deactivateButton->setIcon(qnSkin->icon(lit("buttons/clear.png")));
+        d->deactivateButton->setIcon(qnSkin->icon(lit("text_buttons/clear.png")));
         d->deactivateButton->setFixedSize({ kDeactivateButtonSize, kDeactivateButtonSize });
         d->deactivateButton->setToolTip(d->deactivationToolTip);
         updateDeactivateButtonPalette();
