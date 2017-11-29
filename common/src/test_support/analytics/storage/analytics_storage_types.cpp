@@ -53,6 +53,10 @@ Filter generateRandomFilter()
     if (nx::utils::random::number<bool>())
         filter.freeText = generateFreeText();
 
+    filter.sortOrder = nx::utils::random::number<bool>()
+        ? Qt::SortOrder::AscendingOrder
+        : Qt::SortOrder::DescendingOrder;
+
     return filter;
 }
 

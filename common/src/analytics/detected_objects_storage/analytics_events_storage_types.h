@@ -68,6 +68,7 @@ struct Filter
      * Zero value is treated as no limit.
      */
     int maxObjectsToSelect = 0;
+    Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
