@@ -32,6 +32,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
+const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
@@ -127,6 +128,12 @@ public:
      */
     bool isAutoUpdateThumbnailsEnabled() const;
     void setAutoUpdateThumbnailsEnabled(bool value);
+
+    /**
+     * Override maximum allowed scene items count.
+     */
+    int maxSceneItemsOverride() const;
+    void setMaxSceneItemsOverride(int value);
 
     /**
      * Send text email instead of HTML email in event rules/actions
@@ -286,6 +293,7 @@ signals:
     void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoUpdateThumbnailsChanged();
+    void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
@@ -317,6 +325,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
+    QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;

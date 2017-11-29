@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta
 import logging
 import uuid
-import pytest
-import pytz
-from test_utils.utils import log_list, SimpleNamespace
-from test_utils.server import TimePeriod
+from datetime import datetime, timedelta
 
+import pytz
+
+from test_utils.server import TimePeriod
+from test_utils.utils import log_list
 
 log = logging.getLogger(__name__)
 

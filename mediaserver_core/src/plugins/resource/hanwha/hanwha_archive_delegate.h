@@ -40,7 +40,6 @@ public:
     virtual void setGroupId(const QByteArray& id) override;
 
     void setRateControlEnabled(bool enabled);
-    void setOverlappedId(int overlappedId);
     virtual bool setQuality(
         MediaQuality /*quality*/,
         bool /*fastSwitch*/,

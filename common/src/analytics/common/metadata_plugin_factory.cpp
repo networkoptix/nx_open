@@ -10,8 +10,9 @@
 namespace nx {
 namespace analytics {
 
-MetadataPluginFactory::MetadataPluginFactory(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+MetadataPluginFactory::MetadataPluginFactory(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
 }
 

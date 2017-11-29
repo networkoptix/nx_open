@@ -302,14 +302,29 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 
+    boost::optional<int> overlappedId;
     const auto role = getRole();
+
     if (role == Qn::CR_Archive)
     {
         const auto mediaType = m_hanwhaResource->isNvr()
             ? kHanwhaSearchMediaType
             : kHanwhaBackupMediaType;
 
+        overlappedId = m_hanwhaResource->sharedContext()->overlappedId();
+        if (overlappedId == boost::none)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("Unknown current overlapped ID."));
+        }
+
         params.emplace(kHanwhaMediaTypeProperty, mediaType);
+        params.emplace(
+            kHanwhaOverlappedIdProperty,
+            QString::number(*overlappedId));
+
+        if (profileNumber == kHanwhaInvalidProfile && !m_hanwhaResource->isNvr())
+            profileNumber = 2; //< The actual number doesn't matter.
     }
     else
     {
@@ -318,13 +333,6 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
 
     if (m_hanwhaResource->isNvr())
         params.emplace(kHanwhaClientTypeProperty, "PC");
-
-    if (profileNumber == kHanwhaInvalidProfile
-        && !m_hanwhaResource->isNvr()
-        && role == Qn::ConnectionRole::CR_Archive)
-    {
-        profileNumber = 2; //< The actual number doesn't matter.
-    }
 
     if (profileNumber != kHanwhaInvalidProfile)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
@@ -345,19 +353,17 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
     auto rtspUri = response.response()[kHanwhaUriProperty];
     *outUrl = m_hanwhaResource->fromOnvifDiscoveredUrl(rtspUri.toStdString(), false);
 
-    if (getRole() == Qn::CR_Archive && !m_hanwhaResource->isNvr())
+    if (!m_hanwhaResource->isNvr() && role == Qn::ConnectionRole::CR_Archive)
     {
         QUrl url(*outUrl);
-
         // This path is not documented, but Samsung SmartViewer uses it.
         // May not work with some cameras.
         url.setPath(lit("/recording/%1-%2/OverlappedID=%3/play.smp")
             .arg(toHanwhaPlaybackTime(m_startTimeUsec))
             .arg(toHanwhaPlaybackTime(m_endTimeUsec))
-            .arg(m_overlappedId));
+            .arg(*overlappedId));
 
         *outUrl = url.toString();
-
         qDebug() << "============ GOT PLAYBACK URL!!! (EDGE RECORDING)" << *outUrl;
     }
 
@@ -391,11 +397,6 @@ void HanwhaStreamReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTime
 {
     m_startTimeUsec = startTimeUsec;
     m_endTimeUsec = endTimeUsec;
-}
-
-void HanwhaStreamReader::setOverlappedId(int overlappedId)
-{
-    m_overlappedId = overlappedId;
 }
 
 QnRtspClient& HanwhaStreamReader::rtspClient()

@@ -85,13 +85,14 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     int prefferedChannel,
     bool& isOpened)
 {
-    auto openDelegateIfNeed =
+    auto openDelegateIfNeeded =
         [&](std::function<qint64 ()> positionUs)
         {
             if (isOpened)
                 return;
-            bool imSeek = archiveDelegate->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly);
-            if (imSeek)
+            const bool canSeekImmediately = archiveDelegate->getFlags().
+                testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly);
+            if (canSeekImmediately)
             {
                 archiveDelegate->seek(positionUs(), true);
                 isOpened = archiveDelegate->open(res, /*archiveIntegrityWatcher*/ nullptr);
@@ -126,7 +127,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
         }
         if (!video)
         {
-            openDelegateIfNeed([&]() {return archiveDelegate->endTime() - 1000 * 100;});
+            openDelegateIfNeeded([&]() {return archiveDelegate->endTime() - 1000 * 100;});
             video = getNextArchiveVideoPacket(archiveDelegate, AV_NOPTS_VALUE);
             isArchiveVideoPacket = true;
         }
@@ -135,7 +136,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     {
         isArchiveVideoPacket = true;
         // get archive data
-        openDelegateIfNeed([&]() {return time;});
+        openDelegateIfNeeded([&]() {return time;});
         // todo: getNextArchiveVideoPacket should be refactored to videoSequence interface
         video = getNextArchiveVideoPacket(
             archiveDelegate,

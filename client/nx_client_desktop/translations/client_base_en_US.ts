@@ -1257,6 +1257,33 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -2312,6 +2339,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edge</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6564,15 +6595,15 @@ to %1</source>
 <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-        <source>System time is synchronized with the Internet and is independent from server local times.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No server has Internet access. Time is not being synchronized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

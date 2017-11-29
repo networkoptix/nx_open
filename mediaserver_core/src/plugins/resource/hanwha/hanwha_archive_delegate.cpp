@@ -235,11 +235,6 @@ void HanwhaArchiveDelegate::setRateControlEnabled(bool enabled)
     m_rateControlEnabled = enabled;
 }
 
-void HanwhaArchiveDelegate::setOverlappedId(int overlappedId)
-{
-    m_streamReader->setOverlappedId(overlappedId);
-}
-
 bool HanwhaArchiveDelegate::setQuality(
     MediaQuality /*quality*/,
     bool /*fastSwitch*/,
