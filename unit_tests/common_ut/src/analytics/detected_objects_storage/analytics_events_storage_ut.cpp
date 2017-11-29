@@ -15,6 +15,8 @@ namespace analytics {
 namespace storage {
 namespace test {
 
+static const auto kUsecInMs = 1000;
+
 class AnalyticsEventsStorage:
     public nx::utils::test::TestWithTemporaryDirectory,
     public ::testing::Test
@@ -88,8 +90,27 @@ protected:
     void thenAllEventsCanBeRead()
     {
         whenLookupObjects(Filter());
+        thenLookupResultMatches(Filter(), m_analyticsDataPackets);
+    }
+
+    void thenLookupResultMatches(
+        const Filter& filter,
+        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& expected)
+    {
+        auto objects = toDetectedObjects(expected);
+
+        std::sort(
+            objects.begin(), objects.end(),
+            [&filter](const DetectedObject& left, const DetectedObject& right)
+            {
+                if (filter.sortOrder == Qt::SortOrder::AscendingOrder)
+                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
+                else
+                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
+            });
+
         thenLookupSucceded();
-        andLookupResultEquals(toDetectedObjects(m_analyticsDataPackets));
+        andLookupResultEquals(filterObjects(objects, filter));
     }
 
     void thenLookupSucceded()
@@ -130,9 +151,9 @@ protected:
         const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& analyticsDataPackets)
     {
         std::vector<DetectedObject> result;
-        for (const auto& packet : analyticsDataPackets)
+        for (const auto& packet: analyticsDataPackets)
         {
-            for (const auto& object : packet->objects)
+            for (const auto& object: packet->objects)
             {
                 DetectedObject detectedObject;
                 detectedObject.objectId = object.objectId;
@@ -150,6 +171,34 @@ protected:
         }
 
         return result;
+    }
+
+    std::vector<DetectedObject> filterObjects(
+        std::vector<DetectedObject> objects,
+        const Filter& filter)
+    {
+        for (auto objectIter = objects.begin(); objectIter != objects.end(); )
+        {
+            for (auto objectPositionIter = objectIter->track.begin();
+                objectPositionIter != objectIter->track.end();
+                )
+            {
+                if (satisfiesFilter(filter, *objectPositionIter))
+                    ++objectPositionIter;
+                else
+                    objectPositionIter = objectIter->track.erase(objectPositionIter);
+            }
+
+            if (objectIter->track.empty())
+                objectIter = objects.erase(objectIter);
+            else
+                ++objectIter;
+        }
+
+        if (filter.maxObjectsToSelect > 0 && (int)objects.size() > filter.maxObjectsToSelect)
+            objects.erase(objects.begin() + filter.maxObjectsToSelect, objects.end());
+
+        return objects;
     }
 
 private:
@@ -171,6 +220,22 @@ private:
         m_eventsStorage = std::make_unique<EventsStorage>(m_settings);
         return m_eventsStorage->initialize();
     }
+
+    bool satisfiesFilter(
+        const Filter& filter,
+        const nx::analytics::storage::ObjectPosition& objectPosition)
+    {
+        if (!filter.deviceId.isNull() && objectPosition.deviceId != filter.deviceId)
+            return false;
+
+        if (!filter.timePeriod.isNull() &&
+            !filter.timePeriod.contains(objectPosition.timestampUsec / kUsecInMs))
+        {
+            return false;
+        }
+
+        return true;
+    }
 };
 
 TEST_F(AnalyticsEventsStorage, event_saved_can_be_read_later)
@@ -189,8 +254,6 @@ TEST_F(AnalyticsEventsStorage, storing_multiple_events_concurrently)
 
 //-------------------------------------------------------------------------------------------------
 // Basic Lookup condition.
-
-static const auto kUsecInMs = 1000;
 
 class AnalyticsEventsStorageLookup:
     public AnalyticsEventsStorage
@@ -243,8 +306,8 @@ protected:
 
     void addLimitToFilter()
     {
-        m_filter.maxObjectsToSelect =
-            filterObjects(toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
+        m_filter.maxObjectsToSelect = filterObjects(
+            toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
     }
 
     void givenEmptyFilter()
@@ -302,20 +365,7 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        auto objects = toDetectedObjects(m_analyticsDataPackets);
-
-        std::sort(
-            objects.begin(), objects.end(),
-            [this](const DetectedObject& left, const DetectedObject& right)
-            {
-                if (m_filter.sortOrder == Qt::SortOrder::AscendingOrder)
-                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
-                else
-                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
-            });
-
-        thenLookupSucceded();
-        andLookupResultEquals(filterObjects(objects, m_filter));
+        thenLookupResultMatches(m_filter, m_analyticsDataPackets);
     }
 
 private:
@@ -397,50 +447,6 @@ private:
 
         for (const auto& packet: analyticsDataPackets)
             thenSaveSucceeded();
-    }
-
-    std::vector<DetectedObject> filterObjects(
-        std::vector<DetectedObject> objects,
-        const Filter& filter)
-    {
-        for (auto objectIter = objects.begin(); objectIter != objects.end(); )
-        {
-            for (auto objectPositionIter = objectIter->track.begin();
-                objectPositionIter != objectIter->track.end();
-                )
-            {
-                if (satisfiesFilter(filter, *objectPositionIter))
-                    ++objectPositionIter;
-                else
-                    objectPositionIter = objectIter->track.erase(objectPositionIter);
-            }
-
-            if (objectIter->track.empty())
-                objectIter = objects.erase(objectIter);
-            else
-                ++objectIter;
-        }
-
-        if (filter.maxObjectsToSelect > 0 && (int) objects.size() > filter.maxObjectsToSelect)
-            objects.erase(objects.begin() + filter.maxObjectsToSelect, objects.end());
-
-        return objects;
-    }
-
-    bool satisfiesFilter(
-        const Filter& filter,
-        const nx::analytics::storage::ObjectPosition& objectPosition)
-    {
-        if (!filter.deviceId.isNull() && objectPosition.deviceId != filter.deviceId)
-            return false;
-
-        if (!filter.timePeriod.isNull() &&
-            !filter.timePeriod.contains(objectPosition.timestampUsec / kUsecInMs))
-        {
-            return false;
-        }
-
-        return true;
     }
 };
 
