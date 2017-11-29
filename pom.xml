@@ -557,10 +557,12 @@
             </properties>
             <modules>
                 <module>common_libs/nx_audio</module>
+<!--
                 <module>client/applauncher</module>
                 <module>client/nx_client_core</module>
                 <module>client/nx_client_desktop</module>
                 <module>client/desktop_client</module>
+-->
                 <module>common_libs/nx_media</module>
                 <module>nx_cloud/libvms_gateway_core</module>
             </modules>
@@ -1024,14 +1026,16 @@
                 <target.arch>armhf</target.arch>
             </properties>
             <modules>
+<!--
                 <module>client/nx_client_core</module>
                 <module>client/nx_client_desktop</module>
                 <module>client/desktop_client</module>
                 <module>client/applauncher</module>
+                <module>debsetup/client-deb</module>
+-->
                 <module>nx_cloud/libvms_gateway_core</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
             </modules>
         </profile>
