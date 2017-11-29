@@ -5,7 +5,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include <core/resource/camera_resource.h>
 #include <nx/fusion//model_functions.h>

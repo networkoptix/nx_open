@@ -23,7 +23,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_advanced_param.h>
 
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 #include "soap_wrapper.h"
 

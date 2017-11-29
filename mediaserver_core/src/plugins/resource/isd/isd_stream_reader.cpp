@@ -6,7 +6,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include "isd_resource.h"
 

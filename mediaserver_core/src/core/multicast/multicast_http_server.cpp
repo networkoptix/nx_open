@@ -1,7 +1,7 @@
 #include "multicast_http_server.h"
 #include <QThread>
 #include "media_server/settings.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "common/common_module.h"
 #include "nx_ec/dummy_handler.h"
 #include "network/tcp_listener.h"

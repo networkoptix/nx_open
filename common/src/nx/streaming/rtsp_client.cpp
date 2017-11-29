@@ -23,7 +23,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
