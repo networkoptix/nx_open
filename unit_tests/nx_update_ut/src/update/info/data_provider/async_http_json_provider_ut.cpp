@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/update/info/detail/data_provider/async_raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
 #include <rest/server/json_rest_handler.h>
@@ -18,51 +19,61 @@ namespace test {
 class TestProviderHandler: public AbstractAsyncRawDataProviderHandler
 {
 public:
-    virtual void onUpdatesMetaInformationDone(
-        ResultCode resultCode,
-        const QByteArray& rawData) override
+    virtual void onGetUpdatesMetaInformationDone(ResultCode resultCode, QByteArray rawData) override
     {
-        ASSERT_EQ(ResultCode::ok, resultCode);
         QnMutexLocker lock(&m_mutex);
-        m_metaData = rawData;
+        m_lastResultCode = resultCode;
+        m_metaData = std::make_unique<QByteArray>(std::move(rawData));
         m_condition.wakeOne();;
     }
 
-    virtual void onSpecificDone(
+    virtual void onGetSpecificUpdateInformationDone(
         ResultCode resultCode,
-        const QByteArray& rawData) override
+        QByteArray rawData) override
     {
-        ASSERT_EQ(ResultCode::ok, resultCode);
         QnMutexLocker lock(&m_mutex);
-        m_specificData = rawData;
+        m_lastResultCode = resultCode;
+        m_specificData = std::make_unique<QByteArray>(std::move(rawData));
         m_condition.wakeOne();;
     }
 
     QByteArray metaData()
     {
         QnMutexLocker lock(&m_mutex);
-        while (m_metaData.isEmpty())
+        while (!m_metaData)
             m_condition.wait(lock.mutex());
 
-        return m_metaData;
+        return *m_metaData;
     }
 
     QByteArray updateData()
     {
         QnMutexLocker lock(&m_mutex);
-        while (m_specificData.isEmpty())
+        while (!m_specificData)
             m_condition.wait(lock.mutex());
 
-        return m_specificData;
+        return *m_specificData;
     }
 
+    ResultCode lastResultCode() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return m_lastResultCode;
+    }
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
 
-    QByteArray m_metaData;
-    QByteArray m_specificData;
+    ResultCode m_lastResultCode = ResultCode::ok;
+    std::unique_ptr<QByteArray> m_metaData;
+    std::unique_ptr<QByteArray> m_specificData;
 };
+
+static const QString kCustomization = "default";
+static const QString kVersion = "16975";
+static const QString kUpdatesPath = "/updates.json";
+static const QString kUpdatePath = "/update.json";
+static const QByteArray kJsonMimeType = "application/json";
 
 class AsyncJsonDataProvider: public ::testing::Test
 {
@@ -73,14 +84,26 @@ protected:
         prepareDataProvider();
     }
 
-    void whenAsyncRequestIssued()
+    void whenGetUpdatesMetaInformationRequestIssued()
     {
         m_rawDataProvider->getUpdatesMetaInformation();
     }
 
-    void thenCorrectDataIsProvided()
+    void whenGetSpecificUpdateInformationRequestIssued()
     {
-        ASSERT_EQ(metaDataJson, m_providerHandler.metaData());
+        m_rawDataProvider->getSpecificUpdateData(kCustomization, kVersion);
+    }
+
+    void thenCorrectMetaDataIsProvided()
+    {
+        ASSERT_EQ(QByteArray(metaDataJson), m_providerHandler.metaData());
+        ASSERT_EQ(ResultCode::ok, m_providerHandler.lastResultCode());
+    }
+
+    void thenCorrectUpdateDataIsProvided()
+    {
+        ASSERT_EQ(QByteArray(updateJson), m_providerHandler.updateData());
+        ASSERT_EQ(ResultCode::ok, m_providerHandler.lastResultCode());
     }
 
 private:
@@ -93,41 +116,35 @@ private:
     {
         using namespace std::placeholders;
 
-        m_httpServer.registerRequestProcessorFunc(
-            "/update.json",
-            std::bind(&AsyncJsonDataProvider::onMetaRequest, this, _1, _2, _3, _4, _5));
+        m_httpServer.registerStaticProcessor(kUpdatesPath, metaDataJson, kJsonMimeType);
+        QString updatePath = lit("/%1/%2%3").arg(kCustomization).arg(kVersion).arg(kUpdatePath);
+        m_httpServer.registerStaticProcessor(updatePath, updateJson, kJsonMimeType);
+
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
     void prepareDataProvider()
     {
-        m_rawDataProvider = m_factory.create("127.0.0.1", &m_providerHandler);
+        nx::utils::Url metaUrl;
+        metaUrl.setScheme("http");
+        metaUrl.setHost(m_httpServer.serverAddress().address.toString());
+        metaUrl.setPort(m_httpServer.serverAddress().port);
+
+        m_rawDataProvider = m_factory.create(metaUrl.toString(), &m_providerHandler);
         ASSERT_TRUE((bool) m_rawDataProvider);
-    }
-
-    void onMetaRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
-    {
-        QnJsonRestResult response;
-        response.error = QnRestResult::Error::NoError;
-
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
-        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
-            "application/json",
-            metaDataJson);
-
-        completionHandler(std::move(requestResult));
     }
 };
 
 TEST_F(AsyncJsonDataProvider, MetaDataProvided)
 {
-    whenAsyncRequestIssued();
-    thenCorrectDataIsProvided();
+    whenGetUpdatesMetaInformationRequestIssued();
+    thenCorrectMetaDataIsProvided();
+}
+
+TEST_F(AsyncJsonDataProvider, UpdateDataProvided)
+{
+    whenGetSpecificUpdateInformationRequestIssued();
+    thenCorrectUpdateDataIsProvided();
 }
 
 } // namespace test

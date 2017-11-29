@@ -8,7 +8,7 @@ enum class ResultCode
 {
     ok,
     timeout,
-    transportError,
+    getRawDataError,
     parseError,
     noData
 };

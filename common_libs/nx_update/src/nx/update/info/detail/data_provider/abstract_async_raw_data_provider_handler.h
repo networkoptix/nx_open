@@ -15,8 +15,8 @@ class AbstractAsyncRawDataProviderHandler
 {
 public:
     virtual ~AbstractAsyncRawDataProviderHandler() {}
-    virtual void onUpdatesMetaInformationDone(ResultCode resultCode, const QByteArray& rawData) = 0;
-    virtual void onSpecificDone(ResultCode resultCode, const QByteArray& rawData) = 0;
+    virtual void onGetUpdatesMetaInformationDone(ResultCode resultCode, QByteArray rawData) = 0;
+    virtual void onGetSpecificUpdateInformationDone(ResultCode resultCode, QByteArray rawData) = 0;
 };
 
 } // namespace data_provider
