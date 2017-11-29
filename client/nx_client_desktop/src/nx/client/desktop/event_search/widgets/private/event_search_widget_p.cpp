@@ -111,7 +111,8 @@ void EventSearchWidget::Private::setupSuperTypeButton()
     auto defaultAction = addMenuAction(tr("All types"), QIcon(), Type::all);
     addMenuAction(tr("Events"), QIcon(), Type::events);
     addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("buttons/bookmark.png")), Type::bookmarks);
-    addMenuAction(tr("Detected objects"), QIcon(), Type::analytics);
+    addMenuAction(tr("Detected objects"), qnSkin->icon(lit("buttons/analytics.png")),
+        Type::analytics);
     defaultAction->trigger();
 
     m_superTypeButton->setMenu(typeFilterMenu);

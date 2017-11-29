@@ -53,7 +53,7 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
             return tr("Object on camera");
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap(lit("buttons/analytics.png")));
+            return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
 
         case Qn::DescriptionTextRole:
             return d->description(object);
