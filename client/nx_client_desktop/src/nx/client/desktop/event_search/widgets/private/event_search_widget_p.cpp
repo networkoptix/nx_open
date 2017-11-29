@@ -107,11 +107,10 @@ void EventSearchWidget::Private::setupSuperTypeButton()
             });
         };
 
-    // TODO: #vkutin Specify icons when they're available.
     auto defaultAction = addMenuAction(tr("All types"), QIcon(), Type::all);
-    addMenuAction(tr("Events"), QIcon(), Type::events);
-    addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("buttons/bookmark.png")), Type::bookmarks);
-    addMenuAction(tr("Detected objects"), qnSkin->icon(lit("buttons/analytics.png")),
+    addMenuAction(tr("Events"), qnSkin->icon(lit("text_buttons/event_rules.png")), Type::events);
+    addMenuAction(tr("Bookmarks"), qnSkin->icon(lit("text_buttons/bookmark.png")), Type::bookmarks);
+    addMenuAction(tr("Detected objects"), qnSkin->icon(lit("text_buttons/analytics.png")),
         Type::analytics);
     defaultAction->trigger();
 

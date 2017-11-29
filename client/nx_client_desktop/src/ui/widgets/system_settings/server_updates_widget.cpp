@@ -131,7 +131,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
 
-    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     ui->updateButton->setEnabled(false);
 
     connect(ui->cancelButton, &QPushButton::clicked, this,
@@ -203,7 +203,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     at_tool_stageChanged(QnFullUpdateStage::Init);
 
     ui->downloadButton->hide();
-    ui->downloadButton->setIcon(qnSkin->icon(lit("buttons/download.png")));
+    ui->downloadButton->setIcon(qnSkin->icon(lit("text_buttons/download.png")));
     ui->downloadButton->setForegroundRole(QPalette::WindowText);
 
     initDownloadActions();

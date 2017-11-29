@@ -860,7 +860,7 @@ bool CameraScheduleWidget::isCurrentBitrateCustom() const
 void CameraScheduleWidget::setAdvancedSettingsVisible(bool value)
 {
     const auto text = value ? tr("Less Settings") : tr("More Settings");
-    const auto icon = qnSkin->icon(value ? lit("buttons/collapse.png") : lit("buttons/expand.png"));
+    const auto icon = qnSkin->icon(value ? lit("text_buttons/collapse.png") : lit("text_buttons/expand.png"));
     ui->advancedSettingsButton->setText(text);
     ui->advancedSettingsButton->setIcon(icon);
     ui->advancedSettingsWidget->setVisible(value);

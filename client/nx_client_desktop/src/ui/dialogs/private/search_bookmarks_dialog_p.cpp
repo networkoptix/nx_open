@@ -62,8 +62,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , utcRangeEndMs(utcFinishTimeMs)
 {
     m_ui->setupUi(m_owner);
-    m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    m_ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    m_ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    m_ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
 
     m_ui->gridBookmarks->setModel(m_model);
 
