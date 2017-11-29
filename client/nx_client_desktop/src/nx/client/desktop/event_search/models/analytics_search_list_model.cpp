@@ -44,25 +44,26 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
     if (!isValid(index))
         return QVariant();
 
-    //TODO: #vkutin This is a stub. Fill it when actual analytics fetch is implemented.
+    const auto object = d->object(index.row());
+    NX_ASSERT(!object.track.empty());
 
     switch (role)
     {
-        //case Qt::DisplayRole:
-        //    return event.caption;
+        case Qt::DisplayRole:
+            return tr("Object on camera");
 
-        //case Qt::DecorationRole:
-        //    return QVariant::fromValue(qnSkin->pixmap(lit("analytics.png")));
+        case Qt::DecorationRole:
+            return QVariant::fromValue(qnSkin->pixmap(lit("buttons/analytics.png")));
 
-        //case Qn::DescriptionTextRole:
-        //    return event.description;
+        case Qn::DescriptionTextRole:
+            return d->description(object);
 
-        //case Qn::TimestampRole:
-        //case Qn::PreviewTimeRole:
-        //    return QVariant::fromValue(event.startTimeMs);
+        case Qn::TimestampRole:
+        case Qn::PreviewTimeRole:
+            return Private::startTimeMs(object);
 
-        //case Qn::HelpTopicIdRole:
-        //    return Qn::Analytics_Usage_Help;
+        case Qn::HelpTopicIdRole:
+            return Qn::Empty_Help;
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(d->camera());
