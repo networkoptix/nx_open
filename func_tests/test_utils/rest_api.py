@@ -99,7 +99,7 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(self, server_name, root_url, username, password, timeout=None):
+    def __init__(self, server_name, root_url, username=REST_API_USER, password=REST_API_PASSWORD, timeout=None):
         self.server_name = server_name
         self._root_url = root_url.rstrip('/')
         self.url = self._root_url + '/'

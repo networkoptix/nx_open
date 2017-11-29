@@ -110,7 +110,7 @@ class Server(object):
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
-        self.rest_api = RestApi(self.title, self.rest_api_url, REST_API_USER, REST_API_PASSWORD, rest_api_timeout)
+        self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None

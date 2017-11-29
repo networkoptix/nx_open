@@ -34,7 +34,7 @@ class CloudAccount(object):
         self.name = name
         self.customization = customization
         self.host = host
-        self.rest_api = RestApi('cloud-host:%s' % name, self.url, user, password)
+        self.rest_api = RestApi('cloud-host:%s' % name, self.url, username=user, password=password)
 
     def __repr__(self):
         return '%r @ %r' % (self.name, self.url)
