@@ -45,6 +45,28 @@ struct RemoteArchiveChunk
     RemoteArchiveChunk(const RemoteArchiveChunk& other) = default;
 };
 
+/**
+ * Some general remote archive synchronization settings.
+ */
+struct RemoteArchiveSynchronizationSettings
+{
+    RemoteArchiveSynchronizationSettings() = default;
+    RemoteArchiveSynchronizationSettings(
+        const std::chrono::milliseconds& waitBeforeSync,
+        const std::chrono::milliseconds& waitBetweenChunks,
+        int syncCyclesNumber)
+        :
+        waitBeforeSync(waitBeforeSync),
+        waitBetweenChunks(waitBetweenChunks),
+        syncCyclesNumber(syncCyclesNumber)
+    {
+    };
+
+    std::chrono::milliseconds waitBeforeSync;
+    std::chrono::milliseconds waitBetweenChunks;
+    int syncCyclesNumber = 1;
+};
+
 inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& rhs)
 {
     return lhs.id == rhs.id
@@ -104,6 +126,11 @@ public:
      * @return Remote archive capabilities.
      */
     virtual RemoteArchiveCapabilities capabilities() const = 0;
+
+    /*
+     * @return general synchronization settings.
+     */
+    virtual RemoteArchiveSynchronizationSettings settings() const = 0;
 
     /*
      * Is called before remote archive synchronization.

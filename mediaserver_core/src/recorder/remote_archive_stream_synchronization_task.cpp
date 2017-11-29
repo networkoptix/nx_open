@@ -20,11 +20,7 @@ namespace recorder {
 
 namespace {
 
-static const std::chrono::milliseconds kDetalizationLevel(1);
-static const std::chrono::milliseconds kMinChunkDuration(1000);
-static const int kNumberOfSynchronizationCycles = 2;
-static const std::chrono::milliseconds kWaitBeforeSynchronize(30000);
-static const std::chrono::milliseconds kWaitBeforeLoadNextChunk(3000);
+static const QString kReaderThreadName = lit("Edge reader");
 
 } // namespace
 
@@ -66,6 +62,7 @@ void RemoteArchiveStreamSynchronizationTask::createArchiveReaderThreadUnsafe(
     #endif
 
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
+    m_archiveReader->setObjectName(kReaderThreadName);
     m_archiveReader->setArchiveDelegate(archiveDelegate.release());
     m_archiveReader->setPlaybackRange(timePeriod);
     m_archiveReader->setRole(Qn::CR_Archive);

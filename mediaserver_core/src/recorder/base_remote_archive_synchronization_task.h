@@ -67,6 +67,8 @@ protected:
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
+
+    nx::core::resource::RemoteArchiveSynchronizationSettings m_settings;
 };
 
 } // namespace recorder

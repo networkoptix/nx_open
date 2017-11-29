@@ -21,13 +21,6 @@ namespace recorder {
 
 namespace {
 
-static const std::chrono::milliseconds kDetalizationLevel(1);
-static const std::chrono::milliseconds kMinChunkDuration(1000);
-static const int kNumberOfSynchronizationCycles = 2;
-static const std::chrono::milliseconds kWaitBeforeSynchronize(20000);
-static const std::chrono::milliseconds kWaitBeforeLoadNextChunk(0);
-
-static const QString kRecorderThreadName = lit("Edge recorder");
 static const QString kReaderThreadName = lit("Edge reader");
 
 } // namespace

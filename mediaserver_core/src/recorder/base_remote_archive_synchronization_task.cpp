@@ -17,10 +17,6 @@ namespace {
 
 static const std::chrono::milliseconds kDetalizationLevel(1);
 static const std::chrono::milliseconds kMinChunkDuration(1000);
-static const std::chrono::milliseconds kWaitBeforeSynchronize(30000);
-static const std::chrono::milliseconds kWaitBeforeLoadNextChunk(3000);
-
-static const int kNumberOfSynchronizationCycles = 2;
 static const QString kRecorderThreadName = lit("Edge recorder");
 
 } // namespace
@@ -67,14 +63,19 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     if (!archiveManager)
         return false;
 
+    m_settings = archiveManager->settings();
+
     archiveManager->beforeSynchronization();
     qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
     bool result = true;
-    for (auto i = 0; i < kNumberOfSynchronizationCycles; ++i)
+    for (auto i = 0; i < m_settings.syncCyclesNumber; ++i)
     {
+        if(m_settings.waitBeforeSync > milliseconds::zero())
         {
             QnMutexLocker lock(&m_mutex);
-            m_wait.wait(&m_mutex, duration_cast<milliseconds>(kWaitBeforeSynchronize).count());
+            m_wait.wait(
+                &m_mutex,
+                duration_cast<milliseconds>(m_settings.waitBeforeSync).count());
         }
 
         if (m_canceled)
@@ -121,7 +122,7 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
         NX_ERROR(
             this,
             lm("Can not fetch chunks from camera %1 %2")
-            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
+                .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
 
         return false;
     }
@@ -131,7 +132,7 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
         NX_DEBUG(
             this,
             lm("Device chunks list is empty for resource %1")
-            .arg(m_resource->getUserDefinedName()));
+                .arg(m_resource->getUserDefinedName()));
 
         return true;
     }
@@ -164,8 +165,9 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
     NX_DEBUG(
         this,
         lm("Total remote archive length to synchronize: %1")
-        .arg(m_totalDuration));
+            .arg(m_totalDuration));
 
+    const auto settings = manager->settings();
     for (const auto& timePeriod : deviceTimePeriods)
     {
         if (m_canceled)
@@ -173,11 +175,12 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
 
         if (timePeriod.durationMs >= duration_cast<milliseconds>(kMinChunkDuration).count())
         {
+            if (settings.waitBetweenChunks > milliseconds::zero())
             {
                 QnMutexLocker lock(&m_mutex);
                 m_wait.wait(
                     &m_mutex,
-                    duration_cast<milliseconds>(kWaitBeforeLoadNextChunk).count());
+                    duration_cast<milliseconds>(settings.waitBetweenChunks).count());
 
                 if (m_canceled)
                     break;
