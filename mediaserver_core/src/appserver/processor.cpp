@@ -71,7 +71,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 
-        if (camera->isManuallyAdded() && !commonModule()->resourceDiscoveryManager()->containManualCamera(urlStr))
+        if (camera->isManuallyAdded() && !commonModule()->resourceDiscoveryManager()->isManuallyAdded(camera))
             continue; //race condition. manual camera just deleted
 
         QString uniqueId = camera->getUniqueId();
