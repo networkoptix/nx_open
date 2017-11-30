@@ -8,6 +8,8 @@ set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
+file(TO_CMAKE_PATH ${wix_directory} wix_directory)
+
 ExternalProject_Add(
     customactions
     SOURCE_DIR "${bin_resources}/CustomActions"
