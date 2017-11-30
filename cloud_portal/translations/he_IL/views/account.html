@@ -56,17 +56,17 @@
 </div>
 
 <div class="container" ng-if="passwordMode" >
-    <h1>שנה סיסמה</h1>
+    <h1>שנה סיסמא</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group" validate-field>
-            <label for="password"  class="col-sm-4 control-label">הסיסמה הנוכחית</label>
+            <label for="password"  class="col-sm-4 control-label">הסיסמא הנוכחית</label>
             <div class="col-sm-4">
                 <input type="password" class="form-control" ng-model="pass.password"
                        name="password"
                        id="password" required>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">נדרשת סיסמה נוכחית.</span>
+                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">נדרשת סיסמא נוכחית.</span>
             </div>
         </div>
 

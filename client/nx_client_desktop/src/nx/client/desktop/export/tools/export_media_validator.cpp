@@ -16,9 +16,6 @@
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/data/export_layout_settings.h>
 
-// TODO: #GDM move constant to another place
-#include <nx/client/desktop/ui/dialogs/rapid_review_dialog.h>
-
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
@@ -27,22 +24,25 @@ namespace desktop {
 
 namespace {
 
-/** Maximum sane duration: 30 minutes of recording. */
-static const qint64 kMaxRecordingDurationMs = 1000 * 60 * 30;
-static const qint64 kTimelapseBaseFrameStepMs = 1000 / ui::dialogs::ExportRapidReview::kResultFps;
+// Maximum sane duration: 30 minutes of recording.
+static constexpr qint64 kMaxRecordingDurationMs = 1000 * 60 * 30;
 
-/** Default bitrate for exported file size estimate in megabytes per second. */
-static const qreal kDefaultBitrateMBps = 0.5;
+// Magic knowledge. We know that the result will be generated with 30 fps. --rvasilenko
+static constexpr int kRapidReviewFps = 30;
+static constexpr qint64 kTimelapseBaseFrameStepMs = 1000 / kRapidReviewFps;
 
-/** Exe files greater than 4 Gb are not working. */
-static const qint64 kMaximimumExeFileSizeMb = 4096;
+// Default bitrate for exported file size estimate in megabytes per second.
+static constexpr qreal kDefaultBitrateMBps = 0.5;
 
-/** Reserving 200 Mb for client binaries. */
-static const qint64 kReservedClientSizeMb = 200;
+// Exe files greater than 4 Gb are not working.
+static constexpr qint64 kMaximimumExeFileSizeMb = 4096;
 
-static const int kMsPerSecond = 1000;
+// Reserving 200 Mb for client binaries.
+static constexpr qint64 kReservedClientSizeMb = 200;
 
-static const int kBitsPerByte = 8;
+static constexpr int kMsPerSecond = 1000;
+
+static constexpr int kBitsPerByte = 8;
 
 bool validateLength(const ExportMediaSettings& settings, qint64 durationMs)
 {
@@ -109,11 +109,14 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     Results results;
 
-    if (FileExtensionUtils::isExecutable(settings.fileName.extension))
+    if (FileExtensionUtils::isLayout(settings.fileName.extension))
     {
-        results.set(int(Result::transcodingInBinaryIsNotSupported));
-        if (exeFileIsTooBig(settings.mediaResource, durationMs))
+        results.set(int(Result::transcodingInLayoutIsNotSupported));
+        if (FileExtensionUtils::isExecutable(settings.fileName.extension)
+            && exeFileIsTooBig(settings.mediaResource, durationMs))
+        {
             results.set(int(Result::tooBigExeFile));
+        }
         return results;
     }
 

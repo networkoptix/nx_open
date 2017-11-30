@@ -3,27 +3,27 @@
 Allows working with servers from functional tests - start/stop, setup, configure, access rest api, storage, etc.
 '''
 
-import os.path
-import logging
 import base64
-import uuid
-import urllib
-import hashlib
-import time
 import datetime
-import calendar
-import pytz
-import tzlocal
-import requests.exceptions
-import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
-from .rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
-from .camera import make_schedule_task, Camera, SampleMediaFile
-from .media_stream import open_media_stream
-from .host import Host
-from .cloud_host import CloudAccount
+import hashlib
+import logging
+import os.path
+import time
+import urllib
+import uuid
+import tempfile
 
+import pytest
+import pytz
+import requests.exceptions
+
+from .camera import make_schedule_task, Camera, SampleMediaFile
+from .cloud_host import CloudAccount
+from .host import Host, LocalHost
+from .media_stream import open_media_stream
+from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, ServerRestApi
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
+from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -242,12 +242,6 @@ class Server(object):
         self.internal_ip_address = iflist[-1]['ipAddr']
         self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
-    def _safe_api_call(self, fn, *args, **kw):
-        try:
-            return fn(*args, **kw)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            return None
-
     def get_system_settings(self):
         response = self.rest_api.api.systemSettings.GET()
         return response['settings']
@@ -271,26 +265,44 @@ class Server(object):
         if was_started:
             self.start_service()
 
-    def restart(self, timeout=30):
-        t = time.time()
-        uptime = self.get_uptime()
+    def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
+        old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
+        log.info("Runtime id before restart: %s", old_runtime_id)
+        started_at = datetime.datetime.now(pytz.utc)
         self.rest_api.api.restart.GET()
-        while time.time() - t < timeout:
-            new_uptime = self._safe_api_call(self.get_uptime)
-            if new_uptime and new_uptime < uptime:
-                self.load_system_settings(log_settings=True)
-                return
-            log.debug('Server did not restart yet, waiting...')
-            time.sleep(0.5)
-        assert False, 'Server %r did not restart in %s seconds' % (self, timeout)
+        sleep_time_sec = timeout.total_seconds() / 100.
+        failed_connections = 0
+        while True:
+            try:
+                response = self.rest_api.api.moduleInformation.GET()
+            except requests.ConnectionError as e:
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't started, caught %r, timed out." % e
+                log.debug("Expected failed connection: %r", e)
+                failed_connections += 1
+                time.sleep(sleep_time_sec)
+                continue
+            new_runtime_id = response['runtimeId']
+            if new_runtime_id == old_runtime_id:
+                if failed_connections > 0:
+                    assert False, "Runtime id remains same after failed connections."
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't stopped, timed out."
+                log.warning("Server hasn't stopped yet, delay is acceptable.")
+                time.sleep(sleep_time_sec)
+                continue
+            log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
+            break
 
     def make_core_dump(self):
         self._server_ctl.make_core_dump()
         self._state = self._st_stopped
 
-    def get_uptime(self):
-        response = self.rest_api.api.statistics.GET()
-        return datetime.timedelta(seconds=int(response['uptimeMs'])/1000.)
+    def get_time(self):
+        started_at = datetime.datetime.now(pytz.utc)
+        time_response = self.rest_api.ec2.getCurrentTime.GET()
+        received = datetime.datetime.fromtimestamp(float(time_response['value']) / 1000., pytz.utc)
+        return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
 
     def reset_config(self, **kw):
         self._installation.reset_config(**kw)
@@ -469,32 +481,46 @@ class Storage(object):
         self.dir = dir
         self.timezone = timezone or host.get_timezone()
 
-    def cleanup(self):
-        self.host.run_command(['rm', '-rf',
-                               os.path.join(self.dir, 'low_quality'),
-                               os.path.join(self.dir, 'hi_quality')])
-
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
         assert isinstance(start_time, datetime.datetime) and start_time.tzinfo, repr(start_time)
         assert start_time.tzinfo  # naive datetime are forbidden, use pytz.utc or tzlocal.get_localtimezone() for tz
         assert isinstance(sample, SampleMediaFile), repr(sample)
         camera_mac_addr = camera.mac_addr
-        contents = sample.get_contents()
-        lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, sample.duration)
-        hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, sample.duration)
+        unixtime_utc_ms = int(datetime_utc_to_timestamp(start_time) * 1000)
+
+        contents = self._read_with_start_time_metadata(sample, unixtime_utc_ms)
+
+        lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, unixtime_utc_ms, sample.duration)
+        hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, unixtime_utc_ms, sample.duration)
+
         log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
         self.host.write_file(lowq_fpath, contents)
         log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
         self.host.write_file(hiq_fpath,  contents)
 
+    def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
+        _, ext = os.path.splitext(sample.fpath)
+        _, path = tempfile.mkstemp(suffix=ext)
+        try:
+            LocalHost().run_command([
+                'ffmpeg',
+                '-i', sample.fpath,
+                '-codec', 'copy',
+                '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
+                '-y',
+                path])
+            with open(path, 'rb') as f:
+                return f.read()
+        finally:
+            os.remove(path)
+
     # server stores media data in this format, using local time for directory parts:
     # <data dir>/<{hi_quality,low_quality}>/<camera-mac>/<year>/<month>/<day>/<hour>/<start,unix timestamp ms>_<duration,ms>.mkv
     # for example:
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
-    def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
+    def _construct_fpath(self, camera_mac_addr, quality_part, start_time, unixtime_utc_ms, duration):
         local_dt = start_time.astimezone(self.timezone)  # box local
-        unixtime_utc_ms = int(datetime_utc_to_timestamp(start_time) * 1000)
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,

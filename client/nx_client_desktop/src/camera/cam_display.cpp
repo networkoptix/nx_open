@@ -1242,6 +1242,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     if (media->dataType != QnAbstractMediaData::EMPTY_DATA)
     {
+        m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
         bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
 
         m_timeMutex.lock();

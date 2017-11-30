@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/http_client.h>

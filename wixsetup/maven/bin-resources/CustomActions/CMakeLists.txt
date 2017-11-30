@@ -11,6 +11,12 @@ if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
+if(CMAKE_CL_64)
+    set(arch "x64")
+else()
+    set(arch "x86")
+endif()
+
 set(vsPath "vs2015")
 if (CMAKE_CXX_COMPILER_VERSION MATCHES "19.*")
     set(vsPath "vs2017")

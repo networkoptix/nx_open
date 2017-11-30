@@ -742,8 +742,8 @@ TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCamera)
 
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
-    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewFootagePermission));
-    ASSERT_FALSE(hasPermission(user, camera, Qn::ExportPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 
     // Password changed
     camera->setCameraCapabilities(Qn::SetUserPasswordCapability);

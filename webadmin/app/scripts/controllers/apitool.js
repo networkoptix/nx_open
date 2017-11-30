@@ -1,31 +1,6 @@
 'use strict';
 
 angular.module('webadminApp')
-    .filter('highlight', ["$sce",function($sce) {
-        return function(text, phrase) {
-          if (phrase) text = text.replace(new RegExp('('+phrase+')', 'gi'),
-            '<span class="highlighted">$1</span>')
-
-          return $sce.trustAsHtml(text)
-        }
-    }])
-    .filter('escape', function() {
-        var entityMap = {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;',
-          '/': '&#x2F;',
-          '`': '&#x60;',
-          '=': '&#x3D;'
-        };
-        return function(text) {
-            return String(text).replace(/[&<>"'`=\/]/g, function (s) {
-                return entityMap[s];
-            });
-        }
-    })
     .controller('ApiToolCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$routeParams',
                                 '$location', '$timeout', 'systemAPI',
     function ($scope, mediaserver, $sessionStorage, $routeParams,

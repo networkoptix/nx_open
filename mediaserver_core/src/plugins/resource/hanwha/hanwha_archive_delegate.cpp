@@ -40,11 +40,11 @@ bool HanwhaArchiveDelegate::open(const QnResourcePtr &/*resource*/,
     AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 {
     m_streamReader->setRateControlEnabled(m_rateControlEnabled);
-    const auto result = (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());
-    if (!result && m_errorHandler)
+    m_lastOpenResult = m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+    if (!m_lastOpenResult && m_errorHandler)
         m_errorHandler(lit("Can not open stream"));
 
-    return result;
+    return (bool) m_lastOpenResult;
 }
 
 void HanwhaArchiveDelegate::close()
@@ -92,6 +92,12 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
             m_streamReader->setPositionUsec(m_currentPositionUsec);
         if (!open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr))
         {
+            if (m_lastOpenResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+            {
+                return QnCompressedMetadata::createMediaEventPacket(
+                    isForwardDirection() ? DATETIME_NOW : 0,
+                    Qn::MediaStreamEvent::TooManyOpenedConnections);
+            }
             if (m_errorHandler)
                 m_errorHandler(lit("Can not open stream."));
             return QnAbstractMediaDataPtr();
@@ -214,9 +220,9 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
     }
 }
 
-void HanwhaArchiveDelegate::setClientId(const QnUuid& id)
+void HanwhaArchiveDelegate::setGroupId(const QByteArray& id)
 {
-    m_streamReader->setClientId(id);
+    m_streamReader->setClientId(QnUuid(id));
 }
 
 void HanwhaArchiveDelegate::beforeSeek(qint64 time)
@@ -227,11 +233,6 @@ void HanwhaArchiveDelegate::beforeSeek(qint64 time)
 void HanwhaArchiveDelegate::setRateControlEnabled(bool enabled)
 {
     m_rateControlEnabled = enabled;
-}
-
-void HanwhaArchiveDelegate::setOverlappedId(int overlappedId)
-{
-    m_streamReader->setOverlappedId(overlappedId);
 }
 
 bool HanwhaArchiveDelegate::setQuality(

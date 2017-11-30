@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/app_info.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/stree/node.h>

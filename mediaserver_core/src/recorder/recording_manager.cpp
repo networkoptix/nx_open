@@ -270,7 +270,10 @@ bool QnRecordingManager::startOrStopRecording(
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
-    bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
+    bool needRecordCamera =
+        !isResourceDisabled(res) &&
+        !cameraRes->isDtsBased() &&
+        !cameraRes->needsToChangeDefaultPassword();
 
     bool someRecordingIsPresent = false;
 
@@ -678,7 +681,7 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
     if (auto camRes = res.dynamicCast<QnSecurityCamResource>())
         archiveDelegate = camRes->createArchiveDelegate();
     if (!archiveDelegate)
-        archiveDelegate = new QnServerArchiveDelegate(); // default value
+        archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
     if (!archiveDelegate)
         return nullptr;
 

@@ -39,6 +39,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx {
 namespace client {
@@ -235,6 +236,12 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (!period.isValid() && !bookmark.isValid())
         return;
 
+    const auto centralResource = widget
+        ? widget->resource()->toResourcePtr()
+        : mediaResource->toResourcePtr();
+    const bool hasPermission = accessController()->hasPermissions(centralResource,
+        Qn::ExportPermission);
+
     const bool isBookmark = bookmark.isValid();
 
     const auto isFileNameValid =
@@ -261,7 +268,19 @@ void WorkbenchExportHandler::handleExportVideoAction()
         };
 
     QScopedPointer<ExportSettingsDialog> dialog;
-    if (widget)
+    if (!hasPermission)
+    {
+        if (!widget || !period.isValid())
+            return;
+
+        dialog.reset(new ExportSettingsDialog(
+            widget->item()->layout()->resource(),
+            tr("You have no permissions to export central widget."),
+            period,
+            isFileNameValid,
+            mainWindowWidget()));
+    }
+    else if (widget)
     {
         if (isBookmark)
         {
@@ -318,7 +337,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             const auto settings = dialog->exportMediaSettings();
             exportProcessId = d->initExport(settings.fileName);
 
-            if (FileExtensionUtils::isExecutable(settings.fileName.extension))
+            if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
                 ExportLayoutSettings layoutSettings;
                 layoutSettings.filename = settings.fileName;

@@ -11,64 +11,86 @@ namespace test {
 
 namespace {
 
-class Vector: public std::vector<int>
+class MergeSortedLists: public ::testing::Test
 {
-    using base_type = std::vector<int>;
-
-public:
-    Vector(): base_type() {}
-    Vector(Vector&& other): base_type(other) {}
-    Vector(const std::initializer_list<int>& init): base_type(init) {}
-    Vector(const Vector& other): base_type(other)
+protected:
+    class Vector: public std::vector<int>
     {
-        if (detectCopy)
-            check_deep_copy();
+        using base_type = std::vector<int>;
+
+    public:
+        Vector(const MergeSortedLists* test = nullptr): base_type(), test(test) {}
+        Vector(Vector&& other): base_type(other), test(other.test) {}
+        Vector(const Vector& other): base_type(other), test(other.test)
+        {
+            if (!test || test->m_detectCopy)
+                check_deep_copy();
+        }
+
+        Vector& operator=(const Vector& other)
+        {
+            base_type::operator=(other);
+            test = other.test;
+            if (!test || test->m_detectCopy)
+                check_deep_copy();
+            return *this;
+        }
+
+    private:
+        void check_deep_copy() const
+        {
+            const bool deep_copied = !empty();
+            ASSERT_FALSE(deep_copied);
+        }
+
+        const MergeSortedLists* test = nullptr;
+    };
+
+    Vector createVector(const std::initializer_list<int>& init) const
+    {
+        auto result = Vector(this);
+        result.insert(result.end(), init.begin(), init.end());
+        return result;
     }
 
-    static thread_local bool detectCopy;
-
-private:
-    void check_deep_copy() const
+    std::vector<Vector> testLists()
     {
-        const bool deep_copied = !empty();
-        ASSERT_FALSE(deep_copied);
+        QScopedValueRollback<bool> rollback(m_detectCopy, false);
+        return std::vector<Vector>{
+            createVector({1, 3, 5}),
+            createVector({2, 4}),
+            createVector({}),
+            createVector({8, 9, 10, 11, 12, 13}),
+            createVector({6}),
+            createVector({7}),
+            createVector({})};
+    };
+
+    Vector testResult()
+    {
+        QScopedValueRollback<bool> rollback(m_detectCopy, false);
+        return createVector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});
     }
+
+    Vector singleTestVector()
+    {
+        QScopedValueRollback<bool> rollback(m_detectCopy, false);
+        return createVector({10, 20, 30});
+    }
+
+protected:
+    bool m_detectCopy = true;
 };
-
-thread_local bool Vector::detectCopy = true;
-
-std::vector<Vector> testLists()
-{
-    QScopedValueRollback<bool> rollback(Vector::detectCopy, false);
-    return std::vector<Vector>{
-        {1, 3, 5},
-        {2, 4},
-        {},
-        {8, 9, 10, 11, 12, 13},
-        {6},
-        {7},
-        {}};
-}
-
-Vector testResult()
-{
-    return Vector({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});
-}
-
-Vector singleTestVector()
-{
-    return Vector({10, 20, 30});
-}
 
 } // namespace
 
-TEST(MergeSortedLists, AscendingOrder)
+TEST_F(MergeSortedLists, AscendingOrder)
 {
     const auto result = nx::utils::algorithm::merge_sorted_lists(testLists());
     ASSERT_EQ(result, testResult());
 }
 
-TEST(MergeSortedLists, DescendingOrder)
+TEST_F(MergeSortedLists, DescendingOrder)
 {
     const auto result = nx::utils::algorithm::merge_sorted_lists(testLists(),
         [](int value) { return -value; }, Qt::DescendingOrder);
@@ -76,7 +98,7 @@ TEST(MergeSortedLists, DescendingOrder)
     ASSERT_EQ(result, testResult());
 }
 
-TEST(MergeSortedLists, Limit)
+TEST_F(MergeSortedLists, LimitResults)
 {
     const auto limit = 5;
     const auto result = nx::utils::algorithm::merge_sorted_lists(testLists(),
@@ -87,40 +109,40 @@ TEST(MergeSortedLists, Limit)
     ASSERT_EQ(result, expected);
 }
 
-TEST(MergeSortedLists, NoLists)
+TEST_F(MergeSortedLists, NoLists)
 {
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::vector<Vector>());
     ASSERT_TRUE(result.empty());
 }
 
-TEST(MergeSortedLists, EmptyLists)
+TEST_F(MergeSortedLists, EmptyLists)
 {
-    std::vector<Vector> lists({Vector(), Vector(), Vector()});
+    std::vector<Vector> lists({createVector({}), createVector({}), createVector({})});
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_TRUE(result.empty());
 }
 
-TEST(MergeSortedLists, OneList)
+TEST_F(MergeSortedLists, OneList)
 {
-    Vector::detectCopy = false;
+    m_detectCopy = false;
     std::vector<Vector> lists({singleTestVector()});
-    Vector::detectCopy = true;
+    m_detectCopy = true;
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_EQ(result, singleTestVector());
 }
 
-TEST(MergeSortedLists, OneEmptyList)
+TEST_F(MergeSortedLists, OneEmptyList)
 {
-    std::vector<Vector> lists({Vector()});
+    std::vector<Vector> lists({createVector({})});
     const auto result = nx::utils::algorithm::merge_sorted_lists(lists);
     ASSERT_TRUE(result.empty());
 }
 
-TEST(MergeSortedLists, OneNonEmptyList)
+TEST_F(MergeSortedLists, OneNonEmptyList)
 {
-    Vector::detectCopy = false;
-    std::vector<Vector> lists({{}, {}, singleTestVector()});
-    Vector::detectCopy = true;
+    m_detectCopy = false;
+    std::vector<Vector> lists({createVector({}), createVector({}), singleTestVector()});
+    m_detectCopy = true;
     const auto result = nx::utils::algorithm::merge_sorted_lists(std::move(lists));
     ASSERT_EQ(result, singleTestVector());
 }

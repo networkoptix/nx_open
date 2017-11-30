@@ -14,7 +14,7 @@
 #include <nx/utils/log/log.h>
 #include "client/client_settings.h"
 #include <network/authutil.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 QnMergeSystemsTool::QnMergeSystemsTool(QObject* parent):
     QObject(parent),

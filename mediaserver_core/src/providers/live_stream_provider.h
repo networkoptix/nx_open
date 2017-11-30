@@ -26,16 +26,6 @@
 static const int  META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
-namespace nx {
-namespace analytics {
-
-class NaiveDetectionSmoother;
-
-} // namespace analytics
-} // namespace nx
-
-class QnLiveStreamProvider;
-
 class QnLiveStreamProvider:
     public QnAbstractMediaStreamDataProvider
 {
@@ -87,6 +77,7 @@ public:
     void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
+
 protected:
     QnAbstractCompressedMetadataPtr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -111,6 +102,8 @@ private:
         const QnCompressedVideoDataPtr& videoData,
         const QnLiveStreamParams& liveParams,
         bool isCameraConfigured);
+
+    void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
 
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened

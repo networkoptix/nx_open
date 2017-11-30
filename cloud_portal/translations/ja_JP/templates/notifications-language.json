@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"アカウントを確認"
+  "activate_account": {
+    "emailSubject": "アカウントを確認"
   },
-  "restore_password":{
-    "emailSubject":"パスワードを復元"
+  "restore_password": {
+    "emailSubject": "パスワードを復元"
   },
-  "system_invite":{
-    "emailSubject":"ビデオ システム {{message.system_name}} が共有されました"
+  "system_invite": {
+    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
   },
-  "system_shared":{
-    "emailSubject":"ビデオ システム {{message.system_name}} が共有されました"
+  "system_shared": {
+    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
   },
-  "review_version":{
-    "emailSubject":"バージョン{{message.id}}の準備ができました"
+  "review_version": {
+    "emailSubject": "バージョン{{message.id}}の準備ができました"
   }
 }

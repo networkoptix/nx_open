@@ -1,7 +1,5 @@
 #include "async_http_client_reply.h"
 
-#include "asynchttpclient.h"
-
 QnAsyncHttpClientReply::QnAsyncHttpClientReply(
     const nx_http::AsyncHttpClientPtr& client,
     QObject* parent)

@@ -1,6 +1,7 @@
 'Test to check if coredump collection works'
 
 import os
+
 import pytest
 
 

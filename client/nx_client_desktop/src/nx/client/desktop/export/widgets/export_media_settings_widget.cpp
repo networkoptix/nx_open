@@ -29,6 +29,9 @@ bool ExportMediaSettingsWidget::applyFilters() const
 
 void ExportMediaSettingsWidget::setApplyFilters(bool value)
 {
+    if (value && !transcodingAllowed())
+        return;
+
     ui->filtersCheckBox->setChecked(value);
 }
 

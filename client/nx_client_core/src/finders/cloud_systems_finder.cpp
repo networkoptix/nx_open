@@ -7,7 +7,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
 #include <network/system_helpers.h>

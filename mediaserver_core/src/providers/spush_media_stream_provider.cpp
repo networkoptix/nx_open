@@ -5,7 +5,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include <core/resource/camera_resource.h>
 #include <nx/fusion//model_functions.h>
@@ -17,12 +17,10 @@ static const int kErrorDelayTimeoutMs = 100;
 
 static QnAbstractMediaDataPtr createMetadataPacket()
 {
-    QnCompressedMetadataPtr rez(new QnCompressedMetadata(MetadataType::MediaStreamEvent));
-    rez->timestamp = DATETIME_NOW;
+    QnAbstractMediaDataPtr rez = QnCompressedMetadata::createMediaEventPacket(
+        DATETIME_NOW,
+        Qn::MediaStreamEvent::TooManyOpenedConnections);
     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-    auto data = QnLexical::serialized(Qn::MediaStreamEvent::TooManyOpenedConnections).toUtf8();
-    rez->setData(data.data(), data.size());
-
     QnSleep::msleep(50);
     return rez;
 }
@@ -89,11 +87,13 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     onStreamReopen();
     m_FrameCnt = 0;
     bool isInitialized = m_resource->isInitialized();
-    if (!isInitialized) {
+    if (!isInitialized)
+    {
         if (m_openStreamResult)
             m_openStreamResult = CameraDiagnostics::InitializationInProgress();
     }
-    else {
+    else
+    {
         m_currentLiveParams = getLiveParams();
         m_openStreamResult = openStreamInternal(isControlRequired, m_currentLiveParams);
         m_needControlTimer.restart();

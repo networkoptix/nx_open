@@ -23,7 +23,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_advanced_param.h>
 
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 #include "soap_wrapper.h"
 
@@ -263,7 +263,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    bool detectVideoSourceCount();
+    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
@@ -316,6 +316,7 @@ protected:
 
     void setMaxFps(int f);
     void setPrimaryResolution(const QSize& value);
+
 private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
@@ -325,7 +326,6 @@ private:
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
 
-    CameraDiagnostics::Result fetchVideoSourceToken();
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
@@ -372,6 +372,7 @@ protected:
 
     bool createPullPointSubscription();
     bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
+    void setMaxChannels(int value);
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 

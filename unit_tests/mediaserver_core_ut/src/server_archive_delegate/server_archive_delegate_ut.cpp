@@ -480,7 +480,7 @@ TEST_F(ServerArchiveDelegatePlaybackTest, Main)
 
     QnFfmpegInitializer ffmpegHolder;
 
-    QnServerArchiveDelegate archiveDelegate;
+    QnServerArchiveDelegate archiveDelegate(qnServerModule);
     archiveDelegate.open(cameraResource, /*archiveIntegrityWatcher*/ nullptr);
     archiveDelegate.setQuality(MEDIA_Quality_High, true, QSize());
     archiveDelegate.seek(0, true);

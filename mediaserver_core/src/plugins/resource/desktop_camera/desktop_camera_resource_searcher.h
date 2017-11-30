@@ -5,7 +5,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/url.h>

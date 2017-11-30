@@ -48,6 +48,10 @@ to view more bookmarks</source>
       <source>Delete bookmark</source>
       <translation>ลบ​บุ๊ค​มา​ร์ค</translation>
     </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation type="unfinished">Export bookmark</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -477,22 +481,6 @@ to view more bookmarks</source>
       <translation>ซ่อนข้อมูล</translation>
     </message>
     <message>
-      <source>Change Resolution...</source>
-      <translation>เปลี่ยนความละเอียด...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>อัตโนมัติ</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>ต่ำ</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>สูง</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -705,14 +693,6 @@ to view more bookmarks</source>
       <translation>ผสานการเชื่อมต่อกับระบบปัจจุบัน...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>เปลี่ยนเซลล์อัตราส่วน...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>เปลี่ยนระยะห่างของเซลล์...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>ไม่มี</translation>
     </message>
@@ -872,6 +852,34 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>ทำ Showreel</translation>
     </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation type="unfinished">Start Analytics...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation type="unfinished">Some cameras require passwords to be set</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation type="unfinished">Export Video...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>ส่งออกบุ๊ก...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation type="unfinished">Resolution...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation type="unfinished">Cell Aspect Ratio...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation type="unfinished">Cell Spacing...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -961,6 +969,64 @@ to view more bookmarks</source>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
       <translation>รหัสฮาร์ดแวร์ของเซิร์ฟเวอร์ที่มีใบอนุญาตนี้ไม่ตรงกับหมายเลขฮาร์ดแวร์ที่เปิดใช้งานใบอนุญาต</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .EXE files.</source>
+      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation type="unfinished">Audio Video Interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation type="unfinished">Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation type="unfinished">MPEG-4 Part 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation type="unfinished">%1 Media File</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation type="unfinished">Executable %1 Media File (x86)</translation>
     </message>
   </context>
   <context>
@@ -1078,10 +1144,6 @@ to view more bookmarks</source>
       <translation>สั้น</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>รหัสผ่านของคุณ จะต้องมีความยาวอย่างน้อย 6 ตัวอักษร</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>ทั่วไป</translation>
     </message>
@@ -1096,6 +1158,44 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น</translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation type="unfinished">Long</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation type="unfinished">
+        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation type="unfinished">
+        <numerusform>Password must be at least %n characters long.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation type="unfinished">
+        <numerusform>Password must be no longer than %n characters.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1230,13 +1330,6 @@ to view more bookmarks</source>
     <message>
       <source>Client is not connected to any System</source>
       <translation>ไคลเอ็นต์ไม่ได้เชื่อมต่อกับระบบใด ๆ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>อ่านเท่านั้น</translation>
     </message>
   </context>
   <context>
@@ -2100,6 +2193,15 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message numerus="yes">
+      <source>Analytics is not available for %1</source>
+      <translation type="unfinished">
+        <numerusform>Analytics is not available for %1</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
@@ -2196,6 +2298,26 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>รอง</translation>
+    </message>
+    <message>
+      <source>Don&apos;t change</source>
+      <translation type="unfinished">Don&apos;t change</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>ต่ำ</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>ปานกลาง</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>สูง</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation type="unfinished">Edge</translation>
     </message>
   </context>
   <context>
@@ -2369,6 +2491,29 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+    </message>
+    <message>
+      <source>New Password</source>
+      <translation>สร้างรหัสผ่านใหม่</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation type="unfinished">Repeat Password</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>รหัสผ่านไม่ตรงกัน.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
@@ -2446,6 +2591,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation type="unfinished">Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation type="unfinished">Less Settings</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation type="unfinished">More Settings</translation>
     </message>
   </context>
   <context>
@@ -2977,6 +3134,27 @@ to %1</source>
     <message>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>คุณสามารถสร้างการสำรองข้อมูลสำหรับการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีของความล้มเหลว.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation type="unfinished">This camera requires password to be set up.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
+    </message>
+    <message>
+      <source> Ask your system administrator to do it.</source>
+      <translation type="unfinished"> Ask your system administrator to do it.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set Password</source>
+      <translation type="unfinished">
+        <numerusform>Set Password</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3515,38 +3693,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>กำลังส่งออกไปที่ "%1"...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>ไม่สามารถส่งออกอุปกรณ์ %1.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>ไม่สามารถส่งออก กล้อง %1.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>ไม่รู้จักข้อผิดพลาดที่เกิดขึ้น.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>ไม่สามารถส่งออกโมดูล I/O%1.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>ไม่สามารถสร้างไฟล์ที่ส่งออก%1...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
       <source>Select file...</source>
@@ -4010,12 +4156,6 @@ to %1</source>
   <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>ใช้ใบอนุญาตแบบอะนาล็อกเพื่อดูกล้องเหล่านี้%n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
         <numerusform>ใช้ใบอนุญาตสำหรับอุปกรณ์ที่เลือก %n</numerusform>
@@ -4031,6 +4171,12 @@ to %1</source>
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
         <numerusform>ใช้ใบอนุญาตสำหรับ%n เลือกโมดูล I/O</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Use licenses to view these %n cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -4275,6 +4421,12 @@ to %1</source>
       <source>Disabled by schedule</source>
       <translation>ปิดใช้งานตามกำหนดเวลา</translation>
     </message>
+    <message numerus="yes">
+      <source>Set For All %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set For All %n Cameras</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4415,6 +4567,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>หยุดก่อนหน้า</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4507,6 +4663,10 @@ to %1</source>
     <message>
       <source>Acknowledge</source>
       <translation>รับทราบ</translation>
+    </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation type="unfinished">Set Passwords</translation>
     </message>
   </context>
   <context>
@@ -5872,6 +6032,18 @@ to %1</source>
       <source>Please check authentication information</source>
       <translation>โปรดตรวจสอบข้อมูลการตรวจสอบสิทธิ์</translation>
     </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation type="unfinished">PASSWORD REQUIRED</translation>
+    </message>
+    <message>
+      <source>Set For This Camera</source>
+      <translation type="unfinished">Set For This Camera</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6166,10 +6338,6 @@ to %1</source>
       <translation>ระบบในเซฟโหมด</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>ที่จัดเก็บข้อมูลเต็ม</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>การจัดเก็บข้อมูลไม่ได้กำหนดค่า</translation>
     </message>
@@ -6212,10 +6380,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>ดัชนีเก็บสร้างใหม่จะถูกยกเลิกโดยผู้ใช้บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>ที่จัดเก็บข้อมูลเต็มบนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6291,6 +6455,10 @@ to %1</source>
       <source>Remote archive synchronization</source>
       <translation type="unfinished">Remote archive synchronization</translation>
     </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation type="unfinished">Archive integrity problem detected</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -6352,16 +6520,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>เวลาของระบบถูกซิงโครไนซ์กับอินเทอร์เน็ตและไม่ขึ้นกับเวลาท้องถิ่นของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>เวลาระบบถูกซิงโครไนซ์กับเวลาท้องถิ่นของเซิร์ฟเวอร์ที่เลือกและไม่ขึ้นกับเซิร์ฟเวอร์อื่น ๆ</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>ไม่มีเซิร์ฟเวอร์ที่มีการเข้าถึงอินเทอร์เน็ต เวลาไม่ได้ซิงโครไนซ์</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
@@ -6971,177 +7139,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>รูปแบบการส่งออก</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>ส่งวิดีโอออกเป็น...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>ประทับเวลา:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>การส่งออกวิดีโอ</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>กำลังส่งออกไปที่ "%1"...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>ส่งออกเป็นเค้าโครง...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 สื่อไฟล์ (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>การกรอง: หมุน หหการเพิ่มประสิทธิภาพของภาพที่กำหนดเองอัตราส่วน (ต้องแปลง)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>การส่งออก</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>การประทับเวลาไม่มี</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>มุมซ้ายด้านบน (ต้องแปลง)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>มุมขวาบน (ต้องแปลง)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>ล่างซ้ายมุม (ต้องแปลง)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>มุมขวาล่าง (ต้องแปลง)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>บันทึกหน้าต่างเป็น...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>ทำให้ไฟล์อ่านอย่างเดียว.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>ไฟล์ที่ใช้ในการบันทึกแล้ว</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>โปรดเลือกชื่ออื่นหรือรอจนกว่าการบันทึกจะเสร็จสิ้น</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>คุณกำลังจะส่งออกวิดีโอยาว</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>อาจต้องใช้พื้นที่ฮาร์ดดิสก์กิกะไบต์กิกะไบต์และใช้เวลาหลายนาทีในการดำเนินการ</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>ส่งออกหรือไม่?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>ส่งออกไปยัง AVI ได้หรือไม่?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>เพื่อหลีกเลี่ยงการลดขนาดวิดีโอแนะนำให้ใช้รูปแบบ NOV หรือ EXE สำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>ส่งออกด้วยการแปลงรหัส?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>ส่งออกไปยัง EXE หรือไม่?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>ไม่สามารถส่งออกวิดีโอได้หลายรายการ</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>ไฟล์ท้องถิ่นไม่ได้รับอนุญาตสำหรับการส่งออกวิดีโอหลายรายการ</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>โปรดลบไฟล์ในระบบทั้งหมดออกจากเค้าโครงและลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>ส่งออก</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>คุณกำลังจะส่งออกวิดีโอเป็นจำนวนมาก</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>เลือกระยะเวลาสั้นเกินไป</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>สำหรับการส่งออกเป็น Rapid Review ความยาววิดีโอควรมีอย่างน้อย 10 วินาที</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>การส่งออกเสร็จสมบูรณ์</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>ไม่สามารถส่งออกวิดีโอ</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>ไม่แนะนำให้ใช้รูปแบบ AVI</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>สำหรับการส่งออก MKV แบบไม่ต่อเนื่องหรือรูปแบบอื่น ๆ แนะนำ</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>ไฟล์ EXE ที่มากกว่า 4 GB ไม่สามารถเปิดโดยคลิกสองครั้งเนื่องจากมีข้อจำกัดของ Windows</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -7633,6 +7630,458 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation type="unfinished">Dynamic</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation type="unfinished">Unsupported media for data export.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation type="unfinished">FFMPEG library error.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation type="unfinished">File write error.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation type="unfinished">No data was exported.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation type="unfinished">Internal error</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>การส่งออก</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>ส่งออก</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation type="unfinished">Rapid Review</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation type="unfinished">Add Timestamp</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation type="unfinished">Delete Timestamp</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation type="unfinished">Timestamp</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation type="unfinished">Add Image</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation type="unfinished">Delete Image</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation type="unfinished">Image</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation type="unfinished">Add Text</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation type="unfinished">Delete Text</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation type="unfinished">Text</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation type="unfinished">Reset Speed</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation type="unfinished">Add Bookmark Info</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation type="unfinished">Delete Bookmark Info</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation type="unfinished">Bookmark Info</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation type="unfinished">Folder</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>ชื่อ</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>ชื่อไม่สามารถเว้นว่างได้</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>เลือกโฟลเดอร์...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>เลือกไฟล์...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation type="unfinished">Pictures (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>ข้อผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation type="unfinished">Image cannot be loaded.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>ไม่มมีข้อมูล</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation type="unfinished">NOT A CAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>ต่ำ</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>สูง</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation type="unfinished">
+        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation type="unfinished">Long</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>สั้น</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation type="unfinished">%1 Analytics</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation type="unfinished">Stop Export</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>การส่งออกเสร็จสมบูรณ์</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation type="unfinished">Export failed</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>ไม่สามารถสร้างไฟล์ที่ส่งออก%1...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>ไม่รู้จักข้อผิดพลาดที่เกิดขึ้น.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>กำลังส่งออกไปที่ "%1"...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>ไม่สามารถส่งออกอุปกรณ์ %1.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>ไม่สามารถส่งออก กล้อง %1.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>ไม่สามารถส่งออกโมดูล I/O%1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>ไฟล์ที่ใช้ในการบันทึกแล้ว</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>โปรดเลือกชื่ออื่นหรือรอจนกว่าการบันทึกจะเสร็จสิ้น</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>รูปแบบการส่งออก</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video</source>
+      <translation>คุณกำลังจะส่งออกวิดีโอยาว</translation>
+    </message>
+    <message>
+      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>อาจต้องใช้พื้นที่ฮาร์ดดิสก์กิกะไบต์กิกะไบต์และใช้เวลาหลายนาทีในการดำเนินการ</translation>
+    </message>
+    <message>
+      <source>Export anyway?</source>
+      <translation>ส่งออกหรือไม่?</translation>
+    </message>
+    <message>
+      <source>Export Video As...</source>
+      <translation>ส่งวิดีโอออกเป็น...</translation>
+    </message>
+    <message>
+      <source>No Timestamp</source>
+      <translation>การประทับเวลาไม่มี</translation>
+    </message>
+    <message>
+      <source>Top Left Corner (requires transcoding)</source>
+      <translation>มุมซ้ายด้านบน (ต้องแปลง)</translation>
+    </message>
+    <message>
+      <source>Top Right Corner (requires transcoding)</source>
+      <translation>มุมขวาบน (ต้องแปลง)</translation>
+    </message>
+    <message>
+      <source>Bottom Left Corner (requires transcoding)</source>
+      <translation>ล่างซ้ายมุม (ต้องแปลง)</translation>
+    </message>
+    <message>
+      <source>Bottom Right Corner (requires transcoding)</source>
+      <translation>มุมขวาล่าง (ต้องแปลง)</translation>
+    </message>
+    <message>
+      <source>Timestamps:</source>
+      <translation>ประทับเวลา:</translation>
+    </message>
+    <message>
+      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+      <translation>การกรอง: หมุน หหการเพิ่มประสิทธิภาพของภาพที่กำหนดเองอัตราส่วน (ต้องแปลง)</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended</source>
+      <translation>ไม่แนะนำให้ใช้รูปแบบ AVI</translation>
+    </message>
+    <message>
+      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+      <translation>สำหรับการส่งออก MKV แบบไม่ต่อเนื่องหรือรูปแบบอื่น ๆ แนะนำ</translation>
+    </message>
+    <message>
+      <source>Export to AVI anyway?</source>
+      <translation>ส่งออกไปยัง AVI ได้หรือไม่?</translation>
+    </message>
+    <message>
+      <source>Selected format not recommended</source>
+      <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
+    </message>
+    <message>
+      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
+      <translation>เพื่อหลีกเลี่ยงการลดขนาดวิดีโอแนะนำให้ใช้รูปแบบ NOV หรือ EXE สำหรับกล้องนี้</translation>
+    </message>
+    <message>
+      <source>Export with transcoding?</source>
+      <translation>ส่งออกด้วยการแปลงรหัส?</translation>
+    </message>
+    <message>
+      <source>It will increase CPU usage and may take significant time.</source>
+      <translation>จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
+    </message>
+    <message>
+      <source>Exporting Video</source>
+      <translation>การส่งออกวิดีโอ</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>กำลังส่งออกไปที่ "%1"...</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>ไฟล์ EXE ที่มากกว่า 4 GB ไม่สามารถเปิดโดยคลิกสองครั้งเนื่องจากมีข้อจำกัดของ Windows</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>ส่งออกไปยัง EXE หรือไม่?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>ไม่สามารถส่งออกวิดีโอได้หลายรายการ</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>ไฟล์ท้องถิ่นไม่ได้รับอนุญาตสำหรับการส่งออกวิดีโอหลายรายการ</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>โปรดลบไฟล์ในระบบทั้งหมดออกจากเค้าโครงและลองอีกครั้ง</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>บันทึกหน้าต่างเป็น...</translation>
+    </message>
+    <message>
+      <source>Export Layout As...</source>
+      <translation>ส่งออกเป็นเค้าโครง...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>การส่งออก</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 สื่อไฟล์ (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>ทำให้ไฟล์อ่านอย่างเดียว.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>ส่งออก</translation>
+    </message>
+    <message>
+      <source>You are about to export a lot of video</source>
+      <translation>คุณกำลังจะส่งออกวิดีโอเป็นจำนวนมาก</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>เลือกระยะเวลาสั้นเกินไป</translation>
+    </message>
+    <message>
+      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
+      <translation>สำหรับการส่งออกเป็น Rapid Review ความยาววิดีโอควรมีอย่างน้อย 10 วินาที</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>การส่งออกเสร็จสมบูรณ์</translation>
+    </message>
+    <message>
+      <source>Failed to export video</source>
+      <translation>ไม่สามารถส่งออกวิดีโอ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation type="unfinished">No event types supported</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7968,6 +8417,14 @@ to %1</source>
     <message>
       <source>Failed to open server web page</source>
       <translation>ไม่สามารถเปิดเว็บเซิร์ฟเวอร์ได้</translation>
+    </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation type="unfinished">Failed to change password</translation>
+    </message>
+    <message>
+      <source>Failed to change passwords on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>

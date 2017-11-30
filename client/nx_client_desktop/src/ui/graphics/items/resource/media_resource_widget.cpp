@@ -452,7 +452,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
     if (id != m_itemId)
         return;
 
-    switch(role)
+    switch (role)
     {
         case Qn::ItemPausedRole:
         {
@@ -480,7 +480,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
             break;
         }
         case Qn::ItemSpeedRole:
-                display()->archiveReader()->setSpeed(data.toDouble());
+            display()->archiveReader()->setSpeed(data.toDouble());
             break;
         default:
             break;
@@ -785,7 +785,7 @@ void QnMediaResourceWidget::createButtons()
     {
         auto analyticsButton =
             createStatisticAwareButton(lit("media_widget_analytics"));
-        analyticsButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        analyticsButton->setIcon(qnSkin->icon("item/analytics.png"));
         analyticsButton->setCheckable(true);
         analyticsButton->setToolTip(lit("Analytics"));
         connect(analyticsButton, &QnImageButtonWidget::toggled, this,
@@ -2096,7 +2096,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (d->camera)
     {
-        if (d->camera->needsToChangeDefaultPassword())
+        if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
 
         const Qn::Permission requiredPermission = d->isPlayingLive()
@@ -2688,9 +2688,6 @@ bool QnMediaResourceWidget::isAnalyticsEnabled() const
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
 {
     if (!d->analyticsMetadataProvider)
-        return;
-
-    if (analyticsEnabled == isAnalyticsEnabled())
         return;
 
     if (!analyticsEnabled)

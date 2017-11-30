@@ -25,7 +25,6 @@ FisheyeCalibrationWidget::FisheyeCalibrationWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->loadingWidget->setText(tr("Loading preview, please wait..."));
-
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    ui->imageWidget,    &FisheyeCalibrationImageWidget::setCenter);
     connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    ui->imageWidget,    &FisheyeCalibrationImageWidget::setRadius);
     connect(m_calibrator,       &QnFisheyeCalibrator::stretchChanged,   ui->imageWidget,    &FisheyeCalibrationImageWidget::setStretch);

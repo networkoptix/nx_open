@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout','dialogs', 'urlProtocol', '$base64',
-        function ($scope, cloudApi, account, process, $q, $timeout, dialogs, urlProtocol, $base64) {
+    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout',
+                'dialogs', 'urlProtocol', '$base64', 'systemsProvider',
+        function ($scope, cloudApi, account, process, $q, $timeout,
+                  dialogs, urlProtocol, $base64, systemsProvider) {
 
         account.requireLogin();
 
@@ -128,4 +130,25 @@ angular.module('cloudApp')
                 $scope.linkSettings.auth = 'couldn\'t retrieve temporary auth_key from cloud_portal';
             });
         }
+
+
+
+        $scope.systemsProvider = systemsProvider;
+        $scope.$watch('systemsProvider.systems', function(){
+            $scope.systems = $scope.systemsProvider.systems;
+        });
+        $scope.mergeSettings={
+            masterSystemId:null,
+            slaveSystemId:null
+        }
+        $scope.mergeSystems = function(){
+            $scope.mergeSettings.result = 'working';
+            cloudApi.merge($scope.mergeSettings.masterSystemId,$scope.mergeSettings.slaveSystemId).then(function(success){
+                $scope.mergeSettings.result = JSON.stringify(success, null, 2);
+            },function(error){
+                $scope.mergeSettings.result = JSON.stringify(error, null, 2);
+            });
+        }
+
+
     }]);

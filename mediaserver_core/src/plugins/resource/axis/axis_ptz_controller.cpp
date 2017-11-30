@@ -6,7 +6,7 @@
 
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 
 #include <core/resource_management/resource_data_pool.h>

@@ -757,26 +757,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
-        .condition(ConditionWrapper(new ExportCondition(true))
-            && condition::isTrue(nx::client::desktop::ini().universalExportDialog));
-
-    factory(ExportTimeSelectionAction)
-        .flags(Slider | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Export Selected Area..."))
-        .condition(ConditionWrapper(new ExportCondition(true))
-            && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
-
-    factory(ExportLayoutAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(ContextMenu::tr("Export Multi-Video..."))
-        .condition(ConditionWrapper(new ExportCondition(false))
-            && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
-
-    factory(ExportRapidReviewAction)
-        .flags(Slider | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Export Rapid Review..."))
-        .condition(ConditionWrapper(new ExportCondition(true))
-            && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
+        .condition(ConditionWrapper(new ExportCondition(false)));
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)

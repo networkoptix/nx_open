@@ -5,9 +5,9 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 namespace {
     const QRegExp DW_RES_SETTINGS_FILTER(QLatin1String("[{},']"));

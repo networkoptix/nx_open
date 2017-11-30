@@ -830,7 +830,7 @@
 
     "nx::client::desktop::ui::SelectableTextButton": {
         "palette": {
-            "_": "selected",
+            "_1": "selected",
             "active": {
                 "window": "dark5",
                 "dark": "dark5",
@@ -839,7 +839,7 @@
                 "windowText": "light10",
                 "text": "light10"
             },
-            "_": "not selected",
+            "_2": "not selected",
             "inactive": {
                 "window": "dark10",
                 "dark": "dark6",

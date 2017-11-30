@@ -4,6 +4,10 @@
 
 #include <recorder/abstract_remote_archive_synchronization_task.h>
 #include <recorder/remote_archive_synchronizer.h>
+#include <recorder/server_edge_stream_recorder.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/network/buffer.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -17,8 +21,6 @@ class RemoteArchiveSynchronizationTask:
     public AbstractRemoteArchiveSynchronizationTask
 {
     using AbstractRemoteArchiveManager = nx::core::resource::AbstractRemoteArchiveManager;
-    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveChunk;
-    using BufferType = QByteArray;
 
 public:
     RemoteArchiveSynchronizationTask(
@@ -31,43 +33,45 @@ public:
     virtual QnUuid id() const override;
 
 private:
-    bool synchronizeArchive(const QnSecurityCamResourcePtr& resource);
+    bool synchronizeArchive();
 
-    std::vector<RemoteArchiveEntry> filterEntries(
-        const QnSecurityCamResourcePtr& resource,
-        const std::vector<RemoteArchiveEntry>& allEntries);
+    bool writeTimePeriodToArchive(const QnTimePeriod& timePeriod);
 
-    bool copyEntryToArchive(
-        const QnSecurityCamResourcePtr& resource,
-        const RemoteArchiveEntry& entry);
+    bool writeTimePeriodInternal(
+        const QnTimePeriod& timePeriod,
+        const nx::core::resource::RemoteArchiveChunk& chunk);
 
-    bool writeEntry(
-        const QnSecurityCamResourcePtr& resource,
-        const RemoteArchiveEntry& entry,
-        BufferType* buffer,
-        int64_t* outRealDurationMs = nullptr);
+    boost::optional<nx::core::resource::RemoteArchiveChunk> remoteArchiveChunkByTimePeriod(
+        const QnTimePeriod& timePeriod);
 
-    bool convertAndWriteBuffer(
-        const QnSecurityCamResourcePtr& resource,
-        BufferType* buffer,
-        const QString& fileName,
-        int64_t startTimeMs,
-        const QnResourceAudioLayoutPtr& audioLayout,
-        bool needMotion,
-        int64_t* outRealDurationMs);
+    void createArchiveReaderThreadUnsafe(
+        const QnTimePeriod& timePeriod,
+        const nx::core::resource::RemoteArchiveChunk& chunk);
 
-    QnServer::ChunksCatalog chunksCatalogByResolution(const QSize& resolution) const;
+    void createStreamRecorderThreadUnsafe(
+        const QnTimePeriod& timePeriod,
+        const nx::core::resource::RemoteArchiveChunk& chunk);
 
-    bool isMotionDetectionNeeded(
-        const QnSecurityCamResourcePtr& resource,
-        QnServer::ChunksCatalog catalog) const;
+    bool needToReportProgress() const;
+
+    bool saveMotion(const QnConstMetaDataV1Ptr& motion);
 
 private:
+    mutable QnMutex m_mutex;
+    mutable QnWaitCondition m_wait;
     QnSecurityCamResourcePtr m_resource;
-    std::atomic<bool> m_canceled;
+    std::atomic<bool> m_canceled{false};
     std::function<void()> m_doneHandler;
-    int m_totalChunksToSynchronize;
-    int m_currentNumberOfSynchronizedChunks;
+
+    std::chrono::milliseconds m_totalDuration{0};
+    std::chrono::milliseconds m_importedDuration{0};
+
+    std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
+    std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
+
+    std::vector<nx::core::resource::RemoteArchiveChunk> m_chunks;
+    nx::core::resource::RemoteArchiveChunk m_currentChunk;
+    nx::Buffer m_currentChunkBuffer;
 };
 
 } // namespace recorder

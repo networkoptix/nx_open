@@ -13,7 +13,7 @@
 #include "network/tcp_listener.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/auth_tools.h>
 
 #include "universal_tcp_listener.h"

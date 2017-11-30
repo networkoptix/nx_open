@@ -32,6 +32,7 @@ public:
 
     virtual int getChannel() const override;
 
+    virtual void setPlaybackMode(PlaybackMode mode) override;
     virtual void setGroupId(const QByteArray& data) override;
     virtual QnTimePeriodList chunks() override;
     virtual void beforeSeek(qint64 time) override;
@@ -55,6 +56,7 @@ private:
     bool m_ignoreNextSeek;
     qint64 m_lastMediaTime;
     int m_noDataCounter;
+    PlaybackMode m_playbackMode = PlaybackMode::Archive;
 };
 
 #endif // #ifdef ENABLE_VMAX

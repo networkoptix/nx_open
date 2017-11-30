@@ -126,6 +126,16 @@ class System(object):
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
+    @staticmethod
+    @validate_response
+    @lower_case_email
+    def merge(email, password, master_system_id, slave_system_id):
+        request = CLOUD_DB_URL + "/system/{}/merged_systems" % master_system_id
+        params = {
+            'system_id': slave_system_id
+        }
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
 
 class Account(object):
     @staticmethod

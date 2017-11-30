@@ -15,7 +15,7 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
 #include <nx/utils/async_operation_guard.h>

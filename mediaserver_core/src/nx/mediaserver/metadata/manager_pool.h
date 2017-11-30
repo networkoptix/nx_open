@@ -41,6 +41,7 @@ public:
     ~ManagerPool();
     void init();
     void at_resourceAdded(const QnResourcePtr& resource);
+    void at_propertyChanged(const QnResourcePtr& resource, const QString& name);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 

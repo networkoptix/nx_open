@@ -1,7 +1,7 @@
 'use strict';
 
 
-angular.module('webadminApp').directive('fileupload',function(dialogs){
+angular.module('webadminApp').directive('fileupload', ['dialogs', function(dialogs){
     return {
         restrict: 'E',
         template :
@@ -53,4 +53,4 @@ angular.module('webadminApp').directive('fileupload',function(dialogs){
             scope.text = attrs.text || L.fileUpload.selectFiles;
         }
     };
-});
+}]);

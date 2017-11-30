@@ -48,6 +48,8 @@ private:
 
     bool needToReportProgress() const;
 
+    bool saveMotion(const QnConstMetaDataV1Ptr& motion);
+
 private:
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_wait;

@@ -19,6 +19,7 @@ enum class FusionRequestErrorClass
     //!indicates server bug?
     internalError
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorClass)
 
 enum class FusionRequestErrorDetail
 {
@@ -27,6 +28,7 @@ enum class FusionRequestErrorDetail
     deserializationError,
     notAcceptable
 };
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorDetail)
 
 class NX_NETWORK_API FusionRequestResult
 {
@@ -60,17 +62,8 @@ private:
 
 #define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)
 
-/**
- * Not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec.
- */
-
-bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);
-void NX_NETWORK_API serialize(QnJsonContext*, const FusionRequestResult&, class QJsonValue*);
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorClass)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx_http::FusionRequestErrorClass), (lexical))
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorDetail)
-void NX_NETWORK_API serialize(const nx_http::FusionRequestErrorDetail&, QString*);
+QN_FUSION_DECLARE_FUNCTIONS(nx_http::FusionRequestErrorDetail, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx_http::FusionRequestErrorClass, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx_http::FusionRequestResult, (json), NX_NETWORK_API)
 
 } // namespace nx_http

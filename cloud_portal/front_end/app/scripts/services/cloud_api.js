@@ -152,10 +152,10 @@ angular.module('cloudApp')
                 });
             },
             getDownloads:function(){
-                return $http.get(apiBase + '/utils/downloads').catch(function(){
-                    $log.error("TODO: remove this hack before the release");
-                    return cacheGet('/static/downloads.json', true);
-                });
+                return $http.get(apiBase + '/utils/downloads');
+            },
+            getDownloadsHistory:function(build){
+                return $http.get(apiBase + '/utils/downloads/' + (build||'history'));
             },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
@@ -185,6 +185,12 @@ angular.module('cloudApp')
             connect:function(name){
                 return $http.post(apiBase + '/systems/connect', {
                     name: name
+                });
+            },
+            merge:function(masterSystemId, slaveSystemId){
+                return $http.post(apiBase + '/systems/merge', {
+                    master_system_id: masterSystemId,
+                    slave_system_id: slaveSystemId
                 });
             },
             accessRoles: function(systemId){

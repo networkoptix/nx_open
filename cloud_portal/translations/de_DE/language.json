@@ -1,237 +1,237 @@
 {
-  "language_name":"Deutsch",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"Abbrechen",
-    "loginTitle":"Anmelden bei {{PRODUCT_NAME}}",
-    "loginButton":"Anmelden",
-    "logoutAuthorisedTitle":"Sie sind bereits eingeloggt",
-    "logoutAuthorisedContinueButton":"Fortfahren",
-    "logoutAuthorisedLogoutButton":"Abmelden"
+  "language_name": "Deutsch",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Abbrechen",
+    "loginTitle": "Anmelden bei {{PRODUCT_NAME}}",
+    "loginButton": "Anmelden",
+    "logoutAuthorisedTitle": "Sie sind bereits eingeloggt",
+    "logoutAuthorisedContinueButton": "Fortfahren",
+    "logoutAuthorisedLogoutButton": "Abmelden"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Willkommen bei",
-    "register":"Account erstellen bei",
-    "changePassword":"Passwort ändern -",
-    "account":"Accounteinstellungen -",
-    "systems":"Systeme -",
-    "system":"System -",
-    "systemShare":"System freigeben -",
-    "activate":"Account aktivieren -",
-    "activateSent":"Account aktivieren -",
-    "activateSuccess":"Account aktiviert -",
-    "activateCode":"Account aktivieren -",
-    "restorePassword":"Passwort zurücksetzen -",
-    "restorePasswordSuccess":"Passwort gespeichert -",
-    "restorePasswordCode":"Passwort zurücksetzen -",
-    "view":"Kameras ansehen - ",
-    "debug":"Debug",
-    "login":"Anmelden -",
-    "download":"Download {{VMS_NAME}}",
-    "downloadPlatform":"Download {{VMS_NAME}} für ",
-    "pageNotFound":"Seite nicht gefunden"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Willkommen bei",
+    "register": "Account erstellen bei",
+    "changePassword": "Passwort ändern -",
+    "account": "Accounteinstellungen -",
+    "systems": "Systeme -",
+    "system": "System -",
+    "systemShare": "System freigeben -",
+    "activate": "Account aktivieren -",
+    "activateSent": "Account aktivieren -",
+    "activateSuccess": "Account aktiviert -",
+    "activateCode": "Account aktivieren -",
+    "restorePassword": "Passwort zurücksetzen -",
+    "restorePasswordSuccess": "Passwort gespeichert -",
+    "restorePasswordCode": "Passwort zurücksetzen -",
+    "view": "Kameras ansehen - ",
+    "debug": "Debug",
+    "login": "Anmelden -",
+    "download": "Download {{VMS_NAME}}",
+    "downloadPlatform": "Download {{VMS_NAME}} für ",
+    "pageNotFound": "Seite nicht gefunden"
   },
-  "systemStatuses":{
-    "notActivated":"nicht aktiviert",
-    "activated":"aktiviert",
-    "online":"online",
-    "offline":"offline",
-    "unavailable":"nicht verfügbar"
+  "systemStatuses": {
+    "notActivated": "nicht aktiviert",
+    "activated": "aktiviert",
+    "online": "online",
+    "offline": "offline",
+    "unavailable": "nicht verfügbar"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Deaktiviert",
-      "description":"Benutzer ist deaktiviert und kann sich in das System nicht anmelden"
+  "accessRoles": {
+    "disabled": {
+      "label": "Deaktiviert",
+      "description": "Benutzer ist deaktiviert und kann sich in das System nicht anmelden"
     },
-    "Owner":{
-      "label":"Besitzer",
-      "description":"Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen und Systeme von der Cloud zu verbinden/trennen"
+    "Owner": {
+      "label": "Besitzer",
+      "description": "Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen und Systeme von der Cloud zu verbinden/trennen"
     },
-    "Viewer":{
-      "label":"Betrachter",
-      "description":"Kann Livevideos ansehen und das Archiv durchsuchen"
+    "Viewer": {
+      "label": "Betrachter",
+      "description": "Kann Livevideos ansehen und das Archiv durchsuchen"
     },
-    "Live Viewer":{
-      "label":"Live-Betrachter",
-      "description":"Kann nur Livevideos ansehen"
+    "Live Viewer": {
+      "label": "Live-Betrachter",
+      "description": "Kann nur Livevideos ansehen"
     },
-    "Advanced Viewer":{
-      "label":"Erweiterter Betrachter",
-      "description":"Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
+    "Advanced Viewer": {
+      "label": "Erweiterter Betrachter",
+      "description": "Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
     },
-    "Administrator":{
-      "label":"Administrator",
-      "description":"Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen"
+    "Administrator": {
+      "label": "Administrator",
+      "description": "Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen"
     },
-    "Custom":{
-      "label":"Benutzerdefiniert",
-      "description":"Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
+    "Custom": {
+      "label": "Benutzerdefiniert",
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
     },
-    "cloudAdmin":{
-      "label":"Administrator",
-      "description":"Kann System konfigurieren und es freigeben"
+    "cloudAdmin": {
+      "label": "Administrator",
+      "description": "Kann System konfigurieren und es freigeben"
     },
-    "customRole":{
-      "label":"Benutzerdefinierte Rolle",
-      "description":"Benutzerdefinierte Benutzerrolle im System festgelegt"
+    "customRole": {
+      "label": "Benutzerdefinierte Rolle",
+      "description": "Benutzerdefinierte Benutzerrolle im System festgelegt"
     },
-    "owner":{
-      "label":"Besitzer",
-      "description":"Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen und Systeme von der Cloud zu verbinden/trennen"
+    "owner": {
+      "label": "Besitzer",
+      "description": "Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen und Systeme von der Cloud zu verbinden/trennen"
     },
-    "viewer":{
-      "label":"Betrachter",
-      "description":"Kann Livevideos ansehen und das Archiv durchsuchen"
+    "viewer": {
+      "label": "Betrachter",
+      "description": "Kann Livevideos ansehen und das Archiv durchsuchen"
     },
-    "liveViewer":{
-      "label":"Live-Betrachter",
-      "description":"Kann nur Livevideos ansehen"
+    "liveViewer": {
+      "label": "Live-Betrachter",
+      "description": "Kann nur Livevideos ansehen"
     },
-    "advancedViewer":{
-      "label":"Erweiterter Betrachter",
-      "description":"Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
+    "advancedViewer": {
+      "label": "Erweiterter Betrachter",
+      "description": "Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
     },
-    "custom":{
-      "label":"Benutzerdefiniert",
-      "description":"Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
+    "custom": {
+      "label": "Benutzerdefiniert",
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Bestätigungsmail konnte nicht gesendet werden",
-    "cantDisconnectSystemPrefix":"System kann nicht gelöscht werden",
-    "cantUnshareWithMeSystemPrefix":"System kann nicht gelöscht werden",
-    "cantSharePrefix":"System kann nicht freigegeben werden",
-    "cantGetUsersListPrefix":"Benutzerliste ist nicht verfügbar",
-    "cantGetSystemsListPrefix":"Systemliste ist nicht verfügbar",
-    "cantRegisterPrefix":"Ein Fehler ist aufgetreten",
-    "cantGetSystemInfoPrefix":"Systeminfo ist nicht verfügbar",
-    "cantChangeAccountPrefix":"Änderungen können nicht gespeichert werden",
-    "cantChangePasswordPrefix":"Passwort kann nicht gespeichert werden",
-    "cantActivatePrefix":"Account kann nicht aktiviert werden",
-    "cantSendConfirmationPrefix":"Bestätigungsmail konnte nicht gesendet werden",
-    "cloudInvalidResponse":"Cloud-DB hat eine unerwartete Antwort zurückgegeben",
-    "notAuthorized":"E-Mail oder Passwort ungültig",
-    "wrongParameters":"Einige Parameter in dem Formular sind falsch",
-    "wrongCode":"Account ist bereits aktiviert oder der Bestätigungscode ist falsch",
-    "wrongCodeRestore":"Bestätigungscode wurde bereits verwendet oder ist falsch",
-    "forbidden":"Sie haben keine Berechtigung diese Aktion auszuführen",
-    "accountNotActivated":"Dieser Account ist noch nicht aktiviert. <a href=\"/activate\">Bestätigungsmail erneut senden</a>",
-    "accountBlocked":"Dieser Account wurde gesperrt",
-    "notFound":"Nicht gefunden",
-    "alreadyExists":"Dieser Accounts existiert bereits",
-    "unknownError":"Ein unerwarteter Fehler ist aufgetreten",
-    "accountAlreadyActivated":"Dieser Account ist bereits aktiviert",
-    "emailNotFound":"Account existiert nicht",
-    "EmailAlreadyExists":"Diese E-Mail ist bereits registriert",
-    "oldPasswordMistmatch":"Aktuelles Passwort ist falsch",
-    "passwordMismatch":"Falsches Passwort",
-    "cantEditYourself":"Eigene Berechtigungen zu ändern ist nicht erlaubt",
-    "cantEditAdmin":"Dieser Benutzer hat Administratorberechtigungen",
-    "cantOpenClient":"Die Anwendung {{VMS_NAME}} wurde nicht gefunden. <a href=\"/download\">Download</a>",
-    "lostConnection":"Verbindung zu {{systemName}} verloren",
-    "thisSystem":"das System"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Bestätigungsmail konnte nicht gesendet werden",
+    "cantDisconnectSystemPrefix": "System kann nicht gelöscht werden",
+    "cantUnshareWithMeSystemPrefix": "System kann nicht gelöscht werden",
+    "cantSharePrefix": "System kann nicht freigegeben werden",
+    "cantGetUsersListPrefix": "Benutzerliste ist nicht verfügbar",
+    "cantGetSystemsListPrefix": "Systemliste ist nicht verfügbar",
+    "cantRegisterPrefix": "Ein Fehler ist aufgetreten",
+    "cantGetSystemInfoPrefix": "Systeminfo ist nicht verfügbar",
+    "cantChangeAccountPrefix": "Änderungen können nicht gespeichert werden",
+    "cantChangePasswordPrefix": "Passwort kann nicht gespeichert werden",
+    "cantActivatePrefix": "Account kann nicht aktiviert werden",
+    "cantSendConfirmationPrefix": "Bestätigungsmail konnte nicht gesendet werden",
+    "cloudInvalidResponse": "Cloud-DB hat eine unerwartete Antwort zurückgegeben",
+    "notAuthorized": "E-Mail oder Passwort ungültig",
+    "wrongParameters": "Einige Parameter in dem Formular sind falsch",
+    "wrongCode": "Account ist bereits aktiviert oder der Bestätigungscode ist falsch",
+    "wrongCodeRestore": "Bestätigungscode wurde bereits verwendet oder ist falsch",
+    "forbidden": "Sie haben keine Berechtigung diese Aktion auszuführen",
+    "accountNotActivated": "Dieser Account ist noch nicht aktiviert. <a href=\"/activate\">Bestätigungsmail erneut senden</a>",
+    "accountBlocked": "Dieser Account wurde gesperrt",
+    "notFound": "Nicht gefunden",
+    "alreadyExists": "Dieser Accounts existiert bereits",
+    "unknownError": "Ein unerwarteter Fehler ist aufgetreten",
+    "accountAlreadyActivated": "Dieser Account ist bereits aktiviert",
+    "emailNotFound": "Account existiert nicht",
+    "EmailAlreadyExists": "Diese E-Mail ist bereits registriert",
+    "oldPasswordMistmatch": "Aktuelles Passwort ist falsch",
+    "passwordMismatch": "Falsches Passwort",
+    "cantEditYourself": "Eigene Berechtigungen zu ändern ist nicht erlaubt",
+    "cantEditAdmin": "Dieser Benutzer hat Administratorberechtigungen",
+    "cantOpenClient": "Die Anwendung {{VMS_NAME}} wurde nicht gefunden. <a href=\"/download\">Download</a>",
+    "lostConnection": "Verbindung zu {{systemName}} verloren",
+    "thisSystem": "das System"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"Passwort muss mindestens 8 Zeichen enthalten",
-    "requiredMessage":"Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen",
-    "weakMessage":"Verwenden Sie Zahlen, Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
-    "strongMessage":"Sicheres Passwort!",
-    "commonMessage":"Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt"
+  "passwordRequirements": {
+    "minLengthMessage": "Das Passwort muss mindestens 8 Zeichen lang sein",
+    "requiredMessage": "Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen",
+    "weakMessage": "Verwenden Sie Zahlen, Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
+    "strongMessage": "Sicheres Passwort!",
+    "commonMessage": "Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt"
   },
-  "sharing":{
-    "confirmOwner":"Wenn Sie den Systembesitzer ändern, werden Sie das Eigentum vom aktuellen Account widerrufen. Diese Handlung ist unwiderruflich. Sind Sie sich sicher?",
-    "shareTitle":"Freigeben",
-    "shareConfirmButton":"Freigeben",
-    "editShareTitle":"Berechtigungen bearbeiten",
-    "editShareConfirmButton":"Speichern",
-    "permissionsSaved":"Neue Berechtigungen gespeichert"
+  "sharing": {
+    "confirmOwner": "Wenn Sie den Systembesitzer ändern, werden Sie das Eigentum vom aktuellen Account widerrufen. Diese Handlung ist unwiderruflich. Sind Sie sich sicher?",
+    "shareTitle": "Freigeben",
+    "shareConfirmButton": "Freigeben",
+    "editShareTitle": "Berechtigungen bearbeiten",
+    "editShareConfirmButton": "Speichern",
+    "permissionsSaved": "Neue Berechtigungen gespeichert"
   },
-  "system":{
-    "yourSystem":"Ihr System",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"System ist nicht erreichbar",
-    "offline":"System ist offline",
-    "openClient":"In {{VMS_NAME}} öffnen",
-    "confirmRenameTitle":"Systemname",
-    "confirmRenameAction":"Speichern",
-    "successRename":"Systemname wurde gespeichert",
-    "confirmDisconnectTitle":"System von {{PRODUCT_NAME}} trennen?",
-    "confirmDisconnectAction":"Trennen",
-    "confirmUnshareFromMe":"Sie sind dabei dieses System von Ihrem Account zu trennen. Sie werden nicht mehr auf dieses System zugreifen können. Sind Sie sich sicher?",
-    "confirmUnshareFromMeTitle":"System trennen?",
-    "confirmUnshareFromMeAction":"Trennen",
-    "confirmUnshare":"Dieser Benutzer wird nicht in der Lage sein auf das System zuzugreifen. Sind Sie sich sicher?",
-    "confirmUnshareTitle":"Benutzer löschen?",
-    "confirmUnshareAction":"Löschen",
-    "successDisconnected":"Das System wurde erfoglreich von {{PRODUCT_NAME}} getrennt",
-    "successDeleted":"Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
-    "permissionsRemoved":"Berechtigungen wurden von {{email}} entfernt"
+  "system": {
+    "yourSystem": "Ihr System",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "System ist nicht erreichbar",
+    "offline": "System ist offline",
+    "openClient": "In {{VMS_NAME}} öffnen",
+    "confirmRenameTitle": "Systemname",
+    "confirmRenameAction": "Speichern",
+    "successRename": "Systemname wurde gespeichert",
+    "confirmDisconnectTitle": "System von {{PRODUCT_NAME}} trennen?",
+    "confirmDisconnectAction": "Trennen",
+    "confirmUnshareFromMe": "Sie sind dabei dieses System von Ihrem Account zu trennen. Sie werden nicht mehr auf dieses System zugreifen können. Sind Sie sich sicher?",
+    "confirmUnshareFromMeTitle": "System trennen?",
+    "confirmUnshareFromMeAction": "Trennen",
+    "confirmUnshare": "Dieser Benutzer wird nicht in der Lage sein auf das System zuzugreifen. Sind Sie sich sicher?",
+    "confirmUnshareTitle": "Benutzer löschen?",
+    "confirmUnshareAction": "Löschen",
+    "successDisconnected": "Das System wurde erfoglreich von {{PRODUCT_NAME}} getrennt",
+    "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
+    "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt"
   },
-  "account":{
-    "accountSavedSuccess":"Ihr Account wurde erfolgreich gespeichert",
-    "activationLinkSent":"Der Aktivierungslink wurde versendet",
-    "passwordChangedSuccess":"Ihr Account wurde erfolgreich gespeichert",
-    "changePassword":"Passwort ändern",
-    "newPasswordLabel":"Neues Passwort",
-    "saveChanges":"Speichern"
+  "account": {
+    "accountSavedSuccess": "Ihr Account wurde erfolgreich gespeichert",
+    "activationLinkSent": "Der Aktivierungslink wurde versendet",
+    "passwordChangedSuccess": "Ihr Account wurde erfolgreich gespeichert",
+    "changePassword": "Passwort ändern",
+    "newPasswordLabel": "Neues Passwort",
+    "saveChanges": "Speichern"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Installieren Sie {{VMS_NAME}}, um Ihr System anzusehen",
-    "action":"Download {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Installieren Sie {{VMS_NAME}}, um Ihr System anzusehen",
+    "action": "Download {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Nur Client",
-      "server":"Nur Server",
-      "bundle":"Client und Server",
-      "servertool":"Konfigurationstool"
+    "appTypes": {
+      "client": "Nur Client",
+      "server": "Nur Server",
+      "bundle": "Client und Server",
+      "servertool": "Konfigurationstool"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Aktivierungslink erneut zusenden",
-    "resetPassword":"Passwort zurücksetzen",
-    "setNewPassword":"Passwort speichern",
-    "setNewPasswordLabel":"Neues Passwort"
+  "activeActions": {
+    "sendConfirm": "Aktivierungslink erneut zusenden",
+    "resetPassword": "Passwort zurücksetzen",
+    "setNewPassword": "Passwort speichern",
+    "setNewPasswordLabel": "Neues Passwort"
   },
-  "regActions":{
-    "passwordLabel":"Passwort",
-    "createAccount":"Account erstellen"
+  "regActions": {
+    "passwordLabel": "Passwort",
+    "createAccount": "Account erstellen"
   },
-  "header":{
-    "allSystems":"Alle Systeme",
-    "systems":"Systeme"
+  "header": {
+    "allSystems": "Alle Systeme",
+    "systems": "Systeme"
   }
 }

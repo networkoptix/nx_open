@@ -24,10 +24,10 @@ bool operator < (const IndexRecord& other, qint64 start) { return other.start < 
 // --------------- QnMotionArchiveConnection ---------------------
 
 QnMotionArchiveConnection::QnMotionArchiveConnection(QnMotionArchive* owner):
-m_owner(owner),
-m_minDate(AV_NOPTS_VALUE),
-m_maxDate(AV_NOPTS_VALUE),
-m_lastResult(new QnMetaDataV1())
+    m_owner(owner),
+    m_minDate(AV_NOPTS_VALUE),
+    m_maxDate(AV_NOPTS_VALUE),
+    m_lastResult(new QnMetaDataV1())
 {
     m_lastTimeMs = AV_NOPTS_VALUE;
     m_motionLoadedStart = m_motionLoadedEnd = -1;
@@ -39,7 +39,7 @@ QnMotionArchiveConnection::~QnMotionArchiveConnection()
     qFreeAligned(m_motionBuffer);
 }
 
-QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
+QnAbstractCompressedMetadataPtr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 {
     if (m_lastResult->containTime(timeUsec))
         return QnMetaDataV1Ptr(); // do not duplicate data

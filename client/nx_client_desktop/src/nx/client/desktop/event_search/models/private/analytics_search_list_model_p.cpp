@@ -105,12 +105,12 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
                 return;
 
             NX_ASSERT(m_prefetch.empty());
-            m_prefetch = success ? data : analytics::storage::LookupResult();
+            m_prefetch = success ? std::move(data) : analytics::storage::LookupResult();
             m_success = success;
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
             completionHandler(m_prefetch.size() >= kFetchBatchSize
-                ? startTimeMs(m_prefetch.front()) + 1/*discard last ms*/
+                ? startTimeMs(m_prefetch.front()) + 1 /*discard last ms*/
                 : 0);
         };
 
@@ -160,7 +160,7 @@ QString AnalyticsSearchListModel::Private::description(
     if (object.attributes.empty())
         return QString();
 
-    static const auto kCss = lit(R"(
+    static const auto kCss = QString::fromLatin1(R"(
             <style type = 'text/css'>
                 th { color: %1; font-weight: normal; }
             </style>)");

@@ -55,19 +55,19 @@ void TestOptions::setLoadMode(const QString& mode)
     QString loadMode;
     TEST_OPTIONS_SET_VALUE(loadMode, mode.toLower());
 
+    bool isOk = 0;
+    s_loadMode = mode.toUInt(&isOk);
+    if (isOk)
+        return;
+
     if (loadMode == QLatin1String("light"))
-        s_loadMode = LoadMode::light;
+        s_loadMode = 0;
     else if (loadMode == QLatin1String("normal"))
-        s_loadMode = LoadMode::normal;
+        s_loadMode = 1;
     else if (loadMode == QLatin1String("stress"))
-        s_loadMode = LoadMode::stress;
+        s_loadMode = 100;
     else
         NX_CRITICAL(false, lm("Unrecognized load mode: %1").arg(mode));
-}
-
-TestOptions::LoadMode TestOptions::getLoadMode()
-{
-    return s_loadMode;
 }
 
 void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
@@ -103,7 +103,7 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);
 std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
-std::atomic<TestOptions::LoadMode> TestOptions::s_loadMode(TestOptions::LoadMode::normal);
+std::atomic<size_t> TestOptions::s_loadMode(1);
 
 QnMutex TestOptions::s_mutex;
 QString TestOptions::s_temporaryDirectoryPath =

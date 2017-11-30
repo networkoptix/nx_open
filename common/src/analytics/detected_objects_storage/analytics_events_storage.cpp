@@ -215,7 +215,7 @@ void EventsStorage::loadObjects(
             objectIdToPosition.emplace(detectedObject.objectId, result->size());
         if (iterAndIsInsertedFlag.second)
         {
-            if (filter.maxObjectsToSelect > 0 && result->size() >= filter.maxObjectsToSelect)
+            if (filter.maxObjectsToSelect > 0 && (int) result->size() >= filter.maxObjectsToSelect)
                 break;
             result->push_back(std::move(detectedObject));
         }

@@ -110,7 +110,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     if (!m_hevcSupported)
         return base_type::initializeMedia(onvifCapabilities);
 
-    return CameraDiagnostics::NoErrorResult();
+    return fetchChannelCount();
 }
 
 static std::unique_ptr<nx_http::HttpClient> makeHttpClient(const QAuthenticator& authenticator)
@@ -422,6 +422,11 @@ bool HikvisionResource::tryToEnableOnvifSupport(const nx::utils::Url& url, const
             ? existingUser->first //< Override user permissions and password.
             : (users->empty() ? 1 : users->rbegin()->first + 1), //< New user.
         authenticator.user(), authenticator.password());
+}
+
+CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByEncoders*/)
+{
+    return base_type::fetchChannelCount(/*limitedByEncoders*/ false);
 }
 
 } // namespace plugins

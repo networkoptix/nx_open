@@ -9,7 +9,7 @@
 #include "network/tcp_connection_priv.h"
 #include <network/connection_validator.h>
 #include "utils/common/app_info.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/custom_headers.h>
 #include <rest/server/rest_connection_processor.h>
 #include <licensing/license_validator.h>

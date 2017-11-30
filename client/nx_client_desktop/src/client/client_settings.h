@@ -148,8 +148,6 @@ public:
         INITIAL_LIVE_BUFFER_MSECS,
         MAXIMUM_LIVE_BUFFER_MSECS,
 
-        TIMELAPSE_SPEED,
-
         LAST_LOCAL_CONNECTION_URL,
         KNOWN_SERVER_URLS,
 
@@ -248,7 +246,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
-        QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
 
         // Was used earlier. Kept to migrate old settings.
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())

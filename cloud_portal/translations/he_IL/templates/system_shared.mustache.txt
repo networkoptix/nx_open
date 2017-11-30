@@ -1,7 +1,7 @@
-המערכת שותפה איתך
+מערכת שותפה איתך
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) מערכת משותפת {{message.system_name}} איתך.
+{{message.sharer_name}} ({{message.sharer_email}}) שיתף את המערכת {{message.system_name}} איתך.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}

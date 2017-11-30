@@ -7,7 +7,7 @@
 #include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "common/common_module.h"
 #include "licensing/license.h"
 #include "api/runtime_info_manager.h"
