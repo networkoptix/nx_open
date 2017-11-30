@@ -104,6 +104,7 @@ class RestApi(object):
         self.server_name = server_name
         self._root_url = root_url.rstrip('/')
         self.url = self._root_url + '/'
+        assert isinstance(timeout, datetime.timedelta), repr(timeout)
         self._default_timeout = timeout or REST_API_TIMEOUT
         self._session = requests.Session()
         self._auth = HTTPDigestAuth(username, password)
