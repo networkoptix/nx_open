@@ -16,6 +16,8 @@
 #include "auth_cache.h"
 #include "http_stream_reader.h"
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx_http {
 
 struct AuthInfo
@@ -287,20 +289,20 @@ signals:
     void responseReceived(nx_http::AsyncHttpClientPtr);
     /**
      * Message body buffer is not empty.
-     * Received message body buffer is appended to internal buffer which 
+     * Received message body buffer is appended to internal buffer which
      *   can be read with AsyncHttpClient::fetchMessageBodyBuffer() call.
-     * Responsibility for preventing internal message body buffer 
+     * Responsibility for preventing internal message body buffer
      *   to grow beyond reasonable sizes lies on user of this class.
-     * WARNING: It is strongly recommended to call AsyncHttpClient::fetchMessageBodyBuffer() 
+     * WARNING: It is strongly recommended to call AsyncHttpClient::fetchMessageBodyBuffer()
      *   every time on receiving this signal
     */
     void someMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
     /**
-     * Emitted when http request is done with any result 
+     * Emitted when http request is done with any result
      *   (successfully executed request and received message body,
      *   received response with error code, connection terminated unexpectedly).
      * To get result code use method response().
-     * @note Some message body can still be stored in internal buffer. 
+     * @note Some message body can still be stored in internal buffer.
      *   To read it, call AsyncHttpClient::fetchMessageBodyBuffer.
      */
     void done(nx_http::AsyncHttpClientPtr);
@@ -567,4 +569,8 @@ SystemError::ErrorCode NX_NETWORK_API uploadDataSync(const QUrl &url
     , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
     , nx_http::StatusCode::Value *httpCode = nullptr);
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::AsyncHttpClient::AuthType)
+
 } // namespace nx_http
+
+QN_FUSION_DECLARE_FUNCTIONS(nx_http::AsyncHttpClient::AuthType, (lexical), NX_NETWORK_API)

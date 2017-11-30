@@ -18,6 +18,8 @@
 #include "auth_cache.h"
 #include "http_stream_reader.h"
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx_http {
 
 /**
@@ -111,20 +113,20 @@ public:
     void setOnResponseReceived(nx::utils::MoveOnlyFunc<void()> handler);
     /**
      * Message body buffer is not empty.
-     * Received message body buffer is appended to internal buffer which 
+     * Received message body buffer is appended to internal buffer which
      *   can be read with AsyncClient::fetchMessageBodyBuffer() call.
-     * Responsibility for preventing internal message body buffer 
+     * Responsibility for preventing internal message body buffer
      *   to grow beyond reasonable sizes lies on user of this class.
-     * WARNING: It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer() 
+     * WARNING: It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer()
      *   every time on receiving this signal
     */
     void setOnSomeMessageBodyAvailable(nx::utils::MoveOnlyFunc<void()> handler);
     /**
-     * Emitted when http request is done with any result 
+     * Emitted when http request is done with any result
      *   (successfully executed request and received message body,
      *   received response with error code, connection terminated unexpectedly).
      * To get result code use method response().
-     * @note Some message body can still be stored in internal buffer. 
+     * @note Some message body can still be stored in internal buffer.
      *   To read it, call AsyncClient::fetchMessageBodyBuffer.
      */
     void setOnDone(nx::utils::MoveOnlyFunc<void()> handler);
@@ -356,3 +358,4 @@ private:
 };
 
 } // namespace nx_http
+
