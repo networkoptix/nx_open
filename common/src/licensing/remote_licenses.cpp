@@ -4,7 +4,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 namespace {
     const int defaultTimeoutMs = 10 * 1000;

@@ -1,8 +1,8 @@
 #include "upnp_resource_searcher.h"
 #include "utils/common/sleep.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/system_socket.h>
 
 #include <QtXml/QXmlDefaultHandler>

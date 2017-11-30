@@ -10,7 +10,7 @@
 #include <QtCore/QObject>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
 

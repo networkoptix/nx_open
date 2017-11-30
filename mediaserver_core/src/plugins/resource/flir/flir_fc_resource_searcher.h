@@ -10,7 +10,7 @@
 #include "flir_fc_private.h"
 
 #include <nx/network/system_socket.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <core/resource_management/resource_searcher.h>
 
 namespace nx {

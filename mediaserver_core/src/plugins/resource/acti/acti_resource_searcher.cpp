@@ -7,7 +7,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <plugins/resource/mdns/mdns_listener.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>

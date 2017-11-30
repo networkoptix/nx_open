@@ -17,7 +17,7 @@
 #include <nx/utils/concurrent.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "ec2_thread_pool.h"
 #include "rest/request_params.h"

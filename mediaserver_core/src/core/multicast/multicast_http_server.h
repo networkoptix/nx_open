@@ -5,7 +5,7 @@
 #include "core/multicast/multicast_http_transport.h"
 #include <QSet>
 #include <memory>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QThread;
 class QnTcpListener;

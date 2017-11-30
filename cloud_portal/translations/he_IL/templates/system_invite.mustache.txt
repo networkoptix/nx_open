@@ -6,7 +6,7 @@
 
 {{^message.sharer_name}}
 אתה מוזמן להצטרף אל {{PRODUCT_NAME}}.
-מערכת הווידאו {{message.system_name}} שותפה איתך.
+המערכת {{message.system_name}} שותפה איתך.
 {{/message.sharer_name}}
 
 הרשם וצפה במערכת: {{config.portal_url}} / register / {{message.code}}

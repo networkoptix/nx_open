@@ -3,7 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include <nx/utils/timer_manager.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>

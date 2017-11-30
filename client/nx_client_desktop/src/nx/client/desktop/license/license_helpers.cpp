@@ -2,7 +2,7 @@
 
 #include <QtCore/QThread>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/fusion/serialization_format.h>
 #include <nx/utils/raii_guard.h>
 

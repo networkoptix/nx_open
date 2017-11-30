@@ -7,7 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 
 #include "common.h"

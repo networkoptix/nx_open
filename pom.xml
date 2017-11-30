@@ -580,7 +580,7 @@
                 </property>
             </activation>
             <modules>
-                <module>client/mobile_client</module>
+                <!-- <module>client/mobile_client</module> -->
             </modules>
         </profile>
         <profile>
@@ -796,13 +796,13 @@
             <modules>
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_speech_synthesizer</module>
-                <module>macsetup/client-dmg</module>
+                <!-- <module>macsetup/client-dmg</module> -->
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/librelaying</module>
                 <module>nx_cloud/libtraffic_relay</module>
-                <module>client/mobile_client</module>
+                <!-- <module>client/mobile_client</module> -->
             </modules>
         </profile>
 
@@ -835,7 +835,9 @@
                 <module>nx_cloud/vms_gateway</module>
                 <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
+                <!--
                 <module>debsetup/client-deb</module>
+                -->
                 <module>debsetup/mediaserver-deb</module>
 
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
@@ -962,8 +964,10 @@
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
+                <!-- 
                 <module>client/nx_client_core</module>
                 <module>client/mobile_client</module>
+                -->
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
@@ -1128,8 +1132,10 @@
             <modules>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
+                <!--
                 <module>client/nx_client_core</module>
                 <module>client/mobile_client</module>
+                -->
             </modules>
             <properties>
             </properties>

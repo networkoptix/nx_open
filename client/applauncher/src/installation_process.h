@@ -15,7 +15,7 @@
 #include <api/applauncher_api.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/joinable.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
 

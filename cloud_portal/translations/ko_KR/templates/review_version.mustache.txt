@@ -1,4 +1,4 @@
-{{ message.product }}의 새 개정판이 있습니다.
+{{ message.product }}의 새개정판이 있습니다.
 
 {{ message.id }}링크를 선택하여 {{ message.product }}에 대한 내용을 검토를 하세요.
 

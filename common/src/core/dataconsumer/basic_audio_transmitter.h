@@ -4,7 +4,7 @@
 
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QnBasicAudioTransmitter: public BaseHttpAudioTransmitter
 {

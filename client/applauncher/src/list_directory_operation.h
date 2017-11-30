@@ -10,7 +10,7 @@
 
 #include <QObject>
 #include <QString>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
 

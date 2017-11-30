@@ -5,7 +5,7 @@ Hello, {{message.fullName}}
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-You have been granted access to video management system "{{message.system_name}}".
+To view and manage it, please create account on <0>{{PRODUCT_NAME}}</0> using your current email address and follow further instructions.
 {{/message.sharer_name}}
 
 View in {{PRODUCT_NAME}} Portal: {{config.portal_url}}/systems/{{message.system_id}}

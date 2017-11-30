@@ -3,7 +3,7 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 class QnCommonModule;
 
