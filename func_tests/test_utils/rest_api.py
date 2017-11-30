@@ -32,7 +32,7 @@ def _to_get_param(python_value):
         return 'true' if python_value else 'false'
     if isinstance(python_value, (int, float, str, bytes, unicode)):
         return str(python_value)
-    assert False, "Object of type "
+    assert False, "Cannot use %r of type %s as GET parameter." % (python_value, type(python_value).__name__)
 
 
 class HttpError(Exception):
