@@ -689,7 +689,7 @@
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
                 <module>testcamera</module>
-                <module>wixsetup</module>
+                <!-- <module>wixsetup</module> -->
             </modules>
         </profile>
 
