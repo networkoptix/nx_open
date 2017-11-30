@@ -34,7 +34,7 @@ bool Sps::decodeFromVideoFrame(const QnConstCompressedVideoDataPtr& videoData)
 
         switch (packetHeader.unitType)
         {
-            case (int) hevc::NalUnitType::spsNut:
+            case hevc::NalUnitType::spsNut:
                 return decode(nalu.first, nalu.second);
             default:
                 break;
