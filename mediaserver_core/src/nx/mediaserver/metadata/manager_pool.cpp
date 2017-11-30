@@ -210,11 +210,11 @@ AbstractMetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
     const QnUuid& pluginId)
 {
-    auto handler = new EventHandler();
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return nullptr;
 
+    auto handler = new EventHandler();
     handler->setResource(camera);
     handler->setPluginId(pluginId);
 

@@ -17,6 +17,8 @@ namespace metadata {
 class AbstractMetadataHandler
 {
 public:
+    virtual ~AbstractMetadataHandler() = default;
+
     /**
      * @param error used for reporting errors to the outer code.
      * @param metadata incoming from the plugin
@@ -58,7 +60,7 @@ public:
     /**
      * @brief provides null terminated UTF8 string containing json manifest
      * according to nx_metadata_plugin_manifest.schema.json.
-     * @return pointer to c-style string which MUST be valid till manager object exists 
+     * @return pointer to c-style string which MUST be valid till manager object exists
      */
     virtual const char* capabilitiesManifest(Error* error) const = 0;
 };
