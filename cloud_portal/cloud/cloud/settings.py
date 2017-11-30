@@ -109,7 +109,11 @@ DATABASES = {
         'PASSWORD': cloud_db['password'],
         'NAME': cloud_db['database'],
         'OPTIONS': {
+            'sql_mode': 'TRADITIONAL',
             'charset': 'utf8mb4',
+            'init_command': 'SET '
+                'character_set_connection=utf8,'
+                'collation_connection=utf8_bin'
         }
     }
 }

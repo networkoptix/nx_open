@@ -23,11 +23,11 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=191),
         ),
         migrations.RunSQL(
-            sql = ['ALTER TABLE api_account MODIFY first_name VARCHAR(191) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci'],
-            reverse_sql = ['ALTER TABLE api_account MODIFY first_name VARCHAR(191)']
+            sql = ['ALTER TABLE api_account MODIFY first_name VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci'],
+            reverse_sql = ['ALTER TABLE api_account MODIFY first_name VARCHAR(255)']
         ),
         migrations.RunSQL(
-            sql=['ALTER TABLE api_account MODIFY last_name VARCHAR(191) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci'],
-            reverse_sql=['ALTER TABLE api_account MODIFY last_name VARCHAR(191)']
+            sql=['ALTER TABLE api_account MODIFY last_name VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci'],
+            reverse_sql=['ALTER TABLE api_account MODIFY last_name VARCHAR(255)']
         )
     ]
