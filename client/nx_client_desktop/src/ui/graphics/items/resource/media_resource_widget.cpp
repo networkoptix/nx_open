@@ -785,7 +785,7 @@ void QnMediaResourceWidget::createButtons()
     {
         auto analyticsButton =
             createStatisticAwareButton(lit("media_widget_analytics"));
-        analyticsButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        analyticsButton->setIcon(qnSkin->icon("item/analytics.png"));
         analyticsButton->setCheckable(true);
         analyticsButton->setToolTip(lit("Analytics"));
         connect(analyticsButton, &QnImageButtonWidget::toggled, this,
