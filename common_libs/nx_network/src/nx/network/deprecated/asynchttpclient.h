@@ -12,10 +12,9 @@
 #include "nx/network/abstract_socket.h"
 #include "nx/network/aio/abstract_pollable.h"
 #include "nx/network/aio/timer.h"
-
-#include "auth_cache.h"
-#include "http_async_client.h"
-#include "http_stream_reader.h"
+#include "nx/network/http/auth_cache.h"
+#include "nx/network/http/http_async_client.h"
+#include "nx/network/http/http_stream_reader.h"
 
 namespace nx_http {
 

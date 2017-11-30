@@ -5,7 +5,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/helpers/request_context.h>
 #include <rest/helpers/request_helpers.h>

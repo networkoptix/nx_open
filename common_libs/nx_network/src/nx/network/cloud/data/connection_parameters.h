@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include <nx/network/retry_timer.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "stun_message_data.h"
 

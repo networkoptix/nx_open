@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('cloudApp')
-.filter('escape', function($sce) {
+angular.module('nxCommon')
+.filter('escape', function() {
   var entityMap = {
     '&': '&amp;',
     '<': '&lt;',
@@ -12,7 +12,7 @@ angular.module('cloudApp')
     '`': '&#x60;',
     '=': '&#x3D;'
   };
-  return function(text, phrase) {
+  return function(text) {
     return String(text).replace(/[&<>"'`=\/]/g, function (s) {
       return entityMap[s];
     });

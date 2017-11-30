@@ -4,7 +4,7 @@
 #ifdef ENABLE_DROID
 
 #include <providers/spush_media_stream_provider.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "droid_resource.h"
 #include <nx/network/socket.h>
 #include <nx/streaming/rtsp_client.h>

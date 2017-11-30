@@ -1,237 +1,237 @@
 {
-  "language_name":"Magyar",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"Mégse",
-    "loginTitle":"Bejelentkezés ide: {{PRODUCT_NAME}}",
-    "loginButton":"Bejelentkezés",
-    "logoutAuthorisedTitle":"Már bejelentkezett",
-    "logoutAuthorisedContinueButton":"Folyatatás",
-    "logoutAuthorisedLogoutButton":"Kijelentkezés"
+  "language_name": "Magyar",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Mégse",
+    "loginTitle": "Bejelentkezés ide: {{PRODUCT_NAME}}",
+    "loginButton": "Bejelentkezés",
+    "logoutAuthorisedTitle": "Már bejelentkezett",
+    "logoutAuthorisedContinueButton": "Folyatatás",
+    "logoutAuthorisedLogoutButton": "Kijelentkezés"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Üdvözöljük",
-    "register":"Fiók létrehozása itt",
-    "changePassword":"Jelszó módosítása -",
-    "account":"Fiókbeállítások -",
-    "systems":"Rendszerek -",
-    "system":"Rendszer -",
-    "systemShare":"Rendszer megosztása -",
-    "activate":"Fiók aktiválása -",
-    "activateSent":"Fiók aktiválása -",
-    "activateSuccess":"Fiók aktiválva -",
-    "activateCode":"Fiók aktiválása -",
-    "restorePassword":"Jelszó visszaállítása -",
-    "restorePasswordSuccess":"Jelszó elmentve -",
-    "restorePasswordCode":"Jelszó visszaállítása -",
-    "view":"Kamerák megtekintése - ",
-    "debug":"Hibakeresés",
-    "login":"Bejelentkezés -",
-    "download":"{{VMS_NAME}} letöltése",
-    "downloadPlatform":"{{VMS_NAME}} letöltése ",
-    "pageNotFound":"Az oldal nem található"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Üdvözöljük",
+    "register": "Fiók létrehozása itt",
+    "changePassword": "Jelszó módosítása -",
+    "account": "Fiókbeállítások -",
+    "systems": "Rendszerek -",
+    "system": "Rendszer -",
+    "systemShare": "Rendszer megosztása -",
+    "activate": "Fiók aktiválása -",
+    "activateSent": "Fiók aktiválása -",
+    "activateSuccess": "Fiók aktiválva -",
+    "activateCode": "Fiók aktiválása -",
+    "restorePassword": "Jelszó visszaállítása -",
+    "restorePasswordSuccess": "Jelszó elmentve -",
+    "restorePasswordCode": "Jelszó visszaállítása -",
+    "view": "Kamerák megtekintése - ",
+    "debug": "Hibakeresés",
+    "login": "Bejelentkezés -",
+    "download": "{{VMS_NAME}} letöltése",
+    "downloadPlatform": "{{VMS_NAME}} letöltése ",
+    "pageNotFound": "Az oldal nem található"
   },
-  "systemStatuses":{
-    "notActivated":"nincs aktiválva",
-    "activated":"aktiválva",
-    "online":"online",
-    "offline":"offline",
-    "unavailable":"nem elérhető"
+  "systemStatuses": {
+    "notActivated": "nincs aktiválva",
+    "activated": "aktiválva",
+    "online": "online",
+    "offline": "offline",
+    "unavailable": "nem elérhető"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Letiltva",
-      "description":"Felhasználó le van tiltva, és nem tud bejelentkezni a rendszerbe"
+  "accessRoles": {
+    "disabled": {
+      "label": "Letiltva",
+      "description": "Felhasználó le van tiltva, és nem tud bejelentkezni a rendszerbe"
     },
-    "Owner":{
-      "label":"Tulajdonos",
-      "description":"Korlátlan jog, mely tartalmazza a felhőhöz való csatlakozást, megosztást, leválasztást"
+    "Owner": {
+      "label": "Tulajdonos",
+      "description": "Korlátlan jog, mely tartalmazza a felhőhöz való csatlakozást, megosztást, leválasztást"
     },
-    "Viewer":{
-      "label":"Felhasználó",
-      "description":"Élő videó megtekintése és rögzített visszajátszása"
+    "Viewer": {
+      "label": "Felhasználó",
+      "description": "Élő videó megtekintése és rögzített visszajátszása"
     },
-    "Live Viewer":{
-      "label":"Felhasználó (élő)",
-      "description":"Csak élőkép megtekintése"
+    "Live Viewer": {
+      "label": "Felhasználó (élő)",
+      "description": "Csak élőkép megtekintése"
     },
-    "Advanced Viewer":{
-      "label":"Speciális felhasználó",
-      "description":"Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+    "Advanced Viewer": {
+      "label": "Speciális felhasználó",
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
     },
-    "Administrator":{
-      "label":"Adminisztrátor",
-      "description":"Korlátlan hozzáférést biztosít, beleértve a megosztást"
+    "Administrator": {
+      "label": "Adminisztrátor",
+      "description": "Korlátlan hozzáférést biztosít, beleértve a megosztást"
     },
-    "Custom":{
-      "label":"Egyéni",
-      "description":"Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+    "Custom": {
+      "label": "Egyéni",
+      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     },
-    "cloudAdmin":{
-      "label":"Adminisztrátor",
-      "description":"Rendszerkonfigurálás és megosztás"
+    "cloudAdmin": {
+      "label": "Adminisztrátor",
+      "description": "Rendszerkonfigurálás és megosztás"
     },
-    "customRole":{
-      "label":"Egyéni szerepkör",
-      "description":"Rendszerben megadott egyéni szerepkör"
+    "customRole": {
+      "label": "Egyéni szerepkör",
+      "description": "Rendszerben megadott egyéni szerepkör"
     },
-    "owner":{
-      "label":"Tulajdonos",
-      "description":"Korlátlan jog, mely tartalmazza a felhőhöz való csatlakozást, megosztást, leválasztást"
+    "owner": {
+      "label": "Tulajdonos",
+      "description": "Korlátlan jog, mely tartalmazza a felhőhöz való csatlakozást, megosztást, leválasztást"
     },
-    "viewer":{
-      "label":"Felhasználó",
-      "description":"Élő videó megtekintése és rögzített visszajátszása"
+    "viewer": {
+      "label": "Felhasználó",
+      "description": "Élő videó megtekintése és rögzített visszajátszása"
     },
-    "liveViewer":{
-      "label":"Felhasználó (élő)",
-      "description":"Csak élőkép megtekintése"
+    "liveViewer": {
+      "label": "Felhasználó (élő)",
+      "description": "Csak élőkép megtekintése"
     },
-    "advancedViewer":{
-      "label":"Speciális felhasználó",
-      "description":"Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+    "advancedViewer": {
+      "label": "Speciális felhasználó",
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
     },
-    "custom":{
-      "label":"Egyéni",
-      "description":"Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
+    "custom": {
+      "label": "Egyéni",
+      "description": "Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Megerősítő e-mailt nem lehet elküldeni",
-    "cantDisconnectSystemPrefix":"A rendszer törlése nem lehetséges",
-    "cantUnshareWithMeSystemPrefix":"A rendszer törlése nem lehetséges",
-    "cantSharePrefix":"A rendszer megosztása nem lehetséges",
-    "cantGetUsersListPrefix":"A felhasználólista nem érhető el",
-    "cantGetSystemsListPrefix":"A rendszerlista nem érhető el",
-    "cantRegisterPrefix":"Hiba történt",
-    "cantGetSystemInfoPrefix":"A rendszerinformáció nem érhető el",
-    "cantChangeAccountPrefix":"A módosítások nem menthetők el",
-    "cantChangePasswordPrefix":"Jelszó mentése nem lehetséges",
-    "cantActivatePrefix":"A fiók aktiválása nem lehetséges",
-    "cantSendConfirmationPrefix":"Megerősítő e-mailt nem lehet elküldeni",
-    "cloudInvalidResponse":"Felhő DB ismeretlen választ jelzett vissza",
-    "notAuthorized":"Hibás e-mail cím vagy jelszó",
-    "wrongParameters":"Néhány paraméter hibás",
-    "wrongCode":"A fiók van már aktiválva van, vagy a megerősítési kód hibás",
-    "wrongCodeRestore":"Megerősítési kód már használt, vagy hibás",
-    "forbidden":"Nincs engedélye erre a műveletre",
-    "accountNotActivated":"Ez a fiók még nincs aktiválva. <a href=\"/activate\">Küldje újra az aktiváló linket</a>",
-    "accountBlocked":"A fiók zárolva van",
-    "notFound":"Nem található",
-    "alreadyExists":"Ez a fiük már létezik",
-    "unknownError":"Váratlan hiba történt",
-    "accountAlreadyActivated":"Ez a fiók már aktiválva van",
-    "emailNotFound":"A fiók nem létezik",
-    "EmailAlreadyExists":"Ez az e-mail már regisztrálva van",
-    "oldPasswordMistmatch":"A jelenlegi jelszó helytelen",
-    "passwordMismatch":"Hibás jelszó",
-    "cantEditYourself":"Saját engedélyek módosítása nem engedélyezett",
-    "cantEditAdmin":"Ez a felhasználó rendszergazdai jogokkal rendelkezik",
-    "cantOpenClient":"{{VMS_NAME}} nincs törölve. <a href=\"/download\">Letöltés</a>",
-    "lostConnection":"{{systemName}} kapcsolat megszakadt",
-    "thisSystem":"a rendszer"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Megerősítő e-mailt nem lehet elküldeni",
+    "cantDisconnectSystemPrefix": "A rendszer törlése nem lehetséges",
+    "cantUnshareWithMeSystemPrefix": "A rendszer törlése nem lehetséges",
+    "cantSharePrefix": "A rendszer megosztása nem lehetséges",
+    "cantGetUsersListPrefix": "A felhasználólista nem érhető el",
+    "cantGetSystemsListPrefix": "A rendszerlista nem érhető el",
+    "cantRegisterPrefix": "Hiba történt",
+    "cantGetSystemInfoPrefix": "A rendszerinformáció nem érhető el",
+    "cantChangeAccountPrefix": "A módosítások nem menthetők el",
+    "cantChangePasswordPrefix": "Jelszó mentése nem lehetséges",
+    "cantActivatePrefix": "A fiók aktiválása nem lehetséges",
+    "cantSendConfirmationPrefix": "Megerősítő e-mailt nem lehet elküldeni",
+    "cloudInvalidResponse": "Felhő DB ismeretlen választ jelzett vissza",
+    "notAuthorized": "Hibás e-mail cím vagy jelszó",
+    "wrongParameters": "Néhány paraméter hibás",
+    "wrongCode": "A fiók van már aktiválva van, vagy a megerősítési kód hibás",
+    "wrongCodeRestore": "Megerősítési kód már használt, vagy hibás",
+    "forbidden": "Nincs engedélye erre a műveletre",
+    "accountNotActivated": "Ez a fiók még nincs aktiválva. <a href=\"/activate\">Küldje újra az aktiváló linket</a>",
+    "accountBlocked": "A fiók zárolva van",
+    "notFound": "Nem található",
+    "alreadyExists": "Ez a fiük már létezik",
+    "unknownError": "Váratlan hiba történt",
+    "accountAlreadyActivated": "Ez a fiók már aktiválva van",
+    "emailNotFound": "A fiók nem létezik",
+    "EmailAlreadyExists": "Ez az e-mail már regisztrálva van",
+    "oldPasswordMistmatch": "A jelenlegi jelszó helytelen",
+    "passwordMismatch": "Hibás jelszó",
+    "cantEditYourself": "Saját engedélyek módosítása nem engedélyezett",
+    "cantEditAdmin": "Ez a felhasználó rendszergazdai jogokkal rendelkezik",
+    "cantOpenClient": "{{VMS_NAME}} nincs törölve. <a href=\"/download\">Letöltés</a>",
+    "lostConnection": "{{systemName}} kapcsolat megszakadt",
+    "thisSystem": "a rendszer"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"A jelszónak legalább 8 karakterből kell állnia",
-    "requiredMessage":"Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
-    "weakMessage":"Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
-    "strongMessage":"Erős jelszó!",
-    "commonMessage":"Ez a jelszó a leggyakoribb jelszavak egyike"
+  "passwordRequirements": {
+    "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
+    "requiredMessage": "Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
+    "weakMessage": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
+    "strongMessage": "Erős jelszó!",
+    "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike"
   },
-  "sharing":{
-    "confirmOwner":"Ha megváltoztatja a rendszertulajdonost, érvényteleníti a tulajdonjogot ehhez a fiókhoz. Ez a művelet nem fordítható vissza. Folytatja?",
-    "shareTitle":"Megosztás",
-    "shareConfirmButton":"Megosztás",
-    "editShareTitle":"Engedélyek szerkesztése",
-    "editShareConfirmButton":"Mentés",
-    "permissionsSaved":"Új engedélyek mentve"
+  "sharing": {
+    "confirmOwner": "Ha megváltoztatja a rendszertulajdonost, érvényteleníti a tulajdonjogot ehhez a fiókhoz. Ez a művelet nem fordítható vissza. Folytatja?",
+    "shareTitle": "Megosztás",
+    "shareConfirmButton": "Megosztás",
+    "editShareTitle": "Engedélyek szerkesztése",
+    "editShareConfirmButton": "Mentés",
+    "permissionsSaved": "Új engedélyek mentve"
   },
-  "system":{
-    "yourSystem":"Az Ön rendszere",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"Rendszer nem elérhető",
-    "offline":"A rendszer offline",
-    "openClient":"Megnyitás {{VMS_NAME}}",
-    "confirmRenameTitle":"Rendszer neve",
-    "confirmRenameAction":"Mentés",
-    "successRename":"Rendszer neve mentve",
-    "confirmDisconnectTitle":"Lekapcsolódik innen: {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction":"Szétkapcsolás",
-    "confirmUnshareFromMe":"A rendszer leválasztására készül fiókjáról. Többé nem fog tudni kapcsolódni a rendszerhez. Folytatja?",
-    "confirmUnshareFromMeTitle":"Leválasztja a rendszert?",
-    "confirmUnshareFromMeAction":"Szétkapcsolás",
-    "confirmUnshare":"Ez a felhasználó nem fog tudni csatlakozni a rendszerhez. Folytatja?",
-    "confirmUnshareTitle":"Törli a felhasználót?",
-    "confirmUnshareAction":"Törlés",
-    "successDisconnected":"Rendszer sikeresen bontotta {{PRODUCT_NAME}} kapcsolatát",
-    "successDeleted":"{{systemName}} rendszer sikeresen törölve a fiókból",
-    "permissionsRemoved":"{{email}} engedélyei vissavonva"
+  "system": {
+    "yourSystem": "Az Ön rendszere",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "Rendszer nem elérhető",
+    "offline": "A rendszer offline",
+    "openClient": "Megnyitás {{VMS_NAME}}",
+    "confirmRenameTitle": "Rendszer neve",
+    "confirmRenameAction": "Mentés",
+    "successRename": "Rendszer neve mentve",
+    "confirmDisconnectTitle": "Lekapcsolódik innen: {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "Szétkapcsolás",
+    "confirmUnshareFromMe": "A rendszer leválasztására készül fiókjáról. Többé nem fog tudni kapcsolódni a rendszerhez. Folytatja?",
+    "confirmUnshareFromMeTitle": "Leválasztja a rendszert?",
+    "confirmUnshareFromMeAction": "Szétkapcsolás",
+    "confirmUnshare": "Ez a felhasználó nem fog tudni csatlakozni a rendszerhez. Folytatja?",
+    "confirmUnshareTitle": "Törli a felhasználót?",
+    "confirmUnshareAction": "Törlés",
+    "successDisconnected": "Rendszer sikeresen bontotta {{PRODUCT_NAME}} kapcsolatát",
+    "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
+    "permissionsRemoved": "{{email}} engedélyei vissavonva"
   },
-  "account":{
-    "accountSavedSuccess":"A fiók mentése sikeres",
-    "activationLinkSent":"Aktiválási link elküldve",
-    "passwordChangedSuccess":"A fiók mentése sikeres",
-    "changePassword":"Jelszómódosítás",
-    "newPasswordLabel":"Új jelszó",
-    "saveChanges":"Mentés"
+  "account": {
+    "accountSavedSuccess": "A fiók mentése sikeres",
+    "activationLinkSent": "Aktiválási link elküldve",
+    "passwordChangedSuccess": "A fiók mentése sikeres",
+    "changePassword": "Jelszómódosítás",
+    "newPasswordLabel": "Új jelszó",
+    "saveChanges": "Mentés"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Telepítse a {{VMS_NAME}} alkalmazást a rendszer megtekintéshez",
-    "action":"{{VMS_NAME}} letöltése",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Telepítse a {{VMS_NAME}} alkalmazást a rendszer megtekintéshez",
+    "action": "{{VMS_NAME}} letöltése",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Csak kliens",
-      "server":"Csak szerver",
-      "bundle":"Kliens és szerver",
-      "servertool":"Konfigurációs eszköz"
+    "appTypes": {
+      "client": "Csak kliens",
+      "server": "Csak szerver",
+      "bundle": "Kliens és szerver",
+      "servertool": "Konfigurációs eszköz"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Aktiválási link újraküldése",
-    "resetPassword":"Jelszó visszaállítása",
-    "setNewPassword":"Jelszó mentése",
-    "setNewPasswordLabel":"Új jelszó"
+  "activeActions": {
+    "sendConfirm": "Aktiválási link újraküldése",
+    "resetPassword": "Jelszó visszaállítása",
+    "setNewPassword": "Jelszó mentése",
+    "setNewPasswordLabel": "Új jelszó"
   },
-  "regActions":{
-    "passwordLabel":"Jelszó",
-    "createAccount":"Fiók létrehozása"
+  "regActions": {
+    "passwordLabel": "Jelszó",
+    "createAccount": "Fiók létrehozása"
   },
-  "header":{
-    "allSystems":"Minden rendszer",
-    "systems":"Rendszerek"
+  "header": {
+    "allSystems": "Minden rendszer",
+    "systems": "Rendszerek"
   }
 }

@@ -8,7 +8,7 @@
 
 #include "abstract_socket.h"
 #include "socket_common.h"
-#include "socket_impl_helper.h"
+#include "deprecated/socket_impl_helper.h"
 #include "ssl/ssl_engine.h"
 
 // Forward

@@ -3,7 +3,7 @@
 #include <list>
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/move_only_func.h>
 

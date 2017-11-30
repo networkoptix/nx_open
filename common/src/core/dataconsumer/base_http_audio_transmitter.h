@@ -5,7 +5,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include "audio_data_transmitter.h"
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 
 class BaseHttpAudioTransmitter: public QnAbstractAudioTransmitter

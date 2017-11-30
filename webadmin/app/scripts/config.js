@@ -133,7 +133,8 @@ var Config = {
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
         staticResources: "web_common/",
         maxCrashCount: 2,
-        nativeTimeout: 60 * 1000 //60s
+        nativeTimeout: 60 * 1000, //60s
+        playerReadyTimeout: 100
     },
     debugEvents: {
         events: [

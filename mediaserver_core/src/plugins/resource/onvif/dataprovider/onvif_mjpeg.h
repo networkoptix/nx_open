@@ -6,7 +6,7 @@
 #include <memory>
 
 #include <providers/spush_media_stream_provider.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 
 class MJPEGStreamReader: public CLServerPushStreamReader

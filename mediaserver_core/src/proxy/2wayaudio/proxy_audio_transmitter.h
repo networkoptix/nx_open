@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <core/dataconsumer/audio_data_transmitter.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <utils/common/request_param.h>
 #include <nx/network/socket.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>

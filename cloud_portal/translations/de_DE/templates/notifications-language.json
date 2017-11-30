@@ -1,17 +1,17 @@
 {
-  "activate_account":{
-    "emailSubject":"Bestätigen Sie Ihren Account"
+  "activate_account": {
+    "emailSubject": "Bestätigen Sie Ihren Account"
   },
-  "restore_password":{
-    "emailSubject":"Passwortwiederherstellung"
+  "restore_password": {
+    "emailSubject": "Passwortwiederherstellung"
   },
-  "system_invite":{
-    "emailSubject":"Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
+  "system_invite": {
+    "emailSubject": "Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
   },
-  "system_shared":{
-    "emailSubject":"Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
+  "system_shared": {
+    "emailSubject": "Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
   },
-  "review_version":{
-    "emailSubject":"Version {{message.id}} ist bereit, überprüft zu werden"
+  "review_version": {
+    "emailSubject": "Version {{message.id}} ist bereit, überprüft zu werden"
   }
 }

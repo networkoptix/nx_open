@@ -61,7 +61,7 @@
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>
 

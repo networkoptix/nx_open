@@ -1,27 +1,27 @@
 {
-  "cameraLinks":{
-    "highStream":"Hoher Stream",
-    "lowStream":"Niedriger Stream",
-    "transcoding":"Umkodierung",
-    "unknown":"Unbekannt",
-    "copyToClipboard":"In Zwischenablage kopieren",
-    "copyDefaultText":"Kopieren",
-    "copyActiveText":"In die Zwischenablage kopiert"
-  },
-  "systemOffline":"System offline",
-  "cameraStates":{
-    "offline":"Offline",
-    "error":"Fehler",
-    "unauthorized":"Authentifizierung erforderlich",
-    "noData":"Keine Daten",
-    "iosVideoTooLarge":"iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
-    "flashRequired":"Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos von ARM-basierten Servern abzuspielen.",
-    "flashOrWebmRequired":"Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
-    "noArmSupport":"Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
-    "noFormat":"Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.",
-    "ieNoWebm":"Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
-    "ieWin10":"Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
-    "ubuntuNX":"Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium."
-  },
-  "searchCamPlaceholder":"Suche"
+    "cameraLinks": {
+        "highStream": "Hoher Stream",
+        "lowStream": "Niedriger Stream",
+        "transcoding": "Umkodierung",
+        "unknown": "Unbekannt",
+        "copyToClipboard": "In Zwischenablage kopieren",
+        "copyDefaultText": "Kopieren",
+        "copyActiveText": "In die Zwischenablage kopiert"
+    },
+    "systemOffline": "System offline",
+    "cameraStates": {
+        "offline": "Offline",
+        "error": "Fehler",
+        "unauthorized": "Authentifizierung erforderlich",
+        "noData": "Keine Daten",
+        "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
+        "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos von ARM-basierten Servern abzuspielen.",
+        "flashOrWebmRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
+        "noArmSupport": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
+        "noFormat": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.",
+        "ieNoWebm": "Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
+        "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
+        "ubuntuNX": "Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium."
+    },
+    "searchCamPlaceholder": "Suche"
 }

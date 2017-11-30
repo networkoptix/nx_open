@@ -1,6 +1,6 @@
 #include "async_http_requests_executor.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 namespace nx {
 namespace cdb {

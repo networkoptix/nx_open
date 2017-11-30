@@ -1,237 +1,237 @@
 {
-  "language_name":"Français",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"Annuler",
-    "loginTitle":"Connexion à {{PRODUCT_NAME}}",
-    "loginButton":"Connexion",
-    "logoutAuthorisedTitle":"Vous êtes déjà connecté",
-    "logoutAuthorisedContinueButton":"Continuer",
-    "logoutAuthorisedLogoutButton":"Déconnecter"
+  "language_name": "Français",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Annuler",
+    "loginTitle": "Connexion à {{PRODUCT_NAME}}",
+    "loginButton": "Connexion",
+    "logoutAuthorisedTitle": "Vous êtes déjà connecté",
+    "logoutAuthorisedContinueButton": "Continuer",
+    "logoutAuthorisedLogoutButton": "Déconnecter"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Bienvenue sur",
-    "register":"Créer compte dans",
-    "changePassword":"Changer mot de passe -",
-    "account":"Paramètres compte -",
-    "systems":"Systèmes -",
-    "system":"Système -",
-    "systemShare":"Système de partage -",
-    "activate":"Activer compte -",
-    "activateSent":"Activer compte -",
-    "activateSuccess":"Compte activé -",
-    "activateCode":"Activer compte -",
-    "restorePassword":"Réinitialiser mot de passe -",
-    "restorePasswordSuccess":"Mot de passe sauvé -",
-    "restorePasswordCode":"Réinitialiser mot de passe -",
-    "view":"Voir les caméras - ",
-    "debug":"Débogage",
-    "login":"Connexion -",
-    "download":"Télécharger {{VMS_NAME}}",
-    "downloadPlatform":"Télécharger {{VMS_NAME}} pour ",
-    "pageNotFound":"Page non trouvée"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "Bienvenue sur",
+    "register": "Créer compte dans",
+    "changePassword": "Changer mot de passe -",
+    "account": "Paramètres compte -",
+    "systems": "Systèmes -",
+    "system": "Système -",
+    "systemShare": "Système de partage -",
+    "activate": "Activer compte -",
+    "activateSent": "Activer compte -",
+    "activateSuccess": "Compte activé -",
+    "activateCode": "Activer compte -",
+    "restorePassword": "Réinitialiser mot de passe -",
+    "restorePasswordSuccess": "Mot de passe sauvé -",
+    "restorePasswordCode": "Réinitialiser mot de passe -",
+    "view": "Voir les caméras - ",
+    "debug": "Débogage",
+    "login": "Connexion -",
+    "download": "Télécharger {{VMS_NAME}}",
+    "downloadPlatform": "Télécharger {{VMS_NAME}} pour ",
+    "pageNotFound": "Page non trouvée"
   },
-  "systemStatuses":{
-    "notActivated":"non activé",
-    "activated":"activé",
-    "online":"en ligne",
-    "offline":"hors ligne",
-    "unavailable":"non disponible"
+  "systemStatuses": {
+    "notActivated": "non activé",
+    "activated": "activé",
+    "online": "en ligne",
+    "offline": "hors ligne",
+    "unavailable": "non disponible"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"Désactivé",
-      "description":"L’utilisateur est désactivé et ne peut pas connecter au système"
+  "accessRoles": {
+    "disabled": {
+      "label": "Désactivé",
+      "description": "L’utilisateur est désactivé et ne peut pas connecter au système"
     },
-    "Owner":{
-      "label":"Propriétaire",
-      "description":"Accès illimité, y compris la possibilité de partager et de connecter/déconnecter le système de nuage"
+    "Owner": {
+      "label": "Propriétaire",
+      "description": "Accès illimité, y compris la possibilité de partager et de connecter/déconnecter le système de nuage"
     },
-    "Viewer":{
-      "label":"Visualisateur",
-      "description":"Peut afficher la vidéo en direct et parcourir les archives"
+    "Viewer": {
+      "label": "Visualisateur",
+      "description": "Peut afficher la vidéo en direct et parcourir les archives"
     },
-    "Live Viewer":{
-      "label":"Visualiseur en direct",
-      "description":"Peut seulement voir vidéo en direct"
+    "Live Viewer": {
+      "label": "Visualiseur en direct",
+      "description": "Peut seulement voir vidéo en direct"
     },
-    "Advanced Viewer":{
-      "label":"Visualisateur avancé",
-      "description":"Peut voir la vidéo en direct, parcourir l’archive, configurer les caméras, contrôle PTZ etc"
+    "Advanced Viewer": {
+      "label": "Visualisateur avancé",
+      "description": "Peut voir la vidéo en direct, parcourir l’archive, configurer les caméras, contrôle PTZ etc"
     },
-    "Administrator":{
-      "label":"Administrateur",
-      "description":"Accès illimité, y compris la possibilité de partager"
+    "Administrator": {
+      "label": "Administrateur",
+      "description": "Accès illimité, y compris la possibilité de partager"
     },
-    "Custom":{
-      "label":"Personnalisé",
-      "description":"Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
+    "Custom": {
+      "label": "Personnalisé",
+      "description": "Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
     },
-    "cloudAdmin":{
-      "label":"Administrateur",
-      "description":"Peut configurer le système et le partager"
+    "cloudAdmin": {
+      "label": "Administrateur",
+      "description": "Peut configurer le système et le partager"
     },
-    "customRole":{
-      "label":"Rôle personnalisé",
-      "description":"Rôle d’usager personnalisé spécifié dans le système"
+    "customRole": {
+      "label": "Rôle personnalisé",
+      "description": "Rôle d’usager personnalisé spécifié dans le système"
     },
-    "owner":{
-      "label":"Propriétaire",
-      "description":"Accès illimité, y compris la possibilité de partager et de connecter/déconnecter le système de nuage"
+    "owner": {
+      "label": "Propriétaire",
+      "description": "Accès illimité, y compris la possibilité de partager et de connecter/déconnecter le système de nuage"
     },
-    "viewer":{
-      "label":"Visualisateur",
-      "description":"Peut afficher la vidéo en direct et parcourir les archives"
+    "viewer": {
+      "label": "Visualisateur",
+      "description": "Peut afficher la vidéo en direct et parcourir les archives"
     },
-    "liveViewer":{
-      "label":"Visualiseur en direct",
-      "description":"Peut seulement voir vidéo en direct"
+    "liveViewer": {
+      "label": "Visualiseur en direct",
+      "description": "Peut seulement voir vidéo en direct"
     },
-    "advancedViewer":{
-      "label":"Visualisateur avancé",
-      "description":"Peut voir la vidéo en direct, parcourir l’archive, configurer les caméras, contrôle PTZ etc"
+    "advancedViewer": {
+      "label": "Visualisateur avancé",
+      "description": "Peut voir la vidéo en direct, parcourir l’archive, configurer les caméras, contrôle PTZ etc"
     },
-    "custom":{
-      "label":"Personnalisé",
-      "description":"Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
+    "custom": {
+      "label": "Personnalisé",
+      "description": "Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Impossible d’envoyer courriel de confirmation",
-    "cantDisconnectSystemPrefix":"Impossible de supprimer le système",
-    "cantUnshareWithMeSystemPrefix":"Impossible de supprimer le système",
-    "cantSharePrefix":"Impossible de partager le système",
-    "cantGetUsersListPrefix":"Liste des usagers non disponible",
-    "cantGetSystemsListPrefix":"Liste système non disponible",
-    "cantRegisterPrefix":"Erreur survenue",
-    "cantGetSystemInfoPrefix":"Information système non disponible",
-    "cantChangeAccountPrefix":"Impossible d'enregistrer les changements",
-    "cantChangePasswordPrefix":"Ne peut pas enregistrer le mot de passe",
-    "cantActivatePrefix":"Impossible d'activer votre compte",
-    "cantSendConfirmationPrefix":"Impossible d’envoyer courriel de confirmation",
-    "cloudInvalidResponse":"BD Nuage a retourné une réponse inattendue",
-    "notAuthorized":"Courriel ou mot de passe incorrect",
-    "wrongParameters":"Certains paramètres dans le formulaire sont incorrects",
-    "wrongCode":"Compte déjà activé ou le code de confirmation est incorrect",
-    "wrongCodeRestore":"Code de confirmation est déjà utilisé ou incorrecte",
-    "forbidden":"Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",
-    "accountNotActivated":"Ce compte n’est pas encore activé. <a href=\"/activate\"> Envoyer à nouveau le lien d’activation</a>",
-    "accountBlocked":"Ce compte est bloqué",
-    "notFound":"Introuvable",
-    "alreadyExists":"Ce compte existe déjà",
-    "unknownError":"Erreur inattendue survenue",
-    "accountAlreadyActivated":"Ce compte est déjà activé",
-    "emailNotFound":"Compte n’existe pas",
-    "EmailAlreadyExists":"Courriel déjà enregistré",
-    "oldPasswordMistmatch":"Mot de passe actuel incorrect",
-    "passwordMismatch":"Mot de passe incorrect",
-    "cantEditYourself":"Modification des propres autorisations n’est pas autorisée",
-    "cantEditAdmin":"Cet usager dispose d’autorisations administrateur",
-    "cantOpenClient":"{{VMS_NAME}} application non détectée. <a href=\"/download\"> Télécharger</a>",
-    "lostConnection":"Connexion à {{systemName}} perdu",
-    "thisSystem":"le système"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Impossible d’envoyer courriel de confirmation",
+    "cantDisconnectSystemPrefix": "Impossible de supprimer le système",
+    "cantUnshareWithMeSystemPrefix": "Impossible de supprimer le système",
+    "cantSharePrefix": "Impossible de partager le système",
+    "cantGetUsersListPrefix": "Liste des usagers non disponible",
+    "cantGetSystemsListPrefix": "Liste système non disponible",
+    "cantRegisterPrefix": "Erreur survenue",
+    "cantGetSystemInfoPrefix": "Information système non disponible",
+    "cantChangeAccountPrefix": "Impossible d'enregistrer les changements",
+    "cantChangePasswordPrefix": "Ne peut pas enregistrer le mot de passe",
+    "cantActivatePrefix": "Impossible d'activer votre compte",
+    "cantSendConfirmationPrefix": "Impossible d’envoyer courriel de confirmation",
+    "cloudInvalidResponse": "BD Nuage a retourné une réponse inattendue",
+    "notAuthorized": "Courriel ou mot de passe incorrect",
+    "wrongParameters": "Certains paramètres dans le formulaire sont incorrects",
+    "wrongCode": "Compte déjà activé ou le code de confirmation est incorrect",
+    "wrongCodeRestore": "Code de confirmation est déjà utilisé ou incorrecte",
+    "forbidden": "Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",
+    "accountNotActivated": "Ce compte n’est pas encore activé. <a href=\"/activate\"> Envoyer à nouveau le lien d’activation</a>",
+    "accountBlocked": "Ce compte est bloqué",
+    "notFound": "Introuvable",
+    "alreadyExists": "Ce compte existe déjà",
+    "unknownError": "Erreur inattendue survenue",
+    "accountAlreadyActivated": "Ce compte est déjà activé",
+    "emailNotFound": "Compte n’existe pas",
+    "EmailAlreadyExists": "Courriel déjà enregistré",
+    "oldPasswordMistmatch": "Mot de passe actuel incorrect",
+    "passwordMismatch": "Mot de passe incorrect",
+    "cantEditYourself": "Modification des propres autorisations n’est pas autorisée",
+    "cantEditAdmin": "Cet usager dispose d’autorisations administrateur",
+    "cantOpenClient": "{{VMS_NAME}} application non détectée. <a href=\"/download\"> Télécharger</a>",
+    "lostConnection": "Connexion à {{systemName}} perdu",
+    "thisSystem": "le système"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"Mot de passe doit contenir au moins 8 caractères",
-    "requiredMessage":"Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
-    "weakMessage":"Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
-    "strongMessage":"Mot de passe fort!",
-    "commonMessage":"Ce mot de passe est en haut de la liste des plus populaires dans le monde"
+  "passwordRequirements": {
+    "minLengthMessage": "Mot de passe doit contenir au moins 8 caractères",
+    "requiredMessage": "Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
+    "weakMessage": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
+    "strongMessage": "Mot de passe fort!",
+    "commonMessage": "Ce mot de passe est en haut de la liste des plus populaires dans le monde"
   },
-  "sharing":{
-    "confirmOwner":"Si vous modifiez le propriétaire du système, vous révoquez la propriété sur le compte courant. Cette action est irréversible. Êtes-vous sûr ?",
-    "shareTitle":"Partager",
-    "shareConfirmButton":"Partager",
-    "editShareTitle":"Modifier autorisations",
-    "editShareConfirmButton":"Enregistrer",
-    "permissionsSaved":"Nouvelles autorisations enregistrées"
+  "sharing": {
+    "confirmOwner": "Si vous modifiez le propriétaire du système, vous révoquez la propriété sur le compte courant. Cette action est irréversible. Êtes-vous sûr ?",
+    "shareTitle": "Partager",
+    "shareConfirmButton": "Partager",
+    "editShareTitle": "Modifier autorisations",
+    "editShareConfirmButton": "Enregistrer",
+    "permissionsSaved": "Nouvelles autorisations enregistrées"
   },
-  "system":{
-    "yourSystem":"Votre système",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"Le système est inaccessible",
-    "offline":"System Hors ligne",
-    "openClient":"Ouvert à {{VMS_NAME}}",
-    "confirmRenameTitle":"Nom système",
-    "confirmRenameAction":"Enregistrer",
-    "successRename":"Nom du système sauvegardé",
-    "confirmDisconnectTitle":"Déconnecter le système de {{PRODUCT_NAME}}?",
-    "confirmDisconnectAction":"Déconnecter",
-    "confirmUnshareFromMe":"Vous êtes sur le point de déconnecter ce système de votre compte. Vous ne serez plus en mesure d’accéder à ce système. Êtes-Vous sûr ?",
-    "confirmUnshareFromMeTitle":"Déconnecter système?",
-    "confirmUnshareFromMeAction":"Déconnecter",
-    "confirmUnshare":"Cet usager ne sera pas en mesure d’accéder au système. Êtes-vous sûr?",
-    "confirmUnshareTitle":"Supprimer usager?",
-    "confirmUnshareAction":"Supprimer",
-    "successDisconnected":"Système correctement déconnecté de {{PRODUCT_NAME}}",
-    "successDeleted":"Système {{systemName}} a correctement été supprimé de votre compte",
-    "permissionsRemoved":"Autorisations retirées de {{email}}"
+  "system": {
+    "yourSystem": "Votre système",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "Le système est inaccessible",
+    "offline": "System Hors ligne",
+    "openClient": "Ouvert à {{VMS_NAME}}",
+    "confirmRenameTitle": "Nom système",
+    "confirmRenameAction": "Enregistrer",
+    "successRename": "Nom du système sauvegardé",
+    "confirmDisconnectTitle": "Déconnecter le système de {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction": "Déconnecter",
+    "confirmUnshareFromMe": "Vous êtes sur le point de déconnecter ce système de votre compte. Vous ne serez plus en mesure d’accéder à ce système. Êtes-Vous sûr ?",
+    "confirmUnshareFromMeTitle": "Déconnecter système?",
+    "confirmUnshareFromMeAction": "Déconnecter",
+    "confirmUnshare": "Cet usager ne sera pas en mesure d’accéder au système. Êtes-vous sûr?",
+    "confirmUnshareTitle": "Supprimer usager?",
+    "confirmUnshareAction": "Supprimer",
+    "successDisconnected": "Système correctement déconnecté de {{PRODUCT_NAME}}",
+    "successDeleted": "Système {{systemName}} a correctement été supprimé de votre compte",
+    "permissionsRemoved": "Autorisations retirées de {{email}}"
   },
-  "account":{
-    "accountSavedSuccess":"Votre compte est enregistré avec succès",
-    "activationLinkSent":"Lien d'activation envoyé",
-    "passwordChangedSuccess":"Votre compte est enregistré avec succès",
-    "changePassword":"Changer mot de passe",
-    "newPasswordLabel":"Nouveau mot de passe",
-    "saveChanges":"Enregistrer"
+  "account": {
+    "accountSavedSuccess": "Votre compte est enregistré avec succès",
+    "activationLinkSent": "Lien d'activation envoyé",
+    "passwordChangedSuccess": "Votre compte est enregistré avec succès",
+    "changePassword": "Changer mot de passe",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "saveChanges": "Enregistrer"
   },
-  "downloads":{
-    "noClientDetectedTitle":"Installer {{VMS_NAME}} pour visionner votre Système",
-    "action":"Télécharger {{VMS_NAME}}",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "Installer {{VMS_NAME}} pour visionner votre Système",
+    "action": "Télécharger {{VMS_NAME}}",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"Windows",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"Client seulement",
-      "server":"Server seulement",
-      "bundle":"Client et serveur",
-      "servertool":"Outil de configuration"
+    "appTypes": {
+      "client": "Client seulement",
+      "server": "Server seulement",
+      "bundle": "Client et serveur",
+      "servertool": "Outil de configuration"
     }
   },
-  "activeActions":{
-    "sendConfirm":"Renvoyer lien d'activation",
-    "resetPassword":"Réinitialiser mot de passe",
-    "setNewPassword":"Sauvergarder mot de passe",
-    "setNewPasswordLabel":"Nouveau mot de passe"
+  "activeActions": {
+    "sendConfirm": "Renvoyer lien d'activation",
+    "resetPassword": "Réinitialiser mot de passe",
+    "setNewPassword": "Sauvergarder mot de passe",
+    "setNewPasswordLabel": "Nouveau mot de passe"
   },
-  "regActions":{
-    "passwordLabel":"Mot de passe",
-    "createAccount":"Créer compte"
+  "regActions": {
+    "passwordLabel": "Mot de passe",
+    "createAccount": "Créer compte"
   },
-  "header":{
-    "allSystems":"Tous les systèmes",
-    "systems":"Systèmes"
+  "header": {
+    "allSystems": "Tous les systèmes",
+    "systems": "Systèmes"
   }
 }

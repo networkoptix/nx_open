@@ -5,7 +5,7 @@
 #include <QtConcurrent/QtConcurrentMap>
 
 #include "socket.h"
-#include "simple_http_client.h"
+#include "nx/network/deprecated/simple_http_client.h"
 
 struct QnTestAddress
 {

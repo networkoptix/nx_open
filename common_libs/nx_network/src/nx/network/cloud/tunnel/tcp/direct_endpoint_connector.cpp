@@ -1,7 +1,6 @@
 #include "direct_endpoint_connector.h"
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/log/log.h>
 
 #include "direct_endpoint_tunnel.h"

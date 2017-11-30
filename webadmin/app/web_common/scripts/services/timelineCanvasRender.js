@@ -1046,11 +1046,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
 
         result.eventsRow = drawOrCheckEvents(null, mouseX, mouseY);
-        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
-        mouseY *= self.pixelAspectRatio;
-        result.timeline = mouseY > top && mouseX > 0 &&
-                          mouseX * self.pixelAspectRatio < self.canvas.width &&
-                          mouseY < self.canvas.height;
+        result.timeline = mouseX > 0 && mouseX * self.pixelAspectRatio < self.canvas.width;
 
         return result;
     };

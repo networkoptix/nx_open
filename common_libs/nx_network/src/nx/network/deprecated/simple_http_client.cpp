@@ -8,7 +8,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
-#include "http/http_types.h"
+#include "../http/http_types.h"
 
 //static const int MAX_LINE_LENGTH = 1024*16;
 

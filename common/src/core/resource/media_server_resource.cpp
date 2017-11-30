@@ -4,7 +4,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>

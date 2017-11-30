@@ -174,6 +174,21 @@ angular.module('cloudApp', [
             }
         })
 
+        .when('/downloads/history', {
+            title: L.pageTitles.download,
+            templateUrl: Config.viewsDir + 'downloadHistory.html',
+            controller: 'DownloadHistoryCtrl'
+        })
+        .when('/downloads/:build', {
+            title: L.pageTitles.download,
+            templateUrl: Config.viewsDir + 'downloadHistory.html',
+            controller: 'DownloadHistoryCtrl'
+        })
+        .when('/downloads', {
+            title: L.pageTitles.download,
+            templateUrl: Config.viewsDir + 'download.html',
+            controller: 'DownloadCtrl'
+        })
         .when('/download', {
             title: L.pageTitles.download,
             templateUrl: Config.viewsDir + 'download.html',

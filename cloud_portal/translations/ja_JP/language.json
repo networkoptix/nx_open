@@ -1,237 +1,237 @@
 {
-  "language_name":"日本語",
-  "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
-  "dialogs":{
-    "okButton":"Ok",
-    "cancelButton":"キャンセル",
-    "loginTitle":"{{PRODUCT_NAME}} にログイン",
-    "loginButton":"ログイン",
-    "logoutAuthorisedTitle":"すでにログインしています",
-    "logoutAuthorisedContinueButton":"続行",
-    "logoutAuthorisedLogoutButton":"ログアウト"
+  "language_name": "日本語",
+  "productName": "{{PRODUCT_NAME}}",
+  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "キャンセル",
+    "loginTitle": "{{PRODUCT_NAME}} にログイン",
+    "loginButton": "ログイン",
+    "logoutAuthorisedTitle": "すでにログインしています",
+    "logoutAuthorisedContinueButton": "続行",
+    "logoutAuthorisedLogoutButton": "ログアウト"
   },
-  "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
-    "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"ようこそ",
-    "register":"アカウントを作成",
-    "changePassword":"パスワードを変更 -",
-    "account":"アカウント設定 -",
-    "systems":"システム -",
-    "system":"システム -",
-    "systemShare":"共有システム -",
-    "activate":"アクティベート アカウント -",
-    "activateSent":"アクティベート アカウント -",
-    "activateSuccess":"アカウント アクティベート -",
-    "activateCode":"アクティベート アカウント -",
-    "restorePassword":"パスワードリセット -",
-    "restorePasswordSuccess":"パスワードを保存 -",
-    "restorePasswordCode":"パスワードリセット -",
-    "view":"カメラを表示 - ",
-    "debug":"デバッグ",
-    "login":"ログイン -",
-    "download":"{{VMS_NAME}} をダウンロード",
-    "downloadPlatform":"{{VMS_NAME}} をダウンロード ",
-    "pageNotFound":"ページが見つかりません"
+  "pageTitles": {
+    "template": "{{title}} {{PRODUCT_NAME}}",
+    "default": "{{PRODUCT_NAME}}",
+    "registerSuccess": "ようこそ",
+    "register": "アカウントを作成",
+    "changePassword": "パスワードを変更 -",
+    "account": "アカウント設定 -",
+    "systems": "システム -",
+    "system": "システム -",
+    "systemShare": "共有システム -",
+    "activate": "アクティベート アカウント -",
+    "activateSent": "アクティベート アカウント -",
+    "activateSuccess": "アカウント アクティベート -",
+    "activateCode": "アクティベート アカウント -",
+    "restorePassword": "パスワードリセット -",
+    "restorePasswordSuccess": "パスワードを保存 -",
+    "restorePasswordCode": "パスワードリセット -",
+    "view": "カメラを表示 - ",
+    "debug": "デバッグ",
+    "login": "ログイン -",
+    "download": "{{VMS_NAME}} をダウンロード",
+    "downloadPlatform": "{{VMS_NAME}} をダウンロード ",
+    "pageNotFound": "ページが見つかりません"
   },
-  "systemStatuses":{
-    "notActivated":"アクティベートされていません",
-    "activated":"アクティベート済",
-    "online":"オンライン",
-    "offline":"オフライン",
-    "unavailable":"利用できません"
+  "systemStatuses": {
+    "notActivated": "アクティベートされていません",
+    "activated": "アクティベート済",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "unavailable": "利用できません"
   },
-  "accessRoles":{
-    "disabled":{
-      "label":"無効",
-      "description":"ユーザーが無効の為にシステムにログインできません"
+  "accessRoles": {
+    "disabled": {
+      "label": "無効",
+      "description": "ユーザーが無効の為にシステムにログインできません"
     },
-    "Owner":{
-      "label":"オーナー",
-      "description":"クラウドから、共有とシステムの接続/切断を含む無制限のアクセス"
+    "Owner": {
+      "label": "オーナー",
+      "description": "クラウドから、共有とシステムの接続/切断を含む無制限のアクセス"
     },
-    "Viewer":{
-      "label":"ビューアー",
-      "description":"ライブ ビデオとアーカイブを参照できます"
+    "Viewer": {
+      "label": "ビューアー",
+      "description": "ライブ ビデオとアーカイブを参照できます"
     },
-    "Live Viewer":{
-      "label":"ライブビューアー",
-      "description":"ライブ表示のみ可能"
+    "Live Viewer": {
+      "label": "ライブビューアー",
+      "description": "ライブ表示のみ可能"
     },
-    "Advanced Viewer":{
-      "label":"拡張ビューアー",
-      "description":"ライブ表示、アーカイブ表示、カメラ設定、PTZコントロール 等"
+    "Advanced Viewer": {
+      "label": "拡張ビューアー",
+      "description": "ライブ表示、アーカイブ表示、カメラ設定、PTZコントロール 等"
     },
-    "Administrator":{
-      "label":"アドミニストレーター",
-      "description":"共有する機能を含む無制限のアクセス"
+    "Administrator": {
+      "label": "アドミニストレーター",
+      "description": "共有する機能を含む無制限のアクセス"
     },
-    "Custom":{
-      "label":"カスタム",
-      "description":"{{PRODUCT_NAME}} クライアント アプリケーションを使用してカスタム権限を設定する"
+    "Custom": {
+      "label": "カスタム",
+      "description": "{{PRODUCT_NAME}} クライアント アプリケーションを使用してカスタム権限を設定する"
     },
-    "cloudAdmin":{
-      "label":"アドミニストレーター",
-      "description":"システムを構成し共有することができます"
+    "cloudAdmin": {
+      "label": "アドミニストレーター",
+      "description": "システムを構成し共有することができます"
     },
-    "customRole":{
-      "label":"カスタムの役割",
-      "description":"システムで指定されたカスタムのユーザーの役割"
+    "customRole": {
+      "label": "カスタムの役割",
+      "description": "システムで指定されたカスタムのユーザーの役割"
     },
-    "owner":{
-      "label":"オーナー",
-      "description":"クラウドから、共有とシステムの接続/切断を含む無制限のアクセス"
+    "owner": {
+      "label": "オーナー",
+      "description": "クラウドから、共有とシステムの接続/切断を含む無制限のアクセス"
     },
-    "viewer":{
-      "label":"ビューアー",
-      "description":"ライブ ビデオとアーカイブを参照できます"
+    "viewer": {
+      "label": "ビューアー",
+      "description": "ライブ ビデオとアーカイブを参照できます"
     },
-    "liveViewer":{
-      "label":"ライブビューアー",
-      "description":"ライブ表示のみ可能"
+    "liveViewer": {
+      "label": "ライブビューアー",
+      "description": "ライブ表示のみ可能"
     },
-    "advancedViewer":{
-      "label":"拡張ビューアー",
-      "description":"ライブ表示、アーカイブ表示、カメラ設定、PTZコントロール 等"
+    "advancedViewer": {
+      "label": "拡張ビューアー",
+      "description": "ライブ表示、アーカイブ表示、カメラ設定、PTZコントロール 等"
     },
-    "custom":{
-      "label":"カスタム",
-      "description":"{{PRODUCT_NAME}} クライアント アプリケーションを使用してカスタム権限を設定する"
+    "custom": {
+      "label": "カスタム",
+      "description": "{{PRODUCT_NAME}} クライアント アプリケーションを使用してカスタム権限を設定する"
     }
   },
-  "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"確認メールを送信できません",
-    "cantDisconnectSystemPrefix":"システムを削除できません",
-    "cantUnshareWithMeSystemPrefix":"システムを削除できません",
-    "cantSharePrefix":"システムを共有できません",
-    "cantGetUsersListPrefix":"ユーザーのリストは使用できません",
-    "cantGetSystemsListPrefix":"システム リストは使用できません",
-    "cantRegisterPrefix":"エラーが発生しました",
-    "cantGetSystemInfoPrefix":"システム情報はありません",
-    "cantChangeAccountPrefix":"変更を保存できません",
-    "cantChangePasswordPrefix":"パスワードを保存できません",
-    "cantActivatePrefix":"アカウントをアクティベートできません",
-    "cantSendConfirmationPrefix":"確認メールを送信できません",
-    "cloudInvalidResponse":"クラウド DB が予期しない応答を返しました",
-    "notAuthorized":"Emailまたはパスワードが間違っています",
-    "wrongParameters":"フォーム上のいくつかのパラメーターが正しくありません",
-    "wrongCode":"アカウントは既にアクティブ済か確認コードが正しくありません",
-    "wrongCodeRestore":"確認コードは既に使用されているかまたは不正です",
-    "forbidden":"この操作を実行するアクセス権限がありません",
-    "accountNotActivated":"このアカウントはまだアクティベートされていません <a href=\"/activate\"> 再度アクティベートリンクを送信</a>",
-    "accountBlocked":"このアカウントはブロックされています",
-    "notFound":"見つかりません",
-    "alreadyExists":"このアカウントは既に存在します",
-    "unknownError":"予期しないエラーが発生しました",
-    "accountAlreadyActivated":"このアカウントは既にアクティベートされています",
-    "emailNotFound":"アカウントが存在しません",
-    "EmailAlreadyExists":"このEmailは既に登録されています",
-    "oldPasswordMistmatch":"パスワードが違います",
-    "passwordMismatch":"間違ったパスワード",
-    "cantEditYourself":"自分のアクセス権限を変更することはできません",
-    "cantEditAdmin":"このユーザーは管理者権限を持っています",
-    "cantOpenClient":"{{VMS_NAME}} アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
-    "lostConnection":"{{systemName}} への接続が失われました",
-    "thisSystem":"システム"
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "確認メールを送信できません",
+    "cantDisconnectSystemPrefix": "システムを削除できません",
+    "cantUnshareWithMeSystemPrefix": "システムを削除できません",
+    "cantSharePrefix": "システムを共有できません",
+    "cantGetUsersListPrefix": "ユーザーのリストは使用できません",
+    "cantGetSystemsListPrefix": "システム リストは使用できません",
+    "cantRegisterPrefix": "エラーが発生しました",
+    "cantGetSystemInfoPrefix": "システム情報はありません",
+    "cantChangeAccountPrefix": "変更を保存できません",
+    "cantChangePasswordPrefix": "パスワードを保存できません",
+    "cantActivatePrefix": "アカウントをアクティベートできません",
+    "cantSendConfirmationPrefix": "確認メールを送信できません",
+    "cloudInvalidResponse": "クラウド DB が予期しない応答を返しました",
+    "notAuthorized": "Emailまたはパスワードが間違っています",
+    "wrongParameters": "フォーム上のいくつかのパラメーターが正しくありません",
+    "wrongCode": "アカウントは既にアクティブ済か確認コードが正しくありません",
+    "wrongCodeRestore": "確認コードは既に使用されているかまたは不正です",
+    "forbidden": "この操作を実行するアクセス権限がありません",
+    "accountNotActivated": "このアカウントはまだアクティベートされていません <a href=\"/activate\"> 再度アクティベートリンクを送信</a>",
+    "accountBlocked": "このアカウントはブロックされています",
+    "notFound": "見つかりません",
+    "alreadyExists": "このアカウントは既に存在します",
+    "unknownError": "予期しないエラーが発生しました",
+    "accountAlreadyActivated": "このアカウントは既にアクティベートされています",
+    "emailNotFound": "アカウントが存在しません",
+    "EmailAlreadyExists": "このEmailは既に登録されています",
+    "oldPasswordMistmatch": "パスワードが違います",
+    "passwordMismatch": "間違ったパスワード",
+    "cantEditYourself": "自分のアクセス権限を変更することはできません",
+    "cantEditAdmin": "このユーザーは管理者権限を持っています",
+    "cantOpenClient": "{{VMS_NAME}} アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
+    "lostConnection": "{{systemName}} への接続が失われました",
+    "thisSystem": "システム"
   },
-  "passwordRequirements":{
-    "minLengthMessage":"パスワードは8文字以上必要です",
-    "requiredMessage":"英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
-    "weakMessage":"大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
-    "strongMessage":"強力なパスワード!",
-    "commonMessage":"このパスワードは、世界で最も人気のあるパスワード"
+  "passwordRequirements": {
+    "minLengthMessage": "パスワードは8文字以上必要です",
+    "requiredMessage": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
+    "weakMessage": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
+    "strongMessage": "強力なパスワード!",
+    "commonMessage": "このパスワードは、世界で最も人気のあるパスワード"
   },
-  "sharing":{
-    "confirmOwner":"システムオーナーを変更すると現在のアカウントから所有権を失効します　この操作は元に戻せません　宜しいですか？",
-    "shareTitle":"共有",
-    "shareConfirmButton":"共有",
-    "editShareTitle":"権限を編集",
-    "editShareConfirmButton":"保存",
-    "permissionsSaved":"新しい権限の保存"
+  "sharing": {
+    "confirmOwner": "システムオーナーを変更すると現在のアカウントから所有権を失効します　この操作は元に戻せません　宜しいですか？",
+    "shareTitle": "共有",
+    "shareConfirmButton": "共有",
+    "editShareTitle": "権限を編集",
+    "editShareConfirmButton": "保存",
+    "permissionsSaved": "新しい権限の保存"
   },
-  "system":{
-    "yourSystem":"ご利用のシステム",
-    "mySystemSearch":"IMeMyMine",
-    "unavailable":"システムに到達できません",
-    "offline":"システムはオフライン",
-    "openClient":"{{VMS_NAME}} で開く",
-    "confirmRenameTitle":"システム名",
-    "confirmRenameAction":"保存",
-    "successRename":"システム名は保存されました",
-    "confirmDisconnectTitle":"{{PRODUCT_NAME}} からシステムを切断しますか？",
-    "confirmDisconnectAction":"切断",
-    "confirmUnshareFromMe":"あなたのアカウントからこのシステムを切断しようとしています　もうこのシステムにアクセスすることはできません\n切断しますか？",
-    "confirmUnshareFromMeTitle":"システムを切断しますか？",
-    "confirmUnshareFromMeAction":"切断",
-    "confirmUnshare":"このユーザはシステムにアクセスすることができません　宜しいですか？",
-    "confirmUnshareTitle":"ユーザーを削除しますか？",
-    "confirmUnshareAction":"削除",
-    "successDisconnected":"システムが正常に {{PRODUCT_NAME}} から切断されました",
-    "successDeleted":"システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "permissionsRemoved":"{{email}} からアクセス権限が削除されました"
+  "system": {
+    "yourSystem": "ご利用のシステム",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "システムに到達できません",
+    "offline": "システムはオフライン",
+    "openClient": "{{VMS_NAME}} で開く",
+    "confirmRenameTitle": "システム名",
+    "confirmRenameAction": "保存",
+    "successRename": "システム名は保存されました",
+    "confirmDisconnectTitle": "{{PRODUCT_NAME}} からシステムを切断しますか？",
+    "confirmDisconnectAction": "切断",
+    "confirmUnshareFromMe": "あなたのアカウントからこのシステムを切断しようとしています　もうこのシステムにアクセスすることはできません\n切断しますか？",
+    "confirmUnshareFromMeTitle": "システムを切断しますか？",
+    "confirmUnshareFromMeAction": "切断",
+    "confirmUnshare": "このユーザはシステムにアクセスすることができません　宜しいですか？",
+    "confirmUnshareTitle": "ユーザーを削除しますか？",
+    "confirmUnshareAction": "削除",
+    "successDisconnected": "システムが正常に {{PRODUCT_NAME}} から切断されました",
+    "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
+    "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
   },
-  "account":{
-    "accountSavedSuccess":"あなたのアカウントは正常に保存されました",
-    "activationLinkSent":"アクティベートリンク送信",
-    "passwordChangedSuccess":"あなたのアカウントは正常に保存されました",
-    "changePassword":"パスワードを変更",
-    "newPasswordLabel":"新規パスワード",
-    "saveChanges":"保存"
+  "account": {
+    "accountSavedSuccess": "あなたのアカウントは正常に保存されました",
+    "activationLinkSent": "アクティベートリンク送信",
+    "passwordChangedSuccess": "あなたのアカウントは正常に保存されました",
+    "changePassword": "パスワードを変更",
+    "newPasswordLabel": "新規パスワード",
+    "saveChanges": "保存"
   },
-  "downloads":{
-    "noClientDetectedTitle":"システムを表示するには {{VMS_NAME}} をインストールします",
-    "action":"{{VMS_NAME}} をダウンロード",
-    "mobile":{
-      "ios":{
-        "link":"{{IOS_APP_LINK}}"
+  "downloads": {
+    "noClientDetectedTitle": "システムを表示するには {{VMS_NAME}} をインストールします",
+    "action": "{{VMS_NAME}} をダウンロード",
+    "mobile": {
+      "ios": {
+        "link": "{{IOS_APP_LINK}}"
       },
-      "android":{
-        "link":"{{ANDROID_APP_LINK}}"
+      "android": {
+        "link": "{{ANDROID_APP_LINK}}"
       }
     },
-    "groups":{
-      "windows":{
-        "label":"ウィンドウズ",
-        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
+    "groups": {
+      "windows": {
+        "label": "ウィンドウズ",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
       },
-      "mac":{
-        "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
-      "linux":{
-        "label":"Ubuntu Linux",
-        "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
-    "platforms":{
-      "win64":"x64",
-      "win86":"x86",
-      "linux64":"x64",
-      "linux86":"x86",
-      "mac":"X"
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
     },
-    "appTypes":{
-      "client":"クライアントのみ",
-      "server":"サーバーのみ",
-      "bundle":"クライアントとサーバー",
-      "servertool":"構成ツール"
+    "appTypes": {
+      "client": "クライアントのみ",
+      "server": "サーバーのみ",
+      "bundle": "クライアントとサーバー",
+      "servertool": "構成ツール"
     }
   },
-  "activeActions":{
-    "sendConfirm":"アクティベートリンク再送",
-    "resetPassword":"パスワードリセット",
-    "setNewPassword":"パスワードを保存",
-    "setNewPasswordLabel":"新規パスワード"
+  "activeActions": {
+    "sendConfirm": "アクティベートリンク再送",
+    "resetPassword": "パスワードリセット",
+    "setNewPassword": "パスワードを保存",
+    "setNewPasswordLabel": "新規パスワード"
   },
-  "regActions":{
-    "passwordLabel":"パスワード",
-    "createAccount":"アカウント作成"
+  "regActions": {
+    "passwordLabel": "パスワード",
+    "createAccount": "アカウント作成"
   },
-  "header":{
-    "allSystems":"すべてのシステム",
-    "systems":"システム"
+  "header": {
+    "allSystems": "すべてのシステム",
+    "systems": "システム"
   }
 }
