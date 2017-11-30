@@ -2690,9 +2690,6 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
     if (!d->analyticsMetadataProvider)
         return;
 
-    if (analyticsEnabled == isAnalyticsEnabled())
-        return;
-
     if (!analyticsEnabled)
         d->analyticsController->clearAreas();
 
