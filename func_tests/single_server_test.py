@@ -214,8 +214,8 @@ def test_frequent_restarts(server):
     server.restart_via_api(timeout=timedelta(seconds=10))
 
 
-# https://networkoptix.atlassian.net/browse/VMS-7808
-# https://networkoptix.atlassian.net/browse/VMS-7809
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7808")
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7809")
 @pytest.mark.parametrize('path', [
     '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
     '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
