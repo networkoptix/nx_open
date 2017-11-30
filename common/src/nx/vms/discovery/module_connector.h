@@ -4,7 +4,7 @@
 #include <map>
 
 #include <network/module_information.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/move_only_func.h>
 

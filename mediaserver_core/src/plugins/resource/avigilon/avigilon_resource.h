@@ -13,7 +13,7 @@
 #include <QString>
 
 #include <plugins/resource/onvif/onvif_resource.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 
 /*!

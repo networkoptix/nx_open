@@ -8,9 +8,9 @@
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/thread/stoppable.h>
 
-#include "http/asynchttpclient.h"
-#include "nx/utils/thread/stoppable.h"
+#include "deprecated/asynchttpclient.h"
 
 // TODO: #ak Inherit from aio::BasicPollable.
 

@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
 #include <nx/utils/random.h>
 

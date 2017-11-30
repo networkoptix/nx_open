@@ -9,7 +9,7 @@
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>

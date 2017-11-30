@@ -1,7 +1,7 @@
 
 #include "statistics_settings_watcher.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>

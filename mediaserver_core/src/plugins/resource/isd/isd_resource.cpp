@@ -1,7 +1,7 @@
 #ifdef ENABLE_ISD
 
 #include <utils/math/math.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "isd_stream_reader.h"
 #include "isd_resource.h"

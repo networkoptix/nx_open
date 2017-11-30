@@ -16,7 +16,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/vms/event/rule.h>

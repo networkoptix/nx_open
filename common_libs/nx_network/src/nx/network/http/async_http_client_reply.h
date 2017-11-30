@@ -4,9 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
-
-#include "asynchttpclient.h"
 
 class NX_NETWORK_API QnAsyncHttpClientReply:
     public QObject

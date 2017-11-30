@@ -15,9 +15,8 @@
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/system_error.h>
 
-#include "auth_tools.h"
-#include "buffer_source.h"
-#include "custom_headers.h"
+#include "nx/network/http/buffer_source.h"
+#include "nx/network/http/custom_headers.h"
 
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;

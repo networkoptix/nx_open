@@ -6,10 +6,10 @@
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QSharedPointer>
-#include <nx/utils/url.h>
-#include <nx/network/socket_common.h>
 
-#include "socket.h"
+#include <nx/network/socket_common.h>
+#include <nx/network/socket.h>
+#include <nx/utils/url.h>
 
 // TODO: #Elric this class is so bad interface-wise that I don't even want to fix it.
 

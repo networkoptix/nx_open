@@ -10,7 +10,7 @@
 #include <nx_ec/data/api_email_data.h>
 #include <utils/common/threadqueue.h>
 #include <nx/fusion/serialization/json.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/mutex.h>

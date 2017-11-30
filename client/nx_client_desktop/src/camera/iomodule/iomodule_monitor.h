@@ -5,7 +5,7 @@
 #include "api/model/api_ioport_data.h"
 #include "core/resource/resource_fwd.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
 

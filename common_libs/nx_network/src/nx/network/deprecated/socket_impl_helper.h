@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstract_socket.h"
+#include "../abstract_socket.h"
 
 namespace nx {
 namespace network {
