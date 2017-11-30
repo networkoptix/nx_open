@@ -15,6 +15,7 @@ struct TegraVideoIniConfig: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableTime, "");
 
     NX_INI_INT(1, decodersCount, "Number of simultaneous hardware video decoders.");
+    NX_INI_INT(1, tegraVideoCount, "Number of simultaneous TegraVideo instances.");
     NX_INI_INT(-1, cropRectX, "-1 means 0.");
     NX_INI_INT(-1, cropRectY, "-1 means 0.");
     NX_INI_INT(-1, cropRectW, "-1 means taking frame width.");

@@ -12,6 +12,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <ui/common/palette.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
@@ -57,23 +59,22 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
     setMediaParams(widget->resource(), widget->item()->data(), widget->context());
-    if (!allowLayoutExport)
+    if (allowLayoutExport)
+        setLayout(widget->item()->layout()->resource());
+    else
         hideTab(Mode::Layout);
+}
 
-    const auto layout = widget->item()->layout()->resource();
-    d->setLayout(layout);
-    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
-
-    const auto palette = ui->layoutPreviewWidget->palette();
-    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
-    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
-
-    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
-    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
-        baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
-    baseFileName.name = baseName;
-    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
+ExportSettingsDialog::ExportSettingsDialog(const QnLayoutResourcePtr& layout,
+    const QString& mediaForbiddenReason,
+    const QnTimePeriod& timePeriod,
+    FileNameValidator isFileNameValid,
+    QWidget* parent)
+    :
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
+{
+    disableTab(Mode::Media, mediaForbiddenReason);
+    setLayout(layout);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -126,6 +127,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     isFileNameValid(isFileNameValid)
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Exporting_Help);
 
     ui->mediaPreviewWidget->setMaximumSize(kPreviewSize);
     ui->layoutPreviewWidget->setMaximumSize(kPreviewSize);
@@ -194,13 +196,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
         d, &Private::setLayoutReadOnly);
 
-    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
+    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d,
+        &Private::setLayoutFilename);
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, this,
         [this](const Filename& fileName)
         {
             d->setMediaFilename(fileName);
-            ui->transcodingButtonsWidget->setHidden(
-                FileExtensionUtils::isExecutable(fileName.extension));
         });
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
@@ -257,24 +258,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
 
     connect(d, &Private::transcodingAllowedChanged, this,
-        [this](bool transcodingIsAllowed)
-        {
-            ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
-            if (transcodingIsAllowed)
-            {
-                ui->exportMediaSettingsPage->setApplyFilters(
-                    d->exportMediaPersistentSettings().applyFilters);
-            }
-            else
-            {
-                ui->cameraExportSettingsButton->click();
-            }
-        });
+        &ExportSettingsDialog::updateTranscodingWidgets);
+    updateTranscodingWidgets(d->isTranscodingAllowed());
 
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
         {
-
             setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
             setMaxOverlayWidth(ui->imageSettingsPage, size.width());
             setMaxOverlayWidth(ui->textSettingsPage, size.width());
@@ -497,10 +486,12 @@ void ExportSettingsDialog::updateTabWidgetSize()
 
 void ExportSettingsDialog::updateMode()
 {
-    const auto currentMode = ui->tabWidget->currentWidget() == ui->cameraTab
-        ? Mode::Media
-        : Mode::Layout;
+    const auto cameraTabIndex = ui->tabWidget->indexOf(ui->cameraTab);
 
+    const auto isCameraMode = ui->tabWidget->currentIndex() == cameraTabIndex
+        && ui->tabWidget->isTabEnabled(cameraTabIndex);
+
+    const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
 }
 
@@ -560,6 +551,21 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         setAlertText(i, texts[i]);
 }
 
+void ExportSettingsDialog::updateTranscodingWidgets(bool transcodingIsAllowed)
+{
+    ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
+    if (transcodingIsAllowed)
+    {
+        ui->exportMediaSettingsPage->setApplyFilters(
+            d->exportMediaPersistentSettings().applyFilters);
+    }
+    else
+    {
+        ui->cameraExportSettingsButton->click();
+    }
+    ui->transcodingButtonsWidget->setHidden(!transcodingIsAllowed);
+}
+
 void ExportSettingsDialog::setMediaParams(
     const QnMediaResourcePtr& mediaResource,
     const QnLayoutItemData& itemData,
@@ -607,9 +613,39 @@ void ExportSettingsDialog::setMediaParams(
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
+void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
+{
+    d->setLayout(layout);
+    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
+
+    const auto palette = ui->layoutPreviewWidget->palette();
+    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
+    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
+
+    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
+    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+        baseName = tr("exported");
+    Filename baseFileName = d->exportLayoutSettings().filename;
+    baseFileName.name = baseName;
+    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
+}
+
+void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
+{
+    NX_EXPECT(ui->tabWidget->count() > 1);
+
+    const auto tabIndex = mode == Mode::Media
+        ? ui->tabWidget->indexOf(ui->cameraTab)
+        : ui->tabWidget->indexOf(ui->layoutTab);
+
+    ui->tabWidget->setTabEnabled(tabIndex, false);
+    ui->tabWidget->setTabToolTip(tabIndex, reason);
+    updateMode();
+}
+
 void ExportSettingsDialog::hideTab(Mode mode)
 {
-    NX_ASSERT(ui->tabWidget->count() > 1);
+    NX_EXPECT(ui->tabWidget->count() > 1);
     ui->tabWidget->removeTab(mode == Mode::Media
         ? ui->tabWidget->indexOf(ui->cameraTab)
         : ui->tabWidget->indexOf(ui->layoutTab));

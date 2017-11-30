@@ -1,9 +1,11 @@
-import logging
-import time
-import re
-import imaplib
 import email
+import imaplib
+import logging
+import re
+import time
+
 import pytest
+
 from .utils import datetime_utc_now
 
 log = logging.getLogger(__name__)

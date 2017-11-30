@@ -270,7 +270,10 @@ bool QnRecordingManager::startOrStopRecording(
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
-    bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
+    bool needRecordCamera =
+        !isResourceDisabled(res) &&
+        !cameraRes->isDtsBased() &&
+        !cameraRes->needsToChangeDefaultPassword();
 
     bool someRecordingIsPresent = false;
 

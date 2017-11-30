@@ -1081,12 +1081,8 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
 
 bool CameraScheduleWidget::canEnableRecording() const
 {
-    QnCamLicenseUsageHelper licenseHelper(m_cameras, true, commonModule());
-    return all_of(m_cameras,
-        [&licenseHelper](const QnVirtualCameraResourcePtr& camera)
-        {
-            return licenseHelper.isValid(camera->licenseType());
-        });
+    QnCamLicenseUsageHelper licenseHelper(commonModule());
+    return licenseHelper.canEnableRecording(m_cameras);
 }
 
 void CameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)

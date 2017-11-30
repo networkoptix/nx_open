@@ -9,10 +9,10 @@
 {{/systemName}}
 
 {{#analyticsSdkEventType}}
-    {{analyticsSdkEventType}} {{source}}
+    {{analyticsSdkEventType}}{{#source}} at {{source}}{{/source}}
 {{/analyticsSdkEventType}}
 {{^analyticsSdkEventType}}
-    {{event}} {{source}}
+    {{event}}{{#source}} at {{source}}{{/source}}
 {{/analyticsSdkEventType}}
 
 {{#count}}

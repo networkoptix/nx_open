@@ -422,29 +422,17 @@ void ExportSettingsDialog::Private::setMode(Mode mode)
 
 bool ExportSettingsDialog::Private::isTranscodingAllowed() const
 {
-    return !FileExtensionUtils::isExecutable(m_exportMediaSettings.fileName.extension);
+    return !FileExtensionUtils::isLayout(m_exportMediaSettings.fileName.extension);
 }
 
 FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
 {
     FileExtensionList result;
-    switch (mode)
-    {
-        case Mode::Media:
-            result
-                << FileExtension::mkv
-                << FileExtension::avi
-                << FileExtension::mp4;
-            break;
-        case Mode::Layout:
-            result << FileExtension::nov;
-            break;
-        default:
-            NX_ASSERT(false, "Should never get here");
-            break;
-    }
+    if (mode == Mode::Media)
+        result << FileExtension::mkv << FileExtension::avi << FileExtension::mp4;
 
-    // Both media and layout can be exported to binary.
+    // Both media and layout can be exported to layouts.
+    result << FileExtension::nov;
     if (utils::AppInfo::isWin64())
         result << FileExtension::exe64;
     else if (utils::AppInfo::isWin32())
@@ -853,8 +841,8 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                         "and cannot be opened by double-click in Windows. "
                         "It can be played only in Nx Witness Client.");
 
-                case ExportMediaValidator::Result::transcodingInBinaryIsNotSupported:
-                    return ExportSettingsDialog::tr("Settings are not available for .EXE files.");
+                case ExportMediaValidator::Result::transcodingInLayoutIsNotSupported:
+                    return ExportSettingsDialog::tr("Settings are not available for .NOV and .EXE files.");
 
                 case ExportMediaValidator::Result::nonCameraResources:
                     return ExportSettingsDialog::tr("Local files, server monitor widgets "

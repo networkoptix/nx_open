@@ -103,10 +103,6 @@
                             <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
                         </RegistryKey>
                     </Component>
-
-                    <Component Id="ClientSigar">
-                        <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
-                    </Component>
                 </Directory>
             </Directory>
         </DirectoryRef>
@@ -335,7 +331,6 @@
             <ComponentGroupRef Id="AudioPlugins" />
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientSigar"/>
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
         </Feature>
     </Fragment>

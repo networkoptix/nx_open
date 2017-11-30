@@ -1,12 +1,13 @@
-import time
 import logging
-import pytest
+import time
 from datetime import datetime
-from test_utils.utils import SimpleNamespace, datetime_utc_now
-from test_utils.server import TimePeriod
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+
+import pytest
 import pytz
 
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.server import TimePeriod
+from test_utils.utils import SimpleNamespace, datetime_utc_now
 
 log = logging.getLogger(__name__)
 

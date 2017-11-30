@@ -305,10 +305,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (const auto camera = resource.dynamicCast<QnSecurityCamResource>())
     {
-        if (camera->needsToChangeDefaultPassword())
+        updateStatus();
+        if (status == Online && camera->needsToChangeDefaultPassword())
             status = Incompatible;
-        else
-            updateStatus();
     }
     else
     {

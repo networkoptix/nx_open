@@ -23,7 +23,6 @@ public:
     void start();
     void cancelTask(const QnUuid& taskId);
 
-    // Should be called before start.
     void setMaxTaskCount(int maxTaskCount);
 
     // Should be called before start.

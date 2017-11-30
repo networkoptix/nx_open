@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location, dialogs, systemAPI) {
+    .controller('AdvancedCtrl', ['$scope', '$modal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
+    function ($scope, $modal, $log, mediaserver,$location, dialogs, systemAPI) {
 
 
         mediaserver.getUser().then(function(user){
@@ -228,4 +229,4 @@ angular.module('webadminApp')
             });
         };
 
-    });
+    }]);

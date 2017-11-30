@@ -69,6 +69,7 @@ public:
 
     static QString primaryStreamValue();
     static QString secondaryStreamValue();
+    static QString edgeStreamValue();
 
     static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
 

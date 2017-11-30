@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
+    .factory('mediaserver', ['$http', '$modal', '$q', '$localStorage', '$location', '$log', 'nativeClient', 'systemAPI',
+    function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
 
         if($localStorage.auth){
@@ -573,4 +574,4 @@ angular.module('webadminApp')
         };
 
         return mediaserver;
-    });
+    }]);

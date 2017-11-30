@@ -277,7 +277,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             const qint64 timeToWrite = (fileSize / bitrate) * 1000;
 
             const qint64 CHUNK_SIZE = 4096;
-            const qint64 chunksInFile = fileSize / CHUNK_SIZE;
+            const qint64 chunksInFile = std::max((qint64) 1, fileSize / CHUNK_SIZE);
             const qint64 timeOnChunk = timeToWrite / chunksInFile;
 
             while (fileSize > 0)

@@ -4,6 +4,11 @@ CUSTOMIZATION="@deb.customization.company.name@"
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 KILL_MEDIASERVER_IF_HIGH_MEM_USAGE=1
+HIGH_MEM_USAGE_KEEP_FREE_KB=44272
+MEM_TOTAL_KB=$(cat /proc/meminfo |grep 'MemTotal' |awk '{print $2}')
+MAX_ALLOWED_MEM_USAGE=$(expr "$MEM_TOTAL_KB" - "$HIGH_MEM_USAGE_KEEP_FREE_KB")
+SWAP_FILE="/sdcard/swapfile" #< GDB requires much RAM to process core files.
+SWAP_FILE_SIZE_MB=512
 
 SERVICE_NAME="mediaserver"
 INSTALL_DIR="/opt/$CUSTOMIZATION"
@@ -14,6 +19,7 @@ BIN_FILE="$MEDIASERVER_DIR/bin/$BIN_NAME"
 LOGS_DIR="/sdcard/mserver.data/log"
 STORAGE_PATH="/sdcard"
 HTTP_LOG_LEVEL="none"
+CORE_PATH="$STORAGE_PATH/cores"
 
 # Touch .flag file to capture all mediaserver output to a file.
 MEDIASERVER_OUT_FLAG="$LOGS_DIR/mediaserver-out.flag"
@@ -73,6 +79,111 @@ logArgs() # "$@"
     echo ""
 }
 
+createSwapFileSync()
+{
+    dd if=/dev/zero of="$SWAP_FILE" bs=$MEGABYTE count="$SWAP_FILE_SIZE_MB" || return
+    if ! chmod 0600 "$SWAP_FILE"; then
+        echo "WARNING: Unable to chmod swap file."
+    fi
+    if ! mkswap "$SWAP_FILE"; then
+        echo "ERROR: Unable to prepare swap file with mkswap; deleting it."
+        rm -rf "$SWAP_FILE";
+        return 1
+    fi
+    return 0
+}
+
+recreateSwapFile()
+{
+    if ps aux |grep dd |grep "$SWAP_FILE"; then
+        echo "WARNING: Swap file at $SWAP_FILE is currently being created"
+        return
+    fi
+
+    echo "Creating swap file of $SWAP_FILE_SIZE_MB MB at $SWAP_FILE"
+    rm -f "$SWAP_FILE"
+    createSwapFileSync & #< Run in background.
+}
+
+# [in] SWAP_FILE, SWAP_FILE_SIZE_MB
+# @return 1 if the swap file has to be (re)created, 0 if it exists and has the proper size.
+createSwapFileIfNeeded()
+{
+    MEGABYTE=1048576
+
+    if [ ! -f "$SWAP_FILE" ]; then
+        recreateSwapFile
+        return 1
+    fi
+
+    EXISTING_SWAP_FILE_SIZE_BYTES=$(stat -c '%s' "$SWAP_FILE")
+    if [ $EXISTING_SWAP_FILE_SIZE_BYTES != $(expr $MEGABYTE \* $SWAP_FILE_SIZE_MB) ]; then
+        echo "WARNING: Swap file $SWAP_FILE exists but has the wrong size: $EXISTING_SWAP_FILE_SIZE_BYTES bytes"
+
+        echo "Disabling swap (if any)"
+        swapoff -a #< Just in case.
+
+        recreateSwapFile
+        return 1
+    fi
+
+    return 0
+}
+
+# [in] GDB, BIN_FILE, CORE, REPORT
+generateCrashReport()
+{
+    echo "t apply all bt 25" |"$GDB" "$BIN_FILE" "$CORE" 2>/dev/null >"/tmp/$REPORT" \
+        && mv "/tmp/$REPORT" "/root/$REPORT"
+
+    swapoff -a
+}
+
+processCoreDumpIfNeeded()
+{
+    if pidof gdb; then
+        return 1 #< gdb is already running.
+    fi
+
+    GDB="$(dirname "$BIN_FILE")/gdb"
+    CORE_ORIG="$CORE_PATH/core"
+    TIME=$(date +"%s")
+
+    # Do not process the core if the previous core has appeared less than a day before.
+    OLD_CORE=$(\ls "$CORE_ORIG".*)
+    OLD_CORE_TIME="${OLD_CORE#$CORE_ORIG.}" #< Remove "core." prefix.
+    # Check whether exactly one core file exists with a time in a name.
+    if [ $(expr match "$OLD_CORE_TIME" "[0-9]*\$") != 0 ]; then
+        if [ ! $(expr $TIME - $OLD_CORE_TIME) -gt $(expr 24 \* 60 \* 60) ]; then
+            # Old core is more than a day older.
+            return 1
+        fi
+    fi
+
+    CORE="$CORE_ORIG.$TIME"
+    if ! mv "$CORE_ORIG" "$CORE" 2>/dev/null; then
+        echo "No core file found at $CORE_ORIG"
+        return 1
+    fi
+
+    echo "Enabling swap at $SWAP_FILE"
+    if ! swapon "$SWAP_FILE"; then
+        echo "ERROR: Unable to enable swap; trying to move core file back and recreate swap file."
+        mv "$CORE" "$CORE_ORIG"
+        recreateSwapFile
+        return 1
+    fi
+
+    REPORT="${BIN_NAME}_$("$BIN_FILE" --version)_$TIME.gdb-bt"
+
+    echo "Generate crash report (in background) $REPORT"
+    generateCrashReport &
+
+    \ls "$CORE_ORIG".* |grep -v "$CORE" |xargs rm 2>/dev/null #< Delete all other core files.
+
+    return 0
+}
+
 checkSdCard()
 {
     # Make sure that STORAGE_PATH dir exists and is in /proc/mounts.
@@ -90,17 +201,20 @@ start()
        return 0
     fi
 
-    checkSdCard
-
     if ! touch "$STORAGE_PATH" >/dev/null 2>&1; then
         #echo "RO"
         mount -o rw,remount "$STORAGE_PATH"
     fi
 
     # Workaround for /usr/local/apps being mounted a few dozen seconds after the kernel boots.
+    # ATTENTION: Do no perform any advanced actions in this script before this check succeeds.
     while [ ! -f "$BIN_FILE" ]; do
         sleep 5
     done
+
+    checkSdCard
+
+    createSwapFileIfNeeded && processCoreDumpIfNeeded
 
     if [ -f "$MEDIASERVER_OUT_FLAG" ]; then
         mkdir -p "$(dirname "$MEDIASERVER_OUT_LOG")"
@@ -135,7 +249,7 @@ stop() # [signal]
 
     echo "Stopping $BIN_NAME..."
     killall $SIGNAL "$BIN_NAME" >/dev/null 2>&1
-    local i=0
+    i=0
     while [ ! -z "$(pidof "$BIN_NAME")" ]; do
         sleep 1
         let i++
@@ -191,10 +305,11 @@ kill_mediaserver_if_high_mem_usage()
         exit 0
     fi
 
-    MEM_USAGE=$(cat /proc/$MSERVER_PID/status \
+    MEM_USAGE_KB=$(cat /proc/$MSERVER_PID/status \
         |grep VmRSS |cut -d ":" -f2 |tr -d "\t " |cut -d "k" -f 1)
 
-    if [ "$MEM_USAGE" -gt 89000 ]; then
+    if [ "$MEM_USAGE_KB" -gt "$MAX_ALLOWED_MEM_USAGE" ]; then
+        echo "High mem usage detected: $MEM_USAGE_KB KB; killing mediaserver"
         kill -FPE "$MSERVER_PID"
     fi
 }
@@ -239,9 +354,9 @@ if [ -f "$OUT_FLAG" ]; then
     set -x #< Log each command.
 fi
 
-echo "$STORAGE_PATH/cores/core.%p" >/proc/sys/kernel/core_pattern
-if [ ! -e "$STORAGE_PATH/cores" ]; then
-    mkdir "$STORAGE_PATH/cores"
+echo "$CORE_PATH/core" >/proc/sys/kernel/core_pattern
+if [ ! -e "$CORE_PATH" ]; then
+    mkdir "$CORE_PATH"
 fi
 ulimit -c unlimited
 

@@ -228,7 +228,6 @@ public:
     //QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
-    QByteArray clientGuid;
 
     struct TranscodeParams
     {
@@ -1072,6 +1071,8 @@ void QnRtspConnectionProcessor::createDataProvider()
     if( speedStr.isEmpty() )
         speedStr = nx_http::getHeaderValue( d->request.headers, "Speed" );
 
+    const auto clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
+
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
         if (d->mediaRes)
@@ -1146,7 +1147,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(Qn::CR_Archive)));
         if (d->archiveDP)
         {
-            d->archiveDP->setGroupId(d->clientGuid);
+            d->archiveDP->setGroupId(clientGuid);
             d->archiveDP->getArchiveDelegate()->setPlaybackMode(d->playbackMode);
         }
     }
@@ -1161,15 +1162,15 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (archiveDelegate &&
                 !archiveDelegate->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanProcessMediaStep))
             {
+                archiveDelegate->setPlaybackMode(d->playbackMode);
                 archiveDelegate = new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(archiveDelegate));
             }
         }
         if (!archiveDelegate)
             archiveDelegate = new QnServerArchiveDelegate(qnServerModule); // default value
-        archiveDelegate->setClientId(authSession().id);
         archiveDelegate->setPlaybackMode(d->playbackMode);
         d->thumbnailsDP.reset(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr(), archiveDelegate));
-        d->thumbnailsDP->setGroupId(QnUuid::createUuid().toString().toUtf8());
+        d->thumbnailsDP->setGroupId(clientGuid);
     }
 }
 
@@ -1276,7 +1277,6 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
-        d->clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);

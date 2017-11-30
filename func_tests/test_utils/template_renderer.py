@@ -1,8 +1,8 @@
 'load and render templates'
 
 import os.path
-import jinja2
 
+import jinja2
 
 TEST_UTILS_DIR = os.path.abspath(os.path.dirname(__file__))
 

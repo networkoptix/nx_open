@@ -116,6 +116,9 @@ void QnAbstractArchiveStreamReader::run()
 
         if (data==0 && !needToStop())
         {
+            if (m_noDataHandler)
+                m_noDataHandler();
+
             setNeedKeyData();
             mFramesLost++;
             m_stat[0].onData(0, false);
@@ -166,4 +169,10 @@ void QnAbstractArchiveStreamReader::run()
 
     afterRun();
     NX_INFO(this, "Stopped");
+}
+
+void QnAbstractArchiveStreamReader::setNoDataHandler(
+    nx::utils::MoveOnlyFunc<void()> noDataHandler)
+{
+    m_noDataHandler = std::move(noDataHandler);
 }
