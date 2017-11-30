@@ -6297,10 +6297,6 @@ to %1</source>
       <translation>System pracuje w trybie awaryjnym</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Archiwum jest pełne</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Archiwum nie jest skonfigurowane.</translation>
     </message>
@@ -6343,10 +6339,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Anulowano odbudowę indeksu archiwum na następującym serwerze:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Archiwum jest pełne na następującym serwerze:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6420,7 +6412,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Synchronizacja zdalnego archiwum</translation>
     </message>
   </context>
   <context>
@@ -8215,7 +8207,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Usunąć sekwencję %1?</translation>
     </message>
   </context>
   <context>

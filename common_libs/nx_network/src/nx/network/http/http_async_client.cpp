@@ -17,6 +17,8 @@
 #include "buffer_source.h"
 #include "custom_headers.h"
 
+#include <nx/fusion/model_functions.h>
+
 using std::make_pair;
 
 namespace {
@@ -35,7 +37,7 @@ static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultSendTimeout;
 constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
-    
+
 constexpr int kMaxNumberOfRedirects = 5;
 
 AsyncClient::Timeouts::Timeouts(
@@ -105,7 +107,7 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
     result->cancelIOSync(nx::network::aio::etNone);
     if (!m_receivedBytesLeft.isEmpty())
     {
-        auto bufferedStreamSocket = 
+        auto bufferedStreamSocket =
             std::make_unique<nx::network::BufferedStreamSocket>(std::move(result));
         BufferType buf;
         buf.swap(m_receivedBytesLeft);
@@ -138,7 +140,7 @@ SystemError::ErrorCode AsyncClient::lastSysErrorCode() const
 {
     if (m_lastSysErrorCode != SystemError::noError)
         return m_lastSysErrorCode;
-    // Ensuring system error code is always non-zero in case of failure 
+    // Ensuring system error code is always non-zero in case of failure
     //  to simplify AsyncClient user's life.
     return failed() ? SystemError::connectionReset : SystemError::noError;
 }
@@ -948,7 +950,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
 
             break;
         }
-            
+
         case StatusCode::proxyAuthenticationRequired:
         {
             if (!m_proxyAuthorizationTried &&
@@ -959,7 +961,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
             }
             break;
         }
-            
+
         case StatusCode::found:
         case StatusCode::movedPermanently:
             return sendRequestToNewLocation(response);
@@ -1395,3 +1397,5 @@ AsyncClient::Result AsyncClient::invokeHandler(
 }
 
 } // namespace nx_http
+
+

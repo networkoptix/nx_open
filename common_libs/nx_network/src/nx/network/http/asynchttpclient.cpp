@@ -18,6 +18,8 @@
 #include "auth_tools.h"
 #include "custom_headers.h"
 
+#include <nx/fusion/model_functions.h>
+
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 
@@ -185,8 +187,8 @@ SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
 
 void AsyncHttpClient::doGet(const QUrl& url)
 {
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
+//    NX_ASSERT(!url.host().isEmpty());
+//    NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
@@ -1645,3 +1647,9 @@ SystemError::ErrorCode uploadDataSync(const QUrl &url
 }
 
 } // namespace nx_http
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http::AsyncHttpClient, AuthType,
+(nx_http::AsyncHttpClient::AuthType::authBasicAndDigest, "authBasicAndDigest")
+(nx_http::AsyncHttpClient::AuthType::authDigest, "authDigest")
+(nx_http::AsyncHttpClient::AuthType::authBasic, "authBasic")
+)

@@ -213,6 +213,8 @@
 
         <additionalQrcPaths/>
 
+        <distribution_output_dir/>
+
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,

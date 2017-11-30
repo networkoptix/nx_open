@@ -6168,10 +6168,6 @@ to %1</source>
       <translation>系统处于安全模式</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>存储满</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>存储未设置</translation>
     </message>
@@ -6214,10 +6210,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>以下服务器已取消录像索引重建:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>以下服务器录像已满:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

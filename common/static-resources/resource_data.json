@@ -52,7 +52,7 @@
 
             "2WayAudio":
             {
-                "codec": "MULAW",
+                "codec": "ALAW",
                 "bitrateKbps": 64,
                 "sampleRate": 8,
                 "urlPath": "/audio-out/g711_64.cgi",

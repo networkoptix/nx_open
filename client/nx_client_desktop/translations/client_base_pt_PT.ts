@@ -6239,10 +6239,6 @@ to %1</translation>
       <translation>O sistema está em modo Safe</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Armazenamento cheio</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Armazenamento não configurado</translation>
     </message>
@@ -6285,10 +6281,6 @@ to %1</translation>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>A reconstrução do índice de arquivos foi cancelada pelo utilizador no seguinte Servidor:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>O armazenamento esta cheio no seguinte Servidor:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

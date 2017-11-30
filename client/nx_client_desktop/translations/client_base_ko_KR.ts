@@ -6167,10 +6167,6 @@ to %1</source>
       <translation>시스템 안전모드 상태 입니다</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>저장장치 공간이 다 찼습니다.</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>녹화 장치 설정되지 않음</translation>
     </message>
@@ -6213,10 +6209,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>아래 서버의 녹화 DB 재 정렬이 사용자에 의해 취소됨</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>아래 서버의 녹화 저장공간이 풀 상태임</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>

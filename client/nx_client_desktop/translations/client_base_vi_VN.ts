@@ -6166,10 +6166,6 @@ to %1</source>
       <translation>Hệ thống đang ở chế độ an toàn</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Bộ nhớ đầy</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Lưu trữ không được cấu hình</translation>
     </message>
@@ -6212,10 +6208,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Xây dựng lại chỉ lưu trữ been hoàn thành trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Bộ nhớ đầy trên máy chủ sau đây:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
