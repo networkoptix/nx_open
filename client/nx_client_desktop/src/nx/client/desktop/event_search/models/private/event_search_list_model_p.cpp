@@ -96,15 +96,12 @@ const vms::event::ActionData& EventSearchListModel::Private::getEvent(int index)
 void EventSearchListModel::Private::clear()
 {
     m_updateTimer->stop();
+
+    ScopedReset reset(q, !m_data.empty());
+    m_data.clear();
     m_prefetch.clear();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-
-    if (!m_data.empty())
-    {
-        ScopedReset reset(q);
-        m_data.clear();
-    }
 
     if (m_camera)
         m_updateTimer->start();

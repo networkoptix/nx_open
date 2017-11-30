@@ -61,16 +61,12 @@ const QnCameraBookmark& BookmarkSearchListModel::Private::bookmark(int index) co
 
 void BookmarkSearchListModel::Private::clear()
 {
+    ScopedReset reset(q, !m_data.empty());
+    m_data.clear();
+    m_guidToTimestampMs.clear();
     m_prefetch.clear();
     m_fetchedAll = false;
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
-
-    if (!m_data.empty())
-    {
-        ScopedReset reset(q);
-        m_data.clear();
-        m_guidToTimestampMs.clear();
-    }
 }
 
 bool BookmarkSearchListModel::Private::canFetchMore() const
