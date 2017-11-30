@@ -62,6 +62,9 @@ private:
     QWeakPointer<QnRaiiGuard> m_fetchInProgress;
     Types m_fetchingTypes;
     qint64 m_latestStartTimeMs = -1; //< Synchronization point used during fetch.
+
+    // A flag to request updateModels() call after current fetch finishes:
+    bool m_needToUpdateModels = false;
 };
 
 } // namespace

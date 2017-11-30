@@ -5,6 +5,7 @@
 #include <deque>
 #include <limits>
 
+#include <api/server_rest_connection_fwd.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <core/resource/resource_fwd.h>
 
@@ -42,6 +43,7 @@ private:
     AnalyticsSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    rest::Handle m_fetchInProgress = rest::Handle();
     bool m_fetchedAll = false;
     bool m_success = true;
 

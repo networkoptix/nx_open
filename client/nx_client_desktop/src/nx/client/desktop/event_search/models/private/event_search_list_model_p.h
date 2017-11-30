@@ -8,6 +8,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QScopedPointer>
 
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/event/event_fwd.h>
@@ -57,8 +58,8 @@ private:
     void periodicUpdate();
     void addNewlyReceivedEvents(vms::event::ActionDataList&& data);
 
-    using GetCallback = std::function<void(bool success, vms::event::ActionDataList&& data)>;
-    bool getEvents(qint64 startMs, qint64 endMs, GetCallback callback,
+    using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
+    rest::Handle getEvents(qint64 startMs, qint64 endMs, GetCallback callback,
         int limit = std::numeric_limits<int>::max());
 
 private:
@@ -69,6 +70,8 @@ private:
     QScopedPointer<vms::event::StringsHelper> m_helper;
     qint64 m_latestTimeMs = 0;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    rest::Handle m_fetchInProgress = rest::Handle();
+    rest::Handle m_updateInProgress = rest::Handle();
     bool m_fetchedAll = false;
     bool m_success = true;
 

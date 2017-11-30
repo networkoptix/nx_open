@@ -102,6 +102,8 @@ void EventSearchListModel::Private::clear()
     m_prefetch.clear();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    m_fetchInProgress = rest::Handle();
+    m_updateInProgress = rest::Handle();
 
     if (m_camera)
         m_updateTimer->start();
@@ -109,7 +111,7 @@ void EventSearchListModel::Private::clear()
 
 bool EventSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && m_prefetch.empty()
+    return !m_fetchedAll && m_camera && !m_fetchInProgress
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -119,10 +121,10 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
         return false;
 
     const auto eventsReceived =
-        [this, completionHandler, guard = QPointer<QObject>(this)]
-            (bool success, vms::event::ActionDataList&& data)
+        [this, completionHandler]
+            (bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
-            if (!guard)
+            if (handle != m_fetchInProgress)
                 return;
 
             NX_ASSERT(m_prefetch.empty());
@@ -141,11 +143,17 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
             }
         };
 
-    return getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
+    m_fetchInProgress = getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
+    return m_fetchInProgress != rest::Handle();
 }
 
 void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 {
+    if (!m_fetchInProgress)
+        return;
+
+    m_fetchInProgress = rest::Handle();
+
     if (!m_success)
         return;
 
@@ -172,16 +180,23 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
 void EventSearchListModel::Private::periodicUpdate()
 {
+    if (!m_updateInProgress)
+        return;
+
     const auto eventsReceived =
-        [this, guard = QPointer<QObject>(this)](bool success, vms::event::ActionDataList&& data)
+        [this](bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
-            if (!guard || !success || data.empty())
+            if (handle != m_updateInProgress)
                 return;
 
-            addNewlyReceivedEvents(std::move(data));
+            m_updateInProgress = rest::Handle();
+
+            if (success && !data.empty())
+                addNewlyReceivedEvents(std::move(data));
         };
 
-    getEvents(m_latestTimeMs, std::numeric_limits<qint64>::max(), eventsReceived);
+    m_updateInProgress = getEvents(m_latestTimeMs,
+        std::numeric_limits<qint64>::max(), eventsReceived);
 }
 
 void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDataList&& data)
@@ -233,7 +248,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
         std::chrono::microseconds(m_data.front().eventParams.eventTimestampUsec)).count();
 }
 
-bool EventSearchListModel::Private::getEvents(qint64 startMs, qint64 endMs,
+rest::Handle EventSearchListModel::Private::getEvents(qint64 startMs, qint64 endMs,
     GetCallback callback, int limit)
 {
     if (!m_camera || !callback)
@@ -252,9 +267,11 @@ bool EventSearchListModel::Private::getEvents(qint64 startMs, qint64 endMs,
     request.limit = limit;
 
     const auto internalCallback =
-        [callback](bool success, rest::Handle /*handle*/, rest::EventLogData data)
+        [callback, guard = QPointer<Private>(this)]
+            (bool success, rest::Handle handle, rest::EventLogData data)
         {
-            callback(success, std::move(data.data));
+            if (guard)
+                callback(success, handle, std::move(data.data));
         };
 
     return server->restConnection()->getEvents(request, internalCallback, thread());
