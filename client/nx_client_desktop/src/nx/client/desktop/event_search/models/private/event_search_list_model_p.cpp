@@ -130,7 +130,7 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
                 return;
 
             NX_ASSERT(m_prefetch.empty());
-            m_prefetch = success ? data : vms::event::ActionDataList();
+            m_prefetch = success ? std::move(data) : vms::event::ActionDataList();
             m_success = success;
 
             if (m_prefetch.size() < kFetchBatchSize)
@@ -141,7 +141,7 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
             {
                 completionHandler(std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::microseconds(m_prefetch.front().eventParams.eventTimestampUsec))
-                        .count() + 1/*discard last ms*/);
+                        .count() + 1 /*discard last ms*/);
             }
         };
 
