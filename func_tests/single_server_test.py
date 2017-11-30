@@ -216,7 +216,9 @@ def test_frequent_restarts(server):
 
 # https://networkoptix.atlassian.net/browse/VMS-7808
 # https://networkoptix.atlassian.net/browse/VMS-7809
-@pytest.mark.parametrize('path', ['/ec2/getFullInfo123', '/api/ping456', '/api/qwe', '/ec2/asd'])
+@pytest.mark.parametrize('path', [
+    '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
+    '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
 def test_non_existent_api_endpoints(server, path):
     auth = HTTPDigestAuth(server.user, server.password)
     response = requests.get(server.rest_api_url.rstrip('/') + path, auth=auth, allow_redirects=False)
