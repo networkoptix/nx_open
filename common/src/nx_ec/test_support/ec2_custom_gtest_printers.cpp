@@ -1,4 +1,4 @@
-#include "custom_gtest_printers.h"
+#include "ec2_custom_gtest_printers.h"
 
 #include <nx/fusion/serialization/lexical.h>
 
