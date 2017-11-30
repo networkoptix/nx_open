@@ -160,7 +160,7 @@ QString AnalyticsSearchListModel::Private::description(
     if (object.attributes.empty())
         return QString();
 
-    static const auto kCss = lit(R"(
+    static const auto kCss = QString::fromLatin1(R"(
             <style type = 'text/css'>
                 th { color: %1; font-weight: normal; }
             </style>)");
