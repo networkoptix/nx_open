@@ -8,6 +8,8 @@ namespace info {
 namespace detail {
 namespace data_parser {
 
+RawDataParserFactoryFunction RawDataParserFactory::m_factoryFunction = nullptr;
+
 namespace {
 
 static AbstractRawDataParserPtr createJsonParser()
@@ -17,16 +19,13 @@ static AbstractRawDataParserPtr createJsonParser()
 
 } // namespace
 
-RawDataParserFactory::RawDataParserFactory():
-    m_defaultFactoryFunction(&createJsonParser)
-{}
 
 AbstractRawDataParserPtr RawDataParserFactory::create()
 {
     if (m_factoryFunction != nullptr)
         return m_factoryFunction();
 
-    return m_defaultFactoryFunction();
+    return createJsonParser();
 }
 
 void RawDataParserFactory::setFactoryFunction(RawDataParserFactoryFunction function)

@@ -19,7 +19,7 @@ class MetaDataParser: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        m_parser = m_parserFactory.create();
+        m_parser = RawDataParserFactory::create();
         ASSERT_TRUE((bool) m_parser.get());
         ASSERT_NE(nullptr, dynamic_cast<impl::JsonDataParser*>(m_parser.get()));
     }
@@ -37,7 +37,6 @@ protected:
 
 private:
     AbstractRawDataParserPtr m_parser;
-    RawDataParserFactory m_parserFactory;
     UpdatesMetaData m_updatesMetaData;
 
     void thenAlternativesServersShouldBeCorrect()

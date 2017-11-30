@@ -8,18 +8,16 @@ namespace info {
 namespace detail {
 namespace data_provider {
 
-class AsyncRawDataProviderFactory
+class RawDataProviderFactory
 {
 public:
-    AsyncRawDataProviderFactory();
-    AbstractAsyncRawDataProviderPtr create(
+    static AbstractAsyncRawDataProviderPtr create(
         const QString& baseUrl,
         AbstractAsyncRawDataProviderHandler* handler);
-    void setFactoryFunction(AsyncRawDataProviderFactoryFunction function);
+    static void setFactoryFunction(AsyncRawDataProviderFactoryFunction function);
 
 private:
-    AsyncRawDataProviderFactoryFunction m_defaultFactoryFunction;
-    AsyncRawDataProviderFactoryFunction m_factoryFunction;
+    static AsyncRawDataProviderFactoryFunction m_factoryFunction;
 };
 
 } // namespace data_provider

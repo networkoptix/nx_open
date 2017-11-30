@@ -1,4 +1,4 @@
-#include "async_raw_data_provider_factory.h"
+#include "raw_data_provider_factory.h"
 #include "abstract_async_raw_data_provider.h"
 #include "impl/async_http_json_provider.h"
 
@@ -7,6 +7,8 @@ namespace update {
 namespace info {
 namespace detail {
 namespace data_provider {
+
+AsyncRawDataProviderFactoryFunction RawDataProviderFactory::m_factoryFunction = nullptr;
 
 namespace {
 
@@ -19,21 +21,17 @@ static AbstractAsyncRawDataProviderPtr createHttpJsonProvider(
 
 } // namespace
 
-AsyncRawDataProviderFactory::AsyncRawDataProviderFactory():
-    m_defaultFactoryFunction(&createHttpJsonProvider)
-{}
-
-AbstractAsyncRawDataProviderPtr AsyncRawDataProviderFactory::create(
+AbstractAsyncRawDataProviderPtr RawDataProviderFactory::create(
     const QString& baseUrl,
     AbstractAsyncRawDataProviderHandler* handler)
 {
     if (m_factoryFunction)
         return m_factoryFunction(baseUrl, handler);
 
-    return m_defaultFactoryFunction(baseUrl, handler);
+    return createHttpJsonProvider(baseUrl, handler);
 }
 
-void AsyncRawDataProviderFactory::setFactoryFunction(AsyncRawDataProviderFactoryFunction function)
+void RawDataProviderFactory::setFactoryFunction(AsyncRawDataProviderFactoryFunction function)
 {
     m_factoryFunction = std::move(function);
 }

@@ -23,6 +23,8 @@ private:
     detail::AbstractAsyncRawDataProviderPtr m_rawDataProvider;
     detail::AbstractRawDataParserPtr m_rawDataParser;
     UpdateCheckCallback m_updateCallback;
+    detail::data_parser::UpdatesMetaData m_updatesMetaData;
+    int m_customizationIndex;
 
     virtual void onGetUpdatesMetaInformationDone(
         ResultCode resultCode,
@@ -30,6 +32,8 @@ private:
     virtual void onGetSpecificUpdateInformationDone(
         ResultCode resultCode,
         QByteArray rawData) override;
+
+    void getSpecificData();
 };
 
 } // namespace info

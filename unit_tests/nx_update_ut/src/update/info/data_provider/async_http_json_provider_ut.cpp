@@ -3,7 +3,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/update/info/detail/data_provider/async_raw_data_provider_factory.h>
+#include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
 #include <rest/server/json_rest_handler.h>
 
@@ -107,7 +107,6 @@ protected:
     }
 
 private:
-    AsyncRawDataProviderFactory m_factory;
     AbstractAsyncRawDataProviderPtr m_rawDataProvider;
     TestProviderHandler m_providerHandler;
     TestHttpServer m_httpServer;
@@ -130,7 +129,7 @@ private:
         metaUrl.setHost(m_httpServer.serverAddress().address.toString());
         metaUrl.setPort(m_httpServer.serverAddress().port);
 
-        m_rawDataProvider = m_factory.create(metaUrl.toString(), &m_providerHandler);
+        m_rawDataProvider = RawDataProviderFactory::create(metaUrl.toString(), &m_providerHandler);
         ASSERT_TRUE((bool) m_rawDataProvider);
     }
 };

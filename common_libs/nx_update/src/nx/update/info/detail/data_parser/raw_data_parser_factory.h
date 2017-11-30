@@ -11,13 +11,11 @@ namespace data_parser {
 class RawDataParserFactory
 {
 public:
-    RawDataParserFactory();
-    AbstractRawDataParserPtr create();
-    void setFactoryFunction(RawDataParserFactoryFunction function);
+    static AbstractRawDataParserPtr create();
+    static void setFactoryFunction(RawDataParserFactoryFunction function);
 
 private:
-    RawDataParserFactoryFunction m_defaultFactoryFunction;
-    RawDataParserFactoryFunction m_factoryFunction = nullptr;
+    static RawDataParserFactoryFunction m_factoryFunction;
 };
 
 } // namespace data_parser
