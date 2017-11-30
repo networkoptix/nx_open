@@ -100,7 +100,7 @@ def test_proxy_requests(env):
     assert direct_response_in_front != direct_response_behind
 
 
-@pytest.mark.xfail("https://networkoptix.atlassian.net/browse/VMS-7818")
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7818")
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_non_existent_endpoint_via_proxy_with_auth_same_connection(env):
@@ -114,7 +114,7 @@ def test_non_existent_endpoint_via_proxy_with_auth_same_connection(env):
     assert dummy_response.status_code == 404, "Expected 404 but got: %r." % dummy_response
 
 
-@pytest.mark.xfail("https://networkoptix.atlassian.net/browse/VMS-7819")
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7819")
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_direct_after_proxy_same_connection(env):
