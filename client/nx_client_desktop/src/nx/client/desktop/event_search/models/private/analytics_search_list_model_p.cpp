@@ -76,14 +76,13 @@ void AnalyticsSearchListModel::Private::clear()
 {
     m_prefetch.clear();
     m_fetchedAll = false;
+    m_earliestTimeMs = std::numeric_limits<qint64>::max();
 
     if (!m_data.empty())
     {
         ScopedReset reset(q);
         m_data.clear();
     }
-
-    m_earliestTimeMs = std::numeric_limits<qint64>::max();
 }
 
 bool AnalyticsSearchListModel::Private::canFetchMore() const

@@ -98,14 +98,13 @@ void EventSearchListModel::Private::clear()
     m_updateTimer->stop();
     m_prefetch.clear();
     m_fetchedAll = false;
+    m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
 
     if (!m_data.empty())
     {
         ScopedReset reset(q);
         m_data.clear();
     }
-
-    m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
 
     if (m_camera)
         m_updateTimer->start();

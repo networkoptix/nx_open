@@ -63,6 +63,7 @@ void BookmarkSearchListModel::Private::clear()
 {
     m_prefetch.clear();
     m_fetchedAll = false;
+    m_earliestTimeMs = std::numeric_limits<qint64>::max();
 
     if (!m_data.empty())
     {
@@ -70,8 +71,6 @@ void BookmarkSearchListModel::Private::clear()
         m_data.clear();
         m_guidToTimestampMs.clear();
     }
-
-    m_earliestTimeMs = std::numeric_limits<qint64>::max();
 }
 
 bool BookmarkSearchListModel::Private::canFetchMore() const
