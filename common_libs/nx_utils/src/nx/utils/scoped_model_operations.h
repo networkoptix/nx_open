@@ -10,7 +10,8 @@
 template<class BaseModel>
 class ScopedModelOperations : public BaseModel
 {
-    static_assert(std::is_base_of<QAbstractItemModel, BaseModel>::value, "BaseModel must be derived from QAbstractItemModel");
+    static_assert(std::is_base_of<QAbstractItemModel, BaseModel>::value,
+        "BaseModel must be derived from QAbstractItemModel");
 
 public:
     QN_FORWARD_CONSTRUCTOR(ScopedModelOperations, BaseModel, {});
@@ -19,10 +20,12 @@ protected:
     class ScopedReset final : QnRaiiGuard
     {
     public:
-        explicit ScopedReset(ScopedModelOperations* model) :
-            QnRaiiGuard(
-                [model]() { model->beginResetModel(); },
-                [model]() { model->endResetModel(); })
+        explicit ScopedReset(ScopedModelOperations* model, bool condition = true):
+            QnRaiiGuard(std::move(condition
+                ? QnRaiiGuard(
+                    [model]() { model->beginResetModel(); },
+                    [model]() { model->endResetModel(); })
+                : QnRaiiGuard([]() {})))
         {
         }
     };

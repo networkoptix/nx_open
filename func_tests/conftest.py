@@ -3,25 +3,26 @@
 Loaded by pytest before running all functional tests. Adds common fixtures used by tests.
 '''
 
-import sys
-import os.path
 import logging
+import os.path
+
 import pytest
 from netaddr import IPAddress
-from test_utils.utils import SimpleNamespace
-from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
+
 from test_utils.artifact import ArtifactFactory
-from test_utils.metrics_saver import MetricsSaver
+from test_utils.camera import SampleMediaFile, CameraFactory
+from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
+from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.customization import detect_customization_company_name
 from test_utils.host import SshHostConfig
-from test_utils.vagrant_box_config import BoxConfigFactory
-from test_utils.vagrant_box import VagrantBoxFactory
-from test_utils.server_physical_host import PhysicalInstallationCtl
-from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
-from test_utils.server_factory import ServerFactory
-from test_utils.camera import SampleMediaFile, CameraFactory
+from test_utils.internet_time import TimeProtocolRestriction
 from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
-
+from test_utils.metrics_saver import MetricsSaver
+from test_utils.server_factory import ServerFactory
+from test_utils.server_physical_host import PhysicalInstallationCtl
+from test_utils.utils import SimpleNamespace
+from test_utils.vagrant_box import VagrantBoxFactory
+from test_utils.vagrant_box_config import BoxConfigFactory
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
@@ -319,3 +320,14 @@ def pytest_pyfunc_call(pyfuncitem):
         server_factory.perform_post_checks()
     if passed and lws_factory:
         lws_factory.perform_post_checks()
+
+
+@pytest.fixture()
+def timeless_server(box, server_factory, server_name='timeless_server'):
+    box = box('timeless', sync_time=False)
+    config_file_params = dict(ecInternetSyncTimePeriodSec=3, ecMaxInternetTimeSyncRetryPeriodSec=3)
+    server = server_factory(server_name, box=box, start=False, config_file_params=config_file_params)
+    TimeProtocolRestriction(server).enable()
+    server.start_service()
+    server.setup_local_system()
+    return server

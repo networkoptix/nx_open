@@ -24,6 +24,7 @@ using FileExtensionList = QList<FileExtension>;
 class FileExtensionUtils
 {
 public:
+    static bool isLayout(FileExtension extension);
     static bool isExecutable(FileExtension extension);
 };
 

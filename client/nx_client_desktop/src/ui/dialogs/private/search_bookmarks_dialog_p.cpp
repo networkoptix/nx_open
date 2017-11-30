@@ -62,8 +62,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , utcRangeEndMs(utcFinishTimeMs)
 {
     m_ui->setupUi(m_owner);
-    m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    m_ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    m_ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    m_ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
 
     m_ui->gridBookmarks->setModel(m_model);
 
@@ -388,10 +388,6 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     /* Create menu object: */
     auto newMenu = new QMenu();
 
-    const auto exportActionId = nx::client::desktop::ini().universalExportDialog
-        ? action::ExportVideoAction
-        : action::ExportTimeSelectionAction;
-
     /* Add suitable actions: */
     const auto addActionToMenu =
         [this, newMenu, params](action::IDType id, QAction *action)
@@ -402,7 +398,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 
     addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
-    addActionToMenu(exportActionId, m_exportBookmarkAction);
+    addActionToMenu(action::ExportVideoAction, m_exportBookmarkAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */
@@ -427,9 +423,9 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
         });
 
     connect(m_exportBookmarkAction, &QAction::triggered, this,
-        [this, params, exportActionId]
+        [this, params]
         {
-            menu()->triggerIfPossible(exportActionId, params);
+            menu()->triggerIfPossible(action::ExportVideoAction, params);
         });
 
     /* Execute popup menu: */

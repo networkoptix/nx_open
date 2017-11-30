@@ -1,5 +1,5 @@
 // http://stackoverflow.com/questions/14965968/angularjs-browser-autofill-workaround-by-using-a-directive
-angular.module('webadminApp').directive('autoFillSync', function($timeout) {
+angular.module('webadminApp').directive('autoFillSync',['$timeout', function($timeout) {
     return {
         require: 'ngModel',
         link: function(scope, elem, attrs, ngModel) {
@@ -12,4 +12,4 @@ angular.module('webadminApp').directive('autoFillSync', function($timeout) {
             }, 500);
         }
     }
-});
+}]);

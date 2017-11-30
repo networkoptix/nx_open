@@ -1,5 +1,7 @@
 #include "unified_search_list_model_p.h"
 
+#include <utils/common/delayed.h>
+
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
@@ -55,6 +57,12 @@ void UnifiedSearchListModel::Private::fetchMore()
                 m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
 
             m_fetchingTypes = Types();
+
+            if (m_needToUpdateModels)
+            {
+                executeDelayedParented([this]() { updateModels(); }, 0, this);
+                m_needToUpdateModels = false;
+            }
         };
 
     auto completionGuard = QnRaiiGuard::createDestructible(totalCompletionHandler);
@@ -108,11 +116,42 @@ void UnifiedSearchListModel::Private::setFilter(Types filter)
     updateModels();
 }
 
+vms::event::EventType UnifiedSearchListModel::Private::selectedEventType() const
+{
+    return m_selectedEventType;
+}
+
+void UnifiedSearchListModel::Private::setSelectedEventType(vms::event::EventType value)
+{
+    if (selectedEventType() == value)
+        return;
+
+    m_selectedEventType = value;
+
+    if (m_filter != Types(Type::events))
+        return;
+
+    updateModels();
+}
+
 void UnifiedSearchListModel::Private::updateModels()
 {
+    if (m_fetchInProgress)
+    {
+        // We cannot update models during fetch, so queue it for later:
+        m_needToUpdateModels = true;
+        return;
+    }
+
+    m_needToUpdateModels = false;
+
     m_eventsModel->setCamera(m_filter.testFlag(Type::events)
         ? m_camera
         : QnVirtualCameraResourcePtr());
+
+    m_eventsModel->setSelectedEventType(m_filter == Types(Type::events)
+        ? m_selectedEventType
+        : vms::event::undefinedEvent);
 
     m_bookmarksModel->setCamera(m_filter.testFlag(Type::bookmarks)
         ? m_camera

@@ -33,40 +33,9 @@ bool CustomEvent::isEventStateMatched(EventState state, ActionType actionType) c
 
 bool CustomEvent::checkEventParams(const EventParameters& params) const
 {
-    auto unquote =
-        [](const QStringList& dataList)
-        {
-            QStringList result;
-            for (const auto& data: dataList)
-                result << nx::utils::unquoteStr(data);
-            return result;
-        };
-
-    QStringList resourceNameKeywords = unquote(
-        nx::utils::smartSplit(params.resourceName, L' ', QString::SkipEmptyParts));
-
-    QStringList captionKeywords = unquote(
-        nx::utils::smartSplit(params.caption, L' ', QString::SkipEmptyParts));
-
-    QStringList descriptionKeywords = unquote(
-        nx::utils::smartSplit(params.description, L' ', QString::SkipEmptyParts));
-
-    auto matchKeywords =
-        [](const QStringList& keywords, const QString& pattern)
-        {
-            if (keywords.isEmpty())
-                return true;
-            for (const QString& keyword: keywords)
-            {
-                if (pattern.contains(keyword))
-                    return true;
-            }
-            return false;
-        };
-
-    return matchKeywords(resourceNameKeywords, m_resourceName)
-        && matchKeywords(captionKeywords, m_caption)
-        && matchKeywords(descriptionKeywords, m_description);
+    return checkForKeywords(m_resourceName, params.resourceName)
+        && checkForKeywords(m_caption, params.caption)
+        && checkForKeywords(m_description, params.description);
 }
 
 EventParameters CustomEvent::getRuntimeParams() const

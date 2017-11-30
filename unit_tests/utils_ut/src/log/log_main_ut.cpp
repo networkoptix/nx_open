@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/test_options.h>
+
 #include <QtCore/QSize>
 
 namespace nx {
@@ -102,6 +105,55 @@ TEST_F(LogMainTest, This)
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
 }
+
+class LogMainPerformanceTest: public LogMainTest
+{
+public:
+    LogMainPerformanceTest()
+    {
+        // FIXME: #mshevchenko Should we use setLevelFilters() here instead?
+        // logger->setExceptionFilters({lit("nx::utils::log::test::Enabled")});
+        logger->setWriter(std::make_unique<NullDevice>());
+    }
+
+    template<typename Action>
+    void measureTime(const Action& action)
+    {
+        const auto repeatCount = TestOptions::applyLoadMode(1000);
+        const auto startTime = std::chrono::steady_clock::now();
+        for (int i = 0; i < repeatCount; ++i)
+            action();
+
+        const auto duration = std::chrono::steady_clock::now() - startTime;
+        std::cout << "Run time: " << duration.count() << " " <<
+            ::toString(typeid(duration)).toStdString() << std::endl;
+    }
+
+    template<template<int> class Tag>
+    void measureTimeForTags()
+    {
+        measureTime(
+            []()
+            {
+                { static const Tag<0> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<1> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<2> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<3> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<4> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<5> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<6> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<7> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<8> t{0}; NX_DEBUG(&t, "Test message"); }
+                { static const Tag<9> t{0}; NX_DEBUG(&t, "Test message"); }
+            });
+    }
+};
+
+template<int Id> struct EnabledTag { int i; };
+template<int Id> struct DisabledTag { int i; };
+
+TEST_F(LogMainPerformanceTest, EnabledTag) { measureTimeForTags<EnabledTag>(); }
+TEST_F(LogMainPerformanceTest, DisabledTag) { measureTimeForTags<DisabledTag>(); }
 
 } // namespace test
 } // namespace log

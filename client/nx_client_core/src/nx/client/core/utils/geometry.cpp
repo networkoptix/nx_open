@@ -253,6 +253,30 @@ qreal Geometry::aspectRatio(const QRectF& rect)
     return aspectRatio(rect.size());
 }
 
+qreal Geometry::aspectRatio(const QSize& size, qreal defaultValue)
+{
+    return (size.height() != 0)
+        ? static_cast<qreal>(size.width()) / size.height()
+        : defaultValue;
+}
+
+qreal Geometry::aspectRatio(const QSizeF& size, qreal defaultValue)
+{
+    return !qFuzzyIsNull(size.height())
+        ? size.width() / size.height()
+        : defaultValue;
+}
+
+qreal Geometry::aspectRatio(const QRect& rect, qreal defaultValue)
+{
+    return aspectRatio(rect.size(), defaultValue);
+}
+
+qreal Geometry::aspectRatio(const QRectF& rect, qreal defaultValue)
+{
+    return aspectRatio(rect.size(), defaultValue);
+}
+
 qreal Geometry::dotProduct(const QPointF& a, const QPointF& b)
 {
     return a.x() * b.x() + a.y() * b.y();

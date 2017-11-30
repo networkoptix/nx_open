@@ -12,6 +12,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <ui/common/palette.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
@@ -57,23 +59,22 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
     setMediaParams(widget->resource(), widget->item()->data(), widget->context());
-    if (!allowLayoutExport)
+    if (allowLayoutExport)
+        setLayout(widget->item()->layout()->resource());
+    else
         hideTab(Mode::Layout);
+}
 
-    const auto layout = widget->item()->layout()->resource();
-    d->setLayout(layout);
-    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
-
-    const auto palette = ui->layoutPreviewWidget->palette();
-    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
-    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
-
-    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
-    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
-        baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
-    baseFileName.name = baseName;
-    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
+ExportSettingsDialog::ExportSettingsDialog(const QnLayoutResourcePtr& layout,
+    const QString& mediaForbiddenReason,
+    const QnTimePeriod& timePeriod,
+    FileNameValidator isFileNameValid,
+    QWidget* parent)
+    :
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
+{
+    disableTab(Mode::Media, mediaForbiddenReason);
+    setLayout(layout);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -126,6 +127,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     isFileNameValid(isFileNameValid)
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Exporting_Help);
 
     ui->mediaPreviewWidget->setMaximumSize(kPreviewSize);
     ui->layoutPreviewWidget->setMaximumSize(kPreviewSize);
@@ -194,13 +196,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
         d, &Private::setLayoutReadOnly);
 
-    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
+    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d,
+        &Private::setLayoutFilename);
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, this,
         [this](const Filename& fileName)
         {
             d->setMediaFilename(fileName);
-            ui->transcodingButtonsWidget->setHidden(
-                FileExtensionUtils::isExecutable(fileName.extension));
         });
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
@@ -257,24 +258,12 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
 
     connect(d, &Private::transcodingAllowedChanged, this,
-        [this](bool transcodingIsAllowed)
-        {
-            ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
-            if (transcodingIsAllowed)
-            {
-                ui->exportMediaSettingsPage->setApplyFilters(
-                    d->exportMediaPersistentSettings().applyFilters);
-            }
-            else
-            {
-                ui->cameraExportSettingsButton->click();
-            }
-        });
+        &ExportSettingsDialog::updateTranscodingWidgets);
+    updateTranscodingWidgets(d->isTranscodingAllowed());
 
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
         {
-
             setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
             setMaxOverlayWidth(ui->imageSettingsPage, size.width());
             setMaxOverlayWidth(ui->textSettingsPage, size.width());
@@ -294,26 +283,26 @@ void ExportSettingsDialog::setupSettingsButtons()
 
     ui->cameraExportSettingsButton->setText(tr("Export Settings"));
     ui->cameraExportSettingsButton->setIcon(qnSkin->icon(
-        lit("buttons/settings_hovered.png"),
-        lit("buttons/settings_selected.png")));
+        lit("text_buttons/settings_hovered.png"),
+        lit("text_buttons/settings_selected.png")));
     ui->cameraExportSettingsButton->setState(ui::SelectableTextButton::State::selected);
     ui->cameraExportSettingsButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->exportMediaSettingsPage));
 
     ui->layoutExportSettingsButton->setText(tr("Export Settings"));
     ui->layoutExportSettingsButton->setIcon(qnSkin->icon(
-        lit("buttons/settings_hovered.png"),
-        lit("buttons/settings_selected.png")));
+        lit("text_buttons/settings_hovered.png"),
+        lit("text_buttons/settings_selected.png")));
     ui->layoutExportSettingsButton->setState(ui::SelectableTextButton::State::selected);
 
     ui->timestampButton->setDeactivatable(true);
     ui->timestampButton->setDeactivatedText(tr("Add Timestamp"));
     ui->timestampButton->setDeactivationToolTip(tr("Delete Timestamp"));
     ui->timestampButton->setText(tr("Timestamp"));
-    ui->timestampButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/timestamp.png")));
+    ui->timestampButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/timestamp.png")));
     ui->timestampButton->setIcon(qnSkin->icon(
-        lit("buttons/timestamp_hovered.png"),
-        lit("buttons/timestamp_selected.png")));
+        lit("text_buttons/timestamp_hovered.png"),
+        lit("text_buttons/timestamp_selected.png")));
     ui->timestampButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->timestampSettingsPage));
     ui->timestampButton->setProperty(kOverlayPropertyName,
@@ -323,10 +312,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setDeactivatedText(tr("Add Image"));
     ui->imageButton->setDeactivationToolTip(tr("Delete Image"));
     ui->imageButton->setText(tr("Image"));
-    ui->imageButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/image.png")));
+    ui->imageButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/image.png")));
     ui->imageButton->setIcon(qnSkin->icon(
-        lit("buttons/image_hovered.png"),
-        lit("buttons/image_selected.png")));
+        lit("text_buttons/image_hovered.png"),
+        lit("text_buttons/image_selected.png")));
     ui->imageButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->imageSettingsPage));
     ui->imageButton->setProperty(kOverlayPropertyName,
@@ -336,10 +325,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setDeactivatedText(tr("Add Text"));
     ui->textButton->setDeactivationToolTip(tr("Delete Text"));
     ui->textButton->setText(tr("Text"));
-    ui->textButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/text.png")));
+    ui->textButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/text.png")));
     ui->textButton->setIcon(qnSkin->icon(
-        lit("buttons/text_hovered.png"),
-        lit("buttons/text_selected.png")));
+        lit("text_buttons/text_hovered.png"),
+        lit("text_buttons/text_selected.png")));
     ui->textButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->textSettingsPage));
     ui->textButton->setProperty(kOverlayPropertyName,
@@ -348,10 +337,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Rapid Review"));
     ui->speedButton->setDeactivationToolTip(tr("Reset Speed"));
-    ui->speedButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/rapid_review.png")));
+    ui->speedButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/rapid_review.png")));
     ui->speedButton->setIcon(qnSkin->icon(
-        lit("buttons/rapid_review_hovered.png"),
-        lit("buttons/rapid_review_selected.png")));
+        lit("text_buttons/rapid_review_hovered.png"),
+        lit("text_buttons/rapid_review_selected.png")));
     ui->speedButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->rapidReviewSettingsPage));
     connect(ui->speedButton, &ui::SelectableTextButton::stateChanged, this,
@@ -367,10 +356,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setDeactivatedText(tr("Add Bookmark Info"));
     ui->bookmarkButton->setDeactivationToolTip(tr("Delete Bookmark Info"));
     ui->bookmarkButton->setText(tr("Bookmark Info"));
-    ui->bookmarkButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/bookmark.png")));
+    ui->bookmarkButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/bookmark.png")));
     ui->bookmarkButton->setIcon(qnSkin->icon(
-        lit("buttons/bookmark_hovered.png"),
-        lit("buttons/bookmark_selected.png")));
+        lit("text_buttons/bookmark_hovered.png"),
+        lit("text_buttons/bookmark_selected.png")));
     ui->bookmarkButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->bookmarkSettingsPage));
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
@@ -497,10 +486,12 @@ void ExportSettingsDialog::updateTabWidgetSize()
 
 void ExportSettingsDialog::updateMode()
 {
-    const auto currentMode = ui->tabWidget->currentWidget() == ui->cameraTab
-        ? Mode::Media
-        : Mode::Layout;
+    const auto cameraTabIndex = ui->tabWidget->indexOf(ui->cameraTab);
 
+    const auto isCameraMode = ui->tabWidget->currentIndex() == cameraTabIndex
+        && ui->tabWidget->isTabEnabled(cameraTabIndex);
+
+    const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
 }
 
@@ -560,6 +551,21 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         setAlertText(i, texts[i]);
 }
 
+void ExportSettingsDialog::updateTranscodingWidgets(bool transcodingIsAllowed)
+{
+    ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
+    if (transcodingIsAllowed)
+    {
+        ui->exportMediaSettingsPage->setApplyFilters(
+            d->exportMediaPersistentSettings().applyFilters);
+    }
+    else
+    {
+        ui->cameraExportSettingsButton->click();
+    }
+    ui->transcodingButtonsWidget->setHidden(!transcodingIsAllowed);
+}
+
 void ExportSettingsDialog::setMediaParams(
     const QnMediaResourcePtr& mediaResource,
     const QnLayoutItemData& itemData,
@@ -607,9 +613,39 @@ void ExportSettingsDialog::setMediaParams(
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
+void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
+{
+    d->setLayout(layout);
+    ui->layoutPreviewWidget->setImageProvider(d->layoutImageProvider());
+
+    const auto palette = ui->layoutPreviewWidget->palette();
+    d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
+    d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
+
+    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
+    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+        baseName = tr("exported");
+    Filename baseFileName = d->exportLayoutSettings().filename;
+    baseFileName.name = baseName;
+    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
+}
+
+void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
+{
+    NX_EXPECT(ui->tabWidget->count() > 1);
+
+    const auto tabIndex = mode == Mode::Media
+        ? ui->tabWidget->indexOf(ui->cameraTab)
+        : ui->tabWidget->indexOf(ui->layoutTab);
+
+    ui->tabWidget->setTabEnabled(tabIndex, false);
+    ui->tabWidget->setTabToolTip(tabIndex, reason);
+    updateMode();
+}
+
 void ExportSettingsDialog::hideTab(Mode mode)
 {
-    NX_ASSERT(ui->tabWidget->count() > 1);
+    NX_EXPECT(ui->tabWidget->count() > 1);
     ui->tabWidget->removeTab(mode == Mode::Media
         ? ui->tabWidget->indexOf(ui->cameraTab)
         : ui->tabWidget->indexOf(ui->layoutTab));

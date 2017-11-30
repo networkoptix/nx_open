@@ -15,7 +15,7 @@ angular.module('webadminApp', [
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-}]).config(function ($routeProvider) {
+}]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {
         currentUser: ['mediaserver',function(mediaserver){
@@ -135,4 +135,4 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/'
         });
-});
+}]);

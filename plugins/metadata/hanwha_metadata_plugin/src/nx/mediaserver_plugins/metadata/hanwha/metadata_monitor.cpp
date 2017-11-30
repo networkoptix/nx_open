@@ -3,8 +3,15 @@
 #include <chrono>
 
 #include <nx/utils/std/cpp14.h>
-
 #include "bytestream_filter.h"
+
+#if defined(__GNUC__) || defined(__clang__)
+    #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+    #define NX_PRETTY_FUNCTION __FUNCSIG__
+#else
+    #define NX_PRETTY_FUNCTION __func__
+#endif
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -18,7 +25,8 @@ static const QString kMonitorUrlTemplate =
 
 static const int kDefaultHttpPort = 80;
 
-static const std::chrono::minutes kKeepAliveTimeout{7};
+static const std::chrono::minutes kKeepAliveTimeout{2};
+static const std::chrono::seconds kUpdateInterval{10};
 
 } // namespace
 
@@ -40,27 +48,23 @@ MetadataMonitor::~MetadataMonitor()
 
 void MetadataMonitor::startMonitoring()
 {
-    QnMutexLocker lock(&m_mutex);
-    if (m_started)
-        return;
-
-    m_started = true;
-
-    initMonitorUnsafe();
+    m_timer.post([this](){ initMonitorUnsafe(); });
 }
 
 void MetadataMonitor::stopMonitoring()
 {
-    nx_http::AsyncHttpClientPtr httpClient;
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_started = false;
+    utils::promise<void> promise;
+    m_timer.post(
+        [this, &promise]()
+        {
+            if (m_httpClient)
+                m_httpClient->pleaseStopSync();
 
-        httpClient.swap(m_httpClient);
-    }
+            promise.set_value();
+        });
 
-    if (httpClient)
-        httpClient->pleaseStopSync(false);
+    promise.get_future().wait();
+    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
 }
 
 void MetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -90,7 +94,10 @@ void MetadataMonitor::clearHandlers()
 
 void MetadataMonitor::initMonitorUnsafe()
 {
+    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
     auto httpClient = nx_http::AsyncHttpClient::create();
+    m_timer.pleaseStopSync();
+    httpClient->bindToAioThread(m_timer.getAioThread());
 
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
@@ -126,13 +133,16 @@ void MetadataMonitor::initMonitorUnsafe()
     m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, handler));
 
     httpClient->doGet(m_url);
-
     m_httpClient = httpClient;
 }
 
 void MetadataMonitor::at_responseReceived(nx_http::AsyncHttpClientPtr httpClient)
 {
-    m_contentParser->setContentType(httpClient->contentType());
+    const auto response = httpClient->response();
+    if (response && response->statusLine.statusCode == nx_http::StatusCode::ok)
+        m_contentParser->setContentType(httpClient->contentType());
+    else
+        at_connectionClosed(httpClient);
 }
 
 void MetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient)
@@ -143,11 +153,7 @@ void MetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClie
 
 void MetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr /*httpClient*/)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_started)
-        return;
-
-    initMonitorUnsafe();
+    m_timer.start(kUpdateInterval, [this]() { initMonitorUnsafe(); });
 }
 
 } // namespace hanwha

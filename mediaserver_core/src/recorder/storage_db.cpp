@@ -389,7 +389,16 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
             .arg(m_dbFileName), cl_logINFO);
 
     if (!vacuum(&result))
-        NX_LOG("[StorageDb] vacuum failed", cl_logWARNING);
+    {
+        NX_LOG(lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
+                .arg(m_storage->getUrl())
+                .arg(m_dbFileName), cl_logWARNING);
+        return result;
+    }
+
+    NX_LOG(lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
+            .arg(m_storage->getUrl())
+            .arg(m_dbFileName), cl_logINFO);
 
     return result;
 }

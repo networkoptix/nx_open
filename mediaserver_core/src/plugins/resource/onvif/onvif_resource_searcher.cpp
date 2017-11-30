@@ -275,7 +275,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         if(!resource->getUniqueId().isEmpty())
         {
             auto maxChannels = resource->getMaxChannels();
-            resource->detectVideoSourceCount();
+            resource->fetchChannelCount();
             //if (channel > 0)
             //    resource->updateToChannel(channel-1);
             resList << resource;

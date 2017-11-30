@@ -8,7 +8,7 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'ngStorage',
     'typeahead-focus'
-]).config(function ($routeProvider) {
+]).config(['$routeProvider', function ($routeProvider) {
     $routeProvider
         .when('/setup', {
             templateUrl: Config.viewsDir + 'dialogs/setup-inline.html',
@@ -17,4 +17,4 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/setup'
         });
-});
+}]);

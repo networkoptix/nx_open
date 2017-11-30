@@ -148,6 +148,10 @@ std::vector<QString> Buffer::takeMessages()
     return messages;
 }
 
+void NullDevice::write(Level /*level*/, const QString& /*message*/)
+{
+}
+
 } // namespace log
 } // namespace utils
 } // namespace nx

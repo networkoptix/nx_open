@@ -5,6 +5,7 @@
 
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
+#include <nx/mediaserver/metadata/event_type_mapping.h>
 
 #include <common/common_module.h>
 #include <plugins/plugin_internal_tools.h>
@@ -15,13 +16,6 @@
 namespace nx {
 namespace mediaserver {
 namespace metadata {
-
-namespace {
-
-static const QnUuid kInputPortAnalyticsEventId =
-    QnUuid(lit("{dda94af6-c699-4b33-acfb-a164830430e7}"));
-
-} // namespace
 
 using namespace nx::vms;
 
@@ -51,6 +45,9 @@ RuleHolder::AffectedResources RuleHolder::updateRule(const nx::vms::event::RuleP
     if (!ruleIsBeingWatched && ruleIsNeededToBeWatched)
         return addRuleUnsafe(rule);
 
+    if (ruleIsBeingWatched && ruleIsNeededToBeWatched)
+        return updateRuleUnsafe(rule);
+
     return handleChanges();
 }
 
@@ -64,10 +61,22 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
 {
     QnMutexLocker lock(&m_mutex);
     m_watchedRules.clear();
-    
-    for (const auto& rule: rules)
-        m_watchedRules.insert(rule->id());
+    m_anyResourceRules.clear();
 
+    for (const auto& rule: rules)
+    {
+        if (isAnyResourceRule(rule))
+            m_anyResourceRules.insert(rule->id());
+        else
+            m_watchedRules.insert(rule->id());
+    }
+
+    return handleChanges();
+}
+
+RuleHolder::AffectedResources RuleHolder::addResource(const QnResourcePtr& resourcePtr)
+{
+    QnMutexLocker lock(&m_mutex);
     return handleChanges();
 }
 
@@ -82,7 +91,10 @@ RuleHolder::AffectedResources RuleHolder::addRuleUnsafe(const nx::vms::event::Ru
     if (!needToWatchRule(rule))
         return QSet<QnUuid>();
 
-    m_watchedRules.insert(rule->id());
+    if (isAnyResourceRule(rule))
+        m_anyResourceRules.insert(rule->id());
+    else
+        m_watchedRules.insert(rule->id());
 
     return handleChanges();
 }
@@ -93,17 +105,43 @@ RuleHolder::AffectedResources RuleHolder::removeRuleUnsafe(const QnUuid& ruleId)
         return RuleHolder::AffectedResources();
 
     m_watchedRules.remove(ruleId);
+    m_anyResourceRules.remove(ruleId);
 
     return handleChanges();
 }
 
+RuleHolder::AffectedResources RuleHolder::updateRuleUnsafe(const nx::vms::event::RulePtr& rule)
+{
+    if (isAnyResourceRule(rule))
+    {
+        m_watchedRules.remove(rule->id());
+        m_anyResourceRules.insert(rule->id());
+    }
+    else
+    {
+        m_anyResourceRules.remove(rule->id());
+        m_watchedRules.insert(rule->id());
+    }
+
+    return handleChanges();
+}
+
+bool RuleHolder::isAnyResourceRule(const nx::vms::event::RulePtr& rule) const
+{
+    return rule && rule->eventResources().isEmpty();
+}
+
 bool RuleHolder::isRuleBeingWatched(const QnUuid& ruleId) const
 {
-    return m_watchedRules.contains(ruleId);
+    return m_watchedRules.contains(ruleId)
+        || m_anyResourceRules.contains(ruleId);
 }
 
 bool RuleHolder::needToWatchRule(const event::RulePtr& rule) const
 {
+    if (isAnyResourceRule(rule))
+        return !rule->isDisabled();
+
     const auto ruleEventType = rule->eventType();
     const auto ruleResources = rule->eventResources();
 
@@ -128,10 +166,7 @@ QnUuid RuleHolder::analyticsEventIdFromRule(const nx::vms::event::RulePtr& rule)
     if (rule->eventType() == nx::vms::event::EventType::analyticsSdkEvent)
         return rule->eventParams().analyticsEventId();
 
-    if (rule->eventType() == nx::vms::event::EventType::cameraInputEvent)
-        return kInputPortAnalyticsEventId;
-
-    return QnUuid();
+    return guidByEventType(rule->eventType());
 }
 
 RuleHolder::ResourceEvents RuleHolder::calculateWatchedEvents() const
@@ -140,15 +175,38 @@ RuleHolder::ResourceEvents RuleHolder::calculateWatchedEvents() const
     const auto ruleManager = commonModule()
         ->eventRuleManager();
 
+    const auto resourcePool = commonModule()
+        ->resourcePool();
+
     for (const auto& ruleId: m_watchedRules)
     {
         const auto rule = ruleManager->rule(ruleId);
-        const auto eventId = analyticsEventIdFromRule(rule);
+        if (!rule)
+            continue;
 
+        const auto eventId = analyticsEventIdFromRule(rule);
         const auto resourceIds = rule->eventResources();
 
         for (const auto& resourceId: resourceIds)
            events[resourceId].insert(eventId);
+    }
+
+    for (const auto& ruleId: m_anyResourceRules)
+    {
+        const auto rule = ruleManager->rule(ruleId);
+        if (!rule)
+            continue;
+
+        const auto eventId = analyticsEventIdFromRule(rule);
+        if (eventId.isNull())
+            continue;
+
+        const auto eventType = rule->eventType();
+        for (const auto& camera: resourcePool->getResources<QnSecurityCamResource>())
+        {
+            if (camera->doesEventComeFromAnalyticsDriver(eventType))
+                events[camera->getId()].insert(eventId);
+        }
     }
 
     return events;

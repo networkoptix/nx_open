@@ -12,10 +12,12 @@
 #include "motion/motion_archive.h"
 #include "dualquality_helper.h"
 
+class QnMediaServerModule;
+
 class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    QnServerArchiveDelegate();
+    QnServerArchiveDelegate(QnMediaServerModule* mediaServerModule);
     virtual ~QnServerArchiveDelegate();
 
     //virtual void setSendMotion(bool value) override;
@@ -53,10 +55,11 @@ private:
 private:
     typedef std::map<QnServer::StoragePool, DeviceFileCatalogPtr> PoolToCatalogMap;
 
+    QnMediaServerModule* m_mediaServerModule;
     bool m_opened;
     QnResourcePtr m_resource;
     qint64 m_lastPacketTime;
-    
+
     qint64 m_skipFramesToTime;
     mutable PoolToCatalogMap m_catalogHi;
     mutable PoolToCatalogMap m_catalogLow;

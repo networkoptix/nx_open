@@ -705,7 +705,7 @@ void QnProgressiveDownloadingConsumer::run()
                 if (camRes) {
                     archive = camRes->createArchiveDelegate();
                     if (!archive)
-                        archive = new QnServerArchiveDelegate(); // default value
+                        archive = new QnServerArchiveDelegate(qnServerModule); // default value
                 }
                 if (archive) {
                     archive->open(resource, qnServerModule->archiveIntegrityWatcher());

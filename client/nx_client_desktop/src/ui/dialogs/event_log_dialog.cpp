@@ -175,11 +175,11 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->gridEvents->addAction(m_filterAction);
     ui->gridEvents->addAction(m_resetFilterAction);
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
     connect(ui->clearFilterButton, &QPushButton::clicked, this,
         &QnEventLogDialog::reset);
 
-    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);

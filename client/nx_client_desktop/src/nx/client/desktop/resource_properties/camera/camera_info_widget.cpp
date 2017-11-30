@@ -160,12 +160,12 @@ void CameraInfoWidget::updatePageSwitcher()
     if (ui->stackedWidget->currentWidget() == ui->lessInfoPage)
     {
         ui->toggleInfoButton->setText(tr("More Info"));
-        ui->toggleInfoButton->setIcon(qnSkin->icon("buttons/expand.png"));
+        ui->toggleInfoButton->setIcon(qnSkin->icon("text_buttons/expand.png"));
     }
     else
     {
         ui->toggleInfoButton->setText(tr("Less Info"));
-        ui->toggleInfoButton->setIcon(qnSkin->icon("buttons/collapse.png"));
+        ui->toggleInfoButton->setIcon(qnSkin->icon("text_buttons/collapse.png"));
     }
 }
 

@@ -1,9 +1,9 @@
 'Class to manipulate directory to which server instance is installed'
 
-import os.path
-import logging
-import StringIO
 import ConfigParser
+import StringIO
+import logging
+import os.path
 
 log = logging.getLogger(__name__)
 

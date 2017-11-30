@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .run(['$http','$templateCache', function($http,$templateCache) {
+    .run(['$http','$templateCache', function($http, $templateCache) {
         // Preload content into cache
         $http.get(Config.viewsDir + 'components/offline.html', {cache: $templateCache});
     }])

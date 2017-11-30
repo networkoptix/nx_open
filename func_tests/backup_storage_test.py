@@ -3,13 +3,15 @@ Backup storage test
 '''
 
 import logging
-import pytest
-import time
-import pytz
 import os
+import time
+from datetime import datetime
+
+import pytest
+import pytz
+
 import server_api_data_generators as generator
 import test_utils.utils as utils
-from datetime import datetime
 from test_utils.host import ProcessError
 
 log = logging.getLogger(__name__)
@@ -91,10 +93,10 @@ def server(server_factory, system_backup_type):
     return server
 
 
-def wait_storage_ready(server, stotage_guid):
+def wait_storage_ready(server, storage_guid):
     start = time.time()
     while True:
-        status = server.rest_api.ec2.getStatusList.GET(id=stotage_guid)
+        status = server.rest_api.ec2.getStatusList.GET(id=storage_guid)
         if status and status[0]['status'] == 'Online':
             return
         if time.time() - start >= BACKUP_STORAGE_READY_TIMEOUT_SEC:

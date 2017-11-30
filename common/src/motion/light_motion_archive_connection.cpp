@@ -2,14 +2,16 @@
 
 #include "utils/common/util.h"
 
-QnLightMotionArchiveConnection::QnLightMotionArchiveConnection(const QnMetaDataLightVector& data, int channel):
+QnLightMotionArchiveConnection::QnLightMotionArchiveConnection(
+    const QnMetaDataLightVector& data,
+    int channel)
+    :
     m_motionData(data),
     m_channel(channel)
 {
-
 }
 
-QnMetaDataV1Ptr QnLightMotionArchiveConnection::getMotionData(qint64 timeUsec)
+QnAbstractCompressedMetadataPtr QnLightMotionArchiveConnection::getMotionData(qint64 timeUsec)
 {
     if (m_motionData.empty() ||
             (m_lastResult && m_lastResult->containTime(timeUsec)))  // TODO: #rvasilenko Is this check sane? Why do we return empty result?

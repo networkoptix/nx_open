@@ -120,12 +120,8 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(bookmarksViewer, &QnBookmarksViewer::exportBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            const auto actionId = nx::client::desktop::ini().universalExportDialog
-                ? action::ExportVideoAction
-                : action::ExportTimeSelectionAction;
-
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_export"));
-            menu()->triggerIfPossible(actionId, getActionParamsFunc(bookmark));
+            menu()->triggerIfPossible(action::ExportVideoAction, getActionParamsFunc(bookmark));
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,

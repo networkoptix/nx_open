@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <?include BuildVars.wxi ?>
+
     <Fragment>
-        <?include BuildVars.wxi ?>
         <DirectoryRef Id="AxClientParentDir">
-            <Directory Id="$(var.paxtonDirId)" Name="${release.version}">
+
+            <Directory Id="$(var.paxtonDirId)" Name="$(var.releaseVersionFull)">
                 <Component Id="AxClass">
                     <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.SourceDir)\ax${ax.className}${parsedVersion.majorVersion}.dll">
                         <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
@@ -21,7 +24,7 @@
 
                 <Directory Id="Platforms" Name="platforms">
                 </Directory>
-                
+
                 <Directory Id="Mediaservice" Name="mediaservice">
                 </Directory>
 
@@ -30,10 +33,7 @@
 
                 <Directory Id="ClientQml" Name="qml"/>
                 <Directory Id="ClientFontsDir" Name="fonts"/>
-
-                <Component Id="ClientSigar">
-                    <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
-                </Component>
+                <Directory Id="$(var.customization)VoxDir" Name="vox"/>
             </Directory>
         </DirectoryRef>
         <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.paxtonDirId)">
@@ -83,6 +83,9 @@
             </Component>
             <Component>
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
+            </Component>
+            <Component>
+                <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
             </Component>
         </ComponentGroup>
 
@@ -199,7 +202,7 @@
                 <File Id="qtmedia_audioengine.dll" Name="qtmedia_audioengine.dll" Source="$(var.QtPluginsDir)\mediaservice\qtmedia_audioengine.dll" DiskId="12" />
             </Component>
         </ComponentGroup>
-		
+
         <ComponentGroup Id="AudioPlugins" Directory="Audio">
             <Component>
                 <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
@@ -216,6 +219,7 @@
     <Fragment>
         <ComponentGroup Id="AxClientDirComponents">
             <ComponentRef Id="AxClass"/>
+            <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="ClientLibs"/>
@@ -223,12 +227,12 @@
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ClientQuazip" />
             <ComponentGroupRef Id="ImageFormats" />
-            <ComponentGroupRef Id="Mediaservice" />			
+            <ComponentGroupRef Id="Mediaservice" />
             <ComponentGroupRef Id="Platforms" />
             <ComponentGroupRef Id="AudioPlugins" />
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientSigar"/>
+            <ComponentGroupRef Id="PaxtonVcrt14ComponentGroup"/>
         </ComponentGroup>
     </Fragment>
 </Wix>

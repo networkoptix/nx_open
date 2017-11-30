@@ -137,6 +137,10 @@ if(UNIX)
 endif()
 
 if(LINUX)
+    # TODO: Use CMake defaults in the next release version (remove the following two lines).
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
     if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
@@ -157,6 +161,10 @@ if(LINUX)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
+
+    if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(-ggdb1 -fno-omit-frame-pointer)
+    endif()
 endif()
 
 if(MACOSX)
@@ -179,7 +187,7 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi"
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1"
     OR targetDevice STREQUAL "linux-x64"
     OR targetDevice STREQUAL "linux-x86"
     OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")

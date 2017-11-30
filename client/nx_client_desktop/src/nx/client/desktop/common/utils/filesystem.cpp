@@ -83,6 +83,11 @@ QString FileSystemStrings::filterDescription(FileExtension ext)
     return formatTemplate.arg(description(ext)).arg(suffix(ext));
 }
 
+bool FileExtensionUtils::isLayout(FileExtension extension)
+{
+    return extension == FileExtension::nov || isExecutable(extension);
+}
+
 bool FileExtensionUtils::isExecutable(FileExtension extension)
 {
     return extension == FileExtension::exe64 || extension == FileExtension::exe86;

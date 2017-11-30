@@ -54,6 +54,7 @@ option(withClouds "Enable cloud components" ${_withClouds})
 option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
+option(withPluginStubs "Enable plugin stubs" ON)
 
 unset(_withMediaServer)
 unset(_withTrayTool)

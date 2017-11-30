@@ -147,6 +147,29 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>關鍵字以空白鍵分隔</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>說明包含:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>敘述包含:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation type="unfinished">Event Type:</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -331,6 +354,34 @@
       <location/>
       <source>Post-recording:</source>
       <translation>事後錄影:</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation type="unfinished">Bookmark Info</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation type="unfinished">Area Width</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation type="unfinished">Include description</translation>
     </message>
   </context>
   <context>
@@ -578,58 +629,8 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>我已閱讀手冊並已瞭解風險</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>攝影機設定控制</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>第二串流控制</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>覆蓋第二串流設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>不使用</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>低畫質</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>中畫質</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>高畫質</translation>
-    </message>
-    <message>
-      <location/>
       <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
       <translation>警告! 選擇高畫質可能影像CPU及網路品質並造成額外的問題.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>錄影控制</translation>
     </message>
     <message>
       <location/>
@@ -640,11 +641,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>不錄存第二串流</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>串流控制</translation>
     </message>
     <message>
       <location/>
@@ -678,38 +674,8 @@
     </message>
     <message>
       <location/>
-      <source>Motion detection control</source>
-      <translation>位移偵測控制</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>強制位移偵測由以下串流判斷:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>以 GOP 計算流量而非每秒計算 (這將增加攝影機流量)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>保持攝影機的串流及配置檔設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>系統管理中的 &quot;允許系統優化攝影機設定&quot; 已被停用.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>警告! 請勿變更這些設定除非您明白這可能造成對系統效能的潛在影響.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>PTZ 控制</translation>
     </message>
     <message>
       <location/>
@@ -720,6 +686,71 @@
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>警告! 攝影機內建預設點將無法使用.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation type="unfinished">Camera Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation type="unfinished">Keep camera stream and profile settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation type="unfinished">It will increase bitrate for camera.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation type="unfinished">Secondary Stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation type="unfinished">Disable secondary stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality</source>
+      <translation>畫質</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>位移偵測</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation type="unfinished">Archive</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation type="unfinished">Media Streaming</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation type="unfinished">PTZ</translation>
     </message>
   </context>
   <context>
@@ -867,6 +898,11 @@
       <location/>
       <source>Motion + Lo-Res</source>
       <translation>位移主串流 + 全時次串流</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation type="unfinished">Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1027,6 +1063,42 @@
     </message>
   </context>
   <context>
+    <name>ExportLayoutSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Make read-only</source>
+      <translation type="unfinished">Make read-only</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Apply Filters</source>
+      <translation type="unfinished">Apply Filters</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportRapidReviewDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
@@ -1052,6 +1124,37 @@
       <location/>
       <source>Rapid Review speed</source>
       <translation>縮時預覽倍數</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation type="unfinished">Export Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation type="unfinished">Single Camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation type="unfinished">Export Settings</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation type="unfinished">Multi Video</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>瀏覽…</translation>
     </message>
   </context>
   <context>
@@ -1199,6 +1302,39 @@
       <location/>
       <source>Rotation</source>
       <translation>旋轉</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>圖像:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>大小:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation type="unfinished">Opacity</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation type="unfinished">Default</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>瀏覽…</translation>
     </message>
   </context>
   <context>
@@ -2125,6 +2261,39 @@
     </message>
   </context>
   <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation type="unfinished">Rapid Review</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation type="unfinished">Initial video length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation type="unfinished">Exported video length</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation type="unfinished">Speed</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation type="unfinished">Frames interval</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation type="unfinished">Reset Speed</translation>
+    </message>
+  </context>
+  <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
@@ -2778,6 +2947,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation type="unfinished">Text</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation type="unfinished">Enter plain text or HTML</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation type="unfinished">Area Width</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2788,6 +2985,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation>與網路校時</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation type="unfinished">Timestamp</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation type="unfinished">Format</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>

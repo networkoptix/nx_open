@@ -413,11 +413,7 @@ void QnGridBackgroundItem::updateGeometry()
     if(mapper() == NULL)
         return;
 
-    const int left = d->imageData.size.width() / 2;
-    const int top =  d->imageData.size.height() / 2;
-    d->sceneBoundingRect = QRect(-left, -top,
-        d->imageData.size.width(), d->imageData.size.height());
-
+    d->sceneBoundingRect = QnLayoutResource::backgroundRect(d->imageData.size);
     const QRectF targetRect = mapper()->mapFromGrid(d->sceneBoundingRect);
     setViewportRect(targetRect);
 }
@@ -485,7 +481,7 @@ void QnGridBackgroundItem::setImage(const QImage& image)
     if (!d->imagesMemCache.contains(d->imageData.fileName))
         d->imagesMemCache.insert(d->imageData.fileName, image);
 
-    d->imageAspectRatio = Geometry::aspectRatio(image.size());
+    d->imageAspectRatio = Geometry::aspectRatio(image.size(), 0.0);
 
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..

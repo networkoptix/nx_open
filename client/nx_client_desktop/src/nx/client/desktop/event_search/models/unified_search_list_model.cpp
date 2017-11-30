@@ -35,6 +35,16 @@ void UnifiedSearchListModel::setFilter(Types filter)
     d->setFilter(filter);
 }
 
+vms::event::EventType UnifiedSearchListModel::selectedEventType() const
+{
+    return d->selectedEventType();
+}
+
+void UnifiedSearchListModel::setSelectedEventType(vms::event::EventType value)
+{
+    d->setSelectedEventType(value);
+}
+
 bool UnifiedSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
     return d->canFetchMore();

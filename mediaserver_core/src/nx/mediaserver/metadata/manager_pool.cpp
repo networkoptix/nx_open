@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/serialization/json.h>
-
 #include <nx/mediaserver/metadata/event_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 
@@ -84,7 +83,21 @@ void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
         resource.data(), &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
+    connect(
+        resource.data(), &QnResource::urlChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource.data(), &QnResource::propertyChanged,
+        this, &ManagerPool::at_propertyChanged);
+
     handleResourceChanges(resource);
+}
+
+void ManagerPool::at_propertyChanged(const QnResourcePtr& resource, const QString& name)
+{
+    if (name == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
+        handleResourceChanges(resource);
 }
 
 void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
@@ -142,6 +155,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         std::unique_ptr<EventHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
         if (manager->queryInterface(IID_ConsumingMetadataManager))
             handler->registerDataReceptor(&context);
+
         context.addManager(std::move(manager), std::move(handler), *pluginManifest);
     }
 }
@@ -228,6 +242,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(ResourceMetadataContext& contex
         else
         {
             auto result = data.manager->startFetchingMetadata(); //< TODO: #dmishin pass event types.
+
             if (result != Error::noError)
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
         }
