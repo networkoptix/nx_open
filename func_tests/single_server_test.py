@@ -221,14 +221,3 @@ def test_non_existent_api_endpoints(server, path):
     auth = HTTPDigestAuth(server.user, server.password)
     response = requests.get(server.rest_api_url.rstrip('/') + path, auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
-
-
-def test_digest_reuse(server):
-    server.rest_api.ec2.getCurrentTime.GET()
-    server.rest_api.ec2.getCurrentTime.GET()
-    server.rest_api.ec2.getCurrentTime.GET()
-    server.rest_api.ec2.getCurrentTime.GET()
-    # server.rest_api.ec2.getCurrentTime.GET()
-    # server.restart_via_api(timeout=timedelta(seconds=10))
-    server.rest_api.set_credentials('admin', 'admin')
-    server.rest_api.ec2.getCurrentTime.GET()
