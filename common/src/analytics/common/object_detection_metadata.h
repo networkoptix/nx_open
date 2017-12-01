@@ -9,7 +9,7 @@
 #include <analytics/common/abstract_metadata.h>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/media_data_packet_fwd.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {

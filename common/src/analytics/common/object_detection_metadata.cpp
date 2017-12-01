@@ -3,6 +3,7 @@
 #include <tuple>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_message.h>
 
 namespace nx {
