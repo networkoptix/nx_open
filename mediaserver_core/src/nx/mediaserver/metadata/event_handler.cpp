@@ -82,6 +82,7 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
     }
     data.timestampUsec = packet->timestampUsec();
     data.durationUsec = packet->durationUsec();
+    data.deviceId = m_resource->getId();
 
     if (m_dataReceptor)
         m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
