@@ -604,7 +604,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
 }
 
-AbstractVideoDecoder::Capabilities AndroidVideoDecoder::::capabilities() const
+AbstractVideoDecoder::Capabilities AndroidVideoDecoder::capabilities() const
 {
     return Capability::hardwareAccelerated;
 }

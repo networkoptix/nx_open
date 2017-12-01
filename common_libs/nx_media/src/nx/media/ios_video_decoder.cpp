@@ -407,7 +407,7 @@ int IOSVideoDecoder::decode(
     return frameNum;
 }
 
-AbstractVideoDecoder::Capabilities IOSVideoDecoder::::capabilities() const
+AbstractVideoDecoder::Capabilities IOSVideoDecoder::capabilities() const
 {
     return Capability::hardwareAccelerated;
 }
