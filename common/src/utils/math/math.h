@@ -112,6 +112,17 @@ inline unsigned int qPower2Floor(unsigned int value, int step) {
 }
 
 /**
+* \param value                         Value to round to the nearest number that is power of 2.
+* \param step                          Rounding step, must be power of 2.
+* \returns                             Rounded value.
+*/
+inline unsigned int qPower2Round(unsigned int value, int step)
+{
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
+    return qPower2Floor(value + step / 2, step);
+}
+
+/**
  * Modulo function that never returns negative values.
  *
  * \param l                             The dividend.
