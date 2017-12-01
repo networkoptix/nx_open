@@ -470,7 +470,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     readMotionInfo();
 
-    // determine camera max resolution
+    // Determine camera max resolution.
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
@@ -571,7 +571,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     // Copy information from build-in resource type to runtime params
     // because mobile client doesn't load resource type information.
     if (isIOModule())
-        setProperty(Qn::IO_CONFIG_PARAM_NAME, QString(lit("1")));
+        setProperty(Qn::IO_CONFIG_PARAM_NAME, QString("1"));
 
     saveParams();
 
@@ -923,21 +923,18 @@ bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
     auto status = readAxisParameter(http, AXIS_TWO_WAY_AUDIO_MODES, &duplexModeList);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)
     {
-        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString("0"));
         return true;
     }
-    const QStringList supportedModes = duplexModeList.split(',');
-    const QStringList toCameraModes = {"full","half","get","speaker"};
-    const QStringList fromCameraModes = {"full","half","post"};
+    const QSet<QString> supportedModes = duplexModeList.split(',').toSet();
+    const QSet<QString> kToCameraModes = {"full","half","get","speaker"};
+    const QSet<QString> kFromCameraModes = {"full","half","post"};
 
-    const bool twoWayAudioFound = std::find_first_of(supportedModes.cbegin(), supportedModes.cend(),
-        toCameraModes.cbegin(), toCameraModes.cend())!= supportedModes.cend();
-
-    const bool fromCameraAudioFound = std::find_first_of(supportedModes.cbegin(), supportedModes.cend(),
-        fromCameraModes.cbegin(), fromCameraModes.cend()) != supportedModes.cend();
+    const bool twoWayAudioFound = supportedModes.intersects(kToCameraModes);
+    const bool fromCameraAudioFound = supportedModes.intersects(kFromCameraModes);
 
     if (fromCameraAudioFound)
-        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("1")));
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString("1"));
 
     if (!twoWayAudioFound)
         return true;

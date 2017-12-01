@@ -1408,18 +1408,20 @@ void MediaServerProcess::loadResourcesFromECS(
         messageProcessor->resetPropertyList(kvPairs);
 
         /* Properties and attributes must be read before processing cameras because of getAuth() method */
-        QnManualCameraInfoMap manualCameras;
+        std::vector<QnManualCameraInfo> manualCameras;
         for (const auto &camera : cameras)
         {
             messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
             if (camera.manuallyAdded)
             {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
-                if (resType)
+                if (const auto resourceType = qnResTypePool->getResourceType(camera.typeId))
                 {
-                    const auto auth = QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId);
-                    manualCameras.insert(camera.url,
-                        QnManualCameraInfo(QUrl(camera.url), auth, resType->getName()));
+                    QnManualCameraInfo info(
+                        QUrl(camera.url),
+                        QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId),
+                        resourceType->getName());
+
+                    manualCameras.push_back(std::move(info));
                 }
                 else
                 {
