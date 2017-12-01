@@ -43,7 +43,7 @@ private:
     AnalyticsSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    rest::Handle m_fetchInProgress = rest::Handle();
+    rest::Handle m_currentFetchId = rest::Handle();
     bool m_fetchedAll = false;
     bool m_success = true;
 

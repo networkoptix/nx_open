@@ -60,6 +60,28 @@ Filter generateRandomFilter()
     return filter;
 }
 
+common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount)
+{
+    auto packet = std::make_shared<common::metadata::DetectionMetadataPacket>();
+    packet->deviceId = QnUuid::createUuid();
+    packet->timestampUsec = nx::utils::random::number<qint64>();
+    packet->durationUsec = nx::utils::random::number<qint64>(0, 30000);
+
+    for (int i = 0; i < eventCount; ++i)
+    {
+        common::metadata::DetectedObject detectedObject;
+        detectedObject.objectTypeId = QnUuid::createUuid();
+        detectedObject.objectId = QnUuid::createUuid();
+        detectedObject.boundingBox = QRectF(0, 0, 100, 100);
+        detectedObject.labels.push_back(common::metadata::Attribute{
+            QString::fromUtf8(nx::utils::random::generateName(7)),
+            QString::fromUtf8(nx::utils::random::generateName(7))});
+        packet->objects.push_back(std::move(detectedObject));
+    }
+
+    return packet;
+}
+
 } // namespace test
 } // namespace storage
 } // namespace analytics

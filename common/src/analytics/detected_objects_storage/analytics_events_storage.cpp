@@ -42,9 +42,9 @@ void EventsStorage::save(
 
 void EventsStorage::createLookupCursor(
     Filter /*filter*/,
-    CreateCursorCompletionHandler /*completionHandler*/)
+    CreateCursorCompletionHandler completionHandler)
 {
-    // TODO
+    completionHandler(ResultCode::error, nullptr);
 }
 
 void EventsStorage::lookup(

@@ -28,7 +28,7 @@ UnifiedSearchListModel::Private::~Private()
 
 bool UnifiedSearchListModel::Private::canFetchMore() const
 {
-    return m_camera && !m_fetchInProgress
+    return m_camera && !m_currentFetchGuard
         && (m_eventsModel->canFetchMore() || m_bookmarksModel->canFetchMore()
             || m_analyticsModel->canFetchMore());
 }
@@ -75,7 +75,7 @@ void UnifiedSearchListModel::Private::fetchMore()
         };
 
     m_latestStartTimeMs = 0;
-    m_fetchInProgress = completionGuard;
+    m_currentFetchGuard = completionGuard;
     m_fetchingTypes = Types();
 
     if (m_eventsModel->prefetchAsync(prefetchCompletionHandler))
@@ -136,7 +136,7 @@ void UnifiedSearchListModel::Private::setSelectedEventType(vms::event::EventType
 
 void UnifiedSearchListModel::Private::updateModels()
 {
-    if (m_fetchInProgress)
+    if (m_currentFetchGuard)
     {
         // We cannot update models during fetch, so queue it for later:
         m_needToUpdateModels = true;

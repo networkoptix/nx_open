@@ -557,8 +557,8 @@ bool QnCompressedMetadata::setData(const char* data, std::size_t dataSize)
 bool QnCompressedMetadata::setData(const QByteArray& data)
 {
     return m_data.write(data.data(), data.size());
-}	
-	
+}
+
 QnCompressedMetadataPtr QnCompressedMetadata::createMediaEventPacket(
     qint64 timestampUs,
     Qn::MediaStreamEvent value)

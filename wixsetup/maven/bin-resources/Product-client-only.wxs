@@ -91,7 +91,7 @@
 
         <!-- Trying to kill old applauncher nicely. Notice: new applauncher may be left running during update. -->
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[$(var.clientDirId)]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[ClientRootDir]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 

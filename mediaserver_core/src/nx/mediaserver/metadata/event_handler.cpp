@@ -83,13 +83,8 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
     data.timestampUsec = packet->timestampUsec();
     data.durationUsec = packet->durationUsec();
 
-    QnCompressedMetadataPtr serializedData(new QnCompressedMetadata(MetadataType::ObjectDetection));
-    serializedData->setTimestampUsec(packet->timestampUsec());
-    serializedData->setDurationUsec(packet->durationUsec());
-    serializedData->setData(QnUbjson::serialized(data));
-
     if (m_dataReceptor)
-        m_dataReceptor->putData(serializedData);
+        m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
 }
 
 void EventHandler::handleMetadataEvent(

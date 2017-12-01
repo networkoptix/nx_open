@@ -9,6 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <test_support/analytics/storage/analytics_storage_types.h>
 
 namespace nx {
 namespace analytics {
@@ -123,28 +124,6 @@ protected:
         std::vector<DetectedObject> expected)
     {
         ASSERT_EQ(expected, m_prevLookupResult->eventsFound);
-    }
-
-    common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount)
-    {
-        auto packet = std::make_shared<common::metadata::DetectionMetadataPacket>();
-        packet->deviceId = QnUuid::createUuid();
-        packet->timestampUsec = nx::utils::random::number<qint64>();
-        packet->durationUsec = nx::utils::random::number<qint64>(0, 30000);
-
-        for (int i = 0; i < eventCount; ++i)
-        {
-            common::metadata::DetectedObject detectedObject;
-            detectedObject.objectTypeId = QnUuid::createUuid();
-            detectedObject.objectId = QnUuid::createUuid();
-            detectedObject.boundingBox = QRectF(0, 0, 100, 100);
-            detectedObject.labels.push_back(common::metadata::Attribute{
-                nx::utils::random::generateName(7),
-                nx::utils::random::generateName(7)});
-            packet->objects.push_back(std::move(detectedObject));
-        }
-
-        return packet;
     }
 
     std::vector<DetectedObject> toDetectedObjects(
