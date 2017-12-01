@@ -6,7 +6,7 @@
         <?include BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="$(var.customization)MediaServerDir" Name="MediaServer">
+            <Directory Id="MediaServerRootDir" Name="MediaServer">
                 <Component Id="ServerExecutable">
                     <File Id="mediaserver.exe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes" DiskId="11">
                         <fire:FirewallException Id="FirewallExceptionMediaServer" Name="$(var.mediaserverName)" Scope="any" IgnoreFailure="yes"/>
@@ -101,7 +101,7 @@
 
             </Directory>
         </DirectoryRef>
-        <ComponentGroup Id="ServerLibs" Directory="$(var.customization)MediaServerDir">
+        <ComponentGroup Id="ServerLibs" Directory="MediaServerRootDir">
             <Component>
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
@@ -120,7 +120,7 @@
         </ComponentGroup>
 
         <!-- Component groups -->
-        <ComponentGroup Id="ServerFFmpegLibraries" Directory="$(var.customization)MediaServerDir">
+        <ComponentGroup Id="ServerFFmpegLibraries" Directory="MediaServerRootDir">
             <Component>
                 <File Id="avcodec.dll" Name="avcodec-57.dll" Source="$(var.SourceDir)/avcodec-57.dll" DiskId="2" />
             </Component>
@@ -153,13 +153,13 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerWeb" Directory="$(var.customization)MediaServerDir">
+        <ComponentGroup Id="ServerWeb" Directory="MediaServerRootDir">
             <Component>
                 <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat" DiskId="10" />
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerQTLibraries" Directory="$(var.customization)MediaServerDir">
+        <ComponentGroup Id="ServerQTLibraries" Directory="MediaServerRootDir">
             <Component>
                 <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
             </Component>
@@ -199,13 +199,13 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerQuazip" Directory="$(var.customization)MediaServerDir">
+        <ComponentGroup Id="ServerQuazip" Directory="MediaServerRootDir">
             <Component>
                 <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerOpenSSL" Directory="$(var.customization)MediaServerDir">
+        <ComponentGroup Id="ServerOpenSSL" Directory="MediaServerRootDir">
             <Component>
                 <File Id="ssl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
             </Component>
