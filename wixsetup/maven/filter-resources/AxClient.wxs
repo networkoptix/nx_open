@@ -87,6 +87,9 @@
             <Component>
                 <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
             </Component>
+            <Component>
+                <File Id="nx_relaying.dll" Name="nx_relaying.dll" Source="$(var.SourceDir)/nx_relaying.dll" DiskId="4" />
+            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.paxtonDirId)">

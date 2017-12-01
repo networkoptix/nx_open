@@ -74,21 +74,17 @@ const analytics::storage::DetectedObject& AnalyticsSearchListModel::Private::obj
 
 void AnalyticsSearchListModel::Private::clear()
 {
+    ScopedReset reset(q, !m_data.empty());
+    m_data.clear();
     m_prefetch.clear();
     m_fetchedAll = false;
-
-    if (!m_data.empty())
-    {
-        ScopedReset reset(q);
-        m_data.clear();
-    }
-
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    m_currentFetchId = rest::Handle();
 }
 
 bool AnalyticsSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && m_prefetch.empty()
+    return !m_fetchedAll && m_camera && !m_currentFetchId
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -99,9 +95,9 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
 
     const auto dataReceived =
         [this, completionHandler, guard = QPointer<QObject>(this)]
-            (bool success, rest::Handle /*handle*/, analytics::storage::LookupResult&& data)
+            (bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
         {
-            if (!guard)
+            if (!guard || m_currentFetchId != handle)
                 return;
 
             NX_ASSERT(m_prefetch.empty());
@@ -125,11 +121,19 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;
 
-    return server->restConnection()->lookupDetectedObjects(request, dataReceived, thread());
+    m_currentFetchId = server->restConnection()->lookupDetectedObjects(
+        request, dataReceived, thread());
+
+    return m_currentFetchId != rest::Handle();
 }
 
 void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 {
+    if (!m_currentFetchId)
+        return;
+
+    m_currentFetchId = rest::Handle();
+
     if (!m_success)
         return;
 

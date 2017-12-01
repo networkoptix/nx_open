@@ -30,6 +30,13 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
+    /// @brief                  Asynchronously gathers bookmarks using specified filter.
+    /// @param cameras          Set of target cameras.
+    /// @param filter           Filter parameters.
+    /// @param callback         Callback for receiving bookmarks data.
+    /// @returns                Internal id of the request.
+    int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksInternalCallbackType callback);
+
     /// @brief                  Add the bookmark to the camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.

@@ -21,6 +21,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
 
+#include "media_data_packet_fwd.h"
+
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
 
@@ -57,9 +59,6 @@ using QnEmptyMediaDataPtr = std::shared_ptr<QnEmptyMediaData>;
 
 using QnAbstractCompressedMetadataPtr = std::shared_ptr<QnAbstractCompressedMetadata>;
 using QnConstAbstractCompressedMetadataPtr = std::shared_ptr<const QnAbstractCompressedMetadata>;
-
-using QnCompressedMetadataPtr = std::shared_ptr<QnCompressedMetadata>;
-using QnConstCompressedMetadataPtr = std::shared_ptr<const QnCompressedMetadata>;
 
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 using QnConstMetaDataV1Ptr = std::shared_ptr<const QnMetaDataV1>;
