@@ -8,7 +8,7 @@ namespace info {
 namespace detail {
 namespace data_provider {
 
-class RawDataProviderFactory
+class NX_UPDATE_API RawDataProviderFactory
 {
 public:
     static AbstractAsyncRawDataProviderPtr create(

@@ -3,6 +3,8 @@
 #include <memory>
 #include <nx/update/info/abstract_update_registry.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/update/info/detail/data_parser/updates_meta_data.h>
+#include <nx/update/info/detail/data_parser/update_data.h>
 
 namespace nx {
 namespace update {
@@ -12,10 +14,12 @@ namespace impl {
 using AbstractUpdateRegistryPtr = std::unique_ptr<AbstractUpdateRegistry>;
 using UpdateRegistryFactoryFunction = nx::utils::MoveOnlyFunc<AbstractUpdateRegistryPtr()>;
 
-class UpdateRegistryFactory
+class NX_UPDATE_API UpdateRegistryFactory
 {
 public:
-    static AbstractUpdateRegistryPtr create();
+    static AbstractUpdateRegistryPtr create(
+        detail::data_parser::UpdatesMetaData metaData,
+        QList<detail::data_parser::UpdateData>);
     static void setFactoryFunction(UpdateRegistryFactoryFunction factoryFunction);
 private:
     static UpdateRegistryFactoryFunction m_factoryFunction;

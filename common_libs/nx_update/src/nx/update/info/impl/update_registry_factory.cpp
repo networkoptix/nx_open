@@ -9,24 +9,28 @@ namespace impl {
 UpdateRegistryFactoryFunction UpdateRegistryFactory::m_factoryFunction = nullptr;
 
 namespace {
-AbstractUpdateRegistryPtr createCommonUpdateRegistry()
+AbstractUpdateRegistryPtr createCommonUpdateRegistry(
+    detail::data_parser::UpdatesMetaData metaData,
+    QList<detail::data_parser::UpdateData> updateDataList)
 {
-    return std::make_unique<CommonUpdateRegistry>();
+    return std::make_unique<CommonUpdateRegistry>(std::move(metaData), std::move(updateDataList));
 }
 
 } // namespace
 
-AbstractUpdateRegistryPtr UpdateRegistryFactory::create()
+AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
+    detail::data_parser::UpdatesMetaData metaData,
+    QList<detail::data_parser::UpdateData> updateDataList)
 {
     if (m_factoryFunction)
         return m_factoryFunction();
 
-    return createCommonUpdateRegistry();
+    return createCommonUpdateRegistry(std::move(metaData), std::move(updateDataList));
 }
 
 void UpdateRegistryFactory::setFactoryFunction(UpdateRegistryFactoryFunction factoryFunction)
 {
-    m_factoryFunction = factoryFunction;
+    m_factoryFunction = std::move(factoryFunction);
 }
 
 } // namespace impl

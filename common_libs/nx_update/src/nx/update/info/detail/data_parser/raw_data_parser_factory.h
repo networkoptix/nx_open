@@ -8,7 +8,7 @@ namespace info {
 namespace detail {
 namespace data_parser {
 
-class RawDataParserFactory
+class NX_UPDATE_API RawDataParserFactory
 {
 public:
     static AbstractRawDataParserPtr create();

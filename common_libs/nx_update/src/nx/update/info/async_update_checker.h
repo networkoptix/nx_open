@@ -10,30 +10,18 @@ namespace update {
 namespace info {
 
 using AbstractUpdateRegistryPtr = std::unique_ptr<AbstractUpdateRegistry>;
-
 using UpdateCheckCallback = utils::MoveOnlyFunc<void(ResultCode, AbstractUpdateRegistryPtr)>;
+namespace detail { class AsyncUpdateCheckerImpl; }
 
-class AsyncUpdateChecker: private detail::data_provider::AbstractAsyncRawDataProviderHandler
+class NX_UPDATE_API AsyncUpdateChecker
 {
 public:
     AsyncUpdateChecker();
+    ~AsyncUpdateChecker();
     void check(const QString& baseUrl, UpdateCheckCallback callback);
 
 private:
-    detail::AbstractAsyncRawDataProviderPtr m_rawDataProvider;
-    detail::AbstractRawDataParserPtr m_rawDataParser;
-    UpdateCheckCallback m_updateCallback;
-    detail::data_parser::UpdatesMetaData m_updatesMetaData;
-    int m_customizationIndex;
-
-    virtual void onGetUpdatesMetaInformationDone(
-        ResultCode resultCode,
-        QByteArray rawData) override;
-    virtual void onGetSpecificUpdateInformationDone(
-        ResultCode resultCode,
-        QByteArray rawData) override;
-
-    void getSpecificData();
+    std::unique_ptr<detail::AsyncUpdateCheckerImpl> m_impl;
 };
 
 } // namespace info
