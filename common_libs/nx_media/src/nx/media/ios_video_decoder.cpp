@@ -407,6 +407,10 @@ int IOSVideoDecoder::decode(
     return frameNum;
 }
 
+AbstractVideoDecoder::Capabilities IOSVideoDecoder::::capabilities() const
+{
+    return Capability::hardwareAccelerated;
+}
 
 } // namespace media
 } // namespace nx

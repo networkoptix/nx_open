@@ -33,6 +33,8 @@ public:
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
     virtual double getSampleAspectRatio() const override;
+
+    virtual Capabilities capabilities() const override;
 private:
     static QSize s_maxResolution;
 

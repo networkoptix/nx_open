@@ -360,5 +360,10 @@ void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
     s_maxResolution = maxResolution;
 }
 
+AbstractVideoDecoder::Capabilities FfmpegVideoDecoder::capabilities() const
+{
+    return Capability::noCapability;
+}
+
 } // namespace media
 } // namespace nx

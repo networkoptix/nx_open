@@ -27,11 +27,12 @@ private:
     Q_PROPERTY(qreal framerate MEMBER framerate CONSTANT)
     Q_PROPERTY(qreal bitrate MEMBER bitrate CONSTANT)
     Q_PROPERTY(QString codec MEMBER codec CONSTANT)
-
+    Q_PROPERTY(bool isHwAccelerated MEMBER isHwAccelerated CONSTANT)
 public:
     qreal framerate = 0.0;
     qreal bitrate = 0.0;
     QString codec;
+    bool isHwAccelerated = false;
 };
 
 class PlayerPrivate;

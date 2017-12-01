@@ -35,6 +35,7 @@ public:
         const QnConstCompressedVideoDataPtr& compressedVideoData,
         QVideoFramePtr* outDecodedFrame) override;
 
+    virtual Capabilities capabilities() const override;
 private:
     std::shared_ptr<ProxyVideoDecoderImpl> d;
     friend class ProxyVideoDecoderImpl;
