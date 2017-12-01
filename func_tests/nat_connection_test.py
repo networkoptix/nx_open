@@ -4,6 +4,8 @@ from datetime import datetime
 
 import pytest
 import pytz
+import requests
+import requests.auth
 
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 from test_utils.server import TimePeriod
@@ -96,6 +98,32 @@ def test_proxy_requests(env):
     assert direct_response_in_front == proxy_response_in_front
     assert direct_response_behind == proxy_response_behind
     assert direct_response_in_front != direct_response_behind
+
+
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7818")
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_non_existent_endpoint_via_proxy_with_auth_same_connection(env):
+    # Use requests directly, so REST API wrapper doesn't catch errors.
+    root_url = env.in_front.rest_api.url.rstrip('/')
+    log.debug("Request /api/ping via proxy to show that remote server GUID is correct.")
+    requests.get(root_url + '/api/ping', headers={'X-server-guid': env.behind.ecs_guid})
+    log.debug("Request non-existent path; both requests are made through same connection.")
+    auth = requests.auth.HTTPDigestAuth(env.in_front.rest_api.user, env.in_front.rest_api.password)
+    dummy_response = requests.get(root_url + '/dummy', auth=auth, headers={'X-server-guid': env.behind.ecs_guid})
+    assert dummy_response.status_code == 404, "Expected 404 but got: %r." % dummy_response
+
+
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7819")
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_direct_after_proxy_same_connection(env):
+    # Use requests directly, so REST API wrapper doesn't catch errors.
+    front_url = env.in_front.rest_api.url.rstrip('/') + '/api/ping'
+    with requests.Session() as session:
+        session.get(front_url, headers={'X-server-guid': env.behind.ecs_guid})
+        direct_response = session.get(front_url)
+    assert direct_response.status_code == 200, "Expected 200 but got: %r." % direct_response
 
 
 def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):

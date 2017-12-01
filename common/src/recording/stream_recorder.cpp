@@ -1087,9 +1087,6 @@ bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/
 
 bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
-    if (m_motionHandler)
-        return m_motionHandler(motion);
-
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
         motion->serialize(m_motionFileList[motion->channelNumber].data());
     return true;
@@ -1235,11 +1232,6 @@ void QnStreamRecorder::forceAudioLayout(const QnResourceAudioLayoutPtr& layout)
 void QnStreamRecorder::disableRegisterFile(bool disable)
 {
     m_disableRegisterFile = disable;
-}
-
-void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
-{
-    m_motionHandler = handler;
 }
 
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
