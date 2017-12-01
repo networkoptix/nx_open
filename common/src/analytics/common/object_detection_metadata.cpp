@@ -59,6 +59,17 @@ QString toString(const DetectionMetadataPacket& packet)
         .args(packet.deviceId, packet.timestampUsec, packet.durationUsec);
 }
 
+QnCompressedMetadataPtr toMetadataPacket(
+    const DetectionMetadataPacket& detectionPacket)
+{
+    auto metadataPacket = std::make_shared<QnCompressedMetadata>(
+        MetadataType::ObjectDetection);
+    metadataPacket->setTimestampUsec(detectionPacket.timestampUsec);
+    metadataPacket->setDurationUsec(detectionPacket.durationUsec);
+    metadataPacket->setData(QnUbjson::serialized(detectionPacket));
+    return metadataPacket;
+}
+
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right)
 {
     return left.deviceId == right.deviceId
