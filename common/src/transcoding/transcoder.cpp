@@ -20,6 +20,13 @@
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/json.h>
 
+namespace {
+
+static const int kWidthRoundingFactor = 16;
+static const int kHeightRoundingFactor = 4;
+
+} // namespace
+
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
@@ -156,13 +163,13 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 
         m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
-        // Round resolution height
+        // Round resolution height.
         m_resolution.setHeight(
             qPower2Round((unsigned) m_resolution.height(), kHeightRoundingFactor));
 
         float ar = srcResolution.width() / (float)srcResolution.height();
         m_resolution.setWidth(m_resolution.height() * ar);
-        // Round resolution width
+        // Round resolution width.
         m_resolution.setWidth(qPower2Round((unsigned) m_resolution.width(), kWidthRoundingFactor));
     }
     else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())

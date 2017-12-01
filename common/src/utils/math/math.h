@@ -112,13 +112,14 @@ inline unsigned int qPower2Floor(unsigned int value, int step) {
 }
 
 /**
-* \param value                         Value to round to the nearest number that is power of 2.
-* \param step                          Rounding step, must be power of 2.
-* \returns                             Rounded value.
-*/
-inline unsigned int qPower2Round(unsigned int value, int step)
+ * @param value Value to round to the nearest number that is a power of 2.
+ * @param step Rounding step, must be power of 2.
+ * @return Rounded value.
+ */
+inline int qPower2Round(int value, int step)
 {
-    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
+    NX_EXPECT(value >= 0);
+    NX_EXPECT(qIsPower2(step));
     return qPower2Floor(value + step / 2, step);
 }
 
