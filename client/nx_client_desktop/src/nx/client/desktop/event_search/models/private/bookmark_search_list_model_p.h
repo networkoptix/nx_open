@@ -53,7 +53,7 @@ private:
     BookmarkSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    int m_fetchInProgress = 0;
+    int m_currentFetchId = 0;
     bool m_fetchedAll = false;
     bool m_success = true;
 
