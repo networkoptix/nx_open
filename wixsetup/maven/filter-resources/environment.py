@@ -1,5 +1,6 @@
 import subprocess
 import shutil
+import os
 
 wix_directory = '${wix_directory}/bin'
 qt_directory = '${qt.dir}'
@@ -18,7 +19,9 @@ def execute_command(command, verbose = False):
         raise
 
 def rename(folder, old_name, new_name):
-    if os.path.exists(join(folder, new_name)):
-        os.unlink(join(folder, new_name))
-    if os.path.exists(join(folder, old_name)):
-        shutil.copy2(join(folder, old_name), join(folder, new_name))
+    full_old_name = os.path.join(folder, old_name)
+    full_new_name = os.path.join(folder, new_name)
+    if os.path.exists(full_new_name):
+        os.unlink(full_new_name)
+    if os.path.exists(full_old_name):
+        shutil.copy2(full_old_name, full_new_name)
