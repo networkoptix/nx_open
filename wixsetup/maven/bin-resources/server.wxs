@@ -225,7 +225,7 @@
         </ComponentGroup>
         <?endif?>
 
-        <Component Id="ServerBuildInfoTxt" Directory="$(var.customization)MediaServerDir">
+        <Component Id="ServerBuildInfoTxt" Directory="MediaServerRootDir">
             <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\..\build_info.txt" DiskId="6"/>
         </Component>
         
