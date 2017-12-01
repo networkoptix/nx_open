@@ -21,6 +21,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <core/dataconsumer/data_copier.h>
 #include <utils/common/threadqueue.h>
 
 static const int  META_DATA_DURATION_MS = 300;
@@ -137,6 +138,7 @@ private:
     QWeakPointer<QnAbstractDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
+    QSharedPointer<DataCopier> m_dataReceptorMultiplexer;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
