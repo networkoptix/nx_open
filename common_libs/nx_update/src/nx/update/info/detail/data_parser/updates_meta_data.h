@@ -23,6 +23,7 @@ struct CustomizationData
 
 struct UpdatesMetaData
 {
+    // todo: add data structure for storing information about unsupported versions 
     QList<CustomizationData> customizationDataList;
     QList<AlternativeServerData> alternativeServersDataList;
 };

@@ -23,10 +23,12 @@ public:
     explicit SpecificUpdatesFetcher(
         const UpdatesMetaData& metaData,
         AbstractAsyncRawDataProvider* rawDataProvider,
+        AbstractRawDataParser* rawDataParser,
         MoveOnlyFunc<void(ResultCode)> completionHandler)
         :
         m_metaData(metaData),
         m_rawDataProvider(rawDataProvider),
+        m_rawDataParser(rawDataParser),
         m_completionHandler(std::move(completionHandler))
     {
         fetchNextCustomization();
@@ -36,17 +38,20 @@ public:
     {
         if (resultCode != ResultCode::ok)
         {
-            auto& customizationData = m_metaData.customizationDataList[m_customizationIndex];
-            QString errorString =
-                lm("Failed to get update data for %1 : %2")
-                    .args(
-                        customizationData.name,
-                        customizationData.versions[m_versionIndex].toString());
-
-            NX_ERROR(this, errorString);
+            logError("get");
             m_completionHandler(resultCode);
             return;
         }
+
+        UpdateData updateData;
+        resultCode = m_rawDataParser->parseUpdateData(rawData, &updateData);
+        if (resultCode != ResultCode::ok)
+        {
+            logError("parse");
+            m_completionHandler(resultCode);
+            return;
+        }
+        m_updates.append(updateData);
 
         ++m_versionIndex;
         fetchNextVersion();
@@ -60,6 +65,7 @@ private:
     int m_versionIndex = 0;
     UpdateDataList m_updates;
     AbstractAsyncRawDataProvider* m_rawDataProvider;
+    AbstractRawDataParser* m_rawDataParser;
     MoveOnlyFunc<void(ResultCode)> m_completionHandler;
 
     void fetchNextCustomization()
@@ -71,6 +77,19 @@ private:
         }
 
         fetchNextVersion();
+    }
+
+    void logError(const QString& actionName) const
+    {
+        auto& customizationData = m_metaData.customizationDataList[m_customizationIndex];
+        QString errorString =
+            lm("Failed to %1 update data for %2 : %3")
+            .args(
+                actionName,
+                customizationData.name,
+                customizationData.versions[m_versionIndex].toString());
+
+        NX_ERROR(this, errorString);
     }
 
     void fetchNextVersion()
@@ -132,6 +151,7 @@ private:
             new SpecificUpdatesFetcher(
                 m_updatesMetaData,
                 m_rawDataProvider.get(),
+                m_rawDataParser.get(),
                 std::bind(&AsyncUpdateCheckerImpl::onSpecificUpdateFetcherDone, this, _1)));
     }
 

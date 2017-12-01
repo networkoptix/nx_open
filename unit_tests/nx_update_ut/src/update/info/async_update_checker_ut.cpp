@@ -5,7 +5,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/update/info/async_update_checker.h>
-#include <nx/update/info/abstract_update_registry.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
 
@@ -24,16 +23,16 @@ public:
     SingleThreadExecutor()
     {
         m_needToStop = false;
-        m_thread = nx::utils::thread(std::bind(&SingleThreadExecutor::runLoop, this));
+        m_thread = utils::thread(std::bind(&SingleThreadExecutor::runLoop, this));
     }
 
     ~SingleThreadExecutor()
     {
-        m_needToStop = true;
+        stop();
         m_thread.join();
     }
 
-    void submit(nx::utils::MoveOnlyFunc<void()> task)
+    void submit(utils::MoveOnlyFunc<void()> task)
     {
         QnMutexLocker lock(&m_mutex);
         m_tasks.emplace(std::move(task));
@@ -41,16 +40,29 @@ public:
     }
 
 private:
-    nx::utils::thread m_thread;
-    std::queue<nx::utils::MoveOnlyFunc<void()>> m_tasks;
-    QnMutex m_mutex;
+    utils::thread m_thread;
+    std::queue<utils::MoveOnlyFunc<void()>> m_tasks;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
-    std::atomic<bool> m_needToStop;
+    bool m_needToStop;
 
     void runLoop()
     {
-        while (!m_needToStop)
+        while (!needStop())
             runLoopIteration();
+    }
+
+    bool needStop() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return m_needToStop;
+    }
+
+    void stop()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_needToStop = true;
+        m_condition.wakeOne();
     }
 
     void runLoopIteration()
@@ -63,12 +75,12 @@ private:
             return;
 
         while (!m_tasks.empty() && !m_needToStop)
-            runTasks(&lock);
+            runTask(&lock);
     }
 
-    void runTasks(QnMutexLockerBase* lock)
+    void runTask(QnMutexLockerBase* lock)
     {
-        nx::utils::MoveOnlyFunc<void()> task = std::move(m_tasks.front());
+        utils::MoveOnlyFunc<void()> task = std::move(m_tasks.front());
         m_tasks.pop();
         lock->unlock();
         task();
@@ -118,18 +130,22 @@ class AsyncUpdateChecker: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        using namespace detail::data_provider;
-        RawDataProviderFactory::setFactoryFunction(
-            [](const QString& s, AbstractAsyncRawDataProviderHandler* handler)
-            {
-                return std::make_unique<AsyncDataProviderMockUp>(s, handler);
-            });
     }
 
     virtual void TearDown() override
     {
         using namespace detail::data_provider;
         RawDataProviderFactory::setFactoryFunction(nullptr);
+    }
+
+    void whenMockupDataProviderHasBeenSetUp() const
+    {
+        using namespace detail::data_provider;
+        RawDataProviderFactory::setFactoryFunction(
+            [](const QString& s, AbstractAsyncRawDataProviderHandler* handler)
+            {
+                return std::make_unique<AsyncDataProviderMockUp>(s, handler);
+            });
     }
 
     void whenAsyncCheckRequestHasBeenIssued()
@@ -165,6 +181,7 @@ private:
 
 TEST_F(AsyncUpdateChecker, AsyncOperationCompletesSuccessfully)
 {
+    whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
     thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned();
 }

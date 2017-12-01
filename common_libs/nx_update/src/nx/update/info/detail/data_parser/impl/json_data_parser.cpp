@@ -60,6 +60,7 @@ public:
             return;
         }
 
+        // todo: implement parsing information about unsupported versions
         parseAlternativesServerData();
         parseCustomizationData();
     }

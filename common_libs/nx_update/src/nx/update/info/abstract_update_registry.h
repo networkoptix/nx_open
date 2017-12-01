@@ -7,6 +7,7 @@ namespace info {
 class AbstractUpdateRegistry
 {
 public:
+    // todo: design interface
     virtual ~AbstractUpdateRegistry() {}
 };
 
