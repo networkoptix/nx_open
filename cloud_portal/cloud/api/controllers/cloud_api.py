@@ -130,7 +130,7 @@ class System(object):
     @validate_response
     @lower_case_email
     def merge(email, password, master_system_id, slave_system_id):
-        request = CLOUD_DB_URL + "/system/%s/merged_systems" % master_system_id
+        request = CLOUD_DB_URL + "/system/%s/merged_systems/" % master_system_id
         params = {
             'system_id': slave_system_id
         }
