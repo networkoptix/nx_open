@@ -140,7 +140,7 @@ TimelineActions.prototype.animateScroll = function(targetPosition, linear){
     this.scope.scrollTarget = this.scaleManager.scroll();
     self.delayWatchingPlayingPosition();
     self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':'dryResistance',
-            linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration).
+            linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration * 2).
         then(
         function(){
             self.scrollingNow = false;
@@ -165,7 +165,7 @@ TimelineActions.prototype.scrollingStart = function(left,speed){
     this.scrollingNow = true;
     this.scrollingSpeed = speed;
     this.scope.scrollTarget = this.scaleManager.scroll();
-    this.scrollingRenew();
+    this.scrollingRenew(false);
 };
 TimelineActions.prototype.scrollingStop = function(){
     if(this.scrollingNow) {

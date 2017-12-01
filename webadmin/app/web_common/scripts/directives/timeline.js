@@ -430,7 +430,7 @@ angular.module('nxCommon')
 
                 function viewportMouseUp(){
                     updateMouseCoordinate(null);
-                    timelineActions.scrollingStop(false);
+                    timelineActions.scrollingStop();
                     timelineActions.scrollingToCursorStop();
 
                     if(onReleaseCenter){
