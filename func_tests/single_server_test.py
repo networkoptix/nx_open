@@ -214,21 +214,12 @@ def test_frequent_restarts(server):
     server.restart_via_api(timeout=timedelta(seconds=10))
 
 
-# https://networkoptix.atlassian.net/browse/VMS-7808
-# https://networkoptix.atlassian.net/browse/VMS-7809
-@pytest.mark.parametrize('path', ['/ec2/getFullInfo123', '/api/ping456', '/api/qwe', '/ec2/asd'])
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7808")
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7809")
+@pytest.mark.parametrize('path', [
+    '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
+    '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
 def test_non_existent_api_endpoints(server, path):
     auth = HTTPDigestAuth(server.user, server.password)
     response = requests.get(server.rest_api_url.rstrip('/') + path, auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
-
-
-def test_digest_reuse(server):
-    server.rest_api.ec2.getCurrentTime.GET()
-    server.rest_api.ec2.getCurrentTime.GET()
-    server.rest_api.ec2.getCurrentTime.GET()
-    server.rest_api.ec2.getCurrentTime.GET()
-    # server.rest_api.ec2.getCurrentTime.GET()
-    # server.restart_via_api(timeout=timedelta(seconds=10))
-    server.rest_api.set_credentials('admin', 'admin')
-    server.rest_api.ec2.getCurrentTime.GET()

@@ -44,4 +44,22 @@ function(set_output_directories)
     endif()
 endfunction()
 
+function(nx_create_dev_qt_conf)
+    if(CMAKE_CROSSCOMPILING)
+        set(qt_prefix "..")
+    else()
+        set(qt_prefix "${QT_DIR}")
+    endif()
+
+    if(CMAKE_MULTI_CONFIGURATION_MODE)
+        foreach(config IN ${CMAKE_ACTIVE_CONFIGURATIONS})
+            string(TOUPPER ${config} config)
+            nx_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config}}/qt.conf
+                QT_PREFIX ${qt_prefix})
+        endforeach()
+    else()
+        nx_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf QT_PREFIX ${qt_prefix})
+    endif()
+endfunction()
+
 set_output_directories(RUNTIME "bin" LIBRARY "lib")

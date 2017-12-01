@@ -32,7 +32,7 @@ def _to_get_param(python_value):
         return 'true' if python_value else 'false'
     if isinstance(python_value, (int, float, str, bytes, unicode)):
         return str(python_value)
-    assert False, "Object of type "
+    assert False, "Cannot use %r of type %s as GET parameter." % (python_value, type(python_value).__name__)
 
 
 class HttpError(Exception):
@@ -104,6 +104,7 @@ class RestApi(object):
         self.server_name = server_name
         self._root_url = root_url.rstrip('/')
         self.url = self._root_url + '/'
+        assert timeout is None or isinstance(timeout, datetime.timedelta), repr(timeout)
         self._default_timeout = timeout or REST_API_TIMEOUT
         self._session = requests.Session()
         self._auth = HTTPDigestAuth(username, password)
