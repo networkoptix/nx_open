@@ -85,6 +85,20 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (EventMetaData)(EventParameters),
     (ubjson)(json)(eq)(xml)(csv_record), _Fields, (brief, true))
 
+bool checkForKeywords(const QString& value, const QString& keywords)
+{
+    if (keywords.trimmed().isEmpty())
+        return true;
+
+    for (const auto& keyword: nx::utils::smartSplit(keywords, L' ', QString::SkipEmptyParts))
+    {
+        if (value.contains(nx::utils::unquoteStr(keyword)))
+            return true;
+    }
+
+    return false;
+}
+
 } // namespace event
 } // namespace vms
 } // namespace nx

@@ -21,6 +21,7 @@ public:
     void at_rulesReset(const nx::vms::event::RuleList& rules);
     void at_ruleAddedOrUpdated(const nx::vms::event::RulePtr& rule, bool added);
     void at_ruleRemoved(const QnUuid& ruleId);
+    void at_resourceAdded(const QnResourcePtr& resource);
 
     QSet<QnUuid> watchedEventsForResource(const QnUuid& resourceId);
 

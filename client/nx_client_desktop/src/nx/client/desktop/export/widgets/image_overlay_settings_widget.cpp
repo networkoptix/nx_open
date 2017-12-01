@@ -57,7 +57,7 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
             emit dataChanged(m_data);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon(lit("buttons/trash.png")));
+    ui->deleteButton->setIcon(qnSkin->icon(lit("text_buttons/trash.png")));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &ImageOverlaySettingsWidget::deleteClicked);

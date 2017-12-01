@@ -289,8 +289,6 @@ void MultipleCameraSettingsWidget::updateFromResources()
         const bool isDtsBased = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isDtsBased(); });
         const bool hasVideo = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
         const bool audioSupported = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioSupported(); });
-        const bool audioForced = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioForced(); });
-
         const bool recordingSupported = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0) || camera->isAudioSupported(); });
 
         const bool audioEnabled = m_cameras.front()->isAudioEnabled();
@@ -300,7 +298,7 @@ void MultipleCameraSettingsWidget::updateFromResources()
                 return camera->isAudioEnabled() == audioEnabled;
             });
 
-        ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
+        ui->enableAudioCheckBox->setEnabled(audioSupported);
 
         setTabEnabledSafe(CameraSettingsTab::io, !m_lockedMode);
         setTabEnabledSafe(CameraSettingsTab::motion, !m_lockedMode);

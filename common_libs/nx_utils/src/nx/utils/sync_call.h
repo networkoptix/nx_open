@@ -1,22 +1,13 @@
-/**********************************************************
-* Sep 21, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MAKE_SYNC_CALL_H
-#define NX_MAKE_SYNC_CALL_H
+#pragma once
 
 #include <functional>
 
 #include <nx/utils/std/future.h>
 
-
-//TODO #ak introduce generic implementation using variadic templates (when available)
-
-/*!
-    Calls asynchronous method that accepts completion handler as std::function<ResultType> 
-    and waits for completion
-*/
+/**
+ * Calls asynchronous method that accepts completion handler as std::function<ResultType>
+ * and waits for completion.
+ */
 template<typename ResultType>
 std::tuple<ResultType> makeSyncCall(
     std::function<void(std::function<void(ResultType)>)> function)
@@ -34,10 +25,12 @@ std::tuple<ResultType, OutArg1> makeSyncCall(
     nx::utils::promise<ResultType> promise;
     auto future = promise.get_future();
     OutArg1 result;
-    function([&promise, &result](ResultType resCode, OutArg1 outArg1) {
-        result = std::move(outArg1);
-        promise.set_value(resCode);
-    });
+    function(
+        [&promise, &result](ResultType resCode, OutArg1 outArg1)
+        {
+            result = std::move(outArg1);
+            promise.set_value(resCode);
+        });
     future.wait();
     return std::make_tuple(future.get(), std::move(result));
 }
@@ -47,5 +40,3 @@ std::tuple<ResultType, OutArg1> makeSyncCall(FuncPtr funcPtr, Arg1 arg1, Args...
 {
     return makeSyncCall<ResultType, OutArg1>(std::bind(funcPtr, arg1, args...));
 }
-
-#endif //NX_MAKE_SYNC_CALL_H

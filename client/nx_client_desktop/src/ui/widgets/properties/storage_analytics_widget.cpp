@@ -196,7 +196,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     auto refreshButton = new QPushButton(ui->tabWidget);
     refreshButton->setFlat(true);
     refreshButton->setText(tr("Refresh"));
-    refreshButton->setIcon(qnSkin->icon(lit("buttons/refresh.png")));
+    refreshButton->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
     refreshButton->resize(refreshButton->sizeHint());
 
     auto anchor = new QnWidgetAnchor(refreshButton);

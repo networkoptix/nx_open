@@ -3,25 +3,24 @@
   Measure system synchronization time
 '''
 
-import pytest
-import yaml
-import logging
-import requests
 import datetime
-import traceback
 import json
-from requests.exceptions import ReadTimeout
+import logging
+import traceback
 from functools import wraps
-import test_utils.utils as utils
-from test_utils.utils import GrowingSleep
-from test_utils.compare import compare_values
+from multiprocessing import Pool as ThreadPool
+
+import pytest
+from requests.exceptions import ReadTimeout
+
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
-from test_utils.utils import SimpleNamespace
-from multiprocessing import Pool as ThreadPool
-from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT
+import test_utils.utils as utils
 import transaction_log
 from memory_usage_metrics import load_host_memory_usage
+from test_utils.compare import compare_values
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 
@@ -228,7 +227,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
         expected_result_dirty = get_response(servers[0], method, api_object, api_method)
         if expected_result_dirty is None:
             if utils.datetime_utc_now() - start_time >= merge_timeout:
-                message = 'server %r has not responded' % server[0]
+                message = 'server %r has not responded' % servers[0]
                 make_dumps_and_fail(message, servers, merge_timeout, api_method, api_call_start_time)
             continue
         expected_result = clean_json(api_method, expected_result_dirty)

@@ -30,10 +30,10 @@ public:
     void setTimeSynchronizationEnabled(bool enabled);
     using TimeZoneShiftHandler = utils::MoveOnlyFunc<void(std::chrono::seconds)>;
     void setTimeZoneShiftHandler(TimeZoneShiftHandler handler);
+    void setDateTime(const QDateTime& dateTime);
 
 private:
     void verifyDateTime();
-    void setDateTime(const QDateTime& dateTime);
     void retryVerificationIn(std::chrono::milliseconds timeout);
     void updateTimeZoneShift(std::chrono::seconds value);
     void fireStartPromises();

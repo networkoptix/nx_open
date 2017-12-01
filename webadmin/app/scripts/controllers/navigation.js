@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, dialogs, nativeClient) {
+    .controller('NavigationCtrl', ['$scope', '$location', 'mediaserver', 'dialogs', 'nativeClient',
+    function ($scope, $location, mediaserver, dialogs, nativeClient) {
         $scope.user = {
             isAdmin: true
         };
@@ -45,4 +46,4 @@ angular.module('webadminApp')
                 window.location.reload();
             });
         };
-    });
+    }]);

@@ -3,9 +3,8 @@
 """
 
 from hashlib import md5
-from netaddr import IPAddress
-import uuid
 
+from netaddr import IPAddress
 
 BASE_CAMERA_IP_ADDRESS = IPAddress('192.168.0.0')
 BASE_SERVER_IP_ADDRESS = IPAddress('10.10.0.0')
@@ -55,10 +54,6 @@ def generate_mac(id):
 
 def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
-
-
-def generate_user_name(id):
-    return "User_%s" % id
 
 
 def generate_uuid_from_string(salt):

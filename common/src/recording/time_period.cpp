@@ -194,6 +194,26 @@ QnTimePeriod& QnTimePeriod::deserialize(const QByteArray& data)
     return *this;
 }
 
+void QnTimePeriod::setStartTime(std::chrono::milliseconds value)
+{
+    startTimeMs = value.count();
+}
+
+std::chrono::milliseconds QnTimePeriod::startTime() const
+{
+    return std::chrono::milliseconds(startTimeMs);
+}
+
+void QnTimePeriod::setDuration(std::chrono::milliseconds value)
+{
+    durationMs = value.count();
+}
+
+std::chrono::milliseconds QnTimePeriod::duration() const
+{
+    return std::chrono::milliseconds(durationMs);
+}
+
 QnTimePeriod& QnTimePeriod::operator = (const QnTimePeriod &other)
 {
     startTimeMs = other.startTimeMs;

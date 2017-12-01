@@ -147,7 +147,7 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
             (char*)hevc::kShortNalUnitPrefix,
             sizeof(hevc::kShortNalUnitPrefix));
 
-        // Some cameras (e.g. DigitalWatchdog) 
+        // Some cameras (e.g. DigitalWatchdog)
         // may send extra start code in parameter set SDP string.
         if (parameterSet.endsWith(startCode))
         {
@@ -262,10 +262,10 @@ int HevcParser::calculateFullRtpHeaderSize(
 
     if (rtpHeader->extension)
     {
-        if(headerSize + RtpHeader::EXTENSION_HEADER_SIZE < bufferSize)
+        if (bufferSize < headerSize + RtpHeader::EXTENSION_HEADER_SIZE)
             return kInvalidHeaderSize;
 
-        auto extension = (RtpHeaderExtension*)rtpHeader + headerSize;
+        auto extension = (RtpHeaderExtension*)(rtpHeaderStart + headerSize);
         headerSize += RtpHeader::EXTENSION_HEADER_SIZE;
 
         const int kWordSize = 4;

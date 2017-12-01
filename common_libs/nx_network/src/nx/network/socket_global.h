@@ -45,6 +45,8 @@ public:
         // TODO: Should be moved to a different flag config, because module finders live in common.
         // This flag resides here just because there are no other flag configs for logging.
         NX_INI_INT(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
+
+        NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
     };
 
     struct Ini: nx::kit::IniConfig

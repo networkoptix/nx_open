@@ -5,6 +5,7 @@
 #include <deque>
 #include <limits>
 
+#include <api/server_rest_connection_fwd.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
 #include <core/resource/resource_fwd.h>
 
@@ -27,6 +28,7 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     int count() const;
+    const analytics::storage::DetectedObject& object(int index) const;
 
     void clear();
 
@@ -34,10 +36,14 @@ public:
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commitPrefetch(qint64 latestStartTimeMs);
 
+    static QString description(const analytics::storage::DetectedObject& object);
+    static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
+
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    rest::Handle m_currentFetchId = rest::Handle();
     bool m_fetchedAll = false;
     bool m_success = true;
 

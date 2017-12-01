@@ -558,3 +558,14 @@ bool QnCompressedMetadata::setData(const QByteArray& data)
 {
     return m_data.write(data.data(), data.size());
 }
+
+QnCompressedMetadataPtr QnCompressedMetadata::createMediaEventPacket(
+    qint64 timestampUs,
+    Qn::MediaStreamEvent value)
+{
+    QnCompressedMetadataPtr rez(new QnCompressedMetadata(MetadataType::MediaStreamEvent));
+    rez->timestamp = timestampUs;
+    auto data = QnLexical::serialized(value).toUtf8();
+    rez->setData(data.data(), data.size());
+    return rez;
+}

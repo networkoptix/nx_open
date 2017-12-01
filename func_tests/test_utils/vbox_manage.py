@@ -1,9 +1,10 @@
 '''Virtual Box VBoxManage command wrapper'''
 
 import re
-from netaddr import IPNetwork
-from .host import Host
 
+from netaddr import IPNetwork
+
+from .host import Host
 
 INTERNAL_NETWORK_NAME_INFIX = 'net-'
 
@@ -35,12 +36,6 @@ class DhcpServer(object):
     def network_matches(self, network):
         return self.ip.network == network.network
 
-    def properties_match(self, other):
-        assert isisntance(other, DhcpServer), repr(other)
-        return (self.lower_ip_address == other.lower_ip_address
-                and self.upper_ip_address == other.upper_ip_address
-                and self.enabled == other.enabled)
-
 
 class VBoxManage(object):
 
@@ -53,9 +48,6 @@ class VBoxManage(object):
     def get_vms_list(self):
         output = self._run_command(['list', 'vms'])
         return [line.split()[0].strip('"') for line in output.splitlines()]
-
-    def does_vms_exist(self, vms_name):
-        return vms_name in self.get_vms_list()
 
     def get_vms_state(self, vms_name):
         output = self._run_command(['showvminfo', vms_name, '--machinereadable'], log_output=False)

@@ -19,6 +19,9 @@
 #include <nx/streaming/media_context.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <common/common_globals.h>
+
+#include "media_data_packet_fwd.h"
 
 // TODO: #dmishin move all classes to separate source files.
 // TODO: #dmishin place this code into proper namespace.
@@ -56,9 +59,6 @@ using QnEmptyMediaDataPtr = std::shared_ptr<QnEmptyMediaData>;
 
 using QnAbstractCompressedMetadataPtr = std::shared_ptr<QnAbstractCompressedMetadata>;
 using QnConstAbstractCompressedMetadataPtr = std::shared_ptr<const QnAbstractCompressedMetadata>;
-
-using QnCompressedMetadataPtr = std::shared_ptr<QnCompressedMetadata>;
-using QnConstCompressedMetadataPtr = std::shared_ptr<const QnCompressedMetadata>;
 
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 using QnConstMetaDataV1Ptr = std::shared_ptr<const QnMetaDataV1>;
@@ -207,6 +207,10 @@ struct QnCompressedMetadata: public QnAbstractCompressedMetadata
     bool setData(const QByteArray& data);
     void setDurationUsec(qint64 value) { m_duration = value;  }
     void setTimestampUsec(qint64 value) { timestamp = value; }
+
+    static QnCompressedMetadataPtr createMediaEventPacket(
+        qint64 timestampUs,
+        Qn::MediaStreamEvent value);
 };
 
 /**

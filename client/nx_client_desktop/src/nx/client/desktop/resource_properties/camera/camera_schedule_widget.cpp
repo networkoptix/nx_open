@@ -591,7 +591,7 @@ void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras
     for (const auto& camera: m_cameras)
     {
         disconnect(camera, &QnSecurityCamResource::resourceChanged,
-            this, &CameraScheduleWidget::cameraResourceChanged);
+            this, &CameraScheduleWidget::at_cameraResourceChanged);
     }
 
     m_cameras = cameras;
@@ -599,7 +599,7 @@ void CameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &cameras
     for (const auto& camera: m_cameras)
     {
         connect(camera, &QnSecurityCamResource::resourceChanged,
-            this, &CameraScheduleWidget::cameraResourceChanged, Qt::QueuedConnection);
+            this, &CameraScheduleWidget::at_cameraResourceChanged, Qt::QueuedConnection);
     }
 }
 
@@ -860,7 +860,7 @@ bool CameraScheduleWidget::isCurrentBitrateCustom() const
 void CameraScheduleWidget::setAdvancedSettingsVisible(bool value)
 {
     const auto text = value ? tr("Less Settings") : tr("More Settings");
-    const auto icon = qnSkin->icon(value ? lit("buttons/collapse.png") : lit("buttons/expand.png"));
+    const auto icon = qnSkin->icon(value ? lit("text_buttons/collapse.png") : lit("text_buttons/expand.png"));
     ui->advancedSettingsButton->setText(text);
     ui->advancedSettingsButton->setIcon(icon);
     ui->advancedSettingsWidget->setVisible(value);
@@ -1081,12 +1081,8 @@ void CameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
 
 bool CameraScheduleWidget::canEnableRecording() const
 {
-    QnCamLicenseUsageHelper licenseHelper(m_cameras, true, commonModule());
-    return all_of(m_cameras,
-        [&licenseHelper](const QnVirtualCameraResourcePtr& camera)
-        {
-            return licenseHelper.isValid(camera->licenseType());
-        });
+    QnCamLicenseUsageHelper licenseHelper(commonModule());
+    return licenseHelper.canEnableRecording(m_cameras);
 }
 
 void CameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
@@ -1237,7 +1233,7 @@ void CameraScheduleWidget::updateRecordSpinboxes()
     ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
 }
 
-void CameraScheduleWidget::cameraResourceChanged()
+void CameraScheduleWidget::at_cameraResourceChanged()
 {
     updateMaxFPS();
     updateMotionButtons();

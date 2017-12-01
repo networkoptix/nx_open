@@ -18,7 +18,7 @@ nx_add_target(vms_gateway_core LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway_core_app_info_impl.cpp"
     PUBLIC_LIBS
-        common cloud_db_client nx_network nx_fusion nx_utils librelaying
+        common cloud_db_client nx_network nx_fusion nx_utils nx_relaying
 )
 
 target_compile_definitions(vms_gateway_core

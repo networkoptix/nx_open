@@ -37,10 +37,9 @@ public:
     virtual void beforeSeek(qint64 time) override;
 
     virtual void setPlaybackMode(PlaybackMode value) override;
-    virtual void setClientId(const QnUuid& id) override;
+    virtual void setGroupId(const QByteArray& id) override;
 
     void setRateControlEnabled(bool enabled);
-    void setOverlappedId(int overlappedId);
     virtual bool setQuality(
         MediaQuality /*quality*/,
         bool /*fastSwitch*/,
@@ -55,6 +54,7 @@ private:
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
     qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
     PlaybackMode m_playbackMode = PlaybackMode::Archive;
+    CameraDiagnostics::Result m_lastOpenResult {CameraDiagnostics::NoErrorResult()};
 };
 
 } // namespace plugins

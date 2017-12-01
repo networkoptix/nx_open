@@ -8,6 +8,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+// TODO: #vkutin Stop using int(ExportOverlayType) as an integer index.
+//    Introduce QList<ExportOverlayType> allOverlayTypes() method somewhere.
+//    Make ExportOverlayType::none a default-initialized value.
 enum class ExportOverlayType
 {
     timestamp,

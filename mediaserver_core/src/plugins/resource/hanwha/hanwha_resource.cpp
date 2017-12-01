@@ -588,11 +588,7 @@ SessionContextPtr HanwhaResource::session(
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
 {
-    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
-    const auto overlappedId = sharedContext()->currentOverlappedId();
-    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
-
-    return std::move(delegate);
+    return std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -2557,9 +2553,8 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
         ? kHanwhaPrimaryNxProfileSuffix
         : kHanwhaSecondaryNxProfileSuffix;
 
-    auto appName = QnAppInfo::productNameLong()
-        .mid(0, maxLength - suffix.length())
-        .remove(QRegExp("[^a-zA-Z]"));
+    auto appName = QnAppInfo::productNameLong().splitRef(' ').last().toString()
+        .remove(QRegExp("[^a-zA-Z]")).left(maxLength - suffix.length());
 
     return appName + suffix;
 }

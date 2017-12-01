@@ -31,7 +31,7 @@
                 <include>swresample-2.dll</include>
                 <include>swscale-4.dll</include>
                 <include>udt.dll</include>
-                <include>relaying.dll</include>
+                <include>nx_relaying.dll</include>
                 <include>vms_gateway_core.dll</include>
             </includes>
             <excludes>

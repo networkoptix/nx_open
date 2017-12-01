@@ -2,6 +2,13 @@
 
 #include <chrono>
 
+#include <QtGui/QPalette>
+
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <ui/style/helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/synctime.h>
 
@@ -60,23 +67,24 @@ int AnalyticsSearchListModel::Private::count() const
     return int(m_data.size());
 }
 
+const analytics::storage::DetectedObject& AnalyticsSearchListModel::Private::object(int index) const
+{
+    return m_data[index];
+}
+
 void AnalyticsSearchListModel::Private::clear()
 {
+    ScopedReset reset(q, !m_data.empty());
+    m_data.clear();
     m_prefetch.clear();
     m_fetchedAll = false;
-
-    if (!m_data.empty())
-    {
-        ScopedReset reset(q);
-        m_data.clear();
-    }
-
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
+    m_currentFetchId = rest::Handle();
 }
 
 bool AnalyticsSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && m_prefetch.empty()
+    return !m_fetchedAll && m_camera && !m_currentFetchId
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -85,14 +93,47 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
     if (!canFetchMore() || !completionHandler)
         return false;
 
-    //TODO: #vkutin This is a stub. Fill it when actual analytics fetch is implemented.
-    return false;
+    const auto dataReceived =
+        [this, completionHandler, guard = QPointer<QObject>(this)]
+            (bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
+        {
+            if (!guard || m_currentFetchId != handle)
+                return;
 
-    return true;
+            NX_ASSERT(m_prefetch.empty());
+            m_prefetch = success ? std::move(data) : analytics::storage::LookupResult();
+            m_success = success;
+
+            NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
+            completionHandler(m_prefetch.size() >= kFetchBatchSize
+                ? startTimeMs(m_prefetch.front()) + 1 /*discard last ms*/
+                : 0);
+        };
+
+    const auto server = q->commonModule()->currentServer();
+    NX_ASSERT(server && server->restConnection());
+    if (!server || !server->restConnection())
+        return false;
+
+    analytics::storage::Filter request;
+    request.deviceId = m_camera->getId();
+    request.timePeriod = QnTimePeriod::fromInterval(0, m_earliestTimeMs - 1);
+    request.sortOrder = Qt::DescendingOrder;
+    request.maxObjectsToSelect = kFetchBatchSize;
+
+    m_currentFetchId = server->restConnection()->lookupDetectedObjects(
+        request, dataReceived, thread());
+
+    return m_currentFetchId != rest::Handle();
 }
 
 void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 {
+    if (!m_currentFetchId)
+        return;
+
+    m_currentFetchId = rest::Handle();
+
     if (!m_success)
         return;
 
@@ -108,13 +149,45 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     if (count > 0)
     {
         ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
-        for (auto iter = m_prefetch.begin(); iter != end; ++iter)
-            m_data.push_back(std::move(*iter));
+        m_data.insert(m_data.end(),
+            std::make_move_iterator(m_prefetch.begin()),
+            std::make_move_iterator(end));
     }
 
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
     m_earliestTimeMs = latestStartTimeMs;
     m_prefetch.clear();
+}
+
+QString AnalyticsSearchListModel::Private::description(
+    const analytics::storage::DetectedObject& object)
+{
+    if (object.attributes.empty())
+        return QString();
+
+    static const auto kCss = QString::fromLatin1(R"(
+            <style type = 'text/css'>
+                th { color: %1; font-weight: normal; }
+            </style>)");
+
+    static const auto kTableTemplate = lit("<table cellpadding='0' cellspacing='0'>%1</table>");
+    static const auto kRowTemplate = lit("<tr><th>%1</th>")
+        + lit("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
+        + lit("<td>%2</td></tr>");
+
+    QString rows;
+    for (const auto& attribute : object.attributes)
+        rows += kRowTemplate.arg(attribute.name, attribute.value);
+
+    const auto color = QPalette().color(QPalette::WindowText);
+    return kCss.arg(color.name()) + kTableTemplate.arg(rows);
+}
+
+qint64 AnalyticsSearchListModel::Private::startTimeMs(
+    const analytics::storage::DetectedObject& object)
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::microseconds(startTimeUs(object))).count();
 }
 
 } // namespace

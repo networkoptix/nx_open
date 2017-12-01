@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage,
-                                          cloudAPI, $location, $timeout, dialogs, nativeClient) {
+    .controller('SettingsCtrl', ['$scope', '$rootScope', '$modal', '$log', 'mediaserver', '$poll', '$localStorage',
+                                 'cloudAPI', '$location', '$timeout', 'dialogs', 'nativeClient',
+    function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
+              $timeout, dialogs, nativeClient) {
 
         if(mediaserver.hasProxy()){
             $location.path("/view");
@@ -459,4 +461,4 @@ angular.module('webadminApp')
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
         };
-    });
+    }]);

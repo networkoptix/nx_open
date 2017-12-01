@@ -12,7 +12,7 @@ enum class CameraSettingsTab
     motion,
     fisheye,
     advanced,
-    expert
+    expert,
 };
 
 } // namespace desktop

@@ -486,8 +486,8 @@ void QnNxStylePrivate::drawTextButton(
     if (hasMenu)
     {
         const auto icon = pressed
-            ? qnSkin->icon(lit("buttons/collapse.png"))
-            : qnSkin->icon(lit("buttons/expand.png"));
+            ? qnSkin->icon(lit("text_buttons/collapse.png"))
+            : qnSkin->icon(lit("text_buttons/expand.png"));
 
         paintLabelIcon(
             &textRect,

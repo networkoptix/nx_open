@@ -67,7 +67,9 @@ void EventSearchWidgetPrivateBase::setModel(QAbstractListModel* model)
     connect(model, &QAbstractItemModel::rowsRemoved,
         this, fetchMoreIfNeeded, Qt::QueuedConnection);
 
-    connect(m_ribbon->scrollBar(), &QScrollBar::valueChanged, this, fetchMoreIfNeeded);
+    connect(m_ribbon->scrollBar(), &QScrollBar::valueChanged,
+        this, fetchMoreIfNeeded, Qt::QueuedConnection);
+
     installEventHandler(m_ribbon, QEvent::Show, this, fetchMoreIfNeeded);
 }
 

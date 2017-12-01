@@ -5,13 +5,15 @@ import shutil
 
 from os.path import dirname, join, exists, isfile, abspath
 
+from environment import bin_source_dir, rename, execute_command
+from light_interface import light, light_command
+
 engine_tmp_folder = 'obj'
 
 skip_sign = '${windows.skip.sign}' == 'true'
 build_nxtool = '${nxtool}' == 'true'
 build_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
-bin_source_dir = '${bin_source_dir}'
 installer_target_dir = '${installer.target.dir}'
 
 server_msi_folder = '${installer.target.dir}/msi'
@@ -31,9 +33,6 @@ paxton_exe_folder = '${installer.target.dir}/exe'
 
 nxtool_msi_folder = '${installer.target.dir}/msi'
 
-
-wix_pdb = 'wixsetup.wixpdb'
-
 server_msi_name = '${artifact.name.server}.msi'
 server_exe_name = '${artifact.name.server}.exe'
 
@@ -49,17 +48,16 @@ paxton_msi_name = '${artifact.name.paxton}.msi'
 paxton_exe_name = '${artifact.name.paxton}.exe'
 
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtensionExt']
-common_components = []
 client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-paxton_components = ['AxClient', 'ClientQml', 'ClientFonts']
+server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+paxton_components = ['AxClient', 'ClientQml', 'ClientFonts', 'ClientVox', 'PaxtonVcrt14']
 
 client_exe_components = ['ArchCheck', 'ClientPackage']
 server_exe_components = ['ArchCheck', 'ServerPackage']
 full_exe_components =   ['ArchCheck', 'ClientPackage', 'ServerPackage']
 nxtool_exe_components = ['ArchCheck', 'NxtoolPackage']
-paxton_exe_components = ['VC14RedistPackage','PaxtonPackage']
+paxton_exe_components = ['PaxtonPackage']
 
 def add_wix_extensions(command):
     for ext in wix_extensions:
@@ -73,6 +71,8 @@ def add_components(command, components):
 def get_candle_command(project, suffix, args, components):
     command = ['candle']
     command.append('-dClientVoxSourceDir=${ClientVoxSourceDir}')
+    command.append(r'-dVcrt14SrcDir=${VC14RedistPath}\bin')
+    
     command.append('-arch')
     command.append('${arch}')
     command.append('-out')
@@ -89,12 +89,8 @@ def get_candle_command(project, suffix, args, components):
 
     add_components(command, components)
 
-    command.append(r'-dVcrt14SrcDir=${VC14RedistPath}\bin')
-    command.append(r'-dServerVcrt14DstDir=${customization}MediaServerDir')
-    command.append(r'-dClientVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
-    command.append(r'-dTraytoolVcrt14DstDir=${customization}TrayToolDir')
     command.append(r'-dNxtoolVcrt14DstDir=${customization}NxtoolDir')
-    command.append(r'-dPaxtonVcrt14DstDir=${customization}_${release.version}_Paxton')
+    command.append(r'-dPaxtonVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Paxton')
 
     if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')
@@ -111,65 +107,24 @@ def get_candle_command(project, suffix, args, components):
         command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
 
     add_wix_extensions(command)
-    add_components(command, common_components)
     command.append('Product-{0}.wxs'.format(project))
 
     return command
 
-def get_light_command(folder, msi, suffix):
-    command = ['light']
-    command.append('-sice:ICE07')
-    command.append('-sice:ICE38')
-    command.append('-sice:ICE43')
-    command.append('-sice:ICE57')
-    command.append('-sice:ICE60')
-    command.append('-sice:ICE64')
-    command.append('-sice:ICE69')
-    command.append('-sice:ICE91')
-    command.append('-cultures:${installer.cultures}')
-    command.append('-cc')
-    command.append('{0}/cab'.format(bin_source_dir))
-    command.append('-reusecab')
-    command.append('-loc')
-    command.append('OptixTheme_${installer.language}.wxl')
-    command.append('-out')
-    command.append('{0}/{1}'.format(folder, msi))
-    command.append('-pdbout')
-    command.append('{0}\\${build.configuration}\\{1}'.format(folder, wix_pdb))
-    command.append('obj\\${build.configuration}-{0}\\*.wixobj'.format(suffix))
-
-    add_wix_extensions(command)
-    return command
-
 def get_sign_command(folder, msi):
-    command = ['sign.bat']
-    command.append('{0}/{1}'.format(folder, msi))
-    return command
+    return ['sign.bat', '{0}/{1}'.format(folder, msi)]
 
 def create_sign_command_set(folder, msi):
     return [get_sign_command(folder, msi)]
 
 def get_extract_engine_command(exe, out):
-    command = ['insignia']
-    command.append('-ib')
-    command.append(exe)
-    command.append('-o')
-    command.append(out)
-    return command
+    return ['insignia', '-ib', exe, '-o', out]
 
 def get_bundle_engine_command(engine, out):
-    command = ['insignia']
-    command.append('-ab')
-    command.append(engine)
-    command.append(out)
-    command.append('-o')
-    command.append(out)
-    return command
+    return ['insignia', '-ab', engine, out, '-o', out]
 
 def get_remove_file_command(file_path):
-    command = ['del']
-    command.append(abspath(file_path))
-    return command
+    return ['del', abspath(file_path)]
 
 def create_sign_burn_exe_command_set(folder, engine_folder, exe):
     engine_filename = exe + '.engine.exe'
@@ -184,28 +139,14 @@ def create_sign_burn_exe_command_set(folder, engine_folder, exe):
         get_sign_command(folder, exe)
     ]
 
-def execute_command(command):
-    print '>> {0}'.format(' '.join(command))
-    retcode = subprocess.call(command)
-    if retcode != 0:
-        print "Return code {0}".format(retcode)
-    if retcode != 0 and retcode != 204:
-        sys.exit(1)
-
 def create_commands_set(project, folder, msi, suffix=None, candle_args=None, components=None):
     if suffix is None:
         suffix = project
 
     return [
         get_candle_command(project, suffix, candle_args, components),
-        get_light_command(folder, msi, suffix)
+        light_command(folder, msi, suffix, wix_extensions)
     ]
-
-def rename(folder, old_name, new_name):
-    if os.path.exists(join(folder, new_name)):
-        os.unlink(join(folder, new_name))
-    if os.path.exists(join(folder, old_name)):
-        shutil.copy2(join(folder, old_name), join(folder, new_name))
 
 def add_build_commands_msi_generic(commands, name, msi_folder, msi_name, candle_args, components, suffix=None):
     commands += create_commands_set(name, msi_folder, msi_name, suffix=suffix, candle_args=candle_args, components=components)

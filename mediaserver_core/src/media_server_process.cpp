@@ -1202,7 +1202,7 @@ void MediaServerProcess::stopObjects()
     qnBackupStorageMan->cancelRebuildCatalogAsync();
 
     if (qnFileDeletor)
-        qnFileDeletor->pleaseStop();
+        qnFileDeletor->stop();
 
     if (m_universalTcpListener)
         m_universalTcpListener->pleaseStop();

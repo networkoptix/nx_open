@@ -123,7 +123,6 @@ public:
     virtual int getSequence() const { return 0;  }
 
     virtual void setPlaybackMode(PlaybackMode value) {}
-    virtual void setClientId(const QnUuid& id) { }
 
     virtual void setEndOfPlaybackHandler(std::function<void()> handler)
     {

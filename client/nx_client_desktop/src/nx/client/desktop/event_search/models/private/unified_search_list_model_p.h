@@ -35,6 +35,9 @@ public:
     Types filter() const;
     void setFilter(Types filter);
 
+    vms::event::EventType selectedEventType() const;
+    void setSelectedEventType(vms::event::EventType value);
+
     void clear();
 
     bool canFetchMore() const;
@@ -47,6 +50,7 @@ private:
     UnifiedSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
     Types m_filter = Type::all;
+    vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
 
     EventSearchListModel* const m_eventsModel;
     BookmarkSearchListModel* const m_bookmarksModel;
@@ -55,9 +59,12 @@ private:
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     qint64 m_latestTimeMs = -1;
 
-    QWeakPointer<QnRaiiGuard> m_fetchInProgress;
+    QWeakPointer<QnRaiiGuard> m_currentFetchGuard;
     Types m_fetchingTypes;
     qint64 m_latestStartTimeMs = -1; //< Synchronization point used during fetch.
+
+    // A flag to request updateModels() call after current fetch finishes:
+    bool m_needToUpdateModels = false;
 };
 
 } // namespace

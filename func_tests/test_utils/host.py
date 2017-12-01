@@ -4,19 +4,20 @@ Allows running commands or working with files on local or remote hosts transpare
 '''
 
 import abc
-import os
-import os.path
 import datetime
-import logging
-import threading
-import subprocess
 import errno
 import glob
+import logging
+import os
+import os.path
 import shutil
+import subprocess
+import threading
+
 import pytz
 import tzlocal
-from .utils import quote, is_list_inst
 
+from .utils import quote, is_list_inst, RunningTime
 
 log = logging.getLogger(__name__)
 
@@ -156,6 +157,11 @@ class Host(object):
     @abc.abstractmethod
     def get_timezone(self):
         pass
+
+    def set_time(self, new_time):
+        started_at = datetime.datetime.now(pytz.utc)
+        self.run_command(['date', '--set', new_time.isoformat()])
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
     def make_proxy_command(self):
         return []

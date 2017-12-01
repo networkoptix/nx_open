@@ -61,7 +61,8 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     if (!filter.objectId.isNull())
         params->insert(lit("objectId"), filter.objectId.toSimpleString());
 
-    // TODO: timePeriod
+    params->insert(lit("startTime"), QnLexical::serialized(filter.timePeriod.startTimeMs));
+    params->insert(lit("endTime"), QnLexical::serialized(filter.timePeriod.endTimeMs()));
 
     if (!filter.boundingBox.isNull())
     {
@@ -97,7 +98,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     if (params.contains(lit("objectId")))
         filter->objectId = QnUuid::fromStringSafe(params.value(lit("objectId")));
 
-    // TODO: timePeriod.
+    filter->timePeriod = QnTimePeriod::fromInterval(
+        QnLexical::deserialized<qint64>(params.value(lit("startTime"))),
+        QnLexical::deserialized<qint64>(params.value(lit("endTime"))));
 
     QnLexical::deserialize(params.value(lit("sortOrder")), &filter->sortOrder);
 

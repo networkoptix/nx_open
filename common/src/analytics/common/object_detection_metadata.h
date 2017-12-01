@@ -9,6 +9,7 @@
 #include <analytics/common/abstract_metadata.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/streaming/media_data_packet_fwd.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {
@@ -58,6 +59,7 @@ struct DetectionMetadataPacket
 QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
 
 QString toString(const DetectionMetadataPacket&);
+QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
 
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right);
 

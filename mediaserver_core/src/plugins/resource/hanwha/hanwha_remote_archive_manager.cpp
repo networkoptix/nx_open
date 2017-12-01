@@ -5,6 +5,9 @@
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
 
+#include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -61,6 +64,29 @@ void HanwhaRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
     EntriesUpdatedCallback callback)
 {
     m_callback = callback;
+}
+
+void HanwhaRemoteArchiveManager::beforeSynchronization()
+{
+    // Do nothing.
+}
+
+void HanwhaRemoteArchiveManager::afterSynchronization(bool isSynchronizationSuccessful)
+{
+    if (!isSynchronizationSuccessful)
+    {
+        NX_INFO(
+            this,
+            lm("Synchronization for resource %1 was not successful. "
+                "Date and time synchronization will not be done.")
+                .arg(m_resource->getUserDefinedName()));
+        return;
+    }
+
+    const auto dateTime = qnSyncTime->currentDateTime();
+    NX_INFO(this, lm("Setting date and time (%1) for resource %2")
+        .args(dateTime, m_resource->getUserDefinedName()));
+    m_resource->sharedContext()->setDateTime(dateTime);
 }
 
 } // namespace plugins

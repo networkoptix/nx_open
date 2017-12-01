@@ -42,9 +42,9 @@ void EventsStorage::save(
 
 void EventsStorage::createLookupCursor(
     Filter /*filter*/,
-    CreateCursorCompletionHandler /*completionHandler*/)
+    CreateCursorCompletionHandler completionHandler)
 {
-    // TODO
+    completionHandler(ResultCode::error, nullptr);
 }
 
 void EventsStorage::lookup(
@@ -215,7 +215,7 @@ void EventsStorage::loadObjects(
             objectIdToPosition.emplace(detectedObject.objectId, result->size());
         if (iterAndIsInsertedFlag.second)
         {
-            if (filter.maxObjectsToSelect > 0 && result->size() >= filter.maxObjectsToSelect)
+            if (filter.maxObjectsToSelect > 0 && (int) result->size() >= filter.maxObjectsToSelect)
                 break;
             result->push_back(std::move(detectedObject));
         }

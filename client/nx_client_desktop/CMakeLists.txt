@@ -61,8 +61,6 @@ if(WINDOWS)
     add_dependencies(nx_client_desktop nov_file_launcher)
 endif()
 
-set_target_properties(nx_client_desktop PROPERTIES PREFIX "")
-
 target_include_directories(nx_client_desktop
     PRIVATE
         ${Qt5Gui_PRIVATE_INCLUDE_DIRS}

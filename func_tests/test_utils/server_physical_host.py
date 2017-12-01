@@ -1,14 +1,15 @@
 'Support for installing servers on physical hosts, controlled by yaml test config'
 
-import os.path
 import logging
+import os.path
 import uuid
-from .utils import is_list_inst
-from .template_renderer import TemplateRenderer
+
 from .host import SshHostConfig, host_from_config
+from .server import Server
 from .server_ctl import MEDIASERVER_DIR, SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
-from .server import Server
+from .template_renderer import TemplateRenderer
+from .utils import is_list_inst
 
 log = logging.getLogger(__name__)
 

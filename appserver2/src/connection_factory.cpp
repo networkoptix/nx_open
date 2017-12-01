@@ -373,18 +373,20 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * </p>
      * %permissions Administrator.
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
-     * %param parentId Server unique id.
-     * %param name Storage name.
-     * %param url Should be empty.
+     * %param parentId Parent server unique id.
+     * %param name Might be empty.
+     * %param url Must be full storage url (path to the local folder).
      * %param spaceLimit Free space to maintain on the storage,
-     *     in bytes. Recommended free space is about 5 gigabytes.
+     *     in bytes. Recommended value is 10 gigabytes for local storages and
+     *     100 gigabytes for NAS.
      * %param usedForWriting Whether writing to the storage is
      *         allowed.
      *     %value false
      *     %value true
      * %param storageType Type of the method to access the storage.
      *     %value local
-     *     %value smb
+     *     %value network (manually mounted NAS)
+     *     %value smb (auto mounted NAS)
      * %param addParams List of storage additional parameters. Intended for
      *     internal use; leave empty when creating a new storage.
      * %param isBackup Whether the storage is used for backup.

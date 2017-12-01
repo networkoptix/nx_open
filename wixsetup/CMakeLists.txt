@@ -8,6 +8,9 @@ set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
+file(TO_CMAKE_PATH ${wix_directory} wix_directory)
+file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
+
 ExternalProject_Add(
     customactions
     SOURCE_DIR "${bin_resources}/CustomActions"
@@ -26,7 +29,18 @@ nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 
 add_custom_target(wixsetup ALL
-    DEPENDS desktop_client applauncher traytool mediaserver minilauncher customactions testcamera
+    DEPENDS
+        desktop_client 
+        applauncher 
+        traytool 
+        mediaserver 
+        minilauncher 
+        customactions 
+        testcamera
+        genericrtspplugin 
+        mjpg_link 
+        generic_multicast_plugin 
+        hanwha_metadata_plugin
     COMMENT "Creating installer..."
     # TODO move python to cmake
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -61,8 +75,6 @@ list(APPEND qt_common_libraries
 
 file(GLOB_RECURSE nx_libraries "${bin_source_dir}/nx*.dll")
 list(APPEND nx_libraries "${bin_source_dir}/udt.dll")
-
-file(TO_CMAKE_PATH "${VC14RedistPath}" VC14RedistPath)
 
 file(GLOB_RECURSE vc14redist_files
     "${VC14RedistPath}/bin/*"

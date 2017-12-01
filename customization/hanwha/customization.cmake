@@ -18,12 +18,12 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 # Support section
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
-set(supportUrl "https://wavevms.com/content/support")
+set(supportUrl "http://wavevms.com/support")
 set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail
     "<br><a href=\"mailto:WAVELicense@hanwha.com\">WAVELicense@hanwha.com</a> (for US customers),<br>
-    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers),<br>"
+    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers)<br>"
 )
 
 set(installer.name "wave")
@@ -42,9 +42,17 @@ set(customization.clientBundleUpgradeCode "{3C05AA84-9E80-418D-9558-0BA6729AB6EA
 set(customization.serverBundleUpgradeCode "{110DF587-DBCE-4CEF-ABBF-2C502A4A3723}")
 set(customization.fullBundleUpgradeCode "{E20892D8-1438-478E-94EF-A23380B96A01}")
 #set(customization.nxtoolBundleUpgradeCode "")
-#set(customization.axBundleUpgradeCode "")
+set(customization.axBundleUpgradeCode "13FC4A9F-DBBD-4CAF-B139-93894AE82F74")
 
 set(deb.customization.company.name "hanwha")
+
+set(ax.className "WisenetWAVE")
+set(ax.classId "{4D3237DE-5DB0-4D2A-B41D-0FE6B8F72CC3}")
+set(ax.interfaceId "{531B6B85-2121-4838-A20F-659A0B741865}")
+set(ax.eventsId "{1652D204-F9C7-4804-A461-5B7B2871F104}")
+set(ax.typeLibId "{67662F25-B028-4D35-9334-1CBFAA63CE7B}")
+set(ax.appId "{827595F8-E97C-421F-9D8D-9B9ED2135DE4}")
+set(ax.upgradeCode "{2BEF566D-CB71-44F5-8A77-CEB10C5DA9FA}")
 
 set(ios.skip.sign "false")
 set(ios.bundle_identifier "com.hanwhasecurity.wave")
