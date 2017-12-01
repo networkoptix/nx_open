@@ -9,6 +9,7 @@ set(ClientFontsDir "${bin_source_dir}/fonts")
 set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
+file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
 ExternalProject_Add(
     customactions
@@ -35,7 +36,9 @@ add_custom_target(wixsetup ALL
         "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
     COMMAND ${CMAKE_COMMAND} -E copy
         "${bin_source_dir}/desktop_client.exe" "${bin_source_dir}/${client.binary.name}"
+    COMMENT "Generating wix files..."
     COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
+    COMMENT "Compiling wix files..."
     COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
 )
 
@@ -63,8 +66,6 @@ list(APPEND qt_common_libraries
 
 file(GLOB_RECURSE nx_libraries "${bin_source_dir}/nx*.dll")
 list(APPEND nx_libraries "${bin_source_dir}/udt.dll")
-
-file(TO_CMAKE_PATH "${VC14RedistPath}" VC14RedistPath)
 
 file(GLOB_RECURSE vc14redist_files
     "${VC14RedistPath}/bin/*"

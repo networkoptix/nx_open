@@ -6,6 +6,7 @@ from windeployqt_interface import deploy_qt, cleanup_qtwebprocess
 
 properties_dir = '${project.build.directory}'
 has_nxtool = ('${nxtool}' == 'true')
+has_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 bin_source_dir = '${bin_source_dir}'
 
 def generate_client_backround():
@@ -14,7 +15,7 @@ def generate_client_backround():
         'ClientBg.wxs',
         'ClientBgComponent',
         '${customization}BgDir',
-        ['var.ClientBgSourceDir'])
+        'var.ClientBgSourceDir')
 
 def generate_fonts():
     harvest_dir(
@@ -22,7 +23,7 @@ def generate_fonts():
         'ClientFonts.wxs',
         'ClientFontsComponent',
         'ClientFontsDir',
-        ['var.ClientFontsDir'])
+        'var.ClientFontsDir')
 
 def generate_help():
     clientHelpFile = 'ClientHelp.wxs'
@@ -32,7 +33,7 @@ def generate_help():
         clientHelpFile,
         'ClientHelpComponent',
         '${customization}HelpDir',
-        ['var.ClientHelpSourceDir'])
+        'var.ClientHelpSourceDir')
 
     fragments = (
         (r'''Id="jquery.js"''', '''Id="skawixjquery.js"'''),
@@ -47,7 +48,8 @@ def generate_help():
     open(clientHelpFile, 'w').write(text)
 
 def generate_client_qml():
-    qmldir = '${root.dir}/client/nx_client_desktop/static-resources/qml/'
+    # This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
+    qmldir = '${root.dir}/client/nx_client_desktop/static-resources/src/qml/'
     client_executable = '{0}/desktop_client.exe'.format(bin_source_dir)
     deploy_qt(client_executable, qmldir, 'clientqml')
     cleanup_qtwebprocess('clientqml')
@@ -56,7 +58,7 @@ def generate_client_qml():
         'ClientQml.wxs',
         'ClientQmlComponent',
         'ClientQml',
-        ['var.ClientQmlDir'])
+        'var.ClientQmlDir')
 
 def generate_nxtool_qml():
     qmldir_nxtool = '${root.dir}/nxtool/static-resources/src/qml'
@@ -68,13 +70,13 @@ def generate_nxtool_qml():
         'NxtoolQml.wxs',
         'NxtoolQmlComponent',
         'NxtoolQml',
-        ['var.NxtoolQmlDir'])
+        'var.NxtoolQmlDir')
     harvest_dir(
         '${NxtoolQuickControlsDir}',
         'NxtoolQuickControls.wxs',
         'NxtoolQuickControlsComponent',
         'QtQuickControls',
-        ['var.NxtoolQuickControlsDir'])
+        'var.NxtoolQuickControlsDir')
 
 def generate_client_vox():
     harvest_dir(
@@ -82,7 +84,7 @@ def generate_client_vox():
         'ClientVox.wxs',
         'ClientVoxComponent',
         '${customization}VoxDir',
-        ['var.ClientVoxSourceDir'])
+        'var.ClientVoxSourceDir')
 
 def generate_server_vox():
     harvest_dir(
@@ -90,29 +92,31 @@ def generate_server_vox():
         'ServerVox.wxs',
         'ServerVoxComponent',
         '${customization}ServerVoxDir',
-        ['var.ClientVoxSourceDir'])
+        'var.ClientVoxSourceDir')
 
-def generate_vcrt_14(component):
-    target_file = '{}Vcrt14.wxs'.format(component)
-
+def generate_vcrt_14_client():
     harvest_dir(
         '${VC14RedistPath}/bin',
-        target_file,
-        '{}Vcrt14ComponentGroup'.format(component),
-        '{}Vcrt14DstDir'.format(component),
-        ['var.Vcrt14SrcDir'])
+        'ClientVcrt14.wxs',
+        'ClientVcrt14ComponentGroup',
+        'ClientRootDir',
+        'var.Vcrt14SrcDir')
 
-    # Add component_ prefix to avoid duplicating IDs for Server/Traytool
-    lines = []
-    with open(target_file, 'r') as f:
-        for line in f:
-            lines.append(line
-                        .replace('Component Id="', 'Component Id="{}_'.format(component))
-                        .replace('ComponentRef Id="', 'ComponentRef Id="{}_'.format(component))
-                        .replace('<File Id="', '<File Id="{}_'.format(component)))
+def generate_vcrt_14_mediaserver():
+    harvest_dir(
+        '${VC14RedistPath}/bin',
+        'ServerVcrt14.wxs',
+        'ServerVcrt14ComponentGroup',
+        'MediaServerRootDir',
+        'var.Vcrt14SrcDir')
 
-    with open(target_file, 'w') as f:
-        f.write(''.join(lines))
+def generate_vcrt_14_traytool():
+    harvest_dir(
+        '${VC14RedistPath}/bin',
+        'TraytoolVcrt14.wxs',
+        'TraytoolVcrt14ComponentGroup',
+        'TrayToolRootDir',
+        'var.Vcrt14SrcDir')
 
 def main():
     generate_client_backround()
@@ -121,11 +125,15 @@ def main():
     generate_client_qml()
     generate_client_vox()
     generate_server_vox()
+    generate_vcrt_14_client()
+    generate_vcrt_14_mediaserver()
+    generate_vcrt_14_traytool()
     if has_nxtool:
         generate_nxtool_qml()
-    # TODO: Paxton if win86, Nxtool if has_nxtool
-    for component in ['Client', 'Server', 'Traytool', 'Paxton', 'Nxtool']:
-        generate_vcrt_14(component)
+        generate_vcrt_14('Nxtool')
+    if has_paxton:
+        generate_vcrt_14('Paxton')
+
 
 if __name__ == '__main__':
     main()

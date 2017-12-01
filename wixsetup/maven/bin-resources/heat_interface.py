@@ -57,26 +57,24 @@ Options:
 
 import os
 import subprocess
-
-wix_directory = '${wix_directory}/bin'
+from environment import wix_directory, execute_command
 
 def heat_executable():
     return os.path.join(wix_directory, 'heat.exe')
 
 def common_heat_options():
-    return ['-wixvar', '-nologo', '-sfrag', '-suid', '-sreg', '-ag', '-srd']
+    return ['-wixvar', '-nologo', '-sfrag', '-sreg', '-ag', '-srd']
 
-def harvest_dir_command(source_dir, target_file, component_group_name, directory_ref, vars):
+def harvest_dir_command(source_dir, target_file, component_group_name, directory_ref, source_dir_var):
     command = [heat_executable(), 'dir', source_dir]
     command += common_heat_options()
     command += [
         '-out', target_file,
         '-cg', component_group_name,
-        '-dr', directory_ref]
-    for var in vars:
-        command += ['-var', var]
+        '-dr', directory_ref,
+        '-var', source_dir_var
+        ]
     return command
 
-def harvest_dir(source_dir, target_file, component_group_name, directory_ref, vars):
-    command = harvest_dir_command(source_dir, target_file, component_group_name, directory_ref, vars)
-    return subprocess.check_output(command, stderr = subprocess.STDOUT)
+def harvest_dir(source_dir, target_file, component_group_name, directory_ref, source_dir_var):
+    execute_command(harvest_dir_command(source_dir, target_file, component_group_name, directory_ref, source_dir_var))

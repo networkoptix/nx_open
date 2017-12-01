@@ -1,94 +1,95 @@
 <Include>
+    <?ifndef includeGuard?>
+        <?define includeGuard="BuildWars.wxi"?>
+    
+        <?define installerLanguage="${installer.language}"?>
+        <?define companyName="${company.name}"?>
+        <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+        <?define ProductTitle="${product.title}"?>
 
-    <?define installerLanguage="${installer.language}"?>
-    <?define companyName="${company.name}"?>
-    <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
-    <?define ProductTitle="${product.title}"?>
+        <?define serverUpgradeCode = "${customization.upgradeCode}"?>
+        <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
+        <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
+        <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
+        <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
+        <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
+        <?define axBundleUpgradeCode = "${customization.axBundleUpgradeCode}"?>
 
-    <?define serverUpgradeCode = "${customization.upgradeCode}"?>
-    <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
-    <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
-    <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
-    <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
-    <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
-    <?define axBundleUpgradeCode = "${customization.axBundleUpgradeCode}"?>
+        <?define cloudHost = "${cloudHost}"?>
 
-    <?define cloudHost = "${cloudHost}"?>
+        <?define arch = "${arch}"?>
+        <?define vmax = "${vmax}"?>
 
-    <?define arch = "${arch}"?>
-    <?define vmax = "${vmax}"?>
+        <?define customization = "${customization}"?>
+        <?define uriProtocol = "${uri.protocol}"?>
 
-    <?define customization = "${customization}"?>
-    <?define uriProtocol = "${uri.protocol}"?>
+        <?define releaseVersionFull = "${release.version}.${buildNumber}"?>
+        <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
+        <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
 
-    <?define releaseVersionFull = "${release.version}.${buildNumber}"?>
-    <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
-    <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
+        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
 
-    <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
+        <?define clientInternalName = "${client.name}"?>
+        <?define nxtoolName = "${nxtool.name}"?>
+        <?define mediaserverName = "${mediaserver.name}"?>
+        <?define productName = "${display.product.name}"?>
+        <?define productTitle = "${product.title}"?>
+        <?define applauncherName = "${applauncher.name}"?>
+        <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
+        <?define clientName = "${product.name}"?>
+        <?define clientDisplayName = "${client.display.name}"?>
+        <?define launcherVersionFile = "${launcher.version.file}"?>
 
-    <?define clientInternalName = "${client.name}"?>
-    <?define nxtoolName = "${nxtool.name}"?>
-    <?define mediaserverName = "${mediaserver.name}"?>
-    <?define productName = "${display.product.name}"?>
-    <?define productTitle = "${product.title}"?>
-    <?define applauncherName = "${applauncher.name}"?>
-    <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
-    <?define clientName = "${product.name}"?>
-    <?define clientDisplayName = "${client.display.name}"?>
-    <?define launcherVersionFile = "${launcher.version.file}"?>
+        <?define productExeName = "${product.name}"?>
+        <?define clientExeName = "${display.product.name}"?>
+        <?define nxtoolExeName = "${short.company.name} Server Tool"?>
 
-    <?define productExeName = "${product.name}"?>
-    <?define clientExeName = "${display.product.name}"?>
-    <?define nxtoolExeName = "${short.company.name} Server Tool"?>
-
-    <?define mirrorListUrl = "${mirrorListUrl}"?>
-    <?define quicksync = "${quicksync}"?>
-    <?define defaultTranslation = "${defaultTranslation}"?>
+        <?define mirrorListUrl = "${mirrorListUrl}"?>
+        <?define quicksync = "${quicksync}"?>
+        <?define defaultTranslation = "${defaultTranslation}"?>
 
 
-    <?if $(var.arch) = x86?>
-        <?define ProgramFilesFolder = "ProgramFilesFolder"?>
-        <?define SystemFolderActual = "SystemFolder"?>
-    <?else?>
-        <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
-        <?define SystemFolderActual = "System64Folder"?>
-    <?endif?>
+        <?if $(var.arch) = x86?>
+            <?define ProgramFilesFolder = "ProgramFilesFolder"?>
+            <?define SystemFolderActual = "SystemFolder"?>
+        <?else?>
+            <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+            <?define SystemFolderActual = "System64Folder"?>
+        <?endif?>
 
-    <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Client" ?>
-    <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Nxtool" ?>
+        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Client" ?>
+        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Nxtool" ?>
 
-    <!-- Wix Variables -->
+        <!-- Wix Variables -->
 
-    <?ifdef env.CommonProgramFiles(x86) ?>
-    <?define commonProgramFiles = "c:\Program Files (x86)\Common Files\" ?>
-    <?else?>
-    <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
-    <?endif?>
+        <?ifdef env.CommonProgramFiles(x86) ?>
+        <?define commonProgramFiles = "c:\Program Files (x86)\Common Files\" ?>
+        <?else?>
+        <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
+        <?endif?>
 
-    <?if ${build.configuration} = debug ?>
-    <?define suffix = "d" ?>
-    <?define vmaxsuffix = "dd" ?>
-    <?else?>
-    <?define suffix = "" ?>
-    <?define vmaxsuffix = "r" ?>
-    <?endif?>
+        <?if ${build.configuration} = debug ?>
+        <?define suffix = "d" ?>
+        <?define vmaxsuffix = "dd" ?>
+        <?else?>
+        <?define suffix = "" ?>
+        <?define vmaxsuffix = "r" ?>
+        <?endif?>
 
-    <?if $(var.arch) = x86 ?>
-    <?define archSuffix = "x86" ?>
-    <?else?>
-    <?define archSuffix = "x86_x64" ?>
-    <?endif?>
+        <?if $(var.arch) = x86 ?>
+        <?define archSuffix = "x86" ?>
+        <?else?>
+        <?define archSuffix = "x86_x64" ?>
+        <?endif?>
 
-    <?define SourceDir="${bin_source_dir}"?>
-    <?define CustomizationDir="${customization.dir}"?>
-    <?define NxtoolSourceDir="${bin_source_dir}"?>
-    <?define PluginsDir="${bin_source_dir}/plugins"?>
-    <?define QtDir="${qt.dir}/bin"?>
-    <?define QtPluginsDir="${qt.dir}/plugins"?>
+        <?define SourceDir="${bin_source_dir}"?>
+        <?define CustomizationDir="${customization.dir}"?>
+        <?define NxtoolSourceDir="${bin_source_dir}"?>
+        <?define PluginsDir="${bin_source_dir}/plugins"?>
+        <?define QtDir="${qt.dir}/bin"?>
+        <?define QtPluginsDir="${qt.dir}/plugins"?>
 
-    <?define VC14RedistPath="${VC14RedistPath}"?>
-
-    <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
-    <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
+        <?define VC14RedistPath="${VC14RedistPath}"?>
+        <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
+     <?endif?>
 </Include>
