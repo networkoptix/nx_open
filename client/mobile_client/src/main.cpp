@@ -47,6 +47,7 @@
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
+#include <nx/network/system_socket.h>
 
 #include <ini.h>
 
@@ -235,6 +236,42 @@ int runApplication(QtSingleGuiApplication* application)
     return result;
 }
 
+
+class TcpLogWriterOut : public nx::utils::log::AbstractWriter
+{
+public:
+    TcpLogWriterOut(const SocketAddress& targetAddress) :
+        m_targetAddress(targetAddress)
+    {
+    }
+
+    virtual void write(nx::utils::log::Level level, const QString& message) override
+    {
+        static const int kTimeoutMs = 1000 * 3;
+        if (!m_tcpSock)
+        {
+            m_tcpSock = std::make_unique<nx::network::TCPSocket>();
+            auto ipV4Address = m_targetAddress.address.ipV4();
+            if (!ipV4Address)
+                return; //< Can't connect to non IPv4 address.
+            if (!m_tcpSock->connect(
+                SocketAddress(*ipV4Address, m_targetAddress.port), kTimeoutMs))
+            {
+                m_tcpSock.reset();
+                return;
+            }
+            m_tcpSock->setSendTimeout(kTimeoutMs);
+        }
+        QByteArray data = message.toUtf8();
+        data.append('\n');
+        if (m_tcpSock->send(data.data(), data.size()) < 1)
+            m_tcpSock.reset(); //< Reconnect.
+    }
+private:
+    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    SocketAddress m_targetAddress;
+};
+
 void initLog(const QString& logLevel)
 {
     nx::utils::log::Settings logSettings;
@@ -257,6 +294,17 @@ void initLog(const QString& logLevel)
                 : QnAppInfo::isAndroid()
                     ? lit("-")
                     : (QString::fromUtf8(ini().iniFileDir()) + lit("mobile_client")));
+        const QString tcpLogAddress(QLatin1String(ini().tcpLogAddress));
+        if (!tcpLogAddress.isEmpty())
+        {
+            auto params = tcpLogAddress.split(L':');
+            auto address = params[0];
+            int port = 7001;
+            if (params.size() >= 2)
+                port = params[1].toInt();
+            nx::utils::log::mainLogger()->setWriter(
+                std::make_unique<TcpLogWriterOut>(SocketAddress(address, port)));
+        }
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
