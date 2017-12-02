@@ -34,6 +34,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 #include <appserver/processor.h>
 
@@ -76,6 +77,7 @@
 #include <media_server/crossdomain_connection_processor.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/media_server_resource_searchers.h>
+#include <media_server/media_server_module.h>
 
 #include <motion/motion_helper.h>
 
@@ -2374,6 +2376,15 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+
+    while (!needToStop())
+    {
+        if (qnServerModule->analyticsEventsStorage()->initialize())
+            break;
+
+        NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
+        QnSleep::msleep(1000);
+    }
 
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
     connect(
