@@ -16,7 +16,6 @@
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
 #include "base_request_executor.h"
-#include "sql_cursor.h"
 #include "detail/cursor_handler.h"
 #include "detail/query_queue.h"
 #include "request_executor.h"
@@ -212,10 +211,9 @@ public:
     void createCursor(
         MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
         MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
-        MoveOnlyFunc<void(DBResult, std::unique_ptr<Cursor<Record>>)> completionHandler)
+        MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
     {
         auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
-            this,
             std::move(prepareCursorFunc),
             std::move(readRecordFunc),
             std::move(completionHandler));

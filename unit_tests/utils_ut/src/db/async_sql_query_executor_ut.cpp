@@ -12,6 +12,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/sql_cursor.h>
 #include <nx/utils/db/request_executor_factory.h>
 #include <nx/utils/db/request_execution_thread.h>
 #include <nx/utils/db/query.h>
@@ -23,8 +24,6 @@ namespace utils {
 namespace db {
 namespace test {
 
-namespace {
-
 struct Company
 {
     std::string name;
@@ -32,12 +31,12 @@ struct Company
 
     bool operator<(const Company& right) const
     {
-        return std::tie(name, yearFounded) < std::tie(name, yearFounded);
+        return std::tie(name, yearFounded) < std::tie(right.name, right.yearFounded);
     }
 
     bool operator==(const Company& right) const
     {
-        return std::tie(name, yearFounded) == std::tie(name, yearFounded);
+        return std::tie(name, yearFounded) == std::tie(right.name, right.yearFounded);
     }
 };
 
@@ -47,8 +46,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Company),
     (sql_record),
     _Fields)
-
-} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // DbRequestExecutionThreadTestWrapper
@@ -581,15 +578,15 @@ protected:
     }
 
 private:
-    using Cursor = Cursor<Company>;
+    using CompanyCursor = Cursor<Company>;
 
     struct CursorContext
     {
-        std::unique_ptr<Cursor> cursor;
+        std::unique_ptr<CompanyCursor> cursor;
         std::vector<Company> recordsRead;
     };
 
-    nx::utils::SyncQueue<std::unique_ptr<Cursor>> m_cursorsCreated;
+    nx::utils::SyncQueue<std::unique_ptr<CompanyCursor>> m_cursorsCreated;
     std::vector<Company> m_initialData;
     std::vector<CursorContext> m_cursors;
     int m_cursorsRequested = 0;
@@ -604,9 +601,9 @@ private:
         QnSql::fetch(QnSql::mapping<Company>(query->impl()), query->record(), company);
     }
 
-    void saveCursor(DBResult /*resultCode*/, std::unique_ptr<Cursor> cursor)
+    void saveCursor(DBResult /*resultCode*/, QnUuid cursorId)
     {
-        m_cursorsCreated.push(std::move(cursor));
+        m_cursorsCreated.push(std::make_unique<CompanyCursor>(&asyncSqlQueryExecutor(), cursorId));
     }
 
     void readAllData()

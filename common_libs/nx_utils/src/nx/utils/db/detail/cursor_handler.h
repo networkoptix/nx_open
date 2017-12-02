@@ -6,7 +6,6 @@
 #include <nx/utils/uuid.h>
 
 #include "../request_executor.h"
-#include "../sql_cursor.h"
 #include "../query.h"
 
 namespace nx {
@@ -31,17 +30,14 @@ class CursorHandler:
 public:
     using PrepareCursorFunc = MoveOnlyFunc<void(SqlQuery*)>;
     using ReadRecordFunc = MoveOnlyFunc<void(SqlQuery*, Record*)>;
-    using CursorCreatedHandler =
-        MoveOnlyFunc<void(DBResult, std::unique_ptr<Cursor<Record>>)>;
+    using CursorCreatedHandler = MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)>;
 
     CursorHandler(
-        AsyncSqlQueryExecutor* asyncSqlQueryExecutor,
         PrepareCursorFunc prepareCursorFunc,
         ReadRecordFunc readRecordFunc,
         CursorCreatedHandler cursorCreatedHandler)
         :
         m_id(QnUuid::createUuid()),
-        m_asyncSqlQueryExecutor(asyncSqlQueryExecutor),
         m_prepareCursorFunc(std::move(prepareCursorFunc)),
         m_readRecordFunc(std::move(readRecordFunc)),
         m_cursorCreatedHandler(std::move(cursorCreatedHandler))
@@ -61,19 +57,16 @@ public:
         {
             m_prepareCursorFunc(m_query.get());
             m_query->exec();
-            nx::utils::swapAndCall(
-                m_cursorCreatedHandler,
-                DBResult::ok,
-                std::make_unique<Cursor<Record>>(m_asyncSqlQueryExecutor, m_id));
+            nx::utils::swapAndCall(m_cursorCreatedHandler, DBResult::ok, m_id);
         }
         catch (Exception e)
         {
-            nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), nullptr);
+            nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), QnUuid());
             throw;
         }
     }
 
-    Record fetchNextRecord(QSqlDatabase* const connection)
+    Record fetchNextRecord(QSqlDatabase* const /*connection*/)
     {
         if (!m_query->next())
             throw Exception(DBResult::endOfData);
@@ -85,12 +78,11 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
         if (m_cursorCreatedHandler)
-            nx::utils::swapAndCall(m_cursorCreatedHandler, errorCode, nullptr);
+            nx::utils::swapAndCall(m_cursorCreatedHandler, errorCode, QnUuid());
     }
 
 private:
     QnUuid m_id;
-    AsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
     PrepareCursorFunc m_prepareCursorFunc;
     ReadRecordFunc m_readRecordFunc;
     CursorCreatedHandler m_cursorCreatedHandler;
