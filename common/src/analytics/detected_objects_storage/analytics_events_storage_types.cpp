@@ -1,6 +1,7 @@
 #include "analytics_events_storage_types.h"
 
 #include <cmath>
+#include <sstream>
 
 #include <nx/fusion/model_functions.h>
 
@@ -146,6 +147,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
             filter.boundingBox.bottomRight().x() << ", " <<
             filter.boundingBox.bottomRight().y() << "]; " <<
         "freeText \"" << filter.freeText.toStdString() << "\"; ";
+}
+
+QString toString(const Filter& filter)
+{
+    std::ostringstream stringStream;
+    stringStream << filter;
+    return QString::fromStdString(stringStream.str());
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
