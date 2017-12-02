@@ -4,6 +4,7 @@
 #include <QtCore/QDir>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/sql.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
@@ -21,6 +22,33 @@ namespace nx {
 namespace utils {
 namespace db {
 namespace test {
+
+namespace {
+
+struct Company
+{
+    std::string name;
+    int yearFounded;
+
+    bool operator<(const Company& right) const
+    {
+        return std::tie(name, yearFounded) < std::tie(name, yearFounded);
+    }
+
+    bool operator==(const Company& right) const
+    {
+        return std::tie(name, yearFounded) == std::tie(name, yearFounded);
+    }
+};
+
+#define Company_Fields (name)(yearFounded)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (Company),
+    (sql_record),
+    _Fields)
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // DbRequestExecutionThreadTestWrapper
@@ -94,11 +122,20 @@ public:
     }
 
 protected:
-    void givenRandomData()
+    std::vector<Company> givenRandomData()
     {
+        std::vector<Company> generatedData;
+
         executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Microsoft', 1975)");
+        generatedData.push_back(Company{"Microsoft", 1975});
+
         executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
+        generatedData.push_back(Company{"Google", 1998});
+
         executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('NetworkOptix', 2010)");
+        generatedData.push_back(Company{"NetworkOptix", 2010});
+
+        return generatedData;
     }
 
     void whenIssueMultipleReads()
@@ -337,19 +374,6 @@ private:
     }
 };
 
-struct Company
-{
-    std::string name;
-    int yearFounded;
-};
-
-#define Company_Fields (name)(yearFounded)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Company),
-    (sql_record),
-    _Fields)
-
 TEST_F(DbAsyncSqlQueryExecutor, able_to_execute_query)
 {
     initializeDatabase();
@@ -491,6 +515,135 @@ TEST_F(DbAsyncSqlQueryExecutorNew, DISABLED_interleaved_reads_with_hanging_updat
 
     finishHangingQuery();
 }
+
+//-------------------------------------------------------------------------------------------------
+
+class DbAsyncSqlQueryExecutorCursor:
+    public DbAsyncSqlQueryExecutorNew
+{
+    using base_type = DbAsyncSqlQueryExecutorNew;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_initialData = givenRandomData();
+        std::sort(m_initialData.begin(), m_initialData.end(), std::less<Company>());
+    }
+
+    void whenRequestCursor()
+    {
+        using namespace std::placeholders;
+
+        ++m_cursorsRequested;
+        asyncSqlQueryExecutor().createCursor<Company>(
+            std::bind(&DbAsyncSqlQueryExecutorCursor::prepareCursorQuery, this, _1),
+            std::bind(&DbAsyncSqlQueryExecutorCursor::readCompanyRecord, this, _1, _2),
+            std::bind(&DbAsyncSqlQueryExecutorCursor::saveCursor, this, _1, _2));
+    }
+
+    void whenRequestMultipleCursors()
+    {
+        const auto cursorsCount = nx::utils::random::number<int>(5,11);
+        for (int i = 0; i < cursorsCount; ++i)
+            whenRequestCursor();
+    }
+
+    void thenCursorIsProvided()
+    {
+        thenAllCursorsAreProvided();
+    }
+
+    void thenAllCursorsAreProvided()
+    {
+        for (int i = 0; i < m_cursorsRequested; ++i)
+        {
+            CursorContext cursorContext;
+            cursorContext.cursor = m_cursorsCreated.pop();
+            m_cursors.push_back(std::move(cursorContext));
+            ASSERT_NE(nullptr, m_cursors.back().cursor);
+        }
+    }
+
+    void andDataCanBeReadUsingCursor()
+    {
+        readAllData();
+
+        for (auto& cursorContext: m_cursors)
+        {
+            std::sort(
+                cursorContext.recordsRead.begin(),
+                cursorContext.recordsRead.end(),
+                std::less<Company>());
+            ASSERT_EQ(m_initialData, cursorContext.recordsRead);
+        }
+    }
+
+private:
+    using Cursor = Cursor<Company>;
+
+    struct CursorContext
+    {
+        std::unique_ptr<Cursor> cursor;
+        std::vector<Company> recordsRead;
+    };
+
+    nx::utils::SyncQueue<std::unique_ptr<Cursor>> m_cursorsCreated;
+    std::vector<Company> m_initialData;
+    std::vector<CursorContext> m_cursors;
+    int m_cursorsRequested = 0;
+
+    void prepareCursorQuery(SqlQuery* query)
+    {
+        query->prepare("SELECT * FROM company");
+    }
+
+    void readCompanyRecord(SqlQuery* query, Company* company)
+    {
+        QnSql::fetch(QnSql::mapping<Company>(query->impl()), query->record(), company);
+    }
+
+    void saveCursor(DBResult /*resultCode*/, std::unique_ptr<Cursor> cursor)
+    {
+        m_cursorsCreated.push(std::move(cursor));
+    }
+
+    void readAllData()
+    {
+        bool everyCursorDepleted = false;
+        while (!everyCursorDepleted)
+        {
+            everyCursorDepleted = true;
+            for (auto& cursorContext: m_cursors)
+            {
+                boost::optional<Company> record = cursorContext.cursor->next();
+                if (!record)
+                    continue;
+                cursorContext.recordsRead.push_back(std::move(*record));
+                everyCursorDepleted = false;
+            }
+        }
+    }
+};
+
+TEST_F(DbAsyncSqlQueryExecutorCursor, reading_all_data)
+{
+    whenRequestCursor();
+
+    thenCursorIsProvided();
+    andDataCanBeReadUsingCursor();
+}
+
+TEST_F(DbAsyncSqlQueryExecutorCursor, multiple_cursors)
+{
+    whenRequestMultipleCursors();
+
+    thenAllCursorsAreProvided();
+    andDataCanBeReadUsingCursor();
+}
+
+// TEST_F(DbAsyncSqlQueryExecutorCursor, many_cursors_do_not_block_queries)
 
 } // namespace test
 } // namespace db
