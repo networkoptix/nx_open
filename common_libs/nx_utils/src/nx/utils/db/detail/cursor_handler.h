@@ -38,13 +38,13 @@ public:
         AsyncSqlQueryExecutor* asyncSqlQueryExecutor,
         PrepareCursorFunc prepareCursorFunc,
         ReadRecordFunc readRecordFunc,
-        CursorCreatedHandler ñursorCreatedHandler)
+        CursorCreatedHandler cursorCreatedHandler)
         :
         m_id(QnUuid::createUuid()),
         m_asyncSqlQueryExecutor(asyncSqlQueryExecutor),
         m_prepareCursorFunc(std::move(prepareCursorFunc)),
         m_readRecordFunc(std::move(readRecordFunc)),
-        m_ñursorCreatedHandler(std::move(ñursorCreatedHandler))
+        m_cursorCreatedHandler(std::move(cursorCreatedHandler))
     {
     }
 
@@ -62,13 +62,13 @@ public:
             m_prepareCursorFunc(m_query.get());
             m_query->exec();
             nx::utils::swapAndCall(
-                m_ñursorCreatedHandler,
+                m_cursorCreatedHandler,
                 DBResult::ok,
                 std::make_unique<Cursor<Record>>(m_asyncSqlQueryExecutor, m_id));
         }
         catch (Exception e)
         {
-            nx::utils::swapAndCall(m_ñursorCreatedHandler, e.dbResult(), nullptr);
+            nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), nullptr);
             throw;
         }
     }
@@ -84,8 +84,8 @@ public:
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
-        if (m_ñursorCreatedHandler)
-            nx::utils::swapAndCall(m_ñursorCreatedHandler, errorCode, nullptr);
+        if (m_cursorCreatedHandler)
+            nx::utils::swapAndCall(m_cursorCreatedHandler, errorCode, nullptr);
     }
 
 private:
@@ -93,7 +93,7 @@ private:
     AsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
     PrepareCursorFunc m_prepareCursorFunc;
     ReadRecordFunc m_readRecordFunc;
-    CursorCreatedHandler m_ñursorCreatedHandler;
+    CursorCreatedHandler m_cursorCreatedHandler;
     std::unique_ptr<SqlQuery> m_query;
 };
 
