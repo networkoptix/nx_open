@@ -158,7 +158,7 @@ bool AsyncSqlQueryExecutor::init()
     m_cursorProcessorContext.push_back(CursorProcessorContext());
     // Disabling inactivity timer.
     auto connectionOptions = m_connectionOptions;
-    connectionOptions.inactivityTimeout = std::chrono::seconds::max();
+    connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
     m_cursorProcessorContext.back().processingThread =
         createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 

@@ -91,8 +91,9 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
             queryExecutorQueue()->pop(kTaskWaitTimeout, m_queueReaderId);
         if (!task)
         {
-            if (std::chrono::steady_clock::now() - previousActivityTime >=
-                connectionOptions().inactivityTimeout)
+            if (connectionOptions().inactivityTimeout > std::chrono::seconds::zero() &&
+                (std::chrono::steady_clock::now() - previousActivityTime >=
+                 connectionOptions().inactivityTimeout))
             {
                 // Dropping connection by timeout.
                 NX_LOGX(lm("Closing DB connection by timeout (%1)")
