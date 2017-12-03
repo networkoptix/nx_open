@@ -89,11 +89,13 @@ class IOSMemoryBufferPrivate: public QAbstractVideoBufferPrivate
 public:
     AVFrame* frame;
     QAbstractVideoBuffer::MapMode mapMode;
+    bool isHardwareAccelerated;
 public:
     IOSMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
         frame(_frame),
-        mapMode(QAbstractVideoBuffer::NotMapped)
+        mapMode(QAbstractVideoBuffer::NotMapped),
+        isHardwareAccelerated(false)
     {
     }
 
@@ -380,7 +382,8 @@ int IOSVideoDecoder::decode(
     int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
-    if (d->frame->data[3])
+    d->isHardwareAccelerated = d->frame->data[3];
+    if (d->isHardwareAccelerated)
     {
         CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
         qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
@@ -409,7 +412,7 @@ int IOSVideoDecoder::decode(
 
 AbstractVideoDecoder::Capabilities IOSVideoDecoder::capabilities() const
 {
-    return Capability::hardwareAccelerated;
+    return d->isHardwareAccelerated ? Capability::hardwareAccelerated : Capability::noCapability;
 }
 
 } // namespace media
