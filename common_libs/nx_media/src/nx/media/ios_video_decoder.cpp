@@ -282,7 +282,8 @@ bool IOSVideoDecoder::isCompatible(
     const QSize& resolution,
     bool /*allowOverlay*/)
 {
-    if (codec != AV_CODEC_ID_H264 &&
+    if (codec != AV_CODEC_ID_H265 &&
+        codec != AV_CODEC_ID_H264 &&
         codec != AV_CODEC_ID_H263 &&
         codec != AV_CODEC_ID_H263P &&
         codec != AV_CODEC_ID_MPEG4 &&
@@ -302,22 +303,47 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     static const QSize kFullHdResolution(1920, 1080);
     static const QSize kUhd4kResolution(3840, 2160);
 
-    if (codec != AV_CODEC_ID_H264)
-        return kHdReadyResolution;
-
     const auto& deviceInfo = iosDeviceInformation();
-    if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+    switch (codec)
     {
-        if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
-            return kUhd4kResolution;
+        case AV_CODEC_ID_H265:
+            // List of models with HEVC:
+            // https://support.apple.com/en-ie/HT207022
+            // https://stackoverflow.com/questions/11197509/how-to-get-device-make-and-model-on-ios
+            if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+            {
+                if (deviceInfo.majorVersion == 6) //< iPhone 5s
+                    return kFullHdResolution;
+                else if (deviceInfo.majorVersion == 7) //< iPhone 6
+                    return kFullHdResolution;
+                else if (deviceInfo.majorVersion > 7)
+                    return kUhd4kResolution;
+            }
+            else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
+            {
+                if (deviceInfo.majorVersion == 4) //< iPad Air 1 / iPad Mini 2.
+                    return kFullHdResolution;
+                else if (deviceInfo.majorVersion == 5) //< iPad Air 2 / iPad Mini 4.
+                    return kFullHdResolution;
+                else if (deviceInfo.majorVersion > 5)
+                    return kUhd4kResolution;
+            }
+            return QSize(); //< HEVC is not supported.
+        case AV_CODEC_ID_H264:
+            if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+            {
+                if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
+                    return kUhd4kResolution;
+            }
+            else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
+            {
+                if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
+                    return kUhd4kResolution;
+            }
+            return kFullHdResolution;
+        default:
+            return kHdReadyResolution;
     }
-    else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
-    {
-        if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
-            return kUhd4kResolution;
-    }
-
-    return kFullHdResolution;
 }
 
 int IOSVideoDecoder::decode(
