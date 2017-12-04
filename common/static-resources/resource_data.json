@@ -17,6 +17,68 @@
 
     "version": "1.0",
     "data": [
+
+        {
+            "keys": [
+                "Hanwha|PRN-4011"
+            ],
+            "minimalFirmwareVersion":  "v1.08_171018"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-3010"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-2011"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-2010"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-1610S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-1610"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-810S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-410S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|QRN-810"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|QRN-410"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+
         {
             "keys": [
                 "Sony|SNC-VM772R"

@@ -37,6 +37,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     m_shortVendorByName.insert(lit("norbain_"), lit("vista"));
     m_shortVendorByName.insert(lit("norbain"), lit("vista"));
     m_shortVendorByName.insert(lit("flir systems"), lit("flir"));
+    m_shortVendorByName.insert(lit("hanwha techwin"), lit("hanwha"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {

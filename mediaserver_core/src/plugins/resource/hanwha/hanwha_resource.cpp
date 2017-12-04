@@ -34,6 +34,8 @@
 #include <api/global_settings.h>
 
 #include <media_server/media_server_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -657,6 +659,17 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     CameraDiagnostics::Result result = initSystem();
     if (!result)
         return result;
+
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
+    if (!minFirmwareVersion.isEmpty() &&
+        !getFirmware().isEmpty()
+        && minFirmwareVersion > getFirmware())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Please update firmware for this device. Minimal supported firmware: '%1'. Device firmware: '%2'.")
+            .arg(minFirmwareVersion).arg(getFirmware()));
+    }
 
     result = initMedia();
     if (!result)
