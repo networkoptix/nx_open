@@ -47,7 +47,6 @@ class QnStreamRecorder:
 {
     Q_OBJECT
 
-    using MotionHandler = std::function<bool(const QnConstMetaDataV1Ptr& motion)>;
 public:
     static QString errorString(StreamRecorderError errCode);
 
@@ -94,8 +93,6 @@ public:
     void forceAudioLayout(const QnResourceAudioLayoutPtr& layout);
 
     void disableRegisterFile(bool disable);
-
-    void setSaveMotionHandler(MotionHandler handler);
 
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
@@ -213,7 +210,6 @@ protected:
     std::vector<StreamRecorderContext> m_recordingContextVector;
     boost::optional<std::chrono::microseconds> m_startRecordingBound;
     boost::optional<std::chrono::microseconds> m_endRecordingBound;
-    MotionHandler m_motionHandler;
 
 private:
     bool m_waitEOF;
