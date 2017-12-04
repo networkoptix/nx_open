@@ -100,13 +100,22 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(self, server_name, root_url, username=REST_API_USER, password=REST_API_PASSWORD, timeout=None):
+    def __init__(
+            self,
+            server_name, root_url,
+            username=REST_API_USER, password=REST_API_PASSWORD,
+            timeout=None,
+            ca_cert=None,
+            ):
         self.server_name = server_name
         self._root_url = root_url.rstrip('/')
         self.url = self._root_url + '/'
         assert timeout is None or isinstance(timeout, datetime.timedelta), repr(timeout)
         self._default_timeout = timeout or REST_API_TIMEOUT
         self._session = requests.Session()
+        if ca_cert is not None:
+            self.ca_cert = ca_cert
+            log.info("We will trust CA cert: %s.", self.ca_cert)
         self._auth = HTTPDigestAuth(username, password)
 
     def __enter__(self):
@@ -184,14 +193,12 @@ class RestApi(object):
     def request(self, method, path, raise_exception=True, new_connection=False, timeout=None, **kwargs):
         log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs))
         try:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', InsecureRequestWarning)
-                make_request = requests.request if new_connection else self._session.request
-                response = make_request(
-                    method, self._root_url + path,
-                    auth=self._auth,
-                    timeout=(timeout or self._default_timeout).total_seconds(),
-                    verify=False, **kwargs)
+            make_request = requests.request if new_connection else self._session.request
+            response = make_request(
+                method, self._root_url + path,
+                auth=self._auth,
+                timeout=(timeout or self._default_timeout).total_seconds(),
+                verify=self.ca_cert, **kwargs)
         except requests.ConnectionError as e:
             if not new_connection:
                 log.error("Try new connection after %r.", e)
