@@ -213,6 +213,12 @@ public:
         MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
         MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
     {
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (m_cursorProcessorContext.empty())
+                addCursorProcessingThread(lock);
+        }
+
         auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
             std::move(prepareCursorFunc),
             std::move(readRecordFunc),
@@ -295,6 +301,8 @@ private:
 
         m_queryQueue.push(std::move(executor));
     }
+
+    void addCursorProcessingThread(const QnMutexLockerBase& lock);
 };
 
 } // namespace db

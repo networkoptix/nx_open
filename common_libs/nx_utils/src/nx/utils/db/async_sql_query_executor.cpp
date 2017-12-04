@@ -151,17 +151,6 @@ bool AsyncSqlQueryExecutor::init()
         break;
     }
 
-    QnMutexLocker lock(&m_mutex);
-
-    // TODO: #ak There should be multiple cursor threads supported.
-
-    m_cursorProcessorContext.push_back(CursorProcessorContext());
-    // Disabling inactivity timer.
-    auto connectionOptions = m_connectionOptions;
-    connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
-    m_cursorProcessorContext.back().processingThread =
-        createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
-
     return true;
 }
 
@@ -278,6 +267,16 @@ void AsyncSqlQueryExecutor::dropConnectionAsync(
         return; //< This can happen during AsyncSqlQueryExecutor destruction.
     m_connectionsToDropQueue.push(std::move(*it));
     m_dbThreadPool.erase(it);
+}
+
+void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& lock)
+{
+    m_cursorProcessorContext.push_back(CursorProcessorContext());
+    // Disabling inactivity timer.
+    auto connectionOptions = m_connectionOptions;
+    connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
+    m_cursorProcessorContext.back().processingThread =
+        createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 }
 
 } // namespace db
