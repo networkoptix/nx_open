@@ -17,7 +17,10 @@ struct DefaultPasswordCamerasWatcher::Private
 
     void handleCameraChanged(const QnVirtualCameraResourcePtr& camera)
     {
-        if (camera->needsToChangeDefaultPassword())
+        const auto status = camera->getStatus();
+        const bool canChangePassword = (status == Qn::Online) || (status == Qn::Recording);
+
+        if (canChangePassword && camera->needsToChangeDefaultPassword())
             camerasWithDefaultPassword.insert(camera);
         else
             camerasWithDefaultPassword.remove(camera);
@@ -78,11 +81,14 @@ void DefaultPasswordCamerasWatcher::handleResourceAdded(const QnResourcePtr& res
     if (!camera)
         return;
 
-    connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this,
+    auto handleCameraChanged =
         [this, camera](const QnResourcePtr& resource)
         {
             d->handleCameraChanged(camera);
-        });
+        };
+
+    connect(camera, &QnVirtualCameraResource::statusChanged, this, handleCameraChanged);
+    connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this, handleCameraChanged);
 
     d->handleCameraChanged(camera);
 }

@@ -14,7 +14,7 @@ MotionDelegateWrapper::MotionDelegateWrapper(std::unique_ptr<QnAbstractArchiveDe
 
 QnAbstractMediaDataPtr MotionDelegateWrapper::getNextData()
 {
-    auto delegate = wrappedDelegate();
+    auto wrappedDelegate = delegate();
     if (m_prevVideoFrame)
     {
         auto result = m_prevVideoFrame;
@@ -23,7 +23,7 @@ QnAbstractMediaDataPtr MotionDelegateWrapper::getNextData()
     }
 
     QnMetaDataV1Ptr motion(nullptr);
-    auto mediaData = delegate->getNextData();
+    auto mediaData = wrappedDelegate->getNextData();
 
     if (mediaData && mediaData->dataType == QnAbstractMediaData::DataType::VIDEO)
         motion = analyzeMotion(mediaData);

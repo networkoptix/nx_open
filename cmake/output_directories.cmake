@@ -52,7 +52,7 @@ function(nx_create_dev_qt_conf)
     endif()
 
     if(CMAKE_MULTI_CONFIGURATION_MODE)
-        foreach(config IN ${CMAKE_ACTIVE_CONFIGURATIONS})
+        foreach(config ${CMAKE_ACTIVE_CONFIGURATIONS})
             string(TOUPPER ${config} config)
             nx_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config}}/qt.conf
                 QT_PREFIX ${qt_prefix})

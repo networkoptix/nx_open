@@ -16,6 +16,8 @@ namespace metadata {
 class AbstractMetadataHandler
 {
 public:
+    virtual ~AbstractMetadataHandler() = default;
+
     /**
      * @param error Used for reporting errors to the outer code.
      * @param metadata Incoming from the plugin.

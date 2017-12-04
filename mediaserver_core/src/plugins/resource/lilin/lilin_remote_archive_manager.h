@@ -47,6 +47,8 @@ public:
 
     virtual nx::core::resource::RemoteArchiveCapabilities capabilities() const override;
 
+    virtual nx::core::resource::RemoteArchiveSynchronizationSettings settings() const override;
+
     virtual void beforeSynchronization() override;
 
     virtual void afterSynchronization(bool isSynchronizationSuccessful) override;

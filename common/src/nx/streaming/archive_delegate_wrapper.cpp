@@ -146,7 +146,7 @@ void ArchiveDelegateWrapper::setErrorHandler(std::function<void(const QString& e
     m_delegate->setErrorHandler(handler);
 }
 
-QnAbstractArchiveDelegate* ArchiveDelegateWrapper::wrappedDelegate() const
+QnAbstractArchiveDelegate* ArchiveDelegateWrapper::delegate() const
 {
     return m_delegate.get();
 }
