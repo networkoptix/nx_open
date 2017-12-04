@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <QtCore/QString>
 #include <QtCore/QXmlStreamReader>
 
@@ -26,3 +28,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

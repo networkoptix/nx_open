@@ -74,9 +74,11 @@
                     <Component Id="ServerMulticastPlugin">
                         <File Id="generic_multicast_plugin.dll" Name="generic_multicast_plugin.dll" Source="$(var.PluginsDir)\generic_multicast_plugin.dll" DiskId="10" />
                     </Component>
-                    <Component Id="ServerHanwhaMetadataPlugin">
-                        <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
-                    </Component>
+                    <?if $(var.customization) = "hanwha"?>
+                        <Component Id="ServerHanwhaMetadataPlugin">
+                            <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
+                        </Component>
+                    <?endif?>
                 </Directory>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>

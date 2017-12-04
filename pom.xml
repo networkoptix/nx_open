@@ -544,6 +544,18 @@
             </modules>
         </profile>
         <profile>
+            <id>not-hanwha</id>
+            <activation>
+                <property>
+                    <name>customization</name>
+                    <value>!hanwha</value>
+                </property>
+            </activation>
+            <properties>
+                <customization.defines>DISABLE_HANWHA</customization.defines>
+            </properties>
+        </profile>
+        <profile>
             <id>desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>

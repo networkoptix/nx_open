@@ -65,6 +65,7 @@ fi
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
+[ $COMPANY_NAME != "hanwha" ] && rm $LIBPLUGINSTAGE\hanwha* || true
 cp -r $SERVER_VOX_PATH $BINSTAGE
 #'libstdc++.so.6 is needed on some machines
 if [ '${arch}' != 'arm' ]
