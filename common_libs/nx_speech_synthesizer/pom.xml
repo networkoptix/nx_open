@@ -19,7 +19,7 @@
         <product.title>${company.name} nx_speech_synthesizer</product.title>
         <!--Global libs-->
         <qt.libs>core concurrent</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_kit -lnx_fusion -lnx_utils</global.libs>
         <!--Specific os libs used-->
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <rdep.packages>festival</rdep.packages>
