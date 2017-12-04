@@ -15,7 +15,7 @@ namespace update {
 namespace info {
 namespace test {
 
-static const QString kDummyBaseUrl = "dummy";
+static const QString kBaseUrl = "http://updates.networkoptix.com";
 
 class SingleThreadExecutor
 {
@@ -152,28 +152,45 @@ protected:
     {
         using namespace std::placeholders;
         m_asyncUpdateChecker.check(
-            kDummyBaseUrl,
+            kBaseUrl,
             std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2));
     }
 
     void thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned()
     {
         QnMutexLocker lock(&m_mutex);
-        while (!(bool) m_updateRegistry)
+        while (!m_done)
             m_condition.wait(lock.mutex());
 
+        if (m_noFailIfError)
+        {
+            EXPECT_EQ(ResultCode::ok, m_resultCode) << "Assuming it's ok in this test";
+            EXPECT_TRUE((bool) m_updateRegistry) << "Assuming it's ok in this test";
+            return;
+        }
+
+        ASSERT_EQ(ResultCode::ok, m_resultCode);
         ASSERT_TRUE((bool) m_updateRegistry);
+    }
+
+    void disableFailIfNoInternet()
+    {
+        m_noFailIfError = true;
     }
 private:
     info::AsyncUpdateChecker m_asyncUpdateChecker;
     AbstractUpdateRegistryPtr m_updateRegistry;
     QnMutex m_mutex;
     QnWaitCondition m_condition;
+    bool m_noFailIfError = false;
+    bool m_done = false;
+    ResultCode m_resultCode;
 
     void onCheckCompleted(ResultCode resultCode, AbstractUpdateRegistryPtr updateRegistry)
     {
-        ASSERT_EQ(ResultCode::ok, resultCode);
         QnMutexLocker lock(&m_mutex);
+        m_resultCode = resultCode;
+        m_done = true;
         m_updateRegistry = std::move(updateRegistry);
         m_condition.wakeOne();
     }
@@ -182,6 +199,14 @@ private:
 TEST_F(AsyncUpdateChecker, AsyncOperationCompletesSuccessfully)
 {
     whenMockupDataProviderHasBeenSetUp();
+    whenAsyncCheckRequestHasBeenIssued();
+    thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned();
+}
+
+
+TEST_F(AsyncUpdateChecker, AsyncOperationCompletesSuccessfully_InternetVersion)
+{
+    disableFailIfNoInternet();
     whenAsyncCheckRequestHasBeenIssued();
     thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned();
 }

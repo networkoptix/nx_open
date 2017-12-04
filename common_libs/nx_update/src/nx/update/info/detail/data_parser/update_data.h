@@ -12,7 +12,6 @@ namespace data_parser {
 
 struct UpdateData
 {
-    QnSoftwareVersion version;
     QString cloudHost;
     QHash<QString, FileData> targetToPackage;
     QHash<QString, FileData> targetToClientPackage;

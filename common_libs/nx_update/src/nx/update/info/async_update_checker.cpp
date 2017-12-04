@@ -15,8 +15,6 @@ using namespace detail::data_parser;
 using namespace detail::data_provider;
 using namespace nx::utils;
 
-using UpdateDataList = QList<UpdateData>;
-
 class SpecificUpdatesFetcher
 {
 public:
@@ -36,34 +34,23 @@ public:
 
     void onSpecificDataResponse(ResultCode resultCode, QByteArray rawData)
     {
-        if (resultCode != ResultCode::ok)
-        {
-            logError("get");
-            m_completionHandler(resultCode);
-            return;
-        }
+        if (resultCode == ResultCode::ok)
+            return processUpdateData(std::move(rawData));
 
-        UpdateData updateData;
-        resultCode = m_rawDataParser->parseUpdateData(rawData, &updateData);
-        if (resultCode != ResultCode::ok)
-        {
-            logError("parse");
-            m_completionHandler(resultCode);
-            return;
-        }
-        m_updates.append(updateData);
-
-        ++m_versionIndex;
-        fetchNextVersion();
+        logError("get");
+        return fetchNextVersion();
     }
 
-    UpdateDataList take() { return std::move(m_updates); }
+    detail::CustomizationVersionToUpdate take()
+    {
+        return std::move(m_customizationVersionToUpdate);
+    }
 
 private:
     const UpdatesMetaData& m_metaData;
     int m_customizationIndex = 0;
     int m_versionIndex = 0;
-    UpdateDataList m_updates;
+    detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
     AbstractAsyncRawDataProvider* m_rawDataProvider;
     AbstractRawDataParser* m_rawDataParser;
     MoveOnlyFunc<void(ResultCode)> m_completionHandler;
@@ -76,7 +63,7 @@ private:
             return;
         }
 
-        fetchNextVersion();
+        fetchVersionData();
     }
 
     void logError(const QString& actionName) const
@@ -92,7 +79,7 @@ private:
         NX_ERROR(this, errorString);
     }
 
-    void fetchNextVersion()
+    void fetchVersionData()
     {
         auto& customizationData = m_metaData.customizationDataList[m_customizationIndex];
         if (m_versionIndex >= customizationData.versions.size())
@@ -103,8 +90,32 @@ private:
             return;
         }
 
-        QString version = customizationData.versions[m_versionIndex].toString();
-        m_rawDataProvider->getSpecificUpdateData(customizationData.name, version);
+        const QString build = QString::number(customizationData.versions[m_versionIndex].build());
+        m_rawDataProvider->getSpecificUpdateData(customizationData.name, build);
+    }
+
+    void fetchNextVersion()
+    {
+        ++m_versionIndex;
+        fetchVersionData();
+    }
+
+    void processUpdateData(QByteArray rawData)
+    {
+        UpdateData updateData;
+        const auto resultCode = m_rawDataParser->parseUpdateData(std::move(rawData), &updateData);
+        if (resultCode != ResultCode::ok)
+        {
+            logError("parse");
+            return fetchNextVersion();
+        }
+        const auto& customizationData = m_metaData.customizationDataList[m_customizationIndex];
+        const auto& version = customizationData.versions[m_versionIndex];
+        m_customizationVersionToUpdate.insert(
+            detail::CustomizationVersionData(customizationData.name, version),
+            std::move(updateData));
+
+        fetchNextVersion();
     }
 };
 

@@ -149,7 +149,6 @@ public:
     UpdateDataParser(const QJsonObject& topLevelObject):
         m_topLevelObject(topLevelObject)
     {
-        NX_ASSERT(!topLevelObject.isEmpty());
         if (topLevelObject.isEmpty())
         {
             NX_WARNING(this, "Top level JSON is empty");
@@ -244,7 +243,6 @@ private:
         if (!m_ok)
             return;
 
-        m_updateData.version = QnSoftwareVersion(parseString(kVersionKey));
         m_updateData.cloudHost = parseString(kCloudHostKey);
     }
 

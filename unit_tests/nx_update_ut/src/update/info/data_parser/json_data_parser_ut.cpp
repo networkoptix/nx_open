@@ -88,7 +88,7 @@ protected:
 
     void thenUpdateDataShouldBeCorrect()
     {
-        thenVersionAndCloudHostShoudBeCorrect();
+        thenCloudHostShoudBeCorrect();
         thenServerPackagesShouldBeCorrect();
         thenClientPackagesShouldBeCorrect();
     }
@@ -98,11 +98,9 @@ private:
     AbstractRawDataParserPtr m_parser;
     UpdateData m_updateData;
 
-    void thenVersionAndCloudHostShoudBeCorrect()
+    void thenCloudHostShoudBeCorrect()
     {
-        ASSERT_EQ(QnSoftwareVersion("3.1.0.16975"), m_updateData.version);
         ASSERT_EQ("nxvms.com", m_updateData.cloudHost);
-
     }
 
     void thenServerPackagesShouldBeCorrect()

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtCore>
 #include <utils/common/software_version.h>
 
 namespace nx {
@@ -23,7 +22,7 @@ struct CustomizationData
 
 struct UpdatesMetaData
 {
-    // todo: add data structure for storing information about unsupported versions 
+    // todo: add data structure for storing information about unsupported versions
     QList<CustomizationData> customizationDataList;
     QList<AlternativeServerData> alternativeServersDataList;
 };
