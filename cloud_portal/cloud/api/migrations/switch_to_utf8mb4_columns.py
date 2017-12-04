@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='account',
             name='first_name',
-            field=models.CharField(max_length=191),
+            field=models.CharField(max_length=255),
         ),
         migrations.AlterField(
             model_name='account',
             name='last_name',
-            field=models.CharField(max_length=191),
+            field=models.CharField(max_length=255),
         ),
         migrations.RunSQL(
             sql = ['ALTER TABLE api_account MODIFY first_name VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci'],
