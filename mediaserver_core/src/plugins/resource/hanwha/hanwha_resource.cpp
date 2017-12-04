@@ -697,7 +697,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
     initMediaStreamCapabilities();
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive);
+    sharedContext->startServices(hasVideoArchive, isNvr());
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -2591,7 +2591,13 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    return sharedContext()->chunks(getChannel());
+    const auto timeline = sharedContext()->overlappedTimeline(getChannel());
+    const auto numberOfOverlappedIds = timeline.size();
+    NX_ASSERT(numberOfOverlappedIds <= 1, lit("There should be only one overlapped ID for NVR"));
+    if (numberOfOverlappedIds != 1)
+        return QnTimePeriodList();
+
+    return timeline.cbegin()->second;
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(

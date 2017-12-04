@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
+#include <recording/time_period_list.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
 namespace nx {
@@ -33,16 +34,28 @@ struct RemoteArchiveChunk
     QString id;
     int64_t startTimeMs = 0;
     int64_t durationMs = 0;
+    int overlappedId = 0; //< Is needed for Hanwha driver.
 
     RemoteArchiveChunk() = default;
-    RemoteArchiveChunk(QString _id, int64_t _startTime, int64_t _duration):
-        id(_id),
-        startTimeMs(_startTime),
-        durationMs(_duration)
+    RemoteArchiveChunk(
+        QString id,
+        int64_t startTime,
+        int64_t duration,
+        int overlappedId = 0)
+        :
+        id(id),
+        startTimeMs(startTime),
+        durationMs(duration),
+        overlappedId(overlappedId)
     {
     }
 
     RemoteArchiveChunk(const RemoteArchiveChunk& other) = default;
+
+    int64_t endTimeMs() const
+    {
+        return startTimeMs + durationMs;
+    };
 };
 
 /**
@@ -53,6 +66,7 @@ struct RemoteArchiveSynchronizationSettings
     std::chrono::milliseconds waitBeforeSync;
     std::chrono::milliseconds waitBetweenChunks;
     int syncCyclesNumber;
+    int triesPerPeriod;
 };
 
 inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& rhs)
@@ -61,6 +75,11 @@ inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& 
         && lhs.startTimeMs == rhs.startTimeMs
         && lhs.durationMs == rhs.durationMs;
 }
+
+using OverlappedId = int;
+using RemoteChunks = std::vector<RemoteArchiveChunk>;
+using OverlappedRemoteChunks = std::map<OverlappedId, RemoteChunks>;
+using OverlappedTimePeriods = std::map<OverlappedId, QnTimePeriodList>;
 
 /**
  * Allows to control archive on remote device (e.g. on camera SD card).
@@ -83,15 +102,9 @@ public:
      * @return True if list of entries has been successfully fetched from the remote device, false otherwise.
      */
     virtual bool listAvailableArchiveEntries(
-        std::vector<RemoteArchiveChunk>* outArchiveEntries,
+        OverlappedRemoteChunks* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) = 0;
-
-    /*
-     * @param callback will be called when list of available entries is updated.
-     */
-    virtual void setOnAvailabaleEntriesUpdatedCallback(
-        std::function<void(const std::vector<RemoteArchiveChunk>&)> callback) = 0;
 
     /**
      * Downloads specified entry content. Is used only if FullChunkCapability is present.
@@ -102,7 +115,8 @@ public:
     /*
      * @return Archive delegate. Delegate is used only if StreamChunkCapability is present.
      */
-    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate() = 0;
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(
+        const RemoteArchiveChunk& chunk) = 0;
 
     /**
      * Removes the specified entry from the device.

@@ -328,6 +328,13 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (m_endRecordingBound != boost::none)
     {
+        const auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(nonConstData);
+        if (mediaData && mediaData->dataType == QnAbstractMediaData::DataType::EMPTY_DATA)
+        {
+            if (m_endOfRecordingHandler)
+                m_endOfRecordingHandler();
+        }
+
         if (nonConstData->timestamp > m_endRecordingBound->count())
         {
             if (m_endOfRecordingHandler)

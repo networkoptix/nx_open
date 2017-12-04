@@ -25,7 +25,9 @@ public:
         const QnSecurityCamResourcePtr& resource);
 
 protected:
-    virtual void createArchiveReaderThreadUnsafe(const QnTimePeriod& timePeriod) override;
+    virtual void createArchiveReaderThreadUnsafe(
+        const QnTimePeriod& timePeriod,
+        const nx::core::resource::RemoteArchiveChunk& chunk) override;
 
     virtual bool prepareDataSource(
         const QnTimePeriod& timePeriod,

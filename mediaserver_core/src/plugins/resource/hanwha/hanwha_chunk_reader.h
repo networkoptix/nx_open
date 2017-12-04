@@ -7,13 +7,17 @@
 
 #include <nx/network/buffer.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/utils/timer_manager.h>
+
+#include <core/resource/abstract_remote_archive_manager.h>
 #include <recording/time_period_list.h>
 
-extern "C"
-{
+extern "C" {
+
 // For const AV_NOPTS_VALUE.
 #include <libavutil/avutil.h>
-}
+
+} // extern "C"
 
 namespace nx {
 namespace mediaserver_core {
@@ -28,9 +32,9 @@ class HanwhaChunkLoader: public QObject
     enum class State
     {
         initial,
-        updateTimeRange,
+        loadingRecordingPeriod,
         loadingOverlappedIds,
-        loadingChunks,
+        loadingTimeline,
     };
 
     struct Parameter
@@ -45,17 +49,27 @@ class HanwhaChunkLoader: public QObject
         QString value;
     };
 
+    using OverlappedId = int;
+    using OverlappedIdList = std::vector<OverlappedId>;
+    using ChunksByChannel = std::vector<QnTimePeriodList>;
+    using OverlappedChunks = std::map<int, ChunksByChannel>;
+
 public:
-    HanwhaChunkLoader();
+    HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext);
     virtual ~HanwhaChunkLoader();
 
-    void start(HanwhaSharedResourceContext* resourceContext);
+    void setUp();
+    void start();
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;
     qint64 endTimeUsec(int channelNumber) const;
-    QnTimePeriodList chunks(int channelNumber) const;
-    QnTimePeriodList chunksSync(int channelNumber) const;
+    nx::core::resource::OverlappedTimePeriods overlappedTimeline(int channelNumber) const;
+
+    /**
+     * This method MUST not be called after start().
+     */
+    nx::core::resource::OverlappedTimePeriods overlappedTimelineSync(int channelNumber);
 
     void setTimeZoneShift(std::chrono::seconds timeZoneShift);
     std::chrono::seconds timeZoneShift() const;
@@ -71,13 +85,13 @@ public:
 
 private:
     void sendRequest();
+    void sendRecordingPeriodRequest();
     void sendOverlappedIdRequest();
     void sendTimelineRequest();
-    void sendTimeRangeRequest();
 
-    void handleSuccessfulTimeRangeResponse();
+    void handleSuccessfulRecordingPeriodResponse();
     void handleSuccessfulOverlappedIdResponse();
-    void handlerSuccessfulChunksResponse();
+    void handleSuccessfulTimelineResponse();
 
     // Returns true if an HTTP error occurred.
     bool handleHttpError();
@@ -90,28 +104,39 @@ private:
     void prepareHttpClient();
     void scheduleNextRequest(const std::chrono::milliseconds& delay);
     qint64 latestChunkTimeMs() const;
+    void sortTimeline(OverlappedChunks* outTimeline) const;
 
-    QnTimePeriodList chunksThreadUnsafe(int channelNumber) const;
+    nx::core::resource::OverlappedTimePeriods overlappedTimelineThreadUnsafe(
+        int channelNumber) const;
+
     void setError();
     State nextState(State currentState) const;
     QString makeChannelIdListString() const;
     QString makeStartDateTimeString() const;
     QString makeEndDateTimeSting() const;
 
+    std::chrono::milliseconds timeSinceLastTimelineUpdate() const;
+
+    void setUpThreadUnsafe();
+
     void at_httpClientDone();
     void at_gotChunkData();
 private:
+
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     State m_state = State::initial;
     nx::Buffer m_unfinishedLine;
-    std::vector<QnTimePeriodList> m_chunks;
-    std::vector<QnTimePeriodList> m_newChunks;
-    qint64 m_nextRequestTimerId = 0;
+
+    OverlappedChunks m_chunks;
+    OverlappedChunks m_newChunks;
+    nx::utils::TimerId m_nextRequestTimerId = 0;
 
     qint64 m_startTimeUs = AV_NOPTS_VALUE;
     qint64 m_endTimeUs = AV_NOPTS_VALUE;
     qint64 m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
-    boost::optional<int> m_overlappedId;
+
+    OverlappedIdList m_overlappedIds;
+    OverlappedIdList::const_iterator m_currentOverlappedId;
 
     int m_maxChannels = 0;
     HanwhaSharedResourceContext* m_resourceContext = nullptr;
@@ -120,15 +145,17 @@ private:
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
     std::atomic<bool> m_terminated{false};
 
-    std::atomic<bool> m_timelineLoadedAtLeastOnce{false};
-    std::atomic<bool> m_timeRangeLoadedAtLeastOnce{false};
+    std::atomic<bool> m_started{false};
     mutable std::atomic<bool> m_errorOccured{false};
+    mutable std::atomic<bool> m_isInProgress{false};
     mutable QnWaitCondition m_wait;
 
     bool m_isNvr = false;
     bool m_hasSearchRecordingPeriodSubmenu = false;
     bool m_isSearchRecordingPeriodRetrievalEnabled = true;
     bool m_isUtcEnabled = true;
+
+    std::chrono::milliseconds m_lastTimelineUpdate;
 };
 
 } // namespace plugins

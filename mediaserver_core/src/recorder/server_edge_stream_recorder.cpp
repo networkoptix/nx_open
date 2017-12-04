@@ -27,6 +27,17 @@ void QnServerEdgeStreamRecorder::setSaveMotionHandler(MotionHandler handler)
     m_motionHandler = std::move(handler);
 }
 
+void QnServerEdgeStreamRecorder::setStartTimestampThreshold(
+    const std::chrono::microseconds& threshold)
+{
+    m_threshold = threshold;
+}
+
+int64_t QnServerEdgeStreamRecorder::lastRecordedTimeUs() const
+{
+    return m_lastRecordedTime;
+}
+
 bool QnServerEdgeStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
     if (m_motionHandler)
@@ -40,9 +51,44 @@ bool QnServerEdgeStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr&
     return true;
 }
 
-void QnServerEdgeStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
+bool QnServerEdgeStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
-    setLastMediaTime(media->timestamp);
+    if (!media)
+        return false;
+
+    if (m_terminated)
+        return false;
+
+    bool needToCheckTimestamp = m_startRecordingBound
+        && m_endOfRecordingHandler
+        && m_threshold != std::chrono::microseconds::zero();
+
+    if (needToCheckTimestamp)
+    {
+        const auto frameTimestamp = std::chrono::microseconds(media->timestamp);
+        const auto diff = *m_startRecordingBound - frameTimestamp;
+        if (diff > m_threshold)
+        {
+            NX_WARNING(
+                this,
+                lm("Start timestamp is to far in the past from requested"
+                    "Requested timestmap: %1. Frame timestamp: %2")
+                    .args(*m_startRecordingBound, frameTimestamp));
+
+            m_terminated = true;
+            m_endOfRecordingHandler();
+            return false;
+        }
+    }
+
+    if (media->dataType != QnAbstractMediaData::DataType::EMPTY_DATA
+        && media->timestamp != AV_NOPTS_VALUE)
+    {
+        m_lastRecordedTime = media->timestamp;
+    }
+
+    base_type::setLastMediaTime(media->timestamp);
+    return true;
 }
 
 void QnServerEdgeStreamRecorder::fileStarted(

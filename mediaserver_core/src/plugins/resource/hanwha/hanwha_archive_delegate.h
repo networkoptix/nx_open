@@ -33,6 +33,7 @@ public:
 
     virtual void setSpeed(qint64 displayTime, double value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+    virtual void setOverlappedId(nx::core::resource::OverlappedId overlappedId);
 
     virtual void beforeSeek(qint64 time) override;
 
@@ -51,6 +52,7 @@ private:
     std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
     bool m_rateControlEnabled = true;
+    qint64 m_startTimeUsec = AV_NOPTS_VALUE;
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
     qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
     PlaybackMode m_playbackMode = PlaybackMode::Archive;

@@ -210,6 +210,7 @@ protected:
     std::vector<StreamRecorderContext> m_recordingContextVector;
     boost::optional<std::chrono::microseconds> m_startRecordingBound;
     boost::optional<std::chrono::microseconds> m_endRecordingBound;
+    std::function<void()> m_endOfRecordingHandler;
 
 private:
     bool m_waitEOF;
@@ -258,8 +259,6 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     int64_t m_lastFileSize = 0;
-
-    std::function<void()> m_endOfRecordingHandler;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

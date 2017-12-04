@@ -17,7 +17,9 @@ namespace {
 
 static const std::chrono::milliseconds kDetalizationLevel(1);
 static const std::chrono::milliseconds kMinChunkDuration(1000);
+static const std::chrono::milliseconds kStartTimestampThreshold(10000);
 static const QString kRecorderThreadName = lit("Edge recorder");
+static const int64_t kMaxRecordingDiffMs = 2000;
 
 } // namespace
 
@@ -31,6 +33,11 @@ BaseRemoteArchiveSynchronizationTask::BaseRemoteArchiveSynchronizationTask(
     AbstractRemoteArchiveSynchronizationTask(serverModule),
     m_resource(resource)
 {
+}
+
+QnUuid BaseRemoteArchiveSynchronizationTask::id() const
+{
+    return m_resource->getId();
 }
 
 void BaseRemoteArchiveSynchronizationTask::setDoneHandler(nx::utils::MoveOnlyFunc<void()> handler)
@@ -92,17 +99,12 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     return result;
 }
 
-QnUuid BaseRemoteArchiveSynchronizationTask::id() const
-{
-    return m_resource->getId();
-}
-
 bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
 {
     NX_INFO(
         this,
         lm("Starting archive synchronization. Resource: %1 %2")
-        .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
+            .args(m_resource->getUserDefinedName(), m_resource->getUniqueId()));
 
     if (!fetchChunks(&m_chunks))
         return false;
@@ -110,8 +112,34 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
     if (m_chunks.empty())
         return true;
 
-    const auto startTimeMs = m_chunks.front().startTimeMs;
-    const auto endTimeMs = m_chunks.back().startTimeMs + m_chunks.back().durationMs;
+    m_totalDuration += calculateDurationOfMediaToImport();
+
+    if (m_totalDuration == std::chrono::milliseconds::zero())
+        return true;
+
+    bool result = true;
+    for (const auto& entry: m_chunks)
+    {
+        const auto overlappedId = entry.first;
+        const auto& chunks = entry.second;
+
+        if (!chunks.empty())
+            result &= synchronizeOverlappedTimeline(overlappedId);
+    }
+
+    return result;
+}
+
+bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
+    const OverlappedId& overlappedId)
+{
+    NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device: %2.")
+        .args(overlappedId, m_resource->getUserDefinedName()));
+
+    NX_ASSERT(m_chunks.find(overlappedId) != m_chunks.cend());
+    const auto startTimeMs = m_chunks[overlappedId].front().startTimeMs;
+    const auto endTimeMs = m_chunks[overlappedId].back().startTimeMs
+        + m_chunks[overlappedId].back().durationMs;
 
     NX_CRITICAL(qnNormalStorageMan);
     auto serverTimePeriods = qnNormalStorageMan
@@ -123,26 +151,20 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeArchive()
             /*keepSmallChunks*/ true,
             std::numeric_limits<int>::max());
 
-    auto deviceTimePeriods = toTimePeriodList(m_chunks);
-    NX_DEBUG(this, lm("Device time periods: %1").arg(deviceTimePeriods));
-    NX_DEBUG(this, lm("Server time periods: %1").arg(serverTimePeriods));
+    auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId]);
+    NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device time periods: %2. Device: %3.")
+        .args(overlappedId, deviceTimePeriods, m_resource->getUserDefinedName()));
+    NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Server time periods: %2. Device: %3.")
+        .args(overlappedId, serverTimePeriods, m_resource->getUserDefinedName()));
 
     deviceTimePeriods.excludeTimePeriods(serverTimePeriods);
-    NX_DEBUG(this, lm("Periods to import from device: %1").arg(deviceTimePeriods));
+    NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Periods to import from device: %2. Device %3.")
+        .args(overlappedId, deviceTimePeriods, m_resource->getUserDefinedName()));
 
     if (deviceTimePeriods.isEmpty())
         return true;
 
-    m_totalDuration += totalDuration(deviceTimePeriods, kMinChunkDuration);
-    NX_DEBUG(
-        this,
-        lm("Total remote archive length to synchronize: %1")
-            .arg(m_totalDuration));
-
-    if (m_totalDuration == std::chrono::milliseconds::zero())
-        return true;
-
-    return writeAllTimePeriods(deviceTimePeriods);
+    return writeAllTimePeriods(deviceTimePeriods, overlappedId);
 }
 
 void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
@@ -158,6 +180,7 @@ void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
     m_recorder->setRecordingBounds(
         duration_cast<microseconds>(milliseconds(timePeriod.startTimeMs)),
         duration_cast<microseconds>(milliseconds(timePeriod.endTimeMs())));
+    m_recorder->setStartTimestampThreshold(kStartTimestampThreshold);
 
     m_recorder->setSaveMotionHandler(
         [this](const QnConstMetaDataV1Ptr& motion){ return saveMotion(motion); });
@@ -177,6 +200,9 @@ bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr
 {
     if (motion)
     {
+        NX_VERBOSE(this, lm("Saving motion data packet with timestamp %1. Device: %2.")
+            .args(microseconds(motion->timestamp), m_resource->getUserDefinedName()));
+
         auto helper = QnMotionHelper::instance();
         QnMotionArchive* archive = helper->getArchive(
             m_resource,
@@ -190,7 +216,7 @@ bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr
 }
 
 bool BaseRemoteArchiveSynchronizationTask::fetchChunks(
-    std::vector<nx::core::resource::RemoteArchiveChunk>* outChunks)
+    OverlappedRemoteChunks* outChunks)
 {
     NX_ASSERT(outChunks);
     if (!outChunks)
@@ -230,7 +256,9 @@ bool BaseRemoteArchiveSynchronizationTask::fetchChunks(
     return true;
 }
 
-bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(const QnTimePeriodList& timePeriods)
+bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(
+    const QnTimePeriodList& timePeriods,
+    OverlappedId overlappedId)
 {
     auto manager = m_resource->remoteArchiveManager();
     NX_ASSERT(manager);
@@ -256,7 +284,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(const QnTimePerio
                     break;
             }
 
-            const auto chunk = remoteArchiveChunkByTimePeriod(timePeriod);
+            const auto chunk = remoteArchiveChunkByTimePeriod(timePeriod, overlappedId);
             if (chunk == boost::none)
                 continue;
 
@@ -295,7 +323,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
 
     {
         QnMutexLocker lock(&m_mutex);
-        createArchiveReaderThreadUnsafe(timePeriod);
+        createArchiveReaderThreadUnsafe(timePeriod, chunk);
         createStreamRecorderThreadUnsafe(timePeriod);
     }
 
@@ -391,6 +419,27 @@ void BaseRemoteArchiveSynchronizationTask::onEndOfRecording()
     m_recorder->pleaseStop();
 }
 
+milliseconds BaseRemoteArchiveSynchronizationTask::calculateDurationOfMediaToImport() const
+{
+    auto mergedDeviceTimePeriods = mergeOverlappedChunks(m_chunks);
+    const auto startTimeMs = mergedDeviceTimePeriods.front().startTimeMs;
+    const auto endTimeMs = mergedDeviceTimePeriods.back().endTimeMs();
+
+    NX_CRITICAL(qnNormalStorageMan);
+    auto serverTimePeriods = qnNormalStorageMan
+        ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
+        ->getTimePeriods(
+            startTimeMs,
+            endTimeMs,
+            duration_cast<milliseconds>(kDetalizationLevel).count(),
+            /*keepSmallChunks*/ true,
+            std::numeric_limits<int>::max());
+
+    mergedDeviceTimePeriods.excludeTimePeriods(serverTimePeriods);
+
+    return totalDuration(mergedDeviceTimePeriods, kMinChunkDuration);
+}
+
 bool BaseRemoteArchiveSynchronizationTask::needToReportProgress() const
 {
     return true; //< Report progress for each written file.
@@ -405,18 +454,20 @@ bool BaseRemoteArchiveSynchronizationTask::prepareDataSource(
 
 boost::optional<RemoteArchiveChunk>
 BaseRemoteArchiveSynchronizationTask::remoteArchiveChunkByTimePeriod(
-    const QnTimePeriod& timePeriod) const
+    const QnTimePeriod& timePeriod,
+    OverlappedId overlappedId) const
 {
+    NX_ASSERT(m_chunks.find(overlappedId) != m_chunks.cend());
     auto chunkItr = std::lower_bound(
-        m_chunks.cbegin(),
-        m_chunks.cend(),
+        m_chunks.at(overlappedId).cbegin(),
+        m_chunks.at(overlappedId).cend(),
         timePeriod,
         [](const RemoteArchiveChunk& chunk, const QnTimePeriod& period)
         {
-            return chunk.startTimeMs < period.startTimeMs;
+            return chunk.endTimeMs() < period.endTimeMs();
         });
 
-    if (chunkItr == m_chunks.cend())
+    if (chunkItr == m_chunks.at(overlappedId).cend())
     {
         NX_ASSERT(
             false,

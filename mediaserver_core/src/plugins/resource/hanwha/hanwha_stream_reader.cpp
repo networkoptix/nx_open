@@ -87,7 +87,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     if (m_hanwhaResource->isNvr() && getRole() == Qn::CR_Archive)
     {
         m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
-        m_rtpReader.setOnSocketReadTimeoutCallback([this]() { return createEmptyPacket(); });
+        m_rtpReader.setOnSocketReadTimeoutCallback([this](){ return createEmptyPacket(); });
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
@@ -302,27 +302,27 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 
-    boost::optional<int> overlappedId;
     const auto role = getRole();
-
     if (role == Qn::CR_Archive)
     {
         const auto mediaType = m_hanwhaResource->isNvr()
             ? kHanwhaSearchMediaType
             : kHanwhaBackupMediaType;
 
-        overlappedId = m_hanwhaResource->sharedContext()->overlappedId();
-        if (overlappedId == boost::none)
+        if (m_hanwhaResource->isNvr())
         {
-            return CameraDiagnostics::CameraInvalidParams(
-                lit("Unknown current overlapped ID."));
+            m_overlappedId = m_hanwhaResource->sharedContext()->overlappedId();
+            if (m_overlappedId == boost::none)
+            {
+                return CameraDiagnostics::CameraInvalidParams(
+                    lit("Unknown current overlapped ID."));
+            }
+            params.emplace(
+                kHanwhaOverlappedIdProperty,
+                QString::number(*m_overlappedId));
         }
 
         params.emplace(kHanwhaMediaTypeProperty, mediaType);
-        params.emplace(
-            kHanwhaOverlappedIdProperty,
-            QString::number(*overlappedId));
-
         if (profileNumber == kHanwhaInvalidProfile && !m_hanwhaResource->isNvr())
             profileNumber = 2; //< The actual number doesn't matter.
     }
@@ -355,16 +355,22 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
 
     if (!m_hanwhaResource->isNvr() && role == Qn::ConnectionRole::CR_Archive)
     {
+        NX_ASSERT(m_overlappedId != boost::none);
+        if (m_overlappedId == boost::none)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("No overlapped id set for archive export."));
+        }
+
         QUrl url(*outUrl);
-        // This path is not documented, but Samsung SmartViewer uses it.
-        // May not work with some cameras.
-        url.setPath(lit("/recording/%1-%2/OverlappedID=%3/play.smp")
-            .arg(toHanwhaPlaybackTime(m_startTimeUsec))
-            .arg(toHanwhaPlaybackTime(m_endTimeUsec))
-            .arg(*overlappedId));
+        url.setPath(lit("/recording/OverlappedID=%1/play.smp")
+            .arg(*m_overlappedId));
 
         *outUrl = url.toString();
-        qDebug() << "============ GOT PLAYBACK URL!!! (EDGE RECORDING)" << *outUrl;
+        qDebug() << "============ GOT PLAYBACK URL!!! (EDGE RECORDING)" << *outUrl
+            << "Time Range:"
+            << QDateTime::fromMSecsSinceEpoch(m_startTimeUsec / 1000)
+            << QDateTime::fromMSecsSinceEpoch(m_endTimeUsec / 1000);
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -399,6 +405,11 @@ void HanwhaStreamReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTime
     m_endTimeUsec = endTimeUsec;
 }
 
+void HanwhaStreamReader::setOverlappedId(nx::core::resource::OverlappedId overlappedId)
+{
+    m_overlappedId = overlappedId;
+}
+
 QnRtspClient& HanwhaStreamReader::rtspClient()
 {
     return m_rtpReader.rtspClient();
@@ -426,6 +437,10 @@ void HanwhaStreamReader::setClientId(const QnUuid& id)
 
 QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
 {
+    NX_ASSERT(m_hanwhaResource->isNvr());
+    if (!m_hanwhaResource->isNvr())
+        return QnAbstractMediaDataPtr();
+
     if (!m_timeSinceLastFrame.isValid())
         return QnAbstractMediaDataPtr();
 
@@ -433,7 +448,12 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     const int speed = m_rtpReader.rtspClient().getScale();
     qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsedMs() * speed;
     const bool isForwardSearch = speed >= 0;
-    const auto chunks = context->chunks(m_hanwhaResource->getChannel());
+    const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
+    NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
+    if (timeline.size() != 1)
+        return QnAbstractMediaDataPtr();
+
+    const auto chunks = timeline.cbegin()->second;
     if (chunks.containTime(currentTimeMs))
     {
         if (m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTimeMs)
@@ -463,6 +483,7 @@ QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
         m_lastTimestampUsec = result->timestamp;
         m_timeSinceLastFrame.restart();
     }
+
     return result;
 }
 

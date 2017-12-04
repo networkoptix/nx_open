@@ -58,10 +58,21 @@ public:
      */
     void setSaveMotionHandler(MotionHandler handler);
 
+    /**
+     * If first frame has timestamp that is earlier than start recording border
+     * and the difference is more than threshold then recording will not start.
+     */
+    void setStartTimestampThreshold(const std::chrono::microseconds& threshold);
+
+    /**
+     * Returns last recorded data timestamp;
+     */
+    int64_t lastRecordedTimeUs() const;
+
 protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
-    virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override;
+    virtual bool beforeProcessData(const QnConstAbstractMediaDataPtr& media) override;
 
     virtual void fileStarted(
         qint64 startTimeMs,
@@ -81,4 +92,7 @@ private:
     FileStartedInfo m_lastfileStartedInfo;
     FileWrittenHandler m_fileWrittenHandler;
     MotionHandler m_motionHandler;
+    std::chrono::microseconds m_threshold;
+    bool m_terminated = false;
+    int64_t m_lastRecordedTime = AV_NOPTS_VALUE;
 };

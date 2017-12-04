@@ -14,6 +14,14 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+namespace {
+
+static const std::chrono::seconds kEdgeStartTimeCorrection(1);
+
+} // namespace
+
+using namespace std::chrono;
+
 HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
 {
     auto hanwhaRes = resource.dynamicCast<HanwhaResource>();
@@ -54,6 +62,9 @@ void HanwhaArchiveDelegate::close()
 
 qint64 HanwhaArchiveDelegate::startTime() const
 {
+    if (m_playbackMode == PlaybackMode::Edge)
+        return m_startTimeUsec;
+
     // TODO: This copy-paste should probably be moved into helper function, but it is not easy
     // because with current interface we need to get both channel number and shared context.
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
@@ -61,7 +72,7 @@ qint64 HanwhaArchiveDelegate::startTime() const
         if (resource->getStatus() >= Qn::Online)
         {
             if (const auto context = resource->sharedContext())
-                return context->chunksStartUsec(resource->getChannel());
+                return context->timelineStartUs(resource->getChannel());
         }
     }
 
@@ -70,12 +81,15 @@ qint64 HanwhaArchiveDelegate::startTime() const
 
 qint64 HanwhaArchiveDelegate::endTime() const
 {
+    if (m_playbackMode == PlaybackMode::Edge)
+        return m_endTimeUsec;
+
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
         if (resource->getStatus() >= Qn::Online)
         {
             if (const auto context = resource->sharedContext())
-                return context->chunksEndUsec(resource->getChannel());
+                return context->timelineEndUs(resource->getChannel());
         }
     }
 
@@ -86,6 +100,7 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 {
     if (!m_streamReader)
         return QnAbstractMediaDataPtr();
+
     if (!m_streamReader->isStreamOpened())
     {
         if (m_currentPositionUsec != AV_NOPTS_VALUE)
@@ -106,7 +121,16 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 
     auto result = m_streamReader->getNextData();
     if (!result)
+    {
+        if (m_playbackMode == PlaybackMode::Edge)
+        {
+            result = QnAbstractMediaDataPtr(new QnEmptyMediaData());
+            result->timestamp = DATETIME_NOW;
+            return result;
+        }
+
         return result;
+    }
 
     m_currentPositionUsec = result->timestamp;
     if (!isForwardDirection())
@@ -136,13 +160,22 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
+    if (m_playbackMode == PlaybackMode::Edge)
+    {
+        m_streamReader->setPositionUsec(timeUsec);
+        return timeUsec;
+    }
+
     QnTimePeriodList chunks;
     if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
-        if (resource->getStatus() >= Qn::Online)
+        const auto context = resource->sharedContext();
+        if (resource->getStatus() >= Qn::Online && context)
         {
-            if (const auto context = resource->sharedContext())
-                chunks = context->chunks(resource->getChannel());
+            const auto timeline = context->overlappedTimeline(resource->getChannel());
+            NX_ASSERT(timeline.size() <= 1, lit("For NVRs there should be only one overlapped ID"));
+            if (timeline.size() == 1)
+                chunks = timeline.cbegin()->second;
         }
     }
 
@@ -193,11 +226,20 @@ void HanwhaArchiveDelegate::setSpeed(qint64 displayTime, double value)
 
 void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
+    if (m_playbackMode == PlaybackMode::Edge)
+        startTimeUsec -= duration_cast<microseconds>(kEdgeStartTimeCorrection).count();
+
     if (m_streamReader)
         m_streamReader->setPlaybackRange(startTimeUsec, endTimeUsec);
 
+    m_startTimeUsec = startTimeUsec;
     m_endTimeUsec = endTimeUsec;
     seek(startTimeUsec, true /*findIFrame*/);
+}
+
+void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId overlappedId)
+{
+    m_streamReader->setOverlappedId(overlappedId);
 }
 
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
