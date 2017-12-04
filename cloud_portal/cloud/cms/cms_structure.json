@@ -25,8 +25,8 @@
         ["{{LEGAL_COMPANY_COURT}}", "state and federal courts located in Los Angeles County, California", "Court to handle disputes (for EULA)"],
         ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}],
         ["templates/email_logo.png", "",
-          "Logo for email. Height must be between 32px and 64px, Width must be between 32px and 200px",
-          "Image", {"height_ge": 32, "height_le": 64, "width_le": 200, "width_ge": 32}],
+          "Logo for email. Height must be between 32px and 64px, Width must be between 32px and 240px",
+          "Image", {"height_ge": 32, "height_le": 64, "width_le": 240, "width_ge": 32}],
         ["%MAIL_FROM_NAME%", "", "Reserved for future use"],
         ["%MAIL_FROM_EMAIL%", "", "Reserved for future use"]
       ]
@@ -38,8 +38,8 @@
       "translatable": true,
       "values":[
         ["static/images/promo/cloud.png", "",
-          "Image for the front page. Image must have transparent background, recommended height is 200px (that is minimal height).",
-          "Image", {"height_ge": 200}],
+          "Image for the front page. Image must have transparent background, recommended height is 240px (that is minimal height).",
+          "Image", {"height_ge": 240}],
         ["%SUBTITLE%","Welcome!",
           "One line (50-100 symbols)"],
         ["%BLOCK1_TITLE%","Connect",
