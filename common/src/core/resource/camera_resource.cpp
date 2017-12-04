@@ -10,17 +10,19 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/dataconsumer/basic_audio_transmitter.h>
+#include <core/resource_access/user_access_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_data.h>
+#include <core/resource/resource_data_structures.h>
+#include <nx_ec/ec_api.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
-#include <utils/math/math.h>
 #include <utils/crypt/symmetrical.h>
-#include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
-#include <core/resource_access/user_access_data.h>
-#include <nx_ec/ec_api.h>
-#include <common/static_common_module.h>
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
+#include <utils/math/math.h>
 
 namespace {
 
@@ -170,6 +172,39 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
     m_lastInitTime.restart();
     m_lastCredentials = credentials;
     return CameraDiagnostics::NoErrorResult();
+}
+
+bool QnPhysicalCameraResource::initializeBasicTwoWayAudio()
+{
+    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
+
+    // TODO: Add support for (params.type.tolower() == lit("onvif")) and use
+    // nx::mediaserver_core::plugins::OnvifAudioTransmitter with cofiguration.
+
+    if (params.codec.isEmpty() || params.urlPath.isEmpty())
+        return false;
+
+    QnAudioFormat format;
+    format.setCodec(params.codec);
+    format.setSampleRate(params.sampleRate * 1000);
+    format.setChannelCount(params.channels);
+    auto audioTransmitter = new QnBasicAudioTransmitter(this);
+    m_audioTransmitter.reset(audioTransmitter);
+    m_audioTransmitter->setOutputFormat(format);
+    m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
+    audioTransmitter->setContentType(params.contentType.toUtf8());
+    if (params.noAuth)
+        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::noAuth);
+    else if (params.useBasicAuth)
+        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::basicAuth);
+    else
+        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::digestAndBasicAuth);
+
+    QUrl srcUrl(getUrl());
+    QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+    audioTransmitter->setTransmissionUrl(url);
+    return true;
 }
 
 bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams )

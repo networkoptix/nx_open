@@ -89,6 +89,7 @@ public:
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
+    bool initializeBasicTwoWayAudio();
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 private:
