@@ -34,6 +34,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <analytics/detected_objects_storage/analytics_events_storage.h>
 
 #include <appserver/processor.h>
 
@@ -76,6 +77,7 @@
 #include <media_server/crossdomain_connection_processor.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/media_server_resource_searchers.h>
+#include <media_server/media_server_module.h>
 
 #include <motion/motion_helper.h>
 
@@ -2132,6 +2134,53 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
         &event::EventConnector::at_fileIntegrityCheckFailed);
 }
 
+class TcpLogReceiverConnection: public QnTCPConnectionProcessor
+{
+public:
+    TcpLogReceiverConnection(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+        QnTCPConnectionProcessor(socket, owner),
+        m_socket(socket),
+        m_file(closeDirPath(getDataDirectory()) + lit("log/external_device.log"))
+    {
+        m_file.open(QFile::WriteOnly);
+        socket->setRecvTimeout(1000 * 3);
+    }
+    virtual ~TcpLogReceiverConnection() override { stop(); }
+protected:
+    virtual void run() override
+    {
+        while (true)
+        {
+            quint8 buffer[1024 * 16];
+            int bytesRead = m_socket->recv(buffer, sizeof(buffer));
+            if (bytesRead < 1 && SystemError::getLastOSErrorCode() != SystemError::timedOut)
+                break; //< Connection closed
+            m_file.write((const char*)buffer, bytesRead);
+            m_file.flush();
+        }
+    }
+private:
+    QSharedPointer<AbstractStreamSocket> m_socket;
+    QFile m_file;
+};
+
+class TcpLogReceiver : public QnTcpListener
+{
+public:
+    TcpLogReceiver(
+        QnCommonModule* commonModule, const QHostAddress& address, int port):
+        QnTcpListener(commonModule, address, port)
+    {
+    }
+    virtual ~TcpLogReceiver() override { stop(); }
+
+protected:
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+    {
+        return new TcpLogReceiverConnection(clientSocket, this);
+    }
+};
+
 void MediaServerProcess::run()
 {
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
@@ -2155,6 +2204,15 @@ void MediaServerProcess::run()
     SocketFactory::setIpVersion(ipVersion);
 
     m_serverModule = serverModule;
+
+    // Start plain TCP listener and write data to a separate log file.
+    const int tcpLogPort = qnServerModule->roSettings()->value("tcpLogPort").toInt();
+    if (tcpLogPort)
+    {
+        std::unique_ptr<TcpLogReceiver> logReceiver(new TcpLogReceiver(
+            commonModule(), QHostAddress::Any, tcpLogPort));
+        logReceiver->start();
+    }
 
     if (!m_obsoleteGuid.isNull())
         commonModule()->setObsoleteServerGuid(m_obsoleteGuid);
@@ -2374,6 +2432,15 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+
+    while (!needToStop())
+    {
+        if (qnServerModule->analyticsEventsStorage()->initialize())
+            break;
+
+        NX_WARNING(this, lm("Failed to initialize analytics events storage. Retrying..."));
+        QnSleep::msleep(1000);
+    }
 
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
     connect(

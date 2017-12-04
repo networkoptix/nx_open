@@ -3,6 +3,7 @@
 #include <tuple>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_message.h>
 
 namespace nx {
@@ -57,6 +58,17 @@ QString toString(const DetectionMetadataPacket& packet)
 {
     return lm("deviceId = %1, timestampUsec = %2, durationUsec = %3")
         .args(packet.deviceId, packet.timestampUsec, packet.durationUsec);
+}
+
+QnCompressedMetadataPtr toMetadataPacket(
+    const DetectionMetadataPacket& detectionPacket)
+{
+    auto metadataPacket = std::make_shared<QnCompressedMetadata>(
+        MetadataType::ObjectDetection);
+    metadataPacket->setTimestampUsec(detectionPacket.timestampUsec);
+    metadataPacket->setDurationUsec(detectionPacket.durationUsec);
+    metadataPacket->setData(QnUbjson::serialized(detectionPacket));
+    return metadataPacket;
 }
 
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right)

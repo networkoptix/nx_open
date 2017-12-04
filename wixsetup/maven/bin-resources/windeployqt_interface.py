@@ -35,10 +35,9 @@ Options:
   --verbose <level>          Verbose level.
 '''
 
-import subprocess
-import os
 
-qt_directory = '${qt.dir}'
+import os
+from environment import qt_directory, execute_command
 
 def windeployqt_executable():
     return '{0}/bin/windeployqt.exe'.format(qt_directory)
@@ -52,9 +51,8 @@ def deploy_qt_command(executable, qml_dir, target_dir):
     return command
 
 def deploy_qt(executable, qml_dir, target_dir):
-    command = deploy_qt_command(executable, qml_dir, target_dir)
-    return subprocess.check_output(command, stderr = subprocess.STDOUT)
-    
+    execute_command(deploy_qt_command(executable, qml_dir, target_dir))
+
 def cleanup_qtwebprocess(target_dir):
     if os.path.exists('clientqml/QtWebProcess.exe'):
         os.unlink('clientqml/QtWebProcess.exe')

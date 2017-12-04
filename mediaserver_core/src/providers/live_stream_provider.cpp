@@ -90,15 +90,19 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
         updateSoftwareMotion();
     });
 
+    m_dataReceptorMultiplexer.reset(new DataCopier());
+
     auto pool = qnServerModule->metadataManagerPool();
     m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
-    pool->registerDataReceptor(getResource(), m_metadataReceptor.toWeakRef());
+    m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
     m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
         new nx::analytics::storage::AnalyticsEventsReceptor(
             qnServerModule->analyticsEventsStorage()));
-    pool->registerDataReceptor(getResource(), m_analyticsEventsSaver.toWeakRef());
+    m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
+
+    pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()

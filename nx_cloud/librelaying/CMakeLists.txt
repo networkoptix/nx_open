@@ -17,5 +17,3 @@ nx_add_target(nx_relaying LIBRARY ${library_type}
 target_compile_definitions(nx_relaying
     PRIVATE NX_RELAYING_API=${API_EXPORT_MACRO}
     INTERFACE NX_RELAYING_API=${API_IMPORT_MACRO})
-
-set_target_properties(nx_relaying PROPERTIES PREFIX "")

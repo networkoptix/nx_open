@@ -128,6 +128,7 @@ private:
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
         std::vector<DetectedObject>* result);
+    void prepareQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
 
     nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
 
@@ -137,7 +138,7 @@ private:
         std::vector<DetectedObject>* result);
 
     void loadObject(
-        nx::utils::db::SqlQuery& selectEventsQuery,
+        nx::utils::db::SqlQuery* selectEventsQuery,
         DetectedObject* object);
 
     void mergeObjects(DetectedObject from, DetectedObject* to);

@@ -59,7 +59,7 @@ private:
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     qint64 m_latestTimeMs = -1;
 
-    QWeakPointer<QnRaiiGuard> m_fetchInProgress;
+    QWeakPointer<QnRaiiGuard> m_currentFetchGuard;
     Types m_fetchingTypes;
     qint64 m_latestStartTimeMs = -1; //< Synchronization point used during fetch.
 

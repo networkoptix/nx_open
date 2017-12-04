@@ -67,12 +67,12 @@ void BookmarkSearchListModel::Private::clear()
     m_prefetch.clear();
     m_fetchedAll = false;
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    m_fetchInProgress = 0;
+    m_currentFetchId = 0;
 }
 
 bool BookmarkSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !m_fetchInProgress
+    return !m_fetchedAll && m_camera && !m_currentFetchId
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission);
 }
 
@@ -88,11 +88,11 @@ bool BookmarkSearchListModel::Private::prefetch(PrefetchCompletionHandler comple
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = kFetchBatchSize;
 
-    m_fetchInProgress = qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
+    m_currentFetchId = qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
         [this, completionHandler, guard = QPointer<QObject>(this)]
             (bool success, const QnCameraBookmarkList& bookmarks, int requestId)
         {
-            if (!guard || requestId != m_fetchInProgress)
+            if (!guard || requestId != m_currentFetchId)
                 return;
 
             NX_ASSERT(m_prefetch.empty());
@@ -104,15 +104,15 @@ bool BookmarkSearchListModel::Private::prefetch(PrefetchCompletionHandler comple
                 : m_prefetch.front().startTimeMs + 1/*discard last ms*/);
         });
 
-    return m_fetchInProgress != 0;
+    return m_currentFetchId != 0;
 }
 
 void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 {
-    if (!m_fetchInProgress)
+    if (!m_currentFetchId)
         return;
 
-    m_fetchInProgress = 0;
+    m_currentFetchId = 0;
 
     if (!m_success)
         return;
@@ -125,7 +125,7 @@ void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(), m_prefetch.cbegin(), end);
 
         for (auto iter = m_prefetch.cbegin(); iter != end; ++iter)
@@ -169,7 +169,7 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
 
     const auto index = std::distance(m_data.cbegin(), insertionPos);
 
-    ScopedInsertRows insertRows(q, QModelIndex(), index, index);
+    ScopedInsertRows insertRows(q,  index, index);
     m_data.insert(m_data.begin() + index, bookmark);
     m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs;
 }
@@ -201,7 +201,7 @@ void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& guid)
     if (index < 0)
         return;
 
-    ScopedRemoveRows removeRows(q, QModelIndex(), index, index);
+    ScopedRemoveRows removeRows(q,  index, index);
     m_data.erase(m_data.begin() + index);
     m_guidToTimestampMs.remove(guid);
 }

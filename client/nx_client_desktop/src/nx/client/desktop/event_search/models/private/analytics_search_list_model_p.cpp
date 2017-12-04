@@ -79,12 +79,12 @@ void AnalyticsSearchListModel::Private::clear()
     m_prefetch.clear();
     m_fetchedAll = false;
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    m_fetchInProgress = rest::Handle();
+    m_currentFetchId = rest::Handle();
 }
 
 bool AnalyticsSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !m_fetchInProgress
+    return !m_fetchedAll && m_camera && !m_currentFetchId
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -97,7 +97,7 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
         [this, completionHandler, guard = QPointer<QObject>(this)]
             (bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
         {
-            if (!guard || m_fetchInProgress != handle)
+            if (!guard || m_currentFetchId != handle)
                 return;
 
             NX_ASSERT(m_prefetch.empty());
@@ -121,18 +121,18 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;
 
-    m_fetchInProgress = server->restConnection()->lookupDetectedObjects(
+    m_currentFetchId = server->restConnection()->lookupDetectedObjects(
         request, dataReceived, thread());
 
-    return m_fetchInProgress != rest::Handle();
+    return m_currentFetchId != rest::Handle();
 }
 
 void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 {
-    if (!m_fetchInProgress)
+    if (!m_currentFetchId)
         return;
 
-    m_fetchInProgress = rest::Handle();
+    m_currentFetchId = rest::Handle();
 
     if (!m_success)
         return;
@@ -148,9 +148,10 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
-        for (auto iter = m_prefetch.begin(); iter != end; ++iter)
-            m_data.push_back(std::move(*iter));
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
+        m_data.insert(m_data.end(),
+            std::make_move_iterator(m_prefetch.begin()),
+            std::make_move_iterator(end));
     }
 
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;

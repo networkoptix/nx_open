@@ -102,8 +102,8 @@ void EventSearchListModel::Private::clear()
     m_prefetch.clear();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    m_fetchInProgress = rest::Handle();
-    m_updateInProgress = rest::Handle();
+    m_currentFetchId = rest::Handle();
+    m_currentUpdateId = rest::Handle();
 
     if (m_camera)
         m_updateTimer->start();
@@ -111,7 +111,7 @@ void EventSearchListModel::Private::clear()
 
 bool EventSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !m_fetchInProgress
+    return !m_fetchedAll && m_camera && !m_currentFetchId
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -124,7 +124,7 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
         [this, completionHandler]
             (bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
-            if (handle != m_fetchInProgress)
+            if (handle != m_currentFetchId)
                 return;
 
             NX_ASSERT(m_prefetch.empty());
@@ -143,16 +143,16 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
             }
         };
 
-    m_fetchInProgress = getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
-    return m_fetchInProgress != rest::Handle();
+    m_currentFetchId = getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
+    return m_currentFetchId != rest::Handle();
 }
 
 void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 {
-    if (!m_fetchInProgress)
+    if (!m_currentFetchId)
         return;
 
-    m_fetchInProgress = rest::Handle();
+    m_currentFetchId = rest::Handle();
 
     if (!m_success)
         return;
@@ -168,9 +168,10 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
-        for (auto iter = m_prefetch.begin(); iter != end; ++iter)
-            m_data.push_back(std::move(*iter));
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
+        m_data.insert(m_data.end(),
+            std::make_move_iterator(m_prefetch.begin()),
+            std::make_move_iterator(end));
     }
 
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
@@ -180,22 +181,22 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
 void EventSearchListModel::Private::periodicUpdate()
 {
-    if (!m_updateInProgress)
+    if (!m_currentUpdateId)
         return;
 
     const auto eventsReceived =
         [this](bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
-            if (handle != m_updateInProgress)
+            if (handle != m_currentUpdateId)
                 return;
 
-            m_updateInProgress = rest::Handle();
+            m_currentUpdateId = rest::Handle();
 
             if (success && !data.empty())
                 addNewlyReceivedEvents(std::move(data));
         };
 
-    m_updateInProgress = getEvents(m_latestTimeMs,
+    m_currentUpdateId = getEvents(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);
 }
 
@@ -237,7 +238,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
     if (count == 0)
         return;
 
-    ScopedInsertRows insertRows(q, QModelIndex(), 0, count - 1);
+    ScopedInsertRows insertRows(q,  0, count - 1);
     for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
     {
         if (iter->actionType != vms::event::undefinedAction)

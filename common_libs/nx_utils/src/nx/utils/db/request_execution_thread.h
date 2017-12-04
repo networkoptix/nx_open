@@ -14,7 +14,7 @@ namespace utils {
 namespace db {
 
 /**
- * Connection can be closed by timeout or due to error. 
+ * Connection can be closed by timeout or due to error.
  * Use DbRequestExecutionThread::isOpen to test it.
  */
 class NX_UTILS_API DbRequestExecutionThread:

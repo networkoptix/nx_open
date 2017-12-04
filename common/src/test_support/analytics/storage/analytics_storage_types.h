@@ -9,6 +9,8 @@ namespace test {
 
 Filter generateRandomFilter();
 
+common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount);
+
 } // namespace test
 } // namespace storage
 } // namespace analytics

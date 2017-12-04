@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -99,6 +101,12 @@ public:
 
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);
+
+    void setStartTime(std::chrono::milliseconds value);
+    std::chrono::milliseconds startTime() const;
+
+    void setDuration(std::chrono::milliseconds value);
+    std::chrono::milliseconds duration() const;
 
     /** Start time in milliseconds. */
     qint64 startTimeMs;
