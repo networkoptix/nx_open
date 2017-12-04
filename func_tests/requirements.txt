@@ -1,4 +1,5 @@
-pytest
+urllib3
+pytest==3.0.7  # later version conflicts with pytest-capturelog, both have --log-format option; todo: get rid of capturelog
 pytest-timeout
 pytest-capturelog
 pytest-cpp

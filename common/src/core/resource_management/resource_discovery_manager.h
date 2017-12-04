@@ -53,7 +53,6 @@ struct QnManualCameraInfo
     QnAbstractResourceSearcher* searcher;
     QString uniqueId;
 };
-typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
 class QnAbstractResourceSearcher;
 
@@ -119,9 +118,9 @@ public:
     void setReady(bool ready);
 
     /** Returns number of cameras that were sucessfully added. */
-    int registerManualCameras(const QnManualCameraInfoMap& cameras);
-    bool containManualCamera(const QString& url);
-    void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
+    int registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
+    bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
+    QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;
 
@@ -171,10 +170,10 @@ private:
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 private:
-    QnMutex m_searchersListMutex;
+    mutable QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QnManualCameraInfoMap m_manualCameraMap;
+    QMap<QString, QnManualCameraInfo> m_manualCameraByUniqueId;
 
     bool m_server;
     std::atomic<bool> m_ready;

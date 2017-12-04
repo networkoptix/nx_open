@@ -18,6 +18,8 @@
 #include "auth_cache.h"
 #include "http_stream_reader.h"
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx_http {
 
 enum class AuthType
@@ -374,3 +376,4 @@ private:
 };
 
 } // namespace nx_http
+

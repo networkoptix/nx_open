@@ -17,6 +17,8 @@
 #include "buffer_source.h"
 #include "custom_headers.h"
 
+#include <nx/fusion/model_functions.h>
+
 using std::make_pair;
 
 namespace {
@@ -1498,3 +1500,5 @@ AsyncClient::Result AsyncClient::invokeHandler(
 }
 
 } // namespace nx_http
+
+

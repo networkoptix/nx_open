@@ -146,3 +146,15 @@ function(nx_copy_bin_resources input output)
     nx_copy("${input}/${file}" DESTINATION "${output}")
   endforeach(file)
 endfunction()
+
+function(nx_create_qt_conf file_name)
+    cmake_parse_arguments(CONF "" "QT_PREFIX" "" ${ARGN})
+
+    if(NOT CONF_QT_PREFIX)
+        set(qt_prefix "..")
+    else()
+        set(qt_prefix ${CONF_QT_PREFIX})
+    endif()
+
+    nx_configure_file(${CMAKE_SOURCE_DIR}/cmake/qt.conf ${file_name})
+endfunction()
