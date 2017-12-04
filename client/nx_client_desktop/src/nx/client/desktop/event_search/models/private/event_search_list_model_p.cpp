@@ -168,7 +168,7 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(),
             std::make_move_iterator(m_prefetch.begin()),
             std::make_move_iterator(end));
@@ -238,7 +238,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
     if (count == 0)
         return;
 
-    ScopedInsertRows insertRows(q, QModelIndex(), 0, count - 1);
+    ScopedInsertRows insertRows(q,  0, count - 1);
     for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
     {
         if (iter->actionType != vms::event::undefinedAction)

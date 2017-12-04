@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from test_utils.rest_api import HttpError, ServerRestApiError
+from test_utils.rest_api import HttpError, RestApiError
 
 log = logging.getLogger(__name__)
 

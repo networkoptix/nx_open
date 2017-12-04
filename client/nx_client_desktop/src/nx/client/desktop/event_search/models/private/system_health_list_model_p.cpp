@@ -220,7 +220,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
 
     const auto index = std::distance(m_items.begin(), position);
 
-    ScopedInsertRows insertRows(q, QModelIndex(), index, index);
+    ScopedInsertRows insertRows(q,  index, index);
     m_items.insert(position, item);
 }
 
@@ -259,7 +259,7 @@ void SystemHealthListModel::Private::clear()
 
 void SystemHealthListModel::Private::remove(int first, int count)
 {
-    ScopedRemoveRows removeRows(q, QModelIndex(), first, first + count - 1);
+    ScopedRemoveRows removeRows(q,  first, first + count - 1);
     m_items.erase(m_items.begin() + first, m_items.begin() + (first + count));
 }
 

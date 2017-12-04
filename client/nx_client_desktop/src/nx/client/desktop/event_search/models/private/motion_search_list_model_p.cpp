@@ -113,7 +113,7 @@ void MotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeMs)
     const auto removeCount = std::distance(removeBegin, m_data.end());
     if (removeCount > 0)
     {
-        ScopedRemoveRows removeRows(q, QModelIndex(), 0, removeCount - 1);
+        ScopedRemoveRows removeRows(q,  0, removeCount - 1);
         m_data.resize(m_data.size() - removeCount);
     }
 
@@ -127,7 +127,7 @@ void MotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeMs)
             return;
         }
 
-        ScopedInsertRows insertRows(q, QModelIndex(), 0, newChunksCount - 1);
+        ScopedInsertRows insertRows(q,  0, newChunksCount - 1);
         for (auto chunk = newChunksBegin; chunk != periods.cend(); ++chunk)
             m_data.push_back(*chunk);
     }
@@ -153,7 +153,7 @@ void MotionSearchListModel::Private::fetchMore()
     const auto delta = qMin(remaining, kFetchBatchSize);
     const auto newCount = oldCount + delta;
 
-    ScopedInsertRows insertRows(q, QModelIndex(), oldCount, newCount - 1);
+    ScopedInsertRows insertRows(q,  oldCount, newCount - 1);
     const auto range = std::make_pair(periods.crbegin() + oldCount, periods.crbegin() + newCount);
 
     for (auto chunk = range.first; chunk != range.second; ++chunk)

@@ -34,6 +34,9 @@ static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
 static const std::chrono::minutes kMaxChunkDuration(1);
 
+static const std::chrono::milliseconds kWaitBeforeSync(30000);
+static const int kNumberOfSyncCycles = 2;
+
 } // namespace
 
 using namespace nx::core::resource;
@@ -250,6 +253,15 @@ void LilinRemoteArchiveManager::beforeSynchronization()
 void LilinRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuccessful*/)
 {
     // Do nothing.
+}
+
+RemoteArchiveSynchronizationSettings LilinRemoteArchiveManager::settings() const
+{
+    return {
+        kWaitBeforeSync,
+        std::chrono::milliseconds::zero(),
+        kNumberOfSyncCycles
+    };
 }
 
 } // namespace plugins

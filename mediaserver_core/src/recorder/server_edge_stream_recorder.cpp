@@ -19,7 +19,12 @@ QnServerEdgeStreamRecorder::~QnServerEdgeStreamRecorder()
 
 void QnServerEdgeStreamRecorder::setOnFileWrittenHandler(FileWrittenHandler handler)
 {
-    m_fileWrittenHandler = handler;
+    m_fileWrittenHandler = std::move(handler);
+}
+
+void QnServerEdgeStreamRecorder::setSaveMotionHandler(MotionHandler handler)
+{
+    m_motionHandler = std::move(handler);
 }
 
 bool QnServerEdgeStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
