@@ -41,6 +41,7 @@ function(detect_package_versions)
     if(IOS)
         set(_openssl_version "1.0.1i")
         set(_libjpeg-turbo_version "1.4.1")
+        set(_ffmpeg_version "3.4")
     endif()
 
     if(box MATCHES "bpi|bananapi")
