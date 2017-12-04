@@ -76,14 +76,14 @@ class _RestApiProxy(object):
     # noinspection PyPep8Naming
     def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
         params = {name: _to_get_param(value) for name, value in kw.items()}
-        return self._api.request('GET', self._path, raise_exception, timeout, headers=headers, params=params)
+        return self._api.request('GET', self._path, raise_exception, timeout=timeout, headers=headers, params=params)
 
     # noinspection PyPep8Naming
     def POST(self, raise_exception=True, timeout=None, headers=None, json=None, **kw):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
-        return self._api.request('POST', self._path, raise_exception, timeout, headers=headers, json=json)
+        return self._api.request('POST', self._path, raise_exception, timeout=timeout, headers=headers, json=json)
 
 
 class RestApi(object):
