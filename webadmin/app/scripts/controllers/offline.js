@@ -26,4 +26,4 @@ angular.module('webadminApp')
 
         $scope.state = L.offlineDialog.serverOffline;
         setTimeout(pingServer,1000);
-    });
+    }]);
