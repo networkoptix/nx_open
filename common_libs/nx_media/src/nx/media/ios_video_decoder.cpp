@@ -89,13 +89,11 @@ class IOSMemoryBufferPrivate: public QAbstractVideoBufferPrivate
 public:
     AVFrame* frame;
     QAbstractVideoBuffer::MapMode mapMode;
-    bool isHardwareAccelerated;
 public:
     IOSMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
         frame(_frame),
-        mapMode(QAbstractVideoBuffer::NotMapped),
-        isHardwareAccelerated(false)
+        mapMode(QAbstractVideoBuffer::NotMapped)
     {
     }
 
@@ -225,6 +223,7 @@ public:
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+    bool isHardwareAccelerated = false;
 };
 
 void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -438,6 +437,7 @@ int IOSVideoDecoder::decode(
 
 AbstractVideoDecoder::Capabilities IOSVideoDecoder::capabilities() const
 {
+    Q_D(const IOSVideoDecoder);
     return d->isHardwareAccelerated ? Capability::hardwareAccelerated : Capability::noCapability;
 }
 
