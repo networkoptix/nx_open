@@ -1501,4 +1501,8 @@ AsyncClient::Result AsyncClient::invokeHandler(
 
 } // namespace nx_http
 
-
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, AuthType,
+(nx_http::AuthType::authBasicAndDigest, "authBasicAndDigest")
+(nx_http::AuthType::authDigest, "authDigest")
+(nx_http::AuthType::authBasic, "authBasic")
+)

@@ -16,8 +16,6 @@
 #include "nx/network/http/http_async_client.h"
 #include "nx/network/http/http_stream_reader.h"
 
-#include <nx/fusion/model_functions_fwd.h>
-
 namespace nx_http {
 
 class AsyncHttpClientPtr;
@@ -436,8 +434,4 @@ SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
     const AuthType authType = AuthType::authBasicAndDigest,
     nx_http::StatusCode::Value* httpCode = nullptr);
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::AsyncHttpClient::AuthType)
-
 } // namespace nx_http
-
-QN_FUSION_DECLARE_FUNCTIONS(nx_http::AsyncHttpClient::AuthType, (lexical), NX_NETWORK_API)

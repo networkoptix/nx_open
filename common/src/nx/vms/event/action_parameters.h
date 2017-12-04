@@ -3,8 +3,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/http/http_async_client.h>
 
 namespace nx {
 namespace vms {
@@ -84,7 +84,7 @@ struct ActionParameters
     QString contentType;
 
     //HTTP action
-    nx_http::AsyncHttpClient::AuthType authType;
+    nx_http::AuthType authType;
 
     //HTTP action (empty string means auto detection)
     nx_http::Method::ValueType requestType;

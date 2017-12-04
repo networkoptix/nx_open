@@ -663,9 +663,3 @@ SystemError::ErrorCode uploadDataSync(
 }
 
 } // namespace nx_http
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http::AsyncHttpClient, AuthType,
-(nx_http::AsyncHttpClient::AuthType::authBasicAndDigest, "authBasicAndDigest")
-(nx_http::AsyncHttpClient::AuthType::authDigest, "authDigest")
-(nx_http::AsyncHttpClient::AuthType::authBasic, "authBasic")
-)

@@ -29,6 +29,8 @@ enum class AuthType
     authBasic,
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::AuthType)
+
 /**
  * HTTP client. All operations are done asynchronously.
  *
@@ -377,3 +379,4 @@ private:
 
 } // namespace nx_http
 
+QN_FUSION_DECLARE_FUNCTIONS(nx_http::AuthType, (lexical), NX_NETWORK_API)
