@@ -148,7 +148,7 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(),
             std::make_move_iterator(m_prefetch.begin()),
             std::make_move_iterator(end));
