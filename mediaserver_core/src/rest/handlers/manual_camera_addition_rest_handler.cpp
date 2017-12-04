@@ -195,7 +195,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     auth.setUser(data.user);
     auth.setPassword(data.password);
 
-    QnManualCameraInfoMap infoMap;
+    std::vector<QnManualCameraInfo> cameraList;
     for (const auto& camera: data.cameras)
     {
         QUrl url(camera.url);
@@ -215,15 +215,15 @@ int QnManualCameraAdditionRestHandler::addCameras(
             return CODE_INVALID_PARAMETER;
         }
 
-        infoMap.insert(camera.url, info);
+        cameraList.push_back(info);
     }
 
-    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(infoMap);
+    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
     if (registered > 0)
     {
         QnAuditRecord auditRecord =
             qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
-        for (const QnManualCameraInfo& info: infoMap)
+        for (const QnManualCameraInfo& info: cameraList)
         {
             if (!info.uniqueId.isEmpty())
                 auditRecord.resources.push_back(QnNetworkResource::physicalIdToId(info.uniqueId));
