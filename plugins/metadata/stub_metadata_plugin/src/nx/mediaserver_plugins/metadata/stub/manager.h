@@ -50,7 +50,6 @@ private:
     int m_counter = 0;
     int m_counterObjects = 0;
     nxpl::NX_GUID m_eventTypeId;
-    nxpl::NX_GUID m_objectTypeId;
 };
 
 } // namespace stub
