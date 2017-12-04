@@ -214,7 +214,7 @@ TEST_F(HttpAsyncClient, data_after_successfull_upgrade_is_not_lost)
     thenTrafficSentByServerAfterResponseIsAvailableOnSocket();
 }
 
-TEST(HttpAsyncClientTypes, numericSerialization)
+TEST(HttpAsyncClientTypes, lexicalSerialization)
 {
     ASSERT_EQ(QnLexical::serialized(nx_http::AuthType::authBasicAndDigest).toStdString(),
         std::string("authBasicAndDigest"));
@@ -228,13 +228,6 @@ TEST(HttpAsyncClientTypes, numericSerialization)
     ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("authDigest"),
         nx_http::AuthType::authDigest);
     ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("authBasic"),
-        nx_http::AuthType::authBasic);
-
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("0"),
-        nx_http::AuthType::authBasicAndDigest);
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("1"),
-        nx_http::AuthType::authDigest);
-    ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("2"),
         nx_http::AuthType::authBasic);
 }
 
