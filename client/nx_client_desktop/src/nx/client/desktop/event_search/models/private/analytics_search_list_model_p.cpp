@@ -56,8 +56,8 @@ void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourceP
     if (m_camera == camera)
         return;
 
-    m_camera = camera;
     clear();
+    m_camera = camera;
 
     // TODO: #vkutin Subscribe to analytics metadata in RTSP stream. Process it as required.
 }
