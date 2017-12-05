@@ -91,7 +91,7 @@ bool HanwhaChunkLoader::isStarted() const
 qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
-    int64_t startTimeUs = std::numeric_limits<int64_t>::max();
+    auto startTimeUs = std::numeric_limits<qint64>::max();
 
     for (const auto& entry: m_chunks)
     {
