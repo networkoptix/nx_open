@@ -179,5 +179,3 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
 {
     resource->disconnect(this);
 }
-
-{
