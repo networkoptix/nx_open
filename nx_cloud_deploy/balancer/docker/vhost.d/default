@@ -19,3 +19,13 @@
             proxy_pass http://vms_gateway:3347;
         }
 
+        location ~* /gateway/[\w\-\.]+/web/hls {
+            proxy_pass http://vms_gateway:3347;
+            add_header 'Access-Control-Allow-Origin' 'https://www.gstatic.com';
+        }
+
+        location ~* /gateway/[\w\-\.]+/hls {
+            proxy_pass http://vms_gateway:3347;
+            add_header 'Access-Control-Allow-Origin' 'https://www.gstatic.com';
+        }
+
