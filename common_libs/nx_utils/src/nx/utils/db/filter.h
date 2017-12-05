@@ -53,6 +53,15 @@ struct NX_UTILS_API SqlFilterFieldLess:
         QVariant value);
 };
 
+struct NX_UTILS_API SqlFilterFieldLessOrEqual:
+    SqlFilterField
+{
+    SqlFilterFieldLessOrEqual(
+        const char* name,
+        const char* placeHolderName,
+        QVariant value);
+};
+
 using InnerJoinFilterFields = std::vector<SqlFilterField>;
 
 /**

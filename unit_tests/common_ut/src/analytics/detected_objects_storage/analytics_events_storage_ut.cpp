@@ -231,8 +231,37 @@ private:
         return m_eventsStorage->initialize();
     }
 
+    bool satisfiesFilter(
+        const Filter& filter,
+        const ObjectPosition& data)
+    {
+        if (!filter.boundingBox.isNull())
+        {
+            if (!filter.boundingBox.intersects(data.boundingBox))
+                return false;
+        }
+
+        return satisfiesCommonConditions(filter, data);
+    }
+
+    bool satisfiesFilter(
+        const Filter& filter,
+        const common::metadata::DetectionMetadataPacket& data)
+    {
+        if (!filter.boundingBox.isNull())
+        {
+            bool intersects = false;
+            for (const auto& object: data.objects)
+                intersects |= filter.boundingBox.intersects(object.boundingBox);
+            if (!intersects)
+                return false;
+        }
+
+        return satisfiesCommonConditions(filter, data);
+    }
+
     template<typename T>
-    bool satisfiesFilter(const Filter& filter, const T& data)
+    bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
         if (!filter.deviceId.isNull() && data.deviceId != filter.deviceId)
             return false;
@@ -319,6 +348,15 @@ protected:
             toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
     }
 
+    void addRandomBoundingBoxToFilter()
+    {
+        m_filter.boundingBox = QRectF(
+            nx::utils::random::number<float>(0, 1),
+            nx::utils::random::number<float>(0, 1),
+            nx::utils::random::number<float>(0, 1),
+            nx::utils::random::number<float>(0, 1));
+    }
+
     void givenEmptyFilter()
     {
         m_filter = Filter();
@@ -330,6 +368,8 @@ protected:
         addRandomNonEmptyTimePeriodToFilter();
         if (nx::utils::random::number<bool>())
             addLimitToFilter();
+        if (nx::utils::random::number<bool>())
+            addRandomBoundingBoxToFilter();
     }
 
     void setSortOrder(Qt::SortOrder sortOrder)
@@ -369,6 +409,12 @@ protected:
     void whenLookupWithLimit()
     {
         addLimitToFilter();
+        whenLookupObjects();
+    }
+
+    void whenLookupByRandomBoundingBox()
+    {
+        addRandomBoundingBoxToFilter();
         whenLookupObjects();
     }
 
@@ -524,8 +570,13 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
 
 // TEST_F(AnalyticsEventsStorage, full_text_search)
 // TEST_F(AnalyticsEventsStorage, lookup_by_attribute_value)
-// TEST_F(AnalyticsEventsStorage, lookup_by_bounding_box)
-// TEST_F(AnalyticsEventsStorage, lookup_by_rectangle)
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
+{
+    whenLookupByRandomBoundingBox();
+    thenResultMatchesExpectations();
+}
+
 // TEST_F(AnalyticsEventsStorage, lookup_by_objectId)
 // TEST_F(AnalyticsEventsStorage, lookup_by_objectTypeId)
 // TEST_F(AnalyticsEventsStorage, lookup_stress_test)

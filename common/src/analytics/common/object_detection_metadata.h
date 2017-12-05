@@ -3,6 +3,7 @@
 #include <set>
 #include <chrono>
 #include <memory>
+#include <ostream>
 
 #include <QtCore/QRect>
 
@@ -77,6 +78,7 @@ bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds s
 QString toString(const DetectionMetadataPacket&);
 QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
 DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr&);
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
 
 } // namespace metadata
 } // namespace common
