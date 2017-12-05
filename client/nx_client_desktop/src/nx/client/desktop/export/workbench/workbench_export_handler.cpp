@@ -275,7 +275,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
 
         dialog.reset(new ExportSettingsDialog(
             widget->item()->layout()->resource(),
-            tr("You have no permissions to export central widget."),
+            tr("Selected period cannot be exported for the current camera."),
             period,
             isFileNameValid,
             mainWindow()));
