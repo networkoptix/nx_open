@@ -365,8 +365,8 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     QMap<QString, QnManualCameraInfo> camerasByUrlForSearch;
     for (const auto& manualCamera: manualCameraByUniqueId)
     {
-        const auto camera = qSharedPointerDynamicCast<QnSecurityCamResource>(
-            commonModule()->resourcePool()->getResourceByUniqueId(manualCamera.uniqueId));
+        const auto camera = commonModule()->resourcePool()->getResourceByUniqueId(manualCamera.uniqueId)
+            .dynamicCast<QnSecurityCamResource>();
 
         if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
             camerasByUrlForSearch.insert(manualCamera.url.toString(), manualCamera);
@@ -605,7 +605,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
     int addedCount = 0;
     for (const auto& camera: cameras)
     {
-        for (const auto& searcher : m_searchersList)
+        for (const auto& searcher: m_searchersList)
         {
             if (!camera.resType || !searcher->isResourceTypeSupported(camera.resType->getId()))
                 continue;
