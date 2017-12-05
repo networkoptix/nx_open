@@ -16,6 +16,9 @@ namespace plugins {
 
 namespace {
 
+// Hanwha cameras sometimes gives us first frame with timestamp that is
+// greater than the requested start playback bound. So we request start time
+// that is slightly earlier than one we really need.
 static const std::chrono::seconds kEdgeStartTimeCorrection(1);
 
 } // namespace
@@ -121,16 +124,7 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 
     auto result = m_streamReader->getNextData();
     if (!result)
-    {
-        if (m_playbackMode == PlaybackMode::Edge)
-        {
-            result = QnAbstractMediaDataPtr(new QnEmptyMediaData());
-            result->timestamp = DATETIME_NOW;
-            return result;
-        }
-
         return result;
-    }
 
     m_currentPositionUsec = result->timestamp;
     if (!isForwardDirection())
@@ -160,7 +154,7 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
-    if (m_playbackMode == PlaybackMode::Edge)
+    if (!m_isSeekAlignedByChunkBorder)
     {
         m_streamReader->setPositionUsec(timeUsec);
         return timeUsec;
@@ -245,6 +239,7 @@ void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId ove
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
 {
     m_playbackMode = mode;
+    m_isSeekAlignedByChunkBorder = true;
     auto& rtspClient = m_streamReader->rtspClient();
     switch (mode)
     {
@@ -252,8 +247,10 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
             rtspClient.setAdditionAttribute("Frames", "Intra");
             m_streamReader->setSessionType(HanwhaSessionType::preview);
             break;
-        case PlaybackMode::Export:
         case PlaybackMode::Edge:
+            m_isSeekAlignedByChunkBorder = false;
+            //< break is intentionally missing.
+        case PlaybackMode::Export:
             rtspClient.setAdditionAttribute("Rate-Control", "no");
             m_streamReader->setSessionType(HanwhaSessionType::fileExport);
             break;

@@ -359,7 +359,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         if (m_overlappedId == boost::none)
         {
             return CameraDiagnostics::CameraInvalidParams(
-                lit("No overlapped id set for archive export."));
+                lit("No overlapped id is set for archive export."));
         }
 
         QUrl url(*outUrl);

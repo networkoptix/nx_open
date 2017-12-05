@@ -2591,7 +2591,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    const auto timeline = sharedContext()->overlappedTimeline(getChannel());
+    const auto& timeline = sharedContext()->overlappedTimeline(getChannel());
     const auto numberOfOverlappedIds = timeline.size();
     NX_ASSERT(numberOfOverlappedIds <= 1, lit("There should be only one overlapped ID for NVR"));
     if (numberOfOverlappedIds != 1)

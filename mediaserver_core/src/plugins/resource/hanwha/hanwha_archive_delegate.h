@@ -57,6 +57,7 @@ private:
     qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
     PlaybackMode m_playbackMode = PlaybackMode::Archive;
     CameraDiagnostics::Result m_lastOpenResult {CameraDiagnostics::NoErrorResult()};
+    bool m_isSeekAlignedByChunkBorder = false;
 };
 
 } // namespace plugins

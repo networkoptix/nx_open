@@ -74,6 +74,12 @@ public:
     void setTimeZoneShift(std::chrono::seconds timeZoneShift);
     std::chrono::seconds timeZoneShift() const;
 
+    /**
+     * Returns a default overlapped ID for a device (the highest one).
+     * This method should be used only for NVRs since cameras doesn't have such
+     * kind of "default" overlapped ID and all overlapped periods
+     * should be properly handled for them.
+     */
     boost::optional<int> overlappedId() const;
 
     void setEnableUtcTime(bool enableUtcTime);
@@ -121,6 +127,10 @@ private:
 
     void at_httpClientDone();
     void at_gotChunkData();
+
+    bool isEdge() const;
+    bool isNvr() const;
+
 private:
 
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;

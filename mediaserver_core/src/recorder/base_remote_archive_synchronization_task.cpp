@@ -327,6 +327,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
         createStreamRecorderThreadUnsafe(timePeriod);
     }
 
+
     NX_ASSERT(
         m_archiveReader && m_recorder,
         lm("Can not create archive reader and/or recorder. Resource %1")
@@ -335,6 +336,7 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
     if (!m_archiveReader || !m_recorder)
         return false;
 
+    m_archiveReader->setCycleMode(false);
     m_archiveReader->addDataProcessor(m_recorder.get());
 
     m_recorder->start();

@@ -96,7 +96,7 @@ qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
     for (const auto& entry: m_chunks)
     {
         const auto overlappedId = entry.first;
-        const auto chunksByChannel = entry.second;
+        const auto& chunksByChannel = entry.second;
 
         NX_ASSERT(chunksByChannel.size() > channelNumber);
         if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
@@ -126,7 +126,7 @@ qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
     for (const auto& entry: m_chunks)
     {
         const auto overlappedId = entry.first;
-        const auto chunksByChannel = entry.second;
+        const auto& chunksByChannel = entry.second;
 
         NX_ASSERT(chunksByChannel.size() > channelNumber);
         if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
@@ -419,7 +419,7 @@ void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
         }
     }
 
-    if (!hasBounds()) //< Cameras sometimes send unordered list of chunks.
+    if (isEdge()) //< Cameras sometimes send unordered list of chunks.
     {
         sortTimeline(&m_newChunks);
         m_chunks.swap(m_newChunks);
@@ -881,6 +881,16 @@ void HanwhaChunkLoader::at_gotChunkData()
     const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     for (const auto& line: lines)
         parseTimelineData(line.trimmed(), currentTimeMs);
+}
+
+bool HanwhaChunkLoader::isEdge() const
+{
+    return !m_isNvr;
+}
+
+bool HanwhaChunkLoader::isNvr() const
+{
+    return m_isNvr;
 }
 
 } // namespace plugins
