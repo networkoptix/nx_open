@@ -56,9 +56,7 @@ class VagrantBoxFactory(object):
     def __init__(self, cache, options, config_factory):
         self._cache = cache
         self._bin_dir = options.bin_dir
-        ca_dir = os.path.join(options.work_dir, 'ca')
-        self._ensure_dir_exists(ca_dir)
-        self._ca = CA(os.path.join(ca_dir, 'ca.crt'), os.path.join(ca_dir, 'ca.key'))
+        self._ca = CA(os.path.join(options.work_dir, 'ca'))
         self._vagrant_private_key_path = None  # defined for remote ssh vm host
         self._config_factory = config_factory
         self._vm_host = host_from_config(options.vm_ssh_host_config)
