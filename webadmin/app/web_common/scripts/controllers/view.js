@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
-            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords',
+            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast',
               'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
-    function ($scope, $rootScope, $location, $routeParams, cameraRecords,
+    function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast,
               camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
         var channels = {
@@ -239,6 +239,15 @@ angular.module('nxCommon').controller('ViewCtrl',
             });
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
+
+            if($scope.debugMode){
+                var streamInfo = {};
+                var streamType = $scope.player == "webm" ? "webm" : "hls";
+                streamInfo.src = $scope.player == "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
+                                                         : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
+                streamInfo.title = $scope.activeCamera.name;
+                chromeCast.load(streamInfo, streamType);
+            }
         }
 
 
