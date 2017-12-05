@@ -32,7 +32,7 @@ class ServerInstallation(object):
         self._current_cloud_host = None  # cloud_host encoded in currently installed binary .so file, None means unknown yet
 
     def cleanup_var_dir(self):
-        self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH)])
+        self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
 
     def update_cert(self, ca):
         self.host.run_command(['mkdir', '-p', os.path.dirname(self._key_cert_path)])
