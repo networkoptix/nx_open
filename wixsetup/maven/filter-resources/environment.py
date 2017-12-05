@@ -18,7 +18,7 @@ def execute_command(command, verbose = False):
         print_command(command)
     try:
         subprocess.check_output(command, stderr = subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         if not verbose:
             print_command(command)
         print "Error: {0}".format(e.output)

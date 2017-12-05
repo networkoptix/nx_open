@@ -9,6 +9,7 @@ from environment import bin_source_dir, rename, execute_command
 from light_interface import light_command
 from candle_interface import candle_executable
 from signtool_interface import sign_command
+from insignia_interface import extract_engine_command, reattach_engine_command
 
 engine_tmp_folder = 'obj'
 
@@ -124,14 +125,11 @@ def get_sign_command(folder, msi):
 def create_sign_command_set(folder, msi):
     return [get_sign_command(folder, msi)]
 
-def get_extract_engine_command(exe, out):
-    return ['insignia', '-ib', exe, '-o', out]
+def get_extract_engine_command(bundle, output):
+    return extract_engine_command(bundle, output)
 
-def get_bundle_engine_command(engine, out):
-    return ['insignia', '-ab', engine, out, '-o', out]
-
-def get_remove_file_command(file_path):
-    return ['del', abspath(file_path)]
+def get_bundle_engine_command(engine, bundle):
+    return reattach_engine_command(engine, bundle, bundle)
 
 def create_sign_burn_exe_command_set(folder, engine_folder, exe):
     engine_filename = exe + '.engine.exe'
@@ -222,7 +220,7 @@ def main():
         add_build_nxtool_commands(commands)
 
     for command in commands:
-        execute_command(command)
+        execute_command(command, True)
 
     # Debug code to make applauncher work from the build_environment/target/bin folder
     rename(bin_source_dir, 'minilauncher.exe', '${minilauncher.binary.name}')
