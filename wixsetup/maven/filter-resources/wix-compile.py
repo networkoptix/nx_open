@@ -8,6 +8,7 @@ from os.path import dirname, join, exists, isfile, abspath
 from environment import bin_source_dir, rename, execute_command
 from light_interface import light_command
 from candle_interface import candle_executable
+from signtool_interface import sign_command
 
 engine_tmp_folder = 'obj'
 
@@ -113,7 +114,12 @@ def get_candle_command(project, suffix, args, components):
     return command
 
 def get_sign_command(folder, msi):
-    return ['sign.bat', '{0}/{1}'.format(folder, msi)]
+    target_file = '{0}/{1}'.format(folder, msi)
+    main_certificate = '${certificates_path}/wixsetup/${sign.cer}'
+    additional_certificate = '${sign.intermediate.cer}'
+    password = '${sign.password}'
+    description = '"${company.name} ${display.product.name}"'   
+    return sign_command(target_file, main_certificate, additional_certificate, password, description)
 
 def create_sign_command_set(folder, msi):
     return [get_sign_command(folder, msi)]

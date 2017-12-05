@@ -3,6 +3,7 @@ import shutil
 import os
 
 wix_directory = '${wix_directory}/bin'
+signtool_directory = '${signtool_directory}/bin'
 qt_directory = '${qt.dir}'
 build_configuration = '${build.configuration}'
 installer_cultures = '${installer.cultures}'

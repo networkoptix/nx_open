@@ -9,6 +9,8 @@ set(ClientFontsDir "${bin_source_dir}/fonts")
 set(target_pack_dir ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
+file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
+file(TO_CMAKE_PATH ${certificates_path} certificates_path)
 file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 
 ExternalProject_Add(

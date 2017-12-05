@@ -160,6 +160,8 @@ function(get_dependencies)
         nx_rdep_add_package("vmaxproxy-2.1")
         nx_rdep_add_package(windows/wix-3.11 PATH_VARIABLE wix_directory)
         set(wix_directory ${wix_directory} PARENT_SCOPE)
+        nx_rdep_add_package(windows/signtool PATH_VARIABLE signtool_directory)
+        set(signtool_directory ${signtool_directory} PARENT_SCOPE)
     endif()
 
     if(box STREQUAL "edge1")
