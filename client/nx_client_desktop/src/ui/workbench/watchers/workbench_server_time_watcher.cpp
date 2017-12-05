@@ -1,6 +1,5 @@
 #include "workbench_server_time_watcher.h"
 
-#include <api/media_server_connection.h>
 #include <api/model/time_reply.h>
 
 #include <client/client_settings.h>
@@ -14,6 +13,7 @@
 
 #include <utils/common/synctime.h>
 #include <core/resource/fake_media_server.h>
+#include <api/server_rest_connection.h>
 
 namespace {
     const int serverTimeUpdatePeriodMs = 1000 * 60 * 2; /* 2 minutes. */
@@ -122,8 +122,22 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
     if (server->getStatus() != Qn::Online || server.dynamicCast<QnFakeMediaServerResource>())
         return;
 
-    int handle = server->apiConnection()->getTimeAsync(this, SLOT(at_replyReceived(int, const QnTimeReply &, int)));
-    m_resourceByHandle[handle] = server;
+    QPointer<QnWorkbenchServerTimeWatcher> guard(this);
+    server->restConnection()->getServerLocalTime(
+        [this, guard, server](bool success, rest::Handle /*handle*/, QnJsonRestResult reply)
+        {
+            if (!success || !guard || !server->resourcePool())
+                return;
+
+            const auto result = reply.deserialized<QnTimeReply>();
+
+            if (m_utcOffsetByResource.value(server) == result.timeZoneOffset)
+                return;
+
+            m_utcOffsetByResource[server] = result.timeZoneOffset;
+            emit displayOffsetsChanged();
+        },
+        this->thread());
 }
 
 
@@ -151,15 +165,4 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
 
     m_utcOffsetByResource.remove(server);
     disconnect(server, NULL, this, NULL);
-}
-
-void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QnTimeReply &reply, int handle) {
-    QnMediaServerResourcePtr server = m_resourceByHandle.take(handle);
-    if (!m_utcOffsetByResource.contains(server))
-        return;
-
-    if(status == 0) {
-        m_utcOffsetByResource[server] = reply.timeZoneOffset;
-        emit displayOffsetsChanged();
-    }
 }
