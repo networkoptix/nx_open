@@ -26,13 +26,13 @@ LWS_SYNC_CHECK_TIMEOUT = datetime.timedelta(minutes=1)  # calling api/moduleInfo
 
 class LightweightServersFactory(object):
 
-    def __init__(self, artifact_factory, physical_installation_ctl, test_binary_path):
+    def __init__(self, artifact_factory, physical_installation_ctl, test_binary_path, ca):
         self._artifact_factory = artifact_factory
         self._physical_installation_ctl = physical_installation_ctl
         self._test_binary_path = test_binary_path
         physical_installation_host = self._pick_server()
         if physical_installation_host:
-            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host)
+            self._lws_host = LightweightServersHost(self._artifact_factory, self._test_binary_path, physical_installation_host, ca)
         else:
             self._lws_host = None
 

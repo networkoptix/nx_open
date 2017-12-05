@@ -267,7 +267,8 @@ def server_factory(run_options, init_logging, artifact_factory, customization_co
 def lightweight_servers_factory(run_options, artifact_factory, physical_installation_ctl):
     test_binary_path = os.path.join(run_options.bin_dir, LWS_BINARY_NAME)
     assert os.path.isfile(test_binary_path), 'Test binary for lightweight servers is missing at %s' % test_binary_path
-    lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path)
+    ca = CA(os.path.join(run_options.work_dir, 'ca'))
+    lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path, ca)
     yield lwsf
     lwsf.release()
 
