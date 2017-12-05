@@ -9,12 +9,17 @@ installer_cultures = '${installer.cultures}'
 installer_language = '${installer.language}'
 bin_source_dir = '${bin_source_dir}'
 
+def print_command(command):
+    print '>> {0}'.format(subprocess.list2cmdline(command))
+
 def execute_command(command, verbose = False):
     if verbose:
-        print '>> {0}'.format(' '.join(command))
+        print_command(command)
     try:
         subprocess.check_output(command, stderr = subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
+        if not verbose:
+            print_command(command)
         print "Error: {0}".format(e.output)
         raise
 
