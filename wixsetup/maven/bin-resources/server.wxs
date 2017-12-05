@@ -239,7 +239,9 @@
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentRef Id="ServerHttpPlugin"/>
             <ComponentRef Id="ServerMulticastPlugin"/>
-            <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
+            <?if $(var.customization) = "hanwha"?>
+                <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
+            <?endif?>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
