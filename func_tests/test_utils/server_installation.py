@@ -34,14 +34,8 @@ class ServerInstallation(object):
     def cleanup_var_dir(self):
         self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
 
-    def update_cert(self, ca):
-        self.host.run_command(['mkdir', '-p', os.path.dirname(self._key_cert_path)])
-        request = self.host.run_command([
-            'openssl', 'req',
-            '-newkey', 'rsa:2048', '-nodes', '-keyout', self._key_cert_path,
-            '-subj', '/C=US/O=NetworkOptix/CN=nxwitness'])  # Spaces spoil args!
-        cert = ca.sign(request)
-        self.host.run_command(['tee', '-a', self._key_cert_path], input=cert)
+    def put_key_and_cert(self, key_and_cert):
+        self.host.write_file(os.path.join(self.dir, MEDIASERVER_KEY_CERT_PATH), key_and_cert)
 
     def list_core_files(self):
         return self.host.expand_glob(os.path.join(self.dir, 'bin/*core*'))

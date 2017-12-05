@@ -1,8 +1,8 @@
 import logging
 import os
 
-import subprocess
-import textwrap
+from subprocess import Popen, check_output, check_call, PIPE
+from textwrap import dedent
 
 log = logging.getLogger(__name__)
 
@@ -33,14 +33,22 @@ class CA(object):
                     IP.1 = 127.0.0.1
                 """)))
 
-    def sign(self, request):
+    def generate_key_and_cert(self):
+        log.debug("Generate key.")
+        key = check_output(['openssl', 'genrsa', '2048'])
+        request_subject = '/C=US/O=NetworkOptix/CN=nxwitness'
+        request_command_line = ['openssl', 'req', '-new', '-key', '-', '-subj', request_subject]
+        log.debug("Make request.")
+        request_process = Popen(request_command_line, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        request, request_stderr = request_process.communicate(key)
+        assert request_process.returncode == 0, "Non-zero exit code when making request:\n%s" % request_stderr
         log.debug("Sign request:\n%s", request)
-        process = subprocess.Popen(
-            ['openssl', 'x509', '-req',
-             '-CA', self.cert_path, '-CAkey', self._key_path, '-CAserial', self._serial_path, '-CAcreateserial',
-             '-extfile', self._extensions_config_path]
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        certificate, stderr = process.communicate(input=request)
-        log.debug("Got certificate:\n%s", certificate)
-        assert process.returncode == 0, "Issuing new cert ended with non-zero exit code; stderr:%r" % stderr
-        return certificate
+        cert_command_line = [
+            'openssl', 'x509', '-req',
+            '-CA', self.cert_path, '-CAkey', self._key_path, '-CAserial', self._serial_path, '-CAcreateserial',
+            '-extfile', self._extensions_config_path]
+        cert_process = Popen(cert_command_line, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        cert, cert_stderr = cert_process.communicate(input=request)
+        log.debug("Got certificate:\n%s", cert)
+        assert cert_process.returncode == 0, "Non-zero exit code when signing request:\n%s" % cert_stderr
+        return key + cert
