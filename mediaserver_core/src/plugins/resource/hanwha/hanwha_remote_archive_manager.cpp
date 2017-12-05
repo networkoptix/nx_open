@@ -12,6 +12,14 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+namespace {
+
+static const std::chrono::milliseconds kWaitBeforeSync(30000);
+static const std::chrono::milliseconds kWaitBeforeNextChunk(3000);
+static const int kNumberOfSyncCycles = 2;
+
+} // namespace
+
 using namespace nx::core::resource;
 
 HanwhaRemoteArchiveManager::HanwhaRemoteArchiveManager(HanwhaResource* resource):
@@ -87,6 +95,15 @@ void HanwhaRemoteArchiveManager::afterSynchronization(bool isSynchronizationSucc
     NX_INFO(this, lm("Setting date and time (%1) for resource %2")
         .args(dateTime, m_resource->getUserDefinedName()));
     m_resource->sharedContext()->setDateTime(dateTime);
+}
+
+RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() const
+{
+    return {
+        kWaitBeforeSync,
+        kWaitBeforeNextChunk,
+        kNumberOfSyncCycles
+    };
 }
 
 } // namespace plugins

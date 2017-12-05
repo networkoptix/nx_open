@@ -168,7 +168,7 @@ bool QnUserRolesModelPrivate::updateUserRole(const ec2::ApiUserRoleData& userRol
 
         int row = std::distance(m_userRoles.begin(), insertionPosition) + indexOffset;
 
-        QnUserRolesModel::ScopedInsertRows insertRows(q, QModelIndex(), row, row);
+        QnUserRolesModel::ScopedInsertRows insertRows(q,  row, row);
         m_userRoles.insert(insertionPosition, userRole);
         return true;
     }
@@ -233,7 +233,7 @@ bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
     int row = std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
 
     Q_Q(QnUserRolesModel);
-    QnUserRolesModel::ScopedRemoveRows removeRows(q, QModelIndex(), row, row);
+    QnUserRolesModel::ScopedRemoveRows removeRows(q,  row, row);
     m_userRoles.erase(roleIterator);
     return true;
 }

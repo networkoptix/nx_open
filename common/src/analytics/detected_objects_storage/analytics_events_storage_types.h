@@ -78,6 +78,7 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params);
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter);
+QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
     (deviceId)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)

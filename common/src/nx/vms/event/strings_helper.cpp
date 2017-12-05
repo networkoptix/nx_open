@@ -56,7 +56,7 @@ nx::api::AnalyticsEventType analyticsEventType(const QnVirtualCameraResourcePtr&
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
         [eventTypeId](const nx::api::AnalyticsEventType eventType)
         {
-            return eventType.eventTypeId == eventTypeId;
+            return eventType.typeId == eventTypeId;
         });
 
     return eventType == types.cend()
@@ -723,7 +723,7 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
     const auto eventType = analyticsEventType(camera, driverId, eventTypeId);
-    const auto text = eventType.eventName.text(locale);
+    const auto text = eventType.name.text(locale);
 
     return !text.isEmpty()
         ? text

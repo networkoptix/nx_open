@@ -26,6 +26,9 @@ static const nxpl::NX_GUID kLineCrossingEventGuid =
 static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
     {{0xB0, 0xE6, 0x40, 0x44, 0xFF, 0xA3, 0x4B, 0x7F, 0x80, 0x7A, 0x06, 0x0C, 0x1F, 0xE5, 0xA0, 0x4C}};
 
+static const nxpl::NX_GUID kCarDetectedEventGuid =
+    {{ 0x15, 0x3D, 0xD8, 0x79, 0x1C, 0xD2, 0x46, 0xB7, 0xAD, 0xD6, 0x7C, 0x6B, 0x48, 0xEA, 0xC1, 0xFC }};
+
 } // namespace
 
 using namespace nx::sdk;
@@ -105,11 +108,15 @@ const char* Manager::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
+    // TODO: Reuse GUID constants declared in this file.
     return R"json(
         {
             "supportedEventTypes": [
                 "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
                 "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
+            ]
+            "supportedObjectTypes": [
+                "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}"
             ]
         }
     )json";
@@ -152,7 +159,7 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
     detectedEvent->setDescription("Line crossing (description)");
     detectedEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
     detectedEvent->setIsActive(m_counter == 1);
-    detectedEvent->setEventTypeId(m_eventTypeId);
+    detectedEvent->setTypeId(m_eventTypeId);
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
@@ -174,7 +181,7 @@ AbstractMetadataPacket* Manager::cookSomeObjects(
 
     detectedObject->setId(objectId);
     detectedObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    detectedObject->setEventTypeId(m_objectTypeId);
+    detectedObject->setTypeId(kCarDetectedEventGuid);
 
     double dt = m_counterObjects++ / 32.0;
     double intPart;

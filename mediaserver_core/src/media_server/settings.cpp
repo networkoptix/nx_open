@@ -187,6 +187,7 @@ void MSSettings::loadAnalyticEventsStorageSettings()
     QnSettings settings(m_roSettings.get());
 
     m_roSettings->beginGroup("analyticEventsStorage");
+    m_analyticEventsStorage.dbConnectionOptions.maxConnectionCount = 20; //< TODO: #ak
     m_analyticEventsStorage.load(settings);
     if (m_analyticEventsStorage.dbConnectionOptions.dbName.isEmpty())
     {

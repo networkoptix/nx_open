@@ -124,7 +124,7 @@ def test_secondary_server_temporary_inet_on(system):
     system.secondary.start_service()
 
     # Restart secondary server
-    system.secondary.restart()
+    system.secondary.restart_via_api()
     assert holds_long_enough(lambda: system.primary.get_time().is_close_to(get_internet_time())), (
         "After NON-PRIMARY time server restart via API, "
         "its time %s is NOT EQUAL to internet time %s" % (

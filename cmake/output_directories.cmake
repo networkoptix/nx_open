@@ -35,8 +35,30 @@ function(set_output_directories)
         list(APPEND affected_variables "CMAKE_LIBRARY_OUTPUT_DIRECTORY${CONFIG}")
     endforeach()
 
+    set(distribution_output_dir "${CMAKE_BINARY_DIR}/distrib")
+    file(MAKE_DIRECTORY ${distribution_output_dir})
+    set(distribution_output_dir ${distribution_output_dir} PARENT_SCOPE)
+
     if(DIR_AFFECTED_VARIABLES_RESULT)
         set(${DIR_AFFECTED_VARIABLES_RESULT} ${affected_variables} PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(nx_create_dev_qt_conf)
+    if(CMAKE_CROSSCOMPILING)
+        set(qt_prefix "..")
+    else()
+        set(qt_prefix "${QT_DIR}")
+    endif()
+
+    if(CMAKE_MULTI_CONFIGURATION_MODE)
+        foreach(config ${CMAKE_ACTIVE_CONFIGURATIONS})
+            string(TOUPPER ${config} config)
+            nx_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config}}/qt.conf
+                QT_PREFIX ${qt_prefix})
+        endforeach()
+    else()
+        nx_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf QT_PREFIX ${qt_prefix})
     endif()
 endfunction()
 

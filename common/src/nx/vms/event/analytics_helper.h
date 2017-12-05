@@ -41,6 +41,10 @@ public:
         const QnUuid& eventTypeId,
         const QString& locale);
 
+    static QString objectName(const QnVirtualCameraResourcePtr& camera,
+        const QnUuid& objectTypeId,
+        const QString& locale);
+
 };
 
 } // namespace event

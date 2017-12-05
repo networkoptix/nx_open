@@ -945,7 +945,7 @@ void QnWorkbenchNavigator::jumpBackward()
         bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
-            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
+            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
         if (!periods.empty())
         {
@@ -996,7 +996,7 @@ void QnWorkbenchNavigator::jumpForward()
         bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
-            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
+            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
         /* We want timeline to jump relatively to current position, not camera frame. */
         qint64 currentTime = m_timeSlider->value();
@@ -1909,11 +1909,16 @@ void QnWorkbenchNavigator::updateSpeedRange()
 
 void QnWorkbenchNavigator::updateTimelineRelevancy()
 {
-    auto value = isRecording()
+    // We cannot get earliest time via RTSP for cameras we cannot view.
+    const auto resource = currentWidget() ? currentWidget()->resource() : QnResourcePtr();
+    const bool widgetIsReady = m_currentWidgetLoaded ||
+        (resource && !accessController()->hasPermissions(resource, Qn::ViewLivePermission));
+
+    const auto value = isRecording()
         || (currentWidget()
-            && m_currentWidgetLoaded
+            && widgetIsReady
             && isPlayingSupported()
-            && (hasArchive() || currentWidget()->resource()->flags().testFlag(Qn::local)));
+            && (hasArchive() || resource->flags().testFlag(Qn::local)));
 
     if (m_timelineRelevant == value)
         return;

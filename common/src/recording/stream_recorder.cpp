@@ -473,7 +473,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
 
     if (m_endDateTime != qint64(AV_NOPTS_VALUE)
-        && md->timestamp - m_endDateTime > MAX_FRAME_DURATION * 2 * 1000LL
+        && md->timestamp - m_endDateTime > MAX_FRAME_DURATION_MS * 2 * 1000LL
         && m_truncateInterval > 0)
     {
         // If multifile recording is allowed, recreate the file if a recording hole is detected.
@@ -1087,9 +1087,6 @@ bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/
 
 bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
-    if (m_motionHandler)
-        return m_motionHandler(motion);
-
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
         motion->serialize(m_motionFileList[motion->channelNumber].data());
     return true;
@@ -1235,11 +1232,6 @@ void QnStreamRecorder::forceAudioLayout(const QnResourceAudioLayoutPtr& layout)
 void QnStreamRecorder::disableRegisterFile(bool disable)
 {
     m_disableRegisterFile = disable;
-}
-
-void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
-{
-    m_motionHandler = handler;
 }
 
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)

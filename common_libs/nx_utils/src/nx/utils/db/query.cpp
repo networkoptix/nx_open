@@ -61,6 +61,11 @@ QVariant SqlQuery::value(const QString& name) const
     return m_sqlQuery.value(name);
 }
 
+QSqlRecord SqlQuery::record()
+{
+    return m_sqlQuery.record();
+}
+
 QSqlQuery& SqlQuery::impl()
 {
     return m_sqlQuery;

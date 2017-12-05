@@ -91,10 +91,12 @@ protected:
     void thenAllEventsCanBeRead()
     {
         whenLookupObjects(Filter());
-        thenLookupResultMatches(Filter(), m_analyticsDataPackets);
+
+        thenLookupSucceded();
+        andLookupResultMatches(Filter(), m_analyticsDataPackets);
     }
 
-    void thenLookupResultMatches(
+    void andLookupResultMatches(
         const Filter& filter,
         const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& expected)
     {
@@ -110,7 +112,6 @@ protected:
                     return left.track.front().timestampUsec > right.track.front().timestampUsec;
             });
 
-        thenLookupSucceded();
         andLookupResultEquals(filterObjects(objects, filter));
     }
 
@@ -180,6 +181,36 @@ protected:
         return objects;
     }
 
+    void assertEqual(
+        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& left,
+        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& right)
+    {
+        ASSERT_EQ(left.size(), right.size());
+        // TODO
+    }
+
+    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filterPackets(
+        const Filter& filter,
+        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> packets)
+    {
+        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filteredPackets;
+        std::copy_if(
+            packets.begin(),
+            packets.end(),
+            std::back_inserter(filteredPackets),
+            [this, &filter](const common::metadata::ConstDetectionMetadataPacketPtr& packet)
+            {
+                return satisfiesFilter(filter, *packet);
+            });
+
+        return filteredPackets;
+    }
+
+    EventsStorage& eventsStorage()
+    {
+        return *m_eventsStorage;
+    }
+
 private:
     struct LookupResult
     {
@@ -202,13 +233,41 @@ private:
 
     bool satisfiesFilter(
         const Filter& filter,
-        const nx::analytics::storage::ObjectPosition& objectPosition)
+        const ObjectPosition& data)
     {
-        if (!filter.deviceId.isNull() && objectPosition.deviceId != filter.deviceId)
+        if (!filter.boundingBox.isNull())
+        {
+            if (!filter.boundingBox.intersects(data.boundingBox))
+                return false;
+        }
+
+        return satisfiesCommonConditions(filter, data);
+    }
+
+    bool satisfiesFilter(
+        const Filter& filter,
+        const common::metadata::DetectionMetadataPacket& data)
+    {
+        if (!filter.boundingBox.isNull())
+        {
+            bool intersects = false;
+            for (const auto& object: data.objects)
+                intersects |= filter.boundingBox.intersects(object.boundingBox);
+            if (!intersects)
+                return false;
+        }
+
+        return satisfiesCommonConditions(filter, data);
+    }
+
+    template<typename T>
+    bool satisfiesCommonConditions(const Filter& filter, const T& data)
+    {
+        if (!filter.deviceId.isNull() && data.deviceId != filter.deviceId)
             return false;
 
         if (!filter.timePeriod.isNull() &&
-            !filter.timePeriod.contains(objectPosition.timestampUsec / kUsecInMs))
+            !filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
         {
             return false;
         }
@@ -289,6 +348,15 @@ protected:
             toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
     }
 
+    void addRandomBoundingBoxToFilter()
+    {
+        m_filter.boundingBox = QRectF(
+            nx::utils::random::number<float>(0, 1),
+            nx::utils::random::number<float>(0, 1),
+            nx::utils::random::number<float>(0, 1),
+            nx::utils::random::number<float>(0, 1));
+    }
+
     void givenEmptyFilter()
     {
         m_filter = Filter();
@@ -300,6 +368,8 @@ protected:
         addRandomNonEmptyTimePeriodToFilter();
         if (nx::utils::random::number<bool>())
             addLimitToFilter();
+        if (nx::utils::random::number<bool>())
+            addRandomBoundingBoxToFilter();
     }
 
     void setSortOrder(Qt::SortOrder sortOrder)
@@ -342,9 +412,26 @@ protected:
         whenLookupObjects();
     }
 
+    void whenLookupByRandomBoundingBox()
+    {
+        addRandomBoundingBoxToFilter();
+        whenLookupObjects();
+    }
+
     void thenResultMatchesExpectations()
     {
-        thenLookupResultMatches(m_filter, m_analyticsDataPackets);
+        thenLookupSucceded();
+        andLookupResultMatches(m_filter, m_analyticsDataPackets);
+    }
+
+    const Filter& filter() const
+    {
+        return m_filter;
+    }
+
+    const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& analyticsDataPackets() const
+    {
+        return m_analyticsDataPackets;
     }
 
 private:
@@ -483,8 +570,13 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
 
 // TEST_F(AnalyticsEventsStorage, full_text_search)
 // TEST_F(AnalyticsEventsStorage, lookup_by_attribute_value)
-// TEST_F(AnalyticsEventsStorage, lookup_by_bounding_box)
-// TEST_F(AnalyticsEventsStorage, lookup_by_rectangle)
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
+{
+    whenLookupByRandomBoundingBox();
+    thenResultMatchesExpectations();
+}
+
 // TEST_F(AnalyticsEventsStorage, lookup_by_objectId)
 // TEST_F(AnalyticsEventsStorage, lookup_by_objectTypeId)
 // TEST_F(AnalyticsEventsStorage, lookup_stress_test)
@@ -492,8 +584,70 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
 //-------------------------------------------------------------------------------------------------
 // Cursor.
 
-// TEST_F(AnalyticsEventsStorage, cursor_provides_all_matched_data)
-// TEST_F(AnalyticsEventsStorage, many_concurrent_cursors)
+class AnalyticsEventsStorageCursor:
+    public AnalyticsEventsStorageLookup
+{
+    using base_type = AnalyticsEventsStorageLookup;
+
+protected:
+    void whenReadDataUsingCursor()
+    {
+        whenCreateCursor();
+        thenCursorIsCreated();
+
+        readAllDataFromCursor();
+    }
+
+    void whenCreateCursor()
+    {
+        using namespace std::placeholders;
+
+        eventsStorage().createLookupCursor(
+            filter(),
+            std::bind(&AnalyticsEventsStorageCursor::saveCursor, this, _1, _2));
+    }
+
+    void thenCursorIsCreated()
+    {
+        m_cursor = m_createdCursorsQueue.pop();
+        ASSERT_NE(nullptr, m_cursor);
+    }
+
+    void thenResultMatchesExpectations()
+    {
+        assertEqual(filterPackets(filter(), analyticsDataPackets()), m_packetsRead);
+    }
+
+private:
+    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_packetsRead;
+    nx::utils::SyncQueue<std::unique_ptr<AbstractCursor>> m_createdCursorsQueue;
+    std::unique_ptr<AbstractCursor> m_cursor;
+
+    void readAllDataFromCursor()
+    {
+        while (auto packet = m_cursor->next())
+            m_packetsRead.push_back(packet);
+    }
+
+    void saveCursor(
+        ResultCode /*resultCode*/,
+        std::unique_ptr<AbstractCursor> cursor)
+    {
+        m_createdCursorsQueue.push(std::move(cursor));
+    }
+};
+
+TEST_F(AnalyticsEventsStorageCursor, cursor_provides_all_matched_data)
+{
+    givenRandomFilter();
+    setSortOrder(Qt::SortOrder::DescendingOrder);
+
+    whenReadDataUsingCursor();
+
+    thenResultMatchesExpectations();
+}
+
+//TEST_F(AnalyticsEventsStorage, many_concurrent_cursors)
 
 //-------------------------------------------------------------------------------------------------
 // Deprecating data.

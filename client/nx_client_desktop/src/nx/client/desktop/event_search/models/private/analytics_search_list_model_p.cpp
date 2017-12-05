@@ -56,8 +56,8 @@ void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourceP
     if (m_camera == camera)
         return;
 
-    m_camera = camera;
     clear();
+    m_camera = camera;
 
     // TODO: #vkutin Subscribe to analytics metadata in RTSP stream. Process it as required.
 }
@@ -148,9 +148,10 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
-        for (auto iter = m_prefetch.begin(); iter != end; ++iter)
-            m_data.push_back(std::move(*iter));
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
+        m_data.insert(m_data.end(),
+            std::make_move_iterator(m_prefetch.begin()),
+            std::make_move_iterator(end));
     }
 
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;

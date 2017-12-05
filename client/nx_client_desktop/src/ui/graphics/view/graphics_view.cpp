@@ -114,8 +114,13 @@ void QnGraphicsView::showEvent(QShowEvent *event) {
 }
 
 bool QnGraphicsView::isInRedirectedPaint() const {
+    const auto viewport = this->viewport();
+    NX_ASSERT(viewport);
+    if (!viewport)
+        return false;
+
     QPoint offset;
-    return open(viewport())->invokeRedirected(&offset) != viewport();
+    return open(viewport)->invokeRedirected(&offset) != viewport;
 }
 
 void QnGraphicsView::paintEvent(QPaintEvent *event) {

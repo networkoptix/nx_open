@@ -48,7 +48,7 @@ public:
     virtual void setEndOfPlaybackHandler(std::function<void()> handler) override;
     virtual void setErrorHandler(std::function<void(const QString& errorString)> handler) override;
 
-    QnAbstractArchiveDelegate* wrappedDelegate() const;
+    QnAbstractArchiveDelegate* delegate() const;
 
 private:
     ArchiveDelegatePtr m_delegate;

@@ -17,6 +17,8 @@
 #include "buffer_source.h"
 #include "custom_headers.h"
 
+#include <nx/fusion/model_functions.h>
+
 using std::make_pair;
 
 namespace {
@@ -1498,3 +1500,9 @@ AsyncClient::Result AsyncClient::invokeHandler(
 }
 
 } // namespace nx_http
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, AuthType,
+(nx_http::AuthType::authBasicAndDigest, "authBasicAndDigest")
+(nx_http::AuthType::authDigest, "authDigest")
+(nx_http::AuthType::authBasic, "authBasic")
+)

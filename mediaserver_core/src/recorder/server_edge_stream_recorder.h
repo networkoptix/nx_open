@@ -1,6 +1,7 @@
 #pragma once
 
 #include <recorder/server_stream_recorder.h>
+#include <nx/utils/move_only_func.h>
 
 class QnServerEdgeStreamRecorder: public QnServerStreamRecorder
 {
@@ -32,10 +33,12 @@ class QnServerEdgeStreamRecorder: public QnServerStreamRecorder
     };
 
 public:
-    using FileWrittenHandler = std::function<void(
+    using FileWrittenHandler = nx::utils::MoveOnlyFunc<void(
         std::chrono::milliseconds startTime,
         std::chrono::milliseconds duration)>;
 
+    using MotionHandler =
+        nx::utils::MoveOnlyFunc<bool(const QnConstMetaDataV1Ptr& motion)>;
 
 public:
     QnServerEdgeStreamRecorder(
@@ -45,7 +48,15 @@ public:
 
     virtual ~QnServerEdgeStreamRecorder();
 
+    /**
+     * Called each time archive file has been written.
+     */
     void setOnFileWrittenHandler(FileWrittenHandler handler);
+
+    /**
+     * Motion handler overrides base class behavior.
+     */
+    void setSaveMotionHandler(MotionHandler handler);
 
 protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
@@ -69,4 +80,5 @@ protected:
 private:
     FileStartedInfo m_lastfileStartedInfo;
     FileWrittenHandler m_fileWrittenHandler;
+    MotionHandler m_motionHandler;
 };

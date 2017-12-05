@@ -63,11 +63,11 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<AbstarctDetectedObject> item(packet->nextItem(), false);
+        nxpt::ScopedRef<AbstractDetectedObject> item(packet->nextItem(), false);
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
-        object.objectTypeId = nxpt::fromPluginGuidToQnUuid(item->eventTypeId());
+        object.objectTypeId = nxpt::fromPluginGuidToQnUuid(item->typeId());
         object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
@@ -82,6 +82,7 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
     }
     data.timestampUsec = packet->timestampUsec();
     data.durationUsec = packet->durationUsec();
+    data.deviceId = m_resource->getId();
 
     if (m_dataReceptor)
         m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
@@ -95,7 +96,7 @@ void EventHandler::handleMetadataEvent(
         ? nx::vms::event::EventState::active
         : nx::vms::event::EventState::inactive;
 
-    const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
+    const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
 
     const bool dublicate = eventState == nx::vms::event::EventState::inactive
         && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;

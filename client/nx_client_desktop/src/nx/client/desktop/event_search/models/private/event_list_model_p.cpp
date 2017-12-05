@@ -31,7 +31,7 @@ bool EventListModel::Private::addFront(const EventData& data)
     if (m_sequentialNumberById.contains(data.id))
         return false;
 
-    ScopedInsertRows insertRows(q, QModelIndex(), 0, 0);
+    ScopedInsertRows insertRows(q,  0, 0);
     m_events.push_front({data, m_nextFrontNumber});
     m_sequentialNumberById[data.id] = m_nextFrontNumber;
     ++m_nextFrontNumber;
@@ -43,7 +43,7 @@ bool EventListModel::Private::addBack(const EventData& data)
     if (m_sequentialNumberById.contains(data.id))
         return false;
 
-    ScopedInsertRows insertRows(q, QModelIndex(), m_events.size(), m_events.size());
+    ScopedInsertRows insertRows(q,  m_events.size(), m_events.size());
     m_events.push_back({data, m_nextBackNumber});
     m_sequentialNumberById[data.id] = m_nextBackNumber;
     --m_nextBackNumber;
@@ -56,7 +56,7 @@ bool EventListModel::Private::removeEvent(const QnUuid& id)
     if (index < 0)
         return false;
 
-    ScopedRemoveRows removeRows(q, QModelIndex(), index, index);
+    ScopedRemoveRows removeRows(q,  index, index);
     m_sequentialNumberById.remove(m_events[index].data.id);
     m_events.removeAt(index);
     m_nextFrontNumber = m_events.empty() ? 0 : m_events.front().sequentialNumber + 1;
@@ -72,7 +72,7 @@ void EventListModel::Private::removeEvents(int first, int count)
     if (count == 0)
         return;
 
-    ScopedRemoveRows removeRows(q, QModelIndex(), first, first + count - 1);
+    ScopedRemoveRows removeRows(q,  first, first + count - 1);
 
     for (int i = 0; i < count; ++i)
     {

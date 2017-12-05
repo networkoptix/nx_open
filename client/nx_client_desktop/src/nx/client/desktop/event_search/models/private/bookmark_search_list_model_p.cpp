@@ -45,8 +45,8 @@ void BookmarkSearchListModel::Private::setCamera(const QnVirtualCameraResourcePt
     if (m_camera == camera)
         return;
 
-    m_camera = camera;
     clear();
+    m_camera = camera;
 }
 
 int BookmarkSearchListModel::Private::count() const
@@ -125,7 +125,7 @@ void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
-        ScopedInsertRows insertRows(q, QModelIndex(), first, first + count - 1);
+        ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(), m_prefetch.cbegin(), end);
 
         for (auto iter = m_prefetch.cbegin(); iter != end; ++iter)
@@ -169,7 +169,7 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
 
     const auto index = std::distance(m_data.cbegin(), insertionPos);
 
-    ScopedInsertRows insertRows(q, QModelIndex(), index, index);
+    ScopedInsertRows insertRows(q,  index, index);
     m_data.insert(m_data.begin() + index, bookmark);
     m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs;
 }
@@ -201,7 +201,7 @@ void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& guid)
     if (index < 0)
         return;
 
-    ScopedRemoveRows removeRows(q, QModelIndex(), index, index);
+    ScopedRemoveRows removeRows(q,  index, index);
     m_data.erase(m_data.begin() + index);
     m_guidToTimestampMs.remove(guid);
 }

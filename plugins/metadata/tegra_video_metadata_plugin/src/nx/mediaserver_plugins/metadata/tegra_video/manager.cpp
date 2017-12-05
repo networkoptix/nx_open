@@ -195,11 +195,12 @@ AbstractMetadataPacket* Manager::pushFrameAndGetRects(
     for (const auto rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
+        // TODO: #mike: Make new GUID for every object.
         static const nxpl::NX_GUID objectId =
             {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
         detectedObject->setId(objectId);
-        detectedObject->setEventTypeId(m_objectTypeId);
+        detectedObject->setTypeId(m_objectTypeId);
 
         NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
             << ", width " << rect.width << ", height " << rect.height;

@@ -3,6 +3,7 @@
 #include <set>
 #include <chrono>
 #include <memory>
+#include <ostream>
 
 #include <QtCore/QRect>
 
@@ -58,9 +59,6 @@ struct DetectionMetadataPacket
 #define DetectionMetadataPacket_Fields (deviceId)(timestampUsec)(durationUsec)(objects)
 QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
 
-QString toString(const DetectionMetadataPacket&);
-QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
-
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right);
 
 #define QN_OBJECT_DETECTION_TYPES \
@@ -76,6 +74,11 @@ bool operator<(const DetectionMetadataPacket& first,
     const DetectionMetadataPacket& second);
 bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second);
 bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second);
+
+QString toString(const DetectionMetadataPacket&);
+QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
+DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr&);
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
 
 } // namespace metadata
 } // namespace common

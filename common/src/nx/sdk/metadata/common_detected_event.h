@@ -16,7 +16,7 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nxpl::NX_GUID eventTypeId() const override;
+    virtual nxpl::NX_GUID typeId() const override;
 
     virtual float confidence() const override;
 
@@ -28,7 +28,7 @@ public:
 
     virtual bool isActive() const override;
 
-    virtual void setEventTypeId(const nxpl::NX_GUID& eventTypeId);
+    virtual void setTypeId(const nxpl::NX_GUID& typeId);
 
     virtual void setConfidence(float confidence);
 
@@ -41,7 +41,7 @@ public:
     virtual void setIsActive(bool isActive);
 
 private:
-    nxpl::NX_GUID m_eventTypeId;
+    nxpl::NX_GUID m_typeId;
     float m_confidence = 1.0;
     std::string m_caption;
     std::string m_description;

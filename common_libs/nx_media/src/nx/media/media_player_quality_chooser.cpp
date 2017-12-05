@@ -24,6 +24,8 @@ static const int kFallbackLowQualityLines = 360;
 static const int kHighQualityFallbackThreshold = 560;
 static const QSize kMaxTranscodingResolution(1920, 1080);
 static const QSize kDefaultAspect(16, 9);
+static const int kWidthRoundingFactor = 16;
+static const int kHeightRoundingFactor = 4;
 
 /**
  * If a particular stream is missing, its out parameters are not assigned a value.
@@ -56,21 +58,24 @@ static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
         return desiredResolution;
 
     QSize result = desiredResolution;
+    const float aspectRatio = result.width() / (float) result.height();
 
     if (result.width() > limit.width())
     {
-        result.setHeight((result.height() * limit.width()) / result.width());
+        result.setHeight(qPower2Round(floor(0.5 + limit.width() / aspectRatio), kHeightRoundingFactor));
         result.setWidth(limit.width());
     }
 
     if (result.height() > limit.height())
     {
-        result.setWidth((result.width() * limit.height()) / result.height());
+        result.setWidth(qPower2Round(floor(0.5 + limit.height() * aspectRatio), kWidthRoundingFactor));
         result.setHeight(limit.height());
     }
 
-    NX_ASSERT(result.width() <= limit.width());
-    NX_ASSERT(result.height() <= limit.height());
+    if (result.width() > limit.width())
+        result.setWidth(limit.width());
+    if (result.height() > limit.height())
+        result.setHeight(limit.height());
 
     return result;
 }

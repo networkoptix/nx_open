@@ -42,7 +42,7 @@ private:
         nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedEvent> eventData,
         qint64 timestampUsec);
     void handleMetadataObject(
-        nxpt::ScopedRef<nx::sdk::metadata::AbstarctDetectedObject> eventData,
+        nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedObject> eventData,
         qint64 timestampUsec);
 private:
     QnSecurityCamResourcePtr m_resource;

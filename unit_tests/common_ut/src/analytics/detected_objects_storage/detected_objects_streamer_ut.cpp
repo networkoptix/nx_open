@@ -43,6 +43,9 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+static const std::chrono::microseconds kInitialTimestamp(1000);
+static const std::chrono::microseconds kTimestampStep(10);
+
 class EventsStorageStub:
     public AbstractEventsStorage
 {
@@ -68,7 +71,18 @@ public:
         common::metadata::ConstDetectionMetadataPacketPtr packet,
         StoreCompletionHandler completionHandler) override
     {
-        m_detectionPackets.push_back(std::move(packet));
+        auto it = std::upper_bound(
+            m_detectionPackets.begin(),
+            m_detectionPackets.end(),
+            packet,
+            [](const common::metadata::ConstDetectionMetadataPacketPtr& one,
+                const common::metadata::ConstDetectionMetadataPacketPtr& two)
+            {
+                return one->timestampUsec < two->timestampUsec;
+            });
+
+        m_detectionPackets.insert(it, std::move(packet));
+
         completionHandler(ResultCode::ok);
     }
 
@@ -107,18 +121,34 @@ public:
         return m_detectionPackets;
     }
 
+    common::metadata::ConstDetectionMetadataPacketPtr getPacketByTimestamp(
+        std::chrono::microseconds timestamp) const
+    {
+        auto it = std::upper_bound(
+            m_detectionPackets.begin(),
+            m_detectionPackets.end(),
+            timestamp,
+            [](std::chrono::microseconds one,
+                const common::metadata::ConstDetectionMetadataPacketPtr& two)
+            {
+                return one.count() < two->timestampUsec;
+            });
+        if (it == m_detectionPackets.begin())
+            return nullptr;
+
+        return *(--it);
+    }
+
     void generateRandomPackets()
     {
         const int packetCount = nx::utils::random::number<int>(10, 20);
         const auto deviceId = QnUuid::createUuid();
-        const qint64 initialTimestamp = 1000;
-        const qint64 timestampStep = 10;
 
         for (int i = 0; i < packetCount; ++i)
         {
             auto packet = generateRandomPacket(1);
             packet->deviceId = deviceId;
-            packet->timestampUsec = initialTimestamp + i * timestampStep;
+            packet->timestampUsec = (kInitialTimestamp + i * kTimestampStep).count();
             m_detectionPackets.push_back(packet);
         }
     }
@@ -126,6 +156,9 @@ public:
 private:
     nx::utils::SyncQueue<Cursor*>* m_createdCursors;
     nx::network::aio::BasicPollable m_asyncCaller;
+    /**
+     * Sorted by increasing timestamp.
+     */
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_detectionPackets;
 };
 
@@ -180,6 +213,16 @@ public:
     }
 
 protected:
+    void setFirstRequestTimestamp(std::chrono::microseconds initialTimestamp)
+    {
+        m_initialRequestTimestamp = initialTimestamp;
+    }
+
+    void setRequestTimestampStep(std::chrono::microseconds timestampStep)
+    {
+        m_requestTimestampStep = timestampStep;
+    }
+
     void whenRequestPacket()
     {
         readPacket(std::chrono::milliseconds(
@@ -192,20 +235,57 @@ protected:
             m_eventsStorageStub.packets()[0]->timestampUsec - 1));
     }
 
-    void whenReadPacketsInALoopUsingMaxTimestamp()
+    void whenReadPacketsInALoopUsingNextPacketTimestamp()
     {
-        const auto timestamp = m_eventsStorageStub.packets().back()->timestampUsec;
-        while (auto packet = m_streamer->getMotionData(timestamp))
+        for (const auto& nextExpectedPacket: m_eventsStorageStub.packets())
+        {
+            auto packet = m_streamer->getMotionData(nextExpectedPacket->timestampUsec);
+            if (!packet)
+                break;
             m_packetsRead.push(packet);
+        }
     }
 
-    void whenRequestMultiplePacketsUsingTimestampsWithGap(int timestampGap)
+    void whenRequestMultiplePacketsUsingTimestampsWithGap(
+        std::chrono::milliseconds timestampGap)
     {
-        auto timestamp = m_eventsStorageStub.packets()[0]->timestampUsec;
-        readPacket(std::chrono::microseconds(timestamp));
+        std::chrono::microseconds timestamp(m_eventsStorageStub.packets()[0]->timestampUsec);
+        readPacket(timestamp);
 
         timestamp += timestampGap;
-        readPacket(std::chrono::microseconds(timestamp));
+        readPacket(timestamp);
+    }
+
+    void whenRequestPacketUsingSomeTimestamp()
+    {
+        readPacket(std::chrono::microseconds(
+            m_eventsStorageStub.packets()[m_eventsStorageStub.packets().size() / 2]
+                ->timestampUsec));
+    }
+
+    void whenRequestPacketUsingMaxTimestamp()
+    {
+        readPacket(std::chrono::microseconds::max());
+    }
+
+    void whenReadPacketsInALoop()
+    {
+        for (auto timestamp = m_initialRequestTimestamp;; timestamp += m_requestTimestampStep)
+        {
+            auto expectedPacket =
+                nx::common::metadata::toMetadataPacket(
+                    *m_eventsStorageStub.getPacketByTimestamp(timestamp));
+            if (m_expectedPackets.empty() ||
+                expectedPacket->timestamp != m_expectedPackets.back()->timestamp)
+            {
+                m_expectedPackets.push_back(expectedPacket);
+            }
+
+            auto packet = m_streamer->getMotionData(timestamp.count());
+            if (!packet)
+                break;
+            m_packetsRead.push(packet);
+        }
     }
 
     void thenCursorIsCreated()
@@ -257,6 +337,29 @@ protected:
         andCursorFilterIsCorrect();
     }
 
+    void thenOnlyNearestPacketIsProvided()
+    {
+        std::vector<QnAbstractCompressedMetadataPtr> packetsRead;
+        while (!m_packetsRead.empty())
+            packetsRead.push_back(m_packetsRead.pop());
+
+        std::vector<QnAbstractCompressedMetadataPtr> packetsExpected;
+        auto packet = m_eventsStorageStub.getPacketByTimestamp(m_lastRequestedTimestamp);
+        if (packet)
+            packetsExpected.push_back(nx::common::metadata::toMetadataPacket(*packet));
+
+        assertEqual(packetsExpected, packetsRead);
+    }
+
+    void thenExpectedPacketsRead()
+    {
+        std::vector<QnAbstractCompressedMetadataPtr> packetsRead;
+        while (!m_packetsRead.empty())
+            packetsRead.push_back(m_packetsRead.pop());
+
+        assertEqual(m_expectedPackets, packetsRead);
+    }
+
 private:
     const QnUuid m_deviceId;
     nx::utils::SyncQueue<Cursor*> m_createdCursors;
@@ -266,6 +369,9 @@ private:
     nx::utils::SyncQueue<QnAbstractCompressedMetadataPtr> m_packetsRead;
     QnAbstractCompressedMetadataPtr m_prevPacketRead;
     Cursor* m_prevCursor = nullptr;
+    std::chrono::microseconds m_initialRequestTimestamp;
+    std::chrono::microseconds m_requestTimestampStep;
+    std::vector<QnAbstractCompressedMetadataPtr> m_expectedPackets;
 
     void readPacket(std::chrono::microseconds timestamp)
     {
@@ -289,6 +395,19 @@ private:
         ASSERT_EQ(expected.timestampUsec, actual.timestamp);
         ASSERT_EQ(expected.durationUsec, actual.m_duration);
     }
+
+    void assertEqual(
+        const std::vector<QnAbstractCompressedMetadataPtr>& expected,
+        const std::vector<QnAbstractCompressedMetadataPtr>& actual)
+    {
+        ASSERT_EQ(expected.size(), actual.size());
+        for (std::size_t i = 0; i < expected.size(); ++i)
+        {
+            ASSERT_EQ(expected[i]->timestamp, actual[i]->timestamp);
+            ASSERT_EQ(expected[i]->m_duration, actual[i]->m_duration);
+            // TODO: deserialize objects and compare.
+        }
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -311,14 +430,43 @@ TEST_F(DetectedObjectsStreamer, returns_null_if_next_packet_timestamp_exceeds_re
 
 TEST_F(DetectedObjectsStreamer, reads_all_available_packets)
 {
-    whenReadPacketsInALoopUsingMaxTimestamp();
+    whenReadPacketsInALoopUsingNextPacketTimestamp();
     thenAllPacketsAreRead();
 }
 
 TEST_F(DetectedObjectsStreamer, acquires_new_cursor_in_case_of_a_gap_in_timestamp)
 {
-    whenRequestMultiplePacketsUsingTimestampsWithGap(MAX_FRAME_DURATION+1);
+    whenRequestMultiplePacketsUsingTimestampsWithGap(
+        MAX_FRAME_DURATION + std::chrono::milliseconds(1));
     thenCursorIsRecreatedUsingNewTimestamp();
+}
+
+TEST_F(DetectedObjectsStreamer, acquires_new_cursor_if_timestamp_jumps_backward)
+{
+    whenRequestMultiplePacketsUsingTimestampsWithGap(
+        std::chrono::milliseconds(-100));
+    thenCursorIsRecreatedUsingNewTimestamp();
+}
+
+TEST_F(DetectedObjectsStreamer, returns_closest_packet_to_the_requested_time_skipping_some_if_needed)
+{
+    whenRequestPacketUsingSomeTimestamp();
+    thenOnlyNearestPacketIsProvided();
+}
+
+TEST_F(DetectedObjectsStreamer, returns_only_last_packet_if_needed)
+{
+    whenRequestPacketUsingMaxTimestamp();
+    thenOnlyNearestPacketIsProvided();
+}
+
+TEST_F(DetectedObjectsStreamer, skips_packets_when_timestamp_skips_every_second_packet)
+{
+    setFirstRequestTimestamp(kInitialTimestamp);
+    setRequestTimestampStep(kTimestampStep * 2);
+
+    whenReadPacketsInALoop();
+    thenExpectedPacketsRead();
 }
 
 //-------------------------------------------------------------------------------------------------

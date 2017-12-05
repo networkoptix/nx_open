@@ -46,6 +46,15 @@ SqlFilterFieldLess::SqlFilterFieldLess(
 {
 }
 
+SqlFilterFieldLessOrEqual::SqlFilterFieldLessOrEqual(
+    const char* name,
+    const char* placeHolderName,
+    QVariant value)
+    :
+    SqlFilterField(name, placeHolderName, std::move(value), "<=")
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 
 QString joinFields(

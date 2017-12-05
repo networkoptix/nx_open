@@ -60,6 +60,11 @@ QString toString(const DetectionMetadataPacket& packet)
         .args(packet.deviceId, packet.timestampUsec, packet.durationUsec);
 }
 
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet)
+{
+    return os << toString(packet).toStdString();
+}
+
 QnCompressedMetadataPtr toMetadataPacket(
     const DetectionMetadataPacket& detectionPacket)
 {
@@ -69,6 +74,19 @@ QnCompressedMetadataPtr toMetadataPacket(
     metadataPacket->setDurationUsec(detectionPacket.durationUsec);
     metadataPacket->setData(QnUbjson::serialized(detectionPacket));
     return metadataPacket;
+}
+
+DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr& compressedMetadata)
+{
+    if (!compressedMetadata)
+        return DetectionMetadataPacketPtr();
+
+    DetectionMetadataPacketPtr metadata(new DetectionMetadataPacket);
+
+    *metadata = QnUbjson::deserialized<DetectionMetadataPacket>(
+        QByteArray::fromRawData(compressedMetadata->data(), int(compressedMetadata->dataSize())));
+
+    return metadata;
 }
 
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right)

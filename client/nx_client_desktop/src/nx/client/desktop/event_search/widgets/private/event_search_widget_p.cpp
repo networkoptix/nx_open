@@ -55,6 +55,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     auto buttonsHolder = new QWidget(m_headerWidget);
     auto buttonsLayout = new QVBoxLayout(buttonsHolder);
+    buttonsHolder->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     buttonsLayout->setSpacing(0);
     buttonsLayout->addWidget(m_superTypeButton);
     buttonsLayout->setAlignment(m_superTypeButton, Qt::AlignLeft);
@@ -64,7 +65,6 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     auto layout = m_headerWidget->layout();
     layout->addWidget(m_searchLineEdit);
     layout->addWidget(buttonsHolder);
-    layout->setAlignment(buttonsHolder, Qt::AlignLeft);
 
     auto sortModel = new EventSortFilterModel(this);
     sortModel->setSourceModel(m_model);

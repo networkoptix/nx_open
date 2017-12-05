@@ -25,7 +25,7 @@
 #include "nx/streaming/media_data_packet.h"
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
-#include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
+#include "utils/common/util.h" /* For MAX_FRAME_DURATION_MS, MIN_FRAME_DURATION_USEC. */
 #include <recorder/recording_manager.h>
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
@@ -425,10 +425,10 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
     {
-        if (m_endDateTime == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+        if (m_endDateTime == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION_MS*1000)
             updateMotionStateInternal(false, media->timestamp, QnMetaDataV1Ptr());
         else
-            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
+            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION_USEC, QnMetaDataV1Ptr());
     }
     QnScheduleTask task = currentScheduleTask();
 
@@ -473,10 +473,10 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
     if (!isMotionContinue && m_endDateTime != (qint64)AV_NOPTS_VALUE)
     {
-        if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+        if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION_MS*1000)
             m_endDateTime = media->timestamp;
         else
-            m_endDateTime += MIN_FRAME_DURATION;
+            m_endDateTime += MIN_FRAME_DURATION_USEC;
         close();
     }
     return isMotionContinue;
@@ -638,7 +638,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
                 updateRecordingType(noRecordTask);
             }
             static const qint64 SCHEDULE_AGGREGATION = 1000*60*15;
-            m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION); // check period each 15 min
+            m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION_MS, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION_MS); // check period each 15 min
         }
     }
     else {

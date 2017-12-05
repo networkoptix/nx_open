@@ -9,9 +9,10 @@ namespace api {
 struct AnalyticsDeviceManifest
 {
     QList<QnUuid> supportedEventTypes;
+    QList<QnUuid> supportedObjectTypes;
 };
 
-#define AnalyticsDeviceManifest_Fields (supportedEventTypes)
+#define AnalyticsDeviceManifest_Fields (supportedEventTypes)(supportedObjectTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDeviceManifest, (json))
 

@@ -32,6 +32,8 @@ const char* toString(DBResult result)
             return "connectionError";
         case DBResult::logicError:
             return "logicError";
+        case DBResult::endOfData:
+            return "endOfData";
         default:
             return "unknown";
     }

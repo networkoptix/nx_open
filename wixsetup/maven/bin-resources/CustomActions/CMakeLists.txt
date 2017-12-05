@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
-cmake_policy(SET CMP0054 NEW)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH
     ${ROOT_DIR}/build_utils/cmake

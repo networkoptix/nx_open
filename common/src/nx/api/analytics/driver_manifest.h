@@ -24,7 +24,7 @@ public:
     enum Capability
     {
         noCapabilities = 0,
-        needDeepCopyForMediaFrame = 0x1
+        needDeepCopyForMediaFrame = 1 << 0,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
@@ -46,9 +46,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
    QList<AnalyticsEventType> outputEventTypes;
-   // TODO: #mike: Add outputObjectTypes list.
+   QList<AnalyticsEventType> outputObjectTypes;
 };
-#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+#define AnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)(outputObjectTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
