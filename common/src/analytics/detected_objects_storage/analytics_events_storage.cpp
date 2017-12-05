@@ -261,8 +261,11 @@ void EventsStorage::loadObjects(
 {
     std::map<QnUuid, std::vector<DetectedObject>::size_type> objectIdToPosition;
 
-    while (selectEventsQuery.next())
+    for (int count = 0; selectEventsQuery.next(); ++count)
     {
+        if (filter.maxObjectsToSelect > 0 && count > filter.maxObjectsToSelect)
+            break;
+
         DetectedObject detectedObject;
         loadObject(&selectEventsQuery, &detectedObject);
 
@@ -270,8 +273,8 @@ void EventsStorage::loadObjects(
             objectIdToPosition.emplace(detectedObject.objectId, result->size());
         if (iterAndIsInsertedFlag.second)
         {
-            if (filter.maxObjectsToSelect > 0 && (int) result->size() >= filter.maxObjectsToSelect)
-                break;
+            //if (filter.maxObjectsToSelect > 0 && (int) result->size() >= filter.maxObjectsToSelect)
+            //    break;
             result->push_back(std::move(detectedObject));
         }
         else
