@@ -18,6 +18,8 @@
 #include "nx/network/http/buffer_source.h"
 #include "nx/network/http/custom_headers.h"
 
+#include <nx/fusion/model_functions.h>
+
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 

@@ -98,8 +98,8 @@ const char* Plugin::capabilitiesManifest(Error* error) const
             },
             "outputEventTypes": [
                 {
-                    "eventTypeId": "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
-                    "eventName": {
+                    "typeId": "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
+                    "name": {
                         "value": "Line crossing",
                         "localization": {
                             "ru_RU": "Line crossing (translated to Russian)"
@@ -107,11 +107,31 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                     }
                 },
                 {
-                    "eventTypeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
-                    "eventName": {
+                    "typeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
+                    "name": {
                         "value": "Object in the area",
                         "localization": {
                             "ru_RU": "Object in the area (translated to Russian)"
+                        }
+                    }
+                }
+            ],
+            "outputObjectTypes": [
+                {
+                    "typeId": "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}",
+                    "name": {
+                        "value": "Car detected",
+                        "localization": {
+                            "ru_RU": "Car detected (translated to Russian)"
+                        }
+                    }
+                },
+                {
+                    "typeId": "{C23DEF4D-04F7-4B4C-994E-0C0E6E8B12CB}",
+                    "name": {
+                        "value": "Human face detected",
+                        "localization": {
+                            "ru_RU": "Human face detected (translated to Russian)"
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QVariant>
+#include <QtSql/QSqlRecord>
 #include <QtSql/QSqlQuery>
 
 #include "types.h"
@@ -10,7 +11,7 @@ namespace utils {
 namespace db {
 
 /**
- * Follows same conventions as QSqlQuery except error reporting: 
+ * Follows same conventions as QSqlQuery except error reporting:
  * methods of this class throw nx::utils::db::Exception on error.
  */
 class NX_UTILS_API SqlQuery
@@ -27,6 +28,7 @@ public:
     bool next();
     QVariant value(int index) const;
     QVariant value(const QString& name) const;
+    QSqlRecord record();
 
     QSqlQuery& impl();
     const QSqlQuery& impl() const;

@@ -5,6 +5,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx_http {
@@ -36,7 +37,7 @@ private:
     void sendResponse(AbstractStreamSocket* connection)
     {
         // Sending response.
-        const char* responseMessage = 
+        const char* responseMessage =
             "HTTP/1.1 101 Switching Protocols\r\n"
             "Upgrade: NXRELAY/0.1\r\n"
             "Connection: Upgrade\r\n"
@@ -106,7 +107,7 @@ protected:
     {
         nx::Buffer buf;
         buf.reserve(kNewProtocolMessage.size());
-        const int bytesRead = 
+        const int bytesRead =
             m_upgradedConnection->recv(buf.data(), buf.capacity(), MSG_WAITALL);
         buf.resize(bytesRead);
 
@@ -211,6 +212,23 @@ TEST_F(HttpAsyncClient, data_after_successfull_upgrade_is_not_lost)
     givenSynchronousServer();
     whenPerformedSuccessfulUpgrade();
     thenTrafficSentByServerAfterResponseIsAvailableOnSocket();
+}
+
+TEST(HttpAsyncClientTypes, lexicalSerialization)
+{
+    ASSERT_EQ(QnLexical::serialized(nx_http::AuthType::authBasicAndDigest).toStdString(),
+        std::string("authBasicAndDigest"));
+    ASSERT_EQ(QnLexical::serialized(nx_http::AuthType::authBasic).toStdString(),
+        std::string("authBasic"));
+    ASSERT_EQ(QnLexical::serialized(nx_http::AuthType::authDigest).toStdString(),
+        std::string("authDigest"));
+
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("authBasicAndDigest"),
+        nx_http::AuthType::authBasicAndDigest);
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("authDigest"),
+        nx_http::AuthType::authDigest);
+    ASSERT_EQ(QnLexical::deserialized<nx_http::AuthType>("authBasic"),
+        nx_http::AuthType::authBasic);
 }
 
 } // namespace test

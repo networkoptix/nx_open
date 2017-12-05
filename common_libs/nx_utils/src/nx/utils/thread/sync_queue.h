@@ -42,6 +42,7 @@ public:
 
     void push(Result result);
     bool isEmpty();
+    bool empty() const;
     std::size_t size() const;
     void clear();
     void retestPopIfCondition();
@@ -175,6 +176,13 @@ template< typename Result>
 bool SyncQueue<Result>::isEmpty()
 {
     QnMutexLocker lock( &m_mutex );
+    return m_queue.empty();
+}
+
+template< typename Result>
+bool SyncQueue<Result>::empty() const
+{
+    QnMutexLocker lock(&m_mutex);
     return m_queue.empty();
 }
 

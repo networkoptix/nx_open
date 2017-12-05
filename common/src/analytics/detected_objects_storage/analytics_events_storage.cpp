@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/utils/db/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -29,7 +30,7 @@ void EventsStorage::save(
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, lm("Saving packet %1").arg(*packet));
+    NX_VERBOSE(this, lm("Saving packet %1").args(*packet));
 
     m_dbController.queryExecutor().executeUpdate(
         std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
@@ -41,10 +42,30 @@ void EventsStorage::save(
 }
 
 void EventsStorage::createLookupCursor(
-    Filter /*filter*/,
+    Filter filter,
     CreateCursorCompletionHandler completionHandler)
 {
-    completionHandler(ResultCode::error, nullptr);
+    using namespace std::placeholders;
+    using namespace nx::utils;
+
+    NX_VERBOSE(this, lm("Requested cursor with filter %1").args(filter));
+
+    m_dbController.queryExecutor().createCursor<DetectedObject>(
+        std::bind(&EventsStorage::prepareQuery, this, filter, _1),
+        std::bind(&EventsStorage::loadObject, this, _1, _2),
+        [this, completionHandler = std::move(completionHandler)](
+            db::DBResult resultCode,
+            QnUuid dbCursorId)
+        {
+            if (resultCode != db::DBResult::ok)
+                return completionHandler(ResultCode::error, nullptr);
+
+            completionHandler(
+                ResultCode::ok,
+                std::make_unique<Cursor>(std::make_unique<db::Cursor<DetectedObject>>(
+                    &m_dbController.queryExecutor(),
+                    dbCursorId)));
+        });
 }
 
 void EventsStorage::lookup(
@@ -109,10 +130,10 @@ std::int64_t EventsStorage::insertEvent(
         QnSql::serialized_field(detectedObject.objectId));
     insertEventQuery.bindValue(lit(":attributes"), QJson::serialized(detectedObject.labels));
 
-    insertEventQuery.bindValue(lit(":boxTopLeftX"), (int) detectedObject.boundingBox.topLeft().x());
-    insertEventQuery.bindValue(lit(":boxTopLeftY"), (int)detectedObject.boundingBox.topLeft().y());
-    insertEventQuery.bindValue(lit(":boxBottomRightX"), (int)detectedObject.boundingBox.bottomRight().x());
-    insertEventQuery.bindValue(lit(":boxBottomRightY"), (int)detectedObject.boundingBox.bottomRight().y());
+    insertEventQuery.bindValue(lit(":boxTopLeftX"), detectedObject.boundingBox.topLeft().x());
+    insertEventQuery.bindValue(lit(":boxTopLeftY"), detectedObject.boundingBox.topLeft().y());
+    insertEventQuery.bindValue(lit(":boxBottomRightX"), detectedObject.boundingBox.bottomRight().x());
+    insertEventQuery.bindValue(lit(":boxBottomRightY"), detectedObject.boundingBox.bottomRight().y());
 
     insertEventQuery.exec();
     return insertEventQuery.impl().lastInsertId().toLongLong();
@@ -141,6 +162,20 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
     const Filter& filter,
     std::vector<DetectedObject>* result)
 {
+    SqlQuery selectEventsQuery(*queryContext->connection());
+    selectEventsQuery.setForwardOnly(true);
+    prepareQuery(filter, &selectEventsQuery);
+    selectEventsQuery.exec();
+
+    loadObjects(selectEventsQuery, filter, result);
+
+    return nx::utils::db::DBResult::ok;
+}
+
+void EventsStorage::prepareQuery(
+    const Filter& filter,
+    nx::utils::db::SqlQuery* query)
+{
     const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
     QString sqlQueryFilterStr;
     if (!sqlQueryFilter.empty())
@@ -149,9 +184,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
             nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
     }
 
-    SqlQuery selectEventsQuery(*queryContext->connection());
-    selectEventsQuery.setForwardOnly(true);
-    selectEventsQuery.prepare(lm(R"sql(
+    query->prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
@@ -161,12 +194,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
     )sql").args(
         sqlQueryFilterStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
-    nx::utils::db::bindFields(&selectEventsQuery, sqlQueryFilter);
-    selectEventsQuery.exec();
-
-    loadObjects(selectEventsQuery, filter, result);
-
-    return nx::utils::db::DBResult::ok;
+    nx::utils::db::bindFields(query, sqlQueryFilter);
 }
 
 nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
@@ -209,7 +237,7 @@ void EventsStorage::loadObjects(
     while (selectEventsQuery.next())
     {
         DetectedObject detectedObject;
-        loadObject(selectEventsQuery, &detectedObject);
+        loadObject(&selectEventsQuery, &detectedObject);
 
         auto iterAndIsInsertedFlag =
             objectIdToPosition.emplace(detectedObject.objectId, result->size());
@@ -228,31 +256,31 @@ void EventsStorage::loadObjects(
 }
 
 void EventsStorage::loadObject(
-    SqlQuery& selectEventsQuery,
+    SqlQuery* selectEventsQuery,
     DetectedObject* object)
 {
     object->objectId = QnSql::deserialized_field<QnUuid>(
-        selectEventsQuery.value(lit("object_id")));
+        selectEventsQuery->value(lit("object_id")));
     object->objectTypeId = QnSql::deserialized_field<QnUuid>(
-        selectEventsQuery.value(lit("object_type_id")));
+        selectEventsQuery->value(lit("object_type_id")));
     QJson::deserialize(
-        selectEventsQuery.value(lit("attributes")).toString(),
+        selectEventsQuery->value(lit("attributes")).toString(),
         &object->attributes);
 
     object->track.push_back(ObjectPosition());
     ObjectPosition& objectPosition = object->track.back();
 
     objectPosition.deviceId = QnSql::deserialized_field<QnUuid>(
-        selectEventsQuery.value(lit("device_guid")));
-    objectPosition.timestampUsec = selectEventsQuery.value(lit("timestamp_usec_utc")).toLongLong();
-    objectPosition.durationUsec = selectEventsQuery.value(lit("duration_usec")).toLongLong();
+        selectEventsQuery->value(lit("device_guid")));
+    objectPosition.timestampUsec = selectEventsQuery->value(lit("timestamp_usec_utc")).toLongLong();
+    objectPosition.durationUsec = selectEventsQuery->value(lit("duration_usec")).toLongLong();
 
     objectPosition.boundingBox.setTopLeft(QPointF(
-        selectEventsQuery.value(lit("box_top_left_x")).toInt(),
-        selectEventsQuery.value(lit("box_top_left_y")).toInt()));
+        selectEventsQuery->value(lit("box_top_left_x")).toDouble(),
+        selectEventsQuery->value(lit("box_top_left_y")).toDouble()));
     objectPosition.boundingBox.setBottomRight(QPointF(
-        selectEventsQuery.value(lit("box_bottom_right_x")).toInt(),
-        selectEventsQuery.value(lit("box_bottom_right_y")).toInt()));
+        selectEventsQuery->value(lit("box_bottom_right_x")).toDouble(),
+        selectEventsQuery->value(lit("box_bottom_right_y")).toDouble()));
 }
 
 void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)

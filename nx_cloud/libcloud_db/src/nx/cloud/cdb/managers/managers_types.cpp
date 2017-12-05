@@ -10,6 +10,7 @@ api::ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult)
     switch (dbResult)
     {
         case nx::utils::db::DBResult::ok:
+        case nx::utils::db::DBResult::endOfData:
             return api::ResultCode::ok;
 
         case nx::utils::db::DBResult::notFound:

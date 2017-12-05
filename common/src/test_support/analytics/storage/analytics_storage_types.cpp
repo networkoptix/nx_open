@@ -72,7 +72,7 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount
         common::metadata::DetectedObject detectedObject;
         detectedObject.objectTypeId = QnUuid::createUuid();
         detectedObject.objectId = QnUuid::createUuid();
-        detectedObject.boundingBox = QRectF(0, 0, 100, 100);
+        detectedObject.boundingBox = QRectF(0, 0, 0.5, 0.5);
         detectedObject.labels.push_back(common::metadata::Attribute{
             QString::fromUtf8(nx::utils::random::generateName(7)),
             QString::fromUtf8(nx::utils::random::generateName(7))});

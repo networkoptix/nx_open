@@ -7,6 +7,33 @@
 
 namespace {
 
+QString nameInternal(
+    const QnVirtualCameraResourcePtr& camera,
+    const QnUuid& typeId,
+    const QString& locale,
+    QList<nx::api::AnalyticsEventType> nx::api::AnalyticsDriverManifest::* list)
+{
+    NX_ASSERT(camera);
+    if (!camera)
+        return QString();
+
+    const auto server = camera->getParentServer();
+    NX_ASSERT(server);
+    if (!server)
+        return QString();
+
+    for (const auto& manifest: server->analyticsDrivers())
+    {
+        for (const auto& eventType: manifest.*list)
+        {
+            if (eventType.typeId == typeId)
+                return eventType.name.text(locale);
+        };
+    }
+
+    return QString();
+}
+
 /**
 * Description of the single analytics event type.
 */
@@ -39,7 +66,7 @@ public:
     void addUnique(const nx::api::AnalyticsDriverManifest& manifest,
         const nx::api::AnalyticsEventType& eventType)
     {
-        AnalyticsEventTypeId id{manifest.driverId, eventType.eventTypeId};
+        AnalyticsEventTypeId id{manifest.driverId, eventType.typeId};
         if (keys.contains(id))
             return;
 
@@ -47,8 +74,8 @@ public:
         EventDescriptor ref;
         ref.driverId = manifest.driverId;
         ref.driverName = manifest.driverName;
-        ref.eventTypeId = eventType.eventTypeId;
-        ref.eventName = eventType.eventName;
+        ref.eventTypeId = eventType.typeId;
+        ref.eventName = eventType.name;
         data->push_back(ref);
     }
 
@@ -104,7 +131,7 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvent
         {
             for (const auto& eventType: manifest.outputEventTypes)
             {
-                if (!allowedEvents.contains(eventType.eventTypeId))
+                if (!allowedEvents.contains(eventType.typeId))
                     continue;
 
                 storage.addUnique(manifest, eventType);
@@ -131,27 +158,17 @@ QString AnalyticsHelper::eventName(const QnVirtualCameraResourcePtr& camera,
     const QnUuid& eventTypeId,
     const QString& locale)
 {
-    NX_ASSERT(camera);
-    if (!camera)
-        return QString();
-
-    const auto server = camera->getParentServer();
-    NX_ASSERT(server);
-    if (!server)
-        return QString();
-
-    for (const auto& manifest: server->analyticsDrivers())
-    {
-        for (const auto &eventType: manifest.outputEventTypes)
-        {
-            if (eventType.eventTypeId == eventTypeId)
-                return eventType.eventName.text(locale);
-        };
-    }
-
-    return QString();
+    return nameInternal(
+        camera, eventTypeId, locale, &nx::api::AnalyticsDriverManifest::outputEventTypes);
 }
 
+QString AnalyticsHelper::objectName(const QnVirtualCameraResourcePtr& camera,
+    const QnUuid& objectTypeId,
+    const QString& locale)
+{
+    return nameInternal(
+        camera, objectTypeId, locale, &nx::api::AnalyticsDriverManifest::outputObjectTypes);
+}
 
 } // namespace event
 } // namespace vms

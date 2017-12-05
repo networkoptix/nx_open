@@ -18,7 +18,7 @@ QString StringHelper::buildCaption(
     bool /*isActive*/)
 {
     const auto& descriptor = manifest.eventDescriptorById(eventTypeId);
-    return descriptor.eventName.value;
+    return descriptor.name.value;
 }
 
 QString StringHelper::buildDescription(

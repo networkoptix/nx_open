@@ -150,8 +150,8 @@ void loadResourcesFromEcs(
         if (commonModule->resourceDiscoveryManager())
         {
             /* Properties and attributes must be read before processing cameras because of getAuth() method */
-            QnManualCameraInfoMap manualCameras;
-            for (const auto &camera : cameras)
+            std::vector<QnManualCameraInfo> manualCameras;
+            for (const auto& camera: cameras)
             {
                 messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
                 if (camera.manuallyAdded)
@@ -159,9 +159,10 @@ void loadResourcesFromEcs(
                     QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
                     if (resType)
                     {
-                        const auto auth = QnNetworkResource::getResourceAuth(commonModule, camera.id, camera.typeId);
-                        manualCameras.insert(camera.url,
-                            QnManualCameraInfo(nx::utils::Url(camera.url), auth, resType->getName()));
+                        const auto auth = QnNetworkResource::getResourceAuth(commonModule,
+                            camera.id, camera.typeId);
+                        manualCameras.emplace_back(nx::utils::Url(camera.url), auth,
+                            resType->getName());
                     }
                     else
                     {

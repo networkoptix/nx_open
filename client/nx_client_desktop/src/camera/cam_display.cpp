@@ -471,7 +471,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (vd->flags & AV_REVERSE_BLOCK_START)
     {
         const long frameTimeDiff = abs((long)(currentTime - m_previousVideoTime));
-        needToSleep = (m_lastSleepInterval == 0) && (frameTimeDiff < MAX_FRAME_DURATION * 1000)
+        needToSleep = (m_lastSleepInterval == 0) && (frameTimeDiff < MAX_FRAME_DURATION_MS * 1000)
             ? frameTimeDiff
             : m_lastSleepInterval;
     }
@@ -585,9 +585,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     {
                         if (firstWait)
                         {
-                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION_MS*1000;
                             if (m_jumpTime != DATETIME_NOW)
-                                m_isLongWaiting &= speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
+                                m_isLongWaiting &= speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION_MS*1000;
 
                             /*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
@@ -757,9 +757,9 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
                 {
                     if (firstWait)
                     {
-                        m_isLongWaiting = (displayedTime - ct) > MAX_FRAME_DURATION*1000;
+                        m_isLongWaiting = (displayedTime - ct) > MAX_FRAME_DURATION_MS*1000;
                         if (m_jumpTime != DATETIME_NOW)
-                            m_isLongWaiting &= (displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting &= (displayedTime - m_jumpTime)  > MAX_FRAME_DURATION_MS*1000;
                         firstWait = false;
                         if (m_isLongWaiting)
                             m_audioDisplay->suspend();
@@ -779,7 +779,7 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
     }
     else
     {
-        qint32 needToSleep = qMin(MAX_FRAME_DURATION * 1000, ad->timestamp - m_previousVideoTime);
+        qint32 needToSleep = qMin(MAX_FRAME_DURATION_MS * 1000, ad->timestamp - m_previousVideoTime);
         needToSleep *= 1.0/qAbs(speed);
         doSmartSleep(needToSleep, speed);
         m_previousVideoTime = ad->timestamp;
@@ -1770,7 +1770,7 @@ bool QnCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
         return false; // do not change behaviour for local files
     if (m_videoQueue->isEmpty())
         return false;
-    //return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION*1000ll;
+    //return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION_MS*1000ll;
     return m_videoQueueDuration > m_audioDisplay->getAudioBufferSize() * 2 * 1000;
 }
 
@@ -1779,7 +1779,7 @@ QnCompressedVideoDataPtr QnCamDisplay::dequeueVideo(int channel)
     if (m_videoQueue[channel].size() > 1)
     {
         qint64 timeDiff = m_videoQueue[channel].at(1)->timestamp - m_videoQueue[channel].front()->timestamp;
-        if (timeDiff <= MAX_FRAME_DURATION*1000ll) // ignore data holes
+        if (timeDiff <= MAX_FRAME_DURATION_MS*1000ll) // ignore data holes
             m_videoQueueDuration -= timeDiff;
     }
     return m_videoQueue[channel].dequeue();
@@ -1790,7 +1790,7 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
     if (!m_videoQueue[vd->channelNumber].isEmpty())
     {
         qint64 timeDiff = vd->timestamp - m_videoQueue[vd->channelNumber].last()->timestamp;
-        if (timeDiff <= MAX_FRAME_DURATION*1000ll) // ignore data holes
+        if (timeDiff <= MAX_FRAME_DURATION_MS*1000ll) // ignore data holes
             m_videoQueueDuration += timeDiff;
     }
     m_videoQueue[vd->channelNumber].enqueue(vd);
