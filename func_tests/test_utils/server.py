@@ -101,7 +101,7 @@ class Server(object):
     _st_stopped = object()
     _st_starting = object()
 
-    def __init__(self, name, host, installation, server_ctl, rest_api_url,
+    def __init__(self, name, host, installation, server_ctl, rest_api_url, ca,
                  rest_api_timeout=None, internal_ip_port=None, timezone=None):
         assert name, repr(name)
         assert isinstance(host, Host), repr(host)
@@ -111,7 +111,8 @@ class Server(object):
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
-        self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout)
+        self._ca = ca
+        self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
@@ -154,6 +155,7 @@ class Server(object):
             if was_started:
                 self.stop_service()
             self._installation.cleanup_var_dir()
+            self._installation.update_cert(self._ca)
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
@@ -262,6 +264,7 @@ class Server(object):
         if was_started:
             self.stop_service()
         self._installation.cleanup_var_dir()
+        self._installation.update_cert(self._ca)
         if was_started:
             self.start_service()
 
