@@ -355,7 +355,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
            (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
 
-bool QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
+void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
     setLastMediaTime(media->timestamp);
 
@@ -368,7 +368,7 @@ bool QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
             updateMotionStateInternal(true, metaData->timestamp, metaData);
             m_lastMotionTimeUsec = motionTime;
         }
-        return true;
+        return;
     }
 
     const QnScheduleTask task = currentScheduleTask();
@@ -385,7 +385,7 @@ bool QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
     }
 
     if (!isMotionRec(task.getRecordingType()))
-        return true;
+        return;
 
     qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
     if (motionTime == (qint64)AV_NOPTS_VALUE)
@@ -398,7 +398,7 @@ bool QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         setPrebufferingUsec(0); // motion in progress, flush prebuffer
     }
 
-    return true;
+    return;
 }
 
 void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData)
@@ -666,8 +666,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     }
 
     // for empty schedule we record all time
-    if (!beforeProcessData(media))
-        return true;
+    beforeProcessData(media);
 
     bool rez = QnStreamRecorder::processData(data);
     return rez;

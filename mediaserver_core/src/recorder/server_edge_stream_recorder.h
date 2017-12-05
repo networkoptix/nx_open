@@ -64,15 +64,17 @@ public:
      */
     void setStartTimestampThreshold(const std::chrono::microseconds& threshold);
 
-    /**
-     * Returns last recorded data timestamp;
-     */
-    int64_t lastRecordedTimeUs() const;
+    void setRecordingBounds(
+        const std::chrono::microseconds& startTime,
+        const std::chrono::microseconds& endTime);
+
+    void setEndOfRecordingHandler(nx::utils::MoveOnlyFunc<void()> endOfRecordingHandler);
 
 protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
-    virtual bool beforeProcessData(const QnConstAbstractMediaDataPtr& media) override;
+    virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media) override;
+    virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
 
     virtual void fileStarted(
         qint64 startTimeMs,
@@ -94,5 +96,10 @@ private:
     MotionHandler m_motionHandler;
     std::chrono::microseconds m_threshold;
     bool m_terminated = false;
-    int64_t m_lastRecordedTime = AV_NOPTS_VALUE;
+    bool m_needSaveData = false;
+
+    boost::optional<std::chrono::microseconds> m_startRecordingBound;
+    boost::optional<std::chrono::microseconds> m_endRecordingBound;
+    nx::utils::MoveOnlyFunc<void()> m_endOfRecordingHandler;
+
 };

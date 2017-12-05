@@ -70,16 +70,20 @@ void HanwhaChunkLoader::setUp()
     setUpThreadUnsafe();
 }
 
-void HanwhaChunkLoader::start()
+void HanwhaChunkLoader::start(bool isNvr)
 {
     QnMutexLocker lock(&m_mutex);
     setUpThreadUnsafe();
-    m_state = nextState(m_state);
-    m_started = true;
-    NX_DEBUG(this, lm("Started for %1 channels on %2")
-        .args(m_maxChannels, m_resourceContext->url()));
 
-    sendRequest();
+    if (isNvr)
+    {
+        m_state = nextState(m_state);
+        m_started = true;
+        NX_DEBUG(this, lm("Started for %1 channels on %2")
+            .args(m_maxChannels, m_resourceContext->url()));
+
+        sendRequest();
+    }
 }
 
 bool HanwhaChunkLoader::isStarted() const

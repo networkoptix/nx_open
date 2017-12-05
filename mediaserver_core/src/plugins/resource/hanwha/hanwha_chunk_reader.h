@@ -59,7 +59,7 @@ public:
     virtual ~HanwhaChunkLoader();
 
     void setUp();
-    void start();
+    void start(bool isNvr);
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;

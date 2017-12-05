@@ -60,7 +60,7 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
-    virtual bool beforeProcessData(const QnConstAbstractMediaDataPtr& media);
+    virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
 
     virtual void fileStarted(

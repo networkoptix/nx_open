@@ -132,12 +132,7 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
     NX_VERBOSE(this, lm("Starting services (is NVR: %1)...").arg(isNvr));
     m_timeSynchronizer->start(this);
     if (hasVideoArchive)
-    {
-        if (isNvr)
-            m_chunkLoader->start();
-        else
-            m_chunkLoader->setUp();
-    }
+        m_chunkLoader->start(isNvr);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()

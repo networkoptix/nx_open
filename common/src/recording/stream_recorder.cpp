@@ -319,33 +319,9 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    if (m_startRecordingBound != boost::none)
-    {
-        nonConstData->timestamp = std::max(
-            nonConstData->timestamp,
-            (decltype(nonConstData->timestamp))m_startRecordingBound->count());
-    }
-
-    if (m_endRecordingBound != boost::none)
-    {
-        const auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(nonConstData);
-        if (mediaData && mediaData->dataType == QnAbstractMediaData::DataType::EMPTY_DATA)
-        {
-            if (m_endOfRecordingHandler)
-                m_endOfRecordingHandler();
-        }
-
-        if (nonConstData->timestamp > m_endRecordingBound->count())
-        {
-            if (m_endOfRecordingHandler)
-                m_endOfRecordingHandler();
-
-            return true;
-        }
-    }
-
     QnConstAbstractMediaDataPtr md =
         std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
+
     if (!md)
     {
         VERBOSE("EXIT: Unknown data");
@@ -1244,19 +1220,6 @@ void QnStreamRecorder::disableRegisterFile(bool disable)
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
     m_transcodeFilters = filters;
-}
-
-void QnStreamRecorder::setRecordingBounds(
-    const std::chrono::microseconds& startTime,
-    const std::chrono::microseconds& endTime)
-{
-    m_startRecordingBound = startTime;
-    m_endRecordingBound = endTime;
-}
-
-void QnStreamRecorder::setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler)
-{
-    m_endOfRecordingHandler = endOfRecordingHandler;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

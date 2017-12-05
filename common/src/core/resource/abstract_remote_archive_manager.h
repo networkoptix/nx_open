@@ -15,6 +15,7 @@ namespace core {
 namespace resource {
 
 using BufferType = QByteArray;
+using OverlappedId = int;
 
 enum RemoteArchiveCapability
 {
@@ -34,7 +35,7 @@ struct RemoteArchiveChunk
     QString id;
     int64_t startTimeMs = 0;
     int64_t durationMs = 0;
-    int overlappedId = 0; //< Is needed for Hanwha driver.
+    OverlappedId overlappedId = 0; //< Is needed for Hanwha driver.
 
     RemoteArchiveChunk() = default;
     RemoteArchiveChunk(
@@ -76,7 +77,7 @@ inline bool operator==(const RemoteArchiveChunk& lhs, const RemoteArchiveChunk& 
         && lhs.durationMs == rhs.durationMs;
 }
 
-using OverlappedId = int;
+
 using RemoteChunks = std::vector<RemoteArchiveChunk>;
 using OverlappedRemoteChunks = std::map<OverlappedId, RemoteChunks>;
 using OverlappedTimePeriods = std::map<OverlappedId, QnTimePeriodList>;

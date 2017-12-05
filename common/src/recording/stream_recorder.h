@@ -124,12 +124,6 @@ public:
 
     int64_t lastFileSize() const;
 
-    void setRecordingBounds(
-        const std::chrono::microseconds& startTime,
-        const std::chrono::microseconds& endTime);
-
-    void setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler);
-
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -208,9 +202,6 @@ protected:
     qint64 m_startDateTime;
     int m_currentTimeZone;
     std::vector<StreamRecorderContext> m_recordingContextVector;
-    boost::optional<std::chrono::microseconds> m_startRecordingBound;
-    boost::optional<std::chrono::microseconds> m_endRecordingBound;
-    std::function<void()> m_endOfRecordingHandler;
 
 private:
     bool m_waitEOF;
