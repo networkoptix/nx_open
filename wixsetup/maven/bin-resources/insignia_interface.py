@@ -24,7 +24,7 @@ import subprocess
 from environment import wix_directory, execute_command
 
 def insignia_executable():
-    return os.path.join(wix_directory, 'heat.exe')
+    return os.path.join(wix_directory, 'insignia.exe')
 
 def extract_engine_command(bundle, output):
     return [insignia_executable(), '-ib', bundle, '-o', output]
