@@ -39,16 +39,16 @@ class CA(object):
             os.makedirs(self._gen_dir)
 
     def generate_key_and_cert(self):
-        log.debug("Generate key.")
+        log.debug("Generating key...")
         with open(self._serial_path) as serial_file:
             basename = os.path.join(self._gen_dir, serial_file.read().rstrip())
         key_path = basename + '.key'
         check_call(['openssl', 'genrsa', '-out', key_path, '2048'])
-        log.debug("Make request.")
+        log.debug("Making request...")
         subject = '/C=US/O=NetworkOptix/CN=nxwitness'
         request_path = basename + '.csr'
         check_call(['openssl', 'req', '-new', '-key', key_path, '-subj', subject, '-out', request_path])
-        log.debug("Sign request.")
+        log.debug("Signing request...")
         cert_path = basename + '.crt'
         check_call([
             'openssl', 'x509', '-req',
