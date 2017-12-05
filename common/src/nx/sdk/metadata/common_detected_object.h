@@ -17,7 +17,7 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nxpl::NX_GUID eventTypeId() const override;
+    virtual nxpl::NX_GUID typeId() const override;
     virtual float confidence() const override;
     virtual nxpl::NX_GUID id() const override;
     virtual NX_ASCII const char* objectSubType() const override;
@@ -26,7 +26,7 @@ public:
     virtual const char* auxilaryData() const override;
     virtual Rect boundingBox() const override;
 
-    void setTypeId(const nxpl::NX_GUID& eventTypeId);
+    void setTypeId(const nxpl::NX_GUID& typeId);
     void setConfidence(float confidence);
     void setId(const nxpl::NX_GUID& value);
     void setObjectSubType(const std::string& value);

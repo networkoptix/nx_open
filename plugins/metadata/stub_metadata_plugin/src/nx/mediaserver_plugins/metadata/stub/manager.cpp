@@ -159,7 +159,7 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
     detectedEvent->setDescription("Line crossing (description)");
     detectedEvent->setAuxilaryData(R"json({ "auxilaryData": "someJson" })json");
     detectedEvent->setIsActive(m_counter == 1);
-    detectedEvent->setEventTypeId(m_eventTypeId);
+    detectedEvent->setTypeId(m_eventTypeId);
 
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());

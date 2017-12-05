@@ -73,7 +73,7 @@ Error Manager::startFetchingMetadata()
                     << hanwhaEvent.description.toStdString() << "], "
                     << "channel " << m_channel;
 
-                event->setEventTypeId(hanwhaEvent.typeId);
+                event->setTypeId(hanwhaEvent.typeId);
                 event->setCaption(hanwhaEvent.caption.toStdString());
                 event->setDescription(hanwhaEvent.caption.toStdString());
                 event->setIsActive(hanwhaEvent.isActive);

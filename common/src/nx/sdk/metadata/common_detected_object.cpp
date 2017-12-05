@@ -25,7 +25,7 @@ void* CommonDetectedObject::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nxpl::NX_GUID CommonDetectedObject::eventTypeId() const
+nxpl::NX_GUID CommonDetectedObject::typeId() const
 {
     return m_typeId;
 }
@@ -65,9 +65,9 @@ const char* CommonDetectedObject::auxilaryData() const
     return m_auxilaryData.c_str();
 }
 
-void CommonDetectedObject::setTypeId(const nxpl::NX_GUID& eventTypeId)
+void CommonDetectedObject::setTypeId(const nxpl::NX_GUID& typeId)
 {
-    m_typeId = eventTypeId;
+    m_typeId = typeId;
 }
 
 void CommonDetectedObject::setConfidence(float confidence)
