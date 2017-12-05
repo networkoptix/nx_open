@@ -1,3 +1,5 @@
+#include "json_data.h"
+
 extern const char* const metaDataJson = R"JSON(
 {
     "__info": [
@@ -400,84 +402,261 @@ extern const char* const metaDataJson = R"JSON(
 }
 )JSON";
 
-extern const char* const updateJson = R"JSON(
+
+extern const std::vector<UpdateTestData> updateTestDataList = {
 {
-    "version": "3.1.0.16975",
-    "cloudHost": "nxvms.com",
-    "packages": {
-        "linux": {
-            "arm_rpi": {
-                "file": "nxwitness-server_update-3.1.0.16975-rpi.zip",
-                "size": 80605107,
-                "md5": "211a118de0de617799383b9202139cd7"
+    "default",
+    "16975",
+    R"JSON(
+    {
+        "version": "3.1.0.16975",
+        "cloudHost": "nxvms.com",
+        "packages": {
+            "linux": {
+                "arm_rpi": {
+                    "file": "nxwitness-server_update-3.1.0.16975-rpi.zip",
+                    "size": 80605107,
+                    "md5": "211a118de0de617799383b9202139cd7"
+                },
+                "arm_bpi": {
+                    "file": "nxwitness-server_update-3.1.0.16975-bpi.zip",
+                    "size": 147835827,
+                    "md5": "0ab4bcce79193d5dc3d84f77a7e7b640"
+                },
+                "arm_bananapi": {
+                    "file": "nxwitness-server_update-3.1.0.16975-bananapi.zip",
+                    "size": 64702397,
+                    "md5": "977d21111bb4b6f761da878b670cf479"
+                },
+                "x64_ubuntu": {
+                    "file": "nxwitness-server_update-3.1.0.16975-linux64.zip",
+                    "size": 83795048,
+                    "md5": "586edd0681dc341aebdfbc5d456669e1"
+                },
+                "x86_ubuntu": {
+                    "file": "nxwitness-server_update-3.1.0.16975-linux86.zip",
+                    "size": 101335323,
+                    "md5": "1a4b6166c3af321455dbe05e63b6826f"
+                }
             },
-            "arm_bpi": {
-                "file": "nxwitness-server_update-3.1.0.16975-bpi.zip",
-                "size": 147835827,
-                "md5": "0ab4bcce79193d5dc3d84f77a7e7b640"
-            },
-            "arm_bananapi": {
-                "file": "nxwitness-server_update-3.1.0.16975-bananapi.zip",
-                "size": 64702397,
-                "md5": "977d21111bb4b6f761da878b670cf479"
-            },
-            "x64_ubuntu": {
-                "file": "nxwitness-server_update-3.1.0.16975-linux64.zip",
-                "size": 83795048,
-                "md5": "586edd0681dc341aebdfbc5d456669e1"
-            },
-            "x86_ubuntu": {
-                "file": "nxwitness-server_update-3.1.0.16975-linux86.zip",
-                "size": 101335323,
-                "md5": "1a4b6166c3af321455dbe05e63b6826f"
+            "windows": {
+                "x64_winxp": {
+                    "file": "nxwitness-server_update-3.1.0.16975-win64.zip",
+                    "size": 74358355,
+                    "md5": "58e6395c2b31ba1215b631855ced3827"
+                },
+                "x86_winxp": {
+                    "file": "nxwitness-server_update-3.1.0.16975-win86.zip",
+                    "size": 65677361,
+                    "md5": "3b809d81dd60e3377fe5962c2de48e8c"
+                }
             }
         },
-        "windows": {
-            "x64_winxp": {
-                "file": "nxwitness-server_update-3.1.0.16975-win64.zip",
-                "size": 74358355,
-                "md5": "58e6395c2b31ba1215b631855ced3827"
+        "clientPackages": {
+            "linux": {
+                "x86_ubuntu": {
+                    "file": "nxwitness-client_update-3.1.0.16975-linux86.zip",
+                    "size": 101992185,
+                    "md5": "3e74e6c296abbfb0a9f3ff9475a915d3"
+                },
+                "x64_ubuntu": {
+                    "file": "nxwitness-client_update-3.1.0.16975-linux64.zip",
+                    "size": 103335409,
+                    "md5": "5181a6ce5c6991c8a632c0d443f36f2b"
+                }
             },
-            "x86_winxp": {
-                "file": "nxwitness-server_update-3.1.0.16975-win86.zip",
-                "size": 65677361,
-                "md5": "3b809d81dd60e3377fe5962c2de48e8c"
-            }
-        }
-    },
-    "clientPackages": {
-        "linux": {
-            "x86_ubuntu": {
-                "file": "nxwitness-client_update-3.1.0.16975-linux86.zip",
-                "size": 101992185,
-                "md5": "3e74e6c296abbfb0a9f3ff9475a915d3"
+            "macosx": {
+                "x64_macosx": {
+                    "file": "nxwitness-client_update-3.1.0.16975-mac.zip",
+                    "size": 77903157,
+                    "md5": "88a9225b97d56282325a14ec39af7459"
+                }
             },
-            "x64_ubuntu": {
-                "file": "nxwitness-client_update-3.1.0.16975-linux64.zip",
-                "size": 103335409,
-                "md5": "5181a6ce5c6991c8a632c0d443f36f2b"
+            "windows": {
+                "x64_winxp": {
+                    "file": "nxwitness-client_update-3.1.0.16975-win64.zip",
+                    "size": 86289814,
+                    "md5": "071e18fdaddf9faeab2fe34839dd2d19"
+                },
+                "x86_winxp": {
+                    "file": "nxwitness-client_update-3.1.0.16975-win86.zip",
+                    "size": 74931495,
+                    "md5": "409f942585e2d5df59b7f891f1f94e5c"
+                }
             }
         },
-        "macosx": {
-            "x64_macosx": {
-                "file": "nxwitness-client_update-3.1.0.16975-mac.zip",
-                "size": 77903157,
-                "md5": "88a9225b97d56282325a14ec39af7459"
+        "description": ""
+    }
+    )JSON"
+},
+{
+    "tricom",
+    "14532",
+    R"JSON(
+    {
+        "packages": {
+            "windows": {
+                "x64_winxp": {
+                    "size": 74254007,
+                    "md5": "4c94b0d4c1af28aece7cd4d2fb5d246e",
+                    "file": "tricom-server_update-3.0.0.14532-win64-beta-demo.zip"
+                },
+                "x86_winxp": {
+                    "size": 65251780,
+                    "md5": "26967fd981284a7a0f3744de6c7f1fe8",
+                    "file": "tricom-server_update-3.0.0.14532-win86-beta-demo.zip"
+                }
+            },
+            "linux": {
+                "arm_bpi": {
+                    "size": 116491200,
+                    "md5": "5fe1e4e13834ee88028f105e8c33245d",
+                    "file": "tricom-server_update-3.0.0.14532-bpi-beta-demo.zip"
+                },
+                "x86_ubuntu": {
+                    "size": 76084528,
+                    "md5": "5a882a0be611871e0d6af44c4d7ad015",
+                    "file": "tricom-server_update-3.0.0.14532-linux86-beta-demo.zip"
+                },
+                "arm_bananapi": {
+                    "size": 56097236,
+                    "md5": "2fb5c9de47d5e9cef73e13702dec4479",
+                    "file": "tricom-server_update-3.0.0.14532-bananapi-beta-demo.zip"
+                },
+                "x64_ubuntu": {
+                    "size": 59897502,
+                    "md5": "c6db3f80b51370dc7b9c37a10bae06c7",
+                    "file": "tricom-server_update-3.0.0.14532-linux64-beta-demo.zip"
+                },
+                "arm_rpi": {
+                    "size": 70972113,
+                    "md5": "e7207382eaccb1970219cd80aed3dd6c",
+                    "file": "tricom-server_update-3.0.0.14532-rpi-beta-demo.zip"
+                }
             }
         },
-        "windows": {
-            "x64_winxp": {
-                "file": "nxwitness-client_update-3.1.0.16975-win64.zip",
-                "size": 86289814,
-                "md5": "071e18fdaddf9faeab2fe34839dd2d19"
+        "version": "3.0.0.14532",
+        "clientPackages": {
+            "windows": {
+                "x64_winxp": {
+                    "size": 81117391,
+                    "md5": "df1ea9c2be817f0eb922042cd3f4784e",
+                    "file": "tricom-client_update-3.0.0.14532-win64-beta-demo.zip"
+                },
+                "x86_winxp": {
+                    "size": 69441539,
+                    "md5": "3d2c6fd416897eed543a8dacbe465f8f",
+                    "file": "tricom-client_update-3.0.0.14532-win86-beta-demo.zip"
+                }
             },
-            "x86_winxp": {
-                "file": "nxwitness-client_update-3.1.0.16975-win86.zip",
-                "size": 74931495,
-                "md5": "409f942585e2d5df59b7f891f1f94e5c"
+            "macosx": {
+                "x64_macosx": {
+                    "size": 67998174,
+                    "md5": "301259d83a85b9d9929c2875da204ebb",
+                    "file": "tricom-client_update-3.0.0.14532-mac-beta-demo.zip"
+                }
+            },
+            "linux": {
+                "x86_ubuntu": {
+                    "size": 88679924,
+                    "md5": "eafe8cf6ca85b8fe3c7619adeb51b4e9",
+                    "file": "tricom-client_update-3.0.0.14532-linux86-beta-demo.zip"
+                },
+                "x64_ubuntu": {
+                    "size": 89920467,
+                    "md5": "8d55fde8c0e278d7edd7d4bd82257a9b",
+                    "file": "tricom-client_update-3.0.0.14532-linux64-beta-demo.zip"
+                }
             }
-        }
-    },
-    "description": ""
+        },
+        "cloudHost": "tricom.cloud-demo.hdw.mx"
+    }
+    )JSON"
+},
+{
+    "vista",
+    "16975",
+    R"JSON(
+    {
+        "version": "3.1.0.16975",
+        "cloudHost": "qcloud.vista-cctv.com",
+        "packages": {
+            "linux": {
+                "arm_bpi": {
+                    "file": "qulu-server_update-3.1.0.16975-bpi.zip",
+                    "size": 148280781,
+                    "md5": "ed671c1926374065d32a1611c1bcd610"
+                },
+                "arm_rpi": {
+                    "file": "qulu-server_update-3.1.0.16975-rpi.zip",
+                    "size": 80961694,
+                    "md5": "24f894201cc713288505cf5922422e30"
+                },
+                "arm_bananapi": {
+                    "file": "qulu-server_update-3.1.0.16975-bananapi.zip",
+                    "size": 65046981,
+                    "md5": "1a6a27cf559a35ef8381fc8dedb52c70"
+                },
+                "x86_ubuntu": {
+                    "file": "qulu-server_update-3.1.0.16975-linux86.zip",
+                    "size": 100352644,
+                    "md5": "206504491d7d7a5462de0be6e7b021cb"
+                },
+                "x64_ubuntu": {
+                    "file": "qulu-server_update-3.1.0.16975-linux64.zip",
+                    "size": 82659980,
+                    "md5": "69d7d64b99e6de5edac30f53303c9069"
+                }
+            },
+            "windows": {
+                "x64_winxp": {
+                    "file": "qulu-server_update-3.1.0.16975-win64.zip",
+                    "size": 74558108,
+                    "md5": "458cdfea469d191d0e9516907be27627"
+                },
+                "x86_winxp": {
+                    "file": "qulu-server_update-3.1.0.16975-win86.zip",
+                    "size": 65876062,
+                    "md5": "5eb51b416f193a9736982922dffab750"
+                }
+            }
+        },
+        "clientPackages": {
+            "macosx": {
+                "x64_macosx": {
+                    "file": "qulu-client_update-3.1.0.16975-mac.zip",
+                    "size": 75583681,
+                    "md5": "c64fd2f5413f5233d8f8d0fe13004410"
+                }
+            },
+            "windows": {
+                "x86_winxp": {
+                    "file": "qulu-client_update-3.1.0.16975-win86.zip",
+                    "size": 72599226,
+                    "md5": "3849af95d170e4b3e32ecf563410f9ad"
+                },
+                "x64_winxp": {
+                    "file": "qulu-client_update-3.1.0.16975-win64.zip",
+                    "size": 83955425,
+                    "md5": "2c2489c1da16df190784fdb061553beb"
+                }
+            },
+            "linux": {
+                "x64_ubuntu": {
+                    "file": "qulu-client_update-3.1.0.16975-linux64.zip",
+                    "size": 101055125,
+                    "md5": "3b7e582a985ab5a914f6f95f4a7c5c32"
+                },
+                "x86_ubuntu": {
+                    "file": "qulu-client_update-3.1.0.16975-linux86.zip",
+                    "size": 99726070,
+                    "md5": "fcd5546075481e08a1cf7a2ffab7bbf4"
+                }
+            }
+        },
+        "description": ""
+    }
+    )JSON"
 }
-)JSON";
+
+};

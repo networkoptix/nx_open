@@ -6,6 +6,7 @@ namespace nx {
 namespace update {
 namespace info {
 
+// todo: introduce some kind of constructor with predefined constants
 struct OsVersion
 {
     QString family;

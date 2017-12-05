@@ -1,13 +1,10 @@
-#include <functional>
+#include <algorithm>
 #include <gtest/gtest.h>
-#include <nx/network/http/test_http_server.h>
-#include <nx/network/http/buffer_source.h>
-#include <nx/network/url/url_builder.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
-#include <rest/server/json_rest_handler.h>
-
-#include "../../../inl.h"
+#include "../detail/update_server.h"
 
 namespace nx {
 namespace update {
@@ -60,6 +57,12 @@ public:
         QnMutexLocker lock(&m_mutex);
         return m_lastResultCode;
     }
+
+    void reset()
+    {
+        m_metaData.reset();
+        m_specificData.reset();
+    }
 private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
@@ -69,18 +72,11 @@ private:
     std::unique_ptr<QByteArray> m_specificData;
 };
 
-static const QString kCustomization = "default";
-static const QString kVersion = "16975";
-static const QString kUpdatesPath = "/updates.json";
-static const QString kUpdatePath = "/update.json";
-static const QByteArray kJsonMimeType = "application/json";
-
 class AsyncJsonDataProvider: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
     {
-        prepareHttpServer();
         prepareDataProvider();
     }
 
@@ -89,9 +85,9 @@ protected:
         m_rawDataProvider->getUpdatesMetaInformation();
     }
 
-    void whenGetSpecificUpdateInformationRequestIssued()
+    void whenChainOfUpdateRequestsIssued()
     {
-        m_rawDataProvider->getSpecificUpdateData(kCustomization, kVersion);
+        issueNextRequest();
     }
 
     void thenCorrectMetaDataIsProvided()
@@ -100,37 +96,89 @@ protected:
         ASSERT_EQ(ResultCode::ok, m_providerHandler.lastResultCode());
     }
 
-    void thenCorrectUpdateDataIsProvided()
+    void thenCorrectUpdatesAreProvided()
     {
-        ASSERT_EQ(QByteArray(updateJson), m_providerHandler.updateData());
-        ASSERT_EQ(ResultCode::ok, m_providerHandler.lastResultCode());
+        assertResultCodes();
+        assertResponses();
     }
 
 private:
+    struct UpdateResponse
+    {
+        ResultCode resultCode;
+        QByteArray responseData;
+
+        UpdateResponse(ResultCode resultCode, const QByteArray& responseData):
+            resultCode(resultCode),
+            responseData(responseData)
+        {}
+    };
+
     AbstractAsyncRawDataProviderPtr m_rawDataProvider;
     TestProviderHandler m_providerHandler;
-    TestHttpServer m_httpServer;
-
-    void prepareHttpServer()
-    {
-        using namespace std::placeholders;
-
-        m_httpServer.registerStaticProcessor(kUpdatesPath, metaDataJson, kJsonMimeType);
-        QString updatePath = lit("/%1/%2%3").arg(kCustomization).arg(kVersion).arg(kUpdatePath);
-        m_httpServer.registerStaticProcessor(updatePath, updateJson, kJsonMimeType);
-
-        ASSERT_TRUE(m_httpServer.bindAndListen());
-    }
+    info::test::detail::UpdateServer m_updateServer;
+    size_t m_updateRequestCount = 0;
+    QList<UpdateResponse> m_updateResponses;
 
     void prepareDataProvider()
     {
-        nx::utils::Url metaUrl;
-        metaUrl.setScheme("http");
-        metaUrl.setHost(m_httpServer.serverAddress().address.toString());
-        metaUrl.setPort(m_httpServer.serverAddress().port);
+        nx::utils::Url baseUrl;
+        baseUrl.setScheme("http");
+        baseUrl.setHost(m_updateServer.address().address.toString());
+        baseUrl.setPort(m_updateServer.address().port);
 
-        m_rawDataProvider = RawDataProviderFactory::create(metaUrl.toString(), &m_providerHandler);
+        m_rawDataProvider = RawDataProviderFactory::create(baseUrl.toString(), &m_providerHandler);
         ASSERT_TRUE((bool) m_rawDataProvider);
+    }
+
+    void issueNextRequest()
+    {
+        if (m_updateRequestCount >= updateTestDataList.size())
+            return;
+
+        m_providerHandler.reset();
+        const UpdateTestData& updateTestData = updateTestDataList[m_updateRequestCount];
+        m_rawDataProvider->getSpecificUpdateData(
+            updateTestData.customization,
+            updateTestData.version);
+
+        processResponse();
+    }
+
+    void processResponse()
+    {
+        m_updateResponses.append(
+            UpdateResponse(
+                m_providerHandler.lastResultCode(),
+                m_providerHandler.updateData()));
+        ++m_updateRequestCount;
+        issueNextRequest();
+    }
+
+    void assertResultCodes()
+    {
+        bool allResultsCodesAreOk = std::all_of(
+            m_updateResponses.cbegin(),
+            m_updateResponses.cend(),
+            [](const UpdateResponse& updateResponse)
+            {
+                return updateResponse.resultCode == ResultCode::ok;
+            });
+        ASSERT_TRUE(allResultsCodesAreOk);
+    }
+
+    void assertResponses()
+    {
+        ASSERT_EQ(static_cast<int>(updateTestDataList.size()), m_updateResponses.size());
+        for (size_t i = 0; i < updateTestDataList.size(); ++i)
+            assertResponse(i);
+    }
+
+    void assertResponse(size_t i)
+    {
+        const auto& updateTestData = updateTestDataList[i];
+        const auto updateResponse = m_updateResponses[static_cast<int>(i)];
+        ASSERT_EQ(updateTestData.json, updateResponse.responseData);
     }
 };
 
@@ -142,8 +190,8 @@ TEST_F(AsyncJsonDataProvider, MetaDataProvided)
 
 TEST_F(AsyncJsonDataProvider, UpdateDataProvided)
 {
-    whenGetSpecificUpdateInformationRequestIssued();
-    thenCorrectUpdateDataIsProvided();
+    whenChainOfUpdateRequestsIssued();
+    thenCorrectUpdatesAreProvided();
 }
 
 } // namespace test

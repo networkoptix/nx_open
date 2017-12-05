@@ -5,7 +5,7 @@
 #include <nx/update/info/detail/data_parser/updates_meta_data.h>
 #include <nx/update/info/detail/fwd.h>
 
-#include "../../../inl.h"
+#include "../detail/json_data.h"
 
 namespace nx {
 namespace update {
@@ -83,7 +83,16 @@ protected:
 
     void whenUpdateDataParsed()
     {
-        ASSERT_EQ(ResultCode::ok, m_parser->parseUpdateData(updateJson, &m_updateData));
+        auto defaultUpdateIt = std::find_if(
+            updateTestDataList.cbegin(),
+            updateTestDataList.cend(),
+            [](const UpdateTestData& updateTestData)
+            {
+                return updateTestData.customization == "default"
+                    && updateTestData.version == "16975";
+            });
+        ASSERT_NE(updateTestDataList.cend(), defaultUpdateIt);
+        ASSERT_EQ(ResultCode::ok, m_parser->parseUpdateData(defaultUpdateIt->json, &m_updateData));
     }
 
     void thenUpdateDataShouldBeCorrect()

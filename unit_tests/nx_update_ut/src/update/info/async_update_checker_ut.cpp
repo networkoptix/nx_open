@@ -4,11 +4,12 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/random.h>
 #include <nx/update/info/async_update_checker.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
 
-#include "../../inl.h"
+#include "detail/json_data.h"
 
 namespace nx {
 namespace update {
@@ -108,19 +109,59 @@ public:
     }
 
     virtual void getSpecificUpdateData(
-        const QString& /*customization*/,
-        const QString& /*version*/) override
+        const QString& customization,
+        const QString& version) override
     {
         using namespace detail::data_provider;
         using namespace std::placeholders;
 
+        ResponseComposer responseComposer(customization, version);
         m_executor.submit(
             std::bind(
                 &AbstractAsyncRawDataProviderHandler::onGetSpecificUpdateInformationDone,
-                m_handler, ResultCode::ok, updateJson));
+                m_handler,
+                responseComposer.resultCode(),
+                responseComposer.responseData()));
     }
 
 private:
+    class ResponseComposer
+    {
+    public:
+        ResponseComposer(const QString& customization, const QString& version)
+        {
+            auto testUpdateIt = std::find_if(
+                updateTestDataList.cbegin(),
+                updateTestDataList.cend(),
+                [&customization, &version](const UpdateTestData& updateTestData)
+                {
+                    return updateTestData.customization == customization
+                        && updateTestData.version == version;
+                });
+
+            if (testUpdateIt == updateTestDataList.cend())
+            {
+                chooseRandomResultCode();
+                return;
+            }
+
+            m_responseData = testUpdateIt->json;
+        }
+
+        ResultCode resultCode() const { return m_resultCode; }
+        QByteArray responseData() const { return m_responseData; }
+    private:
+        ResultCode m_resultCode = ResultCode::ok;
+        QByteArray m_responseData;
+
+        void chooseRandomResultCode()
+        {
+            m_resultCode = nx::utils::random::number(0, 1) == 0
+                ? ResultCode::getRawDataError
+                : ResultCode::ok;
+        }
+    };
+
     detail::data_provider::AbstractAsyncRawDataProviderHandler* m_handler = nullptr;
     SingleThreadExecutor m_executor;
 };
@@ -156,35 +197,24 @@ protected:
             std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2));
     }
 
-    void thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned()
+    void thenCorrectUpdateRegistryShouldBeReturned()
     {
         QnMutexLocker lock(&m_mutex);
         while (!m_done)
             m_condition.wait(lock.mutex());
 
-        if (m_noFailIfError)
-        {
-            EXPECT_EQ(ResultCode::ok, m_resultCode) << "Assuming it's ok in this test";
-            EXPECT_TRUE((bool) m_updateRegistry) << "Assuming it's ok in this test";
-            return;
-        }
-
         ASSERT_EQ(ResultCode::ok, m_resultCode);
-        ASSERT_TRUE((bool) m_updateRegistry);
+        ASSERT_TRUE(m_updateRegistry);
+        assertUpdateRegistryContent();
     }
 
-    void disableFailIfNoInternet()
-    {
-        m_noFailIfError = true;
-    }
 private:
     info::AsyncUpdateChecker m_asyncUpdateChecker;
     AbstractUpdateRegistryPtr m_updateRegistry;
     QnMutex m_mutex;
     QnWaitCondition m_condition;
-    bool m_noFailIfError = false;
     bool m_done = false;
-    ResultCode m_resultCode;
+    ResultCode m_resultCode = ResultCode::noData;
 
     void onCheckCompleted(ResultCode resultCode, AbstractUpdateRegistryPtr updateRegistry)
     {
@@ -194,21 +224,30 @@ private:
         m_updateRegistry = std::move(updateRegistry);
         m_condition.wakeOne();
     }
+
+    void assertUpdateRegistryContent() const
+    {
+        assertAlternativeServer();
+        assertFileDataContent();
+    }
+
+    void assertAlternativeServer() const
+    {
+        ASSERT_EQ(1, m_updateRegistry->alternativeServers().size());
+        ASSERT_FALSE(m_updateRegistry->alternativeServers()[0].isEmpty());
+    }
+
+    void assertFileDataContent() const
+    {
+        //m_updateRegistry->findUpdate()
+    }
 };
 
 TEST_F(AsyncUpdateChecker, AsyncOperationCompletesSuccessfully)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
-    thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned();
-}
-
-
-TEST_F(AsyncUpdateChecker, AsyncOperationCompletesSuccessfully_InternetVersion)
-{
-    disableFailIfNoInternet();
-    whenAsyncCheckRequestHasBeenIssued();
-    thenNonEmptyAbstractUpdateRegistryPtrShouldBeReturned();
+    thenCorrectUpdateRegistryShouldBeReturned();
 }
 
 } // namespace test
