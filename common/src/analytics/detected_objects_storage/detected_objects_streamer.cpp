@@ -11,6 +11,7 @@ namespace analytics {
 namespace storage {
 
 static const auto kMaxStreamingDuration = std::chrono::hours(24) * 30 * 12 * 7;
+static const auto kUsecPerMs = 1000;
 
 DetectedObjectsStreamer::DetectedObjectsStreamer(
     AbstractEventsStorage* storage,
@@ -28,7 +29,7 @@ DetectedObjectsStreamer::~DetectedObjectsStreamer()
 
 QnAbstractCompressedMetadataPtr DetectedObjectsStreamer::getMotionData(qint64 timeUsec)
 {
-    NX_VERBOSE(this, lm("Requested timestamp %1").args(timeUsec / 1000));
+    NX_VERBOSE(this, lm("Requested timestamp %1").args(timeUsec / kUsecPerMs));
 
     reinitializeCursorIfTimeDiscontinuityPresent(timeUsec);
 
@@ -38,13 +39,13 @@ QnAbstractCompressedMetadataPtr DetectedObjectsStreamer::getMotionData(qint64 ti
     if (m_packetCache.front()->timestampUsec > timeUsec)
     {
         NX_VERBOSE(this, lm("Delaying packet with timestamp %1 vs requested %2")
-            .args(m_packetCache.front()->timestampUsec / 1000, timeUsec / 1000));
+            .args(m_packetCache.front()->timestampUsec / kUsecPerMs, timeUsec / kUsecPerMs));
         return nullptr;
     }
 
     NX_VERBOSE(this, lm("Returning packet with timestamp %1 vs %2 requested. Difference %3 ms")
-        .args(m_packetCache.front()->timestampUsec / 1000, timeUsec / 1000,
-            (timeUsec - m_packetCache.front()->timestampUsec) / 1000));
+        .args(m_packetCache.front()->timestampUsec / kUsecPerMs, timeUsec / kUsecPerMs,
+            (timeUsec - m_packetCache.front()->timestampUsec) / kUsecPerMs));
 
     auto resultPacket = std::move(m_packetCache.front());
     m_packetCache.pop_front();
@@ -92,14 +93,14 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
         if (detectionPacket)
         {
             NX_VERBOSE(this, lm("Read packet with timestamp %1")
-                .args(detectionPacket->timestampUsec / 1000));
+                .args(detectionPacket->timestampUsec / kUsecPerMs));
             m_packetCache.push_back(detectionPacket);
         }
 
         if (m_packetCache.empty())
         {
             NX_VERBOSE(this, lm("Closing cursor. Device %1, timestamp %2")
-                .args(m_deviceId, timeUsec / 1000));
+                .args(m_deviceId, timeUsec / kUsecPerMs));
             m_cursor.reset();
             return false;
         }
@@ -112,7 +113,7 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
             if ((*nextIt)->timestampUsec > timeUsec)
                 break;
             NX_VERBOSE(this, lm("Skipping packet with timestamp %1")
-                .args((*it)->timestampUsec / 1000));
+                .args((*it)->timestampUsec / kUsecPerMs));
             it = m_packetCache.erase(it);
         }
 
