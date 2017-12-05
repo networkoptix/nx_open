@@ -18,6 +18,8 @@ class CA(object):
         self._serial_path = os.path.join(ca_dir, 'ca.srl')
         self._extensions_config_path = os.path.join(ca_dir, 'ca.extensions.cnf')
         if not os.path.exists(self.cert_path):
+            with open(self._serial_path, 'w') as serial_file:
+                serial_file.write('01')
             check_call([
                 'openssl', 'req', '-x509',
                 '-newkey', 'rsa:2048', '-nodes', '-keyout', self._key_path,
@@ -32,23 +34,26 @@ class CA(object):
                     DNS.1 = localhost
                     IP.1 = 127.0.0.1
                 """)))
+        self._gen_dir = os.path.join(ca_dir, 'gen')
+        if not os.path.exists(self._gen_dir):
+            os.makedirs(self._gen_dir)
 
     def generate_key_and_cert(self):
         log.debug("Generate key.")
-        key = check_output(['openssl', 'genrsa', '2048'])
-        request_subject = '/C=US/O=NetworkOptix/CN=nxwitness'
-        request_command_line = ['openssl', 'req', '-new', '-key', '-', '-subj', request_subject]
+        with open(self._serial_path) as serial_file:
+            basename = os.path.join(self._gen_dir, serial_file.read().rstrip())
+        key_path = basename + '.key'
+        check_call(['openssl', 'genrsa', '-out', key_path, '2048'])
         log.debug("Make request.")
-        request_process = Popen(request_command_line, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        request, request_stderr = request_process.communicate(key)
-        assert request_process.returncode == 0, "Non-zero exit code when making request:\n%s" % request_stderr
-        log.debug("Sign request:\n%s", request)
-        cert_command_line = [
+        subject = '/C=US/O=NetworkOptix/CN=nxwitness'
+        request_path = basename + '.csr'
+        check_call(['openssl', 'req', '-new', '-key', key_path, '-subj', subject, '-out', request_path])
+        log.debug("Sign request.")
+        cert_path = basename + '.crt'
+        check_call([
             'openssl', 'x509', '-req',
             '-CA', self.cert_path, '-CAkey', self._key_path, '-CAserial', self._serial_path, '-CAcreateserial',
-            '-extfile', self._extensions_config_path]
-        cert_process = Popen(cert_command_line, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        cert, cert_stderr = cert_process.communicate(input=request)
-        log.debug("Got certificate:\n%s", cert)
-        assert cert_process.returncode == 0, "Non-zero exit code when signing request:\n%s" % cert_stderr
-        return key + cert
+            '-in', request_path, '-out', cert_path,
+            '-extfile', self._extensions_config_path])
+        with open(key_path) as key_file, open(cert_path) as cert_file:
+            return key_file.read() + cert_file.read()
