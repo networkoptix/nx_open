@@ -119,11 +119,21 @@ if(IOS)
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
         RESOURCE "${resources}"
-        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
-        XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
         XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
     )
+
+    if(developerBuild)
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+            XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${apple_team_id}"
+        )
+    else()
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
+            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
+            XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"
+        )
+    endif()
 
     setup_ios_application(mobile_client
         ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio

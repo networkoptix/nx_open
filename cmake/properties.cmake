@@ -28,5 +28,7 @@ set(liteMode "false")
 set(launcher.version.file "launcher.version")
 set(installation.root "/opt/${deb.customization.company.name}")
 
+set(apple_team_id "L6FE34GJWM")
+
 hg_changeset(${PROJECT_SOURCE_DIR} changeSet)
 hg_branch(${PROJECT_SOURCE_DIR} branch)

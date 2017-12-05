@@ -12,6 +12,10 @@ option(rdepSync
     "Whether rdep should sync packages or use only existing copies"
     ON)
 
+option(developerBuild
+    "Disable this option for production builds (Jenkins)"
+    ON)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
