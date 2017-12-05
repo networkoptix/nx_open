@@ -6,7 +6,8 @@ import shutil
 from os.path import dirname, join, exists, isfile, abspath
 
 from environment import bin_source_dir, rename, execute_command
-from light_interface import light, light_command
+from light_interface import light_command
+from candle_interface import candle_executable
 
 engine_tmp_folder = 'obj'
 
@@ -69,7 +70,7 @@ def add_components(command, components):
         command.append('{0}.wxs'.format(component))
 
 def get_candle_command(project, suffix, args, components):
-    command = ['candle']
+    command = [candle_executable()]
     command.append('-dClientVoxSourceDir=${ClientVoxSourceDir}')
     command.append(r'-dVcrt14SrcDir=${VC14RedistPath}\bin')
     
