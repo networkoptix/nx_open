@@ -108,6 +108,7 @@ const char* Manager::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
+    // TODO: Reuse GUID constants declared in this file.
     return R"json(
         {
             "supportedEventTypes": [
@@ -180,7 +181,7 @@ AbstractMetadataPacket* Manager::cookSomeObjects(
 
     detectedObject->setId(objectId);
     detectedObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    detectedObject->setEventTypeId(kCarDetectedEventGuid);
+    detectedObject->setTypeId(kCarDetectedEventGuid);
 
     double dt = m_counterObjects++ / 32.0;
     double intPart;
