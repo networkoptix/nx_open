@@ -224,6 +224,33 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
         sqlFilter.push_back(std::move(endTimeFilterField));
     }
 
+    if (!filter.boundingBox.isNull())
+    {
+        nx::utils::db::SqlFilterFieldLessOrEqual topLeftXFilter(
+            "box_top_left_x",
+            ":boxTopLeftX",
+            QnSql::serialized_field(filter.boundingBox.bottomRight().x()));
+        sqlFilter.push_back(std::move(topLeftXFilter));
+
+        nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
+            "box_bottom_right_x",
+            ":boxBottomRightX",
+            QnSql::serialized_field(filter.boundingBox.topLeft().x()));
+        sqlFilter.push_back(std::move(bottomRightXFilter));
+
+        nx::utils::db::SqlFilterFieldLessOrEqual topLeftYFilter(
+            "box_top_left_y",
+            ":boxTopLeftY",
+            QnSql::serialized_field(filter.boundingBox.bottomRight().y()));
+        sqlFilter.push_back(std::move(topLeftYFilter));
+
+        nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
+            "box_bottom_right_y",
+            ":boxBottomRightY",
+            QnSql::serialized_field(filter.boundingBox.topLeft().y()));
+        sqlFilter.push_back(std::move(bottomRightYFilter));
+    }
+
     return sqlFilter;
 }
 

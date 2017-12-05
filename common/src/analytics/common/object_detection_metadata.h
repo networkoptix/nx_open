@@ -3,6 +3,7 @@
 #include <set>
 #include <chrono>
 #include <memory>
+#include <ostream>
 
 #include <QtCore/QRect>
 
@@ -59,6 +60,7 @@ struct DetectionMetadataPacket
 QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
 
 QString toString(const DetectionMetadataPacket&);
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
 QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
 
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right);
