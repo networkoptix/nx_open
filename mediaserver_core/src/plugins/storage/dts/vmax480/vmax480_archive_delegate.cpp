@@ -168,14 +168,14 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         }
 
         if (m_thumbnailsMode) {
-            if (getTimer.elapsed() > MAX_FRAME_DURATION*2) {
+            if (getTimer.elapsed() > MAX_FRAME_DURATION_MS*2) {
                 m_ThumbnailsSeekPoints.clear();
                 break; // tell error
             }
         }
         else {
             if (getTimer.elapsed() > EMPTY_PACKET_REPEAT_INTERVAL) {
-                if (++m_noDataCounter == MAX_FRAME_DURATION*2/EMPTY_PACKET_REPEAT_INTERVAL)
+                if (++m_noDataCounter == MAX_FRAME_DURATION_MS*2/EMPTY_PACKET_REPEAT_INTERVAL)
                     reconnect();
                 return m_maxStream->createEmptyPacket(m_lastMediaTime);
             }

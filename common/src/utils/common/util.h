@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QString>
 
 template <typename T, size_t N>
@@ -67,9 +69,14 @@ qint64 getDiskTotalSpace(const QString &root);
 //static const qint64 MAX_FIRST_GOP_DURATION = 1000 * 1000 * 10;
 #define MAX_FIRST_GOP_FRAMES 250ll
 
-#define MAX_FRAME_DURATION (5ll * 1000)
-#define MIN_FRAME_DURATION 16667ll
-#define MAX_AUDIO_FRAME_DURATION 150ll
+#define MAX_FRAME_DURATION_MS (5ll * 1000)
+#define MAX_FRAME_DURATION std::chrono::milliseconds(MAX_FRAME_DURATION_MS)
+
+#define MIN_FRAME_DURATION_USEC 16667ll
+#define MIN_FRAME_DURATION std::chrono::microseconds(MIN_FRAME_DURATION_USEC)
+
+#define MAX_AUDIO_FRAME_DURATION_MS 150ll
+#define MAX_AUDIO_FRAME_DURATION std::chrono::milliseconds(MAX_AUDIO_FRAME_DURATION_MS)
 
 quint64 getUsecTimer();
 

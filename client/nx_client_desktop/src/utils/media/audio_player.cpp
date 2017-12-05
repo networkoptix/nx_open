@@ -31,7 +31,7 @@ public:
 AudioPlayer::AudioPlayer( const QString& filePath )
 :
     m_mediaFileReader( NULL ),
-    m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
+    m_adaptiveSleep( MAX_FRAME_DURATION_MS*1000 ),
     m_renderer( NULL ),
     m_rtStartTime( AV_NOPTS_VALUE ),
     m_lastRtTime( 0 ),
@@ -340,8 +340,8 @@ void AudioPlayer::doRealtimeDelay( const QnAbstractDataPacketPtr& media )
     else if( media->timestamp - m_rtStartTime > AUDIO_PRE_BUFFER*MS_PER_USEC )
     {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
-        if( timeDiff <= MAX_FRAME_DURATION*1000 )
-            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+        if( timeDiff <= MAX_FRAME_DURATION_MS*1000 )
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION_MS*1000); // if diff too large, it is recording hole. do not calc delay for this case
     }
     m_lastRtTime = media->timestamp;
 }

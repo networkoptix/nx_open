@@ -36,7 +36,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
     }
     m_tiledFrame->assignMiscData(frame.data());
     m_prevFrameTime = m_tiledFrame->pts = qMax(static_cast<qint64>(m_tiledFrame->pts),
-        m_prevFrameTime + MIN_FRAME_DURATION);
+        m_prevFrameTime + MIN_FRAME_DURATION_USEC);
 
     const auto pos = m_layout->position(frame->channel);
     const QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(),

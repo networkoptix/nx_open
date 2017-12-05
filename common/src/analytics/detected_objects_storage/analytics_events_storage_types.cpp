@@ -16,7 +16,7 @@ bool ObjectPosition::operator==(const ObjectPosition& right) const
     return deviceId == right.deviceId
         && timestampUsec == right.timestampUsec
         && durationUsec == right.durationUsec
-        && boundingBox == right.boundingBox
+        && equalWithPrecision(boundingBox, right.boundingBox, 6)
         && attributes == right.attributes;
 }
 

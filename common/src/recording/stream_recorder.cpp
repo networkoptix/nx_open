@@ -473,7 +473,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
 
     if (m_endDateTime != qint64(AV_NOPTS_VALUE)
-        && md->timestamp - m_endDateTime > MAX_FRAME_DURATION * 2 * 1000LL
+        && md->timestamp - m_endDateTime > MAX_FRAME_DURATION_MS * 2 * 1000LL
         && m_truncateInterval > 0)
     {
         // If multifile recording is allowed, recreate the file if a recording hole is detected.

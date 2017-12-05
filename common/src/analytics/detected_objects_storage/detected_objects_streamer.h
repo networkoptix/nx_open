@@ -29,9 +29,12 @@ private:
     const QnUuid m_deviceId;
     std::unique_ptr<AbstractCursor> m_cursor;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
-    common::metadata::ConstDetectionMetadataPacketPtr m_lastPacketRead;
-    qint64 m_prevPacketTimestamp = -1;
+    // TODO: #ak Use cyclic array here.
+    std::deque<common::metadata::ConstDetectionMetadataPacketPtr> m_packetCache;
+    qint64 m_prevRequestedTimestamp = -1;
 
+    void reinitializeCursorIfTimeDiscontinuityPresent(qint64 timeUsec);
+    bool readPacketForTimestamp(qint64 timeUsec);
     ResultCode createCursor(std::chrono::milliseconds startTimestamp);
     void createCursorAsync(
         std::chrono::milliseconds startTimestamp,

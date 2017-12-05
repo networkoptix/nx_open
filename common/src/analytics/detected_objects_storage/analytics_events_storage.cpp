@@ -130,10 +130,10 @@ std::int64_t EventsStorage::insertEvent(
         QnSql::serialized_field(detectedObject.objectId));
     insertEventQuery.bindValue(lit(":attributes"), QJson::serialized(detectedObject.labels));
 
-    insertEventQuery.bindValue(lit(":boxTopLeftX"), (int) detectedObject.boundingBox.topLeft().x());
-    insertEventQuery.bindValue(lit(":boxTopLeftY"), (int)detectedObject.boundingBox.topLeft().y());
-    insertEventQuery.bindValue(lit(":boxBottomRightX"), (int)detectedObject.boundingBox.bottomRight().x());
-    insertEventQuery.bindValue(lit(":boxBottomRightY"), (int)detectedObject.boundingBox.bottomRight().y());
+    insertEventQuery.bindValue(lit(":boxTopLeftX"), detectedObject.boundingBox.topLeft().x());
+    insertEventQuery.bindValue(lit(":boxTopLeftY"), detectedObject.boundingBox.topLeft().y());
+    insertEventQuery.bindValue(lit(":boxBottomRightX"), detectedObject.boundingBox.bottomRight().x());
+    insertEventQuery.bindValue(lit(":boxBottomRightY"), detectedObject.boundingBox.bottomRight().y());
 
     insertEventQuery.exec();
     return insertEventQuery.impl().lastInsertId().toLongLong();
@@ -276,11 +276,11 @@ void EventsStorage::loadObject(
     objectPosition.durationUsec = selectEventsQuery->value(lit("duration_usec")).toLongLong();
 
     objectPosition.boundingBox.setTopLeft(QPointF(
-        selectEventsQuery->value(lit("box_top_left_x")).toInt(),
-        selectEventsQuery->value(lit("box_top_left_y")).toInt()));
+        selectEventsQuery->value(lit("box_top_left_x")).toDouble(),
+        selectEventsQuery->value(lit("box_top_left_y")).toDouble()));
     objectPosition.boundingBox.setBottomRight(QPointF(
-        selectEventsQuery->value(lit("box_bottom_right_x")).toInt(),
-        selectEventsQuery->value(lit("box_bottom_right_y")).toInt()));
+        selectEventsQuery->value(lit("box_bottom_right_x")).toDouble(),
+        selectEventsQuery->value(lit("box_bottom_right_y")).toDouble()));
 }
 
 void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
