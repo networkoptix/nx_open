@@ -64,12 +64,6 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
         m_httpClient->pleaseStopSync();
 }
 
-void HanwhaChunkLoader::setUp()
-{
-    QnMutexLocker lock(&m_mutex);
-    setUpThreadUnsafe();
-}
-
 void HanwhaChunkLoader::start(bool isNvr)
 {
     QnMutexLocker lock(&m_mutex);

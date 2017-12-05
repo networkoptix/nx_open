@@ -58,7 +58,6 @@ public:
     HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext);
     virtual ~HanwhaChunkLoader();
 
-    void setUp();
     void start(bool isNvr);
     bool isStarted() const;
 
