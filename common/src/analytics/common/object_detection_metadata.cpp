@@ -71,6 +71,19 @@ QnCompressedMetadataPtr toMetadataPacket(
     return metadataPacket;
 }
 
+DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr& compressedMetadata)
+{
+    if (!compressedMetadata)
+        return DetectionMetadataPacketPtr();
+
+    DetectionMetadataPacketPtr metadata(new DetectionMetadataPacket);
+
+    *metadata = QnUbjson::deserialized<DetectionMetadataPacket>(
+        QByteArray::fromRawData(compressedMetadata->data(), int(compressedMetadata->dataSize())));
+
+    return metadata;
+}
+
 bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right)
 {
     return left.deviceId == right.deviceId

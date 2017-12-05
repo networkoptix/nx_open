@@ -1,5 +1,6 @@
 #include "consuming_analytics_metadata_provider.h"
 
+#include <analytics/common/object_detection_metadata.h>
 #include <core/resource/camera_resource.h>
 #include <nx/media/caching_metadata_consumer.h>
 #include <nx/fusion/serialization/ubjson.h>
@@ -32,18 +33,7 @@ common::metadata::DetectionMetadataPacketPtr ConsumingAnalyticsMetadataProvider:
     const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(
         d->metadataConsumer->metadata(timestamp, channel));
 
-    if (!compressedMetadata)
-        return common::metadata::DetectionMetadataPacketPtr();
-
-    common::metadata::DetectionMetadataPacketPtr metadata(
-        new common::metadata::DetectionMetadataPacket);
-
-    *metadata = QnUbjson::deserialized<common::metadata::DetectionMetadataPacket>(
-        QByteArray::fromRawData(
-            compressedMetadata->data(),
-            static_cast<int>(compressedMetadata->dataSize())));
-
-    return metadata;
+    return common::metadata::fromMetadataPacket(compressedMetadata);
 }
 
 QSharedPointer<media::AbstractMetadataConsumer>

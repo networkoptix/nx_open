@@ -63,7 +63,7 @@ public:
         m_lastMediaTime(AV_NOPTS_VALUE),
         m_utcShift(0),
         m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
-        m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
+        m_adaptiveSleep( MAX_FRAME_DURATION_MS*1000 ),
         m_rtStartTime( AV_NOPTS_VALUE ),
         m_lastRtTime( 0 ),
         m_endTimeUsec( AV_NOPTS_VALUE ),
@@ -179,7 +179,7 @@ protected:
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
-            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
+            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION_MS*1000 &&
                 media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
             {
                 m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
@@ -328,8 +328,8 @@ private:
         else
         {
             qint64 timeDiff = media->timestamp - m_lastRtTime;
-            if( timeDiff <= MAX_FRAME_DURATION*1000 )
-                m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+            if( timeDiff <= MAX_FRAME_DURATION_MS*1000 )
+                m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION_MS*1000); // if diff too large, it is recording hole. do not calc delay for this case
         }
         m_lastRtTime = media->timestamp;
     }

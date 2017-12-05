@@ -428,7 +428,7 @@ bool QnMotionArchive::saveToArchive(QnConstMetaDataV1Ptr data)
         m_lastDetailedData->timestamp = data->timestamp;
     }
     else {
-        if(data->timestamp >= m_lastTimestamp && data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION*1000ll) {
+        if(data->timestamp >= m_lastTimestamp && data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION_MS*1000ll) {
             m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
         }
         else {
