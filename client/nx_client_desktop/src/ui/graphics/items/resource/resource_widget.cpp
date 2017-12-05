@@ -70,9 +70,9 @@ static const qreal kHudMargin = 4.0;
 
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
-const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
+const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS;
 #else
-const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
+const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS * 3;
 #endif
 
 /** Background color for overlay panels. */

@@ -945,7 +945,7 @@ void QnWorkbenchNavigator::jumpBackward()
         bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
-            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
+            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
         if (!periods.empty())
         {
@@ -996,7 +996,7 @@ void QnWorkbenchNavigator::jumpForward()
         bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
-            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
+            periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
         /* We want timeline to jump relatively to current position, not camera frame. */
         qint64 currentTime = m_timeSlider->value();
