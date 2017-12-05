@@ -780,10 +780,7 @@ void HanwhaChunkLoader::setUpThreadUnsafe()
 
     const auto information = m_resourceContext->information();
     if (!information)
-    {
-        NX_DEBUG(this, lit("Unable to fetch channel number"));
         return; //< Unable to start without channel number.
-    }
 
     m_hasSearchRecordingPeriodSubmenu = false;
     const auto searchRecordingPeriodAttribute = information->attributes.attribute<bool>(
