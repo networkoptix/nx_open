@@ -390,7 +390,7 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
-        for (const auto& storage : m_owner->getStorages())
+        for (const auto& storage : storagesToTest())
         {
             if (needToStop())
                 return;
@@ -412,6 +412,35 @@ public:
 
 private:
     QnStorageManager* m_owner;
+
+    QnStorageResourceList storagesToTest()
+    {
+        QnStorageResourceList result = m_owner->getStorages();
+        std::sort(
+            result.begin(),
+            result.end(),
+            [this](const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
+            {
+                return compareByType(lhs, rhs);
+            });
+
+        return result;
+    }
+
+    static bool compareByType(const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
+    {
+        return isLocal(lhs) && !isLocal(rhs);
+    }
+
+    static bool isLocal(const QnStorageResourcePtr& storage)
+    {
+        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        if (fileStorage)
+            return fileStorage->isLocal();
+
+        const auto localDiskType = QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition);
+        return storage->getStorageType() == localDiskType;
+    }
 };
 
 // -------------------- QnStorageManager --------------------
