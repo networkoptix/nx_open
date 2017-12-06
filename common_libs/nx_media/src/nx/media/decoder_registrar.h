@@ -6,6 +6,8 @@
 
 #include "abstract_resource_allocator.h"
 
+enum AVCodecID;
+
 namespace nx {
 namespace media {
 
@@ -22,7 +24,7 @@ public:
      */
     static void registerDecoders(
         std::shared_ptr<AbstractResourceAllocator> allocator,
-        const QSize& maxFfmpegResolution,
+        const QMap<AVCodecID, QSize>& maxFfmpegResolutions,
         bool isTranscodingEnabled);
 };
 

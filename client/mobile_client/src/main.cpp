@@ -49,6 +49,11 @@
 #include <nx/mobile_client/helpers/inter_client_message.h>
 #include <nx/network/system_socket.h>
 
+extern "C"
+{
+#include <libavcodec/avcodec.h>
+}
+
 #include <ini.h>
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
@@ -168,24 +173,32 @@ int runUi(QtSingleGuiApplication* application)
         mainWindow));
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
+    QSize maxFfmpegHevcResolution = maxFfmpegResolution;
     if (maxFfmpegResolution.isEmpty())
     {
         // Use platform-dependent defaults.
 
         if (QnAppInfo::isArm())
         {
-            if (QnAppInfo::isBpi())
+            if (QnAppInfo::isBpi() && !QnAppInfo::isMobile())
+            {
                 maxFfmpegResolution = QSize(1280, 720);
+                maxFfmpegHevcResolution = QSize(640, 480);
+            }
             else
+            {
                 maxFfmpegResolution = QSize(1920, 1080);
-
-            if (QnAppInfo::isMobile())
-                maxFfmpegResolution = QSize(1920, 1080);
+                maxFfmpegHevcResolution = QSize(800, 600);
+            }
         }
     }
 
+    QMap<AVCodecID, QSize> maxFfmpegResolutions;
+    maxFfmpegResolutions[AV_CODEC_ID_NONE] = maxFfmpegResolution;
+    maxFfmpegResolutions[AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
+
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
+        allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context.liteMode());
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();
