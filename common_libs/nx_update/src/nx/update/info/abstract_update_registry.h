@@ -8,7 +8,7 @@ namespace nx {
 namespace update {
 namespace info {
 
-class AbstractUpdateRegistry
+class NX_UPDATE_API AbstractUpdateRegistry
 {
 public:
     // todo: serialize and deserialize

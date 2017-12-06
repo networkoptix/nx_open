@@ -75,6 +75,10 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         logger->setDefaultLevel(level.primary);
         logger->setLevelFilters(level.filters);
     }
+    else
+    {
+        logger->setDefaultLevel(Level::none);
+    }
 
     if (const auto value = arguments.get("log-file", "lf"))
     {

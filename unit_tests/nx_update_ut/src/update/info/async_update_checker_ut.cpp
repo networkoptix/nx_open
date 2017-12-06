@@ -239,11 +239,16 @@ private:
 
     void assertFileDataContent() const
     {
-        //m_updateRegistry->findUpdate()
+        FileData fileData;
+        ResultCode resultCode;
+        resultCode = m_updateRegistry->findUpdate(
+            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+            &fileData);
+        ASSERT_EQ(ResultCode::ok, resultCode);
     }
 };
 
-TEST_F(AsyncUpdateChecker, AsyncOperationCompletesSuccessfully)
+TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
 {
     whenMockupDataProviderHasBeenSetUp();
     whenAsyncCheckRequestHasBeenIssued();
