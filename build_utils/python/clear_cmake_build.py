@@ -41,5 +41,4 @@ def main():
         delete_path(os.path.join(args.build_dir, configuration, "bin", "mobile_client.app"))
 
 if __name__ == "__main__":
-    if not main():
-        exit(1)
+    main()
