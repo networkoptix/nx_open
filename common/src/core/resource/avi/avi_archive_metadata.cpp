@@ -111,7 +111,7 @@ bool deserializeLayout(const QString& layout, QnAviArchiveMetadata& metadata)
         QStringList params = info[i].split(L',');
         if (params.size() != 2)
         {
-            NX_LOG(lit("Invalid layout string stored at file metadata: %1").arg(layout), cl_logWARNING);
+            NX_LOG(lit("Invalid layout string stored at file metadata: \"%1\"").arg(layout), cl_logWARNING);
             return false;
         }
         if (i == 0)

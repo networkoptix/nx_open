@@ -854,7 +854,7 @@ void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, in
             }
         }
     }
-    NX_VERBOSE(this) << lm("%1() END: Processed %2 metadata object(s) in %3 list(s)")
+    NX_VERBOSE(this) << lm("%1() END: Processed %2 metadata object(s) of %3 type(s)")
         .args(__func__, metadataCount, metadataList.size());
 }
 
