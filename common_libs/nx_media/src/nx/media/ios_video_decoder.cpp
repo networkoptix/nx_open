@@ -296,9 +296,11 @@ bool IOSVideoDecoder::isCompatible(
     const QSize& resolution,
     bool /*allowOverlay*/)
 {
+    // VideoToolBox supports H263 only.
+    // If cheat it and provide H263P instead (by changing compression type H263P -> H263)
+    // it would show green box.
     if (codec != AV_CODEC_ID_H265 &&
         codec != AV_CODEC_ID_H264 &&
-        codec != AV_CODEC_ID_H263 &&
         codec != AV_CODEC_ID_H263P &&
         codec != AV_CODEC_ID_MPEG4 &&
         codec != AV_CODEC_ID_MPEG1VIDEO &&
