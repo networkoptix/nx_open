@@ -326,20 +326,12 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
             // https://stackoverflow.com/questions/11197509/how-to-get-device-make-and-model-on-ios
             if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
             {
-                if (deviceInfo.majorVersion == 6) //< iPhone 5s
-                    return kFullHdResolution;
-                else if (deviceInfo.majorVersion == 7) //< iPhone 6
-                    return kFullHdResolution;
-                else if (deviceInfo.majorVersion > 7)
+                if (deviceInfo.majorVersion > 7)
                     return kUhd4kResolution;
             }
             else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
             {
-                if (deviceInfo.majorVersion == 4) //< iPad Air 1 / iPad Mini 2.
-                    return kFullHdResolution;
-                else if (deviceInfo.majorVersion == 5) //< iPad Air 2 / iPad Mini 4.
-                    return kFullHdResolution;
-                else if (deviceInfo.majorVersion > 5)
+                if (deviceInfo.majorVersion > 5)
                     return kUhd4kResolution;
             }
             return QSize(); //< HEVC is not supported.
