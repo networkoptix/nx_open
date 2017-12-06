@@ -830,7 +830,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     return true;
 }
 
-void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, int channel)
+void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, int /*channel*/)
 {
     QnMutexLocker lock(&m_metadataConsumersHashMutex);
     const auto consumers = m_metadataConsumerByType;
@@ -838,8 +838,11 @@ void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, in
 
     for (const auto& metadata: metadataList)
     {
-        if (const auto consumer = m_metadataConsumerByType.value(metadata->metadataType).lock())
-            consumer->processMetadata(metadata);
+        for (const auto& value: m_metadataConsumerByType.values(metadata->metadataType))
+        {
+            if (const auto& consumer = value.lock())
+                consumer->processMetadata(metadata);
+        }
     }
 }
 
