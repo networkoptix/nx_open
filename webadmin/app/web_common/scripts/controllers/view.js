@@ -240,7 +240,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if($scope.debugMode){
+            if($scope.debugMode && !$scope.isWebAdmin){
                 var streamInfo = {};
                 var streamType = $scope.player == "webm" ? "webm" : "hls";
                 streamInfo.src = $scope.player == "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
