@@ -186,7 +186,10 @@ protected:
         const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& right)
     {
         ASSERT_EQ(left.size(), right.size());
-        // TODO
+        for (std::size_t i = 0; i < left.size(); ++i)
+        {
+            ASSERT_EQ(*left[i], *right[i]);
+        }
     }
 
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filterPackets(
@@ -365,9 +368,13 @@ protected:
     void givenRandomFilter()
     {
         addRandomKnownDeviceIdToFilter();
-        addRandomNonEmptyTimePeriodToFilter();
+
+        if (nx::utils::random::number<bool>())
+            addRandomNonEmptyTimePeriodToFilter();
+
         if (nx::utils::random::number<bool>())
             addLimitToFilter();
+
         if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
     }
@@ -577,9 +584,21 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
     thenResultMatchesExpectations();
 }
 
-// TEST_F(AnalyticsEventsStorage, lookup_by_objectId)
-// TEST_F(AnalyticsEventsStorage, lookup_by_objectTypeId)
-// TEST_F(AnalyticsEventsStorage, lookup_stress_test)
+// TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectId)
+// TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectTypeId)
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_stress_test)
+{
+    givenRandomFilter();
+    setSortOrder(
+        nx::utils::random::number<bool>()
+        ? Qt::SortOrder::AscendingOrder
+        : Qt::SortOrder::DescendingOrder);
+
+    whenLookupObjects();
+
+    thenResultMatchesExpectations();
+}
 
 //-------------------------------------------------------------------------------------------------
 // Cursor.
@@ -648,6 +667,108 @@ TEST_F(AnalyticsEventsStorageCursor, cursor_provides_all_matched_data)
 }
 
 //TEST_F(AnalyticsEventsStorage, many_concurrent_cursors)
+
+//-------------------------------------------------------------------------------------------------
+// Time periods lookup.
+
+class AnalyticsEventsStorageTimePeriodsLookup:
+    public AnalyticsEventsStorageLookup
+{
+    using base_type = AnalyticsEventsStorageLookup;
+
+protected:
+    void givenRandomLookupOptions()
+    {
+        m_lookupOptions.detailLevel = std::chrono::milliseconds(
+            nx::utils::random::number<int>(1, 1000000));
+    }
+
+    void whenLookupTimePeriods()
+    {
+        using namespace std::placeholders;
+
+        eventsStorage().lookupTimePeriods(
+            filter(),
+            m_lookupOptions,
+            std::bind(&AnalyticsEventsStorageTimePeriodsLookup::saveLookupResult, this, _1, _2));
+    }
+
+    void thenResultMatchesExpectations()
+    {
+        thenLookupSucceded();
+        andResultMatchesExpectations();
+    }
+
+    void thenLookupSucceded()
+    {
+        m_prevLookupResult = m_lookupResultQueue.pop();
+        ASSERT_EQ(ResultCode::ok, std::get<0>(m_prevLookupResult));
+    }
+
+    void andResultMatchesExpectations()
+    {
+        ASSERT_EQ(expectedLookupResult(), std::get<1>(m_prevLookupResult));
+    }
+
+private:
+    std::tuple<ResultCode, QnTimePeriodList> m_prevLookupResult;
+    nx::utils::SyncQueue<std::tuple<ResultCode, QnTimePeriodList>> m_lookupResultQueue;
+    TimePeriodsLookupOptions m_lookupOptions;
+
+    void saveLookupResult(ResultCode resultCode, QnTimePeriodList timePeriods)
+    {
+        m_lookupResultQueue.push(std::make_tuple(resultCode, std::move(timePeriods)));
+    }
+
+    QnTimePeriodList expectedLookupResult()
+    {
+        return toTimePeriods(
+            filterPackets(filter(), analyticsDataPackets()),
+            m_lookupOptions);
+    }
+
+    QnTimePeriodList toTimePeriods(
+        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& packets,
+        TimePeriodsLookupOptions lookupOptions)
+    {
+        using namespace std::chrono;
+
+        QnTimePeriodList result;
+        for (const auto& packet: packets)
+        {
+            QnTimePeriod timePeriod(
+                duration_cast<milliseconds>(microseconds(packet->timestampUsec)),
+                duration_cast<milliseconds>(microseconds(packet->durationUsec)));
+
+            auto it = std::upper_bound(result.begin(), result.end(), timePeriod);
+            result.insert(it, timePeriod);
+        }
+
+        return QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            result,
+            lookupOptions.detailLevel);
+    }
+};
+
+TEST_F(AnalyticsEventsStorageTimePeriodsLookup, selecting_all_periods)
+{
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_random_filter)
+{
+    givenRandomFilter();
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_aggregation_period)
+{
+    givenRandomLookupOptions();
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
 
 //-------------------------------------------------------------------------------------------------
 // Deprecating data.
