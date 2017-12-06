@@ -228,50 +228,81 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
         sqlFilter.push_back(std::move(filterField));
     }
 
-    if (!filter.timePeriod.isNull())
+    if (!filter.objectId.isNull())
     {
-        nx::utils::db::SqlFilterFieldGreaterOrEqual startTimeFilterField(
-            "timestamp_usec_utc",
-            ":startTimeUsec",
-            QnSql::serialized_field(filter.timePeriod.startTimeMs * kUsecInMs));
-        sqlFilter.push_back(std::move(startTimeFilterField));
-
-        const auto endTimeMs = filter.timePeriod.startTimeMs + filter.timePeriod.durationMs;
-        nx::utils::db::SqlFilterFieldLess endTimeFilterField(
-            "timestamp_usec_utc",
-            ":endTimeUsec",
-            QnSql::serialized_field(endTimeMs * kUsecInMs));
-        sqlFilter.push_back(std::move(endTimeFilterField));
+        nx::utils::db::SqlFilterFieldEqual filterField(
+            "object_id", ":objectId", QnSql::serialized_field(filter.objectId));
+        sqlFilter.push_back(std::move(filterField));
     }
+
+    if (!filter.objectTypeId.empty())
+        addObjectTypeIdToFilter(filter.objectTypeId, &sqlFilter);
+
+    if (!filter.timePeriod.isNull())
+        addTimePeriodToFilter(filter.timePeriod, &sqlFilter);
 
     if (!filter.boundingBox.isNull())
-    {
-        nx::utils::db::SqlFilterFieldLessOrEqual topLeftXFilter(
-            "box_top_left_x",
-            ":boxTopLeftX",
-            QnSql::serialized_field(filter.boundingBox.bottomRight().x()));
-        sqlFilter.push_back(std::move(topLeftXFilter));
-
-        nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
-            "box_bottom_right_x",
-            ":boxBottomRightX",
-            QnSql::serialized_field(filter.boundingBox.topLeft().x()));
-        sqlFilter.push_back(std::move(bottomRightXFilter));
-
-        nx::utils::db::SqlFilterFieldLessOrEqual topLeftYFilter(
-            "box_top_left_y",
-            ":boxTopLeftY",
-            QnSql::serialized_field(filter.boundingBox.bottomRight().y()));
-        sqlFilter.push_back(std::move(topLeftYFilter));
-
-        nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
-            "box_bottom_right_y",
-            ":boxBottomRightY",
-            QnSql::serialized_field(filter.boundingBox.topLeft().y()));
-        sqlFilter.push_back(std::move(bottomRightYFilter));
-    }
+        addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
 
     return sqlFilter;
+}
+
+void EventsStorage::addObjectTypeIdToFilter(
+    const std::vector<QnUuid>& objectTypeIds,
+    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+{
+    // TODO: #ak Add support for every objectTypeId specified.
+
+    nx::utils::db::SqlFilterFieldEqual filterField(
+        "object_type_id", ":objectTypeId", QnSql::serialized_field(objectTypeIds.front()));
+    sqlFilter->push_back(std::move(filterField));
+}
+
+void EventsStorage::addTimePeriodToFilter(
+    const QnTimePeriod& timePeriod,
+    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+{
+    nx::utils::db::SqlFilterFieldGreaterOrEqual startTimeFilterField(
+        "timestamp_usec_utc",
+        ":startTimeUsec",
+        QnSql::serialized_field(timePeriod.startTimeMs * kUsecInMs));
+    sqlFilter->push_back(std::move(startTimeFilterField));
+
+    const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
+    nx::utils::db::SqlFilterFieldLess endTimeFilterField(
+        "timestamp_usec_utc",
+        ":endTimeUsec",
+        QnSql::serialized_field(endTimeMs * kUsecInMs));
+    sqlFilter->push_back(std::move(endTimeFilterField));
+}
+
+void EventsStorage::addBoundingBoxToFilter(
+    const QRectF& boundingBox,
+    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+{
+    nx::utils::db::SqlFilterFieldLessOrEqual topLeftXFilter(
+        "box_top_left_x",
+        ":boxTopLeftX",
+        QnSql::serialized_field(boundingBox.bottomRight().x()));
+    sqlFilter->push_back(std::move(topLeftXFilter));
+
+    nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
+        "box_bottom_right_x",
+        ":boxBottomRightX",
+        QnSql::serialized_field(boundingBox.topLeft().x()));
+    sqlFilter->push_back(std::move(bottomRightXFilter));
+
+    nx::utils::db::SqlFilterFieldLessOrEqual topLeftYFilter(
+        "box_top_left_y",
+        ":boxTopLeftY",
+        QnSql::serialized_field(boundingBox.bottomRight().y()));
+    sqlFilter->push_back(std::move(topLeftYFilter));
+
+    nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
+        "box_bottom_right_y",
+        ":boxBottomRightY",
+        QnSql::serialized_field(boundingBox.topLeft().y()));
+    sqlFilter->push_back(std::move(bottomRightYFilter));
 }
 
 void EventsStorage::loadObjects(

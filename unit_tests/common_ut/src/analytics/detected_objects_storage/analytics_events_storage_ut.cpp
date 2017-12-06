@@ -159,6 +159,12 @@ protected:
     {
         for (auto objectIter = objects.begin(); objectIter != objects.end(); )
         {
+            if (!satisfiesFilter(filter, *objectIter))
+            {
+                objectIter = objects.erase(objectIter);
+                continue;
+            }
+
             for (auto objectPositionIter = objectIter->track.begin();
                 objectPositionIter != objectIter->track.end();
                 )
@@ -235,6 +241,23 @@ private:
     }
 
     bool satisfiesFilter(
+        const Filter& filter, const DetectedObject& detectedObject)
+    {
+        if (!filter.objectId.isNull() && detectedObject.objectId != filter.objectId)
+            return false;
+
+        if (!filter.objectTypeId.empty() &&
+            std::find(
+                filter.objectTypeId.begin(), filter.objectTypeId.end(),
+                detectedObject.objectTypeId) == filter.objectTypeId.end())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    bool satisfiesFilter(
         const Filter& filter,
         const ObjectPosition& data)
     {
@@ -251,12 +274,34 @@ private:
         const Filter& filter,
         const common::metadata::DetectionMetadataPacket& data)
     {
+        if (!filter.objectId.isNull())
+        {
+            bool hasRequiredObject = false;
+            for (const auto& object: data.objects)
+                hasRequiredObject |= object.objectId == filter.objectId;
+            if (!hasRequiredObject)
+                return false;
+        }
+
         if (!filter.boundingBox.isNull())
         {
             bool intersects = false;
             for (const auto& object: data.objects)
                 intersects |= filter.boundingBox.intersects(object.boundingBox);
             if (!intersects)
+                return false;
+        }
+
+        if (!filter.objectTypeId.empty())
+        {
+            bool hasProperType = false;
+            for (const auto& object: data.objects)
+            {
+                hasProperType |= std::find(
+                    filter.objectTypeId.begin(), filter.objectTypeId.end(),
+                    object.objectTypeId) != filter.objectTypeId.end();
+            }
+            if (!hasProperType)
                 return false;
         }
 
@@ -345,6 +390,20 @@ protected:
             duration_cast<milliseconds>(std::chrono::hours(1)).count();
     }
 
+    void addRandomObjectIdToFilter()
+    {
+        const auto& randomPacket = nx::utils::random::choice(m_analyticsDataPackets);
+        const auto& randomObject = nx::utils::random::choice(randomPacket->objects);
+        m_filter.objectId = randomObject.objectId;
+    }
+
+    void addRandomObjectTypeIdToFilter()
+    {
+        const auto& randomPacket = nx::utils::random::choice(m_analyticsDataPackets);
+        const auto& randomObject = nx::utils::random::choice(randomPacket->objects);
+        m_filter.objectTypeId.push_back(randomObject.objectTypeId);
+    }
+
     void addLimitToFilter()
     {
         m_filter.maxObjectsToSelect = filterObjects(
@@ -371,6 +430,12 @@ protected:
 
         if (nx::utils::random::number<bool>())
             addRandomNonEmptyTimePeriodToFilter();
+
+        if (nx::utils::random::number<bool>())
+            addRandomObjectIdToFilter();
+
+        if (nx::utils::random::number<bool>())
+            addRandomObjectTypeIdToFilter();
 
         if (nx::utils::random::number<bool>())
             addLimitToFilter();
@@ -410,6 +475,18 @@ protected:
     void whenLookupByEmptyTimePeriod()
     {
         addEmptyTimePeriodToFilter();
+        whenLookupObjects();
+    }
+
+    void whenLookupByRandomObjectId()
+    {
+        addRandomObjectIdToFilter();
+        whenLookupObjects();
+    }
+
+    void whenLookupByRandomObjectTypeId()
+    {
+        addRandomObjectTypeIdToFilter();
         whenLookupObjects();
     }
 
@@ -584,8 +661,19 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
     thenResultMatchesExpectations();
 }
 
-// TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectId)
-// TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectTypeId)
+TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectId)
+{
+    whenLookupByRandomObjectId();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, lookup_by_objectTypeId)
+{
+    whenLookupByRandomObjectTypeId();
+    thenResultMatchesExpectations();
+}
+
+// TEST_F(AnalyticsEventsStorageLookup, lookup_by_multiple_objectTypeId)
 
 TEST_F(AnalyticsEventsStorageLookup, lookup_stress_test)
 {
