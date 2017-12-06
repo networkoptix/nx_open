@@ -158,6 +158,15 @@ private:
 
     void prepareLookupQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
     nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
+    void addObjectTypeIdToFilter(
+        const std::vector<QnUuid>& objectTypeIds,
+        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+    void addTimePeriodToFilter(
+        const QnTimePeriod& timePeriod,
+        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+    void addBoundingBoxToFilter(
+        const QRectF& boundingBox,
+        nx::utils::db::InnerJoinFilterFields* sqlFilter);
 
     void loadObjects(
         nx::utils::db::SqlQuery& selectEventsQuery,
