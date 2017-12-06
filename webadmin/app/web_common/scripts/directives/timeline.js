@@ -193,7 +193,6 @@ angular.module('nxCommon')
                         });
                         return;
                     }
-                    timelineActions.goToLive();
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
