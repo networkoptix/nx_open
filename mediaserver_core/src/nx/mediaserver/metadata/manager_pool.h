@@ -8,6 +8,7 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 
@@ -90,7 +91,10 @@ private:
             &success);
 
         if (!success)
+        {
+            NX_ERROR(this) << "Unable to deserialize plugin manifest:" << manifestString;
             return boost::none;
+        }
 
         return deserialized;
     }

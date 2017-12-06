@@ -141,7 +141,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         auto managerObject = createMetadataManager(camera, plugin);
         if (!managerObject)
             continue;
-        nxpt::ScopedRef<AbstractMetadataManager> manager(managerObject, false);
+        nxpt::ScopedRef<AbstractMetadataManager> manager(managerObject, /*increaseRef*/ false);
 
         auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
@@ -149,7 +149,10 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 
         auto deviceManifest = addManifestToCamera(camera, manager.get());
         if (!deviceManifest)
+        {
+            // TODO: Investigate why manager is not destructed here by ScopedRef in case of "continue".
             continue;
+        }
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<EventHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));

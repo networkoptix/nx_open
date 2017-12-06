@@ -1,6 +1,8 @@
 #include "plugin.h"
 #include "plugin.h"
 
+#include <nx/kit/debug.h>
+
 #include <plugins/plugin_tools.h>
 
 #include "manager.h"
@@ -12,6 +14,16 @@ namespace tegra_video {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+
+Plugin::Plugin()
+{
+    NX_PRINT << "Created \"" << name() << "\"";
+}
+
+Plugin::~Plugin()
+{
+    NX_PRINT << "Destroyed \"" << name() << "\"";
+}
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
