@@ -204,6 +204,8 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
                 return true;
             }
             break;
+        case Qn::AnalyticsContent:
+            return false;
         default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
             break;
