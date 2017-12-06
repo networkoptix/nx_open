@@ -128,7 +128,7 @@ const char* Manager::capabilitiesManifest(Error* error) const
             "supportedEventTypes": [
                 "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
                 "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
-            ]
+            ],
             "supportedObjectTypes": [
                 "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}"
             ]
