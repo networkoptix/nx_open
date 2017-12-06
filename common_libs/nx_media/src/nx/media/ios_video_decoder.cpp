@@ -32,7 +32,13 @@ namespace nx {
 namespace media {
 
 namespace {
-
+    
+    bool isValidFrameSize(const QSize& size)
+    {
+        static const auto kMinimumFrameSize = QSize(64, 64);
+        return size.width() >= kMinimumFrameSize.width()
+        && size.height() >= kMinimumFrameSize.height();
+    }
 
     bool isFatalError(int ffmpegErrorCode)
     {
@@ -235,7 +241,16 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
         QnFfmpegHelper::mediaContextToAvCodecContext(codecContext, frame->context);
-
+    QSize frameSize = QSize(codecContext->width, codecContext->height);
+    if (!isValidFrameSize(frameSize))
+    {
+        frameSize = QSize(frame->width, frame->height);
+        if (!isValidFrameSize(frameSize))
+            frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
+        codecContext->width = frameSize.width();
+        codecContext->height = frameSize.height();
+    }
+    
     codecContext->thread_count = 1;
     codecContext->opaque = this;
     codecContext->get_format = get_format;
@@ -390,7 +405,7 @@ int IOSVideoDecoder::decode(
     int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
     {
-        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << QString::number(res, 16);
+        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << res;
         // hardware decoder crash if use same frame after decoding error. It seems
         // leaves invalid ref_count on error.
         av_frame_free(&d->frame);
