@@ -23,6 +23,7 @@ public:
 private:
     detail::data_parser::UpdatesMetaData m_metaData;
     detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
+    // todo: remove these two below?
     QList<detail::data_parser::CustomizationData>::const_iterator m_customizationIt;
     FileData* m_fileData = nullptr;
 

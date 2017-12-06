@@ -24,6 +24,7 @@ ResultCode CommonUpdateRegistry::findUpdate(
     if (!hasUpdateForCustomizationAndVersion(updateRequestData))
         return ResultCode::noData;
 
+    // todo: maybe move this to separate class?
     if (!hasRequestedPackage(updateRequestData))
         return ResultCode::noData;
 
@@ -46,6 +47,7 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
 {
     using namespace detail::data_parser;
 
+    // todo: remove this as a class member and return from the function instead?
     m_customizationIt = m_metaData.customizationDataList.cend();
     m_customizationIt = std::find_if(
         m_metaData.customizationDataList.cbegin(),
