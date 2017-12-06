@@ -836,14 +836,24 @@ void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, in
     const auto consumers = m_metadataConsumerByType;
     lock.unlock();
 
+    int metadataCount = 0;
     for (const auto& metadata: metadataList)
     {
         for (const auto& value: m_metadataConsumerByType.values(metadata->metadataType))
         {
             if (const auto& consumer = value.lock())
+            {
+                ++metadataCount;
                 consumer->processMetadata(metadata);
+            }
+            else
+            {
+                NX_VERBOSE(this) << "WARNING: Null metadata";
+            }
         }
     }
+    NX_VERBOSE(this) << lm("Processed %1 metadata object(s) in %2 list(s)")
+        .args(metadataCount, metadataList.size());
 }
 
 bool QnVideoStreamDisplay::selfSyncUsed() const
