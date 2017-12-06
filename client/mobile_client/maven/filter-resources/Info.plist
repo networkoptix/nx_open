@@ -24,6 +24,11 @@
 	<string>${project.version.code}</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+	    <integer>1</integer>
+	    <integer>2</integer>
+	</array>
 	<key>NSAppTransportSecurity</key>  
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

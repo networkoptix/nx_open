@@ -120,6 +120,7 @@ if(IOS)
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/maven/filter-resources/Info.plist"
         RESOURCE "${resources}"
         XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES FALSE
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
     )
 
     if(developerBuild)
