@@ -421,15 +421,10 @@ private:
             result.end(),
             [this](const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
             {
-                return compareByType(lhs, rhs);
+                return isLocal(lhs) && !isLocal(rhs);
             });
 
         return result;
-    }
-
-    static bool compareByType(const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
-    {
-        return isLocal(lhs) && !isLocal(rhs);
     }
 
     static bool isLocal(const QnStorageResourcePtr& storage)
