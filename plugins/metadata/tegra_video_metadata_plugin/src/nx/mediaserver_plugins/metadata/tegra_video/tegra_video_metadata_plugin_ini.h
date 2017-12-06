@@ -17,6 +17,8 @@ struct TegraVideoMetadataPluginIniConfig: public nx::kit::IniConfig
         reload();
     }
 
+    NX_INI_STRING("none", postprocType, "Postprocessing type of net rects: none|ped|car.");
+
     NX_INI_FLAG(1, enableOutput, ""); //< TODO: #mike: Change to 0.
     NX_INI_FLAG(0, enableTime, "");
 

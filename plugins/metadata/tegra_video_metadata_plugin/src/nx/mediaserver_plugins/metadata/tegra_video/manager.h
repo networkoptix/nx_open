@@ -4,6 +4,7 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
@@ -39,8 +40,29 @@ public:
 private:
     nx::sdk::Error stopFetchingMetadataThreadUnsafe();
 
-    nx::sdk::metadata::AbstractMetadataPacket* pushFrameAndGetRects(
-        nx::sdk::metadata::AbstractDataPacket* mediaPacket);
+    bool makeMetadataPacketsFromRects(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool makeMetadataPacketsFromRectsPostprocNone(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool makeMetadataPacketsFromRectsPostprocPed(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool makeMetadataPacketsFromRectsPostprocCar(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool pushFrameAndGetMetadataPackets(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        nx::sdk::metadata::AbstractDataPacket* mediaPacket) const;
 
     int64_t usSinceEpoch() const;
 
