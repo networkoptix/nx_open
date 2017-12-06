@@ -13,6 +13,7 @@ namespace data_parser {
 struct UpdateData
 {
     QString cloudHost;
+    // todo: change key of below to OsVersion?
     QHash<QString, FileData> targetToPackage;
     QHash<QString, FileData> targetToClientPackage;
 };

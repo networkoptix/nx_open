@@ -33,6 +33,11 @@ struct NX_UPDATE_API OsVersion
             && target.contains(architecture)
             && target.contains(version);
     }
+
+    QString toString() const
+    {
+        return lit("%1.%2.%3").arg(family).arg(architecture).arg(version);
+    }
 };
 
 NX_UPDATE_API OsVersion ubuntuX64();
@@ -61,6 +66,15 @@ struct NX_UPDATE_API UpdateRequestData
         currentNxVersion(currentNxVersion),
         osVersion(osVersion)
     {}
+
+    QString toString() const
+    {
+        return lit("cloud host=%1, customization=%2, current nx version=%3, os=%4")
+            .arg(cloudHost)
+            .arg(customization)
+            .arg(currentNxVersion.toString())
+            .arg(osVersion.toString());
+    }
 };
 
 } // namespace info

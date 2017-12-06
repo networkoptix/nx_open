@@ -23,10 +23,13 @@ public:
 private:
     detail::data_parser::UpdatesMetaData m_metaData;
     detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
+    QList<detail::data_parser::CustomizationData>::const_iterator m_customizationIt;
+    FileData* m_fileData = nullptr;
 
-    bool hasCustomization(const QString& customization);
-    bool hasUpdateForOs(const OsVersion& osVersion);
-    ResultCode hasUpdateForVersionAndCloudHost(const UpdateRequestData& updateRequestData);
+    bool hasNewerVersions(const QnSoftwareVersion& nxVersion) const;
+    bool hasUpdateForCustomizationAndVersion(const UpdateRequestData& updateRequestData);
+    void checkPackage(const UpdateRequestData& updateRequestData,const QnSoftwareVersion& version);
+    bool hasRequestedPackage(const UpdateRequestData& updateRequestData);
 };
 
 } // namespace impl
