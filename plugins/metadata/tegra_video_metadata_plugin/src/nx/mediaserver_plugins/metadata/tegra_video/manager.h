@@ -11,6 +11,8 @@
 
 #include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
 
+#include "plugin.h"
+
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
@@ -20,8 +22,10 @@ class Manager:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
 {
 public:
-    Manager();
+    Manager(Plugin* plugin);
     virtual ~Manager();
+
+    virtual Plugin* plugin() override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -67,6 +71,7 @@ private:
     int64_t usSinceEpoch() const;
 
 private:
+    Plugin* const m_plugin;
     mutable std::mutex m_mutex;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
     int m_counter = 0;

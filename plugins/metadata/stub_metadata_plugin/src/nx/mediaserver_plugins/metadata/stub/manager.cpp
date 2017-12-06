@@ -35,10 +35,11 @@ static const nxpl::NX_GUID kCarDetectedEventGuid =
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager():
+Manager::Manager(Plugin* plugin):
+    m_plugin(plugin),
     m_eventTypeId(kLineCrossingEventGuid)
 {
-    NX_PRINT << __func__ << "() -> " << this;
+    NX_PRINT << __func__ << "(\"" << plugin->name() << "\") -> " << this;
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)

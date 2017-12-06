@@ -85,7 +85,7 @@ AbstractMetadataManager* Plugin::managerForResource(
 {
     *outError = Error::noError;
 
-    auto manager = new Manager();
+    auto manager = new Manager(this);
     manager->addRef();
 
     return manager;

@@ -8,6 +8,8 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
 
+#include "plugin.h"
+
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
@@ -16,9 +18,10 @@ namespace stub {
 class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
 {
 public:
-    Manager();
-
+    Manager(Plugin* plugin);
     virtual ~Manager();
+
+    virtual Plugin* plugin() override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -43,6 +46,7 @@ private:
     int64_t usSinceEpoch() const;
 
 private:
+    Plugin* const m_plugin;
     mutable std::mutex m_mutex;
     std::unique_ptr<std::thread> m_thread;
     std::atomic<bool> m_stopping{false};

@@ -2,12 +2,12 @@
 
 #include <iostream>
 #include <chrono>
-#include <math.h>
 
 #define NX_PRINT_PREFIX "metadata::tegra_video::Manager::"
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
@@ -33,10 +33,11 @@ static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager():
+Manager::Manager(Plugin* plugin):
+    m_plugin(plugin),
     m_eventTypeId(kLineCrossingEventGuid)
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
+    NX_PRINT << __func__ << "(\"" << plugin->name() << "\") BEGIN";
 
     m_tegraVideo.reset(TegraVideo::create());
 
@@ -50,12 +51,9 @@ Manager::Manager():
     params.netHeight = ini().netHeight;
 
     if (!m_tegraVideo->start(params))
-    {
         NX_PRINT << "ERROR: TegraVideo::start() failed.";
-        NX_OUTPUT << __func__ << "() END -> unknownError";
-    }
 
-    NX_OUTPUT << __func__ << "() END";
+    NX_OUTPUT << __func__ << "() END -> " << this;
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
