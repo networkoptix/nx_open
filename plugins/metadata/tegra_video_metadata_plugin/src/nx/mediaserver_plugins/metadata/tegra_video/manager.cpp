@@ -157,13 +157,13 @@ bool Manager::makeMetadataPacketsFromRects(
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
-    if (ini().postprocType == "ped")
+    if (strcmp(ini().postprocType, "ped") == 0)
         return makeMetadataPacketsFromRectsPostprocPed(metadataPackets, rects, ptsUs);
 
-    if (ini().postprocType == "car")
+    if (strcmp(ini().postprocType, "car") == 0)
         return makeMetadataPacketsFromRectsPostprocCar(metadataPackets, rects, ptsUs);
 
-    if (ini().postprocType != "none")
+    if (strcmp(ini().postprocType, "none") != 0)
     {
         NX_PRINT << "WARNING: Invalid .ini netPostprocType=\"" << ini().postprocType
             << "\"; assuming \"none\".";
