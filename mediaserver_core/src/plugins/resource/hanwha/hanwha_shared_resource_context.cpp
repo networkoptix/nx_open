@@ -8,6 +8,7 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/abstract_remote_archive_manager.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -41,6 +42,7 @@ static const QUrl cleanUrl(QUrl url)
 
 } // namespace
 
+using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
@@ -107,16 +109,16 @@ QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
     return &m_requestSemaphore;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
+void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr)
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
         if (!m_timeSynchronizer)
             m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
 
-        if (hasVideoArchive && !m_chunkLoader)
+        if (hasVideoArchive)
         {
-            m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
+            m_chunkLoader = std::make_shared<HanwhaChunkLoader>(this);
             m_timeSynchronizer->setTimeSynchronizationEnabled(false);
             m_timeSynchronizer->setTimeZoneShiftHandler(
                 [this](std::chrono::seconds timeZoneShift)
@@ -127,10 +129,10 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
         }
     }
 
-    NX_VERBOSE(this, lm("Starting services (has video archive: %1)...").arg(hasVideoArchive));
+    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...").arg(isNvr));
     m_timeSynchronizer->start(this);
     if (hasVideoArchive)
-        m_chunkLoader->start(this);
+        m_chunkLoader->start(isNvr);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
@@ -186,16 +188,7 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     return strongSessionCtx;
 }
 
-QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
-{
-    QnMutexLocker lock(&m_servicesMutex);
-    if (m_chunkLoader)
-        return m_chunkLoader->chunks(channelNumber);
-
-    return QnTimePeriodList();
-}
-
-QnTimePeriodList HanwhaSharedResourceContext::chunksSync(int channelNumber) const
+OverlappedTimePeriods HanwhaSharedResourceContext::overlappedTimeline(int channelNumber) const
 {
     decltype(m_chunkLoader) chunkLoaderCopy;
     {
@@ -204,12 +197,27 @@ QnTimePeriodList HanwhaSharedResourceContext::chunksSync(int channelNumber) cons
     }
 
     if (chunkLoaderCopy)
-        return chunkLoaderCopy->chunksSync(channelNumber);
+        return chunkLoaderCopy->overlappedTimeline(channelNumber);
 
-    return QnTimePeriodList();
+    return OverlappedTimePeriods();
 }
 
-qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
+OverlappedTimePeriods HanwhaSharedResourceContext::overlappedTimelineSync(
+    int channelNumber) const
+{
+    decltype(m_chunkLoader) chunkLoaderCopy;
+    {
+        QnMutexLocker lock(&m_servicesMutex);
+        chunkLoaderCopy = m_chunkLoader;
+    }
+
+    if (chunkLoaderCopy)
+        return chunkLoaderCopy->overlappedTimelineSync(channelNumber);
+
+    return OverlappedTimePeriods();
+}
+
+qint64 HanwhaSharedResourceContext::timelineStartUs(int channelNumber) const
 {
     QnMutexLocker lock(&m_servicesMutex);
     if (m_chunkLoader)
@@ -218,7 +226,7 @@ qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
     return AV_NOPTS_VALUE;
 }
 
-qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
+qint64 HanwhaSharedResourceContext::timelineEndUs(int channelNumber) const
 {
     QnMutexLocker lock(&m_servicesMutex);
     if (m_chunkLoader)

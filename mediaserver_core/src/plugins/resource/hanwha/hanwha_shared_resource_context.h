@@ -14,6 +14,7 @@
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <recording/time_period_list.h>
+#include <core/resource/abstract_remote_archive_manager.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -121,17 +122,17 @@ public:
     QAuthenticator authenticator() const;
     QnSemaphore* requestSemaphore();
 
-    void startServices(bool hasVideoArchive);
+    void startServices(bool hasVideoArchive, bool isNvr);
 
     SessionContextPtr session(
         HanwhaSessionType sessionType,
         const QnUuid& clientId,
         bool generateNewOne = false);
 
-    QnTimePeriodList chunks(int channelNumber) const;
-    QnTimePeriodList chunksSync(int channelNumber) const;
-    qint64 chunksStartUsec(int channelNumber) const;
-    qint64 chunksEndUsec(int channelNumber) const;
+    nx::core::resource::OverlappedTimePeriods overlappedTimeline(int channelNumber) const;
+    nx::core::resource::OverlappedTimePeriods overlappedTimelineSync(int channelNumber) const;
+    qint64 timelineStartUs(int channelNumber) const;
+    qint64 timelineEndUs(int channelNumber) const;
     boost::optional<int> overlappedId() const;
 
     std::chrono::seconds timeZoneShift() const;

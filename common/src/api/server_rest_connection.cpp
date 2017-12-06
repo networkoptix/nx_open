@@ -81,6 +81,13 @@ rest::Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &req
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::getServerLocalTime(Result<QnJsonRestResult>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params{{lit("local"), QnLexical::serialized(true)}};
+    return executeGet(lit("/api/gettime"), params, callback, targetThread);
+}
+
 rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread /*= 0*/ )
 {
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);

@@ -37,7 +37,8 @@ RemoteArchiveSynchronizationTask::RemoteArchiveSynchronizationTask(
 }
 
 void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
-    const QnTimePeriod& timePeriod)
+    const QnTimePeriod& timePeriod,
+    const RemoteArchiveChunk& /*chunk*/)
 {
     auto ioDevice = new QBuffer(); //< Will be freed by delegate.
     ioDevice->setBuffer(&m_currentChunkBuffer);

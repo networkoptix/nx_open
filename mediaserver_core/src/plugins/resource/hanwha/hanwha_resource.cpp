@@ -34,6 +34,8 @@
 #include <api/global_settings.h>
 
 #include <media_server/media_server_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -658,6 +660,17 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
+    if (!minFirmwareVersion.isEmpty() &&
+        !getFirmware().isEmpty()
+        && minFirmwareVersion > getFirmware())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Please update firmware for this device. Minimal supported firmware: '%1'. Device firmware: '%2'.")
+            .arg(minFirmwareVersion).arg(getFirmware()));
+    }
+
     result = initMedia();
     if (!result)
         return result;
@@ -684,7 +697,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
     initMediaStreamCapabilities();
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive);
+    sharedContext->startServices(hasVideoArchive, isNvr());
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -2578,7 +2591,13 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    return sharedContext()->chunks(getChannel());
+    const auto& timeline = sharedContext()->overlappedTimeline(getChannel());
+    const auto numberOfOverlappedIds = timeline.size();
+    NX_ASSERT(numberOfOverlappedIds <= 1, lit("There should be only one overlapped ID for NVR"));
+    if (numberOfOverlappedIds != 1)
+        return QnTimePeriodList();
+
+    return timeline.cbegin()->second;
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(

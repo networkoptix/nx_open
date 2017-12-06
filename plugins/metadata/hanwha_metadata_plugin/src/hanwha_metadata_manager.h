@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
