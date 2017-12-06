@@ -7,6 +7,7 @@ namespace recorder {
 RemoteArchiveWorker::RemoteArchiveWorker(RemoteArchiveTaskPtr task):
     m_task(task)
 {
+    setObjectName(lit("RemoteArchiveWorker"));
 }
 
 void RemoteArchiveWorker::run()

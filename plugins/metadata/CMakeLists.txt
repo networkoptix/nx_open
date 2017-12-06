@@ -1,4 +1,6 @@
-add_subdirectory(hanwha_metadata_plugin)
+if(customization STREQUAL "hanwha")
+    add_subdirectory(hanwha_metadata_plugin)
+endif()
 add_subdirectory(tegra_video_metadata_plugin)
 
 if(withPluginStubs)

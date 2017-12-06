@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "bytestream_filter.h"
 
 #include <iostream>
@@ -162,3 +164,6 @@ boost::optional<Event> BytestreamFilter::createEvent(
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)
+

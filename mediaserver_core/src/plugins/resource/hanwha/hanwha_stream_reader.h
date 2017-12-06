@@ -3,6 +3,7 @@
 #if defined(ENABLE_HANWHA)
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/abstract_remote_archive_manager.h>
 
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
 #include <plugins/resource/hanwha/hanwha_video_profile.h>
@@ -26,6 +27,7 @@ public:
     void setClientId(const QnUuid& id);
     void setRateControlEnabled(bool enabled);
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
+    void setOverlappedId(nx::core::resource::OverlappedId overlappedId);
 
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
@@ -66,6 +68,7 @@ private:
     int64_t m_endTimeUsec = 0;
     qint64 m_lastTimestampUsec = AV_NOPTS_VALUE;
     nx::utils::ElapsedTimer m_timeSinceLastFrame;
+    boost::optional<nx::core::resource::OverlappedId> m_overlappedId;
 };
 
 } // namespace plugins

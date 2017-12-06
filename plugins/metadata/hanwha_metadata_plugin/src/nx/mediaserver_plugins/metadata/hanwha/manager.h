@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
@@ -63,3 +65,5 @@ private:
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

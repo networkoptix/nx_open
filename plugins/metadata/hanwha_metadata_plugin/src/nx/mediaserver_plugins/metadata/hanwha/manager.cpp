@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "manager.h"
 
 #include <chrono>
@@ -161,3 +163,5 @@ void Manager::setMonitor(MetadataMonitor* monitor)
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

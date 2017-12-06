@@ -8,7 +8,7 @@ import json
 import logging
 import traceback
 from functools import wraps
-from multiprocessing import Pool as ThreadPool
+from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 from requests.exceptions import ReadTimeout
