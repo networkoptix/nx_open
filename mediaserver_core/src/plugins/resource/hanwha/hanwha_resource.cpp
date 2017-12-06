@@ -1739,9 +1739,19 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
         return toHanwhaString(defaultEntropyCodingForStream(role));
     else if (parameter == kBitrateProperty)
     {
-        int bitrateKbps = mediaCapabilityForRole(role).defaultBitrateKbps;
-        if (bitrateKbps > 0)
-            return QString::number(bitrateKbps);
+        auto camera = qnCameraPool->getVideoCamera(toSharedPointer());
+        if (!camera)
+            return QString::number(defaultBitrateForStream(role));
+
+        QnLiveStreamProviderPtr provider = role == Qn::ConnectionRole::CR_LiveVideo
+            ? camera->getPrimaryReader()
+            : camera->getSecondaryReader();
+
+        if (!provider)
+            QString::number(defaultBitrateForStream(role));
+
+        const auto liveStreamParameters = provider->getLiveParams();
+        return QString::number(streamBitrate(role, liveStreamParameters));
     }
     else if (parameter == kFramePriorityProperty)
         return lit("FrameRate");
