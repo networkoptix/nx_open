@@ -1305,7 +1305,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         else
         {
             int ch = metadata->channelNumber;
-            m_lastMetadata[ch][metadata->timestamp] = metadata;
+            m_lastMetadata[ch][metadata->timestamp] << metadata;
             if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
                 m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
         }
