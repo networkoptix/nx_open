@@ -22,6 +22,7 @@
 #include "resource_metadata_context.h"
 
 class QnMediaServerModule;
+class QnCompressedVideoData;
 
 namespace nx {
 namespace mediaserver {
@@ -104,6 +105,8 @@ private:
     bool resourceInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::ResourceInfo* outResourceInfo) const;
+
+    void putVideoData(const QnUuid& id, const QnCompressedVideoData* data);
 private:
     ResourceMetadataContextMap m_contexts;
     QnMediaServerModule* m_serverModule;

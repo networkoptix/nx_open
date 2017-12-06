@@ -283,7 +283,7 @@ void EventsStorage::loadObjects(
 
     for (int count = 0; selectEventsQuery.next(); ++count)
     {
-        if (filter.maxObjectsToSelect > 0 && count > filter.maxObjectsToSelect)
+        if (filter.maxObjectsToSelect > 0 && count >= filter.maxObjectsToSelect)
             break;
 
         DetectedObject detectedObject;

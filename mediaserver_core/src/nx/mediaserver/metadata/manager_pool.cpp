@@ -362,11 +362,30 @@ bool ManagerPool::resourceInfoFromResource(
     return true;
 }
 
+void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* video)
+{
+    QnMutexLocker lock(&m_contextMutex);
+    for (auto& data: m_contexts[id].managers())
+    {
+        using namespace nx::sdk::metadata;
+        nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
+            (AbstractConsumingMetadataManager*)
+            data.manager->queryInterface(IID_ConsumingMetadataManager), false);
+        if (!manager)
+            return;
+        bool needDeepCopy = data.manifest.capabilities.testFlag(
+            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame);
+        auto packet = toPluginVideoPacket(video, needDeepCopy);
+        manager->putData(packet.get());
+    }
+}
+
 QWeakPointer<QnAbstractDataReceptor> ManagerPool::mediaDataReceptor(const QnUuid& id)
 {
     QnMutexLocker lock(&m_contextMutex);
     auto& context = m_contexts[id];
-    auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(&context));
+    auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
+        std::bind(&ManagerPool::putVideoData, this, id, std::placeholders::_1)));
     context.setVideoFrameDataReceptor(dataReceptor);
     return dataReceptor.toWeakRef();
 }
