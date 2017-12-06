@@ -221,7 +221,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-QMap<AVCodecID, QSize> FfmpegVideoDecoder::s_maxResolutions;
+QMap<int, QSize> FfmpegVideoDecoder::s_maxResolutions;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
     const ResourceAllocatorPtr& /*allocator*/,
@@ -358,7 +358,7 @@ double FfmpegVideoDecoder::getSampleAspectRatio() const
     return 1.0;
 }
 
-void FfmpegVideoDecoder::setMaxResolutions(const QMap<AVCodecID, QSize>& maxResolutions)
+void FfmpegVideoDecoder::setMaxResolutions(const QMap<int, QSize>& maxResolutions)
 {
     s_maxResolutions = maxResolutions;
 }

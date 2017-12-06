@@ -20,7 +20,7 @@ namespace media {
 
 void DecoderRegistrar::registerDecoders(
     std::shared_ptr<AbstractResourceAllocator> allocator,
-    const QMap<AVCodecID, QSize>& maxFfmpegResolutions,
+    const QMap<int, QSize>& maxFfmpegResolutions,
     bool isTranscodingEnabled)
 {
     NX_ASSERT(allocator);

@@ -193,9 +193,9 @@ int runUi(QtSingleGuiApplication* application)
         }
     }
 
-    QMap<AVCodecID, QSize> maxFfmpegResolutions;
-    maxFfmpegResolutions[AV_CODEC_ID_NONE] = maxFfmpegResolution;
-    maxFfmpegResolutions[AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
+    QMap<int, QSize> maxFfmpegResolutions;
+    maxFfmpegResolutions[(int) AV_CODEC_ID_NONE] = maxFfmpegResolution;
+    maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     nx::media::DecoderRegistrar::registerDecoders(
         allocator, maxFfmpegResolutions, /*isTranscodingEnabled*/ !context.liteMode());

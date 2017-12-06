@@ -19,9 +19,9 @@ class FfmpegVideoDecoder: public AbstractVideoDecoder
 {
 public:
     /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit.
-     * Map key value 'AV_CODEC_ID_NONE' means default resolution limit.
+     * Map key with value 0 means default resolution limit otherwise limit for specified AV codec.
      */
-    static void setMaxResolutions(const QMap<AVCodecID, QSize>& maxResolutions);
+    static void setMaxResolutions(const QMap<int, QSize>& maxResolutions);
 
     FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
     virtual ~FfmpegVideoDecoder();
@@ -38,7 +38,7 @@ public:
 
     virtual Capabilities capabilities() const override;
 private:
-    static QMap<AVCodecID, QSize> s_maxResolutions;
+    static QMap<int, QSize> s_maxResolutions;
 
     QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(FfmpegVideoDecoder);
