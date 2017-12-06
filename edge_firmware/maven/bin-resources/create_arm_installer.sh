@@ -283,6 +283,10 @@ copyBins()
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
                 if [[ $FILE != *.debug ]]; then
+                    if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
+                        continue;
+                    fi
+
                     echo "Copying plugins/$(basename "$FILE")"
                     cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
                 fi

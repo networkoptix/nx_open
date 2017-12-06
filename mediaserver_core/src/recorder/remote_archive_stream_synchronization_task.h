@@ -26,7 +26,9 @@ public:
         QnMediaServerModule* serverModule,
         const QnSecurityCamResourcePtr& resource);
 
-    virtual void createArchiveReaderThreadUnsafe(const QnTimePeriod& timePeriod) override;
+    virtual void createArchiveReaderThreadUnsafe(
+        const QnTimePeriod& timePeriod,
+        const nx::core::resource::RemoteArchiveChunk& chunk) override;
 };
 
 } // namespace recorder

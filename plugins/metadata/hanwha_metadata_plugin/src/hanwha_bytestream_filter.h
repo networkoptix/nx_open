@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <boost/optional/optional.hpp>
 
 #include <hanwha_metadata_monitor.h>
@@ -40,3 +42,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

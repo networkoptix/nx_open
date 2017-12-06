@@ -83,6 +83,8 @@ public:
     */
     Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
 
+    Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
+
     /**
     * Get camera thumbnail for specified time.
     *

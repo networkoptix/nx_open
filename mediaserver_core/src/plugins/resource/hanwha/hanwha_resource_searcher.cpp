@@ -206,7 +206,7 @@ void HanwhaResourceSearcher::createResource(
     HanwhaResourcePtr resource( new HanwhaResource() );
 
     resource->setTypeId(rt->getId());
-    resource->setVendor(devInfo.manufacturer);
+    resource->setVendor(kHanwhaManufacturerName);
     resource->setName(devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);

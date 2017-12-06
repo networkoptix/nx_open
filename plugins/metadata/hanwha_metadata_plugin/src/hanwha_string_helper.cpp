@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "hanwha_string_helper.h"
 #include "hanwha_common.h"
 
@@ -59,3 +61,5 @@ QString HanwhaStringHelper::buildDescription(
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

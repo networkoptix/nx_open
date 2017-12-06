@@ -397,6 +397,8 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
         m_lastMotionTimeUsec = motionTime;
         setPrebufferingUsec(0); // motion in progress, flush prebuffer
     }
+
+    return;
 }
 
 void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData)
@@ -665,6 +667,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     // for empty schedule we record all time
     beforeProcessData(media);
+
     bool rez = QnStreamRecorder::processData(data);
     return rez;
 }
