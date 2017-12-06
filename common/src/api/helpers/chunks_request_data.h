@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QUrlQuery>
 
 #include <core/resource/resource_fwd.h>
@@ -29,7 +31,7 @@ struct QnChunksRequestData
     QnSecurityCamResourceList resList;
     qint64 startTimeMs;
     qint64 endTimeMs;
-    qint64 detailLevel;
+    std::chrono::milliseconds detailLevel;
     bool keepSmallChunks;
     QString filter; //< TODO: This string is a json. Consider changing to QList<QRegion>.
     bool isLocal;

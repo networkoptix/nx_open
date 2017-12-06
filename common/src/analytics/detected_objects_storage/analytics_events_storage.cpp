@@ -51,7 +51,7 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, lm("Requested cursor with filter %1").args(filter));
 
     m_dbController.queryExecutor().createCursor<DetectedObject>(
-        std::bind(&EventsStorage::prepareQuery, this, filter, _1),
+        std::bind(&EventsStorage::prepareLookupQuery, this, filter, _1),
         std::bind(&EventsStorage::loadObject, this, _1, _2),
         [this, completionHandler = std::move(completionHandler)](
             db::DBResult resultCode,
@@ -77,6 +77,26 @@ void EventsStorage::lookup(
     auto result = std::make_shared<std::vector<DetectedObject>>();
     m_dbController.queryExecutor().executeSelect(
         std::bind(&EventsStorage::selectObjects, this, _1, std::move(filter), result.get()),
+        [this, result, completionHandler = std::move(completionHandler)](
+            QueryContext*, DBResult resultCode)
+        {
+            completionHandler(
+                dbResultToResultCode(resultCode),
+                std::move(*result));
+        });
+}
+
+void EventsStorage::lookupTimePeriods(
+    Filter filter,
+    TimePeriodsLookupOptions options,
+    TimePeriodsLookupCompletionHandler completionHandler)
+{
+    using namespace std::placeholders;
+
+    auto result = std::make_shared<QnTimePeriodList>();
+    m_dbController.queryExecutor().executeSelect(
+        std::bind(&EventsStorage::selectTimePeriods, this,
+            _1, std::move(filter), std::move(options), result.get()),
         [this, result, completionHandler = std::move(completionHandler)](
             QueryContext*, DBResult resultCode)
         {
@@ -164,7 +184,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
 {
     SqlQuery selectEventsQuery(*queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
-    prepareQuery(filter, &selectEventsQuery);
+    prepareLookupQuery(filter, &selectEventsQuery);
     selectEventsQuery.exec();
 
     loadObjects(selectEventsQuery, filter, result);
@@ -172,7 +192,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
     return nx::utils::db::DBResult::ok;
 }
 
-void EventsStorage::prepareQuery(
+void EventsStorage::prepareLookupQuery(
     const Filter& filter,
     nx::utils::db::SqlQuery* query)
 {
@@ -321,6 +341,58 @@ void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
         std::make_move_iterator(from.track.end()));
 
     // TODO: #ak moving attributes.
+}
+
+nx::utils::db::DBResult EventsStorage::selectTimePeriods(
+    nx::utils::db::QueryContext* queryContext,
+    const Filter& filter,
+    const TimePeriodsLookupOptions& options,
+    QnTimePeriodList* result)
+{
+    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString sqlQueryFilterStr;
+    if (!sqlQueryFilter.empty())
+    {
+        sqlQueryFilterStr = lm("WHERE %1").args(
+            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+    }
+
+    // TODO: #ak Aggregate in query.
+
+    SqlQuery query(*queryContext->connection());
+    query.setForwardOnly(true);
+    query.prepare(lm(R"sql(
+        SELECT timestamp_usec_utc, duration_usec
+        FROM event
+        %1
+        ORDER BY timestamp_usec_utc ASC
+    )sql").args(sqlQueryFilterStr));
+    nx::utils::db::bindFields(&query, sqlQueryFilter);
+
+    query.exec();
+    loadTimePeriods(query, options, result);
+    return nx::utils::db::DBResult::ok;
+}
+
+void EventsStorage::loadTimePeriods(
+    nx::utils::db::SqlQuery& query,
+    const TimePeriodsLookupOptions& options,
+    QnTimePeriodList* result)
+{
+    using namespace std::chrono;
+
+    constexpr int kUsecPerMs = 1000;
+
+    while (query.next())
+    {
+        QnTimePeriod timePeriod(
+            milliseconds(query.value(lit("timestamp_usec_utc")).toLongLong() / kUsecPerMs),
+            milliseconds(query.value(lit("duration_usec")).toLongLong() / kUsecPerMs));
+        result->push_back(timePeriod);
+    }
+
+    *result = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+        *result, options.detailLevel);
 }
 
 //-------------------------------------------------------------------------------------------------
