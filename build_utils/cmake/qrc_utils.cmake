@@ -1,4 +1,6 @@
 function(nx_generate_qrc qrc_file)
+    cmake_parse_arguments(QRC "" "" "USED_FILES_VARIABLE" ${ARGN})
+
     message(STATUS "Generating ${qrc_file}")
 
     set(content
@@ -6,9 +8,10 @@ function(nx_generate_qrc qrc_file)
         "<RCC version=\"1.0\">\n"
         "<qresource prefix=\"/\">\n")
 
-    set(inputs ${ARGN})
+    set(inputs ${QRC_UNPARSED_ARGUMENTS})
     list(REVERSE inputs)
     set(aliases)
+    set(used_files)
 
     foreach(input ${inputs})
         if(IS_DIRECTORY ${input})
@@ -19,6 +22,7 @@ function(nx_generate_qrc qrc_file)
                 if(index EQUAL -1)
                     list(APPEND aliases ${alias})
                     list(APPEND content "    <file alias=\"${alias}\">${file}</file>\n")
+                    list(APPEND used_files ${file})
                 endif()
             endforeach()
         else()
@@ -32,6 +36,7 @@ function(nx_generate_qrc qrc_file)
             if(index EQUAL -1)
                 list(APPEND aliases ${alias})
                 list(APPEND content "    <file alias=\"${alias}\">${input}</file>\n")
+                list(APPEND used_files ${input})
             endif()
         endif()
     endforeach()
@@ -47,10 +52,14 @@ function(nx_generate_qrc qrc_file)
     if(NOT result EQUAL 0)
         message(FATAL_ERROR "Cannot create ${qrc_file}")
     endif()
+
+    if(QRC_USED_FILES_VARIABLE)
+        set(${QRC_USED_FILES_VARIABLE} ${used_files} PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(nx_add_qrc qrc_file out_cpp_file_variable)
-    cmake_parse_arguments(QRC "" "" "OPTIONS DEPENDS" ${ARGN})
+    cmake_parse_arguments(QRC "" "" "OPTIONS;DEPENDS" ${ARGN})
 
     if(NOT Qt5Core_RCC_EXECUTABLE)
         message(FATAL_ERROR
