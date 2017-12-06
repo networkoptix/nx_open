@@ -18,8 +18,10 @@ AbstractButton
     {
         implicitWidth: 56
         implicitHeight: 56
+
         color: ColorTheme.transparent(ColorTheme.base3, 0.2)
         radius: height / 2
+
     }
 
     label: Rectangle
@@ -51,6 +53,7 @@ AbstractButton
                 }
             }
         }
+
         PlayPauseIcon
         {
             width: 18

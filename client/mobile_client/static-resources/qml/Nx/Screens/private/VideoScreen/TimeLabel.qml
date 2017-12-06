@@ -22,7 +22,7 @@ Item
         {
             text: dateTime.toLocaleTimeString(_locale, "hh")
 
-            width: 40
+            width: 32
             height: 28
 
             horizontalAlignment: Text.AlignHCenter
@@ -52,7 +52,7 @@ Item
         {
             text: dateTime.toLocaleTimeString(_locale, "mm")
 
-            width: 40
+            width: 32
             height: 28
 
             horizontalAlignment: Text.AlignHCenter
@@ -82,7 +82,7 @@ Item
         {
             text: dateTime.toLocaleTimeString(_locale, "ss")
 
-            width: 40
+            width: 32
             height: 28
 
             horizontalAlignment: Text.AlignHCenter

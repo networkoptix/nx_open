@@ -123,7 +123,7 @@ Item
         id: navigator
 
         width: parent.width
-        height: timeline.height + playbackController.height
+        height: timeline.height + playbackController.height - 16
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea
@@ -215,7 +215,7 @@ Item
             stickToEnd: d.liveMode && !paused
 
             chunkBarHeight: 16
-            textY: height - chunkBarHeight - 16 - 16
+            textY: height - chunkBarHeight - 16 - 14
 
             chunkProvider: cameraChunkProvider
             startBound: cameraChunkProvider.bottomBound
@@ -435,7 +435,7 @@ Item
             height: 48
             width: parent.width
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: timeline.chunkBarHeight + 12
+            anchors.bottomMargin: timeline.chunkBarHeight + 8
             opacity: d.controlsOpacity
 
             Text
@@ -494,7 +494,6 @@ Item
             id: playbackController
 
             anchors.top: navigator.top
-            anchors.topMargin: 8
             anchors.horizontalCenter: parent.horizontalCenter
 
             loading: videoScreenController.mediaPlayer.loading || timeline.dragging
@@ -526,20 +525,9 @@ Item
         {
             color: ColorTheme.windowText
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: playbackController.bottom
-            width: 2
-            height: 8
-            visible: d.hasArchive
-            opacity: timelineOpactiyMask.opacity
-        }
-
-        Rectangle
-        {
-            color: ColorTheme.windowText
-            anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             width: 2
-            height: timeline.chunkBarHeight + 8
+            height: 20
             visible: d.hasArchive
             opacity: timelineOpactiyMask.opacity
         }
