@@ -155,7 +155,7 @@ class Server(object):
             if was_started:
                 self.stop_service()
             self._installation.cleanup_var_dir()
-            self._installation.update_cert(self._ca)
+            self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
@@ -264,7 +264,7 @@ class Server(object):
         if was_started:
             self.stop_service()
         self._installation.cleanup_var_dir()
-        self._installation.update_cert(self._ca)
+        self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
         if was_started:
             self.start_service()
 

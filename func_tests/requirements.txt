@@ -1,11 +1,11 @@
-urllib3
+urllib3>=1.22
 pytest==3.0.7  # later version conflicts with pytest-capturelog, both have --log-format option; todo: get rid of capturelog
 pytest-timeout
 pytest-capturelog
 pytest-cpp
 pytz
 tzlocal
-requests>=2.12.5
+requests>=2.18.4
 python-vagrant
 Jinja2
 python-debian>=0.1.28
