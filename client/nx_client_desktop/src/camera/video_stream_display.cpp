@@ -832,6 +832,8 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 
 void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, int /*channel*/)
 {
+    NX_VERBOSE(this) << lm("%1() BEGIN").arg(__func__);
+
     QnMutexLocker lock(&m_metadataConsumersHashMutex);
     const auto consumers = m_metadataConsumerByType;
     lock.unlock();
@@ -839,7 +841,7 @@ void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, in
     int metadataCount = 0;
     for (const auto& metadata: metadataList)
     {
-        for (const auto& value: m_metadataConsumerByType.values(metadata->metadataType))
+        for (const auto& value: consumers.values(metadata->metadataType))
         {
             if (const auto& consumer = value.lock())
             {
@@ -852,8 +854,8 @@ void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, in
             }
         }
     }
-    NX_VERBOSE(this) << lm("Processed %1 metadata object(s) in %2 list(s)")
-        .args(metadataCount, metadataList.size());
+    NX_VERBOSE(this) << lm("%1() END: Processed %2 metadata object(s) in %3 list(s)")
+        .args(__func__, metadataCount, metadataList.size());
 }
 
 bool QnVideoStreamDisplay::selfSyncUsed() const
