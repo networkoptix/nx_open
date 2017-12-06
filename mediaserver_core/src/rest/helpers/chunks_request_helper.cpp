@@ -51,8 +51,8 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
     const QnChunksRequestData& request)
 {
-    using namespace nx::analytics::storage;
     using namespace std::chrono;
+    using namespace nx::analytics::storage;
 
     if (request.resList.empty())
         return QnTimePeriodList();
@@ -60,26 +60,31 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
     nx::utils::SyncQueue<std::tuple<ResultCode, QnTimePeriodList>> resultsPerCamera;
     int lookupsOngoing = 0;
 
-    auto filter = QJson::deserialized<Filter>(request.filter.toUtf8());
+    Filter filter;
+    if (request.analyticsStorageFilter)
+        filter = *request.analyticsStorageFilter;
     filter.timePeriod.setStartTime(milliseconds(request.startTimeMs));
     filter.timePeriod.setDuration(milliseconds(request.endTimeMs - request.startTimeMs));
-    // TODO: request.resList.
-    filter.deviceId = request.resList.front()->getId();
-    // TODO: request.limit
+    // TODO: #ak request.limit.
 
     TimePeriodsLookupOptions options;
     options.detailLevel = request.detailLevel;
 
-    ++lookupsOngoing;
-    qnServerModule->analyticsEventsStorage()->lookupTimePeriods(
-        filter,
-        options,
-        [&resultsPerCamera](
-            ResultCode resultCode,
-            QnTimePeriodList timePeriods)
-        {
-            resultsPerCamera.push(std::make_tuple(resultCode, std::move(timePeriods)));
-        });
+    for (const auto& cameraResource: request.resList)
+    {
+        filter.deviceId = cameraResource->getId();
+
+        ++lookupsOngoing;
+        qnServerModule->analyticsEventsStorage()->lookupTimePeriods(
+            filter,
+            options,
+            [&resultsPerCamera](
+                ResultCode resultCode,
+                QnTimePeriodList timePeriods)
+            {
+                resultsPerCamera.push(std::make_tuple(resultCode, std::move(timePeriods)));
+            });
+    }
 
     QnTimePeriodList totalPeriodList;
     for (int i = 0; i < lookupsOngoing; ++i)

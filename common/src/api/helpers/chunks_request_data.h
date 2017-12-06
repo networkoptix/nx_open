@@ -2,8 +2,11 @@
 
 #include <chrono>
 
+#include <boost/optional.hpp>
+
 #include <QUrlQuery>
 
+#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 
@@ -38,4 +41,6 @@ struct QnChunksRequestData
     Qn::SerializationFormat format;
     int limit;
     bool flat;
+
+    boost::optional<nx::analytics::storage::Filter> analyticsStorageFilter;
 };

@@ -80,6 +80,13 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
     nx::camera_id_helper::findAllCamerasByFlexibleIds(resourcePool, &request.resList, params,
         {kCameraIdParam, kDeprecatedIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 
+    if (request.periodsType == Qn::TimePeriodContent::AnalyticsContent)
+    {
+        request.analyticsStorageFilter = nx::analytics::storage::Filter();
+        if (!deserializeFromParams(params, &request.analyticsStorageFilter.get()))
+            request.analyticsStorageFilter.reset();
+    }
+
     return request;
 }
 
