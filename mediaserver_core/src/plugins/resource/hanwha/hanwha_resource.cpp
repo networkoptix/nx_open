@@ -14,6 +14,7 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
+#include <plugins/utils/common_tools.h>
 #include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <camera/camera_pool.h>
@@ -1769,7 +1770,7 @@ QSize HanwhaResource::bestSecondaryResolution(
     const QSize& primaryResolution,
     const std::vector<QSize>& resolutionList) const
 {
-    if (primaryResolution.height() == 0)
+    if (primaryResolution.isEmpty())
     {
         NX_WARNING(
             this,
@@ -1778,46 +1779,7 @@ QSize HanwhaResource::bestSecondaryResolution(
         return QSize();
     }
 
-    const auto primaryAspectRatio =
-        (double)primaryResolution.width() / primaryResolution.height();
-
-    QSize secondaryResolution;
-    double minAspectDiff = std::numeric_limits<double>::max();
-
-    for (const auto& res: resolutionList)
-    {
-        const auto width = res.width();
-        const auto height = res.height();
-
-        if (width * height > kHanwhaMaxSecondaryStreamArea)
-            continue;
-
-        if (height == 0)
-        {
-            NX_WARNING(
-                this,
-                lit("Finding secondary resolution: wrong resolution. Resolution height is 0"));
-            continue;
-        }
-
-        const auto secondaryAspectRatio = (double)width / height;
-        const auto diff = std::abs(primaryAspectRatio - secondaryAspectRatio);
-
-        if (diff < minAspectDiff)
-        {
-            minAspectDiff = diff;
-            secondaryResolution = res;
-        }
-    }
-
-    if (!secondaryResolution.isNull())
-        return secondaryResolution;
-
-    NX_WARNING(
-        this,
-        lit("Can not find secondary resolution of appropriate size, using the smallest one"));
-
-    return resolutionList[resolutionList.size() -1];
+    return secondaryStreamResolution(primaryResolution, resolutionList);
 }
 
 QnCameraAdvancedParams HanwhaResource::filterParameters(
