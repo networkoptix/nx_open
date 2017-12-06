@@ -2,8 +2,6 @@
 
 #include "hanwha_time_synchronizer.h"
 
-#if defined(ENABLE_HANWHA)
-
 #include <map>
 #include <QtCore/QTimeZone>
 
