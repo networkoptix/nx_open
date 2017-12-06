@@ -8,7 +8,7 @@ function(nx_generate_qrc qrc_file)
         "<RCC version=\"1.0\">\n"
         "<qresource prefix=\"/\">\n")
 
-    set(inputs ${ARGN})
+    set(inputs ${QRC_UNPARSED_ARGUMENTS})
     list(REVERSE inputs)
     set(aliases)
     set(used_files)
