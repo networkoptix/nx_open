@@ -5,7 +5,7 @@ function(set_distribution_names)
         set(suffix "${box}${beta_suffix}-${cloudGroup}")
     else()
         set(beta_suffix)
-        set(suffix)
+        set(suffix "${box}")
     endif()
 
     set(client_distribution_name "${prefix}-client-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
