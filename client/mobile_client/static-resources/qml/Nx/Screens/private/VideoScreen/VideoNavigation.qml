@@ -188,6 +188,7 @@ Item
             source: lp("/images/timeline_chunkbar_preloader.png")
             sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
             fillMode: Image.Tile
+            visible: d.hasArchive
         }
 
         Image
@@ -198,6 +199,7 @@ Item
             anchors.bottomMargin: timeline.chunkBarHeight
             sourceSize.height: 150 - timeline.chunkBarHeight
             source: lp("/images/timeline_gradient.png")
+            visible: d.hasArchive
         }
 
         Timeline
@@ -332,7 +334,7 @@ Item
             font.capitalization: Font.AllUppercase
             font.pixelSize: 12
             anchors.bottom: timeline.bottom
-            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
+            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
             color: ColorTheme.windowText
             visible: !d.hasArchive
             opacity: 0.5 * timelineOpactiyMask.opacity
