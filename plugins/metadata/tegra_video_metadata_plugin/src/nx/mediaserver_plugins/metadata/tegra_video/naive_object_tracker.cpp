@@ -1,5 +1,6 @@
 #include "naive_object_tracker.h"
-#include "tegra_video_metadata_plugin_ini.h"
+
+#include <cmath>
 
 #include <boost/optional/optional.hpp>
 
@@ -11,6 +12,8 @@
 #include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
+
+#include "tegra_video_metadata_plugin_ini.h"
 
 namespace nx {
 namespace mediaserver_plugins {
