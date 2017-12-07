@@ -140,7 +140,7 @@ DATABASES = {
         'NAME': cloud_db['database'],
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
-            'charset': 'utf8',
+            'charset': 'utf8mb4',
             'init_command': 'SET '
                 'character_set_connection=utf8,'
                 'collation_connection=utf8_bin'
@@ -322,6 +322,8 @@ AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
 CORS_ALLOW_CREDENTIALS = True
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 USE_ASYNC_QUEUE = True
 

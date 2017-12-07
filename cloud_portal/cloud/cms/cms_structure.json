@@ -140,7 +140,7 @@
             "height_ge": 32,
             "height_le": 64,
             "width_ge": 32,
-            "width_le": 200
+            "width_le": 240
           }
         }
       ]
@@ -160,7 +160,7 @@
           "type": "Image",
           "meta": {
             "format": "png",
-            "height_ge": 200
+            "height_ge": 240
           }
         },
         ["Subtitle", "%SUBTITLE%","Welcome!",
