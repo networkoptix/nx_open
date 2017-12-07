@@ -143,6 +143,12 @@ static const QString kCustomizationVersionNameKey = "customizationName";
 static const QString kCustomizationVersionVersionKey = "customizationVersion";
 static const QString kUpdateKey = "update";
 static const QString kCloudHostKey = "cloudHost";
+static const QString kServerPackagesKey = "serverPackages";
+static const QString kClientPackagesKey = "clientPackages";
+static const QString kTargetKey = "target";
+static const QString kFileKey = "file";
+static const QString kSizeKey = "size";
+static const QString kMd5Key = "md5";
 
 
 class Serializer
@@ -164,7 +170,6 @@ public:
 
     QByteArray json() const { return QJsonDocument(m_jsonObject).toJson(); }
 private:
-
     const QString& m_url;
     const UpdatesMetaData& m_metaData;
     const CustomizationVersionToUpdate& m_customizationVersionToUpdate;
@@ -238,14 +243,63 @@ private:
         m_jsonObject[kCustomizationVersionToUpdateKey] = customizationVersionToUpdateArray;
     }
 
-    void serializeUpdate(
+    static void serializeUpdate(
         const UpdateData& updateData,
         QJsonObject& customizationVersionToUpdateObject)
     {
         QJsonObject updateObject;
         updateObject[kCloudHostKey] = updateData.cloudHost;
-        //updateObject[]
+        serializePackages(updateData.targetToPackage, updateObject, kServerPackagesKey);
+        serializePackages(updateData.targetToClientPackage, updateObject, kClientPackagesKey);
+        customizationVersionToUpdateObject[kUpdateKey] = updateObject;
     }
+
+    static void serializePackages(
+        const QHash<QString, FileData>& targetToPackage,
+        QJsonObject& updateObject,
+        const QString& packagesKey)
+    {
+        QJsonArray targetToPackageArray;
+        for (auto it = targetToPackage.cbegin(); it != targetToPackage.cend(); ++it)
+        {
+            QJsonObject targetToPackageObject;
+            targetToPackageObject[kTargetKey] = it.key();
+            serializeFileData(it.value(), targetToPackageObject);
+            targetToPackageArray.append(targetToPackageObject);
+        }
+        updateObject[packagesKey] = targetToPackageArray;
+    }
+
+    static void serializeFileData(const FileData& fileData, QJsonObject& targetToPackageObject)
+    {
+        targetToPackageObject[kFileKey] = fileData.file;
+        targetToPackageObject[kUrlKey] = fileData.url;
+        targetToPackageObject[kSizeKey] = fileData.size;
+        targetToPackageObject[kMd5Key] = QString::fromLatin1(fileData.md5);
+    }
+};
+
+class Deserializer
+{
+public:
+    explicit Deserializer(const QByteArray& rawData)
+    {
+        QJsonObject rootObject = QJsonDocument::fromJson(rawData).object();
+    }
+
+    QString url() const { return m_url; }
+    UpdatesMetaData metaData() const { return m_metaData; }
+    CustomizationVersionToUpdate customizationVersionToUpdate() const
+    {
+        return m_customizationVersionToUpdate;
+    }
+    bool ok() const { return m_ok; }
+private:
+    QString m_url;
+    UpdatesMetaData m_metaData;
+    CustomizationVersionToUpdate m_customizationVersionToUpdate;
+    QJsonObject m_jsonObject;
+    bool m_ok = false;
 };
 } // namespace
 
@@ -324,6 +378,19 @@ QByteArray CommonUpdateRegistry::toByteArray() const
 }
 
 bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
+{
+    Deserializer deserializer(rawData);
+    if (!deserializer.ok())
+        return false;
+
+    m_baseUrl = deserializer.url();
+    m_metaData = deserializer.metaData();
+    m_customizationVersionToUpdate = deserializer.customizationVersionToUpdate();
+
+    return false;
+}
+
+bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
 {
     return false;
 }

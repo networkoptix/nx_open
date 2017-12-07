@@ -229,6 +229,7 @@ private:
     {
         assertAlternativeServer();
         assertFileDataContent();
+        assertSerializability();
     }
 
     void assertAlternativeServer() const
@@ -284,6 +285,11 @@ private:
         ASSERT_FALSE(fileData.file.isEmpty());
         ASSERT_TRUE(fileData.url.contains(kBaseUrl));
         ASSERT_TRUE(fileData.url.contains(fileData.file));
+    }
+
+    void assertSerializability() const
+    {
+        auto rawData = m_updateRegistry->toByteArray();
     }
 };
 

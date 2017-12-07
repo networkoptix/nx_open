@@ -12,6 +12,7 @@ class NX_UPDATE_API AbstractUpdateRegistry
 {
 public:
     // todo: serialize and deserialize
+    // todo: findClientUpdate() implement
     virtual ~AbstractUpdateRegistry() {}
     virtual ResultCode findUpdate(
         const UpdateRequestData& updateRequestData,
@@ -19,6 +20,7 @@ public:
     virtual QList<QString> alternativeServers() const = 0;
     virtual QByteArray toByteArray() const = 0;
     virtual bool fromByteArray(const QByteArray& rawData) = 0;
+    virtual bool equals(AbstractUpdateRegistry* other) const = 0;
 };
 
 } // namespace info
