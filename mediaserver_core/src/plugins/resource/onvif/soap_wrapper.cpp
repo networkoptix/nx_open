@@ -668,6 +668,12 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getAudioOutputs( _onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response )
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetAudioOutputs(m_endpoint, NULL, &request, &response);
+}
+
 int MediaSoapWrapper::getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response)
 {
     beforeMethodInvocation();

@@ -582,6 +582,8 @@ void QnRtspClient::parseSDP()
     QString codecName;
     QByteArray codecType;
     QByteArray setupURL;
+    bool isBackChannel = false;
+    int timeBase = 0;
 
     for(QByteArray line: lines)
     {
@@ -593,12 +595,16 @@ void QnRtspClient::parseSDP()
                 if (codecName.isEmpty())
                     codecName = findCodecById(mapNum);
                 QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+                sdpTrack->isBackChannel = isBackChannel;
+                sdpTrack->timeBase = timeBase;
                 m_sdpTracks << sdpTrack;
                 setupURL.clear();
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
             codecType = trackParams[0];
             codecName.clear();
+            isBackChannel = false;
+            timeBase = 0;
             mapNum = 0;
             if (trackParams.size() >= 4) {
                 mapNum = trackParams[3].toInt();
@@ -615,19 +621,27 @@ void QnRtspClient::parseSDP()
                 continue; // invalid data format. skip
             mapNum = trackInfo[1].toUInt();
             codecName = QLatin1String(codecInfo[0]);
+            if (codecInfo.size() > 1)
+                timeBase = codecInfo[1].toInt();
         }
-        //else if (lineLower.startsWith("a=control:track"))
         else if (lineLower.startsWith("a=control:"))
         {
             setupURL = line.mid(QByteArray("a=control:").length());
         }
+        else if (lineLower.startsWith("a=sendonly"))
+        {
+            isBackChannel = true;
+        }
     }
-    if (mapNum >= 0) {
+    if (mapNum >= 0) 
+    {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
         //if (codecName == METADATA_STR)
         //    trackNumber = METADATA_TRACK_NUM;
         QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
+        sdpTrack->isBackChannel = isBackChannel;
+        sdpTrack->timeBase = timeBase;
         m_sdpTracks << sdpTrack;
     }
     updateTrackNum();
@@ -1488,7 +1502,7 @@ bool QnRtspClient::sendKeepAlive()
     return sendRequestInternal(std::move(request));
 }
 
-void QnRtspClient::sendBynaryResponse(quint8* buffer, int size)
+void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
 {
     m_tcpSock->send(buffer, size);
 #ifdef _DUMP_STREAM
@@ -2030,6 +2044,12 @@ QnRtspClient::TrackMap QnRtspClient::getTrackInfo() const
 {
     return m_sdpTracks;
 }
+
+void QnRtspClient::setTrackInfo(const TrackMap& tracks)
+{
+    m_sdpTracks = tracks;
+}
+
 AbstractStreamSocket* QnRtspClient::tcpSock()
 {
     return m_tcpSock.get();

@@ -669,6 +669,9 @@ void QnDesktopDataProvider::putAudioData()
             continue;
         if (got_packet)
         {
+            if (m_initTime == AV_NOPTS_VALUE)
+                m_initTime = qnSyncTime->currentUSecsSinceEpoch();
+
             AVRational timeBaseNative;
             timeBaseNative.num = 1;
             timeBaseNative.den = 1000000;
