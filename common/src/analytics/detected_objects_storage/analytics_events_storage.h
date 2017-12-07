@@ -177,7 +177,7 @@ private:
         nx::utils::db::SqlQuery* selectEventsQuery,
         DetectedObject* object);
 
-    void mergeObjects(DetectedObject from, DetectedObject* to);
+    void mergeObjects(DetectedObject&& from, DetectedObject* to);
 
     nx::utils::db::DBResult selectTimePeriods(
         nx::utils::db::QueryContext* queryContext,

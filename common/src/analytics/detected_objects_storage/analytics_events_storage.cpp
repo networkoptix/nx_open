@@ -331,7 +331,15 @@ void EventsStorage::loadObjects(
         else
         {
             DetectedObject& existingObject = result->at(iterAndIsInsertedFlag.first->second);
-            mergeObjects(std::move(detectedObject), &existingObject);
+            if (filter.sortOrder == Qt::AscendingOrder)
+            {
+                mergeObjects(std::move(detectedObject), &existingObject);
+            }
+            else
+            {
+                mergeObjects(std::move(existingObject), &detectedObject);
+                existingObject = std::move(detectedObject);
+            }
         }
     }
 }
@@ -364,7 +372,7 @@ void EventsStorage::loadObject(
         selectEventsQuery->value(lit("box_bottom_right_y")).toDouble()));
 }
 
-void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
+void EventsStorage::mergeObjects(DetectedObject&& from, DetectedObject* to)
 {
     to->track.insert(
         to->track.end(),
