@@ -1219,7 +1219,7 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= this.minPixelsPerLevel / this.pixelAspectRatio) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel * this.pixelAspectRatio) {
             // minMsPerPixel
             break;
         }
