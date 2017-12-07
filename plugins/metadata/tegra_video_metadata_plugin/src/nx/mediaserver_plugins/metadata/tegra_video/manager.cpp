@@ -293,42 +293,51 @@ bool Manager::pushFrameAndGetMetadataPackets(
     compressedFrame.data = (const uint8_t*) videoPacket->data();
     compressedFrame.ptsUs = videoPacket->timestampUsec();
 
+    NX_OUTPUT << "Pushing frame to net: PTS " << compressedFrame.ptsUs;
     if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
     {
         NX_PRINT << "ERROR: TegraVideo::pushCompressedFrame() failed";
         return false;
     }
 
-    if (!m_tegraVideo->hasMetadata())
-        return true; //< No error: no metadata at this time.
-
-    static constexpr int kMaxRects = 1000;
-    std::vector<TegraVideo::Rect> rects;
-    rects.resize(kMaxRects);
-
-    int64_t ptsUs = -1;
-    int rectsCount = -1;
-    if (!m_tegraVideo->pullRectsForFrame(&rects.front(), rects.size(), &rectsCount, &ptsUs))
+    while (m_tegraVideo->hasMetadata())
     {
-        NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
-        return false;
-    }
+        static constexpr int kMaxRects = 1000;
+        std::vector<TegraVideo::Rect> rects;
+        rects.resize(kMaxRects);
 
-    if (rectsCount <= 0)
-        return true; //< No error: no rects at this time.
-
-    rects.resize(rectsCount);
-    if (NX_DEBUG_ENABLE_OUTPUT)
-    {
-        NX_OUTPUT << "Got " << rectsCount << " rect(s) for PTS " << ptsUs << ":";
-        for (const auto rect: rects)
+        int64_t ptsUs = -1;
+        int rectsCount = -1;
+        if (!m_tegraVideo->pullRectsForFrame(&rects.front(), rects.size(), &rectsCount, &ptsUs))
         {
-            NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
-                << ", width " << rect.width << ", height " << rect.height;
+            NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
+            return false;
         }
-    }
 
-    return makeMetadataPacketsFromRects(metadataPackets, rects, ptsUs);
+        if (rectsCount <= 0)
+            return true; //< No error: no rects at this time.
+
+        rects.resize(rectsCount);
+        if (NX_DEBUG_ENABLE_OUTPUT)
+        {
+            const int64_t dPts = ptsUs - compressedFrame.ptsUs;
+            const std::string dPtsMsStr =
+                (dPts >= 0 ? "+" : "-") + nx::kit::debug::format("%lld", (500 + abs(dPts)) / 1000);
+
+            NX_OUTPUT << "Got " << rectsCount << " rect(s) for PTS " << ptsUs
+                << " (" << dPtsMsStr << " ms):";
+
+            for (const auto rect: rects)
+            {
+                NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
+                    << ", width " << rect.width << ", height " << rect.height;
+            }
+        }
+
+        if (!makeMetadataPacketsFromRects(metadataPackets, rects, ptsUs))
+            NX_OUTPUT << "WARNING: makeMetadataPacketsFromRects() failed";
+    }
+    return true; //< No error: no more metadata.
 }
 
 int64_t Manager::usSinceEpoch() const
