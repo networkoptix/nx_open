@@ -21,6 +21,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
+#include <QtCore/QThreadPool>
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
@@ -315,6 +316,8 @@ const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static QString kLogTag = toString(typeid(MediaServerProcess));
+
+static const int kMinimalGlobalThreadPoolSize = 4;
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -2387,6 +2390,10 @@ void MediaServerProcess::serviceModeInit()
 
 void MediaServerProcess::run()
 {
+    // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
+    if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
+        QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
