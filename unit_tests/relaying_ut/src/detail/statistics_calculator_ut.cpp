@@ -57,16 +57,6 @@ TEST_F(StatisticsCalculator, connectionCount)
         m_statisticsCalculator.calculateStatistics(1).connectionCount);
 }
 
-TEST_F(StatisticsCalculator, connectionsAveragePerServerCount)
-{
-    const int serverCount = 0;
-
-    simulateRandomUsage();
-    ASSERT_EQ(
-        m_expectedTotalConnectionCount,
-        m_statisticsCalculator.calculateStatistics(1).connectionCount);
-}
-
 } // namespace test
 } // namespace detail
 } // namespace relaying
