@@ -334,8 +334,6 @@ public:
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
-    
-    void setTrackInfo(const TrackMap& tracks);
 
     void setTrackInfo(const TrackMap& tracks);
 
