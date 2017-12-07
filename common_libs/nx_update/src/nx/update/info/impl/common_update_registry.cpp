@@ -7,10 +7,135 @@ namespace update {
 namespace info {
 namespace impl {
 
+namespace {
+
+using namespace detail::data_parser;
+
+class FileDataFinder
+{
+public:
+    FileDataFinder(
+        const QString& baseUrl,
+        const UpdateRequestData& updateRequestData,
+        const detail::CustomizationVersionToUpdate& customizationVersionToUpdate,
+        const CustomizationData& customizationData)
+        :
+        m_baseUrl(baseUrl),
+        m_updateRequestData(updateRequestData),
+        m_customizationVersionToUpdate(customizationVersionToUpdate),
+        m_customizationData(customizationData)
+    {
+        if (!hasNewerVersions(updateRequestData.currentNxVersion))
+        {
+            NX_WARNING(
+                this,
+                lm("No newer versions found. Current version is %1")
+                    .args(updateRequestData.currentNxVersion.toString()));
+            return;
+        }
+
+        if (!hasRequestedPackage())
+        {
+            NX_WARNING(this, lm("No update package found for %1")
+                .args(updateRequestData.toString()));
+        }
+    }
+
+    bool ok() const
+    {
+        return m_found;
+    }
+
+    FileData fileData() const
+    {
+        return m_fileData;
+    }
+private:
+    const QString& m_baseUrl;
+    const UpdateRequestData& m_updateRequestData;
+    const detail::CustomizationVersionToUpdate& m_customizationVersionToUpdate;
+    const CustomizationData& m_customizationData;
+    mutable FileData m_fileData;
+    mutable bool m_found = false;
+
+    bool hasNewerVersions(const QnSoftwareVersion& currentNxVersion) const
+    {
+        if (m_customizationData.versions.last() <= currentNxVersion)
+            return false;
+
+        return true;
+    }
+
+    bool hasRequestedPackage() const
+    {
+        for (auto versionIt = m_customizationData.versions.rbegin();
+            versionIt != m_customizationData.versions.rend();
+            ++versionIt)
+        {
+            checkForUpdateData(*versionIt);
+        }
+
+        if (!m_found)
+            return false;
+
+        return true;
+    }
+
+    void checkForUpdateData(const QnSoftwareVersion& version) const
+    {
+        if (m_found)
+            return;
+
+        if (version <= m_updateRequestData.currentNxVersion)
+            return;
+
+        auto updateIt = m_customizationVersionToUpdate.find(
+            detail::CustomizationVersionData(m_customizationData.name, version));
+        if (updateIt == m_customizationVersionToUpdate.cend())
+            return;
+
+        if (updateIt->cloudHost != m_updateRequestData.cloudHost)
+        {
+            NX_WARNING(this, lm("Cloud host doesn't match: %1").args(updateIt->cloudHost));
+            return;
+        }
+
+        for (auto packageIt = updateIt->targetToPackage.cbegin();
+            packageIt != updateIt->targetToPackage.cend();
+            ++packageIt)
+        {
+            checkPackage(packageIt.key(), packageIt.value(), version);
+        }
+    }
+
+    void checkPackage(
+        const QString& target,
+        const FileData& fileData,
+        const QnSoftwareVersion& version) const
+    {
+        if (m_found)
+            return;
+
+        if (!m_updateRequestData.osVersion.matches(target))
+            return;
+
+        m_fileData = fileData;
+        auto filePath = lit("/%1/%2/%3")
+            .arg(m_customizationData.name)
+            .arg(QString::number(version.build()))
+            .arg(fileData.file);
+        m_fileData.url = m_baseUrl + filePath;
+        m_found = true;
+    }
+};
+} // namespace
+
 CommonUpdateRegistry::CommonUpdateRegistry(
+    const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
     :
+    m_baseUrl(baseUrl),
     m_metaData(std::move(metaData)),
     m_customizationVersionToUpdate(std::move(customizationVersionToUpdate))
 {}
@@ -21,15 +146,21 @@ ResultCode CommonUpdateRegistry::findUpdate(
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
 
-    if (!hasUpdateForCustomizationAndVersion(updateRequestData))
+    CustomizationData customizationData;
+    if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
         return ResultCode::noData;
 
-    // todo: maybe move this to separate class?
-    if (!hasRequestedPackage(updateRequestData))
+    FileDataFinder fileDataFinder(
+        m_baseUrl,
+        updateRequestData,
+        m_customizationVersionToUpdate,
+        customizationData);
+
+    if (!fileDataFinder.ok())
         return ResultCode::noData;
 
+    *outFileData = fileDataFinder.fileData();
     NX_INFO(this, lm("Update for %1 successfully found").args(updateRequestData.toString()));
-    *outFileData = *m_fileData;
 
     return ResultCode::ok;
 }
@@ -43,13 +174,12 @@ QList<QString> CommonUpdateRegistry::alternativeServers() const
 }
 
 bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
-    const UpdateRequestData& updateRequestData)
+    const UpdateRequestData& updateRequestData,
+    CustomizationData* customizationData)
 {
     using namespace detail::data_parser;
 
-    // todo: remove this as a class member and return from the function instead?
-    m_customizationIt = m_metaData.customizationDataList.cend();
-    m_customizationIt = std::find_if(
+    auto customizationIt = std::find_if(
         m_metaData.customizationDataList.cbegin(),
         m_metaData.customizationDataList.cend(),
         [&updateRequestData](const CustomizationData& customizationData)
@@ -57,60 +187,26 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
             return customizationData.name == updateRequestData.customization;
         });
 
-    if (m_customizationIt == m_metaData.customizationDataList.cend())
+    if (customizationIt == m_metaData.customizationDataList.cend())
     {
         NX_WARNING(
             this,
             lm("No update for this customization %1").args(updateRequestData.customization));
         return false;
     }
-
-    return hasNewerVersions(updateRequestData.currentNxVersion);
-}
-
-bool CommonUpdateRegistry::hasNewerVersions(const QnSoftwareVersion& nxVersion) const
-{
-    if (m_customizationIt->versions.last() <= nxVersion)
-    {
-        NX_WARNING(
-            this,
-            lm("No newer versions found. Current version is %1").args(nxVersion.toString()));
-        return false;
-    }
+    *customizationData = *customizationIt;
 
     return true;
 }
 
-bool CommonUpdateRegistry::hasRequestedPackage(const UpdateRequestData& updateRequestData)
+QByteArray CommonUpdateRegistry::toByteArray() const
 {
-    m_fileData = nullptr;
-    for (auto versionIt = m_customizationIt->versions.cbegin();
-        versionIt != m_customizationIt->versions.cend();
-        ++versionIt)
-    {
-        checkPackage(updateRequestData, *versionIt);
-    }
 
-    if (m_fileData == nullptr)
-    {
-        NX_WARNING( this, lm("No package found."));
-        return false;
-    }
-
-    return true;
 }
 
-void CommonUpdateRegistry::checkPackage(
-    const UpdateRequestData& updateRequestData,
-    const QnSoftwareVersion& version)
+bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
 {
-    if (m_fileData != nullptr)
-        return;
 
-    if (version <= updateRequestData.currentNxVersion)
-        return;
-
-    // todo: implement
 }
 
 } // namespace impl

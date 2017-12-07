@@ -18,6 +18,7 @@ class NX_UPDATE_API UpdateRegistryFactory
 {
 public:
     static AbstractUpdateRegistryPtr create(
+        const QString& baseUrl,
         detail::data_parser::UpdatesMetaData metaData,
         detail::CustomizationVersionToUpdate customizationVersionToUpdate);
     static void setFactoryFunction(UpdateRegistryFactoryFunction factoryFunction);

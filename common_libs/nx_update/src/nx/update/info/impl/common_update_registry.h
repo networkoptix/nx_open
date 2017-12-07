@@ -14,6 +14,7 @@ class CommonUpdateRegistry: public AbstractUpdateRegistry
 {
 public:
     CommonUpdateRegistry(
+        const QString& baseUrl,
         detail::data_parser::UpdatesMetaData metaData,
         detail::CustomizationVersionToUpdate customizationVersionToUpdate);
     virtual ResultCode findUpdate(
@@ -21,16 +22,13 @@ public:
         FileData* outFileData) override;
     virtual QList<QString> alternativeServers() const override;
 private:
+    QString m_baseUrl;
     detail::data_parser::UpdatesMetaData m_metaData;
     detail::CustomizationVersionToUpdate m_customizationVersionToUpdate;
-    // todo: remove these two below?
-    QList<detail::data_parser::CustomizationData>::const_iterator m_customizationIt;
-    FileData* m_fileData = nullptr;
 
-    bool hasNewerVersions(const QnSoftwareVersion& nxVersion) const;
-    bool hasUpdateForCustomizationAndVersion(const UpdateRequestData& updateRequestData);
-    void checkPackage(const UpdateRequestData& updateRequestData,const QnSoftwareVersion& version);
-    bool hasRequestedPackage(const UpdateRequestData& updateRequestData);
+    bool hasUpdateForCustomizationAndVersion(
+        const UpdateRequestData& updateRequestData,
+        detail::data_parser::CustomizationData* customizationData);
 };
 
 } // namespace impl

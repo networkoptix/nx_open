@@ -10,10 +10,12 @@ UpdateRegistryFactoryFunction UpdateRegistryFactory::m_factoryFunction = nullptr
 
 namespace {
 AbstractUpdateRegistryPtr createCommonUpdateRegistry(
+    const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
 {
     return std::make_unique<CommonUpdateRegistry>(
+        baseUrl,
         std::move(metaData),
         std::move(customizationVersionToUpdate));
 }
@@ -21,6 +23,7 @@ AbstractUpdateRegistryPtr createCommonUpdateRegistry(
 } // namespace
 
 AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
+    const QString& baseUrl,
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
 {
@@ -28,6 +31,7 @@ AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
         return m_factoryFunction();
 
     return createCommonUpdateRegistry(
+        baseUrl,
         std::move(metaData),
         std::move(customizationVersionToUpdate));
 }

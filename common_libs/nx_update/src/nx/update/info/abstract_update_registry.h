@@ -17,6 +17,8 @@ public:
         const UpdateRequestData& updateRequestData,
         FileData* outFileData) = 0;
     virtual QList<QString> alternativeServers() const = 0;
+    virtual QByteArray toByteArray() const = 0;
+    virtual bool fromByteArray(const QByteArray& rawData) = 0;
 };
 
 } // namespace info

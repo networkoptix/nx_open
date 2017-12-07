@@ -127,6 +127,7 @@ class AsyncUpdateCheckerImpl: private detail::data_provider::AbstractAsyncRawDat
 public:
     void check(const QString& baseUrl, UpdateCheckCallback callback)
     {
+        m_baseUrl = baseUrl;
         m_rawDataParser = RawDataParserFactory::create();
         m_rawDataProvider = RawDataProviderFactory::create(baseUrl, this);
         m_updateCallback = std::move(callback);
@@ -134,6 +135,7 @@ public:
     }
 
 private:
+    QString m_baseUrl;
     AbstractAsyncRawDataProviderPtr m_rawDataProvider;
     AbstractRawDataParserPtr m_rawDataParser;
     UpdateCheckCallback m_updateCallback;
@@ -182,6 +184,7 @@ private:
         m_updateCallback(
             resultCode,
             impl::UpdateRegistryFactory::create(
+                m_baseUrl,
                 std::move(m_updatesMetaData),
                 m_specificUpdatesFetcher->take()));
     }
