@@ -95,14 +95,14 @@ def common_light_options():
     return ['-sice:ICE07', '-sice:ICE38', '-sice:ICE43', '-sice:ICE57',
         '-sice:ICE60', '-sice:ICE64', '-sice:ICE69', '-sice:ICE91']
 
-def light_command(folder, msi, suffix, extensions):
+def light_command(output_file, input_folder, extensions):
     command = [light_executable(),
         light_cultures,
         '-cc', light_cache_path, '-reusecab',
         '-loc', light_locale,
-        '-out', '{0}/{1}'.format(folder, msi),
-        '-pdbout', '{0}/{1}/{2}'.format(folder, environment.build_configuration, wix_pdb),
-        'obj/{0}-{1}/*.wixobj'.format(environment.build_configuration, suffix)
+        '-out', output_file,
+        '-pdbout', 'obj/{}'.format(wix_pdb),
+        '{}/*.wixobj'.format(input_folder)
         ]
     command += common_light_options()
     for extension in extensions:
@@ -110,5 +110,5 @@ def light_command(folder, msi, suffix, extensions):
     
     return command
 
-def light(folder, msi, suffix, extensions):
-    environment.execute_command(light_command(folder, msi, suffix, extensions))
+def light(output_file, input_folder, extensions):
+    environment.execute_command(light_command(output_file, input_folder, extensions))
