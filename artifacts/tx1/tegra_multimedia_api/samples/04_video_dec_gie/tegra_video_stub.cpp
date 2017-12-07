@@ -61,6 +61,7 @@ public:
             << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
 
         m_hasMetadata = true;
+        m_ptsUs = compressedFrame->ptsUs;
         return true;
     }
 
@@ -69,7 +70,7 @@ public:
     {
         NX_OUTPUT << __func__ << "() -> false";
 
-        *outPtsUs = 0;
+        *outPtsUs = m_ptsUs;
 
         // Produce 2 stub rects.
         if (maxRectsCount < 2)
@@ -99,6 +100,7 @@ public:
     }
 
 private:
+    int64_t m_ptsUs;
     std::string m_id;
     std::string m_modelFile;
     std::string m_deployFile;
