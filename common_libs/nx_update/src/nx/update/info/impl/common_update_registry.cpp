@@ -9,6 +9,7 @@ namespace impl {
 
 namespace {
 
+using namespace detail;
 using namespace detail::data_parser;
 
 class FileDataFinder
@@ -128,6 +129,124 @@ private:
         m_found = true;
     }
 };
+
+static const QString kUrlKey = "url";
+static const QString kMetaDataKey = "metaData";
+static const QString kAlternativeServersKey = "alternativeServers";
+static const QString kCustomizationsKey = "customizations";
+static const QString kAlternativeServerNameKey = "name";
+static const QString kAlternativeServerUrlKey = "url";
+static const QString kCustomizationNameKey = "name";
+static const QString kVersionsKey = "versions";
+static const QString kCustomizationVersionToUpdateKey = "customizationVersionToUpdate";
+static const QString kCustomizationVersionNameKey = "customizationName";
+static const QString kCustomizationVersionVersionKey = "customizationVersion";
+static const QString kUpdateKey = "update";
+static const QString kCloudHostKey = "cloudHost";
+
+
+class Serializer
+{
+public:
+    Serializer(
+        const QString& url,
+        const UpdatesMetaData& metaData,
+        const CustomizationVersionToUpdate& customizationVersionToUpdate)
+        :
+        m_url(url),
+        m_metaData(metaData),
+        m_customizationVersionToUpdate(customizationVersionToUpdate)
+    {
+        serializeUrl();
+        serializeMetaData();
+        serializeCustomizationVersionToUpdate();
+    }
+
+    QByteArray json() const { return QJsonDocument(m_jsonObject).toJson(); }
+private:
+
+    const QString& m_url;
+    const UpdatesMetaData& m_metaData;
+    const CustomizationVersionToUpdate& m_customizationVersionToUpdate;
+    QJsonObject m_jsonObject;
+
+    void serializeUrl()
+    {
+        m_jsonObject[kUrlKey] = m_url;
+    }
+
+    void serializeMetaData()
+    {
+        QJsonObject metaDataObject;
+        serializeAlternativeServers(metaDataObject);
+        serializeCustomizations(metaDataObject);
+        m_jsonObject[kMetaDataKey] = metaDataObject;
+    }
+
+    void serializeAlternativeServers(QJsonObject& metaDataObject) const
+    {
+        QJsonArray alternativeServersArray;
+        for (const auto& alternativeServer: m_metaData.alternativeServersDataList)
+        {
+            QJsonObject alternativeServerObject;
+            alternativeServerObject[kAlternativeServerNameKey] = alternativeServer.name;
+            alternativeServerObject[kAlternativeServerUrlKey] = alternativeServer.url;
+            alternativeServersArray.append(alternativeServerObject);
+        }
+        metaDataObject[kAlternativeServersKey] = alternativeServersArray;
+    }
+
+    void serializeCustomizations(QJsonObject& metaDataObject) const
+    {
+        QJsonArray customizationsArray;
+        for (const auto& customizationData: m_metaData.customizationDataList)
+        {
+            QJsonObject customizationDataObject;
+            customizationDataObject[kCustomizationNameKey] = customizationData.name;
+            fillCustomizationDataVersions(customizationData, customizationDataObject);
+            customizationsArray.append(customizationDataObject);
+        }
+        metaDataObject[kCustomizationsKey] = customizationsArray;
+    }
+
+    static void fillCustomizationDataVersions(
+        const CustomizationData& customizationData,
+        QJsonObject& customizationDataObject)
+    {
+        QJsonArray versionsArray;
+        for (const auto& version : customizationData.versions)
+            versionsArray.append(QJsonValue(version.toString()));
+
+        customizationDataObject[kVersionsKey] = versionsArray;
+    }
+
+
+    void serializeCustomizationVersionToUpdate()
+    {
+        QJsonArray customizationVersionToUpdateArray;
+        for (auto it = m_customizationVersionToUpdate.cbegin();
+            it != m_customizationVersionToUpdate.cend();
+            ++it)
+        {
+            QJsonObject customizationVersionToUpdateObject;
+            customizationVersionToUpdateObject[kCustomizationVersionNameKey] = it.key().name;
+            customizationVersionToUpdateObject[kCustomizationVersionVersionKey] =
+                it.key().version.toString();
+            serializeUpdate(it.value(), customizationVersionToUpdateObject);
+            customizationVersionToUpdateArray.append(customizationVersionToUpdateObject);
+        }
+        m_jsonObject[kCustomizationVersionToUpdateKey] = customizationVersionToUpdateArray;
+    }
+
+    void serializeUpdate(
+        const UpdateData& updateData,
+        QJsonObject& customizationVersionToUpdateObject)
+    {
+        QJsonObject updateObject;
+        updateObject[kCloudHostKey] = updateData.cloudHost;
+        //updateObject[]
+    }
+};
 } // namespace
 
 CommonUpdateRegistry::CommonUpdateRegistry(
@@ -201,7 +320,7 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
 
 QByteArray CommonUpdateRegistry::toByteArray() const
 {
-    return QByteArray();
+    return Serializer(m_baseUrl, m_metaData, m_customizationVersionToUpdate).json();
 }
 
 bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
