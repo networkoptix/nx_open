@@ -103,12 +103,22 @@ public:
         Filter /*filter*/,
         LookupCompletionHandler /*completionHandler*/) override
     {
+        FAIL();
+    }
+
+    virtual void lookupTimePeriods(
+        Filter /*filter*/,
+        TimePeriodsLookupOptions /*options*/,
+        TimePeriodsLookupCompletionHandler /*completionHandler*/) override
+    {
+        FAIL();
     }
 
     virtual void markDataAsDeprecated(
         QnUuid /*deviceId*/,
         qint64 /*oldestNeededDataTimestamp*/) override
     {
+        FAIL();
     }
 
     const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& packets() const

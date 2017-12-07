@@ -11,6 +11,9 @@ namespace tegra_video {
 class Plugin: public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
+    Plugin();
+    virtual ~Plugin() override;
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual const char* name() const override;

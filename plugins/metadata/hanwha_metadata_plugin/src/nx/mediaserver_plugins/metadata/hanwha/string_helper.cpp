@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "string_helper.h"
 
 #include <nx/fusion/serialization/lexical_enum.h>
@@ -57,3 +59,5 @@ QString StringHelper::buildDescription(
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

@@ -41,8 +41,8 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractDataPacketPtr result;
     QElapsedTimer getTimer;

@@ -63,8 +63,21 @@ enum class Error
     unknownError, //< TODO: #mike: Consider renaming to "otherError".
     needMoreBufferSpace,
     typeIsNotSupported,
-    networkError
+    networkError,
 };
+
+static inline const char* toString(Error error)
+{
+    switch (error)
+    {
+        case Error::noError: return "noError";
+        case Error::unknownError: return "unknownError";
+        case Error::needMoreBufferSpace: return "needMoreBufferSpace";
+        case Error::typeIsNotSupported: return "typeIsNotSupported";
+        case Error::networkError: return "networkError";
+        default: return "<unsupported Error>";
+    }
+}
 
 } // namespace sdk
 } // namespace nx

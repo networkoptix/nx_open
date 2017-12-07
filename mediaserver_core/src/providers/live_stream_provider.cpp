@@ -21,7 +21,7 @@
 #include <utils/media/av_codec_helper.h>
 #include <utils/common/synctime.h>
 #include <camera/video_camera.h>
-#include <analytics/plugins/detection/config.h>
+#include <ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
@@ -55,7 +55,7 @@ public:
 
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
-    m_livemutex(QnMutex::Recursive),
+    m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
     m_totalAudioFrames(0),
@@ -86,7 +86,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
         m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
-        QnMutexLocker mtx( &m_livemutex );
+        QnMutexLocker mtx( &m_liveMutex );
         updateSoftwareMotion();
     });
 
@@ -126,7 +126,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
 
-    QnMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx(&m_liveMutex);
     updateSoftwareMotion();
 
     const auto oldParams = m_newLiveParams;
@@ -146,7 +146,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QnMutexLocker mtx( &m_livemutex );
+    QnMutexLocker mtx( &m_liveMutex );
     return m_role;
 }
 
@@ -166,7 +166,7 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 void QnLiveStreamProvider::setParams(const QnLiveStreamParams& params)
 {
     {
-        QnMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx(&m_liveMutex);
         if (m_newLiveParams == params)
             return;
         m_newLiveParams = params;
@@ -243,24 +243,19 @@ float QnLiveStreamProvider::getDefaultFps() const
     return qMax(1.0, maxFps - reservedSecondStreamFps);
 }
 
-bool QnLiveStreamProvider::needAnalyzeStream(Qn::ConnectionRole role)
+bool QnLiveStreamProvider::needAnalyzeMotion(Qn::ConnectionRole /*role*/)
 {
-    bool needAnalyzeMotion = m_role == roleForMotionEstimation()
+    return m_role == roleForMotionEstimation()
         && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid;
-
-    QnSecurityCamResourcePtr secRes = m_resource.dynamicCast<QnSecurityCamResource>();
-
-
-    return needAnalyzeMotion;
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
 {
-    QnMutexLocker mtx( &m_livemutex );
+    QnMutexLocker mtx( &m_liveMutex );
     return m_newLiveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
-bool QnLiveStreamProvider::needMetaData()
+bool QnLiveStreamProvider::needMetadata()
 {
     // I assume this function is called once per video frame
     if (!m_metadataReceptor->metadataQueue.isEmpty())
@@ -273,18 +268,15 @@ bool QnLiveStreamProvider::needMetaData()
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-        if (needAnalyzeStream(getRole()))
+        if (needAnalyzeMotion(getRole()))
         {
-            if (nx::analytics::ini().enableMotionDetection)
+            for (int i = 0; i < m_videoChannels; ++i)
             {
-                for (int i = 0; i < m_videoChannels; ++i)
+                bool rez = m_motionEstimation[i].existsMetadata();
+                if (rez)
                 {
-                    bool rez = m_motionEstimation[i].existsMetadata();
-                    if (rez)
-                    {
-                        m_softMotionLastChannel = i;
-                        return rez;
-                    }
+                    m_softMotionLastChannel = i;
+                    return rez;
                 }
             }
         }
@@ -332,35 +324,22 @@ void QnLiveStreamProvider::onGotVideoFrame(
         && (!m_resolutionCheckTimer.isValid()
             || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS);
 
-    if (needAnalyzeStream(getRole()))
+    if (needAnalyzeMotion(getRole()))
     {
-        auto channel = videoData->channelNumber;
-        bool needAnalyzeFrame = !nx::analytics::ini().useKeyFramesOnly
-            || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
+        static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
+            * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
-        if (needAnalyzeFrame && nx::analytics::ini().enableMotionDetection)
+        const bool needAnalyzeFrame = !m_forcedMotionStream.isEmpty()
+            || videoData->width * videoData->height <= maxSquare;
+
+        const int channel = videoData->channelNumber;
+
+        if (needAnalyzeFrame && m_motionEstimation[channel].analyzeFrame(videoData))
         {
-            static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
-                * SECONDARY_STREAM_MAX_RESOLUTION.height();
-
-            needAnalyzeFrame &= !m_forcedMotionStream.isEmpty()
-                || videoData->width * videoData->height <= maxSquare;
-
-            if (needAnalyzeFrame && m_motionEstimation[channel].analizeFrame(videoData))
-            {
-                updateStreamResolution(
-                    channel,
-                    m_motionEstimation[channel].videoResolution());
-            }
+            updateStreamResolution(
+                channel,
+                m_motionEstimation[channel].videoResolution());
         }
-
-        auto receptor = m_videoDataReceptor.toStrongRef();
-        if (nx::analytics::ini().enableDetectionPlugin &&
-            receptor && receptor->canAcceptData())
-        {
-            receptor->putData(videoData);
-        }
-
     }
     else if (updateResolutionFromPrimaryStream)
     {
@@ -370,6 +349,19 @@ void QnLiveStreamProvider::onGotVideoFrame(
         {
             updateStreamResolution( videoData->channelNumber, newResolution );
             m_resolutionCheckTimer.restart();
+        }
+    }
+
+    if (ini().enableMetadataProcessing)
+    {
+        const bool needAnalyzeFrame = !ini().analyzeKeyFramesOnly
+            || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
+
+        if (needAnalyzeFrame)
+        {
+            auto receptor = m_videoDataReceptor.toStrongRef();
+            if (receptor && receptor->canAcceptData())
+                receptor->putData(videoData);
         }
     }
 #endif // ENABLE_SOFTWARE_MOTION_DETECTION
@@ -439,13 +431,13 @@ void QnLiveStreamProvider::onPrimaryParamsChanged(const QnLiveStreamParams& prim
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
-    QnMutexLocker lock(&m_livemutex);
+    QnMutexLocker lock(&m_liveMutex);
     if (m_newLiveParams.fps == QnLiveStreamParams::kFpsNotInitialized)
         m_newLiveParams.fps = getDefaultFps();
     return m_newLiveParams;
 }
 
-QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
+QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
 {
     if (!m_metadataReceptor->metadataQueue.isEmpty())
     {
@@ -537,7 +529,7 @@ void QnLiveStreamProvider::updateStreamResolution(int channelNumber, const QSize
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
-    QnMutexLocker mtx( &m_livemutex );
+    QnMutexLocker mtx( &m_liveMutex );
     updateSoftwareMotion();
 }
 

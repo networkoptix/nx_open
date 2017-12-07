@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <vector>
 
 #include <nx/utils/basic_factory.h>
@@ -8,6 +9,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include <analytics/common/object_detection_metadata.h>
+#include <recording/time_period_list.h>
 
 #include "analytics_events_storage_cursor.h"
 #include "analytics_events_storage_db_controller.h"
@@ -26,10 +28,22 @@ using LookupResult = std::vector<DetectedObject>;
 using LookupCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, LookupResult)>;
 
+using TimePeriodsLookupCompletionHandler =
+    nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, QnTimePeriodList)>;
+
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
         std::unique_ptr<AbstractCursor> /*cursor*/)>;
+
+struct TimePeriodsLookupOptions
+{
+    /**
+     * If distance between two time periods less than this value,
+     * then those periods SHOULD be merged ignoring gap.
+     */
+    std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
+};
 
 /**
  * NOTE: Every method of this class is asynchronous if other not specified.
@@ -67,6 +81,14 @@ public:
         LookupCompletionHandler completionHandler) = 0;
 
     /**
+     * Select periods of time which contain any data suitable for filter.
+     */
+    virtual void lookupTimePeriods(
+        Filter filter,
+        TimePeriodsLookupOptions options,
+        TimePeriodsLookupCompletionHandler completionHandler) = 0;
+
+    /**
      * In some undefined time after this call deprecated data will be removed from persistent storage.
      * @param deviceId Can be null.
      */
@@ -96,6 +118,11 @@ public:
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override;
+
+    virtual void lookupTimePeriods(
+        Filter filter,
+        TimePeriodsLookupOptions options,
+        TimePeriodsLookupCompletionHandler completionHandler) override;
 
     virtual void markDataAsDeprecated(
         QnUuid deviceId,
@@ -128,9 +155,18 @@ private:
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
         std::vector<DetectedObject>* result);
-    void prepareQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
 
+    void prepareLookupQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
     nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
+    void addObjectTypeIdToFilter(
+        const std::vector<QnUuid>& objectTypeIds,
+        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+    void addTimePeriodToFilter(
+        const QnTimePeriod& timePeriod,
+        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+    void addBoundingBoxToFilter(
+        const QRectF& boundingBox,
+        nx::utils::db::InnerJoinFilterFields* sqlFilter);
 
     void loadObjects(
         nx::utils::db::SqlQuery& selectEventsQuery,
@@ -142,6 +178,17 @@ private:
         DetectedObject* object);
 
     void mergeObjects(DetectedObject from, DetectedObject* to);
+
+    nx::utils::db::DBResult selectTimePeriods(
+        nx::utils::db::QueryContext* queryContext,
+        const Filter& filter,
+        const TimePeriodsLookupOptions& options,
+        QnTimePeriodList* result);
+
+    void loadTimePeriods(
+        nx::utils::db::SqlQuery& query,
+        const TimePeriodsLookupOptions& options,
+        QnTimePeriodList* result);
 };
 
 //-------------------------------------------------------------------------------------------------

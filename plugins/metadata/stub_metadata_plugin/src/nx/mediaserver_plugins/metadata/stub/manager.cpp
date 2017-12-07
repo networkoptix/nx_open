@@ -10,7 +10,8 @@
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
-#define NX_PRINT_PREFIX "[metadata::stub::Manager] "
+#define NX_DEBUG_ENABLE_OUTPUT true
+#define NX_PRINT_PREFIX "metadata::stub::Manager::"
 #include <nx/kit/debug.h>
 
 namespace nx {
@@ -34,10 +35,11 @@ static const nxpl::NX_GUID kCarDetectedEventGuid =
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Manager::Manager():
+Manager::Manager(Plugin* plugin):
+    m_plugin(plugin),
     m_eventTypeId(kLineCrossingEventGuid)
 {
-    NX_PRINT << "Creating metadata manager " << (uintptr_t) this;
+    NX_PRINT << __func__ << "(\"" << plugin->name() << "\") -> " << this;
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -64,13 +66,16 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 Error Manager::setHandler(AbstractMetadataHandler* handler)
 {
+    NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
+    NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
 
 Error Manager::startFetchingMetadata()
 {
+    NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);
 
     stopFetchingMetadataUnsafe();
@@ -89,19 +94,28 @@ Error Manager::startFetchingMetadata()
 
     m_thread.reset(new std::thread(metadataDigger));
 
+    NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
 
 nx::sdk::Error Manager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
 {
+    NX_OUTPUT << __func__ << "() BEGIN";
     m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
+    NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
 
 Error Manager::stopFetchingMetadata()
 {
+    NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);
-    return stopFetchingMetadataUnsafe();
+    const Error result = stopFetchingMetadataUnsafe();
+    if (result == Error::noError)
+        NX_OUTPUT << __func__ << "() END -> noError";
+    else
+        NX_OUTPUT << __func__ << "() END -> Error{" << (int) result << "}";
+    return result;
 }
 
 const char* Manager::capabilitiesManifest(Error* error) const
@@ -114,7 +128,7 @@ const char* Manager::capabilitiesManifest(Error* error) const
             "supportedEventTypes": [
                 "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
                 "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
-            ]
+            ],
             "supportedObjectTypes": [
                 "{153DD879-1CD2-46B7-ADD6-7C6B48EAC1FC}"
             ]
@@ -124,8 +138,9 @@ const char* Manager::capabilitiesManifest(Error* error) const
 
 Manager::~Manager()
 {
+    NX_PRINT << __func__ << "(" << this << ") BEGIN";
     stopFetchingMetadata();
-    NX_PRINT << "Destroying metadata manager " << (uintptr_t) this;
+    NX_PRINT << __func__ << "(" << this << ") END";
 }
 
 Error Manager::stopFetchingMetadataUnsafe()

@@ -14,7 +14,7 @@ QnBufferedFrameDisplayer::QnBufferedFrameDisplayer():
     start();
 }
 
-void QnBufferedFrameDisplayer::setRenderList(QSet<QnAbstractRenderer*> renderList)
+void QnBufferedFrameDisplayer::setRenderList(std::set<QnAbstractRenderer*> renderList)
 {
     QnMutexLocker lock( &m_renderMtx );
     m_renderList = renderList;

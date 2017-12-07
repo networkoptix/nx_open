@@ -36,7 +36,7 @@ public:
     {
         QtPlugin = 1, //< Qt-based plugins.
         NxPlugin = 2, //< Plugins, implementing plugin_api.h.
-        
+
         AllPlugins = QtPlugin | NxPlugin
     };
 
@@ -107,5 +107,6 @@ private:
     //!Loads \a nxpl::PluginInterface based plugin
     bool loadNxPlugin(
         const std::vector<nxpl::Setting>& settingsForPlugin,
-        const QString& fullFilePath );
+        const QString& fileDir,
+        const QString& fileName);
 };

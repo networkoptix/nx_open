@@ -383,6 +383,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        AnalyticsContent,
 
         TimePeriodContentCount
     };

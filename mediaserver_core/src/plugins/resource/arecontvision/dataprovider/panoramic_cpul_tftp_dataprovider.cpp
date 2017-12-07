@@ -126,12 +126,12 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     if (m_motionData > 0)
     {
         --m_motionData;
-        QnAbstractMediaDataPtr metadata = getMetaData();
+        QnAbstractMediaDataPtr metadata = getMetadata();
         if (metadata)
             return metadata;
     }
 
-    if (needMetaData())
+    if (needMetadata())
     {
         m_motionData = m_channelCount;
     }

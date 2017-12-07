@@ -93,7 +93,7 @@ int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 
     QnMutexLocker lock( &m_renderListMtx );
     renderer->setScreenshotInterface(this);
-    m_newList << renderer;
+    m_newList.insert(renderer);
     m_renderListModified = true;
     return m_newList.size();
 }
@@ -101,7 +101,7 @@ int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 int QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
 {
     QnMutexLocker lock( &m_renderListMtx );
-    m_newList.remove(renderer);
+    m_newList.erase(renderer);
     m_renderListModified = true;
     return m_newList.size();
 }
@@ -145,7 +145,7 @@ void QnVideoStreamDisplay::freeScaleContext()
     }
 }
 
-QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QSet<QnAbstractRenderer*> renderList,
+QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(std::set<QnAbstractRenderer*> renderList,
                                                                           int channelNumber,
                                                                           int srcWidth, int srcHeight,
                                                                           QnFrameScaler::DownscaleFactor force_factor)
@@ -478,7 +478,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (dec == 0)
     {
         // todo: all renders MUST have same GL context!!!
-        const QnAbstractRenderer* renderer = m_renderList.isEmpty() ? 0 : *m_renderList.constBegin();
+        const QnAbstractRenderer* renderer = m_renderList.empty() ? 0 : *m_renderList.begin();
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
         dec = QnVideoDecoderFactory::createDecoder(
                 data,
@@ -644,7 +644,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
-    if (!draw || m_renderList.isEmpty())
+    if (!draw || m_renderList.empty())
         return Status_Skipped;
     else if (m_lastIgnoreTime != (qint64)AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
         return Status_Skipped;
@@ -830,17 +830,32 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     return true;
 }
 
-void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, int channel)
+void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, int /*channel*/)
 {
+    NX_VERBOSE(this) << lm("%1() BEGIN").arg(__func__);
+
     QnMutexLocker lock(&m_metadataConsumersHashMutex);
     const auto consumers = m_metadataConsumerByType;
     lock.unlock();
 
+    int metadataCount = 0;
     for (const auto& metadata: metadataList)
     {
-        if (const auto consumer = m_metadataConsumerByType.value(metadata->metadataType).lock())
-            consumer->processMetadata(metadata);
+        for (const auto& value: consumers.values(metadata->metadataType))
+        {
+            if (const auto& consumer = value.lock())
+            {
+                ++metadataCount;
+                consumer->processMetadata(metadata);
+            }
+            else
+            {
+                NX_VERBOSE(this) << "WARNING: Null metadata";
+            }
+        }
     }
+    NX_VERBOSE(this) << lm("%1() END: Processed %2 metadata object(s) of %3 type(s)")
+        .args(__func__, metadataCount, metadataList.size());
 }
 
 bool QnVideoStreamDisplay::selfSyncUsed() const
@@ -967,7 +982,7 @@ void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
 
 qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 {
-    if (m_renderList.isEmpty())
+    if (m_renderList.empty())
         return AV_NOPTS_VALUE;
     foreach(QnAbstractRenderer* renderer, m_renderList)
     {
@@ -1006,7 +1021,7 @@ void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 bool QnVideoStreamDisplay::isTimeBlocked() const
 {
     QnMutexLocker lock(&m_renderListMtx);
-    if (m_renderList.isEmpty())
+    if (m_renderList.empty())
         return false;
     QnAbstractRenderer* renderer = *m_renderList.begin();
     return renderer->isTimeBlocked(m_channelNumber);

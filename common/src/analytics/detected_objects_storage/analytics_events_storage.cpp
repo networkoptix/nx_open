@@ -51,7 +51,7 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, lm("Requested cursor with filter %1").args(filter));
 
     m_dbController.queryExecutor().createCursor<DetectedObject>(
-        std::bind(&EventsStorage::prepareQuery, this, filter, _1),
+        std::bind(&EventsStorage::prepareLookupQuery, this, filter, _1),
         std::bind(&EventsStorage::loadObject, this, _1, _2),
         [this, completionHandler = std::move(completionHandler)](
             db::DBResult resultCode,
@@ -77,6 +77,26 @@ void EventsStorage::lookup(
     auto result = std::make_shared<std::vector<DetectedObject>>();
     m_dbController.queryExecutor().executeSelect(
         std::bind(&EventsStorage::selectObjects, this, _1, std::move(filter), result.get()),
+        [this, result, completionHandler = std::move(completionHandler)](
+            QueryContext*, DBResult resultCode)
+        {
+            completionHandler(
+                dbResultToResultCode(resultCode),
+                std::move(*result));
+        });
+}
+
+void EventsStorage::lookupTimePeriods(
+    Filter filter,
+    TimePeriodsLookupOptions options,
+    TimePeriodsLookupCompletionHandler completionHandler)
+{
+    using namespace std::placeholders;
+
+    auto result = std::make_shared<QnTimePeriodList>();
+    m_dbController.queryExecutor().executeSelect(
+        std::bind(&EventsStorage::selectTimePeriods, this,
+            _1, std::move(filter), std::move(options), result.get()),
         [this, result, completionHandler = std::move(completionHandler)](
             QueryContext*, DBResult resultCode)
         {
@@ -164,7 +184,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
 {
     SqlQuery selectEventsQuery(*queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
-    prepareQuery(filter, &selectEventsQuery);
+    prepareLookupQuery(filter, &selectEventsQuery);
     selectEventsQuery.exec();
 
     loadObjects(selectEventsQuery, filter, result);
@@ -172,7 +192,7 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
     return nx::utils::db::DBResult::ok;
 }
 
-void EventsStorage::prepareQuery(
+void EventsStorage::prepareLookupQuery(
     const Filter& filter,
     nx::utils::db::SqlQuery* query)
 {
@@ -208,50 +228,81 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
         sqlFilter.push_back(std::move(filterField));
     }
 
-    if (!filter.timePeriod.isNull())
+    if (!filter.objectId.isNull())
     {
-        nx::utils::db::SqlFilterFieldGreaterOrEqual startTimeFilterField(
-            "timestamp_usec_utc",
-            ":startTimeUsec",
-            QnSql::serialized_field(filter.timePeriod.startTimeMs * kUsecInMs));
-        sqlFilter.push_back(std::move(startTimeFilterField));
-
-        const auto endTimeMs = filter.timePeriod.startTimeMs + filter.timePeriod.durationMs;
-        nx::utils::db::SqlFilterFieldLess endTimeFilterField(
-            "timestamp_usec_utc",
-            ":endTimeUsec",
-            QnSql::serialized_field(endTimeMs * kUsecInMs));
-        sqlFilter.push_back(std::move(endTimeFilterField));
+        nx::utils::db::SqlFilterFieldEqual filterField(
+            "object_id", ":objectId", QnSql::serialized_field(filter.objectId));
+        sqlFilter.push_back(std::move(filterField));
     }
+
+    if (!filter.objectTypeId.empty())
+        addObjectTypeIdToFilter(filter.objectTypeId, &sqlFilter);
+
+    if (!filter.timePeriod.isNull())
+        addTimePeriodToFilter(filter.timePeriod, &sqlFilter);
 
     if (!filter.boundingBox.isNull())
-    {
-        nx::utils::db::SqlFilterFieldLessOrEqual topLeftXFilter(
-            "box_top_left_x",
-            ":boxTopLeftX",
-            QnSql::serialized_field(filter.boundingBox.bottomRight().x()));
-        sqlFilter.push_back(std::move(topLeftXFilter));
-
-        nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
-            "box_bottom_right_x",
-            ":boxBottomRightX",
-            QnSql::serialized_field(filter.boundingBox.topLeft().x()));
-        sqlFilter.push_back(std::move(bottomRightXFilter));
-
-        nx::utils::db::SqlFilterFieldLessOrEqual topLeftYFilter(
-            "box_top_left_y",
-            ":boxTopLeftY",
-            QnSql::serialized_field(filter.boundingBox.bottomRight().y()));
-        sqlFilter.push_back(std::move(topLeftYFilter));
-
-        nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
-            "box_bottom_right_y",
-            ":boxBottomRightY",
-            QnSql::serialized_field(filter.boundingBox.topLeft().y()));
-        sqlFilter.push_back(std::move(bottomRightYFilter));
-    }
+        addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
 
     return sqlFilter;
+}
+
+void EventsStorage::addObjectTypeIdToFilter(
+    const std::vector<QnUuid>& objectTypeIds,
+    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+{
+    // TODO: #ak Add support for every objectTypeId specified.
+
+    nx::utils::db::SqlFilterFieldEqual filterField(
+        "object_type_id", ":objectTypeId", QnSql::serialized_field(objectTypeIds.front()));
+    sqlFilter->push_back(std::move(filterField));
+}
+
+void EventsStorage::addTimePeriodToFilter(
+    const QnTimePeriod& timePeriod,
+    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+{
+    nx::utils::db::SqlFilterFieldGreaterOrEqual startTimeFilterField(
+        "timestamp_usec_utc",
+        ":startTimeUsec",
+        QnSql::serialized_field(timePeriod.startTimeMs * kUsecInMs));
+    sqlFilter->push_back(std::move(startTimeFilterField));
+
+    const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
+    nx::utils::db::SqlFilterFieldLess endTimeFilterField(
+        "timestamp_usec_utc",
+        ":endTimeUsec",
+        QnSql::serialized_field(endTimeMs * kUsecInMs));
+    sqlFilter->push_back(std::move(endTimeFilterField));
+}
+
+void EventsStorage::addBoundingBoxToFilter(
+    const QRectF& boundingBox,
+    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+{
+    nx::utils::db::SqlFilterFieldLessOrEqual topLeftXFilter(
+        "box_top_left_x",
+        ":boxTopLeftX",
+        QnSql::serialized_field(boundingBox.bottomRight().x()));
+    sqlFilter->push_back(std::move(topLeftXFilter));
+
+    nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
+        "box_bottom_right_x",
+        ":boxBottomRightX",
+        QnSql::serialized_field(boundingBox.topLeft().x()));
+    sqlFilter->push_back(std::move(bottomRightXFilter));
+
+    nx::utils::db::SqlFilterFieldLessOrEqual topLeftYFilter(
+        "box_top_left_y",
+        ":boxTopLeftY",
+        QnSql::serialized_field(boundingBox.bottomRight().y()));
+    sqlFilter->push_back(std::move(topLeftYFilter));
+
+    nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
+        "box_bottom_right_y",
+        ":boxBottomRightY",
+        QnSql::serialized_field(boundingBox.topLeft().y()));
+    sqlFilter->push_back(std::move(bottomRightYFilter));
 }
 
 void EventsStorage::loadObjects(
@@ -263,7 +314,7 @@ void EventsStorage::loadObjects(
 
     for (int count = 0; selectEventsQuery.next(); ++count)
     {
-        if (filter.maxObjectsToSelect > 0 && count > filter.maxObjectsToSelect)
+        if (filter.maxObjectsToSelect > 0 && count >= filter.maxObjectsToSelect)
             break;
 
         DetectedObject detectedObject;
@@ -321,6 +372,58 @@ void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
         std::make_move_iterator(from.track.end()));
 
     // TODO: #ak moving attributes.
+}
+
+nx::utils::db::DBResult EventsStorage::selectTimePeriods(
+    nx::utils::db::QueryContext* queryContext,
+    const Filter& filter,
+    const TimePeriodsLookupOptions& options,
+    QnTimePeriodList* result)
+{
+    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString sqlQueryFilterStr;
+    if (!sqlQueryFilter.empty())
+    {
+        sqlQueryFilterStr = lm("WHERE %1").args(
+            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+    }
+
+    // TODO: #ak Aggregate in query.
+
+    SqlQuery query(*queryContext->connection());
+    query.setForwardOnly(true);
+    query.prepare(lm(R"sql(
+        SELECT timestamp_usec_utc, duration_usec
+        FROM event
+        %1
+        ORDER BY timestamp_usec_utc ASC
+    )sql").args(sqlQueryFilterStr));
+    nx::utils::db::bindFields(&query, sqlQueryFilter);
+
+    query.exec();
+    loadTimePeriods(query, options, result);
+    return nx::utils::db::DBResult::ok;
+}
+
+void EventsStorage::loadTimePeriods(
+    nx::utils::db::SqlQuery& query,
+    const TimePeriodsLookupOptions& options,
+    QnTimePeriodList* result)
+{
+    using namespace std::chrono;
+
+    constexpr int kUsecPerMs = 1000;
+
+    while (query.next())
+    {
+        QnTimePeriod timePeriod(
+            milliseconds(query.value(lit("timestamp_usec_utc")).toLongLong() / kUsecPerMs),
+            milliseconds(query.value(lit("duration_usec")).toLongLong() / kUsecPerMs));
+        result->push_back(timePeriod);
+    }
+
+    *result = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+        *result, options.detailLevel);
 }
 
 //-------------------------------------------------------------------------------------------------

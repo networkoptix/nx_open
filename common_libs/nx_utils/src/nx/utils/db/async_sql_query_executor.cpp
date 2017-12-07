@@ -62,7 +62,7 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
         std::swap(m_dbThreadPool, dbThreadPool);
 
         for (auto& context: m_cursorProcessorContext)
-            dbThreadPool.push_back(std::move(context.processingThread));
+            dbThreadPool.push_back(std::move(context->processingThread));
         m_cursorProcessorContext.clear();
 
         m_terminated = true;
@@ -172,6 +172,25 @@ std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
     return m_queryQueue.size();
 }
 
+void AsyncSqlQueryExecutor::removeCursor(QnUuid id)
+{
+    m_cursorProcessorContext.front()->cursorContextPool.markCursorForDeletion(id);
+    auto task = std::make_unique<detail::CleanUpDroppedCursorsExecutor>(
+        &m_cursorProcessorContext.front()->cursorContextPool);
+    m_cursorTaskQueue.push(std::move(task));
+}
+
+int AsyncSqlQueryExecutor::openCursorCount() const
+{
+    return std::accumulate(
+        m_cursorProcessorContext.begin(), m_cursorProcessorContext.end(),
+        0,
+        [](int sum, const std::unique_ptr<CursorProcessorContext>& element) -> int
+        {
+            return sum + (int) element->cursorContextPool.cursorCount();
+        });
+}
+
 void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
 {
     m_queryQueue.setConcurrentModificationQueryLimit(value);
@@ -271,11 +290,11 @@ void AsyncSqlQueryExecutor::dropConnectionAsync(
 
 void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& lock)
 {
-    m_cursorProcessorContext.push_back(CursorProcessorContext());
+    m_cursorProcessorContext.push_back(std::make_unique<CursorProcessorContext>());
     // Disabling inactivity timer.
     auto connectionOptions = m_connectionOptions;
     connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
-    m_cursorProcessorContext.back().processingThread =
+    m_cursorProcessorContext.back()->processingThread =
         createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 }
 

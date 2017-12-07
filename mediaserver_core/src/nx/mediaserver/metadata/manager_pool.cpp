@@ -141,7 +141,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         auto managerObject = createMetadataManager(camera, plugin);
         if (!managerObject)
             continue;
-        nxpt::ScopedRef<AbstractMetadataManager> manager(managerObject, false);
+        nxpt::ScopedRef<AbstractMetadataManager> manager(managerObject, /*increaseRef*/ false);
 
         auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
@@ -149,7 +149,10 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 
         auto deviceManifest = addManifestToCamera(camera, manager.get());
         if (!deviceManifest)
+        {
+            // TODO: Investigate why manager is not destructed here by ScopedRef in case of "continue".
             continue;
+        }
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<EventHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
@@ -262,31 +265,43 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
         return boost::none;
 
     Error error = Error::noError;
-    auto pluginManifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(
-        plugin->capabilitiesManifest(&error));
+    const char* const manifestStr = plugin->capabilitiesManifest(&error);
+    if (error != Error::noError)
+    {
+        NX_ERROR(this) << lm("Unable to receive Plugin manifest for \"%1\": %2.")
+            .args(plugin->name(), error);
+        return boost::none;
+    }
+    if (manifestStr == nullptr)
+    {
+        NX_ERROR(this) << lm("Received null Plugin manifest for \"%1\".")
+            .arg(plugin->name());
+        return boost::none;
+    }
 
-    if (!pluginManifest || error != Error::noError)
-        boost::none;
+    auto manifest = deserializeManifest<nx::api::AnalyticsDriverManifest>(manifestStr);
+    if (!manifest)
+        return boost::none; //< Error already logged.
 
     bool overwritten = false;
     auto existingManifests = server->analyticsDrivers();
     for (auto& existingManifest : existingManifests)
     {
-        if (existingManifest.driverId == pluginManifest->driverId)
+        if (existingManifest.driverId == manifest->driverId)
         {
-            existingManifest = *pluginManifest;
+            existingManifest = *manifest;
             overwritten = true;
             break;
         }
     }
 
     if (!overwritten)
-        existingManifests.push_back(*pluginManifest);
+        existingManifests.push_back(*manifest);
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
 
-    return pluginManifest;
+    return manifest;
 }
 
 boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCamera(
@@ -297,16 +312,28 @@ boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCame
     NX_ASSERT(camera);
 
     Error error = Error::noError;
-    auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
-        manager->capabilitiesManifest(&error));
-
-    if (!deviceManifest || error != Error::noError)
+    const char *const manifestStr = manager->capabilitiesManifest(&error);
+    if (error != Error::noError)
+    {
+        NX_ERROR(this) << lm("Unable to receive Manager manifest for \"%1\": %2.")
+            .args(manager->plugin()->name(), error);
         return boost::none;
+    }
+    if (manifestStr == nullptr)
+    {
+        NX_ERROR(this) << lm("Received null Manager manifest for \"%1\".")
+            .arg(manager->plugin()->name());
+        return boost::none;
+    }
 
-    camera->setAnalyticsSupportedEvents(deviceManifest->supportedEventTypes);
+    auto manifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(manifestStr);
+    if (!manifest)
+        return boost::none; //< Error already logged.
+
+    camera->setAnalyticsSupportedEvents(manifest->supportedEventTypes);
     camera->saveParams();
 
-    return deviceManifest;
+    return manifest;
 }
 
 bool ManagerPool::resourceInfoFromResource(
@@ -362,11 +389,30 @@ bool ManagerPool::resourceInfoFromResource(
     return true;
 }
 
+void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* video)
+{
+    QnMutexLocker lock(&m_contextMutex);
+    for (auto& data: m_contexts[id].managers())
+    {
+        using namespace nx::sdk::metadata;
+        nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
+            (AbstractConsumingMetadataManager*)
+            data.manager->queryInterface(IID_ConsumingMetadataManager), false);
+        if (!manager)
+            return;
+        bool needDeepCopy = data.manifest.capabilities.testFlag(
+            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame);
+        auto packet = toPluginVideoPacket(video, needDeepCopy);
+        manager->putData(packet.get());
+    }
+}
+
 QWeakPointer<QnAbstractDataReceptor> ManagerPool::mediaDataReceptor(const QnUuid& id)
 {
     QnMutexLocker lock(&m_contextMutex);
     auto& context = m_contexts[id];
-    auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(&context));
+    auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
+        std::bind(&ManagerPool::putVideoData, this, id, std::placeholders::_1)));
     context.setVideoFrameDataReceptor(dataReceptor);
     return dataReceptor.toWeakRef();
 }

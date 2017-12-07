@@ -14,9 +14,10 @@ namespace plugins {
 
 namespace {
 
-static const std::chrono::milliseconds kWaitBeforeSync(30000);
+static const std::chrono::milliseconds kWaitBeforeSync(20000);
 static const std::chrono::milliseconds kWaitBeforeNextChunk(3000);
 static const int kNumberOfSyncCycles = 2;
+static const int kTriesPerChunk = 3;
 
 } // namespace
 
@@ -28,19 +29,28 @@ HanwhaRemoteArchiveManager::HanwhaRemoteArchiveManager(HanwhaResource* resource)
 }
 
 bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
-    std::vector<RemoteArchiveChunk>* outArchiveEntries,
+    OverlappedRemoteChunks* outArchiveEntries,
     int64_t /*startTimeMs*/,
     int64_t /*endTimeMs*/)
 {
     // TODO: #dmishin Fix channel if needed
-    const auto chunks = m_resource->sharedContext()->chunksSync(m_resource->getChannel());
+    const auto overlappedPeriods = m_resource
+        ->sharedContext()
+        ->overlappedTimelineSync(m_resource->getChannel());
 
-    for (const auto& chunk: chunks)
+    for (const auto& entry: overlappedPeriods)
     {
-        outArchiveEntries->emplace_back(
-            lit("%1-%2").arg(chunk.startTimeMs).arg(chunk.endTimeMs()),
-            chunk.startTimeMs,
-            chunk.durationMs);
+        const auto overlappedId = entry.first;
+        const auto& periods = entry.second;
+
+        for (const auto& period: periods)
+        {
+            (*outArchiveEntries)[overlappedId].emplace_back(
+                QString(),
+                period.startTimeMs,
+                period.durationMs,
+                overlappedId);
+        }
     }
 
     return true;
@@ -63,15 +73,16 @@ RemoteArchiveCapabilities HanwhaRemoteArchiveManager::capabilities() const
     return RemoteArchiveCapability::RandomAccessChunkCapability;
 }
 
-std::unique_ptr<QnAbstractArchiveDelegate> HanwhaRemoteArchiveManager::archiveDelegate()
+std::unique_ptr<QnAbstractArchiveDelegate> HanwhaRemoteArchiveManager::archiveDelegate(
+    const RemoteArchiveChunk& chunk)
 {
-    return m_resource->remoteArchiveDelegate();
-}
+    auto delegate = m_resource->remoteArchiveDelegate();
+    auto hanwhaDelegate = dynamic_cast<HanwhaArchiveDelegate*>(delegate.get());
 
-void HanwhaRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
-    EntriesUpdatedCallback callback)
-{
-    m_callback = callback;
+    if (hanwhaDelegate)
+        hanwhaDelegate->setOverlappedId(chunk.overlappedId);
+
+    return delegate;
 }
 
 void HanwhaRemoteArchiveManager::beforeSynchronization()
@@ -102,7 +113,8 @@ RemoteArchiveSynchronizationSettings HanwhaRemoteArchiveManager::settings() cons
     return {
         kWaitBeforeSync,
         kWaitBeforeNextChunk,
-        kNumberOfSyncCycles
+        kNumberOfSyncCycles,
+        kTriesPerChunk
     };
 }
 

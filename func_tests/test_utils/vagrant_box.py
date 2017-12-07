@@ -9,6 +9,7 @@ import jinja2
 import vagrant
 import vagrant.compat
 
+from test_utils.ca import CA
 from .host import ProcessError, RemoteSshHost, host_from_config
 from .server import Server
 from .server_ctl import VagrantBoxServerCtl
@@ -55,6 +56,7 @@ class VagrantBoxFactory(object):
     def __init__(self, cache, options, config_factory):
         self._cache = cache
         self._bin_dir = options.bin_dir
+        self._ca = CA(os.path.join(options.work_dir, 'ca'))
         self._vagrant_private_key_path = None  # defined for remote ssh vm host
         self._config_factory = config_factory
         self._vm_host = host_from_config(options.vm_ssh_host_config)
@@ -115,6 +117,7 @@ class VagrantBoxFactory(object):
             self._ssh_config_path,
             self._vm_host,
             config,
+            self._ca,
             is_running)
 
     def _init_running_boxes(self):
@@ -214,7 +217,7 @@ class VagrantBoxFactory(object):
 class VagrantBox(object):
 
     def __init__(self, bin_dir, vagrant_dir, vagrant, vagrant_private_key_path,
-                 ssh_config_path, vm_host, config, is_running=False):
+                 ssh_config_path, vm_host, config, ca, is_running=False):
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir
         self._vagrant = vagrant
@@ -228,6 +231,7 @@ class VagrantBox(object):
         self.is_allocated = False
         self._server_ctl = None
         self._installation = None
+        self._ca = ca
 
     def __str__(self):
         return '%s vm_name=%s timezone=%s' % (self.name, self.vm_name, self.timezone or '?')
@@ -279,7 +283,7 @@ class VagrantBox(object):
         assert self.host, 'Not initialized (init method was not called)'
         rest_api_url = '%s://%s:%d/' % (server_config.http_schema, self._vm_host.host, self.config.rest_api_forwarded_port)
         return Server(server_config.name, self.host, self._installation, self._server_ctl,
-                      rest_api_url, server_config.rest_api_timeout, timezone=self.timezone)
+                      rest_api_url, self._ca, server_config.rest_api_timeout, timezone=self.timezone)
         
     def _box_host(self, user, ssh_config_path=None):
         return RemoteSshHost(self.name, self.name, user, self._vagrant_private_key_path,

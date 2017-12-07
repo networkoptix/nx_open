@@ -20,6 +20,22 @@ QnTimePeriodList toTimePeriodList(const std::vector<RemoteArchiveChunk>& chunks)
     return result;
 }
 
+OverlappedTimePeriods toOverlappedTimePeriods(
+    const OverlappedRemoteChunks& overlappedChunks)
+{
+    OverlappedTimePeriods result;
+
+    for (const auto& entry: overlappedChunks)
+    {
+        const auto overlappedId = entry.first;
+        const auto& chunks = entry.second;
+
+        result[overlappedId] = toTimePeriodList(chunks);
+    }
+
+    return result;
+}
+
 std::chrono::milliseconds totalDuration(
     const QnTimePeriodList& timePeriods,
     const std::chrono::milliseconds& minDuration)
@@ -40,6 +56,28 @@ std::chrono::milliseconds totalDuration(
     }
 
     return std::chrono::milliseconds(result);
+}
+
+std::chrono::milliseconds totalDuration(
+    const OverlappedTimePeriods& overlappedTimeline,
+    const std::chrono::milliseconds& minDuration)
+{
+    std::vector<QnTimePeriodList> periodsToMerge;
+    for (const auto& entry: overlappedTimeline)
+        periodsToMerge.push_back(entry.second);
+
+    const auto mergedPeriods = QnTimePeriodList::mergeTimePeriods(periodsToMerge);
+    return totalDuration(mergedPeriods, minDuration);
+}
+
+QnTimePeriodList mergeOverlappedChunks(const nx::core::resource::OverlappedRemoteChunks& chunks)
+{
+    std::vector<QnTimePeriodList> periodsToMerge;
+    for (const auto& entry: chunks)
+        periodsToMerge.push_back(toTimePeriodList(entry.second));
+
+    return QnTimePeriodList::mergeTimePeriods(periodsToMerge);
+
 }
 
 } // namespace nx

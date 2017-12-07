@@ -8,6 +8,7 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 
@@ -22,6 +23,7 @@
 #include "resource_metadata_context.h"
 
 class QnMediaServerModule;
+class QnCompressedVideoData;
 
 namespace nx {
 namespace mediaserver {
@@ -89,7 +91,10 @@ private:
             &success);
 
         if (!success)
+        {
+            NX_ERROR(this) << "Unable to deserialize plugin manifest:" << manifestString;
             return boost::none;
+        }
 
         return deserialized;
     }
@@ -104,6 +109,8 @@ private:
     bool resourceInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::ResourceInfo* outResourceInfo) const;
+
+    void putVideoData(const QnUuid& id, const QnCompressedVideoData* data);
 private:
     ResourceMetadataContextMap m_contexts;
     QnMediaServerModule* m_serverModule;

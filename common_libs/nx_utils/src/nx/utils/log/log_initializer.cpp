@@ -68,12 +68,18 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
     const auto logger = mainLogger();
     isInitializedGlobally = true;
 
+    bool isLogLevelSpecified = false;
     if (const auto value = arguments.get("log-level", "ll"))
     {
         LevelSettings level;
         level.parse(*value);
         logger->setDefaultLevel(level.primary);
         logger->setLevelFilters(level.filters);
+        isLogLevelSpecified = true;
+    }
+    else
+    {
+        logger->setDefaultLevel(Level::none);
     }
     else
     {
@@ -88,6 +94,9 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         fileSettings.count = 5;
 
         logger->setWriter(std::make_unique<File>(fileSettings));
+
+        if (!isLogLevelSpecified)
+            logger->setDefaultLevel(kDefaultLevel);
     }
 }
 

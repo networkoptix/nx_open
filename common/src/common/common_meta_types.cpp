@@ -11,6 +11,7 @@
 #include <utils/common/optional.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/math/space_mapper.h>
+#include <nx/streaming/media_data_packet.h>
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
@@ -383,6 +384,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnChannelMapping>>();
     qRegisterMetaType<QnResourceChannelMapping>();
     qRegisterMetaType<QList<QnResourceChannelMapping>>();
+
+    qRegisterMetaType<QnAbstractCompressedMetadataPtr>();
 
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();

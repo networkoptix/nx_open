@@ -75,9 +75,9 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
     updateCameraParams();
 
-    if (needMetaData())
+    if (needMetadata())
     {
-        const QnAbstractMediaDataPtr& metadata = getMetaData();
+        const QnAbstractMediaDataPtr& metadata = getMetadata();
         if (metadata)
             return metadata;
     }
