@@ -1487,7 +1487,7 @@ static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType event
         socket->isSendInProgress = false;
     if (eventType == aio::etRead || eventType == aio::etNone)
         socket->isRecvInProgress = false;
-    
+
     if (socket->asyncSslHelper)
         socket->asyncSslHelper->clear();
 }
@@ -1560,7 +1560,7 @@ bool SslSocket::shutdown()
             if (auto promisePtr = d->syncRecvPromise.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
-            NX_LOGX("Socket is shutdown", cl_logDEBUG1);
+            NX_LOGX("Socket is shutdown", cl_logDEBUG2);
             promise.set_value();
         });
 
