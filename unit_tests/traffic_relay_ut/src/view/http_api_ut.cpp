@@ -301,7 +301,7 @@ private:
 
         statistics.relaying.connectionsAcceptedPerMinute =
             nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionsCount = nx::utils::random::number<>(1, 20);
+        statistics.relaying.connectionCount = nx::utils::random::number<>(1, 20);
         statistics.relaying.connectionsAveragePerServerCount = nx::utils::random::number<>(1, 20);
         statistics.relaying.listeningServerCount = nx::utils::random::number<>(1, 20);
 
