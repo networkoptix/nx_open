@@ -3,8 +3,10 @@
 QnAbstractCompressedMetadataPtr MetadataMultiplexer::getMotionData(qint64 timeUsec)
 {
     ReaderContext* selectedReaderContext = nullptr;
-    for (auto& readerContext: m_readers)
+    for (auto& readerIdAndContext: m_readers)
     {
+        auto& readerContext = readerIdAndContext.second;
+
         if (!readerContext.packet)
             readerContext.packet = readerContext.reader->getMotionData(timeUsec);
 
@@ -25,8 +27,22 @@ QnAbstractCompressedMetadataPtr MetadataMultiplexer::getMotionData(qint64 timeUs
     return result;
 }
 
-void MetadataMultiplexer::add(QnAbstractMotionArchiveConnectionPtr metadataReader)
+void MetadataMultiplexer::add(
+    int id,
+    QnAbstractMotionArchiveConnectionPtr metadataReader)
 {
-    m_readers.emplace_back(ReaderContext());
-    m_readers.back().reader = std::move(metadataReader);
+    ReaderContext context;
+    context.reader = std::move(metadataReader);
+    m_readers[id] = std::move(context);
+}
+
+QnAbstractMotionArchiveConnectionPtr MetadataMultiplexer::readerById(int id)
+{
+    auto it = m_readers.find(id);
+    return it == m_readers.end() ? nullptr : it->second.reader;
+}
+
+void MetadataMultiplexer::removeById(int id)
+{
+    m_readers.erase(id);
 }
