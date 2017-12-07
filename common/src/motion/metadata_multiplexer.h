@@ -21,6 +21,10 @@ public:
      * NOTE: If id already taken, object is replaced.
      */
     void add(int id, QnAbstractMotionArchiveConnectionPtr metadataReader);
+    /**
+     * Uses any unused id.
+     */
+    void add(QnAbstractMotionArchiveConnectionPtr metadataReader);
     QnAbstractMotionArchiveConnectionPtr readerById(int id);
     void removeById(int id);
 

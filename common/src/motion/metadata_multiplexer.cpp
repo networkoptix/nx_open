@@ -36,6 +36,13 @@ void MetadataMultiplexer::add(
     m_readers[id] = std::move(context);
 }
 
+void MetadataMultiplexer::add(
+    QnAbstractMotionArchiveConnectionPtr metadataReader)
+{
+    const int id = m_readers.empty() ? 0 : (m_readers.rbegin()->first + 1);
+    add(id, metadataReader);
+}
+
 QnAbstractMotionArchiveConnectionPtr MetadataMultiplexer::readerById(int id)
 {
     auto it = m_readers.find(id);
