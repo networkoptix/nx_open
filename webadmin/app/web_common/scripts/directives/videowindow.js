@@ -31,7 +31,8 @@ angular.module('nxCommon')
                 vgSrc:"=",
                 player:"=",
                 activeFormat:"=",
-                rotation: "="
+                rotation: "=",
+                playerErrorHandler: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
@@ -344,7 +345,7 @@ angular.module('nxCommon')
                     $timeout(function(){
                         if( crashCount < Config.webclient.maxCrashCount ){
                             crashCount += 1;
-                            srcChanged();
+                            scope.playerErrorHandler();
                         }
                         else{
                             crashCount = 0;

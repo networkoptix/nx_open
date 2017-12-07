@@ -290,6 +290,11 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
+        //On player error update source to cause player to restart
+        $scope.playerErrorHandler = function(){
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+        };
+
         $scope.selectFormat = function(format){
             $scope.activeFormat = format;
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);

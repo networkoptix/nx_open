@@ -102,6 +102,7 @@
                                                             (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)" rotation="rotation"
+                                             player-error-handler="playerErrorHandler"
                                              vg-src="activeVideoSource" player="player" active-format="activeFormat">
                                 </videowindow>
                             </div>
