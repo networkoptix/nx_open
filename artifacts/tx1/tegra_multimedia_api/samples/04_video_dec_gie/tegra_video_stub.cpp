@@ -80,15 +80,15 @@ public:
         }
         *outRectsCount = 2;
 
-        outRects[0].x = 10;
-        outRects[0].y = 20;
-        outRects[0].width = 100;
-        outRects[0].height = 50;
+        outRects[0].x = 0.1f;
+        outRects[0].y = 0.2f;
+        outRects[0].width = 0.7f;
+        outRects[0].height = 0.5f;
 
-        outRects[1].x = 20;
-        outRects[1].y = 10;
-        outRects[1].width = 50;
-        outRects[1].height = 100;
+        outRects[1].x = 0.2f;
+        outRects[1].y = 0.1f;
+        outRects[1].width = 0.4f;
+        outRects[1].height = 0.8f;
 
         return true;
     }
