@@ -753,9 +753,10 @@ gieThread(void *arg)
         buf_num = 0;
         queue<vector<cv::Rect>> rectList_queue;
 
+        NX_TIME_BEGIN(Inference);
         ctx->gie_ctx->doInference(
             rectList_queue);
-
+        NX_TIME_END(Inference);
 
         {
             pthread_mutex_lock(&ctx->gie_lock);
