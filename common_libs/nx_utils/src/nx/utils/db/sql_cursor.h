@@ -28,7 +28,10 @@ public:
     {
     }
 
-    virtual ~Cursor() = default;
+    virtual ~Cursor()
+    {
+        m_asyncSqlQueryExecutor->removeCursor(m_id);
+    }
 
     boost::optional<Record> next()
     {
