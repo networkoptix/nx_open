@@ -14,7 +14,7 @@ void* CommonDetectedObject::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == IID_DetectedObject)
     {
         addRef();
-        return static_cast<AbstarctDetectedObject*>(this);
+        return static_cast<AbstractDetectedObject*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -25,9 +25,9 @@ void* CommonDetectedObject::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nxpl::NX_GUID CommonDetectedObject::eventTypeId() const
+nxpl::NX_GUID CommonDetectedObject::typeId() const
 {
-    return m_eventTypeId;
+    return m_typeId;
 }
 
 float CommonDetectedObject::confidence() const
@@ -65,9 +65,9 @@ const char* CommonDetectedObject::auxilaryData() const
     return m_auxilaryData.c_str();
 }
 
-void CommonDetectedObject::setEventTypeId(const nxpl::NX_GUID& eventTypeId)
+void CommonDetectedObject::setTypeId(const nxpl::NX_GUID& typeId)
 {
-    m_eventTypeId = eventTypeId;
+    m_typeId = typeId;
 }
 
 void CommonDetectedObject::setConfidence(float confidence)

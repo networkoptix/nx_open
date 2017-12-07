@@ -1,11 +1,13 @@
 import logging
 import os
 import time
+import warnings
 from datetime import datetime, timedelta
 
 import pytest
 import pytz
 import requests
+import urllib3.exceptions
 from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
@@ -223,3 +225,14 @@ def test_non_existent_api_endpoints(server, path):
     auth = HTTPDigestAuth(server.user, server.password)
     response = requests.get(server.rest_api_url.rstrip('/') + path, auth=auth, allow_redirects=False)
     assert response.status_code == 404, "Expected 404 but got %r"
+
+
+def test_https_verification(server_factory):
+    server = server_factory('server', http_schema='https')
+    url = server.rest_api_url.rstrip('/') + '/api/ping'
+    with warnings.catch_warnings(record=True) as warning_list:
+        response = requests.get(url, verify=server.rest_api.ca_cert)
+    assert response.status_code == 200
+    for warning in warning_list:
+        log.warning("Warning collected: %s.", warning)
+        assert not isinstance(warning, urllib3.exceptions.InsecureRequestWarning)

@@ -26,10 +26,10 @@ public:
         QnMediaServerModule* serverModule,
         const QnSecurityCamResourcePtr& resource);
 
+    virtual QnUuid id() const override;
     virtual void setDoneHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancel() override;
     virtual bool execute() override;
-    virtual QnUuid id() const override;
 
 protected:
     virtual bool needToReportProgress() const;
@@ -38,24 +38,33 @@ protected:
         const QnTimePeriod& timePeriod,
         const nx::core::resource::RemoteArchiveChunk& chunk);
 
-    virtual void createArchiveReaderThreadUnsafe(const QnTimePeriod& timePeriod) = 0;
+    virtual void createArchiveReaderThreadUnsafe(
+        const QnTimePeriod& timePeriod,
+        const nx::core::resource::RemoteArchiveChunk& chunk) = 0;
 
     virtual void createStreamRecorderThreadUnsafe(const QnTimePeriod& timePeriod);
 
     virtual boost::optional<nx::core::resource::RemoteArchiveChunk> remoteArchiveChunkByTimePeriod(
-        const QnTimePeriod& timePeriod) const;
+        const QnTimePeriod& timePeriod,
+        nx::core::resource::OverlappedId overlappedId) const;
 
 private:
     bool synchronizeArchive();
+    bool synchronizeOverlappedTimeline(const nx::core::resource::OverlappedId& overlappedId);
     bool saveMotion(const QnConstMetaDataV1Ptr& motion);
-    bool fetchChunks(std::vector<nx::core::resource::RemoteArchiveChunk>* outChunks);
-    bool writeAllTimePeriods(const QnTimePeriodList& timePeriods);
+    bool fetchChunks(nx::core::resource::OverlappedRemoteChunks* outChunks);
+    bool writeAllTimePeriods(
+        const QnTimePeriodList& timePeriods,
+        nx::core::resource::OverlappedId overlappedId);
+
     bool writeTimePeriodToArchive(
         const QnTimePeriod& timePeriod,
         const nx::core::resource::RemoteArchiveChunk& chunk);
 
     void onFileHasBeenWritten(const std::chrono::milliseconds& fileDuration);
     void onEndOfRecording();
+
+    std::chrono::milliseconds calculateDurationOfMediaToImport() const;
 
 protected:
     mutable QnMutex m_mutex;
@@ -69,7 +78,7 @@ protected:
     std::chrono::milliseconds m_importedDuration{0};
     double m_progress = 0;
 
-    std::vector<nx::core::resource::RemoteArchiveChunk> m_chunks;
+    nx::core::resource::OverlappedRemoteChunks m_chunks;
 
     std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
     std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;

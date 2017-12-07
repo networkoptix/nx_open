@@ -529,6 +529,12 @@ protected:
         std::sort(m_initialData.begin(), m_initialData.end(), std::less<Company>());
     }
 
+    void givenCursor()
+    {
+        whenRequestCursor();
+        thenCursorIsProvided();
+    }
+
     void whenRequestCursor()
     {
         using namespace std::placeholders;
@@ -545,6 +551,11 @@ protected:
         const auto cursorsCount = nx::utils::random::number<int>(5,11);
         for (int i = 0; i < cursorsCount; ++i)
             whenRequestCursor();
+    }
+
+    void whenDeleteCursor()
+    {
+        m_cursors.clear();
     }
 
     void thenCursorIsProvided()
@@ -575,6 +586,12 @@ protected:
                 std::less<Company>());
             ASSERT_EQ(m_initialData, cursorContext.recordsRead);
         }
+    }
+
+    void thenCursorQueryIsDeleted()
+    {
+        while (asyncSqlQueryExecutor().openCursorCount() > 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
 private:
@@ -638,6 +655,13 @@ TEST_F(DbAsyncSqlQueryExecutorCursor, multiple_cursors)
 
     thenAllCursorsAreProvided();
     andDataCanBeReadUsingCursor();
+}
+
+TEST_F(DbAsyncSqlQueryExecutorCursor, cursor_query_cleaned_up_when_after_early_cursor_deletion)
+{
+    givenCursor();
+    whenDeleteCursor();
+    thenCursorQueryIsDeleted();
 }
 
 // TEST_F(DbAsyncSqlQueryExecutorCursor, many_cursors_do_not_block_queries)

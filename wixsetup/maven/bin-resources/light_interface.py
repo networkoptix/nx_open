@@ -86,7 +86,7 @@ import environment
 wix_pdb = 'wixsetup.wixpdb'
 light_cultures = '-cultures:{}'.format(environment.installer_cultures)
 light_locale = 'OptixTheme_{}.wxl'.format(environment.installer_language)
-light_cache_path = 'cab' #.format(environment.bin_source_dir)
+light_cache_path = 'cab'
 
 def light_executable():
     return os.path.join(environment.wix_directory, 'light.exe')
@@ -96,7 +96,7 @@ def common_light_options():
         '-sice:ICE60', '-sice:ICE64', '-sice:ICE69', '-sice:ICE91']
 
 def light_command(folder, msi, suffix, extensions):
-    command = ['light',
+    command = [light_executable(),
         light_cultures,
         '-cc', light_cache_path, '-reusecab',
         '-loc', light_locale,

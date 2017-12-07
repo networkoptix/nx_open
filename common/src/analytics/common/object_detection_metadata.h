@@ -3,10 +3,9 @@
 #include <set>
 #include <chrono>
 #include <memory>
+#include <ostream>
 
 #include <QtCore/QRect>
-
-#include <analytics/common/abstract_metadata.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/streaming/media_data_packet_fwd.h>
@@ -77,6 +76,7 @@ bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds s
 QString toString(const DetectionMetadataPacket&);
 QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
 DetectionMetadataPacketPtr fromMetadataPacket(const QnCompressedMetadataPtr&);
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
 
 } // namespace metadata
 } // namespace common

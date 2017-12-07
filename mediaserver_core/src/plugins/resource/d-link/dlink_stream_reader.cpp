@@ -185,8 +185,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr();
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     if (m_profile.codec.contains("264"))
         return m_rtpReader.getNextData();

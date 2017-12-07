@@ -1,4 +1,6 @@
-﻿#include "plugin.h"
+﻿#if defined(ENABLED_HANWHA)
+
+#include "plugin.h"
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -318,3 +320,6 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 }
 
 } // extern "C"
+
+#endif // defined(ENABLED_HANWHA)
+

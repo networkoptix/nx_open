@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 extern "C"
 {
     #include <libswscale/swscale.h>
@@ -100,8 +102,8 @@ private:
     mutable QnMutex m_mtx;
     QMap<AVCodecID, QnAbstractVideoDecoder*> m_decoder;
 
-    QSet<QnAbstractRenderer*> m_newList;
-    QSet<QnAbstractRenderer*> m_renderList;
+    std::set<QnAbstractRenderer*> m_newList;
+    std::set<QnAbstractRenderer*> m_renderList;
     bool m_renderListModified;
 
     /**
@@ -159,7 +161,7 @@ private:
 
     QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
     QnFrameScaler::DownscaleFactor determineScaleFactor(
-        QSet<QnAbstractRenderer*> renderList,
+        std::set<QnAbstractRenderer*> renderList,
         int channelNumber,
         int srcWidth,
         int srcHeight,

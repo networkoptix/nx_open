@@ -10,6 +10,7 @@ import pytest
 from netaddr import IPAddress
 
 from test_utils.artifact import ArtifactFactory
+from test_utils.ca import CA
 from test_utils.camera import SampleMediaFile, CameraFactory
 from test_utils.cloud_host import CloudAccountFactory, resolve_cloud_host_from_registry
 from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
@@ -243,6 +244,7 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
         run_options.mediaserver_dist_path,
         customization_company_name,
         run_options.tests_config.physical_installation_host_list,
+        CA(os.path.join(run_options.work_dir, 'ca')),
         )
     if run_options.reinstall:
         pic.reset_all_installations()
@@ -265,7 +267,8 @@ def server_factory(run_options, init_logging, artifact_factory, customization_co
 def lightweight_servers_factory(run_options, artifact_factory, physical_installation_ctl):
     test_binary_path = os.path.join(run_options.bin_dir, LWS_BINARY_NAME)
     assert os.path.isfile(test_binary_path), 'Test binary for lightweight servers is missing at %s' % test_binary_path
-    lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path)
+    ca = CA(os.path.join(run_options.work_dir, 'ca'))
+    lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path, ca)
     yield lwsf
     lwsf.release()
 

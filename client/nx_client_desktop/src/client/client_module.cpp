@@ -454,6 +454,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 void QnClientModule::initLog(const QnStartupParameters& startupParams)
 {
     auto logLevel = startupParams.logLevel;
+    auto logFile = startupParams.logFile;
     auto ec2TranLogLevel = startupParams.ec2TranLogLevel;
 
     QString logFileNameSuffix;
@@ -466,7 +467,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     }
     else if (startupParams.selfUpdateMode)
     {
-        // we hope self-updater will run only once per time and will not overflow log-file
+        // we hope self-updater will run only once per time and will not overflow log file
         // qnClientInstanceManager is not initialized in self-update mode
         logFileNameSuffix = lit("self_update");
     }
@@ -494,7 +495,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logSettings,
         qApp->applicationName(),
         qApp->applicationFilePath(),
-        lit("log_file") + logFileNameSuffix);
+        !logFile.isEmpty() ? logFile : (lit("log_file") + logFileNameSuffix));
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))

@@ -62,9 +62,11 @@ if(enableAllVendors)
         -DENABLE_ISD
         -DENABLE_PULSE_CAMERA
         -DENABLE_FLIR
-        -DENABLE_HANWHA
         -DENABLE_ADVANTECH
     )
+    if(customization STREQUAL "hanwha")
+        add_definitions(-DENABLE_HANWHA)
+    endif()
 endif()
 
 if(WINDOWS)

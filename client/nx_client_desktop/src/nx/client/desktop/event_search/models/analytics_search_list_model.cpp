@@ -5,6 +5,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 
+#include <nx/vms/event/analytics_helper.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -47,10 +49,12 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
     const auto object = d->object(index.row());
     NX_ASSERT(!object.track.empty());
 
+    static const auto kDefaultLocale = QString();
     switch (role)
     {
         case Qt::DisplayRole:
-            return tr("Object on camera");
+            return vms::event::AnalyticsHelper::objectName(d->camera(),
+                object.objectTypeId, kDefaultLocale);
 
         case Qt::DecorationRole:
             return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));

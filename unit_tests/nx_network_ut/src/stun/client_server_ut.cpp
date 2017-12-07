@@ -186,7 +186,7 @@ TEST_F(StunClientServerTest, Connectivity)
 
     while (server->connectionCount() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    ASSERT_EQ(1U, server->connectionCount()) << 
+    ASSERT_EQ(1U, server->connectionCount()) <<
         "Total connections accepted: " << server->totalConnectionsAccepted();
 
     ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr)) <<
@@ -209,7 +209,7 @@ TEST_F(StunClientServerTest, RequestResponse)
         client->sendRequest(std::move(request), waiter.pusher());
 
         const auto result = waiter.pop();
-        const auto timePassed = 
+        const auto timePassed =
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - t1);
 
@@ -256,7 +256,8 @@ TEST_F(StunClientServerTest, Indications)
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
 
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(1U, server->connectionCount());
+    while (server->connectionCount() < 1)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
     EXPECT_EQ(sendIndicationSync(0xAB), SystemError::noError);
     EXPECT_EQ(sendIndicationSync(0xCD), SystemError::noError);

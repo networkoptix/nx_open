@@ -4,11 +4,17 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics lib for Tx1 and Tx2.
+
+#include "plugin.h"
+
+#include <nx/mediaserver_plugins/metadata/tegra_video/naive_object_tracker.h>
+#include <nx/mediaserver_plugins/metadata/tegra_video/naive_detection_smoother.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -19,8 +25,10 @@ class Manager:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
 {
 public:
-    Manager();
+    Manager(Plugin* plugin);
     virtual ~Manager();
+
+    virtual Plugin* plugin() override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -39,12 +47,34 @@ public:
 private:
     nx::sdk::Error stopFetchingMetadataThreadUnsafe();
 
-    nx::sdk::metadata::AbstractMetadataPacket* pushFrameAndGetRects(
-        nx::sdk::metadata::AbstractDataPacket* mediaPacket);
+    bool makeMetadataPacketsFromRects(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool makeMetadataPacketsFromRectsPostprocNone(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool makeMetadataPacketsFromRectsPostprocPed(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool makeMetadataPacketsFromRectsPostprocCar(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        const std::vector<TegraVideo::Rect>& rects,
+        int64_t ptsUs) const;
+
+    bool pushFrameAndGetMetadataPackets(
+        std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
+        nx::sdk::metadata::AbstractDataPacket* mediaPacket) const;
 
     int64_t usSinceEpoch() const;
 
 private:
+    Plugin* const m_plugin;
     mutable std::mutex m_mutex;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
     int m_counter = 0;
@@ -53,6 +83,8 @@ private:
     nxpl::NX_GUID m_objectTypeId;
 
     std::unique_ptr<TegraVideo> m_tegraVideo;
+
+    mutable NaiveObjectTracker m_tracker;
 };
 
 } // namespace tegra_video

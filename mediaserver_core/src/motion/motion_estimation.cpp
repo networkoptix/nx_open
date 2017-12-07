@@ -1013,7 +1013,7 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
 }
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
+bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& videoData)
 {
     QnMutexLocker lock( &m_mutex );
 

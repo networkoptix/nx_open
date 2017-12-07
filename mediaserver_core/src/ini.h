@@ -8,6 +8,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, verboseAutoRequestForwarder, "Set log level to Verbose for AutoRequestForwarder.");
     NX_INI_FLAG(0, ignoreApiModuleInformationInAutoRequestForwarder, "");
+
+    NX_INI_FLAG(1, enableMetadataProcessing, "Enable processing data from metadata plugins.");
+    NX_INI_FLAG(0, analyzeKeyFramesOnly, "Use only key frames for metadata plugins.");
 };
 
 inline Ini& ini()

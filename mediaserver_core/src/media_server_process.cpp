@@ -1,5 +1,7 @@
 #include "media_server_process.h"
 
+#include <plugins/plugin_internal_tools.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -2064,6 +2066,8 @@ void MediaServerProcess::serviceModeInit()
 {
     const auto settings = qnServerModule->roSettings();
     const auto binaryPath = QFile::decodeName(m_argv[0]);
+
+    // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
     nx::utils::log::Settings logSettings;
     logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();

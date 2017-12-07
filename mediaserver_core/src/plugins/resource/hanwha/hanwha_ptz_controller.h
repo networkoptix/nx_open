@@ -11,7 +11,7 @@
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
-    
+
 class HanwhaPtzController: public QnBasicPtzController
 {
     Q_OBJECT

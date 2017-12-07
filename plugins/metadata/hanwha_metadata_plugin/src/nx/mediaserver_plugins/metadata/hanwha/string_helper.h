@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <unordered_map>
 
 #include <QtCore/QString>
@@ -47,6 +49,8 @@ private:
 };
 
 } // namespace hanwha
-} // namespace nx
-} // namespace mediaserver_plugins
 } // namespace metadata
+} // namespace mediaserver_plugins
+} // namespace nx
+
+#endif // defined(ENABLED_HANWHA)
