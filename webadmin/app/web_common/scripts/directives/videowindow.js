@@ -31,8 +31,7 @@ angular.module('nxCommon')
                 vgSrc:"=",
                 player:"=",
                 activeFormat:"=",
-                rotation: "=",
-                playing: "="
+                rotation: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
@@ -339,9 +338,10 @@ angular.module('nxCommon')
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 
                 function playerErrorHandler(error){
+                    console.error(error);
+                    scope.videoFlags.errorLoading = true;
+                    scope.loading = false; // Some error happended - stop loading
                     $timeout(function(){
-                        scope.videoFlags.errorLoading = true;
-                        scope.loading = false; // Some error happended - stop loading
                         if( crashCount < Config.webclient.maxCrashCount ){
                             crashCount += 1;
                             srcChanged();
@@ -351,7 +351,6 @@ angular.module('nxCommon')
                         }
                     });
                     resetPlayer();
-                    console.error(error);
                 }
 
                 function initNewPlayer(){
