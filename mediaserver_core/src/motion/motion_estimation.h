@@ -32,7 +32,7 @@ public:
     /*!
         \return true if successfully decoded and analyzed \a frame
     */
-    bool analizeFrame(const QnCompressedVideoDataPtr& frame);
+    bool analyzeFrame(const QnCompressedVideoDataPtr& frame);
 #endif
     QnAbstractCompressedMetadataPtr getMotion();
     bool existsMetadata() const;

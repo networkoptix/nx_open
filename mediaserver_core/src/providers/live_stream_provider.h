@@ -1,13 +1,10 @@
 #pragma once
-
-#ifdef ENABLE_DATA_PROVIDERS
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <atomic>
 #include <map>
-#include <queue>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QObject>
 
 #include <motion/motion_estimation.h>
 
@@ -15,20 +12,15 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 
-#include <nx/utils/safe_direct_connection.h>
-
 #include <core/resource/resource_fwd.h>
-#include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
-#include <utils/common/threadqueue.h>
 
-static const int  META_DATA_DURATION_MS = 300;
+static const int META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
-class QnLiveStreamProvider:
-    public QnAbstractMediaStreamDataProvider
+class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
 public:
     class MetadataDataReceptor;
@@ -41,18 +33,16 @@ public:
     int encoderIndex() const;
 
     void setParams(const QnLiveStreamParams& params);
-    //void setSecondaryQuality(Qn::SecondStreamQuality  quality);
-    //virtual void setQuality(Qn::StreamQuality q);
-    //virtual void setFps(float f);
+
     virtual void setCameraControlDisabled(bool value);
 
-    // for live providers only
+    // For live providers only.
     bool isMaxFps() const;
 
     void onPrimaryParamsChanged(const QnLiveStreamParams& params);
     QnLiveStreamParams getLiveParams();
 
-    bool needMetaData();
+    bool needMetadata();
 
     void onStreamReopen();
 
@@ -80,25 +70,28 @@ public:
     virtual void pleaseReopenStream() = 0;
 
 protected:
-    QnAbstractCompressedMetadataPtr getMetaData();
+    QnAbstractCompressedMetadataPtr getMetadata();
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
-    virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
+    virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
 
 protected:
-    mutable QnMutex m_livemutex;
+    mutable QnMutex m_liveMutex;
 
 private:
     float getDefaultFps() const;
-    bool needAnalyzeStream(Qn::ConnectionRole role);
+
+    bool needAnalyzeMotion(Qn::ConnectionRole role);
 
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
+
     void extractMediaStreamParams(
         const QnCompressedVideoDataPtr& videoData,
         QSize* const newResolution,
         std::map<QString, QString>* const customStreamParams = nullptr);
 
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
+
     void saveBitrateIfNeeded(
         const QnCompressedVideoDataPtr& videoData,
         const QnLiveStreamParams& liveParams,
@@ -107,8 +100,8 @@ private:
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
 
 private:
-    // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened
-    // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)
+    // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
+    // TODO: Find the way to keep it in sync besides pleaseReopenStream() call, which causes delay.
     QnLiveStreamParams m_newLiveParams;
 
     bool m_prevCameraControlDisabled;
@@ -121,9 +114,9 @@ private:
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
-#endif
+    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+        QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+    #endif
 
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
@@ -143,4 +136,4 @@ private:
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
 
-#endif // ENABLE_DATA_PROVIDERS
+#endif // defined(ENABLE_DATA_PROVIDERS)
