@@ -70,6 +70,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     sortModel->setSourceModel(m_model);
     sortModel->setFilterRole(Qn::ResourceSearchStringRole);
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    sortModel->setTriggeringRoles({Qn::TimestampRole});
 
     connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
         sortModel, &EventSortFilterModel::setFilterWildcard);
