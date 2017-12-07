@@ -9,7 +9,6 @@
 #include <nx/utils/log/assert.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 
