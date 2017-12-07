@@ -7,9 +7,9 @@
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
@@ -109,6 +109,12 @@ Error Manager::putData(AbstractDataPacket* dataPacket)
         return Error::unknownError;
     }
 
+    if (!metadataPackets.empty())
+    {
+        NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
+            << " metadata packet(s)";
+    }
+
     for (auto& metadataPacket: metadataPackets)
     {
         m_handler->handleMetadata(Error::noError, metadataPacket);
@@ -196,10 +202,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
     for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
-        // TODO: #mike: Make new GUID for every object.
-        static const nxpl::NX_GUID objectId =
-            {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
+        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
         detectedObject->setId(objectId);
         detectedObject->setTypeId(m_objectTypeId);
 
@@ -207,6 +211,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
         objectPacket->addItem(detectedObject);
     }
     metadataPackets->push_back(objectPacket);
+
+    NX_OUTPUT << __func__ << "(): Created objects packet with " << rects.size() << " rects";
     return true;
 }
 
@@ -226,10 +232,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
     for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
-        // TODO: #mike: Make new GUID for every object.
-        static const nxpl::NX_GUID objectId =
-            {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
+        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
         detectedObject->setId(objectId);
         detectedObject->setTypeId(m_objectTypeId);
 
@@ -255,7 +259,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
 
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
 
-    /*for (const auto& rect: rects)
+#if 0 //< Stub implementation.
+    for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
         // TODO: #mike: Make new GUID for every object.
@@ -268,7 +273,9 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
         detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
         objectPacket->addItem(detectedObject);
     }
-    metadataPackets->push_back(objectPacket);*/
+    metadataPackets->push_back(objectPacket);
+#endif // 0
+
     return true;
 }
 
