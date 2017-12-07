@@ -67,6 +67,7 @@ using QnMetaDataLightVector = std::vector<QnMetaDataV1Light, QnAlignedAllocator<
 
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
+Q_DECLARE_METATYPE(QnAbstractCompressedMetadataPtr);
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MediaQuality), (lexical))
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
