@@ -104,7 +104,8 @@ void CursorCreator::executeCursor(QSqlDatabase* const connection)
 {
     m_cursorHandler->initialize(connection); //< Throws on failure.
 
-    cursorContextPool()->add(m_cursorHandler->id(), std::move(m_cursorHandler));
+    const auto id = m_cursorHandler->id();
+    cursorContextPool()->add(id, std::move(m_cursorHandler));
 }
 
 //-------------------------------------------------------------------------------------------------
