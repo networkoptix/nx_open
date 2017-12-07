@@ -13,6 +13,9 @@
 
 #include "plugin.h"
 
+#include <nx/mediaserver_plugins/metadata/tegra_video/naive_object_tracker.h>
+#include <nx/mediaserver_plugins/metadata/tegra_video/naive_detection_smoother.h>
+
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
@@ -80,6 +83,8 @@ private:
     nxpl::NX_GUID m_objectTypeId;
 
     std::unique_ptr<TegraVideo> m_tegraVideo;
+
+    mutable NaiveObjectTracker m_tracker;
 };
 
 } // namespace tegra_video

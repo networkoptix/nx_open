@@ -22,11 +22,9 @@ namespace tegra_video {
 
 namespace {
 
-static const nxpl::NX_GUID kLineCrossingEventGuid =
-    {{0x7E, 0x94, 0xCE, 0x15, 0x3B, 0x69, 0x47, 0x19, 0x8D, 0xFD, 0xAC, 0x1B, 0x76, 0xE5, 0xD8, 0xF4}};
-
-static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
-    {{0xB0, 0xE6, 0x40, 0x44, 0xFF, 0xA3, 0x4B, 0x7F, 0x80, 0x7A, 0x06, 0x0C, 0x1F, 0xE5, 0xA0, 0x4C}};
+// TODO: #dmishin get rid of this. Pass object type id from TegraVideo.
+const QnUuid kCarUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
+const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
 
 } // namespace
 
@@ -34,8 +32,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
 Manager::Manager(Plugin* plugin):
-    m_plugin(plugin),
-    m_eventTypeId(kLineCrossingEventGuid)
+    m_plugin(plugin)
 {
     NX_PRINT << __func__ << "(\"" << plugin->name() << "\") BEGIN";
 
@@ -54,6 +51,11 @@ Manager::Manager(Plugin* plugin):
         NX_PRINT << "ERROR: TegraVideo::start() failed.";
 
     NX_OUTPUT << __func__ << "() END -> " << this;
+
+    if (strcmp(ini().postprocType, "ped") == 0)
+        m_tracker.setObjectTypeId(kHumanUuid);
+    else if (strcmp(ini().postprocType, "car") == 0)
+        m_tracker.setObjectTypeId(kCarUuid);
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -130,6 +132,14 @@ const char* Manager::capabilitiesManifest(Error* error) const
 
     return R"manifest(
         {
+            "supportedEventTypes": [
+                "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
+                "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
+            ],
+            "supportedObjectTypes": [
+                "{58AE392F-8516-4B27-AEE1-311139B5A37A}",
+                "{3778A599-FB60-47E9-8EC6-A9949E8E0AE7}"
+            ]
         }
     )manifest";
 }
@@ -243,7 +253,9 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
     objectPacket->setTimestampUsec(ptsUs);
     objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
 
-    for (const auto& rect: rects)
+    m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
+
+    /*for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
         // TODO: #mike: Make new GUID for every object.
@@ -256,7 +268,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
         detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
         objectPacket->addItem(detectedObject);
     }
-    metadataPackets->push_back(objectPacket);
+    metadataPackets->push_back(objectPacket);*/
     return true;
 }
 

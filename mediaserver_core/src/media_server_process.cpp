@@ -1,5 +1,7 @@
 #include "media_server_process.h"
 
+#include <plugins/plugin_internal_tools.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -3126,6 +3128,14 @@ public:
 protected:
     virtual int executeApplication() override
     {
+        auto id = QnUuid::fromStringSafe(lit("{01020304-0506-0708-090a-0b0c0d0e0f01}"));
+        qDebug() << "@@@@@@@@@@@@@@@@@@@@@" << id.toByteArray();
+        qDebug() << "@@@@@@@@@@@@@@@@@@@@@" << id.toRfc4122();
+
+        nxpl::NX_GUID guid = nxpt::fromQnUuidToPluginGuid(id);
+
+
+
         m_main.reset(new MediaServerProcess(m_argc, m_argv, true));
 
         const auto cmdParams = m_main->cmdLineArguments();
