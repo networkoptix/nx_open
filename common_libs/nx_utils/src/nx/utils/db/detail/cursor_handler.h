@@ -178,7 +178,7 @@ public:
     }
 
 protected:
-    virtual void executeCursor(QSqlDatabase* const connection) override
+    virtual void executeCursor(QSqlDatabase* const /*connection*/) override
     {
         auto cursorHandler = cursorContextPool()->cursorHander(m_cursorId);
         if (!cursorHandler)
