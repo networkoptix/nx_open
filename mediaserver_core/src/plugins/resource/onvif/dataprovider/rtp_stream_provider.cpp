@@ -38,9 +38,9 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
         return QnAbstractMediaDataPtr(0);
     }
 
-    if (needMetaData())
+    if (needMetadata())
     {
-        const auto metaData = getMetaData();
+        const auto metaData = getMetadata();
         NX_VERBOSE(this, lm("Next data: meta at %1 from %2")
             .args(metaData->timestamp, m_rtpReader.getCurrentStreamUrl()));
         return metaData;

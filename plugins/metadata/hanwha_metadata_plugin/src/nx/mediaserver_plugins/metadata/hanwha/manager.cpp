@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "manager.h"
 
 #include <chrono>
@@ -73,7 +75,7 @@ Error Manager::startFetchingMetadata()
                     << hanwhaEvent.description.toStdString() << "], "
                     << "channel " << m_channel;
 
-                event->setEventTypeId(hanwhaEvent.typeId);
+                event->setTypeId(hanwhaEvent.typeId);
                 event->setCaption(hanwhaEvent.caption.toStdString());
                 event->setDescription(hanwhaEvent.caption.toStdString());
                 event->setIsActive(hanwhaEvent.isActive);
@@ -161,3 +163,5 @@ void Manager::setMonitor(MetadataMonitor* monitor)
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

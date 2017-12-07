@@ -40,15 +40,16 @@ ProxyWorker::ProxyWorker(
         std::bind(&ProxyWorker::onSomeMessageBodyRead, this, _1));
     m_targetHostPipeline->setOnMessageEnd(
         std::bind(&ProxyWorker::onMessageEnd, this));
-    m_targetHostPipeline->startReadingConnection();
 
     m_proxyHost = nx_http::getHeaderValue(translatedRequest.headers, "Host");
+
+    bindToAioThread(m_targetHostPipeline->getAioThread());
 
     nx_http::Message requestMsg(nx_http::MessageType::request);
     *requestMsg.request = std::move(translatedRequest);
     m_targetHostPipeline->sendMessage(std::move(requestMsg));
 
-    bindToAioThread(m_targetHostPipeline->getAioThread());
+    m_targetHostPipeline->startReadingConnection();
 }
 
 void ProxyWorker::bindToAioThread(

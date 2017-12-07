@@ -39,6 +39,7 @@ public:
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize &) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    virtual QnAbstractMotionArchiveConnectionPtr getAnalyticsConnection(int channel) override;
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 

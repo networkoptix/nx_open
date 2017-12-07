@@ -410,8 +410,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     if( !isStreamOpened() )
         return QnAbstractMediaDataPtr(0);
 
-    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetaData() )
-        return getMetaData();
+    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetadata() )
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;

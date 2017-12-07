@@ -61,6 +61,7 @@ public:
             << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
 
         m_hasMetadata = true;
+        m_ptsUs = compressedFrame->ptsUs;
         return true;
     }
 
@@ -69,7 +70,7 @@ public:
     {
         NX_OUTPUT << __func__ << "() -> false";
 
-        *outPtsUs = 0;
+        *outPtsUs = m_ptsUs;
 
         // Produce 2 stub rects.
         if (maxRectsCount < 2)
@@ -80,15 +81,15 @@ public:
         }
         *outRectsCount = 2;
 
-        outRects[0].x = 10;
-        outRects[0].y = 20;
-        outRects[0].width = 100;
-        outRects[0].height = 50;
+        outRects[0].x = 0.1f;
+        outRects[0].y = 0.2f;
+        outRects[0].width = 0.7f;
+        outRects[0].height = 0.5f;
 
-        outRects[1].x = 20;
-        outRects[1].y = 10;
-        outRects[1].width = 50;
-        outRects[1].height = 100;
+        outRects[1].x = 0.2f;
+        outRects[1].y = 0.1f;
+        outRects[1].width = 0.4f;
+        outRects[1].height = 0.8f;
 
         return true;
     }
@@ -99,6 +100,7 @@ public:
     }
 
 private:
+    int64_t m_ptsUs;
     std::string m_id;
     std::string m_modelFile;
     std::string m_deployFile;

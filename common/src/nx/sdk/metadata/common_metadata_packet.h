@@ -50,7 +50,7 @@ class CommonEventsMetadataPacket:
 };
 
 class CommonObjectsMetadataPacket:
-    public CommonMetadataPacketBase<AbstractObjectsMetadataPacket, AbstarctDetectedObject>
+    public CommonMetadataPacketBase<AbstractObjectsMetadataPacket, AbstractDetectedObject>
 {
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 };

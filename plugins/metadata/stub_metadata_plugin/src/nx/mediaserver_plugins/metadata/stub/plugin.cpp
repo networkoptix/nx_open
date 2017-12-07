@@ -1,5 +1,7 @@
 #include "plugin.h"
 
+#include <nx/kit/debug.h>
+
 #include "manager.h"
 
 namespace nx {
@@ -9,6 +11,16 @@ namespace stub {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+
+Plugin::Plugin()
+{
+    NX_PRINT << "Created \"" << name() << "\"";
+}
+
+Plugin::~Plugin()
+{
+    NX_PRINT << "Destroyed \"" << name() << "\"";
+}
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
@@ -70,7 +82,7 @@ AbstractMetadataManager* Plugin::managerForResource(
 {
     *outError = Error::noError;
 
-    auto manager = new Manager();
+    auto manager = new Manager(this);
     manager->addRef();
 
     return manager;

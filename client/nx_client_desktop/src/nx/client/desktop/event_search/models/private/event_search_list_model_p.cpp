@@ -65,8 +65,8 @@ void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& 
     if (m_camera == camera)
         return;
 
-    m_camera = camera;
     clear();
+    m_camera = camera;
 }
 
 vms::event::EventType EventSearchListModel::Private::selectedEventType() const

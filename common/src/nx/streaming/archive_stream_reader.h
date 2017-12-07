@@ -13,6 +13,8 @@ class FrameTypeExtractor;
 #include <nx/utils/thread/wait_condition.h>
 #include <recording/playbackmask_helper.h>
 
+#include "motion/metadata_multiplexer.h"
+
 class QnArchiveStreamReader: public QnAbstractArchiveStreamReader
 {
     Q_OBJECT;
@@ -179,7 +181,7 @@ private:
     double m_prevSpeed;
 
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
-    QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
+    std::shared_ptr<MetadataMultiplexer> m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
     bool m_sendMotion;
     bool m_prevSendMotion;
@@ -199,6 +201,8 @@ private:
     void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);
     std::function<void()> m_endOfPlaybackHandler;
     std::function<void(const QString& errorString)> m_errorHandler;
+
+    void updateMetadataReaders(int channel, bool sendMotion, bool sendAnalytics);
 };
 
 #endif // ARCHIVE_STREAM_READER_H
