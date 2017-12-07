@@ -218,7 +218,7 @@ public:
             std::move(readRecordFunc),
             std::move(completionHandler));
         auto cursorCreator = std::make_unique<detail::CursorCreator>(
-            &m_cursorProcessorContext.front().cursorContextPool,
+            &m_cursorProcessorContext.front()->cursorContextPool,
             std::move(cursorHandler));
         m_cursorTaskQueue.push(std::move(cursorCreator));
     }
@@ -229,11 +229,15 @@ public:
         MoveOnlyFunc<void(DBResult, Record)> completionHandler)
     {
         auto task = std::make_unique<detail::FetchCursorDataExecutor<Record>>(
-            &m_cursorProcessorContext.front().cursorContextPool,
+            &m_cursorProcessorContext.front()->cursorContextPool,
             id,
             std::move(completionHandler));
         m_cursorTaskQueue.push(std::move(task));
     }
+
+    void removeCursor(QnUuid id);
+
+    int openCursorCount() const;
 
 private:
     struct CursorProcessorContext
@@ -252,7 +256,7 @@ private:
     StatisticsCollector* m_statisticsCollector;
 
     detail::QueryQueue m_cursorTaskQueue;
-    std::vector<CursorProcessorContext> m_cursorProcessorContext;
+    std::vector<std::unique_ptr<CursorProcessorContext>> m_cursorProcessorContext;
 
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
 

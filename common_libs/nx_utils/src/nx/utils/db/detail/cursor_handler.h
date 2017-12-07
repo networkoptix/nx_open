@@ -4,6 +4,7 @@
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
 #include "../request_executor.h"
@@ -67,7 +68,7 @@ public:
         }
     }
 
-    Record fetchNextRecord(QSqlDatabase* const /*connection*/)
+    Record fetchNextRecord()
     {
         if (!m_query->next())
             throw Exception(DBResult::endOfData);
@@ -92,18 +93,49 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class CursorHandlerPool
+class NX_UTILS_API CursorHandlerPool
 {
 public:
-    std::map<QnUuid, std::unique_ptr<AbstractCursorHandler>> cursors;
+    void add(QnUuid id, std::unique_ptr<AbstractCursorHandler> cursorHandler);
+    AbstractCursorHandler* cursorHander(QnUuid id);
+    int cursorCount() const;
+    void remove(QnUuid id);
+    void cleanupDroppedCursors();
+    void markCursorForDeletion(QnUuid id);
+
+private:
+    mutable QnMutex m_mutex;
+    std::map<QnUuid, std::unique_ptr<AbstractCursorHandler>> m_cursors;
+    std::vector<QnUuid> m_cursorsMarkedForDeletion;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_UTILS_API BasicCursorOperationExecutor:
+    public BaseExecutor
+{
+    using base_type = BaseExecutor;
+
+public:
+    BasicCursorOperationExecutor(CursorHandlerPool* cursorContextPool);
+
+protected:
+    CursorHandlerPool* cursorContextPool();
+
+    virtual void executeCursor(QSqlDatabase* const connection) = 0;
+
+private:
+    CursorHandlerPool* m_cursorContextPool;
+
+    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 class NX_UTILS_API CursorCreator:
-    public BaseExecutor
+    public BasicCursorOperationExecutor
 {
-    using base_type = BaseExecutor;
+    using base_type = BasicCursorOperationExecutor;
 
 public:
     CursorCreator(
@@ -113,10 +145,9 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 protected:
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
+    virtual void executeCursor(QSqlDatabase* const connection) override;
 
 private:
-    CursorHandlerPool* m_cursorContextPool;
     std::unique_ptr<AbstractCursorHandler> m_cursorHandler;
 };
 
@@ -124,16 +155,17 @@ private:
 
 template<typename Record>
 class FetchCursorDataExecutor:
-    public BaseExecutor
+    public BasicCursorOperationExecutor
 {
+    using base_type = BasicCursorOperationExecutor;
+
 public:
     FetchCursorDataExecutor(
         CursorHandlerPool* cursorContextPool,
         QnUuid cursorId,
         MoveOnlyFunc<void(DBResult, Record)> completionHandler)
         :
-        BaseExecutor(QueryType::lookup),
-        m_cursorContextPool(cursorContextPool),
+        base_type(cursorContextPool),
         m_cursorId(cursorId),
         m_completionHandler(std::move(completionHandler))
     {
@@ -141,42 +173,55 @@ public:
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
-        m_cursorContextPool->cursors.erase(m_cursorId);
+        cursorContextPool()->remove(m_cursorId);
         m_completionHandler(errorCode, Record());
     }
 
 protected:
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override
+    virtual void executeCursor(QSqlDatabase* const connection) override
     {
-        auto it = m_cursorContextPool->cursors.find(m_cursorId);
-        if (it == m_cursorContextPool->cursors.end())
+        auto cursorHandler = cursorContextPool()->cursorHander(m_cursorId);
+        if (!cursorHandler)
         {
             m_completionHandler(DBResult::notFound, Record());
             // Unknown cursor id is not a reason to close connection, so reporting ok.
-            return DBResult::ok;
+            return;
         }
 
-        auto cursorHandler = static_cast<CursorHandler<Record>*>(it->second.get());
+        auto typedCursorHandler = static_cast<CursorHandler<Record>*>(cursorHandler);
         try
         {
-            auto record = cursorHandler->fetchNextRecord(connection);
+            auto record = typedCursorHandler->fetchNextRecord();
             m_completionHandler(DBResult::ok, std::move(record));
-            return DBResult::ok;
         }
         catch (Exception e)
         {
-            m_cursorContextPool->cursors.erase(it);
+            cursorContextPool()->remove(m_cursorId);
             m_completionHandler(e.dbResult(), Record());
-            if (e.dbResult() == DBResult::endOfData)
-                return DBResult::ok; //< End of cursor data is not an error actually.
-            throw;
+            if (e.dbResult() != DBResult::endOfData) //< End of cursor data is not an error actually.
+                throw;
         }
     }
 
 private:
-    CursorHandlerPool* m_cursorContextPool;
     QnUuid m_cursorId;
     MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class CleanUpDroppedCursorsExecutor:
+    public BasicCursorOperationExecutor
+{
+    using base_type = BasicCursorOperationExecutor;
+
+public:
+    CleanUpDroppedCursorsExecutor(CursorHandlerPool* cursorContextPool);
+
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+
+protected:
+    virtual void executeCursor(QSqlDatabase* const connection) override;
 };
 
 } // namespace detail
