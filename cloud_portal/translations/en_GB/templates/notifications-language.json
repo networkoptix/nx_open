@@ -6,10 +6,10 @@
     "emailSubject": "Reset your password"
   },
   "system_invite": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "You have been granted access to {{message.system_name}}"
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "You have been granted access to {{message.system_name}}"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} is ready to be reviewed"

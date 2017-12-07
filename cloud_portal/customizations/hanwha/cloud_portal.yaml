@@ -18,7 +18,7 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
-mail_from: 'noreply@wavevms.com'
+mail_from: 'WAVE Sync <noreply@wavevms.com>'
 
 mail_prefix: ''
 

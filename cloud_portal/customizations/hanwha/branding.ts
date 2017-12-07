@@ -12,7 +12,7 @@
     </message>
     <message>
       <source>{{VMS_NAME}}</source>
-      <translation>WAVE</translation>
+      <translation>Wisenet WAVE</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>mailto:support@hanwhasecurity.com</translation>
+      <translation>http://wavevms.com/support</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>support@hanwhasecurity.com</translation>
+      <translation>http://wavevms.com/support</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
@@ -32,15 +32,15 @@
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>none</translation>
+      <translation>Q5VL4R39XK.com.hanwhasecurity.wavemobile</translation>
     </message>
     <message>
       <source>{{IOS_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://itunes.apple.com/us/app/wave-mobile/id1284037424</translation>
     </message>
     <message>
       <source>{{ANDROID_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://play.google.com/store/apps/details?id=com.hanwhasecurity.wavemobile</translation>
     </message>
     <message>
       <source>{{COMPANY_NAME}}</source>
