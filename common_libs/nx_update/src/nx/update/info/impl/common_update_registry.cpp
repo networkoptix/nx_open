@@ -201,12 +201,12 @@ bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
 
 QByteArray CommonUpdateRegistry::toByteArray() const
 {
-
+    return QByteArray();
 }
 
 bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
 {
-
+    return false;
 }
 
 } // namespace impl

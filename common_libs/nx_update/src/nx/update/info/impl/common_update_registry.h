@@ -21,6 +21,8 @@ public:
         const UpdateRequestData& updateRequestData,
         FileData* outFileData) override;
     virtual QList<QString> alternativeServers() const override;
+    virtual QByteArray toByteArray() const override;
+    virtual bool fromByteArray(const QByteArray& rawData) override;
 private:
     QString m_baseUrl;
     detail::data_parser::UpdatesMetaData m_metaData;
