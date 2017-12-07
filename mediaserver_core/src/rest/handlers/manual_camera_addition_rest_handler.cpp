@@ -16,25 +16,6 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <common/common_module.h>
 
-class ManualSearchThreadPoolHolder
-{
-public:
-    QThreadPool pool;
-
-    ManualSearchThreadPoolHolder()
-    {
-        pool.setMaxThreadCount(
-            #ifdef __arm__
-                8
-            #else
-                32
-            #endif
-        );
-    }
-};
-
-static ManualSearchThreadPoolHolder manualSearchThreadPoolHolder;
-
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
 }
@@ -81,17 +62,10 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         // Consider using async fsm here (this one should be quite simple).
         // NOTE: boost::bind is here temporarily, until nx::utils::concurrent::run supports arbitrary
         // number of arguments.
+        const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
         m_searchProcessRuns.insert(processUuid,
-            nx::utils::concurrent::run(
-                &manualSearchThreadPoolHolder.pool,
-                boost::bind(
-                    &QnManualCameraSearcher::run,
-                    searcher,
-                    &manualSearchThreadPoolHolder.pool,
-                    addr1,
-                    addr2,
-                    auth,
-                    port)));
+            nx::utils::concurrent::run(threadPool, boost::bind(
+                &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
     }
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));

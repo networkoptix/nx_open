@@ -202,10 +202,14 @@ def test_auth_with_time_changed(timeless_server):
 def test_uptime_is_monotonic(timeless_server):
     timeless_server.host.set_time(datetime.now(pytz.utc))
     first_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
+    if not isinstance(first_uptime, (int, float)):
+        log.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
     new_time = timeless_server.host.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
     assert wait_until(lambda: timeless_server.get_time().is_close_to(new_time))
     second_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
-    assert first_uptime < second_uptime
+    if not isinstance(first_uptime, (int, float)):
+        log.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
+    assert float(first_uptime) < float(second_uptime)
 
 
 def test_frequent_restarts(server):
