@@ -9,8 +9,6 @@ namespace relaying {
 namespace detail {
 namespace test {
 
-#if 0
-
 class StatisticsCalculator:
     public ::testing::Test
 {
@@ -51,12 +49,12 @@ TEST_F(StatisticsCalculator, listeningServerCount)
     ASSERT_EQ(val, m_statisticsCalculator.calculateStatistics(val).listeningServerCount);
 }
 
-TEST_F(StatisticsCalculator, connectionsCount)
+TEST_F(StatisticsCalculator, connectionCount)
 {
     simulateRandomUsage();
     ASSERT_EQ(
         m_expectedTotalConnectionCount,
-        m_statisticsCalculator.calculateStatistics(1).connectionsCount);
+        m_statisticsCalculator.calculateStatistics(1).connectionCount);
 }
 
 TEST_F(StatisticsCalculator, connectionsAveragePerServerCount)
@@ -66,14 +64,8 @@ TEST_F(StatisticsCalculator, connectionsAveragePerServerCount)
     simulateRandomUsage();
     ASSERT_EQ(
         m_expectedTotalConnectionCount,
-        m_statisticsCalculator.calculateStatistics(1).connectionsCount);
+        m_statisticsCalculator.calculateStatistics(1).connectionCount);
 }
-
-TEST_F(StatisticsCalculator, connectionsAcceptedPerMinute)
-{
-}
-
-#endif
 
 } // namespace test
 } // namespace detail
