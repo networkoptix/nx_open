@@ -127,7 +127,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>서버 연결...</translation>
+      <translation>서버에 연결...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
@@ -175,7 +175,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>신규 비디오월...</translation>
+      <translation>새 비디오 월...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -183,7 +183,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation>신규 웹페이지...</translation>
+      <translation>새로운 웹 페이지...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -288,7 +288,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>%1에 로그인</translation>
+      <translation>%1에 로그인...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -314,11 +314,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>장치리스트</translation>
+      <translation>장치 목록</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>카메라리스트</translation>
+      <translation>카메라 목록</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
@@ -330,7 +330,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exit</source>
-      <translation>나가기</translation>
+      <translation>끝내기</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -426,7 +426,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>비디오 월에 배속...</translation>
+      <translation>비디오 월 첨부...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -490,7 +490,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>조정...</translation>
+      <translation>저장...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
@@ -702,7 +702,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Medium</source>
-      <translation>일반화</translation>
+      <translation>일반</translation>
     </message>
     <message>
       <source>Large</source>
@@ -738,11 +738,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To Start</source>
-      <translation>시작</translation>
+      <translation>시작으로</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>종료</translation>
+      <translation>끝으로</translation>
     </message>
     <message>
       <source>Volume Down</source>
@@ -936,7 +936,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -990,16 +990,16 @@ to view more bookmarks</source>
       <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
-    </message>
-    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation type="unfinished">Settings are not available for .EXE files.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -1041,7 +1041,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>최상단</translation>
+      <translation>맨 위</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1049,7 +1049,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>최하단</translation>
+      <translation>맨 아래</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1073,7 +1073,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>위로 올리기</translation>
+      <translation>위로 스크롤</translation>
     </message>
     <message>
       <source>Scroll Right</source>
@@ -1325,7 +1325,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Customer Support</source>
-      <translation>고객 지원</translation>
+      <translation>고객지원센터</translation>
     </message>
     <message>
       <source>Client is not connected to any System</source>
@@ -1412,11 +1412,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>전택영역 파일로 저장...</translation>
+      <translation>선택된 파일로 내보내기...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>전체 선택</translation>
+      <translation>모두 선택</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1432,11 +1432,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device actions</source>
-      <translation>장치 액션</translation>
+      <translation>장치 작업</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation>카메라 액션</translation>
+      <translation>카메라 작업</translation>
     </message>
     <message>
       <source>Details for %1 session(s) of %2</source>
@@ -1505,7 +1505,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>알려지지 않음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1513,7 +1513,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1521,7 +1521,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>라이브 보기</translation>
+      <translation>실시간 감시</translation>
     </message>
     <message>
       <source>Watching archive</source>
@@ -1591,7 +1591,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>User</source>
-      <translation>사용자</translation>
+      <translation>사용자:</translation>
     </message>
     <message>
       <source>IP</source>
@@ -1611,7 +1611,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>상세설명</translation>
+      <translation>설명</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1767,7 +1767,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -1819,7 +1819,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>북마크 관리하기</translation>
+      <translation>북마크 관리</translation>
     </message>
   </context>
   <context>
@@ -1903,7 +1903,7 @@ to view more bookmarks</source>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>에</translation>
+      <translation>항목</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -2009,7 +2009,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>동작 간격</translation>
+      <translation>동작 간격:</translation>
     </message>
   </context>
   <context>
@@ -2069,7 +2069,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation>
-        <numerusform>%n개의 장치 검색됨</numerusform>
+        <numerusform>%n 장치 검색됨</numerusform>
       </translation>
     </message>
     <message>
@@ -2246,11 +2246,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation>장치 검사</translation>
+      <translation>장치 진단</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation>카메라 검사</translation>
+      <translation>카메라 진단</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
@@ -2274,7 +2274,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation>I/O모듈 검사</translation>
+      <translation>I/O 모듈 진단</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
@@ -2305,19 +2305,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>낮음</translation>
+      <translation>낮은</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>중간</translation>
+      <translation>일반</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>높음</translation>
+      <translation>높은</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2344,11 +2344,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>파일로 내보내기...</translation>
+      <translation>선택된 파일로 내보내기...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>전체 선택</translation>
+      <translation>모두 선택</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2362,11 +2362,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>장치 리스트</translation>
+      <translation>장치 목록</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>카메라 리스트</translation>
+      <translation>카메라 목록</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2411,7 +2411,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>수요자</translation>
+      <translation>제조사:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2419,7 +2419,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>펌웨어</translation>
+      <translation>펌웨어:</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2431,7 +2431,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>서버</translation>
+      <translation>서버:</translation>
     </message>
   </context>
   <context>
@@ -2594,7 +2594,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -2609,11 +2609,11 @@ to view more bookmarks</source>
     <name>QnCameraSettingsDialog</name>
     <message>
       <source>Device Settings</source>
-      <translation>장치 설정</translation>
+      <translation>장비 설정</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation>다수 장치 설정</translation>
+      <translation>장비 설정</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -2625,7 +2625,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O모듈 설정</translation>
+      <translation>I/O 모듈 설정</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
@@ -2637,7 +2637,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>이벤트 로그...</translation>
+      <translation>이벤트정보...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
@@ -2750,7 +2750,7 @@ devices</source>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1에서 시스템을 분리</translation>
+      <translation>%1에서 시스템 연결을 끊으시겠습니까</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
@@ -2794,7 +2794,7 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation>이메일 또는 패스워드가 잘못 되었습니다</translation>
+      <translation>사용자 이름과 암호가 일치하지 않습니다.</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
@@ -2809,7 +2809,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>서버 연결...</translation>
+      <translation>서버에 연결...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -2832,11 +2832,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>계정을 만듭니다</translation>
+      <translation>계정 만들기</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3146,22 +3146,22 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
     </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation type="unfinished"> Ask your system administrator to do it.</translation>
-    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
         <numerusform>Set Password</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
+      <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3188,7 +3188,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
+      <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3219,7 +3219,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation>계속 하려면 암호를 입력 합니다.</translation>
+      <translation>계속 하려면 패스워드를 입력하세요</translation>
     </message>
     <message>
       <source>Set local owner password</source>
@@ -3227,11 +3227,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3251,11 +3251,11 @@ to %1</source>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>연결 해제</translation>
+      <translation>연결 끊기</translation>
     </message>
     <message>
       <source>All cloud users will be deleted.</source>
-      <translation>모든 클라우드 사용자 삭제 됩니다.</translation>
+      <translation>모든 클라우드 사용자가 삭제됩니다.</translation>
     </message>
     <message>
       <source>Failed to disconnect System from %1</source>
@@ -3265,7 +3265,7 @@ to %1</source>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1에서 시스템을 분리하실래요?</translation>
+      <translation>%1에서 시스템 연결을 끊으시겠습니까?</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
@@ -3293,7 +3293,7 @@ to %1</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>전체 선택</translation>
+      <translation>모두 선택</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3352,7 +3352,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>상세</translation>
+      <translation>설명</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3397,6 +3397,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>자동</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -3443,17 +3447,17 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>낮음</translation>
+      <translation>낮은</translation>
     </message>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation>중간</translation>
+      <translation>일반</translation>
     </message>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>높음</translation>
+      <translation>높은</translation>
     </message>
   </context>
   <context>
@@ -3593,7 +3597,7 @@ to %1</source>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation>방식</translation>
+      <translation>형식</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3606,7 +3610,7 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>알려지지 않음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3752,22 +3756,22 @@ to %1</source>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>제공된 설정은 유효하지 않음.</translation>
+      <translation>제공된 설정 유효하지 않음.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>테스트 실행 실패.</translation>
+      <translation>테스트 실행 불가.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>시간제한</translation>
+      <translation>시간 초과됨</translation>
     </message>
   </context>
   <context>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3837,7 +3841,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>인증키</translation>
+      <translation>인증키:</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3852,11 +3856,11 @@ to %1</source>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation>방식</translation>
+      <translation>유형</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>인증키</translation>
+      <translation>인증키:</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3864,7 +3868,7 @@ to %1</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>서버</translation>
+      <translation>서버:</translation>
     </message>
     <message>
       <source>Never</source>
@@ -4071,7 +4075,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4130,7 +4134,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>무료 키 인증</translation>
+      <translation>데모 제품키 인증</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -4200,7 +4204,7 @@ to %1</source>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>화면 저장 중</translation>
+      <translation>화면 녹화</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4239,7 +4243,7 @@ to %1</source>
     <name>QnLoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>서버 연결...</translation>
+      <translation>서버에 연결...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -4286,15 +4290,15 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>계정을 만듭니다</translation>
+      <translation>계정 만들기</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>암호를 잊으셨나요?</translation>
+      <translation>패스워드 분실?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4390,7 +4394,7 @@ to %1</source>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>라이브</translation>
+      <translation>실시간 뷰</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4398,11 +4402,11 @@ to %1</source>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation>줌 영역</translation>
+      <translation>창 확대/축소</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O 모듈</translation>
+      <translation>IO장치</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -4448,7 +4452,7 @@ to %1</source>
     </message>
     <message>
       <source>Testing...</source>
-      <translation>시험...</translation>
+      <translation>검사중</translation>
     </message>
     <message>
       <source>Merging Systems...</source>
@@ -4530,7 +4534,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>&quot; 움직임 + 낮음 - Res&quot; 녹화 옵션을 설정할 수 없습니다.</translation>
+      <translation>"모션 + 낮은-해상도" 녹화 옵션을 설정할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -4576,7 +4580,7 @@ to %1</source>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation>B/s</translation>
+      <translation>B/초</translation>
     </message>
     <message>
       <source>MB/s</source>
@@ -4731,7 +4735,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>북마크 관리</translation>
+      <translation>북마크 관리하기</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
@@ -4863,11 +4867,11 @@ to %1</source>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation>최저</translation>
+      <translation>최하</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>낮음</translation>
+      <translation>낮은</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4875,7 +4879,7 @@ to %1</source>
     </message>
     <message>
       <source>High</source>
-      <translation>높음</translation>
+      <translation>높은</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5013,11 +5017,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation>%1TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5250,7 +5254,7 @@ to %1</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>서버</translation>
+      <translation>서버:</translation>
     </message>
     <message>
       <source>Invalid URL</source>
@@ -5337,7 +5341,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>모든 카메라</translation>
+      <translation>전체 카메라</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -5527,7 +5531,7 @@ to %1</source>
     <name>QnServerUpdatesModel</name>
     <message>
       <source>Server</source>
-      <translation>서버</translation>
+      <translation>서버:</translation>
     </message>
     <message>
       <source>Status</source>
@@ -5781,7 +5785,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O장치 셋팅</translation>
+      <translation>I/O 모듈 설정</translation>
     </message>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
@@ -5848,11 +5852,11 @@ to %1</source>
     </message>
     <message>
       <source>User</source>
-      <translation>사용자</translation>
+      <translation>사용자:</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5860,7 +5864,7 @@ to %1</source>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>지원 서명</translation>
+      <translation>서명 지원</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5879,7 +5883,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -5906,7 +5910,7 @@ to %1</source>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation>시간제한</translation>
+      <translation>시간 초과됨</translation>
     </message>
     <message>
       <source>TLS</source>
@@ -6007,7 +6011,7 @@ to %1</source>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>장치 설정</translation>
+      <translation>장비 설정</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -6023,11 +6027,11 @@ to %1</source>
     </message>
     <message>
       <source>Enable</source>
-      <translation>활성화</translation>
+      <translation>사용</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>정식 키 인증</translation>
+      <translation>제품키 인증</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6042,15 +6046,15 @@ to %1</source>
       <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation type="unfinished">Set For This Camera</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>전체 선택</translation>
+      <translation>모두 선택</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6137,11 +6141,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>아카이브 백업이 &lt;b&gt;%1&lt;/b&gt;까지 완료되었습니다.</translation>
+      <translation>아카이브 백업 &lt;b&gt;%1&lt;/b&gt;까지 완료</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>다음 백업은 &lt;b&gt;%1&lt;/b&gt;에 예약되어 있습니다.</translation>
+      <translation>다음 백업은 &lt;b&gt;%1&lt;/b&gt; 예정 입니다</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6196,7 +6200,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6228,7 +6232,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6410,7 +6414,7 @@ to %1</source>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>일부 사용자는 이메일 주소를 설정하지 않았습니다.</translation>
+      <translation>일부 사용자는 이메일 주소를 설정하지 않았습니다</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
@@ -6454,7 +6458,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>원격 보관 파일 동기화</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6499,7 +6503,7 @@ to %1</source>
     <name>QnTimeServerSelectionModel</name>
     <message>
       <source>Server</source>
-      <translation>서버</translation>
+      <translation>서버:</translation>
     </message>
     <message>
       <source>Offset</source>
@@ -6736,7 +6740,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6793,7 +6797,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6931,7 +6935,7 @@ to %1</source>
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation>내부</translation>
+      <translation>로컬</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -6939,7 +6943,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6967,7 +6971,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -7090,7 +7094,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>북마크</translation>
+      <translation>북마크(책갈피)</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7123,11 +7127,11 @@ to %1</source>
     <name>QnWorkbenchConnectHandler</name>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>다른 서버 연결...</translation>
+      <translation>다른 서버에 연결...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>서버 연결...</translation>
+      <translation>서버에 연결...</translation>
     </message>
     <message>
       <source>%1 in %2</source>
@@ -7339,7 +7343,7 @@ to %1</source>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>비디오 월</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -7347,7 +7351,7 @@ to %1</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>새 비디오 월...</translation>
+      <translation>신규 비디오월...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -7680,7 +7684,7 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>빠른 검토</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -7696,7 +7700,7 @@ to %1</source>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>타임스템프</translation>
     </message>
     <message>
       <source>Add Image</source>
@@ -7708,7 +7712,7 @@ to %1</source>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>이미지:</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -7743,7 +7747,7 @@ to %1</source>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>폴더</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7796,15 +7800,15 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>낮음</translation>
+      <translation>낮은</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>높음</translation>
+      <translation>높은</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>사용자 정의</translation>
     </message>
   </context>
   <context>
@@ -8165,7 +8169,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation>투어 중지</translation>
+      <translation>전환 멈춤</translation>
     </message>
     <message>
       <source>Start Tour</source>
@@ -8377,7 +8381,7 @@ to %1</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>서버</translation>
+      <translation>서버:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
@@ -8424,8 +8428,8 @@ to %1</source>
       <translation type="unfinished">Failed to change password</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>

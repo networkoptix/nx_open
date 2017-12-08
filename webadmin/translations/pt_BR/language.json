@@ -30,7 +30,7 @@
         "unexpectedError": "Failed: unexpected error has happened",
         "connnetionError": "Erro de ligação",
         "wrongPassword": "Wrong password.",
-        "error": "Error: ",
+        "error": "Erro: ",
         "restartNeeded": "Changes saved. Restart server to apply new settings?",
         "settingsSaved": "Settings saved",
         "confirmHardwareRestart": "Restart server operation system?",
@@ -88,12 +88,12 @@
         "cannotGetUser": "Server failure: cannot retrieve current user data"
     },
     "offlineDialog": {
-        "serverOffline": "server is offline"
+        "serverOffline": "servidor offline"
     },
     "restartDialog": {
         "serverStarting": "server is starting",
         "serverRestarting": "server is restarting",
-        "serverOffline": "server is offline"
+        "serverOffline": "servidor offline"
     },
     "fileUpload": {
         "started": "Update successfully started. It will take several minutes",
@@ -118,13 +118,13 @@
         "cameraLinks": {
             "copyToClipboard": "copy to clipboard",
             "highStream": "High stream",
-            "copyDefaultText": "copy",
+            "copyDefaultText": "copiar",
             "unknown": "Desconhecido",
             "lowStream": "Low stream",
             "transcoding": "Transcoding",
             "copyActiveText": "copied to clipboard"
         },
-        "searchCamPlaceholder": "search",
+        "searchCamPlaceholder": "pesquisa",
         "cameraStates": {
             "noFormat": "This browser or device does not support video playback from  this camera.",
             "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",

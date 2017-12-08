@@ -93,7 +93,7 @@
     "restartDialog": {
         "serverStarting": "启动服务器",
         "serverRestarting": "服务器正在重新启动 ！",
-        "serverOffline": "服务器离线"
+        "serverOffline": "服务器已离线"
     },
     "fileUpload": {
         "started": "成功更新。它将需要几分钟时间",

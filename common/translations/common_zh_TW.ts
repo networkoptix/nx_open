@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>無法初始化聲音編碼器。</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時效性</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>橋接</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>橋接授權</translation>
     </message>
   </context>
   <context>
@@ -652,13 +652,6 @@
     </message>
   </context>
   <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-      <source>Operation is not permitted.</source>
-      <translation type="unfinished">Operation is not permitted.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
@@ -782,7 +775,7 @@
     </message>
     <message>
       <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <translation>未匯出任何資料.</translation>
     </message>
   </context>
   <context>
@@ -854,7 +847,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -1005,7 +998,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>自定</translation>
+      <translation>自訂</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1453,7 +1446,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n 使用者</numerusform>
+        <numerusform>%n 個使用者</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1496,12 +1489,12 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>分析事件</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 於 %2</translation>
     </message>
   </context>
   <context>

@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro desconhecido.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>

@@ -990,16 +990,16 @@ to view more bookmarks</source>
       <translation>Sie sind im Begriff, ein langes Video zu exportieren. Es kann mehr als ein Gigabyte an Festplattenplatz benötigen und mehrere Minuten dauern.</translation>
     </message>
     <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation>Exportierte .EXE-Datei hat eine Größe von mehr als 4 GB und kann nicht durch Doppelklicken in Windows geöffnet werden. Es kann nur im Nx Witness Client abgespielt werden.</translation>
-    </message>
-    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation>Einstellungen sind für .EXE-Dateien nicht verfügbar.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>Lokale Dateien, Servermonitor-Widgets und Webseiten werden nicht exportiert.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -2341,7 +2341,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Kante</translation>
     </message>
   </context>
   <context>
@@ -3180,16 +3180,16 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>Bei einigen ausgewählten Kameras muss ein Passwort eingerichtet werden.</translation>
     </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation> Bitten Sie Ihren Systemadministrator, dies zu tun.</translation>
-    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation>
         <numerusform>Passwort festlegen</numerusform>
         <numerusform>Passwörter festlegen</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -3438,6 +3438,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -6114,8 +6118,8 @@ to %1</source>
       <translation>PASSWORT ERFORDERLICH</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation>Für diese Kamera setzen</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
@@ -6599,11 +6603,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Die Systemzeit wird mit dem Internet synchronisiert und ist unabhängig von der lokalen Zeit auf den Servern.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Die Systemzeit wird mit der lokalen Uhrzeit auf dem ausgewählten Server synchronisiert und ist unabhängig von der Ortszeit auf anderen Servern.</translation>
     </message>
   </context>
   <context>
@@ -7800,7 +7804,7 @@ to %1</source>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation>Zeitstempel</translation>
+      <translation>Zeitmarke</translation>
     </message>
     <message>
       <source>Add Image</source>
@@ -8536,8 +8540,8 @@ to %1</source>
       <translation>Fehler beim Ändern des Passworts</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>

@@ -16,7 +16,7 @@
   <String Id="ClientAndServer">클라이언트와 서버</String>
   <String Id="ClientOnly">클라이언트만</String>
   <String Id="ClientOnlyDesc">클라이언트 응용 프로그램은 비디오를 확인 하 고 시스템을 관리 하는 데 사용 됩니다.</String>
-  <String Id="ServerOnly">서버 전용</String>
+  <String Id="ServerOnly">서버 만</String>
   <String Id="ServerOnlyDesc">서버 프로그램은 시스템 정보 와 녹화 데이터 저장을 하는데 사용됩니다.</String>
   <String Id="HelpHeader">설치 도움말</String>
   <String Id="HelpCloseButton">닫기</String>
@@ -42,13 +42,13 @@
   <String Id="SuccessInstallHeader">설치 성공적으로 완료</String>
   <String Id="SuccessLaunchButton">Launch</String>
   <String Id="SuccessRestartText">소프트웨어를 사용하려면 컴퓨터를 다시 시작해야 합니다.</String>
-  <String Id="SuccessRestartButton">다시시작</String>
+  <String Id="SuccessRestartButton">재시작</String>
   <String Id="SuccessCloseButton">닫기</String>
   <String Id="FailureHeader">설치 실패</String>
   <String Id="FailureHyperlinkLogText">하나 이상의 문제가 설정이 실패 했습니다. 문제를 고치고나서 다시 설정 시도 하세요. 더 자세한 내용은 아래</String>
   <String Id="FailureHyperlinkLogTextLink">로그 파일</String>
   <String Id="FailureRestartText">소프트웨어의 롤백 완료 하려면 컴퓨터를 다시 시작 해야 합니다.</String>
-  <String Id="FailureRestartButton">다시시작</String>
+  <String Id="FailureRestartButton">재시작</String>
   <String Id="FailureCloseButton">닫기</String>
   <String Id="WillInstall">[WixBundleName] 장치에 설치 될 것 이다</String>
   <String Id="InstallLicenseLinkText">사용자 라이센스 계약 보기</String>
@@ -66,7 +66,7 @@
   <String Id="WixSchedFirewallExceptionsUninstall">Windows 방화벽 구성</String>
   <String Id="WixRollbackFirewallExceptionsInstall">Windows 방화벽 구성 롤백 중</String>
   <String Id="WixExecFirewallExceptionsInstall">Windows 방화벽 구성 설치 중</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Windows 방화벽 구성 롤백 중</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Windows 방화벽 구성 롤백</String>
   <String Id="WixExecFirewallExceptionsUninstall">Windows 방화벽 구성 제거 중</String>
   <String Id="Product_ArchMismatch_x86">이 패키지는 32 비트 OS용으로 설계 되었습니다. 설치를 지금 종료 합니다.</String>
   <String Id="Product_ArchMismatch_x64">이 패키지는 64 비트 OS용으로 설계 되었습니다. 설치를 지금 종료 합니다.</String>

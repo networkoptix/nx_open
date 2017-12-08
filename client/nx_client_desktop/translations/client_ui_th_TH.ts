@@ -174,7 +174,7 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>รีเฟส</translation>
+      <translation>รีเฟรส</translation>
     </message>
     <message>
       <location/>
@@ -422,7 +422,7 @@
     <message>
       <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>รีเฟรช</translation>
+      <translation>รีเฟรส</translation>
     </message>
     <message>
       <location/>
@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
       <location/>
@@ -720,7 +720,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>สตรีมรอง</translation>
     </message>
     <message>
       <location/>
@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -792,7 +792,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>กำหนดการตั้งค่า</translation>
+      <translation>การตั้งค่าการบันทึก</translation>
     </message>
     <message>
       <location/>
@@ -892,7 +892,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>โหมดตื่นตระหนก:</translation>
+      <translation>โหมดฟังเพลง:</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>บิตเรท</translation>
     </message>
   </context>
   <context>
@@ -1003,7 +1003,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>รีเฟส</translation>
+      <translation>รีเฟรส</translation>
     </message>
     <message>
       <location/>
@@ -1052,6 +1052,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1240,7 +1250,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>&amp;ลบ</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <location/>
@@ -1542,7 +1552,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>ถอนออก</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <location/>
@@ -1618,7 +1628,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>คีย์สัญญาอนุญาตไม่ถูกต้อง</translation>
+      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <location/>
@@ -1755,7 +1765,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>ทัวร์รอบ</translation>
     </message>
   </context>
   <context>
@@ -1776,7 +1786,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>การยืนยันตัวตน</translation>
+      <translation>ผู้ดูแลระบบ</translation>
     </message>
     <message>
       <location/>
@@ -1786,7 +1796,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>ชื่อผู้ใช้งาน:</translation>
+      <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
       <location/>
@@ -1801,7 +1811,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>เพิ่มเติม</translation>
+      <translation>ผู้เชี่ยวชาญ</translation>
     </message>
   </context>
   <context>
@@ -1960,7 +1970,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>ที่คั่นหนังสือ</translation>
+      <translation>บุ๊คมาร์ก</translation>
     </message>
   </context>
   <context>
@@ -2048,7 +2058,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>ชื่อผู้ใช้:</translation>
+      <translation>เข้าสู่ระบบ:</translation>
     </message>
     <message>
       <location/>
@@ -2102,7 +2112,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>ลบ</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <location/>
@@ -2265,7 +2275,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>รีวิวอย่างรวดเร็ว</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2290,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>ความเร็ว</translation>
     </message>
     <message>
       <location/>
@@ -2578,7 +2588,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>กำลังบันทึก</translation>
+      <translation>การบันทึก</translation>
     </message>
     <message>
       <location/>
@@ -2742,7 +2752,7 @@
     <message>
       <location/>
       <source>Port:</source>
-      <translation>พอร์ต:</translation>
+      <translation>พอร์ท:</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2902,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>ชื่อผู้ใช้:</translation>
+      <translation>เข้าสู่ระบบ:</translation>
     </message>
     <message>
       <location/>
@@ -2992,7 +3002,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>ประทับเวลา</translation>
     </message>
     <message>
       <location/>
@@ -3002,7 +3012,7 @@
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>รูปแบบ</translation>
     </message>
     <message>
       <location/>
@@ -3065,7 +3075,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Role</source>
-      <translation>บทบาท</translation>
+      <translation>สิทธิพิเศษ</translation>
     </message>
     <message>
       <location/>

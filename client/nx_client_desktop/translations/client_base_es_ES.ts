@@ -50,7 +50,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Exportar marcadores</translation>
     </message>
   </context>
   <context>
@@ -854,15 +854,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>Iniciar el Analíticas...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Algunas cámaras requieren que se establezcan contraseñas</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Exportar Video...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -870,15 +870,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Resolución...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>Relación de Aspecto de Celda...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>Espaciado de Celda...</translation>
     </message>
   </context>
   <context>
@@ -975,58 +975,58 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>Los ajustes elegidos requieren transcodificación. Aumentará el uso de la CPU y puede tomar un tiempo significativo.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>No se recomienda el formato AVI para exportar una grabación no continua con pista de audio.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>Recomendamos exportar video desde esta cámara como &quot;Multi Video&quot; para evitar la reducción de escala.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
+      <translation>Estás a punto de exportar un video largo. Puede requerir más de un gigabyte de espacio del disco duro y tomar varios minutos para completar.</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>La configuración no está disponible para archivos .EXE.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>Los archivos locales, los widgets del monitor del servidor y las páginas web no se exportarán.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio y vídeo entrelazado</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Parte 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Archivo multimedia</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>Eejecutables %1 Archivo Multimedia (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>Eejecutables %1 Archivo Multimedia (x86)</translation>
     </message>
   </context>
   <context>
@@ -1162,45 +1162,45 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Largo</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>Solo se permiten letras latinas, números y símbolos de teclado %1.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>La contraseña debe contener %n combinaciones diferentes de caracteres, símbolos o dígitos</numerusform>
+        <numerusform>La contraseña debe contener %n combinaciones diferentes de caracteres, símbolos o dígitos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>La contraseña debe tener al menos %n caracteres de longitud.</numerusform>
+        <numerusform>La contraseña debe tener al menos %n caracteres de longitud.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>La contraseña no debe tener más de %n caracteres.</numerusform>
+        <numerusform>La contraseña no debe tener más de %n caracteres.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos.</numerusform>
+        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos.</numerusform>
+        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos.</numerusform>
       </translation>
     </message>
   </context>
@@ -2218,9 +2218,9 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message numerus="yes">
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">
-        <numerusform>Analytics is not available for %1</numerusform>
-        <numerusform>Analytics is not available for %1</numerusform>
+      <translation>
+        <numerusform>Analíticas no está disponible para %1</numerusform>
+        <numerusform>Analíticas no está disponible para %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2325,7 +2325,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>Don&apos;t cambio</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2341,7 +2341,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2524,7 +2524,7 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>Contraseña no debe ser igual al nombre de usuario de la cámara</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2532,7 +2532,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Repetir contraseña</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2540,7 +2540,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>La contraseña debe tener al menos 8 símbolos de largo y contener diferentes tipos de caracteres.</translation>
     </message>
   </context>
   <context>
@@ -2625,15 +2625,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>Menos configuraciones</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>Más configuraciones</translation>
     </message>
   </context>
   <context>
@@ -3177,22 +3177,22 @@ a %1</translation>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>Esta cámara requiere contraseña para ser configurada.</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
-    </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation type="unfinished"> Ask your system administrator to do it.</translation>
+      <translation>Algunas de las cámaras seleccionadas requieren que se configure una contraseña.</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
-        <numerusform>Set Password</numerusform>
+      <translation>
+        <numerusform>Configurar contraseña</numerusform>
+        <numerusform>Configurar contraseña</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -3441,6 +3441,10 @@ a %1</translation>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -4233,9 +4237,9 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>Usa licencias para ver estas %n cámaras</numerusform>
+        <numerusform>Usa licencias para ver estas %n cámaras</numerusform>
       </translation>
     </message>
   </context>
@@ -4482,9 +4486,9 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Set For All %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set For All %n Cameras</numerusform>
-        <numerusform>Set For All %n Cameras</numerusform>
+      <translation>
+        <numerusform>Configurar para todas las cámaras de %n</numerusform>
+        <numerusform>Configurar para todas las cámaras de %n</numerusform>
       </translation>
     </message>
   </context>
@@ -4629,7 +4633,7 @@ a %1</translation>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>Las cámaras NVR no son compatibles con la reproducción no sincronizada</translation>
     </message>
   </context>
   <context>
@@ -4727,7 +4731,7 @@ a %1</translation>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>Configurar Contraseña</translation>
     </message>
   </context>
   <context>
@@ -6109,15 +6113,15 @@ a %1</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>DEMASIADAS CONEXIONES</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>SE REQUIERE CONTRASEÑA</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation type="unfinished">Set For This Camera</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
@@ -6529,11 +6533,11 @@ a %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Sincronización de archivo remoto</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Problema de integridad del archivo</translation>
     </message>
   </context>
   <context>
@@ -6601,11 +6605,11 @@ a %1</translation>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>La hora del sistema se sincroniza con Internet y no depende de la hora local en los servidores.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>La hora del sistema se sincroniza con Internet y no depende de la hora local en los servidores.</translation>
     </message>
   </context>
   <context>
@@ -7740,38 +7744,38 @@ a %1</translation>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>Dinámico</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>Medios no compatibles para la exportación de datos.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>El formato seleccionado no es compatible con la biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>Error de biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>El códec de video o audio no es compatible con el formato seleccionado.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Error al escribir archivo.</translation>
     </message>
     <message>
       <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <translation>No se exportaron datos.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Error interno</translation>
     </message>
   </context>
   <context>
@@ -7786,70 +7790,70 @@ a %1</translation>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Revisión Rápida</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportar Ajustes</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>Añadir marca de tiempo</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>Eliminar marca de tiempo</translation>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Marcas de tiempo</translation>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>Añadir imagen</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>Borrar imagen</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imagen</translation>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>Añadir texto</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>Eliminar texto</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Texto</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Restablecer velocidad</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>Añadir información de marcador</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>Eliminar la información de marcador</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Información de marcadores</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Carpeta</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7872,7 +7876,7 @@ a %1</translation>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>Imágenes (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -7880,7 +7884,7 @@ a %1</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>La imagen no puede ser cargada.</translation>
     </message>
   </context>
   <context>
@@ -7891,7 +7895,7 @@ a %1</translation>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>NO ES UNA CÁMARA</translation>
     </message>
   </context>
   <context>
@@ -7910,23 +7914,23 @@ a %1</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>Establezca la resolución del diseño en &quot;Auto&quot; para aumentar el rendimiento.</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>Para exportar, la duración del video de la Revisión Rápida debe ser de al menos %n segundos.</numerusform>
+        <numerusform>Para exportar, la duración del video de la Revisión Rápida debe ser de al menos %n segundos.</numerusform>
       </translation>
     </message>
   </context>
@@ -7934,7 +7938,7 @@ a %1</translation>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Largo</translation>
     </message>
     <message>
       <source>Short</source>
@@ -7945,14 +7949,14 @@ a %1</translation>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 Analíticas</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>Detener exportación</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -7960,16 +7964,16 @@ a %1</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Error de exportación</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>No se puede escribir archivo</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 está en uso por otra exportación.</translation>
     </message>
   </context>
   <context>
@@ -8179,14 +8183,14 @@ a %1</translation>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>Ningún tipo de evento soportado</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>Evento se activará sólo si la Analítica de Eventos cumple todas las condiciones anteriores. Si un campo de palabra clave está vacío, siempre se cumple la condición. Si no es así, se cumple la condición si el campo correspondiente de análisis contiene las claves.</translation>
     </message>
   </context>
   <context>
@@ -8535,11 +8539,11 @@ a %1</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>Error al cambiar la contraseña</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>
@@ -8580,7 +8584,7 @@ a %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>¿Eliminar Showreel %1?</translation>
     </message>
   </context>
   <context>

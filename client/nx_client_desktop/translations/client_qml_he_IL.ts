@@ -27,7 +27,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Password</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>התחבר</translation>
+      <translation>חיבור</translation>
     </message>
   </context>
   <context>
@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>בלתי ניתן להשגה</translation>
+      <translation>לא זמין</translation>
     </message>
     <message>
       <source>New Server</source>

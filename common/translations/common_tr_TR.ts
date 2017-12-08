@@ -662,13 +662,6 @@
     </message>
   </context>
   <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-      <source>Operation is not permitted.</source>
-      <translation type="unfinished">Operation is not permitted.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
@@ -1531,7 +1524,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%2 de %1</translation>
     </message>
   </context>
   <context>

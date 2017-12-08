@@ -990,16 +990,16 @@ to view more bookmarks</source>
       <translation>Zamierzasz wyeksportować długie nagranie wideo. Może to wymagać ponad gigabajta przestrzeni na dysku twardym i może potrwać kilka minut.</translation>
     </message>
     <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation>Eksportowany plik EXE ma rozmiar powyżej 4 GB i nie można go otworzyć standardowymi narzędziami w systemie Windows. Można go odtwarzać tylko w aplikacji Nx Witness.</translation>
-    </message>
-    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation>Ustawienia nie są dostępne dla plików EXE.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation>Pliki lokalne, wykresy monitorowania stanów serwerów i strony internetowe nie zostaną wyeksportowane.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -2365,7 +2365,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -3214,10 +3214,6 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>Niektóre z wybranych kamer wymagają ustawienia haseł.</translation>
     </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation>Poproś administratora systemu, aby to zrobił.</translation>
-    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation>
@@ -3225,6 +3221,10 @@ to %1</source>
         <numerusform>Ustaw hasła</numerusform>
         <numerusform>Ustawianie haseł</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -3479,6 +3479,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -6186,8 +6190,8 @@ to %1</source>
       <translation>WYMAGANE HASŁO</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation>Ustaw dla tej kamery</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
@@ -6672,11 +6676,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Czas systemowy jest zsynchronizowany z Internetem i nie zależy od lokalnych serwerów.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Czas systemowy jest zsynchronizowany z wybranym serwerem lokalnym i nie zależy od innych serwerów.</translation>
     </message>
   </context>
   <context>
@@ -8648,8 +8652,8 @@ to %1</source>
       <translation>Nie udało się zmienić hasła</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation>Nie udało się zmienić haseł w %1 z %2 kamer</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>
