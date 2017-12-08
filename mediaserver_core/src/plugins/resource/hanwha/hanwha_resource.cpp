@@ -14,7 +14,6 @@
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <plugins/utils/common_tools.h>
 #include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <camera/camera_pool.h>
