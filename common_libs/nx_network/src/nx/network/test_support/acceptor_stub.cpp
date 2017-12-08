@@ -59,7 +59,7 @@ void AcceptorStub::deliverConnection()
     acceptHandler.swap(m_acceptHandler);
 
     post(
-        [this, connection = std::move(connection), 
+        [this, connection = std::move(connection),
             acceptHandler = std::move(acceptHandler)]() mutable
         {
             acceptHandler(SystemError::noError, std::move(connection));

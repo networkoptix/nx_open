@@ -65,7 +65,7 @@ protected:
                     urlFoundPromise.set_value(url);
                 }
             });
-     
+
         return urlFoundPromise.get_future().get();
     }
 
@@ -224,7 +224,7 @@ protected:
         setModulesUrl(
             nx::utils::Url(lit("http://%1/cloud_modules.xml").arg(httpServer().serverAddress().toString())));
     }
-    
+
     void assertUrlFetcherReportsError()
     {
         try
@@ -299,6 +299,12 @@ static const char* kConnectionMediatorXmlPath = "/mediator_test_modules.xml";
 class MediatorUrlFetcher:
     public CloudModuleUrlFetcher
 {
+public:
+    ~MediatorUrlFetcher()
+    {
+        m_urlFetcher.pleaseStopSync();
+    }
+
 protected:
     void givenXmlWithSingleMediatorUrl()
     {

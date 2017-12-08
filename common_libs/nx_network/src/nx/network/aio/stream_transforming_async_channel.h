@@ -16,9 +16,9 @@ namespace aio {
 using UserIoHandler = IoCompletionHandler;
 
 /**
- * Delegates read/write calls to the wrapped AbstractAsyncChannel 
+ * Delegates read/write calls to the wrapped AbstractAsyncChannel
  *   moving data through utils::bstream::Converter first.
- * WARNING: Converter MUST NOT generate wouldBlock error by itself before 
+ * WARNING: Converter MUST NOT generate wouldBlock error by itself before
  *   invoking underlying input/output. Otherwise, behavior is undefined.
  */
 class NX_NETWORK_API StreamTransformingAsyncChannel:

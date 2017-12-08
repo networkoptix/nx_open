@@ -175,7 +175,7 @@ void AIOThread::cancelPostedCalls(Pollable* const sock, bool waitForRunningHandl
 size_t AIOThread::socketsHandled() const
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
-    return m_taskQueue->pollSet->size() 
+    return m_taskQueue->pollSet->size()
         + m_taskQueue->newReadMonitorTaskCount
         + m_taskQueue->newWriteMonitorTaskCount;
 }
@@ -200,7 +200,7 @@ void AIOThread::run()
 
     while (!needToStop())
     {
-        //setting processingPostedCalls flag before processPollSetModificationQueue 
+        //setting processingPostedCalls flag before processPollSetModificationQueue
         //  to be able to atomically add "cancel posted call" task and check for tasks to complete
         m_taskQueue->processingPostedCalls = 1;
 

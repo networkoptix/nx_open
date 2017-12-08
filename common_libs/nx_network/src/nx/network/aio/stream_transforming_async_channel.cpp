@@ -333,7 +333,7 @@ void StreamTransformingAsyncChannel::removeUserTask(UserTask* taskToRemove)
 
 void StreamTransformingAsyncChannel::cancelIoWhileInAioThread(aio::EventType eventType)
 {
-    // Removing user task and cancelling operations on underlying 
+    // Removing user task and cancelling operations on underlying
     //   raw channel that are required by the task cancelled.
 
     for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end();)

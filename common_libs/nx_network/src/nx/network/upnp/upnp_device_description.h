@@ -1,13 +1,12 @@
-#ifndef UPNP_DEVICE_DESCRIPTION_H
-#define UPNP_DEVICE_DESCRIPTION_H
+#pragma once
 
 #include <QtXml/QXmlDefaultHandler>
 
 namespace nx_upnp {
 
 //Helper formaters "urn:schemas-upnp-org:service:ID:VERSION"
-QString NX_NETWORK_API toUpnpUrn( const QString& id, const QString& suffix, int version = 1 );
-QString NX_NETWORK_API fromUpnpUrn( const QString& urn, const QString& suffix, int version = 1 );
+QString NX_NETWORK_API toUpnpUrn(const QString& id, const QString& suffix, int version = 1);
+QString NX_NETWORK_API fromUpnpUrn(const QString& urn, const QString& suffix, int version = 1);
 
 //!Contains some info about discovered UPnP device
 struct NX_NETWORK_API DeviceInfo
@@ -42,22 +41,22 @@ public:
     virtual bool startDocument() override;
     virtual bool endDocument() override;
 
-    virtual bool startElement( const QString& namespaceURI,
-                               const QString& localName,
-                               const QString& qName,
-                               const QXmlAttributes& atts ) override;
+    virtual bool startElement(const QString& namespaceURI,
+        const QString& localName,
+        const QString& qName,
+        const QXmlAttributes& atts) override;
 
-    virtual bool endElement( const QString& namespaceURI,
-                             const QString& localName,
-                             const QString& qName ) override;
+    virtual bool endElement(const QString& namespaceURI,
+        const QString& localName,
+        const QString& qName) override;
 
-    virtual bool characters( const QString& ch ) override;
+    virtual bool characters(const QString& ch) override;
 
     const DeviceInfo& deviceInfo() const { return m_deviceInfo; }
 
 private:
-    bool charactersInDevice( const QString& ch );
-    bool charactersInService( const QString& ch );
+    bool charactersInDevice(const QString& ch);
+    bool charactersInService(const QString& ch);
 
 private:
     DeviceInfo m_deviceInfo;
@@ -69,4 +68,3 @@ private:
 
 } // namespace nx_upnp
 
-#endif // UPNP_DEVICE_DESCRIPTION_H

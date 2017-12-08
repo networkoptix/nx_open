@@ -17,7 +17,7 @@ class TunnelConnector:
 {
 public:
     ~TunnelConnector();
-    
+
     void setConnectorFactoryFunc(
         CrossNatConnectorFactory::Function newFactoryFunc);
     const hpm::MediatorFunctionalTest& mediator() const;

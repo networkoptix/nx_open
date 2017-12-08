@@ -13,7 +13,7 @@ StatisticsCalculator::StatisticsCalculator():
 Statistics StatisticsCalculator::calculateStatistics(int currentServerCount) const
 {
     Statistics statistics;
-    statistics.connectionsCount = m_connectionCount;
+    statistics.connectionCount = m_connectionCount;
     statistics.listeningServerCount = currentServerCount;
     statistics.connectionsAveragePerServerCount =
         currentServerCount > 0
