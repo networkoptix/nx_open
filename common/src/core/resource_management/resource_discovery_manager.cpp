@@ -45,13 +45,14 @@ static QString normalizeUrl(const QString& url)
 }
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
-QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
+QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType, const QString& uniqueId)
 {
     QString urlStr = url.toString();
     this->url = url;
     this->auth = auth;
     this->resType = qnResTypePool->getResourceTypeByName(resType);
     this->searcher = 0;
+    this->uniqueId = uniqueId;
 }
 
 QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
@@ -389,7 +390,12 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
             .dynamicCast<QnSecurityCamResource>();
 
         if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
+        {
+            NX_VERBOSE(this, lm("Manual camera %1 check host address %2")
+                .args(manualCamera.uniqueId, manualCamera.url));
+
             searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
+        }
     }
 
     for (auto& future: searchFutures)
@@ -615,7 +621,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(camera->getTypeId());
-    QnManualCameraInfo info(QUrl(camera->getUrl()), camera->getAuth(), resourceType->getName());
+    QnManualCameraInfo info(QUrl(camera->getUrl()), camera->getAuth(), resourceType->getName(), camera->getUniqueId());
     for (const auto& searcher: m_searchersList)
     {
         if (searcher->isResourceTypeSupported(resourceType->getId()))
@@ -686,13 +692,8 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
         if (!camera || !camera->isManuallyAdded())
             return;
 
-        QString cameraNormalUrl = normalizeUrl(camera->getUrl());
         if (!m_manualCameraByUniqueId.contains(camera->getUniqueId()))
-        {
-            const auto resouceType = qnResTypePool->getResourceType(camera->getTypeId());
-            QnManualCameraInfo info(QUrl(camera->getUrl()), camera->getAuth(), resouceType->getName());
-            newCameras.push_back(info);
-        }
+            newCameras.push_back(manualCameraInfo(camera));
     }
 
     if (!newCameras.empty())

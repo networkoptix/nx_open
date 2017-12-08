@@ -180,8 +180,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
             url.setPath(QByteArray());
         }
 
-        QnManualCameraInfo info(url, auth, camera.manufacturer);
-        info.uniqueId = camera.uniqueId;
+        QnManualCameraInfo info(url, auth, camera.manufacturer, camera.uniqueId);
         if (info.resType.isNull())
         {
             result.setError(QnJsonRestResult::InvalidParameter,
