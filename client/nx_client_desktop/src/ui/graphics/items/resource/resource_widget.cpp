@@ -1058,6 +1058,9 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
+    if (!m_mouseInWidget)
+        hoverEnterEvent(event);
+
     const bool animate = display()->animationAllowed();
 
     setOverlayVisible(true, animate);
