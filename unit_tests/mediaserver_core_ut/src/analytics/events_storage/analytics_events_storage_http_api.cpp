@@ -80,6 +80,14 @@ public:
             });
     }
 
+    virtual void lookupTimePeriods(
+        Filter /*filter*/,
+        TimePeriodsLookupOptions /*options*/,
+        TimePeriodsLookupCompletionHandler /*completionHandler*/) override
+    {
+        FAIL();
+    }
+
     virtual void markDataAsDeprecated(
         QnUuid /*deviceId*/,
         qint64 /*oldestNeededDataTimestamp*/) override

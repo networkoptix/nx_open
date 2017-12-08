@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
@@ -23,8 +25,9 @@ class Manager:
 
 public:
     Manager(Plugin* plugin);
-
     virtual ~Manager();
+
+    virtual Plugin* plugin() override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -54,7 +57,7 @@ private:
     QString m_sharedId;
     int m_channel = 0;
 
-    Plugin* m_plugin = nullptr;
+    Plugin* const m_plugin;
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
@@ -63,3 +66,5 @@ private:
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

@@ -1,9 +1,12 @@
 #pragma once
 
-#include <vector>
+#include <map>
 
 #include "abstract_motion_archive.h"
 
+/**
+ * NOTE: All methods are not thread-safe.
+ */
 class MetadataMultiplexer:
     public QnAbstractMotionArchiveConnection
 {
@@ -14,7 +17,16 @@ public:
      */
     virtual QnAbstractCompressedMetadataPtr getMotionData(qint64 timeUsec) override;
 
+    /**
+     * NOTE: If id already taken, object is replaced.
+     */
+    void add(int id, QnAbstractMotionArchiveConnectionPtr metadataReader);
+    /**
+     * Uses any unused id.
+     */
     void add(QnAbstractMotionArchiveConnectionPtr metadataReader);
+    QnAbstractMotionArchiveConnectionPtr readerById(int id);
+    void removeById(int id);
 
 private:
     struct ReaderContext
@@ -23,5 +35,5 @@ private:
         QnAbstractCompressedMetadataPtr packet;
     };
 
-    std::vector<ReaderContext> m_readers;
+    std::map<int /*id*/, ReaderContext> m_readers;
 };

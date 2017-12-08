@@ -405,8 +405,8 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 10; ++i)

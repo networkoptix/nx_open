@@ -35,11 +35,12 @@ RemoteArchiveStreamSynchronizationTask::RemoteArchiveStreamSynchronizationTask(
 }
 
 void RemoteArchiveStreamSynchronizationTask::createArchiveReaderThreadUnsafe(
-    const QnTimePeriod& timePeriod)
+    const QnTimePeriod& timePeriod,
+    const RemoteArchiveChunk& chunk)
 {
     auto archiveDelegate = m_resource
         ->remoteArchiveManager()
-        ->archiveDelegate();
+        ->archiveDelegate(chunk);
 
     if (!archiveDelegate)
         return;
@@ -70,7 +71,7 @@ void RemoteArchiveStreamSynchronizationTask::createArchiveReaderThreadUnsafe(
     m_archiveReader->setErrorHandler(
         [this, timePeriod](const QString& errorString)
         {
-            NX_DEBUG(
+            NX_WARNING(
                 this,
                 lm("Can not synchronize time period: %1-%2, error: %3")
                     .args(timePeriod.startTimeMs, timePeriod.endTimeMs(), errorString));

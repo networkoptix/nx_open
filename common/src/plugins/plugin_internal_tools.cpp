@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #endif
 
+#include <nx/utils/log/assert.h>
+
 namespace nxpt {
 
 QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
@@ -22,6 +24,18 @@ QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
         guid.bytes[13],
         guid.bytes[14],
         guid.bytes[15]));
+}
+
+nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
+{
+    nxpl::NX_GUID result;
+    const auto binary = uuid.toRfc4122();
+
+    NX_ASSERT(sizeof(result.bytes) == binary.size());
+    for (auto i = 0; i < binary.size(); ++i)
+        result.bytes[i] = binary.at(i);
+
+    return result;
 }
 
 } // namespace nxpt

@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLED_HANWHA)
+
 #include <QtCore/QString>
 #include <QtCore/QFlag>
 
@@ -106,3 +108,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventItemType),
     (metatype)(numeric)(lexical)
 )
+
+#endif // defined(ENABLED_HANWHA)

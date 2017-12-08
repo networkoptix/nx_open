@@ -39,8 +39,8 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     quint8 header[6];
 

@@ -124,12 +124,6 @@ public:
 
     int64_t lastFileSize() const;
 
-    void setRecordingBounds(
-        const std::chrono::microseconds& startTime,
-        const std::chrono::microseconds& endTime);
-
-    void setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler);
-
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -208,8 +202,6 @@ protected:
     qint64 m_startDateTime;
     int m_currentTimeZone;
     std::vector<StreamRecorderContext> m_recordingContextVector;
-    boost::optional<std::chrono::microseconds> m_startRecordingBound;
-    boost::optional<std::chrono::microseconds> m_endRecordingBound;
 
 private:
     bool m_waitEOF;
@@ -258,8 +250,6 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     int64_t m_lastFileSize = 0;
-
-    std::function<void()> m_endOfRecordingHandler;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

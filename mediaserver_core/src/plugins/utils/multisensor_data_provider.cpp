@@ -38,8 +38,8 @@ MultisensorDataProvider::~MultisensorDataProvider()
 
 QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
 {
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     auto data = m_dataSource.retrieveData();
 

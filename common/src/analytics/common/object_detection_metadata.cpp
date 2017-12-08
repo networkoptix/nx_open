@@ -60,6 +60,11 @@ QString toString(const DetectionMetadataPacket& packet)
         .args(packet.deviceId, packet.timestampUsec, packet.durationUsec);
 }
 
+::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet)
+{
+    return os << toString(packet).toStdString();
+}
+
 QnCompressedMetadataPtr toMetadataPacket(
     const DetectionMetadataPacket& detectionPacket)
 {

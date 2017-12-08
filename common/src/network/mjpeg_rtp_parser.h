@@ -53,7 +53,7 @@ private:
 
     //QnByteArray m_frameData;
     int m_frameSize;
-    std::vector<quint8> m_extendedJPegHeader;
+    std::vector<quint8> m_extendedJpegHeader;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

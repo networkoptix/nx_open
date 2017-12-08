@@ -62,7 +62,7 @@ void showUsage(char* exeName)
     qDebug() << "";
     qDebug() << "example:";
     QString str = QFileInfo(exeName).baseName() + QString(" files=\"c:/test.264\";count=20");
-    qDebug() << str;
+    qDebug().noquote() << str;
     qDebug() << "\n[options]: ";
     qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
     qDebug() << "-S, --camera-for-file      Run separate camera for each primary file, count parameter must be empty or 0";

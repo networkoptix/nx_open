@@ -4,7 +4,6 @@
 #include <QRectF>
 
 #include <nx/utils/singleton.h>
-#include <analytics/common/abstract_metadata.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/streaming/media_data_packet.h>

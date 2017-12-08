@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include <gtest/gtest.h>
 
 #include <plugins/resource/hanwha/hanwha_attributes.h>
@@ -136,3 +138,5 @@ TEST_F(HanwhaAttributesParser, LongCompact) { longTest(removeWhiteSpace(kLongXml
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

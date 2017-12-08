@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "common.h"
 
 #include <nx/fusion/model_functions.h>
@@ -65,3 +67,5 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanw
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
+
+#endif // defined(ENABLED_HANWHA)

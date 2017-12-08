@@ -41,12 +41,16 @@ struct ManagerContext
 
 using ManagerList = std::vector<ManagerContext>;
 
+/**
+ * Private class for internal use inside ManagerPool only
+ */
 class ResourceMetadataContext: public QnAbstractDataReceptor
 {
 public:
     ResourceMetadataContext();
     ~ResourceMetadataContext();
-
+    friend class ManagerPool;
+private:
     /**
      * Register plugin manager. This function takes ownership for the manager and handler
      */

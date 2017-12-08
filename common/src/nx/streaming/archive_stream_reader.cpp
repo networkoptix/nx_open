@@ -458,6 +458,9 @@ begin_label:
         m_prevSendMotion = sendMotion;
     }
 
+    // TODO: Set sendAnalytics from appropriate parameter(s).
+    bool sendAnalytics = true;
+
     int channelCount = m_delegate->getVideoLayout()->channelCount();
 
     m_jumpMtx.lock();
@@ -929,12 +932,14 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData && sendMotion)
+    if (m_currentData && (sendMotion || sendAnalytics))
     {
-        int channel = m_currentData->channelNumber;
-        if (!m_motionConnection[channel])
-            m_motionConnection[channel] = m_delegate->getMotionConnection(channel);
-        if (m_motionConnection[channel]) {
+        const int channel = m_currentData->channelNumber;
+
+        updateMetadataReaders(channel, sendMotion, sendAnalytics);
+
+        if (m_motionConnection[channel])
+        {
             auto motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
             if (motion)
             {
@@ -948,6 +953,36 @@ begin_label:
     if (m_currentData)
         m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : qMin(qnSyncTime->currentUSecsSinceEpoch(), m_currentData->timestamp);
     return m_currentData;
+}
+
+void QnArchiveStreamReader::updateMetadataReaders(
+    int channel, bool sendMotion, bool sendAnalytics)
+{
+    constexpr int kMotionReaderId = 0;
+    constexpr int kAnalyticsReaderId = 1;
+
+    if (!m_motionConnection[channel])
+        m_motionConnection[channel] = std::make_shared<MetadataMultiplexer>();
+
+    if (sendMotion && !m_motionConnection[channel]->readerById(kMotionReaderId))
+    {
+        auto motionReader = m_delegate->getMotionConnection(channel);
+        if (motionReader)
+            m_motionConnection[channel]->add(kMotionReaderId, motionReader);
+    }
+
+    if (!sendMotion && m_motionConnection[channel]->readerById(kMotionReaderId))
+        m_motionConnection[channel]->removeById(kMotionReaderId);
+
+    if (sendAnalytics && !m_motionConnection[channel]->readerById(kAnalyticsReaderId))
+    {
+        auto analyticsReader = m_delegate->getAnalyticsConnection(channel);
+        if (analyticsReader)
+            m_motionConnection[channel]->add(kAnalyticsReaderId, analyticsReader);
+    }
+
+    if (!sendAnalytics && m_motionConnection[channel]->readerById(kAnalyticsReaderId))
+        m_motionConnection[channel]->removeById(kAnalyticsReaderId);
 }
 
 void QnArchiveStreamReader::internalJumpTo(qint64 mksec)

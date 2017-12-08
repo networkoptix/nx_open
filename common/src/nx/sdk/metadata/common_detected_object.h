@@ -10,14 +10,14 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonDetectedObject: public nxpt::CommonRefCounter<AbstarctDetectedObject>
+class CommonDetectedObject: public nxpt::CommonRefCounter<AbstractDetectedObject>
 {
 public:
     virtual ~CommonDetectedObject();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nxpl::NX_GUID eventTypeId() const override;
+    virtual nxpl::NX_GUID typeId() const override;
     virtual float confidence() const override;
     virtual nxpl::NX_GUID id() const override;
     virtual NX_ASCII const char* objectSubType() const override;
@@ -26,7 +26,7 @@ public:
     virtual const char* auxilaryData() const override;
     virtual Rect boundingBox() const override;
 
-    void setEventTypeId(const nxpl::NX_GUID& eventTypeId);
+    void setTypeId(const nxpl::NX_GUID& typeId);
     void setConfidence(float confidence);
     void setId(const nxpl::NX_GUID& value);
     void setObjectSubType(const std::string& value);
@@ -35,8 +35,7 @@ public:
     void setBoundingBox(const Rect& rect);
 
 private:
-    // TODO: #mike: Rename to m_typeId.
-    nxpl::NX_GUID m_eventTypeId;
+    nxpl::NX_GUID m_typeId;
 
     float m_confidence = 1.0;
 

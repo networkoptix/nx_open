@@ -1211,28 +1211,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     QnAbstractCompressedMetadataPtr metadata =
         std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
-
-    if (metadata)
-    {
-        if (metadata->metadataType == MetadataType::MediaStreamEvent)
-        {
-            QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
-            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
-                QString::fromLatin1(data));
-
-            m_lastMediaEvent = mediaEvent;
-            m_lastMediaEventTimeout.restart();
-        }
-        else
-        {
-            int ch = metadata->channelNumber;
-        	m_lastMetadata[ch][metadata->timestamp] << metadata;
-            if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
-                m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
-        }
-        return true;
-    }
-
     QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
@@ -1313,6 +1291,26 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_extTimeSrc->reinitTime(AV_NOPTS_VALUE);
     }
 
+    if (metadata)
+    {
+        if (metadata->metadataType == MetadataType::MediaStreamEvent)
+        {
+            QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
+            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
+                QString::fromLatin1(data));
+
+            m_lastMediaEvent = mediaEvent;
+            m_lastMediaEventTimeout.restart();
+        }
+        else
+        {
+            int ch = metadata->channelNumber;
+            m_lastMetadata[ch][metadata->timestamp] << metadata;
+            if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
+                m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
+        }
+        return true;
+    }
     if (ad)
     {
         if (speed < 0)

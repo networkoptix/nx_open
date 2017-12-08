@@ -76,8 +76,10 @@ namespace
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
 
-    const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
-    const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
+    #if defined(ENABLE_HANWHA)
+        const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
+        const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
+    #endif
 
     const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
     const bool kEnableEdgeRecordingDefault(true);
@@ -405,10 +407,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kCloudConnectRelayingEnabledDefault,
         this);
 
-    m_hanwhaDeleteProfilesOnInitIfNeeded = new QnLexicalResourcePropertyAdaptor<bool>(
-        kHanwhaDeleteProfilesOnInitIfNeeded,
-        kHanwhaDeleteProfilesOnInitIfNeededDefault,
-        this);
+    #if defined(ENABLE_HANWHA)
+        m_hanwhaDeleteProfilesOnInitIfNeeded = new QnLexicalResourcePropertyAdaptor<bool>(
+            kHanwhaDeleteProfilesOnInitIfNeeded,
+            kHanwhaDeleteProfilesOnInitIfNeededDefault,
+            this);
+    #endif
 
     m_edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kEnableEdgeRecording,
@@ -475,7 +479,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_rtpFrameTimeoutMs
         << m_cloudConnectUdpHolePunchingEnabledAdaptor
         << m_cloudConnectRelayingEnabledAdaptor
-        << m_hanwhaDeleteProfilesOnInitIfNeeded
+        #if defined(ENABLE_HANWHA)
+            << m_hanwhaDeleteProfilesOnInitIfNeeded
+        #endif
         << m_edgeRecordingEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
         ;
@@ -1061,15 +1067,17 @@ int QnGlobalSettings::maxRecorderQueueSizePackets() const
     return m_maxRecorderQueueSizePackets->value();
 }
 
-bool QnGlobalSettings::hanwhaDeleteProfilesOnInitIfNeeded() const
-{
-    return m_hanwhaDeleteProfilesOnInitIfNeeded->value();
-}
+#if defined(ENABLE_HANWHA)
+    bool QnGlobalSettings::hanwhaDeleteProfilesOnInitIfNeeded() const
+    {
+        return m_hanwhaDeleteProfilesOnInitIfNeeded->value();
+    }
 
-void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles)
-{
-    m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
-}
+    void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles)
+    {
+        m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
+    }
+#endif
 
 bool QnGlobalSettings::isEdgeRecordingEnabled() const
 {

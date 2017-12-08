@@ -10,7 +10,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include <nx/utils/log/log.h>
-#include "motion/metadata_multiplexer.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
@@ -461,16 +460,19 @@ begin_label:
 
 QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnection(int channel)
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
-    auto multiplexer = std::make_shared<MetadataMultiplexer>();
-    multiplexer->add(
-        std::dynamic_pointer_cast<QnAbstractMotionArchiveConnection>(
-            QnMotionHelper::instance()->createConnection(m_resource, channel)));
-    multiplexer->add(std::make_shared<nx::analytics::storage::DetectedObjectsStreamer>(
+    return std::dynamic_pointer_cast<QnAbstractMotionArchiveConnection>(
+        QnMotionHelper::instance()->createConnection(m_resource, channel));
+}
+
+QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getAnalyticsConnection(int channel)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    return std::make_shared<nx::analytics::storage::DetectedObjectsStreamer>(
         m_mediaServerModule->analyticsEventsStorage(),
-        m_resource->getId()));
-    return multiplexer;
+        m_resource->getId());
 }
 
 QnAbstractArchiveDelegate::ArchiveChunkInfo QnServerArchiveDelegate::getLastUsedChunkInfo() const

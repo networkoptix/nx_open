@@ -72,16 +72,12 @@ def language(request):
 def downloads_history(request):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    cache_key = "downloads_history_" + customization
-    downloads_json = cache.get(cache_key, False)
-    if not downloads_json:
-        downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
-        downloads_json = requests.get(downloads_url)
-        downloads_json.raise_for_status()
-        downloads_json = downloads_json.json()
-        cache.set(cache_key, json.dumps(downloads_json))
-    else:
-        downloads_json = json.loads(downloads_json)
+
+    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
+    downloads_json = requests.get(downloads_url)
+    downloads_json.raise_for_status()
+    downloads_json = downloads_json.json()
+
     return Response(downloads_json)
 
 
@@ -94,7 +90,21 @@ def download_build(request, build):
     downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
     downloads_json.raise_for_status()
-    return Response(downloads_json.json())
+    downloads_json = downloads_json.json()
+
+    updates_json = requests.get(settings.UPDATE_JSON)
+    updates_json.raise_for_status()
+    updates_json = updates_json.json()
+
+    # find settings for customizations
+    if customization not in updates_json:
+        logger.error('Customization not in updates.json: ' + customization + '. Ask Boris to fix that.')
+        customization = 'default'
+
+    updates_record = updates_json[customization]
+    downloads_json['updatesPrefix'] = updates_record['updates_prefix']
+
+    return Response(downloads_json)
 
 
 @api_view(['GET', 'POST'])
@@ -105,7 +115,6 @@ def downloads(request):
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
         cache.set(cache_key, False)
-        cache.set("all_downloads_" + customization, False)
     downloads_json = cache.get(cache_key, False)
     if not downloads_json:
         # get updates.json

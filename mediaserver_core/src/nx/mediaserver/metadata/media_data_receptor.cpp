@@ -1,62 +1,30 @@
-#include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/common_compressed_video_packet.h>
-#include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
-#include <nx/streaming/video_data_packet.h>
-#include "manager_pool.h"
 #include "media_data_receptor.h"
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-VideoDataReceptor::VideoDataReceptor(ResourceMetadataContext* context):
-    m_context(context)
+nxpt::ScopedRef<nx::sdk::metadata::CommonCompressedVideoPacket> toPluginVideoPacket(
+    const QnCompressedVideoData* video,
+    bool needDeepCopy)
 {
-}
+    nxpt::ScopedRef<CommonCompressedVideoPacket> packet(new CommonCompressedVideoPacket());
 
-void VideoDataReceptor::detachFromContext()
-{
-    QnMutexLocker lock(&m_mutex);
-    m_context = nullptr;
-}
-
-void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
-{
-    QnMutexLocker lock(&m_mutex);
-    if (!m_context)
-        return;
-    using namespace nx::sdk::metadata;
-
-    for (auto& contextData: m_context->managers())
+    packet->setTimestampUsec(video->timestamp);
+    packet->setWidth(video->width);
+    packet->setHeight(video->height);
+    packet->setCodec(toString(video->compressionType).toStdString());
+    if (needDeepCopy)
     {
-        nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
-            (AbstractConsumingMetadataManager*)
-            contextData.manager->queryInterface(IID_ConsumingMetadataManager), false);
-        if (!manager)
-            return;
-        const auto video = dynamic_cast<QnCompressedVideoData*>(data.get());
-        if (video)
-        {
-            nxpt::ScopedRef<CommonCompressedVideoPacket> packet(new CommonCompressedVideoPacket());
-            packet->setTimestampUsec(data->timestamp);
-            packet->setWidth(video->width);
-            packet->setHeight(video->height);
-            packet->setCodec(toString(video->compressionType).toStdString());
-            if (contextData.manifest.capabilities.testFlag(
-                nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame))
-            {
-                std::vector<char> buffer(video->dataSize());
-                memcpy(&buffer[0], video->data(), video->dataSize());
-                packet->setData(std::move(buffer));
-            }
-            else
-            {
-                packet->setData(video->data(), video->dataSize());
-            }
-
-            manager->putData(packet.get());
-        }
+        std::vector<char> buffer(video->dataSize());
+        memcpy(&buffer[0], video->data(), video->dataSize());
+        packet->setData(std::move(buffer));
     }
+    else
+    {
+        packet->setData(video->data(), video->dataSize());
+    }
+    return packet;
 }
 
 } // namespace metadata

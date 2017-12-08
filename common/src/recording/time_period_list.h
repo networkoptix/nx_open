@@ -138,7 +138,14 @@ public:
      */
     static void unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
 
+    static QnTimePeriodList aggregateTimePeriodsUnconstrained(
+        const QnTimePeriodList& periods,
+        std::chrono::milliseconds detailLevel);
+
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
+    static QnTimePeriodList aggregateTimePeriods(
+        const QnTimePeriodList& periods,
+        std::chrono::milliseconds detailLevel);
 
     /**
      * Include a period to the period list

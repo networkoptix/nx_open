@@ -14,8 +14,6 @@ ResourceMetadataContext::ResourceMetadataContext()
 
 ResourceMetadataContext::~ResourceMetadataContext()
 {
-    if (m_videoFrameDataReceptor)
-        m_videoFrameDataReceptor->detachFromContext();
     m_videoFrameDataReceptor.clear();
 }
 

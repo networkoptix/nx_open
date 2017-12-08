@@ -34,6 +34,8 @@ public:
 static const nxpl::NX_GUID IID_MetadataManager =
     {{0x48, 0x5a, 0x23, 0x51, 0x55, 0x73, 0x4f, 0xb5, 0xa9, 0x11, 0xe4, 0xfb, 0x22, 0x87, 0x79, 0x24}};
 
+class AbstractMetadataPlugin;
+
 /**
  * Interface used to control the process of fetching metadata from the resource.
  */
@@ -41,6 +43,8 @@ class AbstractMetadataManager: public nxpl::PluginInterface
 {
 public:
     // TODO: #mike: Decide on separation between events and other metadata packet types.
+
+    virtual AbstractMetadataPlugin* plugin() = 0;
 
     /**
      * Starts fetching metadata from the resource.

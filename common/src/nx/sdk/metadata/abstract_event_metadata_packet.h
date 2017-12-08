@@ -16,7 +16,6 @@ static const nxpl::NX_GUID IID_DetectedEvent
 
 class AbstractDetectedEvent: public AbstractMetadataItem
 {
-
 public:
     /**
      * @return Null terminated UTF8 string containing the caption of the event.

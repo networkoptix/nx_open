@@ -54,7 +54,7 @@ static const nxpl::NX_GUID IID_DetectedObject
 /**
  * Represents a single object detected on the scene.
  */
-class AbstarctDetectedObject: public AbstractMetadataItem //< TODO: #mike: Rename (typo).
+class AbstractDetectedObject: public AbstractMetadataItem
 {
 public:
     /**
@@ -108,7 +108,7 @@ public:
      * @return next detected object or null if no more objects left.
      * This functions should not modify objects and behave like a constant iterator.
      */
-    virtual AbstarctDetectedObject* nextItem() = 0;
+    virtual AbstractDetectedObject* nextItem() = 0;
 };
 
 } // namespace metadata

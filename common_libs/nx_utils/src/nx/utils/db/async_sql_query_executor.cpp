@@ -57,20 +57,21 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     m_dropConnectionThread.join();
 
     std::vector<std::unique_ptr<BaseRequestExecutor>> dbThreadPool;
+    decltype(m_cursorProcessorContexts) cursorProcessorContexts;
     {
         QnMutexLocker lk(&m_mutex);
         std::swap(m_dbThreadPool, dbThreadPool);
-
-        for (auto& context: m_cursorProcessorContext)
-            dbThreadPool.push_back(std::move(context.processingThread));
-        m_cursorProcessorContext.clear();
-
+        std::swap(m_cursorProcessorContexts, cursorProcessorContexts);
         m_terminated = true;
     }
 
     for (auto& dbConnection: dbThreadPool)
         dbConnection->pleaseStop();
     dbThreadPool.clear();
+
+    for (auto& context: cursorProcessorContexts)
+        context->processingThread->pleaseStop();
+    cursorProcessorContexts.clear();
 }
 
 const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
@@ -172,6 +173,25 @@ std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
     return m_queryQueue.size();
 }
 
+void AsyncSqlQueryExecutor::removeCursor(QnUuid id)
+{
+    m_cursorProcessorContexts.front()->cursorContextPool.markCursorForDeletion(id);
+    auto task = std::make_unique<detail::CleanUpDroppedCursorsExecutor>(
+        &m_cursorProcessorContexts.front()->cursorContextPool);
+    m_cursorTaskQueue.push(std::move(task));
+}
+
+int AsyncSqlQueryExecutor::openCursorCount() const
+{
+    return std::accumulate(
+        m_cursorProcessorContexts.begin(), m_cursorProcessorContexts.end(),
+        0,
+        [](int sum, const std::unique_ptr<CursorProcessorContext>& element) -> int
+        {
+            return sum + (int) element->cursorContextPool.cursorCount();
+        });
+}
+
 void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
 {
     m_queryQueue.setConcurrentModificationQueryLimit(value);
@@ -271,11 +291,11 @@ void AsyncSqlQueryExecutor::dropConnectionAsync(
 
 void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& lock)
 {
-    m_cursorProcessorContext.push_back(CursorProcessorContext());
+    m_cursorProcessorContexts.push_back(std::make_unique<CursorProcessorContext>());
     // Disabling inactivity timer.
     auto connectionOptions = m_connectionOptions;
     connectionOptions.inactivityTimeout = std::chrono::seconds::zero();
-    m_cursorProcessorContext.back().processingThread =
+    m_cursorProcessorContexts.back()->processingThread =
         createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 }
 

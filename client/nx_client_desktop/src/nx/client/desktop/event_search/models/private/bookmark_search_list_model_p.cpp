@@ -45,8 +45,8 @@ void BookmarkSearchListModel::Private::setCamera(const QnVirtualCameraResourcePt
     if (m_camera == camera)
         return;
 
-    m_camera = camera;
     clear();
+    m_camera = camera;
 }
 
 int BookmarkSearchListModel::Private::count() const

@@ -10,7 +10,7 @@ bool Statistics::operator==(const Statistics& right) const
 {
     return
         listeningServerCount == right.listeningServerCount &&
-        connectionsCount == right.connectionsCount &&
+        connectionCount == right.connectionCount &&
         connectionsAveragePerServerCount == right.connectionsAveragePerServerCount &&
         connectionsAcceptedPerMinute == right.connectionsAcceptedPerMinute;
 }
