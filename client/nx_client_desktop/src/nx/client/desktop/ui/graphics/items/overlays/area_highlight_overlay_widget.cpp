@@ -21,10 +21,6 @@ namespace desktop {
 
 namespace {
 
-struct Side {
-    enum Type { left = 0, right, top, bottom };
-};
-
 static const auto kDimmerColor = QColor("#70000000");
 
 static constexpr auto kSpacing = 8;
@@ -41,11 +37,11 @@ static QRectF calculateLabelGeometry(
         boundingRect.right() - objectRect.right() - spacing,
         boundingRect.bottom() - objectRect.bottom() - spacing);
 
-    auto bestSide = Side::bottom;
+    auto bestSide = Qt::BottomEdge;
     qreal bestSpaceProportion = 0;
 
     auto checkSide =
-        [&](Side::Type side, qreal labelSize, qreal space)
+        [&](Qt::Edge side, qreal labelSize, qreal space)
         {
             const qreal proportion = space / labelSize;
             if (proportion >= 1.0 || proportion >= bestSpaceProportion)
@@ -55,35 +51,35 @@ static QRectF calculateLabelGeometry(
             }
         };
 
-    checkSide(Side::left, labelSize.width(), space.left());
-    checkSide(Side::top, labelSize.height(), space.top());
-    checkSide(Side::right, labelSize.width(), space.right());
-    checkSide(Side::bottom, labelSize.height(), space.bottom());
+    checkSide(Qt::LeftEdge, labelSize.width(), space.left());
+    checkSide(Qt::TopEdge, labelSize.height(), space.top());
+    checkSide(Qt::RightEdge, labelSize.width(), space.right());
+    checkSide(Qt::BottomEdge, labelSize.height(), space.bottom());
 
     QPointF pos;
     QSizeF size;
 
     switch (bestSide)
     {
-        case Side::left:
+        case Qt::LeftEdge:
             pos = QPointF(
                 objectRect.left() - labelSize.width() - spacing,
                 objectRect.top());
             size = Geometry::bounded(labelSize, QSizeF(space.left(), boundingRect.height()));
             break;
-        case Side::right:
+        case Qt::RightEdge:
             pos = QPointF(
                 objectRect.right() + spacing,
                 objectRect.top());
             size = Geometry::bounded(labelSize, QSizeF(space.right(), boundingRect.height()));
             break;
-        case Side::top:
+        case Qt::TopEdge:
             pos = QPointF(
                 objectRect.left(),
                 objectRect.top() - labelSize.height() - spacing);
             size = Geometry::bounded(labelSize, QSizeF(boundingRect.width(), space.top()));
             break;
-        case Side::bottom:
+        case Qt::BottomEdge:
             pos = QPointF(
                 objectRect.left(),
                 objectRect.bottom() + spacing);
