@@ -914,7 +914,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
         requestStr += lit(" DESC");
 
     if (limit > 0 && limit < std::numeric_limits<int>().max())
-        requestStr += lit("LIMIT %1").arg(limit);
+        requestStr += lit(" LIMIT %1").arg(limit);
 
     return requestStr;
 }

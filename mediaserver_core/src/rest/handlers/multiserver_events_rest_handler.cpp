@@ -66,7 +66,9 @@ public:
 private:
     void getEventsLocal(MultiData& outputData, RequestContext* context)
     {
-        vms::event::ActionDataList actions = qnServerDb->getActions(context->request().filter);
+        vms::event::ActionDataList actions = qnServerDb->getActions(context->request().filter,
+            context->request().order, context->request().limit);
+
         if (actions.empty())
             return;
 
