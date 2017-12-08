@@ -113,8 +113,10 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
-        if (!m_timeSynchronizer)
-            m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
+        if (m_timeSynchronizer)
+            return; //< All members are already initialized.
+
+        m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
 
         if (hasVideoArchive)
         {

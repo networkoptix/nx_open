@@ -84,7 +84,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
     m_rtpReader.setRole(role);
-    if (m_hanwhaResource->isNvr() && getRole() == Qn::CR_Archive)
+    if (m_hanwhaResource->isNvr() && m_sessionType == HanwhaSessionType::archive)
     {
         m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
         m_rtpReader.setOnSocketReadTimeoutCallback([this](){ return createEmptyPacket(); });

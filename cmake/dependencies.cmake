@@ -1,88 +1,100 @@
-function(detect_package_versions)
-    set(_qt_version "5.6.2")
-    set(_boost_version "1.60.0")
-    set(_openssl_version "1.0.2e")
-    set(_ffmpeg_version "3.1.1")
-    set(_sigar_version "1.7")
-    set(_openldap_version "2.4.42")
-    set(_sasl2_version "2.1.26")
-    set(_openal_version "1.16")
-    set(_libjpeg-turbo_version "1.4.2")
-    set(_festival_version "2.4")
-    set(_directx_version "JUN2010")
-    set(_cassandra_version "2.7.0")
+macro(_set_version pkg version)
+    set(_${pkg}_version ${version})
+endmacro()
+
+function(nx_detect_package_versions)
+    _set_version(qt "5.6.2")
+    _set_version(boost "1.60.0")
+    _set_version(openssl "1.0.2e")
+    _set_version(ffmpeg "3.1.1")
+    _set_version(sigar "1.7")
+    _set_version(openldap "2.4.42")
+    _set_version(sasl2 "2.1.26")
+    _set_version(openal "1.16")
+    _set_version(libjpeg-turbo "1.4.2")
+    _set_version(festival "2.4")
+    _set_version(directx "JUN2010")
+    _set_version(cassandra "2.7.0")
 
     if(WINDOWS)
-        set(_qt_version "5.6.1-1")
+        _set_version(qt "5.6.1-1")
     endif()
 
     if(LINUX AND box STREQUAL "none")
-        set(_qt_version "5.6.2-2")
+        _set_version(qt "5.6.2-2")
     endif()
 
     if(MACOSX)
-        set(_qt_version "5.6.3")
-        set(_ffmpeg_version "3.1.1-2")
-        set(_openssl_version "1.0.2e-2")
-        set(_festival_version "2.1")
+        _set_version(qt "5.6.3")
+        _set_version(ffmpeg "3.1.1-2")
+        _set_version(openssl "1.0.2e-2")
+        _set_version(festival "2.1")
     endif()
 
     if(ANDROID)
-        set(_qt_version "5.6.2-2")
-        set(_openssl_version "1.0.2g")
-        set(_openal_version "1.17.2")
+        _set_version(qt "5.6.2-2")
+        _set_version(openssl "1.0.2g")
+        _set_version(openal "1.17.2")
     endif()
 
     if(IOS)
-        set(_openssl_version "1.0.1i")
-        set(_libjpeg-turbo_version "1.4.1")
+        _set_version(openssl "1.0.1i")
+        _set_version(libjpeg-turbo "1.4.1")
     endif()
 
     if(box MATCHES "bpi|bananapi")
-        set(_openssl_version "1.0.0j")
+        _set_version(openssl "1.0.0j")
     endif()
 
     if(box STREQUAL "bananapi")
-        set(_ffmpeg_version "3.1.1-bananapi")
-        set(_qt_version "5.6.1")
-        set(_openssl_version "1.0.0j")
+        _set_version(ffmpeg "3.1.1-bananapi")
+        _set_version(qt "5.6.1")
+        _set_version(openssl "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
-        set(_qt_version "5.6.1")
-        set(_openssl_version "1.0.0j")
+        _set_version(qt "5.6.1")
+        _set_version(openssl "1.0.0j")
     endif()
 
     if(box STREQUAL "edge1")
-        set(_ffmpeg_version "3.1.1")
-        set(_qt_version "5.6.3")
-        set(_openssl_version "1.0.1f")
+        _set_version(ffmpeg "3.1.1")
+        _set_version(qt "5.6.1")
+        _set_version(openssl "1.0.1f")
     endif()
 
     if(box STREQUAL "tx1")
-        set(_festival_version "2.1x")
-        set(_openssl_version "1.0.0j")
-        set(_qt_version "5.6.3")
+        _set_version(festival "2.1x")
+        _set_version(openssl "1.0.0j")
+        _set_version(qt "5.6.3")
     endif()
+    _set_version(festival-vox ${_festival_version})
+    _set_version(help ${customization}-${releaseVersion.short})
 
-    set(qt_version ${_qt_version} CACHE STRING "")
-    set(boost_version ${_boost_version} CACHE STRING "")
-    set(openssl_version ${_openssl_version} CACHE STRING "")
-    set(ffmpeg_version ${_ffmpeg_version} CACHE STRING "")
-    set(sigar_version ${_sigar_version} CACHE STRING "")
-    set(openldap_version ${_openldap_version} CACHE STRING "")
-    set(sasl2_version ${_sasl2_version} CACHE STRING "")
-    set(openal_version ${_openal_version} CACHE STRING "")
-    set(libjpeg-turbo_version ${_libjpeg-turbo_version} CACHE STRING "")
-    set(festival_version ${_festival_version} CACHE STRING "")
-    set(festival-vox_version ${festival_version} PARENT_SCOPE)
-    set(directx_version ${_directx_version} CACHE STRING "")
-    set(cassandra_version ${_cassandra_version} CACHE STRING "")
-    set(server-external_version "" CACHE STRING "")
-    set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
+    foreach(pkg
+        qt
+        boost
+        openssl
+        ffmpeg
+        quazip
+        onvif
+        sigar
+        openldap
+        sasl2
+        openal
+        libjpeg-turbo
+        festival festival-vox
+        gtest gmock
+        directx
+        help
+        cassandra
+    )
+        nx_set_variable_if_empty(${pkg}_version ${_${pkg}_version})
+        nx_expose_to_parent_scope(${pkg}_version)
+    endforeach()
 endfunction()
 
-function(get_dependencies)
+function(nx_get_dependencies)
     if (WINDOWS OR (LINUX AND NOT ANDROID))
         set(haveServer TRUE)
     endif()
@@ -224,5 +236,5 @@ function(get_dependencies)
     set(certificates_path ${certificates_path} PARENT_SCOPE)
 endfunction()
 
-detect_package_versions()
-get_dependencies()
+nx_detect_package_versions()
+nx_get_dependencies()

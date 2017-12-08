@@ -3,6 +3,8 @@
 #include <memory>
 #include <atomic>
 
+#include <QThreadPool>
+
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
@@ -135,6 +137,8 @@ public:
 
     static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
 
+    QThreadPool* threadPool();
+
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:
@@ -170,6 +174,8 @@ private:
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 private:
+    QThreadPool m_threadPool;
+
     mutable QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
