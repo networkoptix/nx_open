@@ -32,6 +32,7 @@ angular.module('nxCommon')
                 player:"=",
                 activeFormat:"=",
                 rotation: "=",
+                crashCount: "=",
                 playerErrorHandler: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
@@ -234,7 +235,7 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("loadeddata", function(event){
                                     scope.loading = false; // Video is playing - disable loading
-                                    crashCount = 0;
+                                    scope.crashCount = 0;
                                     cancelTimeoutNativeLoad();
                                 });
 
@@ -319,7 +320,7 @@ angular.module('nxCommon')
 
                                     scope.vgApi.addEventListener("loadeddata", function(){
                                         scope.loading = false;  // Video is ready - disable loading
-                                        crashCount = 0;
+                                        scope.crashCount = 0;
                                     });
 
                                     scope.vgApi.addEventListener("timeupdate", function (event) {
@@ -342,16 +343,8 @@ angular.module('nxCommon')
                     console.error(error);
                     scope.videoFlags.errorLoading = true;
                     scope.loading = false; // Some error happended - stop loading
-                    $timeout(function(){
-                        if( crashCount < Config.webclient.maxCrashCount ){
-                            crashCount += 1;
-                            scope.playerErrorHandler();
-                        }
-                        else{
-                            crashCount = 0;
-                        }
-                    });
                     resetPlayer();
+                    scope.playerErrorHandler();
                 }
 
                 function initNewPlayer(){

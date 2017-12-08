@@ -206,9 +206,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
 
             $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
-            var salt = '';
             if(live){
-                salt = '&' + Math.random();
                 playingPosition = timeManager.nowToDisplay();
             }else{
                 playingPosition = Math.round(playingPosition);
@@ -217,6 +215,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.activeCamera){
                 return;
             }
+            var salt = '&' + Math.random();
             var cameraId = $scope.activeCamera.id;
             var serverUrl = '';
 
@@ -291,8 +290,15 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         //On player error update source to cause player to restart
+        $scope.crashCount = 0;
         $scope.playerErrorHandler = function(){
-            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+            if($scope.crashCount < Config.webclient.maxCrashCount){
+                updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+                $scope.crashCount += 1;
+            }
+            else{
+                //$scope.crashCount = 0;
+            }
         };
 
         $scope.selectFormat = function(format){
