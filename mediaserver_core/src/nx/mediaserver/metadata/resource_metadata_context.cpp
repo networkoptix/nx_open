@@ -8,6 +8,12 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
+ManagerContext::~ManagerContext()
+{
+    if (manager)
+        manager->stopFetchingMetadata();
+}
+
 ResourceMetadataContext::ResourceMetadataContext()
 {
 }

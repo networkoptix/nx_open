@@ -37,6 +37,9 @@ struct ManagerContext
     HandlerPtr handler;
     ManagerPtr manager;
     nx::api::AnalyticsDriverManifest manifest;
+    ManagerContext() = default;
+    ManagerContext(ManagerContext&& other) = default;
+    ~ManagerContext();
 };
 
 using ManagerList = std::vector<ManagerContext>;
