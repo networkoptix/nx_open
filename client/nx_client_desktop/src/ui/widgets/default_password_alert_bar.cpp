@@ -70,8 +70,8 @@ void QnDefaultPasswordAlertBar::updateState()
         "This camera requires password to be set up.");
     static const auto kMultipleCameraAlertText = tr(
         "Some of selected cameras requires password to be set up.");
-    static const auto kAskAdministratorText =
-        tr(" Ask your system administrator to do it.");
+    static const auto kAskAdministratorText = L' ' +
+        tr("Ask your system administrator to do it.");
 
     const bool hasAdminAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;

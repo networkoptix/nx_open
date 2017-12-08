@@ -667,7 +667,7 @@ void ActionHandler::showMultipleCamerasErrorMessage(
     const QnVirtualCameraResourceList& camerasWithError,
     const QString& explanation)
 {
-    static const auto kMessageTemplate = tr("Failed to change passwords on %1 of %2 cameras");
+    static const auto kMessageTemplate = tr("Failed to change password on %1 of %2 cameras");
     static const auto kSimpleOptions = QnResourceListView::Options(
         QnResourceListView::HideStatusOption
         | QnResourceListView::ServerAsHealthMonitorOption

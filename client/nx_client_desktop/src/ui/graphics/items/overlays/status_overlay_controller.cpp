@@ -312,7 +312,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
     result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Enable"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
-    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set For This Camera"));
+    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set for this camera"));
 
     if (resource)
     {
