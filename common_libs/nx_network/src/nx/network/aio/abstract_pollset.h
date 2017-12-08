@@ -32,7 +32,7 @@ public:
 /**
  * Wrapper on top of OS provided epoll, select or kqueue.
  * Allows to wait for state change on mutiple sockets.
- * If AbstractPollSet::poll() returns positive value, then AbstractPollSet::getSocketEventsIterator() 
+ * If AbstractPollSet::poll() returns positive value, then AbstractPollSet::getSocketEventsIterator()
  *   returns iterator pointing just before the first socket which state has been changed.
  * NOTE: Every socket is always monitored for error and all errors are reported.
  * NOTE: This class is not thread-safe.
@@ -45,21 +45,21 @@ public:
     virtual ~AbstractPollSet() = default;
 
     /**
-     * Returns true, if all internal data has been initialized successfully. 
+     * Returns true, if all internal data has been initialized successfully.
      */
     virtual bool isValid() const = 0;
     /**
      * Interrupts poll method, blocked in other thread.
      * This is the only method which is allowed to be called from different thread.
-     * poll, called after interrupt, will return immediately. 
-     * But, it is unspecified whether it will return multiple times 
+     * poll, called after interrupt, will return immediately.
+     * But, it is unspecified whether it will return multiple times
      *   if interrupt has been called multiple times.
      */
     virtual void interrupt() = 0;
     /**
      * Add socket to set. Does not take socket ownership.
      * @param eventType event to monitor on socket sock.
-     * @param userData 
+     * @param userData
      * @return true, if socket added to set.
      * NOTE: This method does not check, whether sock is already in pollset.
      * NOTE: Ivalidates all iterators.
@@ -68,7 +68,7 @@ public:
     virtual bool add(Pollable* const sock, EventType eventType, void* userData = NULL) = 0;
     /**
      * Do not monitor event eventType on socket sock anymore.
-     * NOTE: Ivalidates all iterators to the left of removed element. 
+     * NOTE: Ivalidates all iterators to the left of removed element.
      * So, it is ok to iterate signalled sockets and remove current element:
      *   following iterator increment operation will perform safely.
      */

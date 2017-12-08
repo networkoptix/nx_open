@@ -31,7 +31,7 @@ public:
 /**
  * Parses Range header ([rfc2326, 12.29]).
  * Returns range in microseconds.
- * NOTE: Only clock is supported. 
+ * NOTE: Only clock is supported.
  *   Though, it MUST contain UTC timestamp (millis or usec). I.e., not rfc2326-compliant.
  * NOTE: For now constant DATETIME_NOW is returned.
  * @return true if startTime and endTime were filled with values.

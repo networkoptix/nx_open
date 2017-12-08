@@ -13,7 +13,7 @@ namespace aio {
 class AIOService;
 
 /**
- * This class implements AbstractPollable and simplifies async operation cancellation 
+ * This class implements AbstractPollable and simplifies async operation cancellation
  * by introducing BasicPollable::stopWhileInAioThread method.
  *
  * TODO #ak conflicts with Pollable. Introduce proper names for Pollable, AbstractPollable, BasicPollable.
@@ -38,9 +38,9 @@ public:
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     /**
-     * Generally, binding to aio thread can be done just after 
+     * Generally, binding to aio thread can be done just after
      *     object creation before any usage.
-     * Some implementation may allow more (e.g., binding if no async 
+     * Some implementation may allow more (e.g., binding if no async
      *     operations are scheduled at the moment)
      * NOTE: Re-binding is allowed
      */

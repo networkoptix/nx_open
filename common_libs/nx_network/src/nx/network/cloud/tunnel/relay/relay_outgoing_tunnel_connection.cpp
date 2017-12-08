@@ -130,7 +130,7 @@ void OutgoingTunnelConnection::onConnectionOpened(
     std::unique_ptr<AbstractStreamSocket> connection,
     std::list<std::unique_ptr<RequestContext>>::iterator requestIter)
 {
-    const auto requestContext = std::move(*requestIter);
+    auto requestContext = std::move(*requestIter);
     m_activeRequests.erase(requestIter);
 
     const auto errorCodeToReport = toSystemError(resultCode);
@@ -150,8 +150,12 @@ void OutgoingTunnelConnection::onConnectionOpened(
         connection.swap(outgoingConnection);
     }
 
+    decltype(requestContext->completionHandler) completionHandler;
+    completionHandler.swap(requestContext->completionHandler);
+    requestContext.reset();
+
     utils::ObjectDestructionFlag::Watcher watcher(&m_objectDestructionFlag);
-    requestContext->completionHandler(
+    completionHandler(
         errorCodeToReport,
         std::move(connection),
         resultCode == nx::cloud::relay::api::ResultCode::ok);
