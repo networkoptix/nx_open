@@ -662,13 +662,6 @@
     </message>
 </context>
 <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-        <source>Operation is not permitted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnSignHelper</name>
     <message>
         <source>Unknown</source>
