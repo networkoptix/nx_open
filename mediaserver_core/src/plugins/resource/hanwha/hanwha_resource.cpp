@@ -10,6 +10,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <QtCore/QMap>
 
@@ -1139,15 +1140,22 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    bool hasRemoteArchive = !isNvr();
+    if (!ini().enableEdge || isNvr())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
+        return CameraDiagnostics::NoErrorResult();
+    }
 
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(lit("recording/storage"));
     if (!response.isSuccessful())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
         return CameraDiagnostics::NoErrorResult();
+    }
 
     const auto storageEnabled = response.parameter<bool>(lit("Enable"));
-    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
+    const bool hasRemoteArchive = (storageEnabled != boost::none) && *storageEnabled;
     setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
 
     return CameraDiagnostics::NoErrorResult();
