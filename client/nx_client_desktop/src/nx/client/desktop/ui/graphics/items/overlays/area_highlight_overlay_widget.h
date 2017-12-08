@@ -36,6 +36,7 @@ public:
 
 signals:
     void highlightedAreaChanged(const QnUuid& areaId);
+    void areaClicked(const QnUuid& areaId);
 
 private:
     class Private;

@@ -233,6 +233,12 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
                 else if (d->highlightedAreaId == id)
                     d->setHighlightedArea(QnUuid());
             });
+
+        connect(rectItem.data(), &AreaRectItem::clicked, this,
+            [this, id = area.info.id]()
+            {
+                emit areaClicked(id);
+            });
     }
     d->updateAreaRectangle(area);
 
