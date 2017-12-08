@@ -11,7 +11,6 @@ namespace info {
 class NX_UPDATE_API AbstractUpdateRegistry
 {
 public:
-    // todo: serialize and deserialize
     // todo: findClientUpdate() implement
     virtual ~AbstractUpdateRegistry() {}
     virtual ResultCode findUpdate(
