@@ -235,6 +235,9 @@ TegraVideo::Rect NaiveObjectTracker::applySpeedToRectangle(
     result.x = std::max(std::min(result.x + xOffset, 1.0f), 0.0f);
     result.y = std::max(std::min(result.y + yOffset, 1.0f), 0.0f);
 
+    result.width = std::min(result.width, 1.0f - result.x);
+    result.height = std::min(result.height, 1.0f - result.y);
+
     return result;
 }
 
