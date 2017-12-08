@@ -32,16 +32,16 @@ file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 
 add_custom_target(wixsetup ALL
     DEPENDS
-        desktop_client 
-        applauncher 
-        traytool 
-        mediaserver 
-        minilauncher 
-        customactions 
+        desktop_client
+        applauncher
+        traytool
+        mediaserver
+        minilauncher
+        customactions
         testcamera
-        genericrtspplugin 
-        mjpg_link 
-        generic_multicast_plugin 
+        genericrtspplugin
+        mjpg_link
+        generic_multicast_plugin
         hanwha_metadata_plugin
     COMMENT "Creating installer..."
     # TODO move python to cmake
