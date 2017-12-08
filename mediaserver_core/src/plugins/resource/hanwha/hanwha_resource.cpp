@@ -1789,7 +1789,15 @@ QSize HanwhaResource::bestSecondaryResolution(
         return QSize();
     }
 
-    return secondaryStreamResolution(primaryResolution, resolutionList);
+    QList<QSize> resolutions; //< TODO: #dmishin get rid of this.
+    for (const auto& resolution: resolutionList)
+        resolutions.push_back(resolution);
+
+    return closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+        getResolutionAspectRatio(primaryResolution),
+        SECONDARY_STREAM_MAX_RESOLUTION,
+        resolutions);
 }
 
 QnCameraAdvancedParams HanwhaResource::filterParameters(
