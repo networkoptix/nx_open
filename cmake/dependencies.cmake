@@ -68,6 +68,7 @@ function(nx_detect_package_versions)
         _set_version(openssl "1.0.0j")
         _set_version(qt "5.6.3")
     endif()
+
     _set_version(festival-vox ${_festival_version})
     _set_version(help ${customization}-${releaseVersion.short})
 
@@ -84,13 +85,17 @@ function(nx_detect_package_versions)
         openal
         libjpeg-turbo
         festival festival-vox
-        gtest gmock
         directx
         help
         cassandra
     )
-        nx_set_variable_if_empty(${pkg}_version ${_${pkg}_version})
-        nx_expose_to_parent_scope(${pkg}_version)
+        if("${_${pkg}_version}" STREQUAL "")
+            message(WARNING
+                "Cannot set version of ${pkg} because _${pkg}_version variable is not set.")
+        else()
+            nx_set_variable_if_empty(${pkg}_version ${_${pkg}_version})
+            nx_expose_to_parent_scope(${pkg}_version)
+        endif()
     endforeach()
 endfunction()
 
