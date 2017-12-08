@@ -11,7 +11,7 @@ namespace info {
 class NX_UPDATE_API AbstractUpdateRegistry
 {
 public:
-    // todo: findClientUpdate() implement
+    // todo: implement findClientUpdate()
     virtual ~AbstractUpdateRegistry() {}
     virtual ResultCode findUpdate(
         const UpdateRequestData& updateRequestData,
