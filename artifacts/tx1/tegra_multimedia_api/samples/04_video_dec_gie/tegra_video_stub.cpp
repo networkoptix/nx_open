@@ -91,6 +91,8 @@ public:
         outRects[1].width = 0.4f;
         outRects[1].height = 0.8f;
 
+        m_hasMetadata = false;
+
         return true;
     }
 

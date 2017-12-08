@@ -85,7 +85,7 @@ void CommonDetectedObject::setObjectSubType(const std::string& value)
     m_objectSubType = value;
 }
 
-void CommonDetectedObject::seAttributes(const std::vector<NX_LOCALE_DEPENDENT Attribute>& value)
+void CommonDetectedObject::setAttributes(const std::vector<CommonAttribute>& value)
 {
     m_attributes = value;
 }

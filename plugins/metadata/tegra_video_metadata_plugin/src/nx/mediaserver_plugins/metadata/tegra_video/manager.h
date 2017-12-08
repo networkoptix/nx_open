@@ -73,6 +73,9 @@ private:
 
     int64_t usSinceEpoch() const;
 
+    void setTrackerAttributeOptions(
+        const std::map<QString, std::vector<QString>>& options);
+
 private:
     Plugin* const m_plugin;
     mutable std::mutex m_mutex;

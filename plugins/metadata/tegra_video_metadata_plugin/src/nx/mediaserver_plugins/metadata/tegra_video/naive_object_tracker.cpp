@@ -6,12 +6,15 @@
 
 #define NX_PRINT_PREFIX "metadata::tegra_video::NaiveObjectTracker::"
 #include <nx/kit/debug.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/random.h>
+#include <nx/utils/uuid.h>
+
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
+#include <nx/sdk/metadata/common_attribute.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
 
@@ -52,6 +55,13 @@ void NaiveObjectTracker::filterAndTrack(
 void NaiveObjectTracker::setObjectTypeId(const QnUuid& objectTypeId)
 {
     m_objectTypeId = objectTypeId;
+}
+
+void NaiveObjectTracker::setAttributeOptions(
+    const QString& attributeName,
+    const std::vector<QString>& attributeValues)
+{
+    m_attributeOptions[attributeName] = attributeValues;
 }
 
 void NaiveObjectTracker::unmarkFoundObjectsInCache()
@@ -119,6 +129,8 @@ void NaiveObjectTracker::addObjectToCache(const QnUuid& id, const TegraVideo::Re
     object.rect = boundingBox;
     object.lifetime = ini().postProcObjectLifetime;
     object.found = true;
+
+    assignRandomAttributes(&object);
 
     m_cachedObjects[id] = object;
 }
@@ -192,6 +204,22 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         object->setId(toSdkGuid(cached.id));
         object->setConfidence(1);
         object->setTypeId(toSdkGuid(m_objectTypeId));
+
+        std::vector<sdk::CommonAttribute> attributes;
+        for (const auto& entry: cached.attributes)
+        {
+            const auto attributeName = entry.first;
+            const auto attributeValue = entry.second;
+
+            sdk::CommonAttribute attribute(
+                nx::sdk::AttributeType::string,
+                attributeName.toStdString(),
+                attributeValue.toStdString());
+
+            attributes.push_back(attribute);
+        }
+
+        object->setAttributes(attributes);
         outPacket->addItem(object);
     }
 }
@@ -314,6 +342,39 @@ double NaiveObjectTracker::predictXSpeedForRectangle(const TegraVideo::Rect& rec
         return (double)ini().postProcXthirdZoneCorrection / 1000;
     else
         return (double)ini().postProcXsecondZoneCorrection / 1000;
+}
+
+void NaiveObjectTracker::assignRandomAttributes(CachedObject* outCachedObject)
+{
+    NX_ASSERT(outCachedObject);
+    if (!outCachedObject)
+        return;
+
+    for (const auto& entry: m_attributeOptions)
+    {
+        const auto attributeName = entry.first;
+        const auto attributeValue = randomAttributeValue(attributeName);
+
+        if (attributeValue.isEmpty())
+            return;
+
+        outCachedObject->attributes[attributeName] = attributeValue;
+    }
+}
+
+QString NaiveObjectTracker::randomAttributeValue(const QString& attributeName) const
+{
+    auto itr = m_attributeOptions.find(attributeName);
+    if (itr == m_attributeOptions.cend() || itr->second.empty())
+        return QString();
+
+    const auto& options = itr->second;
+    const auto index = nx::utils::random::number<int>(0, options.size() - 1);
+    NX_ASSERT(index >= 0 && index < options.size());
+    if (index < 0 && index >= options.size())
+        return QString();
+
+    return options[index];
 }
 
 bool NaiveObjectTracker::isTooBig(const TegraVideo::Rect& rectangle)
