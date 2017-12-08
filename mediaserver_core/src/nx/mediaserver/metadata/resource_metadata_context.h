@@ -32,7 +32,7 @@ class VideoDataReceptor;
 using ManagerPtr = nxpt::ScopedRef<nx::sdk::metadata::AbstractMetadataManager>;
 using HandlerPtr = std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler>;
 
-struct ManagerContext
+struct ManagerContext final
 {
     HandlerPtr handler;
     ManagerPtr manager;
