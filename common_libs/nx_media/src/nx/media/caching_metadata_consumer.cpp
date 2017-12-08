@@ -3,8 +3,28 @@
 #include <QtCore/QCache>
 #include <QtCore/QVector>
 
+#include <nx/media/ini.h>
+
 namespace nx {
 namespace media {
+
+namespace {
+
+bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const qint64 timestamp)
+{
+    const auto allowedDelay = (metadata->metadataType == MetadataType::ObjectDetection)
+        ? ini().allowedAnalyticsMetadataDelay * 1000
+        : 0;
+
+    const auto duration = metadata->duration() + allowedDelay;
+
+    if (duration == 0)
+        return timestamp == metadata->timestamp;
+
+    return timestamp >= metadata->timestamp && timestamp < metadata->timestamp + duration;
+}
+
+} // namespace
 
 class CachingMetadataConsumer::Private
 {
@@ -31,7 +51,7 @@ QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(qint64 timesta
         return QnAbstractCompressedMetadataPtr();
 
     const auto& metadata = d->cachedMetadata[channel];
-    if (metadata && metadata->containTime(timestamp))
+    if (metadata && metadataContainsTime(metadata, timestamp))
         return metadata;
 
     return QnAbstractCompressedMetadataPtr();
