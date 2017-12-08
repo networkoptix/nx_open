@@ -83,16 +83,11 @@ Error Manager::startFetchingMetadata()
     auto metadataDigger =
         [this]()
         {
-            while (true)
+            while (!m_stopping)
             {
-                {
-                    std::lock_guard<std::mutex> lock(m_mutex);
-                    if (m_stopping)
-                        break;
-                    const auto packet = cookSomeEvents();
-                    m_handler->handleMetadata(Error::noError, packet);
-                    packet->releaseRef();
-                }
+                const auto packet = cookSomeEvents();
+                m_handler->handleMetadata(Error::noError, packet);
+                packet->releaseRef();
                 std::this_thread::sleep_for(std::chrono::milliseconds(3000));
             }
         };
