@@ -37,8 +37,7 @@ class AIOService:
     public AIOEventHandler
 {
 public:
-    AIOService():
-        m_service(1)
+    AIOService()
     {
     }
 
@@ -98,7 +97,7 @@ protected:
             else if (action == 1)
             {
                 m_service.post(
-                    m_socket.get(), 
+                    m_socket.get(),
                     [this]()
                     {
                         m_service.stopMonitoring(m_socket.get(), eventType, true);
@@ -154,6 +153,8 @@ private:
 
     virtual void SetUp() override
     {
+        ASSERT_TRUE(m_service.initialize(1));
+
         ASSERT_TRUE(m_tcpServer.bindAndListen(SocketAddress::anyPrivateAddress));
         m_tcpServer.start();
     }
