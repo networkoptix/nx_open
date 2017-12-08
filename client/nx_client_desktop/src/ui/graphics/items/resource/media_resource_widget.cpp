@@ -394,6 +394,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(m_recordingStatusHelper, &RecordingStatusHelper::recordingModeChanged,
         this, &QnMediaResourceWidget::updateIconButton);
 
+    d->analyticsController.reset(new WidgetAnalyticsController(this));
     d->analyticsController->setAreaHighlightOverlayWidget(m_areaHighlightOverlayWidget);
     d->analyticsController->setAnalyticsMetadataProvider(d->analyticsMetadataProvider);
 

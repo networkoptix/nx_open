@@ -417,8 +417,15 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
     data.dewarpingParams = params.dewarpingParams;
 
     qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, params.time);
+
     if (params.frameDistinctionColor.isValid())
         qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+
+    if (!params.zoomWindowRectangleVisible)
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
+    }
 
     if (params.usePosition)
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
@@ -2166,6 +2173,8 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     addParams.dewarpingParams.enabled = widget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameDistinctionColor = params.argument<QColor>(Qn::ItemFrameDistinctionColorRole);
+    addParams.zoomWindowRectangleVisible =
+        params.argument<bool>(Qn::ItemZoomWindowRectangleVisibleRole);
     addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);

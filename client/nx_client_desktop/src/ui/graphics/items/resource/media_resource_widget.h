@@ -182,6 +182,7 @@ signals:
     void positionChanged(qint64 positionUtcMs);
     void motionSearchModeEnabled(bool enabled);
     void zoomWindowCreationModeEnabled(bool enabled);
+    void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
 
 protected:
