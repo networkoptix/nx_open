@@ -214,7 +214,10 @@ var Config = {
         staticResources: "static/web_common/",
         maxCrashCount: 2,
         nativeTimeout: 60 * 1000, //60s
-        playerReadyTimeout: 100
+        playerReadyTimeout: 100,
+        endOfArchiveTime: 30 * 1000, //30s
+        chunksToCheckFatal: 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
+
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',

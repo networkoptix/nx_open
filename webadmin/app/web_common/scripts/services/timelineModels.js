@@ -938,7 +938,27 @@ ShortCache.prototype.setPlayingPosition = function(position){
     return this.playedPosition;
 };
 
+ShortCache.prototype.getChunks = function(requestPosition){
+    return this.mediaserver.getRecords(
+        this.cameras[0],
+        timeManager.displayToServer(requestPosition),
+        timeManager.nowToServer() + 100000,
+        this.requestDetailization,
+        Config.chunksForFatalCheck
+    ).then(function(data){
+        var chunks = data.data.reply;
+        _.forEach(chunks,function(chunk){
+            chunk.durationMs = parseInt(chunk.durationMs);
+            chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
 
+            if(chunk.durationMs == -1){
+                chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
+            }
+        });
+
+        return chunks;
+    });
+};
 
 
 
