@@ -283,6 +283,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //if(playing === false) {
+                $scope.crashCount = 0;
                 updateVideoSource(val);//We have nothing more to do with it.
             /*}else{
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
@@ -297,7 +298,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.crashCount += 1;
             }
             else{
-                //$scope.crashCount = 0;
+                $scope.crashCount = 0;
             }
         };
 
@@ -378,6 +379,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return;
             }
             $scope.player = null;
+            $scope.crashCount = 0;
             $scope.storage.cameraId  = $scope.activeCamera.id;
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
@@ -389,6 +391,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.player){
                 return;
             }
+            $scope.crashCount = 0;
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         },true);
 
