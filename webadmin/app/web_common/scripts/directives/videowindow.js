@@ -340,11 +340,11 @@ angular.module('nxCommon')
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 
                 function playerErrorHandler(error){
-                    console.error(error);
                     scope.videoFlags.errorLoading = true;
                     scope.loading = false; // Some error happended - stop loading
                     resetPlayer();
                     scope.playerErrorHandler();
+                    console.error(error);
                 }
 
                 function initNewPlayer(){
