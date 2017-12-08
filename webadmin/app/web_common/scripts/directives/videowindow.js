@@ -32,8 +32,7 @@ angular.module('nxCommon')
                 player:"=",
                 activeFormat:"=",
                 rotation: "=",
-                crashCount: "=",
-                playerErrorHandler: "="
+                playerHandler: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
@@ -186,7 +185,6 @@ angular.module('nxCommon')
                 // TODO: Support new players
 
                 var makingPlayer = false;
-                var crashCount = 0;
                 var nativePlayerLoadError = null;
 
                 //For the native player. Handles webm's long loading times
@@ -235,7 +233,7 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("loadeddata", function(event){
                                     scope.loading = false; // Video is playing - disable loading
-                                    scope.crashCount = 0;
+                                    scope.playerHandler();
                                     cancelTimeoutNativeLoad();
                                 });
 
@@ -320,7 +318,7 @@ angular.module('nxCommon')
 
                                     scope.vgApi.addEventListener("loadeddata", function(){
                                         scope.loading = false;  // Video is ready - disable loading
-                                        scope.crashCount = 0;
+                                        scope.playerHandler();
                                     });
 
                                     scope.vgApi.addEventListener("timeupdate", function (event) {
@@ -343,7 +341,7 @@ angular.module('nxCommon')
                     scope.videoFlags.errorLoading = true;
                     scope.loading = false; // Some error happended - stop loading
                     resetPlayer();
-                    scope.playerErrorHandler();
+                    scope.playerHandler(true);
                     console.error(error);
                 }
 
