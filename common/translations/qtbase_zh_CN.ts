@@ -585,7 +585,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>移除</translation>
+      <translation>删除</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -966,7 +966,7 @@ Do you want to delete it anyway?</source>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>撤消</translation>
+      <translation>取消</translation>
     </message>
   </context>
   <context>

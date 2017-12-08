@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>הדלק/כבה</translation>
+      <translation>מתג</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation>תצורה</translation>
+      <translation>הגדרות</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -735,7 +735,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;סגור</translation>
+      <translation>&amp;סגירה</translation>
     </message>
     <message>
       <source>Close without Saving</source>
@@ -936,7 +936,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>סגור</translation>
+      <translation>סגירה</translation>
     </message>
     <message>
       <source>Cancel</source>

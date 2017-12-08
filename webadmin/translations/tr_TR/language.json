@@ -116,7 +116,7 @@
     "common": {
         "systemOffline": "Sistem çevrimdışı",
         "cameraLinks": {
-            "copyToClipboard": "panoya yapıştır",
+            "copyToClipboard": "panoya kopyala",
             "highStream": "Yüksek akış",
             "copyDefaultText": "kopyala",
             "unknown": "Belirtilmemiş",
