@@ -189,6 +189,8 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
 
     loadObjects(selectEventsQuery, filter, result);
 
+    queryTrackInfo(queryContext, result);
+
     return nx::utils::db::DBResult::ok;
 }
 
@@ -372,7 +374,7 @@ void EventsStorage::loadObject(
         selectEventsQuery->value(lit("box_bottom_right_y")).toDouble()));
 }
 
-void EventsStorage::mergeObjects(DetectedObject&& from, DetectedObject* to)
+void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
 {
     to->track.insert(
         to->track.end(),
@@ -380,6 +382,52 @@ void EventsStorage::mergeObjects(DetectedObject&& from, DetectedObject* to)
         std::make_move_iterator(from.track.end()));
 
     // TODO: #ak moving attributes.
+    for (auto& attribute: from.attributes)
+    {
+        auto existingAttributeIter = std::find_if(
+            to->attributes.begin(), to->attributes.end(),
+            [&attribute](const nx::common::metadata::Attribute& existingAttribute)
+            {
+                return existingAttribute.name == attribute.name;
+            });
+        if (existingAttributeIter == to->attributes.end())
+        {
+            to->attributes.push_back(std::move(attribute));
+            continue;
+        }
+        else if (existingAttributeIter->value == attribute.value)
+        {
+            continue;
+        }
+        else
+        {
+            // TODO: #ak Not sure it is correct.
+            *existingAttributeIter = std::move(attribute);
+        }
+    }
+}
+
+void EventsStorage::queryTrackInfo(
+    nx::utils::db::QueryContext* queryContext,
+    std::vector<DetectedObject>* result)
+{
+    SqlQuery trackInfoQuery(*queryContext->connection());
+    trackInfoQuery.setForwardOnly(true);
+    trackInfoQuery.prepare(QString::fromLatin1(R"sql(
+        SELECT min(timestamp_usec_utc), max(timestamp_usec_utc)
+        FROM event
+        WHERE object_id = :objectId
+    )sql"));
+
+    for (auto& object: *result)
+    {
+        trackInfoQuery.bindValue(lit(":objectId"), QnSql::serialized_field(object.objectId));
+        trackInfoQuery.exec();
+        if (!trackInfoQuery.next())
+            continue;
+        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong();
+        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong();
+    }
 }
 
 nx::utils::db::DBResult EventsStorage::selectTimePeriods(

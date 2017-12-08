@@ -24,7 +24,9 @@ bool DetectedObject::operator==(const DetectedObject& right) const
 {
     return objectId == right.objectId
         && objectTypeId == right.objectTypeId
-        && attributes == right.attributes
+        //&& attributes == right.attributes
+        && firstAppearanceTimeUsec == right.firstAppearanceTimeUsec
+        && lastAppearanceTimeUsec == right.lastAppearanceTimeUsec
         && track == right.track;
 }
 
@@ -85,6 +87,9 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     if (filter.maxObjectsToSelect > 0)
         params->insert(lit("limit"), QString::number(filter.maxObjectsToSelect));
 
+    if (filter.maxTrackSize > 0)
+        params->insert(lit("maxTrackSize"), QString::number(filter.maxTrackSize));
+
     params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
 
@@ -129,6 +134,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
     if (params.contains(lit("limit")))
         filter->maxObjectsToSelect = params.value(lit("limit")).toInt();
+
+    if (params.contains(lit("maxTrackSize")))
+        filter->maxTrackSize = params.value(lit("maxTrackSize")).toInt();
 
     return true;
 }
