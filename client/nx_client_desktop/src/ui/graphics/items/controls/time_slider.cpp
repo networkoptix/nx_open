@@ -184,8 +184,8 @@ namespace
     // Timeline border area width in pixels where single click will auto-scroll the timeline
     static constexpr int kAutoShiftAreaWidth = 64;
 
-    // Auto-scroll will move the timeline such way, so cursor will be 240 pixels away from border.
-    static constexpr int kAutoShiftOffsetWidth = 240;
+    // Auto-scroll will move the timeline such way, so cursor will be 180 pixels away from border.
+    static constexpr int kAutoShiftOffsetWidth = 180;
 
     QTime msecsToTime(qint64 msecs)
     {
