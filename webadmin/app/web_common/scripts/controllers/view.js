@@ -292,14 +292,36 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         //On player error update source to cause player to restart
         $scope.crashCount = 0;
-        $scope.playerErrorHandler = function(){
+
+        function reloadSource(forceLive){
             if($scope.crashCount < Config.webclient.maxCrashCount){
-                updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+                updateVideoSource($scope.positionProvider.liveMode || forceLive
+                                                                    ? null : $scope.positionProvider.playedPosition);
                 $scope.crashCount += 1;
             }
             else{
                 $scope.crashCount = 0;
             }
+        }
+        $scope.playerErrorHandler = function(){
+            $scope.positionProvider.chunksForFatalError().then(function(chunks){
+                //If there are no chunks in the short cache use lastMinute
+                var endDate = timeManager.nowToDisplay - TimelineConfig.lastMinuteDuration;
+                console.log(chunks);
+                if (chunks.length > 0){
+                    //This is supposed to find the cutoff point in the chunk
+                    var endTime = Config.webclient.endOfArchiveTime;
+                    var i = chunks.length - 1;
+                    for(; i > 0; --i){
+                        if ( endTime - chunks[i].durationMs <= 0){
+                            break;
+                        }
+                        endTime -= chunks[i].durationMs;
+                    }
+                    endDate = chunks[i].startTimeMs + chunks[i].durationMs - endTime;
+                }
+                reloadSource($scope.positionProvider.playedPosition > endDate);
+            }, reloadSource);
         };
 
         $scope.selectFormat = function(format){

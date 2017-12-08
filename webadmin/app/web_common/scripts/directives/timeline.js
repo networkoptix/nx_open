@@ -236,34 +236,12 @@ angular.module('nxCommon')
                 }
 
                 function jumpToPosition(date){
-                    //If there are no chunks in the short cache use lastMinute
-                    scope.positionProvider.getChunks(date).then(function(chunks){
-                        var lastMinute = scope.scaleManager.lastMinute();
-                        var endDate = lastMinute;
-
-                        if (chunks.length > 0){
-                            //This is supposed to find the cutoff point in the chunk
-                            var endTime = Config.webclient.endOfArchiveTime;
-                            var i = chunks.length - 1;
-                            for(; i > 0; --i){
-                                if ( endTime - chunks[i].durationMs <= 0){
-                                    break;
-                                }
-                                endTime += -1 * chunks[i].durationMs;
-                            }
-                            endDate = chunks[i].startTimeMs + chunks[i].durationMs - endTime;
-                        }
-                        else{
-                            endDate += -1 * Config.webclient.endOfArchiveTime;
-                        }
-
-                        if(date > lastMinute || date > endDate){
-                            goToLive ();
-                        }else {
-                            scope.positionHandler(date);
-                        }
-                    });
-
+                    var lastMinute = scope.scaleManager.lastMinute();
+                    if(date > lastMinute){
+                        goToLive ();
+                    }else {
+                        scope.positionHandler(date);
+                    }
                 }
 
 

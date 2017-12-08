@@ -473,13 +473,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     return self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
-            var chunks = data.data.reply;
-            //if(chunks.length == 0){} // No chunks for this camera
-
-            _.forEach(chunks,function(chunk){
-                chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-            });
+            var chunks = parseChunks(data.data.reply);
 
             var chunksToIterate = chunks.length;
             //If level == 0 - we want only first chunk
@@ -802,16 +796,7 @@ ShortCache.prototype.update = function(requestPosition, position){
     this.currentRequest.then(function(data){
         self.updating = false;
 
-        var chunks = data.data.reply;
-
-        _.forEach(chunks,function(chunk){
-            chunk.durationMs = parseInt(chunk.durationMs);
-            chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-
-            if(chunk.durationMs == -1){
-                chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
-            }
-        });
+        var chunks = parseChunks(data.data.reply);
 
         //if(chunks.length == 0){ } // no chunks for this camera and interval
 
@@ -938,28 +923,29 @@ ShortCache.prototype.setPlayingPosition = function(position){
     return this.playedPosition;
 };
 
-ShortCache.prototype.getChunks = function(requestPosition){
+ShortCache.prototype.chunksForFatalError = function(requestPosition){
     return this.mediaserver.getRecords(
         this.cameras[0],
         timeManager.displayToServer(requestPosition),
         timeManager.nowToServer() + 100000,
         this.requestDetailization,
-        Config.webclient.chunksForFatalCheck
+        Config.webclient.chunksToFatalCheck
     ).then(function(data){
-        var chunks = data.data.reply;
-        _.forEach(chunks,function(chunk){
-            chunk.durationMs = parseInt(chunk.durationMs);
-            chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-
-            if(chunk.durationMs == -1){
-                chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
-            }
-        });
-
-        return chunks;
+        return parseChunks(data.data.reply);
     });
 };
 
+//Used by ShortCache and CameraRecords
+function parseChunks(chunks){
+    return _.forEach(chunks,function(chunk){
+        chunk.durationMs = parseInt(chunk.durationMs);
+        chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
+
+        if(chunk.durationMs == -1){
+            chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
+        }
+    });
+}
 
 
 
