@@ -944,7 +944,7 @@ ShortCache.prototype.getChunks = function(requestPosition){
         timeManager.displayToServer(requestPosition),
         timeManager.nowToServer() + 100000,
         this.requestDetailization,
-        Config.chunksForFatalCheck
+        Config.webclient.chunksForFatalCheck
     ).then(function(data){
         var chunks = data.data.reply;
         _.forEach(chunks,function(chunk){

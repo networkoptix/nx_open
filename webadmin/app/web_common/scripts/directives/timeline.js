@@ -243,7 +243,7 @@ angular.module('nxCommon')
 
                         if (chunks.length > 0){
                             //This is supposed to find the cutoff point in the chunk
-                            var endTime = Config.endOfArchiveTime;
+                            var endTime = Config.webclient.endOfArchiveTime;
                             var i = chunks.length - 1;
                             for(; i > 0; --i){
                                 if ( endTime - chunks[i].durationMs <= 0){
@@ -254,7 +254,7 @@ angular.module('nxCommon')
                             endDate = chunks[i].startTimeMs + chunks[i].durationMs - endTime;
                         }
                         else{
-                            endDate += -1 * Config.endOfArchiveTime;
+                            endDate += -1 * Config.webclient.endOfArchiveTime;
                         }
 
                         if(date > lastMinute || date > endDate){
