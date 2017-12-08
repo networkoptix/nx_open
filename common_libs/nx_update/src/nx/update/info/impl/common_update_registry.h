@@ -17,6 +17,7 @@ public:
         const QString& baseUrl,
         detail::data_parser::UpdatesMetaData metaData,
         detail::CustomizationVersionToUpdate customizationVersionToUpdate);
+    CommonUpdateRegistry() = default;
     virtual ResultCode findUpdate(
         const UpdateRequestData& updateRequestData,
         FileData* outFileData) override;

@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <nx/utils/log/log.h>
 #include "common_update_registry.h"
+#include <boost/variant/detail/substitute.hpp>
 
 namespace nx {
 namespace update {
@@ -282,9 +283,16 @@ private:
 class Deserializer
 {
 public:
-    explicit Deserializer(const QByteArray& rawData)
+    explicit Deserializer(const QByteArray& rawData):
+        m_rawData(rawData)
     {
-        QJsonObject rootObject = QJsonDocument::fromJson(rawData).object();
+        m_rootObject = QJsonDocument::fromJson(rawData).object();
+        deserializeUrl();
+        deserializeMetaData();
+        deserializeCustomizationVersionToUpdate();
+
+        if (!m_ok)
+            NX_WARNING(this, "UpdateRegistry deserialization failed");
     }
 
     QString url() const { return m_url; }
@@ -295,11 +303,327 @@ public:
     }
     bool ok() const { return m_ok; }
 private:
+    const QByteArray& m_rawData;
     QString m_url;
     UpdatesMetaData m_metaData;
     CustomizationVersionToUpdate m_customizationVersionToUpdate;
-    QJsonObject m_jsonObject;
-    bool m_ok = false;
+    bool m_ok = true;
+    QJsonObject m_rootObject;
+
+    void deserializeUrl()
+    {
+        if (!m_rootObject.contains(kUrlKey) || !m_rootObject[kUrlKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        m_url = m_rootObject[kUrlKey].toString();
+    }
+
+    void deserializeMetaData()
+    {
+        if (!m_ok)
+            return;
+
+        if (!m_rootObject.contains(kMetaDataKey) || !m_rootObject[kMetaDataKey].isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        deserializeAlternativeServers();
+        deserializeCustomizationDatas();
+    }
+
+    void deserializeAlternativeServers()
+    {
+        QJsonObject metaDataObject = m_rootObject[kMetaDataKey].toObject();
+        if (!metaDataObject.contains(kAlternativeServersKey)
+            || !metaDataObject[kAlternativeServersKey].isArray())
+        {
+            m_ok = false;
+            return;
+        }
+        QJsonArray alternativeServersArray = metaDataObject[kAlternativeServersKey].toArray();
+        for (int i = 0; i < alternativeServersArray.size(); ++i)
+            deserializeAlternativeServerObject(alternativeServersArray[i]);
+    }
+
+    void deserializeAlternativeServerObject(const QJsonValue& jsonValue)
+    {
+        if (!jsonValue.isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        QJsonObject alternativeServerObject = jsonValue.toObject();
+        if (!alternativeServerObject.contains(kUrlKey)
+            || !alternativeServerObject[kUrlKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!alternativeServerObject.contains(kAlternativeServerNameKey)
+            || !alternativeServerObject[kAlternativeServerNameKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        m_metaData.alternativeServersDataList.append(
+            AlternativeServerData(
+                alternativeServerObject[kUrlKey].toString(),
+                alternativeServerObject[kAlternativeServerNameKey].toString()));
+    }
+
+    void deserializeCustomizationDatas()
+    {
+        if (!m_ok)
+            return;
+
+        QJsonObject metaDataObject = m_rootObject[kMetaDataKey].toObject();
+        if (!metaDataObject.contains(kCustomizationsKey)
+            || !metaDataObject[kCustomizationsKey].isArray())
+        {
+            m_ok = false;
+            return;
+        }
+        QJsonArray customizationDatasArray = metaDataObject[kCustomizationsKey].toArray();
+        for (int i = 0; i < customizationDatasArray.size(); ++i)
+            deserializeCustomizationDataObject(customizationDatasArray[i]);
+    }
+
+    void deserializeCustomizationDataObject(const QJsonValue& jsonValue)
+    {
+        if (!jsonValue.isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        QJsonObject customizationDataObject = jsonValue.toObject();
+        if (!customizationDataObject.contains(kCustomizationNameKey)
+            || !customizationDataObject[kCustomizationNameKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!customizationDataObject.contains(kVersionsKey)
+            || !customizationDataObject[kVersionsKey].isArray())
+        {
+            m_ok = false;
+            return;
+        }
+
+        CustomizationData customizationData;
+        customizationData.name = customizationDataObject[kCustomizationNameKey].toString();
+        fillCustomizationVersions(
+            customizationDataObject[kVersionsKey].toArray(),
+            customizationData.versions);
+        m_metaData.customizationDataList.append(customizationData);
+    }
+
+    void fillCustomizationVersions(
+        const QJsonArray& customizationDataArray,
+        QList<QnSoftwareVersion>& customizationDataList)
+    {
+        for (int i = 0; i < customizationDataArray.size(); ++i)
+            appendCustomizationVersion(customizationDataArray[i], customizationDataList);
+    }
+
+    void appendCustomizationVersion(
+        const QJsonValue& jsonValue,
+        QList<QnSoftwareVersion>& customizationDataList)
+    {
+        if (!m_ok)
+            return;
+
+        if (!jsonValue.isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        customizationDataList.append(QnSoftwareVersion(jsonValue.toString()));
+    }
+
+    void deserializeCustomizationVersionToUpdate()
+    {
+        if (!m_ok)
+            return;
+
+        if (!m_rootObject.contains(kCustomizationVersionToUpdateKey)
+            || !m_rootObject[kCustomizationVersionToUpdateKey].isArray())
+        {
+            m_ok = false;
+            return;
+        }
+
+        deserializeCustomizationVersionToUpdateArray(
+            m_rootObject[kCustomizationVersionToUpdateKey].toArray());
+    }
+
+    void deserializeCustomizationVersionToUpdateArray(const QJsonArray& jsonArray)
+    {
+        for (int i = 0; i < jsonArray.size(); ++i)
+            insertCustomizationVersionToUpdate(jsonArray[i]);
+    }
+
+    void insertCustomizationVersionToUpdate(const QJsonValue& jsonValue)
+    {
+        if (!m_ok)
+            return;
+
+        if (!jsonValue.isObject())
+            return;
+
+        QJsonObject customizationVersionToUpdateObject = jsonValue.toObject();
+        if (!customizationVersionToUpdateObject.contains(kCustomizationVersionNameKey)
+            || !customizationVersionToUpdateObject[kCustomizationVersionNameKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!customizationVersionToUpdateObject.contains(kCustomizationVersionNameKey)
+            || !customizationVersionToUpdateObject[kCustomizationVersionNameKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!customizationVersionToUpdateObject.contains(kCustomizationVersionVersionKey)
+            || !customizationVersionToUpdateObject[kCustomizationVersionVersionKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        CustomizationVersionData customizationVersionData(
+            customizationVersionToUpdateObject[kCustomizationVersionNameKey].toString(),
+            QnSoftwareVersion(
+                customizationVersionToUpdateObject[kCustomizationVersionVersionKey].toString()));
+
+        if (!customizationVersionToUpdateObject.contains(kUpdateKey)
+            || !customizationVersionToUpdateObject[kUpdateKey].isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        UpdateData updateData;
+        if (!deserializeUpdateData(
+            customizationVersionToUpdateObject[kUpdateKey].toObject(),
+            updateData))
+        {
+            m_ok = false;
+            return;
+        }
+
+        m_customizationVersionToUpdate.insert(customizationVersionData, updateData);
+    }
+
+    bool deserializeUpdateData(const QJsonObject& updateObject, UpdateData& updateData)
+    {
+        if (!updateObject.contains(kCloudHostKey)
+            || !updateObject[kCloudHostKey].isString())
+        {
+            m_ok = false;
+            return false;
+        }
+
+        if (!updateObject.contains(kServerPackagesKey)
+            || !updateObject[kServerPackagesKey].isArray())
+        {
+            m_ok = false;
+            return false;
+        }
+
+        if (!updateObject.contains(kClientPackagesKey)
+            || !updateObject[kClientPackagesKey].isArray())
+        {
+            m_ok = false;
+            return false;
+        }
+
+        updateData.cloudHost = updateObject[kCloudHostKey].toString();
+        deserializePackages(
+            updateObject[kServerPackagesKey].toArray(),
+            updateData.targetToPackage);
+        deserializePackages(
+            updateObject[kClientPackagesKey].toArray(),
+            updateData.targetToClientPackage);
+
+        return m_ok;
+    }
+
+    void deserializePackages(const QJsonArray& jsonArray, QHash<QString, FileData>& hash)
+    {
+        for (int i = 0; i < jsonArray.size(); ++i)
+            insertValueToTargetToPackage(jsonArray[i], hash);
+    }
+
+    void insertValueToTargetToPackage(
+        const QJsonValue& jsonValue,
+        QHash<QString, FileData>& hash)
+    {
+        if (!m_ok)
+            return;
+
+        if (!jsonValue.isObject())
+        {
+            m_ok = false;
+            return;
+        }
+
+        QJsonObject targetToUpdateObject = jsonValue.toObject();
+        if (!targetToUpdateObject.contains(kTargetKey)
+            || !targetToUpdateObject[kTargetKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!targetToUpdateObject.contains(kFileKey)
+            || !targetToUpdateObject[kFileKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!targetToUpdateObject.contains(kUrlKey)
+            || !targetToUpdateObject[kUrlKey].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!targetToUpdateObject.contains(kSizeKey)
+            || !targetToUpdateObject[kSizeKey].isDouble())
+        {
+            m_ok = false;
+            return;
+        }
+
+        if (!targetToUpdateObject.contains(kMd5Key)
+            || !targetToUpdateObject[kMd5Key].isString())
+        {
+            m_ok = false;
+            return;
+        }
+
+        hash.insert(
+            targetToUpdateObject[kTargetKey].toString(),
+            FileData(
+                targetToUpdateObject[kFileKey].toString(),
+                targetToUpdateObject[kUrlKey].toString(),
+                targetToUpdateObject[kSizeKey].toDouble(),
+                targetToUpdateObject[kMd5Key].toString().toLatin1()));
+    }
 };
 } // namespace
 
@@ -387,12 +711,18 @@ bool CommonUpdateRegistry::fromByteArray(const QByteArray& rawData)
     m_metaData = deserializer.metaData();
     m_customizationVersionToUpdate = deserializer.customizationVersionToUpdate();
 
-    return false;
+    return true;
 }
 
 bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
 {
-    return false;
+    CommonUpdateRegistry* otherCommonUpdateRegistry = dynamic_cast<CommonUpdateRegistry*>(other);
+    if (!otherCommonUpdateRegistry)
+        return false;
+
+    return otherCommonUpdateRegistry->m_baseUrl == m_baseUrl
+        && otherCommonUpdateRegistry->m_metaData == m_metaData
+        && otherCommonUpdateRegistry->m_customizationVersionToUpdate == m_customizationVersionToUpdate;
 }
 
 } // namespace impl

@@ -12,7 +12,12 @@ namespace info {
 namespace impl {
 
 using AbstractUpdateRegistryPtr = std::unique_ptr<AbstractUpdateRegistry>;
-using UpdateRegistryFactoryFunction = nx::utils::MoveOnlyFunc<AbstractUpdateRegistryPtr()>;
+using UpdateRegistryFactoryFunction =
+    nx::utils::MoveOnlyFunc<AbstractUpdateRegistryPtr(
+        const QString&,
+        detail::data_parser::UpdatesMetaData metaData,
+        detail::CustomizationVersionToUpdate customizationVersionToUpdate)>;
+using EmptyUpdateRegistryFactoryFunction = nx::utils::MoveOnlyFunc<AbstractUpdateRegistryPtr()>;
 
 class NX_UPDATE_API UpdateRegistryFactory
 {
@@ -21,9 +26,12 @@ public:
         const QString& baseUrl,
         detail::data_parser::UpdatesMetaData metaData,
         detail::CustomizationVersionToUpdate customizationVersionToUpdate);
+    static AbstractUpdateRegistryPtr create();
     static void setFactoryFunction(UpdateRegistryFactoryFunction factoryFunction);
+    static void setEmptyFactoryFunction(EmptyUpdateRegistryFactoryFunction factoryFunction);
 private:
     static UpdateRegistryFactoryFunction m_factoryFunction;
+    static EmptyUpdateRegistryFactoryFunction m_emptyFactoryFunction;
 };
 
 } // namespace impl

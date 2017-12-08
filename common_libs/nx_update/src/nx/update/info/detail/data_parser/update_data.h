@@ -17,6 +17,13 @@ struct UpdateData
     QHash<QString, FileData> targetToClientPackage;
 };
 
+inline bool operator == (const UpdateData& lhs, const UpdateData& rhs)
+{
+    return lhs.cloudHost == rhs.cloudHost
+        && lhs.targetToPackage == rhs.targetToPackage
+        && lhs.targetToClientPackage == rhs.targetToClientPackage;
+}
+
 } // data_parser
 } // namespace detail
 } // namespace info

@@ -7,6 +7,7 @@ namespace info {
 namespace impl {
 
 UpdateRegistryFactoryFunction UpdateRegistryFactory::m_factoryFunction = nullptr;
+EmptyUpdateRegistryFactoryFunction UpdateRegistryFactory::m_emptyFactoryFunction = nullptr;
 
 namespace {
 AbstractUpdateRegistryPtr createCommonUpdateRegistry(
@@ -20,6 +21,10 @@ AbstractUpdateRegistryPtr createCommonUpdateRegistry(
         std::move(customizationVersionToUpdate));
 }
 
+AbstractUpdateRegistryPtr createEmptyCommonUpdateRegistry()
+{
+    return std::make_unique<CommonUpdateRegistry>();
+}
 } // namespace
 
 AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
@@ -28,7 +33,12 @@ AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
 {
     if (m_factoryFunction)
-        return m_factoryFunction();
+    {
+        return m_factoryFunction(
+            baseUrl,
+            std::move(metaData),
+            std::move(customizationVersionToUpdate));
+    }
 
     return createCommonUpdateRegistry(
         baseUrl,
@@ -36,11 +46,24 @@ AbstractUpdateRegistryPtr UpdateRegistryFactory::create(
         std::move(customizationVersionToUpdate));
 }
 
+AbstractUpdateRegistryPtr UpdateRegistryFactory::create()
+{
+    if (m_emptyFactoryFunction)
+        return m_emptyFactoryFunction();
+
+    return createEmptyCommonUpdateRegistry();
+}
+
 void UpdateRegistryFactory::setFactoryFunction(UpdateRegistryFactoryFunction factoryFunction)
 {
     m_factoryFunction = std::move(factoryFunction);
 }
 
+void UpdateRegistryFactory::setEmptyFactoryFunction(
+    EmptyUpdateRegistryFactoryFunction emptyFactoryFunction)
+{
+    m_emptyFactoryFunction = std::move(emptyFactoryFunction);
+}
 } // namespace impl
 } // namespace info
 } // namespace update

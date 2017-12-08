@@ -8,6 +8,7 @@
 #include <nx/update/info/async_update_checker.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
+#include <nx/update/info/impl/update_registry_factory.h>
 
 #include "detail/json_data.h"
 
@@ -290,6 +291,9 @@ private:
     void assertSerializability() const
     {
         auto rawData = m_updateRegistry->toByteArray();
+        auto newUpdateRegistry = impl::UpdateRegistryFactory::create();
+        ASSERT_TRUE(newUpdateRegistry->fromByteArray(rawData));
+        ASSERT_TRUE(m_updateRegistry->equals(newUpdateRegistry.get()));
     }
 };
 
