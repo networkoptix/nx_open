@@ -168,11 +168,24 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
             m_prefetch = success ? std::move(data) : analytics::storage::LookupResult();
             m_success = success;
 
+            if (m_prefetch.empty())
+            {
+                qDebug() << "Pre-fetched no analytics";
+            }
+            else
+            {
+                qDebug() << "Pre-fetched" << m_prefetch.size() << "analytics from"
+                    << debugTimestampToString(startTimeMs(m_prefetch.back())) << "to"
+                    << debugTimestampToString(startTimeMs(m_prefetch.front()));
+            }
+
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
             completionHandler(m_prefetch.size() >= kFetchBatchSize
-                ? startTimeMs(m_prefetch.front()) + 1 /*discard last ms*/
+                ? startTimeMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
         };
+
+    qDebug() << "Requesting analytics from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
 
     m_currentFetchId = getObjects(0, m_earliestTimeMs - 1, dataReceived, kFetchBatchSize);
     return m_currentFetchId != rest::Handle();
@@ -186,7 +199,10 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_currentFetchId = rest::Handle();
 
     if (!m_success)
+    {
+        qDebug() << "Committing no analytics";
         return;
+    }
 
     const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::milliseconds(latestStartTimeMs)).count();
@@ -199,10 +215,18 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
+        qDebug() << "Committing" << count << "analytics from"
+            << debugTimestampToString(startTimeMs(m_prefetch[count - 1])) << "to"
+            << debugTimestampToString(startTimeMs(m_prefetch.front()));
+
         ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(),
             std::make_move_iterator(m_prefetch.begin()),
             std::make_move_iterator(end));
+    }
+    else
+    {
+        qDebug() << "Committing no analytics";
     }
 
     m_fetchedAll = m_prefetch.empty();
@@ -228,6 +252,9 @@ void AnalyticsSearchListModel::Private::periodicUpdate()
             if (success && !data.empty())
                 addNewlyReceivedObjects(std::move(data));
         };
+
+    qDebug() << "Requesting new analytics from" << debugTimestampToString(m_latestTimeMs)
+        << "to infinity";
 
     m_currentUpdateId = getObjects(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);
