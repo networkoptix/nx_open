@@ -13,7 +13,7 @@ namespace {
 bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const qint64 timestamp)
 {
     const auto allowedDelay = (metadata->metadataType == MetadataType::ObjectDetection)
-        ? ini().allowedAnalyticsMetadataDelay * 1000
+        ? ini().allowedAnalyticsMetadataDelayMs * 1000
         : 0;
 
     const auto duration = metadata->duration() + allowedDelay;
