@@ -142,6 +142,8 @@ private:
         std::int64_t eventId,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
+    void prepareCursorQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
+
     nx::utils::db::DBResult selectObjects(
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,

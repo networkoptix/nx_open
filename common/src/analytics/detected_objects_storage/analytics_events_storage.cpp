@@ -51,7 +51,7 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, lm("Requested cursor with filter %1").args(filter));
 
     m_dbController.queryExecutor().createCursor<DetectedObject>(
-        std::bind(&EventsStorage::prepareLookupQuery, this, filter, _1),
+        std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
         std::bind(&EventsStorage::loadObject, this, _1, _2),
         [this, completionHandler = std::move(completionHandler)](
             db::DBResult resultCode,
@@ -177,6 +177,31 @@ void EventsStorage::insertEventAttributes(
     insertEventAttributesQuery.exec();
 }
 
+void EventsStorage::prepareCursorQuery(
+    const Filter& filter,
+    nx::utils::db::SqlQuery* query)
+{
+    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString sqlQueryFilterStr;
+    if (!sqlQueryFilter.empty())
+    {
+        sqlQueryFilterStr = lm("WHERE %1").args(
+            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+    }
+
+    query->prepare(lm(R"sql(
+        SELECT timestamp_usec_utc, duration_usec, device_guid,
+            object_type_id, object_id, attributes,
+            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
+        FROM event
+        %1
+        ORDER BY timestamp_usec_utc %2, object_id %2;
+    )sql").args(
+        sqlQueryFilterStr,
+        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
+    nx::utils::db::bindFields(query, sqlQueryFilter);
+}
+
 nx::utils::db::DBResult EventsStorage::selectObjects(
     nx::utils::db::QueryContext* queryContext,
     const Filter& filter,
@@ -206,15 +231,26 @@ void EventsStorage::prepareLookupQuery(
             nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
     }
 
+    QString sqlLimitStr;
+    if (filter.maxObjectsToSelect > 0)
+        sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
+
     query->prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
-        FROM event
-        %1
-        ORDER BY timestamp_usec_utc %2, object_id %2;
+        FROM event e,
+            (SELECT MIN(timestamp_usec_utc) AS matching_track_start_time, rowid as r
+             FROM event
+             %1
+             GROUP BY object_id
+             ORDER BY matching_track_start_time DESC
+             %2) objects
+        WHERE e.rowid=objects.r
+        ORDER BY timestamp_usec_utc %3
     )sql").args(
         sqlQueryFilterStr,
+        sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     nx::utils::db::bindFields(query, sqlQueryFilter);
 }

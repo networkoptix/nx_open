@@ -235,6 +235,19 @@ protected:
         if (filter.maxObjectsToSelect > 0 && (int)objects.size() > filter.maxObjectsToSelect)
             objects.erase(objects.begin() + filter.maxObjectsToSelect, objects.end());
 
+        if (filter.maxTrackSize > 0)
+        {
+            for (auto& object: objects)
+            {
+                if ((int) object.track.size() > filter.maxTrackSize)
+                {
+                    object.track.erase(
+                        object.track.begin() + filter.maxTrackSize,
+                        object.track.end());
+                }
+            }
+        }
+
         return objects;
     }
 
@@ -455,10 +468,16 @@ protected:
         m_filter.objectTypeId.push_back(randomObject.objectTypeId);
     }
 
-    void addLimitToFilter()
+    void addMaxObjectsLimitToFilter()
     {
         m_filter.maxObjectsToSelect = filterObjects(
             toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
+    }
+
+    void addMaxTrackLengthLimitToFilter()
+    {
+        // TODO: #ak Currently, only 1 track element can be returned.
+        m_filter.maxTrackSize = 1;
     }
 
     void addRandomBoundingBoxToFilter()
@@ -489,7 +508,7 @@ protected:
             addRandomObjectTypeIdToFilter();
 
         if (nx::utils::random::number<bool>())
-            addLimitToFilter();
+            addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
@@ -572,9 +591,18 @@ protected:
         whenLookupObjects();
     }
 
-    void whenLookupWithLimit()
+    void whenLookupWithMaxObjectsLimit()
     {
-        addLimitToFilter();
+        addMaxObjectsLimitToFilter();
+        whenLookupObjects();
+    }
+
+    void whenLookupWithMaxTrackLengthLimit()
+    {
+        m_filter.objectId = m_specificObjectId;
+        addMaxTrackLengthLimitToFilter();
+        //m_filter.maxTrackSize = 1;
+
         whenLookupObjects();
     }
 
@@ -728,9 +756,16 @@ TEST_F(AnalyticsEventsStorageLookup, full_track_timestamps)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_result_limit)
+TEST_F(AnalyticsEventsStorageLookup, max_objects_limit)
 {
-    whenLookupWithLimit();
+    whenLookupWithMaxObjectsLimit();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, max_track_length_limit)
+{
+    givenObjectWithLongTrack();
+    whenLookupWithMaxTrackLengthLimit();
     thenResultMatchesExpectations();
 }
 
