@@ -69,7 +69,9 @@ protected:
 };
 
 /**
- * Implements asynchronous socket operations (connect, send, recv) and async cancellation routines.
+ * Implements asynchronous socket operations (connect, send, recv) and async cancellation routines using AIOService.
+ * NOTE: When adding support for win32 I/O completion ports this class should
+ *   become an abstraction level on top of completion ports and AIOService.
  */
 template<class SocketType>
 class AsyncSocketImplHelper:
@@ -100,20 +102,18 @@ public:
 
     virtual ~AsyncSocketImplHelper()
     {
-        //synchronization may be required here in case if recv handler and send/connect handler called simultaneously in different aio threads,
-        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing
-        //async I/O and wait for completion. That is, wait for eventTriggered to return.
-        //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
+        // NOTE eventTriggered can be down the stack because socket
+        // is allowed to be removed from I/O completion handler.
     }
 
     void terminate()
     {
-        //this method is to cancel all asynchronous operations when called within socket's aio thread
+        // This method is to cancel all asynchronous operations when called within socket's aio thread.
+        // TODO: #ak What's the difference of this method from cancelAsyncIO(aio::etNone)?
 
         this->terminateAsyncIO();
-        //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
-        //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
+        // Cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack.
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
             stopPollingSocket(aio::etNone);
@@ -200,14 +200,11 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         NX_CRITICAL(addr.address.isIpAddress());
-        //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
+        // TODO: #ak With UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline.
 
         if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
         {
-            //socket has been terminated, no async call possible.
-            //Returning true to trick calling party: let it think everything OK and
-            //finish its completion handler correctly.
-            //TODO #ak is it really ok to trick someone?
+            // Socket has been terminated, no async call possible.
             return;
         }
 
@@ -255,8 +252,8 @@ public:
         NX_ASSERT(isNonBlockingMode());
         static const int DEFAULT_RESERVE_SIZE = 4 * 1024;
 
-        //this assert is not critical but is a signal of possible
-        //ineffective memory usage in calling code
+        // This assert is not critical but is a signal of a possible
+        // ineffective memory usage in calling code.
         NX_ASSERT(buf->capacity() > buf->size());
 
         if (buf->capacity() == buf->size())
@@ -317,7 +314,7 @@ public:
         auto cancelImpl =
             [this, eventType, handler = move(handler)]() mutable
             {
-                // cancelIOSync will be instant from socket's IO thread
+                // cancelIOSync will be instant from socket's IO thread.
                 this->m_aioService->dispatch(
                     this->m_socket,
                     [this, eventType, handler = move(handler)]() mutable
@@ -337,7 +334,7 @@ public:
     {
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
-            //TODO #ak we must cancel resolve task here, but must do it without blocking!
+            // TODO: #ak We must cancel resolve task here, but must do it without blocking!
             cancelAsyncIOWhileInAioThread(eventType);
         }
         else
@@ -352,10 +349,10 @@ public:
     void cancelAsyncIOWhileInAioThread(const aio::EventType eventType)
     {
         stopPollingSocket(eventType);
-        std::atomic_thread_fence(std::memory_order_acquire);    //TODO #ak looks like it is not needed
+        std::atomic_thread_fence(std::memory_order_acquire);    //< TODO: #ak Looks like it is not needed.
 
-        //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-        //  avoiding unnecessary stopMonitoring calls in eventTriggered
+        // We are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+        //  avoiding unnecessary stopMonitoring calls in eventTriggered.
 
         if (eventType == aio::etRead || eventType == aio::etNone)
             ++m_recvAsyncCallCounter;
@@ -395,7 +392,7 @@ private:
         bool value;
         if (!this->m_socket->getNonBlockingMode(&value))
         {
-            // TODO: MUST return FALSE;
+            // TODO: #ak MUST return FALSE;
             // Currently here is a problem in UDT, getsockopt(...) can not find descriptor by some
             // reason, but send(...) and recv(...) work just fine.
             return true;
@@ -537,7 +534,7 @@ private:
             }
             else
             {
-                m_recvBuffer->resize(bufSizeBak + bytesRead);   //< Shrinking buffer.
+                m_recvBuffer->resize(bufSizeBak + bytesRead); //< Shrinking buffer.
                 reportReadCompletion(SystemError::noError, bytesRead);
             }
         }
@@ -709,7 +706,7 @@ private:
      */
     void stopPollingSocket(const aio::EventType eventType)
     {
-        m_addressResolver->dnsResolver().cancel(this, true);    //< TODO: #ak Must not block here!
+        m_addressResolver->dnsResolver().cancel(this, true); //< TODO: #ak Must not block here!
 
         if (eventType == aio::etNone)
             this->m_aioService->cancelPostedCalls(this->m_socket, true);
