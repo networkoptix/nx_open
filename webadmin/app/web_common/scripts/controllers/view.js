@@ -206,9 +206,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
 
             $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
-            var salt = '';
             if(live){
-                salt = '&' + Math.random();
                 playingPosition = timeManager.nowToDisplay();
             }else{
                 playingPosition = Math.round(playingPosition);
@@ -217,6 +215,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.activeCamera){
                 return;
             }
+            var salt = '&' + Math.random();
             var cameraId = $scope.activeCamera.id;
             var serverUrl = '';
 
@@ -293,10 +292,35 @@ angular.module('nxCommon').controller('ViewCtrl',
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //if(playing === false) {
+                $scope.crashCount = 0;
                 updateVideoSource(val);//We have nothing more to do with it.
             /*}else{
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
             }*/
+        };
+
+        //On player error update source to cause player to restart
+        $scope.crashCount = 0;
+
+        function reloadSource(forceLive){
+            if($scope.crashCount < Config.webclient.maxCrashCount){
+                updateVideoSource($scope.positionProvider.liveMode || forceLive
+                                                                    ? null : $scope.positionProvider.playedPosition);
+                $scope.crashCount += 1;
+            }
+            else{
+                $scope.crashCount = 0;
+            }
+        }
+        $scope.playerHandler = function(error){
+            if(error){
+                $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
+                   reloadSource(jumpToLive);
+                });
+            }
+            else{
+                $scope.crashCount = 0;
+            }
         };
 
         $scope.selectFormat = function(format){
@@ -376,6 +400,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return;
             }
             $scope.player = null;
+            $scope.crashCount = 0;
             $scope.storage.cameraId  = $scope.activeCamera.id;
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
@@ -387,6 +412,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.player){
                 return;
             }
+            $scope.crashCount = 0;
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         },true);
 

@@ -29,25 +29,6 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
 };
 
-TimelineActions.prototype.goToLive = function(){
-    var self = this;
-    var moveDate = self.scaleManager.screenCoordinateToDate(1);
-    if(self.scaleManager.watch.live){
-        // we are already watching live position - no need for animation
-        return;
-    }
-    self.animateScope.progress(self.scope, 'goingToLive' ).then(
-        function(){
-            var activeDate = timeManager.nowToDisplay();
-            self.scaleManager.setAnchorDateAndPoint(activeDate, 1);
-            self.scaleManager.watchPosition(activeDate, true); // goToLive animation
-        },
-        function(){},
-        function(val){
-            var activeDate = moveDate + val * (timeManager.nowToDisplay() - moveDate);
-            self.scaleManager.setAnchorDateAndPoint(activeDate, 1);
-        });
-};
 TimelineActions.prototype.updatePlayingState = function(playingPosition){
     this.scaleManager.updatePlayingState(playingPosition, this.positionProvider.liveMode, this.positionProvider.playing);
 

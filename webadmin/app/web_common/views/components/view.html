@@ -104,7 +104,8 @@
                                 <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
                                                             (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
-                                             vg-player-ready="playerReady($API)" rotation="rotation" playing="positionProvider.playing"
+                                             vg-player-ready="playerReady($API)" rotation="rotation"
+                                             player-handler="playerHandler"
                                              vg-src="activeVideoSource" player="player" active-format="activeFormat">
                                 </videowindow>
                             </div>

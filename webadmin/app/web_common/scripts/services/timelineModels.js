@@ -473,13 +473,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     return self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
-            var chunks = data.data.reply;
-            //if(chunks.length == 0){} // No chunks for this camera
-
-            _.forEach(chunks,function(chunk){
-                chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-            });
+            var chunks = parseChunks(data.data.reply);
 
             var chunksToIterate = chunks.length;
             //If level == 0 - we want only first chunk
@@ -802,16 +796,7 @@ ShortCache.prototype.update = function(requestPosition, position){
     this.currentRequest.then(function(data){
         self.updating = false;
 
-        var chunks = data.data.reply;
-
-        _.forEach(chunks,function(chunk){
-            chunk.durationMs = parseInt(chunk.durationMs);
-            chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-
-            if(chunk.durationMs == -1){
-                chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
-            }
-        });
+        var chunks = parseChunks(data.data.reply);
 
         //if(chunks.length == 0){ } // no chunks for this camera and interval
 
@@ -938,8 +923,45 @@ ShortCache.prototype.setPlayingPosition = function(position){
     return this.playedPosition;
 };
 
+ShortCache.prototype.checkEndOfArchive = function(){
+    var self = this;
+    return this.mediaserver.getRecords(
+        this.cameras[0],
+        timeManager.displayToServer(this.playedPosition),
+        timeManager.nowToServer() + 100000,
+        this.requestDetailization,
+        Config.webclient.chunksToCheckFatal
+    ).then(function(data){
+        var chunks = parseChunks(data.data.reply);
+        //If there are no chunks in the short cache use lastMinute
+        var endDate = timeManager.nowToDisplay - TimelineConfig.lastMinuteDuration;
+        if (chunks.length > 0){
+            //This is supposed to find the cutoff point in the chunk
+            var endTime = Config.webclient.endOfArchiveTime;
+            var i = chunks.length - 1;
+            for(; i > 0; --i){
+                if ( endTime - chunks[i].durationMs <= 0){
+                    break;
+                }
+                endTime -= chunks[i].durationMs;
+            }
+            endDate = chunks[i].startTimeMs + chunks[i].durationMs - endTime;
+        }
+        return self.playedPosition > endDate;
+    },function(){return null;});
+};
 
+//Used by ShortCache and CameraRecords
+function parseChunks(chunks){
+    return _.forEach(chunks,function(chunk){
+        chunk.durationMs = parseInt(chunk.durationMs);
+        chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
 
+        if(chunk.durationMs == -1){
+            chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
+        }
+    });
+}
 
 
 
@@ -1219,7 +1241,7 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= this.minPixelsPerLevel / this.pixelAspectRatio) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel * this.pixelAspectRatio) {
             // minMsPerPixel
             break;
         }
