@@ -923,16 +923,32 @@ ShortCache.prototype.setPlayingPosition = function(position){
     return this.playedPosition;
 };
 
-ShortCache.prototype.chunksForFatalError = function(requestPosition){
+ShortCache.prototype.checkEndOfArchive = function(){
+    var self = this;
     return this.mediaserver.getRecords(
         this.cameras[0],
-        timeManager.displayToServer(requestPosition),
+        timeManager.displayToServer(this.playedPosition),
         timeManager.nowToServer() + 100000,
         this.requestDetailization,
-        Config.webclient.chunksToFatalCheck
+        Config.webclient.chunksToCheckFatal
     ).then(function(data){
-        return parseChunks(data.data.reply);
-    });
+        var chunks = parseChunks(data.data.reply);
+        //If there are no chunks in the short cache use lastMinute
+        var endDate = timeManager.nowToDisplay - TimelineConfig.lastMinuteDuration;
+        if (chunks.length > 0){
+            //This is supposed to find the cutoff point in the chunk
+            var endTime = Config.webclient.endOfArchiveTime;
+            var i = chunks.length - 1;
+            for(; i > 0; --i){
+                if ( endTime - chunks[i].durationMs <= 0){
+                    break;
+                }
+                endTime -= chunks[i].durationMs;
+            }
+            endDate = chunks[i].startTimeMs + chunks[i].durationMs - endTime;
+        }
+        return self.playedPosition > endDate;
+    },function(){return null;});
 };
 
 //Used by ShortCache and CameraRecords
