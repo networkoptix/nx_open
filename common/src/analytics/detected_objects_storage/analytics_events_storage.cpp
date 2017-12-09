@@ -235,20 +235,30 @@ void EventsStorage::prepareLookupQuery(
     if (filter.maxObjectsToSelect > 0)
         sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
 
+    QString freeTextFilter;
+    if (!filter.freeText.isEmpty())
+    {
+        freeTextFilter = lm(R"sql(
+            (SELECT rowid, * FROM event
+             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1'))
+        )sql").args(filter.freeText);
+    }
+
     query->prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
         FROM event e,
             (SELECT MIN(timestamp_usec_utc) AS matching_track_start_time, rowid as r
-             FROM event
-             %1
+             FROM %1
+             %2
              GROUP BY object_id
              ORDER BY matching_track_start_time DESC
-             %2) objects
+             %3) objects
         WHERE e.rowid=objects.r
-        ORDER BY timestamp_usec_utc %3
+        ORDER BY timestamp_usec_utc %4
     )sql").args(
+        freeTextFilter.isEmpty() ? QString::fromLatin1("event") : freeTextFilter,
         sqlQueryFilterStr,
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());

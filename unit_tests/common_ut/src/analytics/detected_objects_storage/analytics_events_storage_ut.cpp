@@ -122,7 +122,7 @@ protected:
     }
 
     void andLookupResultEquals(
-        std::vector<DetectedObject> expected)
+        const std::vector<DetectedObject>& expected)
     {
         ASSERT_EQ(expected, m_prevLookupResult->eventsFound);
     }
@@ -318,6 +318,12 @@ private:
             return false;
         }
 
+        if (!filter.freeText.isEmpty() &&
+            !matchAttributes(detectedObject.attributes, filter.freeText))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -325,13 +331,13 @@ private:
         const Filter& filter,
         const ObjectPosition& data)
     {
-        if (!filter.boundingBox.isNull())
-        {
-            if (!filter.boundingBox.intersects(data.boundingBox))
-                return false;
-        }
+        if (!satisfiesCommonConditions(filter, data))
+            return false;
 
-        return satisfiesCommonConditions(filter, data);
+        if (!filter.boundingBox.isNull() && !filter.boundingBox.intersects(data.boundingBox))
+            return false;
+
+        return true;
     }
 
     bool satisfiesFilter(
@@ -369,6 +375,15 @@ private:
                 return false;
         }
 
+        if (!filter.freeText.isEmpty())
+        {
+            bool isFilterSatisfied = false;
+            for (const auto& object: data.objects)
+                isFilterSatisfied |= matchAttributes(object.labels, filter.freeText);
+            if (!isFilterSatisfied)
+                return false;
+        }
+
         return satisfiesCommonConditions(filter, data);
     }
 
@@ -382,6 +397,32 @@ private:
             !filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
         {
             return false;
+        }
+
+        return true;
+    }
+
+    bool matchAttributes(
+        const std::vector<nx::common::metadata::Attribute>& attributes,
+        const QString& filter)
+    {
+        const auto filterWords = filter.split(L' ');
+        // Attributes have to contain all words.
+        for (const auto& filterWord: filterWords)
+        {
+            bool found = false;
+            for (const auto& attribute: attributes)
+            {
+                if (attribute.name.indexOf(filterWord) != -1 ||
+                    attribute.value.indexOf(filterWord) != -1)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+                return false;
         }
 
         return true;
@@ -416,6 +457,7 @@ public:
             std::chrono::system_clock::from_time_t(0),
             std::chrono::system_clock::from_time_t(0))
     {
+        m_attributeDictionary.initialize(5, 2);
     }
 
 protected:
@@ -480,6 +522,11 @@ protected:
         m_filter.maxTrackSize = 1;
     }
 
+    void addRandomTextFoundInDataToFilter()
+    {
+        m_filter.freeText = m_attributeDictionary.getRandomText();
+    }
+
     void addRandomBoundingBoxToFilter()
     {
         m_filter.boundingBox = QRectF(
@@ -511,7 +558,13 @@ protected:
             addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
+            addRandomTextFoundInDataToFilter();
+
+        if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
+
+        if (nx::utils::random::number<bool>())
+            addRandomTextFoundInDataToFilter();
     }
 
     void givenObjectWithLongTrack()
@@ -606,6 +659,12 @@ protected:
         whenLookupObjects();
     }
 
+    void whenLookupByRandomTextFoundInData()
+    {
+        addRandomTextFoundInDataToFilter();
+        whenLookupObjects();
+    }
+
     void whenLookupByRandomBoundingBox()
     {
         addRandomBoundingBoxToFilter();
@@ -646,6 +705,7 @@ private:
     Filter m_filter;
     QnUuid m_specificObjectId;
     QnTimePeriod m_specificObjectTimePeriod;
+    AttributeDictionary m_attributeDictionary;
 
     void generateVariousEvents()
     {
@@ -685,7 +745,7 @@ private:
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
-                auto packet = generateRandomPacket(1);
+                auto packet = generateRandomPacket(1, &m_attributeDictionary);
                 packet->deviceId = deviceId;
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
@@ -789,9 +849,12 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
     thenResultMatchesExpectations();
 }
 
-// Advanced Lookup.
+TEST_F(AnalyticsEventsStorageLookup, full_text_search)
+{
+    whenLookupByRandomTextFoundInData();
+    thenResultMatchesExpectations();
+}
 
-// TEST_F(AnalyticsEventsStorage, full_text_search)
 // TEST_F(AnalyticsEventsStorage, lookup_by_attribute_value)
 
 TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
