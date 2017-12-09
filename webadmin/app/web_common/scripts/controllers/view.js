@@ -303,8 +303,8 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.crashCount = 0;
             }
         }
-        $scope.playerHandler = function(isError){
-            if(isError){
+        $scope.playerHandler = function(error){
+            if(error){
                 $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
                    reloadSource(jumpToLive);
                 });

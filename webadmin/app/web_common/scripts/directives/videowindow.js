@@ -341,7 +341,7 @@ angular.module('nxCommon')
                     scope.videoFlags.errorLoading = true;
                     scope.loading = false; // Some error happended - stop loading
                     resetPlayer();
-                    scope.playerHandler(true);
+                    scope.playerHandler(error);
                     console.error(error);
                 }
 
