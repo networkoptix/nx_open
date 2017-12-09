@@ -2,9 +2,9 @@
 
 angular.module('nxCommon').controller('ViewCtrl',
             ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast',
-              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
+              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'dialogs',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast,
-              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
+              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, dialogs) {
 
         var channels = {
             Auto: 'lo',
@@ -18,6 +18,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.systemAPI = systemAPI;
 
         $scope.debugMode = Config.allowDebugMode;
+        $scope.castMode = Config.allowCastMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
@@ -31,6 +32,10 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
+        }
+
+        if($scope.castMode){
+            dialogs.alert("Warning!!! This feature is resource intensive and may cause issues on your server.", "Chrome Cast: Beta Version!!!");
         }
 
         $scope.positionProvider = null;
@@ -239,13 +244,25 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if($scope.debugMode && !$scope.isWebAdmin){
+            if($scope.castMode || $scope.debugMode){
                 var streamInfo = {};
-                var streamType = $scope.player == "webm" ? "webm" : "hls";
-                streamInfo.src = $scope.player == "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
+                var streamType = "webm";
+
+                if($scope.debugMode){
+                    streamType = $scope.player == "webm" ? "webm" : "hls";
+                }
+
+                streamInfo.src = streamType == "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
                                                          : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
                 streamInfo.title = $scope.activeCamera.name;
-                chromeCast.load(streamInfo, streamType);
+
+                if(cameraSupports(streamType) || $scope.debugMode){
+                    $scope.showCastButton = true;
+                    chromeCast.load(streamInfo, streamType);
+                }
+                else{
+                    $scope.showCastButton = false;
+                }
             }
         }
 
