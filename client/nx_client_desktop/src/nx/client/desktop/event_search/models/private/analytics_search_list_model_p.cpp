@@ -46,7 +46,7 @@ static void advanceObject(analytics::storage::DetectedObject& object,
         }
     }
 
-    object.track.push_back(position);
+    object.lastAppearanceTimeUsec = position.timestampUsec;
 }
 
 static const auto lowerBoundPredicate =
@@ -330,6 +330,8 @@ void AnalyticsSearchListModel::Private::processMetadata(
             newObject.objectTypeId = item.objectTypeId;
             newObject.attributes = std::move(item.labels);
             newObject.track.push_back(pos);
+            newObject.firstAppearanceTimeUsec = pos.timestampUsec;
+            newObject.lastAppearanceTimeUsec = pos.timestampUsec;
             newObjects.push_back(std::move(newObject));
         }
         else
@@ -417,7 +419,7 @@ QString AnalyticsSearchListModel::Private::description(
         + lit("<td>%2</td></tr>");
 
     QString rows;
-    for (const auto& attribute : object.attributes)
+    for (const auto& attribute: object.attributes)
         rows += kRowTemplate.arg(attribute.name, attribute.value);
 
     const auto color = QPalette().color(QPalette::WindowText);
