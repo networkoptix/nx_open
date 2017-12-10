@@ -33,12 +33,6 @@ static constexpr int kFetchBatchSize = 25;
 
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
 
-static qint64 startTimeUs(const DetectedObject& object)
-{
-    NX_ASSERT(!object.track.empty());
-    return object.track.empty() ? 0 : object.track.front().timestampUsec;
-}
-
 static void advanceObject(analytics::storage::DetectedObject& object,
     analytics::storage::ObjectPosition&& position)
 {
@@ -58,13 +52,13 @@ static void advanceObject(analytics::storage::DetectedObject& object,
 static const auto lowerBoundPredicate =
     [](const DetectedObject& left, qint64 right)
     {
-        return startTimeUs(left) > right;
+        return left.firstAppearanceTimeUsec > right;
     };
 
 static const auto upperBoundPredicate =
     [](qint64 left, const DetectedObject& right)
     {
-        return left > startTimeUs(right);
+        return left > right.firstAppearanceTimeUsec;
     };
 
 } // namespace
@@ -345,7 +339,7 @@ void AnalyticsSearchListModel::Private::processMetadata(
             finishedObjects.remove(item.objectId);
 
             const auto emitDataChanged =
-                [this, timeUs = startTimeUs(m_data[index]), id = m_data[index].objectId]()
+                [this, timeUs = m_data[index].firstAppearanceTimeUsec, id = m_data[index].objectId]()
                 {
                     static const QVector<int> kUpdateRoles
                         {Qt::ToolTipRole, Qn::DescriptionTextRole};
@@ -398,8 +392,9 @@ QString AnalyticsSearchListModel::Private::description(
 
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTimeMs(object));
-    const auto durationUs = object.track.back().durationUsec
-        + (object.track.back().timestampUsec - object.track.front().timestampUsec);
+    // TODO: #vkutin Is this duration formula good enough for us?
+    //   Or we need to add some "lastAppearanceDurationUsec"?
+    const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
     return lit("%1: %2<br>%3: %4")
         .arg(tr("Start"))
@@ -435,7 +430,7 @@ qint64 AnalyticsSearchListModel::Private::startTimeMs(
     const analytics::storage::DetectedObject& object)
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::microseconds(startTimeUs(object))).count();
+        std::chrono::microseconds(object.firstAppearanceTimeUsec)).count();
 }
 
 } // namespace
