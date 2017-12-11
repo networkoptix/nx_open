@@ -77,7 +77,6 @@ function(nx_detect_package_versions)
         boost
         openssl
         ffmpeg
-        quazip
         sigar
         openldap
         sasl2
@@ -149,6 +148,7 @@ function(nx_get_dependencies)
     if(box STREQUAL "tx1")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(tegra_video)
+        nx_rdep_add_package(jetpack)
     endif()
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")
