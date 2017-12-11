@@ -4426,9 +4426,9 @@ to %1</source>
       <translation>スケジュールで無効</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
-      <translation>
-        <numerusform>全ての %n カメラに設定</numerusform>
+      <source>Set for all %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6046,8 +6046,8 @@ to %1</source>
       <translation>パスワードが必要</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7664,12 +7664,12 @@ to %1</source>
       <translation>ファイル書き込みエラー</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>データはエクスポートされませんでした</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>内部エラー</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

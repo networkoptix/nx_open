@@ -999,7 +999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Eksportowany plik EXE ma rozmiar powyżej 4 GB i nie można go otworzyć standardowymi narzędziami w systemie Windows. Można go odtwarzać tylko w aplikacji klienckiej %1.</translation>
     </message>
   </context>
   <context>
@@ -3224,7 +3224,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Poproś administratora systemu, aby to zrobił.</translation>
     </message>
   </context>
   <context>
@@ -3482,7 +3482,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Podstawowa</translation>
     </message>
   </context>
   <context>
@@ -4538,11 +4538,11 @@ to %1</source>
       <translation>Wyłączone harmonogramem</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
-      <translation>
-        <numerusform>Ustaw dla kamery</numerusform>
-        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
-        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
+      <source>Set for all %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6190,8 +6190,8 @@ to %1</source>
       <translation>WYMAGANE HASŁO</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7872,12 +7872,12 @@ to %1</source>
       <translation>Błąd zapisu pliku.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Dane nie zostały wyeksportowane.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>Błąd wewnętrzny</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -8653,7 +8653,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>Nie udało się zmienić hasła w %1 z %2 kamer</translation>
     </message>
   </context>
   <context>

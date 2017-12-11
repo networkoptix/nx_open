@@ -4432,9 +4432,9 @@ to %1</source>
       <translation>已依據排程停用</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
-      <translation>
-        <numerusform>設定這 %n 個攝影機</numerusform>
+      <source>Set for all %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6052,8 +6052,8 @@ to %1</source>
       <translation>需要密碼</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7670,12 +7670,12 @@ to %1</source>
       <translation>檔案寫入錯誤.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>未匯出任何資料.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>內部錯誤</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

@@ -50,7 +50,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>북마크 내보내기</translation>
     </message>
   </context>
   <context>
@@ -854,15 +854,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>분석을 시작...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>일부 카메라는 암호설정이 요구됩니다</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>영상 내보내기...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -870,15 +870,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>해상도...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>셀 종횡비...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>셀 간격...</translation>
     </message>
   </context>
   <context>
@@ -975,7 +975,7 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>선택한 설정은 코드변환이 필요합니다. CPU 사용량이 증가하고 상당한 시간이 걸릴 수 있습니다.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
@@ -999,7 +999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>백업 .EXE 의 파일의 크기가 4GB 이상이며 이 파일은 Windows에서 더블 클릭하여 열 수 없습니다. %1 클라이언트에서만 재생할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -4426,9 +4426,9 @@ to %1</source>
       <translation>일정에 따라 중지됨</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
+      <source>Set for all %n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Set For All %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6046,8 +6046,8 @@ to %1</source>
       <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7664,12 +7664,12 @@ to %1</source>
       <translation type="unfinished">File write error.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation type="unfinished">Internal error</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -7688,15 +7688,15 @@ to %1</source>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>설정 내보내기</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>시간표시 추가</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>시간표시 삭제</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -7704,11 +7704,11 @@ to %1</source>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>그림 추가</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>그림 삭제</translation>
     </message>
     <message>
       <source>Image</source>
@@ -7716,31 +7716,31 @@ to %1</source>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>문자 추가</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>문자 삭제</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>문자</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>속도 초기화</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>책갈피 정보 추가</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>책갈피 정보 삭제</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>책갈피 정보</translation>
     </message>
   </context>
   <context>
@@ -7770,7 +7770,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>사진 (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -7778,7 +7778,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>사진을 불러 올 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -7789,7 +7789,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>카메라가 아닙니다</translation>
     </message>
   </context>
   <context>
@@ -7815,7 +7815,7 @@ to %1</source>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>성능을 높이기 위하여 레이아웃 해상도를 &quot;Auto&quot; 값으로 설정하세요.</translation>
     </message>
   </context>
   <context>
@@ -8470,7 +8470,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Showreel %1을 삭제 하시겠습니까?</translation>
     </message>
   </context>
   <context>

@@ -4484,7 +4484,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Set For All %n Cameras</source>
+        <source>Set for all %n Cameras</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -6119,7 +6119,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set for this camera</source>
+        <source>Set for this Camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7769,11 +7769,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No data was exported.</source>
+        <source>Internal error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Internal error</source>
+        <source>No data exported.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
