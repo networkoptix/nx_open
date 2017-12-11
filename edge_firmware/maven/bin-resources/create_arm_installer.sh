@@ -284,7 +284,7 @@ copyBins()
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
                 if [[ $FILE != *.debug ]]; then
                     if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
-                        continue;
+                        continue
                     fi
 
                     echo "Copying plugins/$(basename "$FILE")"

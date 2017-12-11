@@ -19,7 +19,7 @@
                         Dung lượng trống
                     </th>
                     <th width="150">
-                        Không gian dành riêng
+                        Bộ nhớ dự trữ
                     </th>
                     <th >
                     </th>
@@ -68,7 +68,7 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">Gb</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
@@ -121,7 +121,7 @@
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Không: Vô hiệu hoá log.</option>
+                    <option value="NONE">Không có: Đăng nhập bị vô hiệu.</option>
                     <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
                     <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
                     <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
@@ -135,7 +135,7 @@
             <label class="col-sm-4">Cấp nhật ký giao dịch</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Không có: Đăng nhập bị vô hiệu.</option>
+                    <option value="NONE">Không: Vô hiệu hoá log.</option>
                     <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
                     <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
                     <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Cảnh báo!</b> Một số thay đổi cần khởi động lại <b>tất cả</b> các máy chủ trong hệ thống.<br><br>
+        <b>sự phản đối!</b> Một số thay đổi cần khởi động lại <b>tất cả</b> các máy chủ trong hệ thống.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Khởi động lại máy chủ hiện tại</button>
         </div>

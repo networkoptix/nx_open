@@ -1,7 +1,7 @@
 import logging
 import os
 
-from subprocess import Popen, check_output, check_call, PIPE
+from subprocess import check_call
 from textwrap import dedent
 
 log = logging.getLogger(__name__)
@@ -17,14 +17,16 @@ class CA(object):
         self._key_path = os.path.join(ca_dir, 'ca.key')
         self._serial_path = os.path.join(ca_dir, 'ca.srl')
         self._extensions_config_path = os.path.join(ca_dir, 'ca.extensions.cnf')
-        if not os.path.exists(self.cert_path):
-            with open(self._serial_path, 'w') as serial_file:
-                serial_file.write('01')
+        if not os.path.exists(self.cert_path) or not os.path.exists(self._key_path):
+            log.debug("Generating new CA certificate %s and key %s...", self.cert_path, self._key_path)
             check_call([
                 'openssl', 'req', '-x509',
                 '-newkey', 'rsa:2048', '-nodes', '-keyout', self._key_path,
                 '-subj', '/C=US/O=NetworkOptix/CN=nxca',
                 '-out', self.cert_path])
+            log.info("New CA certificate %s can be added to browser or system as trusted.", self.cert_path)
+        if not os.path.exists(self._extensions_config_path):
+            log.debug("Save extensions config %s...", self._extensions_config_path)
             with open(self._extensions_config_path, 'w') as extensions_config_file:
                 extensions_config_file.write(str.strip(dedent("""
                     basicConstraints = CA:FALSE
@@ -34,6 +36,10 @@ class CA(object):
                     DNS.1 = localhost
                     IP.1 = 127.0.0.1
                 """)))
+        if not os.path.exists(self._serial_path):
+            log.debug("Saving new serial file %s...", self._serial_path)
+            with open(self._serial_path, 'w') as serial_file:
+                serial_file.write('01')  # Could be any hex-encoded byte string up to 20 octets.
         self._gen_dir = os.path.join(ca_dir, 'gen')
         if not os.path.exists(self._gen_dir):
             os.makedirs(self._gen_dir)

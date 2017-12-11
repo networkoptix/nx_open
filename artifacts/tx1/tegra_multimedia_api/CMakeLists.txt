@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEGRA_VIDEO_STUB_ONLY=")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 if(NOT TARGET nx_kit)
+    set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
     set(NX_KIT_DIR "../../../open/artifacts/nx_kit")
     include(${NX_KIT_DIR}/nx_kit.cmake)
 endif()

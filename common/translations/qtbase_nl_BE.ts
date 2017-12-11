@@ -518,7 +518,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Verwijderen</translation>
+      <translation>&amp;Verwijder</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -725,7 +725,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;Annuleer</translation>
+      <translation>&amp;Annuleren</translation>
     </message>
     <message>
       <source>&amp;Close</source>

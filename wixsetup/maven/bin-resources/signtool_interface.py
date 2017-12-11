@@ -6,7 +6,7 @@ Usage: signtool <command> [options]
                 timestamp  --  Timestamp previously-signed files.
                 verify     --  Verify embedded or catalog signatures.
                 catdb      --  Modify a catalog database.
-                
+
 Usage: signtool sign [options] <filename(s)>
 
 Use the "sign" command to sign files using embedded signatures. Signing
@@ -80,25 +80,25 @@ def signtool_executable():
 
 def common_signtool_options():
     return [
-        '/td', 'sha256', 
-        '/fd', 'sha256', 
+        '/td', 'sha256',
+        '/fd', 'sha256',
         '/tr', 'http://tsa.startssl.com/rfc3161',
         '/v',
         '/a']
 
-def sign_command(target_file, main_certificate, additional_certificate, password, description):
+def sign_command(target_file):
     command = [signtool_executable(), 'sign']
     command += common_signtool_options()
-    if description:
-        command += ['/d', description]
-    if password:
-        command += ['/p', password]
-    if main_certificate:
-        command += ['/f', main_certificate]
-    if additional_certificate:
-        command += ['/ac', certificate]   
+    if environment.sign_description:
+        command += ['/d', environment.sign_description]
+    if environment.sign_password:
+        command += ['/p', environment.sign_password]
+    if environment.main_certificate:
+        command += ['/f', environment.main_certificate]
+    if environment.additional_certificate:
+        command += ['/ac', environment.additional_certificate]
     command += [target_file]
     return command
 
-def sign(target_file, main_certificate, additional_certificate, password, description):
-    environment.execute_command(sign_command(target_file, main_certificate, additional_certificate, password, description))
+def sign(target_file):
+    environment.execute_command(sign_command(target_file))

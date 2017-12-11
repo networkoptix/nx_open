@@ -50,7 +50,7 @@
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisar</translation>
+      <translation>Pesquisa</translation>
     </message>
   </context>
   <context>
@@ -88,7 +88,7 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>A carregar...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>

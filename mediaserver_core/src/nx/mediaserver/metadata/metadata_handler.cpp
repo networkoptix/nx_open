@@ -87,9 +87,11 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<AbstractObjectsMetadat
         for (int i = 0; i < item->attributeCount(); ++i)
         {
             nx::common::metadata::Attribute attribute;
-            attribute.name = QString::fromStdString(item->attribute(i)->name);
-            attribute.value = QString::fromStdString(item->attribute(i)->value);
+            attribute.name = QString::fromStdString(item->attribute(i)->name());
+            attribute.value = QString::fromStdString(item->attribute(i)->value());
             object.labels.push_back(attribute);
+
+            NX_VERBOSE(this) << __func__ << "Attribute:" << attribute.name << attribute.value;
         }
         data.objects.push_back(std::move(object));
     }

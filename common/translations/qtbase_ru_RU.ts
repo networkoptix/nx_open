@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation>Настр</translation>
+      <translation>Настройка</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -732,7 +732,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>От&amp;мена</translation>
+      <translation>&amp;Отмена</translation>
     </message>
     <message>
       <source>&amp;Close</source>
@@ -882,7 +882,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>Закрыть</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Help</source>
@@ -957,18 +957,18 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Сбросить</translation>
+      <translation>Сброс</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>По умолчанию</translation>
+      <translation>Сбросить настройки</translation>
     </message>
   </context>
   <context>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Отменить</translation>
+      <translation>Отмена</translation>
     </message>
   </context>
   <context>
@@ -1120,7 +1120,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Загрузки</translation>
+      <translation>Загрузка</translation>
     </message>
   </context>
   <context>

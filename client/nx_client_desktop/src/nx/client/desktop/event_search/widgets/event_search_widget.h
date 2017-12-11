@@ -21,6 +21,14 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    void setAnalyticsSearchRect(const QRectF& relativeRect);
+
+    bool analyticsSearchByAreaEnabled() const;
+    void setAnalyticsSearchByAreaEnabled(bool value);
+
+signals:
+    void analyticsSearchByAreaEnabledChanged(bool enabled);
+
 private:
     class Private;
     QScopedPointer<Private> d;

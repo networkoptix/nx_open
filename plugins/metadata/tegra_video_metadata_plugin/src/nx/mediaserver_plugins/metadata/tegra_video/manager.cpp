@@ -14,6 +14,7 @@
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
+#include "attribute_options.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -53,9 +54,15 @@ Manager::Manager(Plugin* plugin):
     NX_OUTPUT << __func__ << "() END -> " << this;
 
     if (strcmp(ini().postprocType, "ped") == 0)
+    {
+        setTrackerAttributeOptions(kHumanAttributeOptions);
         m_tracker.setObjectTypeId(kHumanUuid);
+    }
     else if (strcmp(ini().postprocType, "car") == 0)
+    {
+        setTrackerAttributeOptions(kCarAttributeOptions);
         m_tracker.setObjectTypeId(kCarUuid);
+    }
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -127,8 +134,7 @@ Error Manager::putData(AbstractDataPacket* dataPacket)
 
 Error Manager::stopFetchingMetadata()
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
-
+    NX_OUTPUT << __func__ << "() -> noError";
     return Error::noError;
 }
 
@@ -240,6 +246,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
         detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
         objectPacket->addItem(detectedObject);
     }
+
     metadataPackets->push_back(objectPacket);
     return true;
 }
@@ -345,6 +352,18 @@ int64_t Manager::usSinceEpoch() const
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
+}
+
+void Manager::setTrackerAttributeOptions(
+    const std::map<QString, std::vector<QString>>& options)
+{
+    for (const auto& entry : options)
+    {
+        const auto attributeName = entry.first;
+        const auto& attributeOptions = entry.second;
+
+        m_tracker.setAttributeOptions(attributeName, attributeOptions);
+    }
 }
 
 } // namespace tegra_video

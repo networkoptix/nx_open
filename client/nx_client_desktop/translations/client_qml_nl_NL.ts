@@ -27,11 +27,11 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Save password</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
   </context>
   <context>
@@ -73,7 +73,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation>Nieuwe server</translation>
+      <translation>Nieuwe Server</translation>
     </message>
   </context>
   <context>

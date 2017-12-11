@@ -915,6 +915,12 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
 #endif
                     break;
                 }
+                case Qn::ItemZoomWindowRectangleVisibleRole:
+                {
+                    auto data = QJson::deserialized<bool>(value);
+                    item->setData(role, data);
+                    break;
+                }
                 case Qn::ItemPositionRole:
                 {
                     QPointF data = QJson::deserialized<QPointF>(value);
@@ -2646,6 +2652,16 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
 #endif
             QJson::serialize(value, &json);
             cached = true;
+            break;
+        }
+
+        case Qn::ItemZoomWindowRectangleVisibleRole:
+        {
+            const auto value = data.toBool();
+#ifdef SENDER_DEBUG
+            qDebug() << "SENDER: Item" << item->uuid() << debugRole(role) << "changed to" << value;
+#endif
+            QJson::serialize(value, &json);
             break;
         }
 

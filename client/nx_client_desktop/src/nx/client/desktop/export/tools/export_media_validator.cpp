@@ -159,8 +159,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
         if (!resource)
             continue;
 
-        // TODO: #GDM #3.1.1 What's with re-export from exported layouts?
-        if (!resource.dynamicCast<QnVirtualCameraResource>())
+        if (resource->hasFlags(Qn::still_image))
         {
             results.set(int(Result::nonCameraResources));
             continue;

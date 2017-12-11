@@ -71,23 +71,16 @@ public:
 
 protected:
     struct AddToLayoutParams {
-        bool usePosition;
+        bool usePosition = false;
         QPointF position;
         QRectF zoomWindow;
         QnUuid zoomUuid;
-        qint64 time;
+        qint64 time = -1;
         QColor frameDistinctionColor;
-        qreal rotation;
+        bool zoomWindowRectangleVisible = true;
+        qreal rotation = 0.0;
         ImageCorrectionParams contrastParams;
         QnItemDewarpingParams dewarpingParams;
-
-        AddToLayoutParams() :
-            usePosition(false),
-            position(QPointF()),
-            zoomUuid(QnUuid()),
-            time(-1),
-            rotation(0)
-        {}
     };
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const;

@@ -659,13 +659,20 @@ gieThread(void *arg)
             auto now = std::chrono::high_resolution_clock::now();
             auto timeElapsedSinceLastInference = std::chrono::duration_cast<std::chrono::milliseconds>(
                 (now - ctx->m_lastInferenceTime));
+            
+            if (ctx->m_lastInferenceTime.time_since_epoch() == std::chrono::milliseconds::zero())
+                ctx->m_lastInferenceTime = now;
 
-            if (timeElapsedSinceLastInference < minTimeToNextInference)
+           
+            bool needToDropFrame = !ctx->m_ptsQueue.empty()
+                && (ctx->m_lastInferenceTime.time_since_epoch() + minTimeToNextInference
+                    > std::chrono::microseconds(ctx->m_ptsQueue.front()));
+
+            if (needToDropFrame)
             {
                 NX_OUTPUT << "Dropping frame without inference! "
                     << timeElapsedSinceLastInference.count() << " "
                     << minTimeToNextInference.count();
-
 
                 if (!ctx->m_ptsQueue.empty())
                     ctx->m_ptsQueue.pop();

@@ -27,11 +27,11 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Save password</source>
@@ -50,7 +50,7 @@
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Zoek</translation>
+      <translation>Search</translation>
     </message>
   </context>
   <context>

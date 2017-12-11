@@ -188,6 +188,8 @@ public:
 
     virtual bool containTime(const qint64 timeUsec) const;
 
+    qint64 duration() const;
+
 public:
     MetadataType metadataType;
     qint64 m_duration;

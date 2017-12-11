@@ -36,10 +36,7 @@ public:
 
 signals:
     void highlightedAreaChanged(const QnUuid& areaId);
-
-protected:
-    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+    void areaClicked(const QnUuid& areaId);
 
 private:
     class Private;

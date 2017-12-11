@@ -104,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -389,7 +389,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Не найден кодировщик для кодекa %1.</translation>
+      <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>Начать</translation>
+      <translation>Начинается</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -464,7 +464,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Неверно</translation>
+      <translation>Неверный</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>Бесплатная</translation>
+      <translation>Свободно</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>Лицензии Bridge</translation>
     </message>
   </context>
   <context>
@@ -500,16 +500,16 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 использована из %1.</numerusform>
-        <numerusform>%n %2 использованы из %1.</numerusform>
+        <numerusform>%n %2 использовано из %1.</numerusform>
+        <numerusform>%n %2 использовано из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 будет использована из %1.</numerusform>
-        <numerusform>%n %2 будут использованы из %1.</numerusform>
+        <numerusform>%n %2 будет использовано из %1.</numerusform>
+        <numerusform>%n %2 будет использовано из %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
       </translation>
     </message>
@@ -542,7 +542,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Срок действия лицензии истёк</translation>
+      <translation>Истёк срок действия лицензии</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -672,17 +672,10 @@
     </message>
   </context>
   <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-      <source>Operation is not permitted.</source>
-      <translation type="unfinished">Operation is not permitted.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -713,15 +706,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкое</translation>
+      <translation>Низкая</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Среднее</translation>
+      <translation>Средний</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокое</translation>
+      <translation>Высокая</translation>
     </message>
     <message>
       <source>Best</source>
@@ -802,7 +795,7 @@
     </message>
     <message>
       <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <translation>Нет данных для экспорта.</translation>
     </message>
   </context>
   <context>
@@ -816,7 +809,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -926,25 +919,25 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>миллисекунда</numerusform>
-        <numerusform>миллисекунды</numerusform>
-        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунда</numerusform>
+        <numerusform>миллисекунда</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>секунда</numerusform>
         <numerusform>секунды</numerusform>
-        <numerusform>секунд</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>минута</numerusform>
-        <numerusform>минуты</numerusform>
+        <numerusform>минут</numerusform>
+        <numerusform>минут</numerusform>
         <numerusform>минут</numerusform>
       </translation>
     </message>
@@ -952,8 +945,8 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>час</numerusform>
-        <numerusform>часа</numerusform>
+        <numerusform>часов</numerusform>
+        <numerusform>часов</numerusform>
         <numerusform>часов</numerusform>
       </translation>
     </message>
@@ -961,8 +954,8 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>день</numerusform>
-        <numerusform>дня</numerusform>
+        <numerusform>дней</numerusform>
+        <numerusform>дней</numerusform>
         <numerusform>дней</numerusform>
       </translation>
     </message>
@@ -970,8 +963,8 @@
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>неделя</numerusform>
-        <numerusform>недели</numerusform>
+        <numerusform>недель</numerusform>
+        <numerusform>недель</numerusform>
         <numerusform>недель</numerusform>
       </translation>
     </message>
@@ -979,8 +972,8 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>месяц</numerusform>
-        <numerusform>месяца</numerusform>
+        <numerusform>месяцев</numerusform>
+        <numerusform>месяцев</numerusform>
         <numerusform>месяцев</numerusform>
       </translation>
     </message>
@@ -988,8 +981,8 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>год</numerusform>
-        <numerusform>года</numerusform>
+        <numerusform>лет</numerusform>
+        <numerusform>лет</numerusform>
         <numerusform>лет</numerusform>
       </translation>
     </message>
@@ -1041,7 +1034,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Особая</translation>
+      <translation>Особые</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1556,12 +1549,12 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Событие аналитики</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 на %2</translation>
     </message>
   </context>
   <context>

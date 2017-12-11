@@ -51,7 +51,7 @@ void EventsStorage::createLookupCursor(
     NX_VERBOSE(this, lm("Requested cursor with filter %1").args(filter));
 
     m_dbController.queryExecutor().createCursor<DetectedObject>(
-        std::bind(&EventsStorage::prepareLookupQuery, this, filter, _1),
+        std::bind(&EventsStorage::prepareCursorQuery, this, filter, _1),
         std::bind(&EventsStorage::loadObject, this, _1, _2),
         [this, completionHandler = std::move(completionHandler)](
             db::DBResult resultCode,
@@ -177,22 +177,7 @@ void EventsStorage::insertEventAttributes(
     insertEventAttributesQuery.exec();
 }
 
-nx::utils::db::DBResult EventsStorage::selectObjects(
-    nx::utils::db::QueryContext* queryContext,
-    const Filter& filter,
-    std::vector<DetectedObject>* result)
-{
-    SqlQuery selectEventsQuery(*queryContext->connection());
-    selectEventsQuery.setForwardOnly(true);
-    prepareLookupQuery(filter, &selectEventsQuery);
-    selectEventsQuery.exec();
-
-    loadObjects(selectEventsQuery, filter, result);
-
-    return nx::utils::db::DBResult::ok;
-}
-
-void EventsStorage::prepareLookupQuery(
+void EventsStorage::prepareCursorQuery(
     const Filter& filter,
     nx::utils::db::SqlQuery* query)
 {
@@ -213,6 +198,69 @@ void EventsStorage::prepareLookupQuery(
         ORDER BY timestamp_usec_utc %2, object_id %2;
     )sql").args(
         sqlQueryFilterStr,
+        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
+    nx::utils::db::bindFields(query, sqlQueryFilter);
+}
+
+nx::utils::db::DBResult EventsStorage::selectObjects(
+    nx::utils::db::QueryContext* queryContext,
+    const Filter& filter,
+    std::vector<DetectedObject>* result)
+{
+    SqlQuery selectEventsQuery(*queryContext->connection());
+    selectEventsQuery.setForwardOnly(true);
+    prepareLookupQuery(filter, &selectEventsQuery);
+    selectEventsQuery.exec();
+
+    loadObjects(selectEventsQuery, filter, result);
+
+    queryTrackInfo(queryContext, result);
+
+    return nx::utils::db::DBResult::ok;
+}
+
+void EventsStorage::prepareLookupQuery(
+    const Filter& filter,
+    nx::utils::db::SqlQuery* query)
+{
+    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString sqlQueryFilterStr;
+    if (!sqlQueryFilter.empty())
+    {
+        sqlQueryFilterStr = lm("WHERE %1").args(
+            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+    }
+
+    QString sqlLimitStr;
+    if (filter.maxObjectsToSelect > 0)
+        sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
+
+    QString freeTextFilter;
+    if (!filter.freeText.isEmpty())
+    {
+        freeTextFilter = lm(R"sql(
+            (SELECT rowid, * FROM event
+             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1'))
+        )sql").args(filter.freeText);
+    }
+
+    query->prepare(lm(R"sql(
+        SELECT timestamp_usec_utc, duration_usec, device_guid,
+            object_type_id, object_id, attributes,
+            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
+        FROM event e,
+            (SELECT MIN(timestamp_usec_utc) AS matching_track_start_time, rowid as r
+             FROM %1
+             %2
+             GROUP BY object_id
+             ORDER BY matching_track_start_time DESC
+             %3) objects
+        WHERE e.rowid=objects.r
+        ORDER BY timestamp_usec_utc %4
+    )sql").args(
+        freeTextFilter.isEmpty() ? QString::fromLatin1("event") : freeTextFilter,
+        sqlQueryFilterStr,
+        sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     nx::utils::db::bindFields(query, sqlQueryFilter);
 }
@@ -372,7 +420,7 @@ void EventsStorage::loadObject(
         selectEventsQuery->value(lit("box_bottom_right_y")).toDouble()));
 }
 
-void EventsStorage::mergeObjects(DetectedObject&& from, DetectedObject* to)
+void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
 {
     to->track.insert(
         to->track.end(),
@@ -380,6 +428,52 @@ void EventsStorage::mergeObjects(DetectedObject&& from, DetectedObject* to)
         std::make_move_iterator(from.track.end()));
 
     // TODO: #ak moving attributes.
+    for (auto& attribute: from.attributes)
+    {
+        auto existingAttributeIter = std::find_if(
+            to->attributes.begin(), to->attributes.end(),
+            [&attribute](const nx::common::metadata::Attribute& existingAttribute)
+            {
+                return existingAttribute.name == attribute.name;
+            });
+        if (existingAttributeIter == to->attributes.end())
+        {
+            to->attributes.push_back(std::move(attribute));
+            continue;
+        }
+        else if (existingAttributeIter->value == attribute.value)
+        {
+            continue;
+        }
+        else
+        {
+            // TODO: #ak Not sure it is correct.
+            *existingAttributeIter = std::move(attribute);
+        }
+    }
+}
+
+void EventsStorage::queryTrackInfo(
+    nx::utils::db::QueryContext* queryContext,
+    std::vector<DetectedObject>* result)
+{
+    SqlQuery trackInfoQuery(*queryContext->connection());
+    trackInfoQuery.setForwardOnly(true);
+    trackInfoQuery.prepare(QString::fromLatin1(R"sql(
+        SELECT min(timestamp_usec_utc), max(timestamp_usec_utc)
+        FROM event
+        WHERE object_id = :objectId
+    )sql"));
+
+    for (auto& object: *result)
+    {
+        trackInfoQuery.bindValue(lit(":objectId"), QnSql::serialized_field(object.objectId));
+        trackInfoQuery.exec();
+        if (!trackInfoQuery.next())
+            continue;
+        object.firstAppearanceTimeUsec = trackInfoQuery.value(0).toLongLong();
+        object.lastAppearanceTimeUsec = trackInfoQuery.value(1).toLongLong();
+    }
 }
 
 nx::utils::db::DBResult EventsStorage::selectTimePeriods(

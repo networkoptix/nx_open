@@ -36,7 +36,7 @@ include_directories("${CONFIG_DIRECTORY}" "${CMAKE_CURRENT_SOURCE_DIR}" "${wixDi
 file(GLOB cpp_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 #find_sources("${CMAKE_CURRENT_SOURCE_DIR}" cpp_files hpp_files)
 link_directories("${wixDirectory}/sdk/${vsPath}/lib/${arch}")
-add_library(customactions SHARED ${cpp_files} "CustomActions.rc")
+add_library(customactions SHARED ${cpp_files} "CustomActions.rc" "CustomActions.def")
 add_precompiled_header(customactions "${CMAKE_CURRENT_SOURCE_DIR}/stdafx.h")
 target_link_libraries(customactions userenv.lib;Rpcrt4.lib;Ws2_32.lib;IPHLPAPI.lib;comsuppw.lib;msi.lib;dutil.lib;wcautil.lib;Version.lib)
 

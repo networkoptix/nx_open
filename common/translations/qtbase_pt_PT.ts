@@ -531,7 +531,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation type="unfinished">All files (*)</translation>
+      <translation>Todos ficheiros (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -614,7 +614,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Folder</translation>
+      <translation>Pasta</translation>
     </message>
     <message>
       <source>Alias</source>
@@ -1076,7 +1076,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Imagens</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
