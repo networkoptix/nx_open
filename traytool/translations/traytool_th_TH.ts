@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation>เซิร์ฟเวอร์ถูกหยุดการทำงาน.</translation>
+      <translation>เซิร์ฟเวอร์ถูกหยุดการทำงาน</translation>
     </message>
     <message>
       <source>Server has been started</source>

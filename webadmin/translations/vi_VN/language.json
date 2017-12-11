@@ -116,13 +116,13 @@
     "common": {
         "systemOffline": "Hệ thống offline",
         "cameraLinks": {
-            "copyToClipboard": "chép vào bảng nháp",
+            "copyToClipboard": "sao chép vào clipboard",
             "highStream": "Luồng tốc độ cao",
-            "copyDefaultText": "sao chép",
-            "unknown": "Không biết",
+            "copyDefaultText": "bản sao",
+            "unknown": "Không xác định",
             "lowStream": "Luồng tốc độ thấp",
             "transcoding": "Đang chuyển mã",
-            "copyActiveText": "sao chép vào clipboard"
+            "copyActiveText": "đã sao chép vào clipboard"
         },
         "searchCamPlaceholder": "tìm kiếm",
         "cameraStates": {

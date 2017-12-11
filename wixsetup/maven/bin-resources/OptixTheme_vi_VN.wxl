@@ -14,7 +14,7 @@
 /log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Bạn có chắc muốn hủy bỏ không?</String>
   <String Id="ClientAndServer">Máy chủ và Máy trạm</String>
-  <String Id="ClientOnly">Chỉ máy trạm</String>
+  <String Id="ClientOnly">Chỉ khách hàng</String>
   <String Id="ClientOnlyDesc">Các ung dụng trên máy trạm được sử dụng để xem video và quản lý Hệ thống</String>
   <String Id="ServerOnly">Chỉ máy chủ</String>
   <String Id="ServerOnlyDesc">Các ứng dụng trên máy chủ được sử dụng để lưu thông tin hệ thống và lưu trữ</String>
@@ -25,7 +25,7 @@
   <String Id="InstallInstallButton">Cài đặt</String>
   <String Id="InstallCloseButton">Gần</String>
   <String Id="OptionsHeader">Thiết lập tùy chọn</String>
-  <String Id="OptionsLocationLabel">Vị trí cài đặt:</String>
+  <String Id="OptionsLocationLabel">Cài đặt vị trí:</String>
   <String Id="OptionsBrowseButton">Chọn</String>
   <String Id="OptionsOkButton">Xác định</String>
   <String Id="OptionsCancelButton">Hủy bỏ</String>

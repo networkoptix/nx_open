@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>אודות</translation>
+      <translation>שירותים</translation>
     </message>
     <message>
       <location/>
@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>קרדיטים</translation>
+      <translation>תודות</translation>
     </message>
     <message>
       <location/>
@@ -47,7 +47,7 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>שיפור תמונה</translation>
+      <translation>שיפורי תמונה</translation>
     </message>
     <message>
       <location/>
@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>אוטו'</translation>
+      <translation>אוטומטי</translation>
     </message>
     <message>
       <location/>
@@ -72,7 +72,7 @@
     <message>
       <location/>
       <source>White level</source>
-      <translation>רמת לבן</translation>
+      <translation>רמת לובן</translation>
     </message>
   </context>
   <context>
@@ -214,7 +214,7 @@
     <message>
       <location/>
       <source>System actions</source>
-      <translation>פעולות מערכת</translation>
+      <translation>פעולות המערכת</translation>
     </message>
     <message>
       <location/>
@@ -244,7 +244,7 @@
     <message>
       <location/>
       <source>Email settings</source>
-      <translation>הגדרות דואר אלקטרוני</translation>
+      <translation>הגדרות דוא"ל</translation>
     </message>
     <message>
       <location/>
@@ -531,7 +531,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>עצירה</translation>
+      <translation>עצור</translation>
     </message>
     <message>
       <location/>
@@ -650,7 +650,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>אוטומטית</translation>
+      <translation>אוטומטי</translation>
     </message>
     <message>
       <location/>
@@ -665,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>שחזר לברירת המחדל</translation>
+      <translation>שחזר ברירות מחדל</translation>
     </message>
     <message>
       <location/>
@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>הגדרות מצלמה</translation>
     </message>
     <message>
       <location/>
@@ -720,7 +720,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>זרם משני</translation>
     </message>
     <message>
       <location/>
@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>מצלמה ממונעת</translation>
     </message>
   </context>
   <context>
@@ -792,7 +792,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>הגדרות לוח זמנים</translation>
+      <translation>הגדרות לוח הזמנים</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>קצב נתונים</translation>
     </message>
   </context>
   <context>
@@ -910,7 +910,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>שינוי סיסמה</translation>
+      <translation>שנה סיסמא</translation>
     </message>
   </context>
   <context>
@@ -993,7 +993,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>רשימת אירועים</translation>
+      <translation>יומן אירועים</translation>
     </message>
     <message>
       <location/>
@@ -1052,6 +1052,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation>כתובת HTTP</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1215,7 +1225,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>הגדרות שונות</translation>
+      <translation>שונות</translation>
     </message>
     <message>
       <location/>
@@ -1296,7 +1306,7 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation>יחס רוחב גובה</translation>
+      <translation>יחס גובה-רוחב</translation>
     </message>
     <message>
       <location/>
@@ -1443,7 +1453,7 @@
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation>הגדרות LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <location/>
@@ -1476,7 +1486,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>יבא משתמשים מLDAP...</translation>
+      <translation>רענן נתוני LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1628,7 +1638,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>מזהה-חומרה</translation>
+      <translation>מזהה חומרה</translation>
     </message>
   </context>
   <context>
@@ -1755,7 +1765,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>מחזור סיור</translation>
     </message>
   </context>
   <context>
@@ -1819,7 +1829,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>בדוק...</translation>
+      <translation>בדיקה...</translation>
     </message>
     <message>
       <location/>
@@ -1981,7 +1991,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -2038,7 +2048,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -2265,7 +2275,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>סקירה מהירה</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2290,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>מהירות</translation>
     </message>
     <message>
       <location/>
@@ -2316,12 +2326,12 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation>פריימים לשניה</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation>ש</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2466,7 +2476,7 @@
     <message>
       <location/>
       <source>Failover</source>
-      <translation>מעבר בזמן כשל</translation>
+      <translation>גיבוי חם</translation>
     </message>
     <message>
       <location/>
@@ -2897,7 +2907,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
   </context>
   <context>
@@ -2992,7 +3002,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>חותמת זמן</translation>
     </message>
     <message>
       <location/>
@@ -3002,7 +3012,7 @@
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>פורמט</translation>
     </message>
     <message>
       <location/>
@@ -3015,7 +3025,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>שינוי סיסמה...</translation>
+      <translation>שינוי סיסמא...</translation>
     </message>
   </context>
   <context>

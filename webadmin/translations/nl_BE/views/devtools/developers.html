@@ -1,11 +1,11 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer tools</h2>
+        <h2>Developer Tools</h2>
         <p>
             Heb je een idee hoe we onze ontwikkelaar tools kunnen verbeteren of wil je in geprek met onze ontwikkelaars?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Geef feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Feedback geven</a></p>
     </div>
 
     <div>
@@ -19,7 +19,7 @@
     <div>
         <h3>Server API</h3>
         <p>
-            De server API biedt een standaard set van API calls voor 3rd party systemen. Het geeft developers de mogelijkheid om toegang te verkrijgen tot elke systeem feature die beschikbaar is in de reguliere client: query/beheer systeem resources (servers, camera's, gebruikers, rechten), verkrijgen van stream van live en opgenomen beelden uit het systeem, het genereren van events, creëren van regels, PTZ camera's bedienen en nog veel meer.
+            De server API bied een standaard set van API calls welke ingevoerd kunnen worden in systemen van derden (LPR, toegangscontrole, barcodescanners, Video Content Analyse, etc). Het geeft ontwikkelaars de mogelijkheid om toegang te verkrijgen tot elke systeemfunctie die beschikbaar is in de reguliere desktop client: query/beheer vsan systeembronnen (servers, camera's, gebruikers, rechten), verkrijgen van streams van de live en opgenomen beelden uit het systeem, het genereren van events, creëren van regels, PTZ camera's bedienen en nog veel meer.
         </p>
         <p>
             <a href="#/developers/api"><b>API Test Tool (nieuw)</b></a>
@@ -31,24 +31,24 @@
 
     </div>
     <div>
-        <h3>Camera Details Paneel</h3>
+        <h3>Camera Detail Paneel</h3>
         <p>
             Geeft voor de ontwikkelaar extra informatie weer over de camera's in de Web Admin-interface:
         </p>
         <ul>
             <li>Camera ID</li>
             <li>Links met alle beschikbare video-streams</li>
-            <li>Directe export video vanaf de browser</li>
+            <li>Directe export van video via de webclient</li>
         </ul>
         <p>
-            Om het Camera Details Paneel te openen - ga naar de Web Admin interface, selecteer <a href="#/view"> Weergave </a>, selecteer de doelcamera, klik op het instellingenpictogram (tandwieltje) en kies vervolgens "Camera details"
+            Om het Camera Details Panel te openen - ga naar de Web Admin interface, selecteer <a href="#/view"> Weergave </a>, selecteer de doelcamera, klik op het instellingenpictogram (tandwieltje) en kies vervolgens "Camera details"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Paneel</a></p>
+        <p><a href="#/view/?cameraLinks">open Camera Detail Paneel</a></p>
     </div>
     <div>
         <h3>Video Source Integratie SDK</h3>
         <p>
-            Video Source integratie SDK biedt de mogelijkheid om vrijwel elke live of opgenomen videobron (IP-camera's, NVRs, DVRs, enz.) te integreren in het systeem. SDK maakt het mogelijk om methoden voor het ontdekken van, weergeven, analyseren en opnemen van video. Het maakt het ook mogelijk om bijvoorbeeld I/O modules en Video Content Analyse te integreren.
+            De Video Source integratie SDK biedt de mogelijkheid om vrijwel elke live of opgenomen videobron (IP-camera's, NVRs, DVRs, enz.) te integreren in het systeem. Deze SDK maakt het mogelijk om video te ontdekken, weer te geven, analyseren en  op te nemen. Ook is het hiermee mogelijk om, bijvoorbeeld, I/O modules en bewegingsdetectie te integreren.
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >download SDK</a></p>
     </div>

@@ -183,13 +183,15 @@ function(nx_get_dependencies)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
-        nx_rdep_add_package(any/roboto-fonts)
+        nx_rdep_add_package(any/roboto-fonts PATH_VARIABLE fonts_directory)
+        set(fonts_directory ${fonts_directory} PARENT_SCOPE)
     endif()
 
     if((haveServer OR haveDesktopClient) AND NOT box STREQUAL "edge1")
         nx_rdep_add_package(festival)
         if(NOT "${festival-vox_version}" STREQUAL "system")
-            nx_rdep_add_package(any/festival-vox)
+            nx_rdep_add_package(any/festival-vox PATH_VARIABLE festival_vox_directory)
+            set(festival_vox_directory ${festival_vox_directory} PARENT_SCOPE)
         endif()
     endif()
 

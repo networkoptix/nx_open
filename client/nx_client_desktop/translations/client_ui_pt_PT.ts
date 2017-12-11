@@ -57,7 +57,7 @@
     <message>
       <location/>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gama</translation>
     </message>
     <message>
       <location/>
@@ -287,7 +287,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Começar</translation>
     </message>
   </context>
   <context>
@@ -470,7 +470,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Em</translation>
     </message>
   </context>
   <context>
@@ -665,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurar Padrões</translation>
+      <translation>Restaurar Predefinições</translation>
     </message>
     <message>
       <location/>
@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Definições da Câmara</translation>
     </message>
     <message>
       <location/>
@@ -792,7 +792,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições de Agenda</translation>
+      <translation>Definições da Agenda</translation>
     </message>
     <message>
       <location/>
@@ -1052,6 +1052,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation type="unfinished">HTTP URL</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1448,7 +1458,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL Servidor</translation>
     </message>
     <message>
       <location/>
@@ -1476,7 +1486,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter Utilizador através do LDAP...</translation>
+      <translation>Obter utilizador a partir do LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1677,7 +1687,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <location/>
@@ -1791,12 +1801,12 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <translation>Activar Áudio</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Em gravação</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2290,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Velocidade</translation>
     </message>
     <message>
       <location/>
@@ -2486,7 +2496,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
   </context>
   <context>
@@ -3002,7 +3012,7 @@
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Formato</translation>
     </message>
     <message>
       <location/>

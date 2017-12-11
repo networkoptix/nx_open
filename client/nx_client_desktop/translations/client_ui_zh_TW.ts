@@ -67,12 +67,12 @@
     <message>
       <location/>
       <source>Black level</source>
-      <translation>黑色準位</translation>
+      <translation>黑階</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation>白色準位</translation>
+      <translation>白階</translation>
     </message>
   </context>
   <context>
@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>事件類型:</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>書籤資訊</translation>
     </message>
     <message>
       <location/>
@@ -371,17 +371,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>區域寬度</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>字體大小</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>包含說明</translation>
     </message>
   </context>
   <context>
@@ -591,7 +591,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -665,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>恢復預設值</translation>
+      <translation>回復預設值</translation>
     </message>
     <message>
       <location/>
@@ -690,42 +690,42 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>請勿變更這些設定除非您明白可能造成的對系統效能的潛在影響.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>攝影機設定</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>保持攝影機的串流及配置檔設定</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>錄影排程中的畫質和張數(FPS) 設定將失去作用.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>計算每個 GOP 的流量而不是每秒流量</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>這會增加攝影機的流量.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>次串流</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>停用次串流</translation>
     </message>
     <message>
       <location/>
@@ -740,17 +740,17 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>錄影</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>影音串流</translation>
     </message>
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>流量</translation>
     </message>
   </context>
   <context>
@@ -910,7 +910,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>變更密碼</translation>
+      <translation>更改密碼</translation>
     </message>
   </context>
   <context>
@@ -993,7 +993,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>事件記錄</translation>
+      <translation>事件日誌</translation>
     </message>
     <message>
       <location/>
@@ -1031,7 +1031,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -1053,6 +1053,16 @@
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1067,12 +1077,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>匯出設定</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>建立為唯獨模式</translation>
     </message>
   </context>
   <context>
@@ -1080,22 +1090,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>匯出設定</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>套用過濾器</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>翻轉、魚眼攤平校正及影像強化等.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>套用的過濾器和新增的浮水印需要轉碼. 這會增加CPU使用率且可能需要很長時間.</translation>
     </message>
   </context>
   <context>
@@ -1131,22 +1141,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>匯出影像</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>單支攝影機</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>匯出設定</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>多支影像</translation>
     </message>
   </context>
   <context>
@@ -1202,7 +1212,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小:</translation>
+      <translation>大小</translation>
     </message>
     <message>
       <location/>
@@ -1215,7 +1225,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>其他</translation>
+      <translation>其他設定</translation>
     </message>
     <message>
       <location/>
@@ -1319,17 +1329,17 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小:</translation>
+      <translation>大小</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>不透明度</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>預設</translation>
     </message>
     <message>
       <location/>
@@ -1476,7 +1486,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>從LDAP中選取使用者...</translation>
+      <translation>從LDAP獲取使用者...</translation>
     </message>
     <message>
       <location/>
@@ -1682,7 +1692,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -1725,7 +1735,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>時間模式:</translation>
+      <translation>時間模式</translation>
     </message>
     <message>
       <location/>
@@ -1740,7 +1750,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>明亮度:</translation>
+      <translation>亮度</translation>
     </message>
     <message>
       <location/>
@@ -1755,7 +1765,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>巡曳週期</translation>
     </message>
   </context>
   <context>
@@ -1776,7 +1786,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>認證</translation>
+      <translation>身份驗証</translation>
     </message>
     <message>
       <location/>
@@ -1791,7 +1801,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>啟用聲音</translation>
+      <translation>允許聲音</translation>
     </message>
     <message>
       <location/>
@@ -1819,7 +1829,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>測試…</translation>
+      <translation>測試...</translation>
     </message>
     <message>
       <location/>
@@ -1893,7 +1903,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>詳細</translation>
+      <translation>細節</translation>
     </message>
     <message>
       <location/>
@@ -1960,7 +1970,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>書籤</translation>
+      <translation>寫入書籤</translation>
     </message>
   </context>
   <context>
@@ -2048,7 +2058,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>登入:</translation>
+      <translation>登入帳號:</translation>
     </message>
     <message>
       <location/>
@@ -2265,32 +2275,32 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>快速檢視</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>原始影像長度</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>匯出影像長度</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>速度</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>影格間隔</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>重設速度</translation>
     </message>
   </context>
   <context>
@@ -2321,7 +2331,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2481,7 +2491,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 位址:</translation>
+      <translation>IP 位址</translation>
     </message>
     <message>
       <location/>
@@ -2573,7 +2583,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>驗證</translation>
+      <translation>身份驗証</translation>
     </message>
     <message>
       <location/>
@@ -2583,7 +2593,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>位移偵測</translation>
+      <translation>位移</translation>
     </message>
     <message>
       <location/>
@@ -2648,7 +2658,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -2658,7 +2668,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 位址:</translation>
+      <translation>IP 位址</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2902,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>登入:</translation>
+      <translation>登入帳號:</translation>
     </message>
     <message>
       <location/>
@@ -2951,7 +2961,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>文字</translation>
     </message>
     <message>
       <location/>
@@ -2961,17 +2971,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>字體大小</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>輸入純文本或HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>區域寬度</translation>
     </message>
   </context>
   <context>
@@ -2992,17 +3002,17 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>時間戳記</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>字體大小</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>格式</translation>
     </message>
     <message>
       <location/>
