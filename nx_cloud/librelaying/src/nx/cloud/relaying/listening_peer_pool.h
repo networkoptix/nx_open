@@ -193,10 +193,12 @@ private:
         const QnMutexLockerBase& lock,
         const std::string& peerName,
         PeerContext* peerContext);
-    void processExpirationTimers(
+
+    void processExpirationTimers();
+    void processExpirationTimers(const QnMutexLockerBase& lock);
+    void removeExpiredListeningPeers(
         const QnMutexLockerBase& lock,
-        std::chrono::steady_clock::time_point currentTime = nx::utils::monotonicTime());
-    void processExpirationTimers(std::chrono::steady_clock::time_point currentTime);
+        std::chrono::steady_clock::time_point currentTime);
 
     void doPeriodicTasks();
     void handleTimedoutTakeConnectionRequests(

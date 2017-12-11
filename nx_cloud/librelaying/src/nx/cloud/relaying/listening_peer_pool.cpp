@@ -392,7 +392,21 @@ void ListeningPeerPool::startPeerExpirationTimer(
     peerContext->expirationTimer = timerIter;
 }
 
-void ListeningPeerPool::processExpirationTimers(
+void ListeningPeerPool::processExpirationTimers()
+{
+    QnMutexLocker lock(&m_mutex);
+    processExpirationTimers(lock);
+}
+
+void ListeningPeerPool::processExpirationTimers(const QnMutexLockerBase& lock)
+{
+    const auto currentTime = nx::utils::monotonicTime();
+
+    handleTimedoutTakeConnectionRequests(lock, currentTime);
+    removeExpiredListeningPeers(lock, currentTime);
+}
+
+void ListeningPeerPool::removeExpiredListeningPeers(
     const QnMutexLockerBase& /*lock*/,
     std::chrono::steady_clock::time_point currentTime)
 {
@@ -418,22 +432,9 @@ void ListeningPeerPool::processExpirationTimers(
     }
 }
 
-void ListeningPeerPool::processExpirationTimers(
-    std::chrono::steady_clock::time_point currentTime)
-{
-    QnMutexLocker lock(&m_mutex);
-    processExpirationTimers(lock, currentTime);
-}
-
 void ListeningPeerPool::doPeriodicTasks()
 {
-    const auto currentTime = nx::utils::monotonicTime();
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        handleTimedoutTakeConnectionRequests(lock, currentTime);
-        processExpirationTimers(lock, currentTime);
-    }
+    processExpirationTimers();
     raiseScheduledEvents();
 
     m_periodicTasksTimer.cancelSync();

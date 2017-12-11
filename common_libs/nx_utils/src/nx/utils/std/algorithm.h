@@ -140,5 +140,17 @@ RandomAccessContainer reverseWords(
         separator);
 }
 
+template<typename InputIt, typename T>
+bool contains(InputIt first, InputIt last, const T& value)
+{
+    return std::count(first, last, value) == 1;
+}
+
+template<typename InputIt, typename UnaryPredicate>
+bool contains_if(InputIt first, InputIt last, UnaryPredicate p)
+{
+    return std::count(first, last, p) == 1;
+}
+
 } // namespace utils
 } // namespace nx

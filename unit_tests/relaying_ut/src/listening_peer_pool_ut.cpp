@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_delegate.h>
@@ -13,6 +14,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/test_support/settings_loader.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -245,15 +247,30 @@ protected:
         ASSERT_EQ(nullptr, m_prevTakeIdleConnectionResult->connection);
     }
 
-    void thenGetConnectionRequestIs(relay::api::ResultCode expectedResultCode)
+    void thenGetConnectionRequestIs(std::vector<relay::api::ResultCode> expectedResultCodes)
     {
         thenConnectRequestHasCompleted();
 
-        ASSERT_EQ(expectedResultCode, m_prevTakeIdleConnectionResult->code);
-        if (expectedResultCode == relay::api::ResultCode::ok)
+        ASSERT_TRUE(nx::utils::contains(
+            expectedResultCodes.begin(), expectedResultCodes.end(),
+            m_prevTakeIdleConnectionResult->code)) << "Expected: "
+            << QnLexical::serialized(m_prevTakeIdleConnectionResult->code).toStdString();
+
+        if (nx::utils::contains(
+                expectedResultCodes.begin(), expectedResultCodes.end(),
+                relay::api::ResultCode::ok))
+        {
             ASSERT_NE(nullptr, m_prevTakeIdleConnectionResult->connection);
+        }
         else
+        {
             ASSERT_EQ(nullptr, m_prevTakeIdleConnectionResult->connection);
+        }
+    }
+
+    void thenGetConnectionRequestIs(relay::api::ResultCode expectedResultCode)
+    {
+        thenGetConnectionRequestIs({{expectedResultCode}});
     }
 
     void thenConnectRequestHasCompleted()
@@ -450,6 +467,26 @@ TEST_F(
     givenListeningPeerWhoseConnectionsHaveBeenTaken();
     whenRequestedConnection();
     thenGetConnectionRequestIs(relay::api::ResultCode::timedOut);
+}
+
+TEST_F(
+    ListeningPeerPool,
+    get_idle_connection_response_is_still_delivered_if_peer_goes_offline)
+{
+    // This test can actually report false positive, but on multiple runs it will detect problem.
+
+    addArg("-listeningPeer/disconnectedPeerTimeout", "20ms");
+    addArg("-listeningPeer/takeIdleConnectionTimeout", "1m");
+    addArg("-listeningPeer/internalTimerPeriod", "1m");
+
+    givenListeningPeerWhoseConnectionsHaveBeenTaken();
+
+    whenRequestedConnection();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    whenRequestedConnection(); //< This request will trigger expiration timers check.
+
+    thenGetConnectionRequestIs(
+        {relay::api::ResultCode::timedOut, relay::api::ResultCode::notFound});
 }
 
 TEST_F(ListeningPeerPool, waits_get_idle_connection_completion_before_destruction)
