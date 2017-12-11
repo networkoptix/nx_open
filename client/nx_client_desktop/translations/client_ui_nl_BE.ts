@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Authenticatie type</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Aanvraag type</translation>
     </message>
   </context>
   <context>

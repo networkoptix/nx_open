@@ -774,8 +774,8 @@
       <translation>数据导出非法资源类型.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>没有数据导出。</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

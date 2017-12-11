@@ -999,7 +999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Het geëxporteerde *.exe bestand heeft een grootte van meer dan 4 GB en kan alleen in de %1 desktop client worden gespeeld.</translation>
     </message>
   </context>
   <context>
@@ -3189,7 +3189,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Vraag uw systeembeheerder om dit te doen.</translation>
     </message>
   </context>
   <context>
@@ -3441,7 +3441,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Basis</translation>
     </message>
   </context>
   <context>
@@ -4482,10 +4482,10 @@ to %1</source>
       <translation>Uitgeschakeld volgens schema</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
-      <translation>
-        <numerusform>Instellen voor alle %n camera's</numerusform>
-        <numerusform>Instellen voor alle %n camera's</numerusform>
+      <source>Set for all %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -4630,7 +4630,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation>NVR camera's ondersteunen geen niet-gesynchroniseerd afspelen</translation>
+      <translation>NVR camera's kunnen uitsluitend gesynchroniseerd afgespeeld worden</translation>
     </message>
   </context>
   <context>
@@ -6118,8 +6118,8 @@ to %1</source>
       <translation>WACHTWOORD VEREIST</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7768,12 +7768,12 @@ to %1</source>
       <translation>Bestandsschrijffout.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Er zijn geen gegevens geëxporteerd.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>Interne fout</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -8541,7 +8541,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>Wijzigen van wachtwoord op %1 of %2 camera's mislukt</translation>
     </message>
   </context>
   <context>

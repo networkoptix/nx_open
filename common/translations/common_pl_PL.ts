@@ -794,8 +794,8 @@
       <translation>Nieprawidłowy typ zasobu do eksportowania danych.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Dane nie zostały wyeksportowane.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

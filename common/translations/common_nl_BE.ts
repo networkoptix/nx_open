@@ -784,8 +784,8 @@
       <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Geen gegevens geëxporteerd.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
