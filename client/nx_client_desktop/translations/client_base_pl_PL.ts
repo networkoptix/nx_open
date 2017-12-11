@@ -4539,10 +4539,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Ustaw dla %n kamery</numerusform>
+        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
+        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
       </translation>
     </message>
   </context>
@@ -6191,7 +6191,7 @@ to %1</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Ustaw dla tej kamery</translation>
     </message>
   </context>
   <context>
@@ -7877,7 +7877,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Dane nie zostały wyeksportowane.</translation>
     </message>
   </context>
   <context>

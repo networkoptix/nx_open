@@ -999,7 +999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>El archivo exportado .EXE tendrá un tamaño superior a 4 GB y no se podrá abrir haciendo doble clic en Windows. Solo se puede abrir en el Cliente %1.</translation>
     </message>
   </context>
   <context>
@@ -3192,7 +3192,7 @@ a %1</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Consulte a su administrador de sistema para hacerlo.</translation>
     </message>
   </context>
   <context>
@@ -3444,7 +3444,7 @@ a %1</translation>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Básico</translation>
     </message>
   </context>
   <context>
@@ -4486,9 +4486,9 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Establecer para todas las cámaras %n</numerusform>
+        <numerusform>Configurar para todas las Cámaras %n</numerusform>
       </translation>
     </message>
   </context>
@@ -6121,7 +6121,7 @@ a %1</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Establecer para esta cámara</translation>
     </message>
   </context>
   <context>
@@ -7775,7 +7775,7 @@ a %1</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>No se exportaron datos.</translation>
     </message>
   </context>
   <context>
@@ -8543,7 +8543,7 @@ a %1</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>Error al cambiar la contraseña en %1 de %2 cámaras</translation>
     </message>
   </context>
   <context>
