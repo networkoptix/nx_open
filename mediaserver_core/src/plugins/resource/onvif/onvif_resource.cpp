@@ -933,11 +933,13 @@ QSize QnPlOnvifResource::findSecondaryResolution(const QSize& primaryRes, const 
         }
     }
 
-    float currentAspect = getResolutionAspectRatio(primaryRes);
-    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
-    QSize result = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSquare, secondaryResList, matchCoeff);
-    if (result == EMPTY_RESOLUTION_PAIR)
-        result = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSquare, secondaryResList, matchCoeff); // try to get resolution ignoring aspect ration
+    auto result = closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+        getResolutionAspectRatio(primaryRes),
+        SECONDARY_STREAM_MAX_RESOLUTION,
+        secondaryResList,
+        matchCoeff);
+
     return result;
 }
 

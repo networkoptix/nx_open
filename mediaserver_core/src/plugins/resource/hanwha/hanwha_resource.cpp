@@ -10,11 +10,11 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <QtCore/QMap>
 
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <plugins/utils/common_tools.h>
 #include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <camera/camera_pool.h>
@@ -1140,15 +1140,22 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    bool hasRemoteArchive = !isNvr();
+    if (!ini().enableEdge || isNvr())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
+        return CameraDiagnostics::NoErrorResult();
+    }
 
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(lit("recording/storage"));
     if (!response.isSuccessful())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
         return CameraDiagnostics::NoErrorResult();
+    }
 
     const auto storageEnabled = response.parameter<bool>(lit("Enable"));
-    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
+    const bool hasRemoteArchive = (storageEnabled != boost::none) && *storageEnabled;
     setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
 
     return CameraDiagnostics::NoErrorResult();
@@ -1789,7 +1796,15 @@ QSize HanwhaResource::bestSecondaryResolution(
         return QSize();
     }
 
-    return secondaryStreamResolution(primaryResolution, resolutionList);
+    QList<QSize> resolutions; //< TODO: #dmishin get rid of this.
+    for (const auto& resolution: resolutionList)
+        resolutions.push_back(resolution);
+
+    return closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+        getResolutionAspectRatio(primaryResolution),
+        SECONDARY_STREAM_MAX_RESOLUTION,
+        resolutions);
 }
 
 QnCameraAdvancedParams HanwhaResource::filterParameters(
