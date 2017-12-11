@@ -184,7 +184,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(API) {
                 playerReadyTimeout = $timeout(function(){
                     $scope.switchPlaying($scope.positionProvider.playing);
-                    if($scope.playerAPI){
+                    if($scope.playerAPI && !Config.webclient.disableVolume){
                         $scope.playerAPI.volume($scope.volumeLevel);
                     }
                 }, Config.webclient.playerReadyTimeout);
@@ -294,7 +294,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.crashCount = 0;
 
         function reloadSource(forceLive){
-            if($scope.crashCount < Config.webclient.maxCrashCount){
+            var showError = $scope.crashCount < Config.webclient.maxCrashCount;
+            if(showError){
                 updateVideoSource($scope.positionProvider.liveMode || forceLive
                                                                     ? null : $scope.positionProvider.playedPosition);
                 $scope.crashCount += 1;
@@ -302,15 +303,17 @@ angular.module('nxCommon').controller('ViewCtrl',
             else{
                 $scope.crashCount = 0;
             }
+            return !showError;
         }
         $scope.playerHandler = function(error){
             if(error){
                 $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
-                   reloadSource(jumpToLive);
+                   return reloadSource(jumpToLive);
                 });
             }
             else{
                 $scope.crashCount = 0;
+                return false;
             }
         };
 
