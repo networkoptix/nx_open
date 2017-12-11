@@ -112,7 +112,7 @@ def create_client_update_file(
 
         qt_plugins_dir = os.path.join(qt_dir, 'plugins')
         zip_files(zip, qt_plugins_files(qt_plugins_dir), qt_plugins_dir)
-       
+
         redist_bin_dir = os.path.join(redist_dir, 'bin')
         zip_files(zip, find_all_files(redist_bin_dir), redist_bin_dir)
 
@@ -121,7 +121,7 @@ def create_client_update_file(
 
         fonts_bin_dir = os.path.join(fonts_dir, 'bin')
         zip_files(zip, find_all_files(fonts_bin_dir), fonts_bin_dir)
-        
+
         zip.write(os.path.join(binaries_dir, 'desktop_client.exe'), client_binary_name + '.exe')
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
