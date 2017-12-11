@@ -5,9 +5,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
-#include <api/app_server_connection.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
+#include "peer_selection/peer_selector_factory.h"
 
 namespace nx {
 namespace vms {
@@ -18,11 +18,50 @@ namespace downloader {
 namespace {
 
 static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
+using namespace peer_selection;
+
+class OtherPeerInfosProvider
+{
+public:
+    explicit OtherPeerInfosProvider(QnCommonModule* commonModule)
+    {
+        const auto selfId = commonModule->moduleGUID();
+        const auto servers = commonModule->resourcePool()->getAllServers(Qn::Online);
+        for (const auto& server : servers)
+            addInfo(server, selfId);
+    }
+
+    QList<QnUuid> ids() const
+    {
+        QList<QnUuid> result;
+        for (const auto& peerInfo: m_peerInfos)
+            result.append(peerInfo.id);
+        return result;
+    }
+
+    PeerInformationList peerInfos() const
+    {
+        return m_peerInfos;
+    }
+private:
+    PeerInformationList m_peerInfos;
+
+    void addInfo(const QnMediaServerResourcePtr& server, const QnUuid& selfId)
+    {
+        if (server->getId() == selfId)
+            return;
+        m_peerInfos.append(PeerInformation(server->getSystemInfo(), server->getId()));
+    }
+};
 
 } // namespace
 
-ResourcePoolPeerManager::ResourcePoolPeerManager(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+ResourcePoolPeerManager::ResourcePoolPeerManager(
+    QnCommonModule* commonModule,
+    peer_selection::AbstractPeerSelectorPtr peerSelector)
+    :
+    QnCommonModuleAware(commonModule),
+    m_peerSelector(std::move(peerSelector))
 {
 }
 
@@ -56,19 +95,7 @@ QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
 
 QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
 {
-    const auto& servers = resourcePool()->getAllServers(Qn::Online);
-    const auto& currentId = selfId();
-
-    QList<QnUuid> result;
-
-    for (const auto& server: servers)
-    {
-        const auto& id = server->getId();
-        if (id != currentId)
-            result.append(id);
-    }
-
-    return result;
+    return OtherPeerInfosProvider(commonModule()).ids();
 }
 
 int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
@@ -240,14 +267,23 @@ rest::QnConnectionPtr ResourcePoolPeerManager::getConnection(const QnUuid& peerI
     return server->restConnection();
 }
 
+QList<QnUuid> ResourcePoolPeerManager::peers() const
+{
+    const auto allOtherPeerInfos = OtherPeerInfosProvider(commonModule()).peerInfos();
+    return m_peerSelector->peers(allOtherPeerInfos);
+}
+
 ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
 }
 
-AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager()
+AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
+    FileInformation::PeerPolicies peerPolicy)
 {
-    return new ResourcePoolPeerManager(commonModule());
+    return new ResourcePoolPeerManager(
+        commonModule(),
+        PeerSelectorFactory::create(peerPolicy, commonModule()));
 }
 
 } // namespace downloader
