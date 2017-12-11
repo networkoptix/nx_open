@@ -190,10 +190,13 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
 
         // Dim everything around highlighted area.
         QPainterPath path;
-        path.addRegion(QRegion(paintRect).subtracted(
-            Geometry::subRect(paintRect, m_highlight).toAlignedRect()));
+        const auto highlightRect = Geometry::subRect(paintRect, m_highlight).toAlignedRect();
+        path.addRegion(QRegion(paintRect).subtracted(highlightRect));
         static const auto kDimmerColor = QColor("#70000000"); //< TODO: #vkutin Customize.
         painter.fillPath(path, kDimmerColor);
+        // Paint frame.
+        painter.setPen(palette().highlight().color());
+        painter.drawRect(highlightRect);
     }
 }
 
