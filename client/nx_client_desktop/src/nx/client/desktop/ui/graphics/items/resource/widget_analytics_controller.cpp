@@ -61,6 +61,23 @@ QString objectDescription(const common::metadata::DetectedObject& object)
     return result;
 }
 
+QnUuid findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& objectId)
+{
+    if (objectId.isNull())
+        return QnUuid();
+
+    for (const auto& item: layout->getItems())
+    {
+        const auto id = qnResourceRuntimeDataManager->layoutItemData(
+            item.uuid, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
+
+        if (id == objectId)
+            return item.uuid;
+    }
+
+    return QnUuid();
+}
+
 } // namespace
 
 class WidgetAnalyticsController::Private: public QObject
@@ -77,8 +94,11 @@ public:
 
     void at_areaClicked(const QnUuid& areaId);
 
+    void findExistingItems();
+
     QnLayoutResourcePtr layoutResource() const;
 
+    void updateObjectInfoFromLayoutItem(const QnUuid& itemId);
     ObjectInfo& addOrUpdateObject(const nx::common::metadata::DetectedObject& object);
     void removeObject(const QnUuid& objectId);
 
@@ -94,9 +114,15 @@ public:
 
 void WidgetAnalyticsController::Private::at_areaClicked(const QnUuid& areaId)
 {
-    const auto it = objectInfoById.find(areaId);
+    auto it = objectInfoById.find(areaId);
     if (it == objectInfoById.end())
-        return;
+    {
+        const auto& itemId = findItemForObject(layoutResource(), areaId);
+        if (!itemId.isNull())
+            return;
+
+        updateObjectInfoFromLayoutItem(itemId);
+    }
 
     auto& object = *it;
 
@@ -120,13 +146,55 @@ void WidgetAnalyticsController::Private::at_areaClicked(const QnUuid& areaId)
         item.uuid, Qn::ItemFrameDistinctionColorRole, object.color);
     qnResourceRuntimeDataManager->setLayoutItemData(
         item.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
+    qnResourceRuntimeDataManager->setLayoutItemData(
+        item.uuid, Qn::ItemAnalyticsModeRegionIdRole, areaId);
 
     layout->addItem(item);
+}
+
+void WidgetAnalyticsController::Private::findExistingItems()
+{
+    const auto currentTime = timer.elapsed();
+
+    for (const auto& item: layoutResource()->getItems())
+    {
+        const auto id = qnResourceRuntimeDataManager->layoutItemData(
+            item.uuid, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
+
+        if (id.isNull())
+            continue;
+
+        updateObjectInfoFromLayoutItem(item.uuid);
+
+        auto& objectInfo = objectInfoById[id];
+        objectInfo.active = true;
+        objectInfo.lastUsedTime = currentTime;
+    }
 }
 
 QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
 {
     return mediaResourceWidget->item()->layout()->resource();
+}
+
+void WidgetAnalyticsController::Private::updateObjectInfoFromLayoutItem(const QnUuid& itemId)
+{
+    const auto item = layoutResource()->getItem(itemId);
+
+    if (item.uuid.isNull())
+        return;
+
+    const auto objectId = qnResourceRuntimeDataManager->layoutItemData(
+        itemId, Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
+
+    if (objectId.isNull())
+        return;
+
+    auto& objectInfo = objectInfoById[objectId];
+    objectInfo.rectangle = item.zoomRect;
+    objectInfo.zoomWindowItemUuid = item.zoomTargetUuid;
+    objectInfo.color = qnResourceRuntimeDataManager->layoutItemData(
+        item.uuid, Qn::ItemFrameDistinctionColorRole).value<QColor>();
 }
 
 WidgetAnalyticsController::Private::ObjectInfo&
@@ -184,6 +252,8 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
     d->mediaResourceWidget = mediaResourceWidget;
 
     d->timer.restart();
+
+    d->findExistingItems();
 }
 
 WidgetAnalyticsController::~WidgetAnalyticsController()
