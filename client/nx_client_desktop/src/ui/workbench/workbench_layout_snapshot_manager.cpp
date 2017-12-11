@@ -133,7 +133,7 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
             /* Check if all OK */
             bool success = errorCode == ec2::ErrorCode::ok;
             if (success)
-            {              
+            {
                 store(layout); //< Cleanup 'changed' flag here, sending corresponding signal.
                 clean(layout->getId()); //< Silently remove from flags storage.
             }
@@ -184,7 +184,17 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
     disconnectFrom(resource);
     {
         const QnWorkbenchLayoutSnapshot &snapshot = m_storage->snapshot(resource);
-        resource->setItems(snapshot.items);
+
+        // Cleanup from snapshot resources which are already deleted from the resource pool.
+        QnLayoutItemDataMap existingItems;
+        for (const auto item: snapshot.items)
+        {
+            if (!resourcePool()->getResourceByDescriptor(item.resource))
+                continue;
+            existingItems.insert(item.uuid, item);
+        }
+
+        resource->setItems(existingItems);
         resource->setName(snapshot.name);
         resource->setCellAspectRatio(snapshot.cellAspectRatio);
         resource->setCellSpacing(snapshot.cellSpacing);
