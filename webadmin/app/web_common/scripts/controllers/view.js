@@ -307,13 +307,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
         $scope.playerHandler = function(error){
             if(error){
-                $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
+                return $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
                    return reloadSource(jumpToLive);
                 });
             }
             else{
                 $scope.crashCount = 0;
-                return false;
             }
         };
 
