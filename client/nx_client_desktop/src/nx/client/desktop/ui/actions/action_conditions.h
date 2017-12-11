@@ -325,10 +325,9 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-class PreviewCondition: public ExportCondition
+class PreviewCondition: public Condition
 {
 public:
-    PreviewCondition();
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 

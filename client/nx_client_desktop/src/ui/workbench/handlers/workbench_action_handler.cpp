@@ -1594,19 +1594,27 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if (!periods.empty()) {
-
+    if (!periods.empty())
+    {
         QnTimePeriodList localPeriods = periods.intersected(period);
+        NX_ASSERT(!localPeriods.empty());
 
-        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
-        if (startDelta > 0) { //user selected period before the first chunk
-            period.startTimeMs += startDelta;
-            period.durationMs -= startDelta;
-        }
+        if (!localPeriods.empty())
+        {
+            // Check if user selected period before the first chunk.
+            const qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
+            if (startDelta > 0)
+            {
+                period.startTimeMs += startDelta;
+                period.durationMs -= startDelta;
+            }
 
-        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
-        if (endDelta > 0) { // user selected period after the last chunk
-            period.durationMs -= endDelta;
+            // Check if user selected period after the last chunk.
+            const qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
+            if (endDelta > 0)
+            {
+                period.durationMs -= endDelta;
+            }
         }
     }
 
