@@ -132,7 +132,6 @@ function(nx_get_dependencies)
         nx_rdep_add_package(any/qtsinglecoreapplication)
     endif()
 
-    nx_rdep_add_package(any/nx_kit)
     nx_rdep_add_package(any/detection_plugin_interface)
 
     nx_rdep_add_package(openssl)
