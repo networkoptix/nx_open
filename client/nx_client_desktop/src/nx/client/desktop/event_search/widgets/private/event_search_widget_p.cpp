@@ -195,7 +195,8 @@ void EventSearchWidget::Private::updateButtonVisibility()
     if (m_selectAreaCheckBox->isHidden() != selectAreaHidden)
     {
         m_selectAreaCheckBox->setHidden(selectAreaHidden);
-        emit q->analyticsSearchByAreaEnabledChanged(analyticsSearchByAreaEnabled());
+        if (selectAreaHidden)
+            m_selectAreaCheckBox->setChecked(false);
         updated = true;
     }
 
@@ -226,7 +227,7 @@ void EventSearchWidget::Private::setAnalyticsSearchRect(const QRectF& relativeRe
 
 bool EventSearchWidget::Private::analyticsSearchByAreaEnabled() const
 {
-    return m_selectAreaCheckBox->isChecked() && !m_selectAreaCheckBox->isHidden();
+    return m_selectAreaCheckBox->isChecked();
 }
 
 void EventSearchWidget::Private::setAnalyticsSearchByAreaEnabled(bool value)
