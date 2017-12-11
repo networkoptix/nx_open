@@ -119,7 +119,7 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
 
     *m_mediaWidgetConnections << connect(
-        m_currentMediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled, this,
+        m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled, this,
         [this](bool enabled)
         {
             if (enabled)
@@ -129,7 +129,7 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         });
 
     *m_mediaWidgetConnections << connect(
-        m_currentMediaWidget, &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
+        m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
         [this](const QRectF& relativeRect)
         {
             m_eventsWidget->setAnalyticsSearchRect(relativeRect);
