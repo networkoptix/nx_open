@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation>บัญชีนี้ถูกปิดแล้ว</translation>
+      <translation>บัญชีนี้ถูกปิดแล้ว.</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>

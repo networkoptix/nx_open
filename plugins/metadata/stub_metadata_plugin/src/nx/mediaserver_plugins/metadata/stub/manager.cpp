@@ -191,16 +191,18 @@ AbstractMetadataPacket* Manager::cookSomeObjects(
         return nullptr;
 
     auto detectedObject = new CommonDetectedObject();
-    static const nxpl::NX_GUID objectId =
+    nxpl::NX_GUID objectId =
         {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
-    detectedObject->setId(objectId);
     detectedObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
     detectedObject->setTypeId(kCarDetectedEventGuid);
 
     double dt = m_counterObjects++ / 32.0;
     double intPart;
     dt = modf(dt, &intPart) * 0.75;
+
+    *reinterpret_cast<int*>(objectId.bytes) = static_cast<int>(intPart);
+    detectedObject->setId(objectId);
 
     detectedObject->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
 

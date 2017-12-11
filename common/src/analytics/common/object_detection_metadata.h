@@ -50,6 +50,7 @@ bool operator==(const DetectedObject& left, const DetectedObject& right);
 struct DetectionMetadataPacket
 {
     QnUuid deviceId;
+    // TODO: Rename "Usec" -> "Us".
     qint64 timestampUsec = 0;
     qint64 durationUsec = 0;
     std::vector<DetectedObject> objects;

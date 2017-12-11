@@ -65,6 +65,9 @@ public:
     QnImageProvider* preview() const;
     void setPreview(QnImageProvider* value);
 
+    QRectF previewHighlight() const;
+    void setPreviewHighlight(const QRectF& relativeRect);
+
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
 

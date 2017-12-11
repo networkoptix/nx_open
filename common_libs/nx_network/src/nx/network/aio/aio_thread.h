@@ -25,8 +25,8 @@ public:
 
 /**
  * This class implements socket event loop using PollSet class to do actual polling.
- * Also supports: 
- *   - Asynchronous functor execution via AIOThread::post or AIOThread::dispatch. 
+ * Also supports:
+ *   - Asynchronous functor execution via AIOThread::post or AIOThread::dispatch.
  *   - Maximum timeout to wait for desired event.
  */
 class NX_NETWORK_API AIOThread:
@@ -59,7 +59,7 @@ public:
      * If AIOEventHandler::eventTriggered is running and stopMonitoring called not from AIOEventHandler::eventTriggered,
      *   method blocks untill AIOEventHandler::eventTriggered had returned.
      * @param waitForRunningHandlerCompletion See comment to aio::AIOService::stopMonitoring.
-     * NOTE: Calling this method with same parameters simultaneously from 
+     * NOTE: Calling this method with same parameters simultaneously from
      *   multiple threads can cause undefined behavour.
      * NOTE: MUST be called with mutex locked.
      */
@@ -73,7 +73,7 @@ public:
      */
     void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
     /**
-     * If called in this aio thread, then calls functor immediately, 
+     * If called in this aio thread, then calls functor immediately,
      *   otherwise queues functor in same way as aio::AIOThread::post does.
      */
     void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
@@ -105,7 +105,7 @@ private:
         AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
-    
+
     void stopMonitoringInternal(
         QnMutexLockerBase* lock,
         Pollable* const sock,
@@ -114,7 +114,7 @@ private:
         nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**
-     * Change timeout of existing polling sock for eventToWatch to timeoutMS. 
+     * Change timeout of existing polling sock for eventToWatch to timeoutMS.
      *   eventHandler is changed also.
      * NOTE: If sock is not polled, undefined behaviour can occur.
      */
@@ -124,7 +124,7 @@ private:
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
-        std::function<void()> socketAddedToPollHandler = std::function<void()>());    
+        std::function<void()> socketAddedToPollHandler = std::function<void()>());
 
     void post(
         const QnMutexLockerBase& /*lock*/,

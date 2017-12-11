@@ -10,6 +10,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <QtCore/QMap>
 
@@ -1139,15 +1140,22 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    bool hasRemoteArchive = !isNvr();
+    if (!ini().enableEdge || isNvr())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
+        return CameraDiagnostics::NoErrorResult();
+    }
 
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(lit("recording/storage"));
     if (!response.isSuccessful())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
         return CameraDiagnostics::NoErrorResult();
+    }
 
     const auto storageEnabled = response.parameter<bool>(lit("Enable"));
-    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
+    const bool hasRemoteArchive = (storageEnabled != boost::none) && *storageEnabled;
     setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
 
     return CameraDiagnostics::NoErrorResult();
@@ -1738,9 +1746,19 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
         return toHanwhaString(defaultEntropyCodingForStream(role));
     else if (parameter == kBitrateProperty)
     {
-        int bitrateKbps = mediaCapabilityForRole(role).defaultBitrateKbps;
-        if (bitrateKbps > 0)
-            return QString::number(bitrateKbps);
+        auto camera = qnCameraPool->getVideoCamera(toSharedPointer());
+        if (!camera)
+            return QString::number(defaultBitrateForStream(role));
+
+        QnLiveStreamProviderPtr provider = role == Qn::ConnectionRole::CR_LiveVideo
+            ? camera->getPrimaryReader()
+            : camera->getSecondaryReader();
+
+        if (!provider)
+            QString::number(defaultBitrateForStream(role));
+
+        const auto liveStreamParameters = provider->getLiveParams();
+        return QString::number(streamBitrate(role, liveStreamParameters));
     }
     else if (parameter == kFramePriorityProperty)
         return lit("FrameRate");
@@ -1769,7 +1787,7 @@ QSize HanwhaResource::bestSecondaryResolution(
     const QSize& primaryResolution,
     const std::vector<QSize>& resolutionList) const
 {
-    if (primaryResolution.height() == 0)
+    if (primaryResolution.isEmpty())
     {
         NX_WARNING(
             this,
@@ -1778,46 +1796,15 @@ QSize HanwhaResource::bestSecondaryResolution(
         return QSize();
     }
 
-    const auto primaryAspectRatio =
-        (double)primaryResolution.width() / primaryResolution.height();
+    QList<QSize> resolutions; //< TODO: #dmishin get rid of this.
+    for (const auto& resolution: resolutionList)
+        resolutions.push_back(resolution);
 
-    QSize secondaryResolution;
-    double minAspectDiff = std::numeric_limits<double>::max();
-
-    for (const auto& res: resolutionList)
-    {
-        const auto width = res.width();
-        const auto height = res.height();
-
-        if (width * height > kHanwhaMaxSecondaryStreamArea)
-            continue;
-
-        if (height == 0)
-        {
-            NX_WARNING(
-                this,
-                lit("Finding secondary resolution: wrong resolution. Resolution height is 0"));
-            continue;
-        }
-
-        const auto secondaryAspectRatio = (double)width / height;
-        const auto diff = std::abs(primaryAspectRatio - secondaryAspectRatio);
-
-        if (diff < minAspectDiff)
-        {
-            minAspectDiff = diff;
-            secondaryResolution = res;
-        }
-    }
-
-    if (!secondaryResolution.isNull())
-        return secondaryResolution;
-
-    NX_WARNING(
-        this,
-        lit("Can not find secondary resolution of appropriate size, using the smallest one"));
-
-    return resolutionList[resolutionList.size() -1];
+    return closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+        getResolutionAspectRatio(primaryResolution),
+        SECONDARY_STREAM_MAX_RESOLUTION,
+        resolutions);
 }
 
 QnCameraAdvancedParams HanwhaResource::filterParameters(

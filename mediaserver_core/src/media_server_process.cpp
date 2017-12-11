@@ -23,6 +23,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
+#include <QtCore/QThreadPool>
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
@@ -326,6 +327,8 @@ const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
+
+static const int kMinimalGlobalThreadPoolSize = 4;
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -2067,6 +2070,8 @@ void MediaServerProcess::serviceModeInit()
     const auto settings = qnServerModule->roSettings();
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
+    // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
+
     nx::utils::log::Settings logSettings;
     logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
     logSettings.directory = settings->value("logDir").toString();
@@ -2185,6 +2190,10 @@ protected:
 
 void MediaServerProcess::run()
 {
+    // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
+    if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
+        QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
@@ -3128,14 +3137,6 @@ public:
 protected:
     virtual int executeApplication() override
     {
-        auto id = QnUuid::fromStringSafe(lit("{01020304-0506-0708-090a-0b0c0d0e0f01}"));
-        qDebug() << "@@@@@@@@@@@@@@@@@@@@@" << id.toByteArray();
-        qDebug() << "@@@@@@@@@@@@@@@@@@@@@" << id.toRfc4122();
-
-        nxpl::NX_GUID guid = nxpt::fromQnUuidToPluginGuid(id);
-
-
-
         m_main.reset(new MediaServerProcess(m_argc, m_argv, true));
 
         const auto cmdParams = m_main->cmdLineArguments();

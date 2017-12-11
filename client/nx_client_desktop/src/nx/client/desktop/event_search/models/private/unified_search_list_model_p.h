@@ -38,6 +38,8 @@ public:
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);
 
+    void setAnalyticsSearchRect(const QRectF& relativeRect);
+
     void clear();
 
     bool canFetchMore() const;

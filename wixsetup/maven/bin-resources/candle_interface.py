@@ -31,3 +31,28 @@ import environment
 
 def candle_executable():
     return os.path.join(environment.wix_directory, 'candle.exe')
+
+def common_candle_options():
+    return ['-nologo']
+
+def candle_command(output_folder, components, variables, extensions):
+    command = [candle_executable(),
+        '-arch', environment.arch,
+        '-out', output_folder + '/' # Candle output folder must end with separator
+        ]
+
+    command += common_candle_options()
+
+    for extension in extensions:
+        command += ['-ext', '{0}.dll'.format(extension)]
+
+    for key, value in variables.iteritems():
+        command += ['-d{0}={1}'.format(key, value)]
+
+    for component in components:
+        command += ['{0}.wxs'.format(component)]
+
+    return command
+
+def candle(output_folder, components, variables, extensions):
+    environment.execute_command(candle_command(output_folder, components, variables, extensions))

@@ -52,8 +52,9 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>관리자 패스워드 변경</h3>
-                            <p>시스템이 로컬인 경우(클라우드에 연결되지 않음) 일부 서버의 경우 "admin"사용자 및 복구 (루트) 암호의 암호가 변경됩니다. <br> 그렇지 않으면 복구 암호 만 변경됩니다.</p>
+                            <h3>관리자 암호 변경</h3>
+                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
+                                Otherwise this will change the recovery password only.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>

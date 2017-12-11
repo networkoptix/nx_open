@@ -1,6 +1,4 @@
-
 #include "event_type.h"
-
 
 namespace nx {
 namespace network {
@@ -25,6 +23,6 @@ const char* toString(EventType eventType)
     }
 }
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

@@ -7,18 +7,22 @@ angular.module('cloudApp')
 
         account.requireLogin();
         $scope.downloads = Config.downloads;
-        $scope.linkbase = "http://updates.networkoptix.com";
 
-        cloudApi.getDownloadsHistory($routeParams.build).then(function(data){
-            $scope.downloadsData = data.data;
+        cloudApi.getDownloadsHistory($routeParams.build).then(function(result){
+            $scope.linkbase = result.data.updatesPrefix;
 
             if(!$routeParams.build){ // only one build
-                $scope.activeBuilds = data.data.releases;
-                $scope.downloadTypes=["releases","patches","betas"];
+                $scope.activeBuilds = result.data.releases;
+                $scope.downloadTypes=["releases", "patches", "betas"];
+                $scope.downloadsData = result.data;
             }else{
-                $scope.activeBuilds = [data.data];
-                $scope.downloadTypes = [data.data.type]
+                $scope.activeBuilds = [result.data];
+                $scope.downloadTypes = [result.data.type]
+                $scope.downloadsData = {}
+                $scope.downloadsData[result.data.type] = $scope.activeBuilds;
             }
+        },function(error){
+             $location.path("404"); // Can't find downloads.json in specific build
         });
 
         $scope.changeType = function (type){

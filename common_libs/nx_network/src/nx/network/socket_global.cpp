@@ -34,6 +34,7 @@ public:
     void initialize()
     {
         m_aioService = std::make_unique<aio::AIOService>();
+        m_aioService->initialize();
     }
 
     aio::AIOService& aioService()

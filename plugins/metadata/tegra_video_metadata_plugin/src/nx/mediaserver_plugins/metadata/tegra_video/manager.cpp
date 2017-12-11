@@ -7,13 +7,14 @@
 #include <nx/kit/debug.h>
 
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 #include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
+#include "attribute_options.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -53,9 +54,15 @@ Manager::Manager(Plugin* plugin):
     NX_OUTPUT << __func__ << "() END -> " << this;
 
     if (strcmp(ini().postprocType, "ped") == 0)
+    {
+        setTrackerAttributeOptions(kHumanAttributeOptions);
         m_tracker.setObjectTypeId(kHumanUuid);
+    }
     else if (strcmp(ini().postprocType, "car") == 0)
+    {
+        setTrackerAttributeOptions(kCarAttributeOptions);
         m_tracker.setObjectTypeId(kCarUuid);
+    }
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -109,6 +116,12 @@ Error Manager::putData(AbstractDataPacket* dataPacket)
         return Error::unknownError;
     }
 
+    if (!metadataPackets.empty())
+    {
+        NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
+            << " metadata packet(s)";
+    }
+
     for (auto& metadataPacket: metadataPackets)
     {
         m_handler->handleMetadata(Error::noError, metadataPacket);
@@ -121,8 +134,7 @@ Error Manager::putData(AbstractDataPacket* dataPacket)
 
 Error Manager::stopFetchingMetadata()
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
-
+    NX_OUTPUT << __func__ << "() -> noError";
     return Error::noError;
 }
 
@@ -196,10 +208,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
     for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
-        // TODO: #mike: Make new GUID for every object.
-        static const nxpl::NX_GUID objectId =
-            {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
+        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
         detectedObject->setId(objectId);
         detectedObject->setTypeId(m_objectTypeId);
 
@@ -207,6 +217,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
         objectPacket->addItem(detectedObject);
     }
     metadataPackets->push_back(objectPacket);
+
+    NX_OUTPUT << __func__ << "(): Created objects packet with " << rects.size() << " rects";
     return true;
 }
 
@@ -226,16 +238,15 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
     for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
-        // TODO: #mike: Make new GUID for every object.
-        static const nxpl::NX_GUID objectId =
-            {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
 
+        const auto objectId = nxpt::fromQnUuidToPluginGuid(QnUuid::createUuid());
         detectedObject->setId(objectId);
         detectedObject->setTypeId(m_objectTypeId);
 
         detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
         objectPacket->addItem(detectedObject);
     }
+
     metadataPackets->push_back(objectPacket);
     return true;
 }
@@ -255,7 +266,8 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
 
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
 
-    /*for (const auto& rect: rects)
+#if 0 //< Stub implementation.
+    for (const auto& rect: rects)
     {
         auto detectedObject = new CommonDetectedObject();
         // TODO: #mike: Make new GUID for every object.
@@ -268,7 +280,9 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
         detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
         objectPacket->addItem(detectedObject);
     }
-    metadataPackets->push_back(objectPacket);*/
+    metadataPackets->push_back(objectPacket);
+#endif // 0
+
     return true;
 }
 
@@ -286,42 +300,51 @@ bool Manager::pushFrameAndGetMetadataPackets(
     compressedFrame.data = (const uint8_t*) videoPacket->data();
     compressedFrame.ptsUs = videoPacket->timestampUsec();
 
+    NX_OUTPUT << "Pushing frame to net: PTS " << compressedFrame.ptsUs;
     if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
     {
         NX_PRINT << "ERROR: TegraVideo::pushCompressedFrame() failed";
         return false;
     }
 
-    if (!m_tegraVideo->hasMetadata())
-        return true; //< No error: no metadata at this time.
-
-    static constexpr int kMaxRects = 1000;
-    std::vector<TegraVideo::Rect> rects;
-    rects.resize(kMaxRects);
-
-    int64_t ptsUs = -1;
-    int rectsCount = -1;
-    if (!m_tegraVideo->pullRectsForFrame(&rects.front(), rects.size(), &rectsCount, &ptsUs))
+    while (m_tegraVideo->hasMetadata())
     {
-        NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
-        return false;
-    }
+        static constexpr int kMaxRects = 1000;
+        std::vector<TegraVideo::Rect> rects;
+        rects.resize(kMaxRects);
 
-    if (rectsCount <= 0)
-        return true; //< No error: no rects at this time.
-
-    rects.resize(rectsCount);
-    if (NX_DEBUG_ENABLE_OUTPUT)
-    {
-        NX_OUTPUT << "Got " << rectsCount << " rect(s) for PTS " << ptsUs << ":";
-        for (const auto rect: rects)
+        int64_t ptsUs = -1;
+        int rectsCount = -1;
+        if (!m_tegraVideo->pullRectsForFrame(&rects.front(), rects.size(), &rectsCount, &ptsUs))
         {
-            NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
-                << ", width " << rect.width << ", height " << rect.height;
+            NX_PRINT << "ERROR: TegraVideo::pullRectsForFrame() failed";
+            return false;
         }
-    }
 
-    return makeMetadataPacketsFromRects(metadataPackets, rects, ptsUs);
+        if (rectsCount <= 0)
+            return true; //< No error: no rects at this time.
+
+        rects.resize(rectsCount);
+        if (NX_DEBUG_ENABLE_OUTPUT)
+        {
+            const int64_t dPts = ptsUs - compressedFrame.ptsUs;
+            const std::string dPtsMsStr =
+                (dPts >= 0 ? "+" : "-") + nx::kit::debug::format("%lld", (500 + abs(dPts)) / 1000);
+
+            NX_OUTPUT << "Got " << rectsCount << " rect(s) for PTS " << ptsUs
+                << " (" << dPtsMsStr << " ms):";
+
+            for (const auto rect: rects)
+            {
+                NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
+                    << ", width " << rect.width << ", height " << rect.height;
+            }
+        }
+
+        if (!makeMetadataPacketsFromRects(metadataPackets, rects, ptsUs))
+            NX_OUTPUT << "WARNING: makeMetadataPacketsFromRects() failed";
+    }
+    return true; //< No error: no more metadata.
 }
 
 int64_t Manager::usSinceEpoch() const
@@ -329,6 +352,18 @@ int64_t Manager::usSinceEpoch() const
     using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
+}
+
+void Manager::setTrackerAttributeOptions(
+    const std::map<QString, std::vector<QString>>& options)
+{
+    for (const auto& entry : options)
+    {
+        const auto attributeName = entry.first;
+        const auto& attributeOptions = entry.second;
+
+        m_tracker.setAttributeOptions(attributeName, attributeOptions);
+    }
 }
 
 } // namespace tegra_video

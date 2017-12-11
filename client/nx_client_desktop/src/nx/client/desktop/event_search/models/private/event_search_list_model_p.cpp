@@ -39,6 +39,17 @@ static const auto lowerBoundPredicate =
         return left.eventParams.eventTimestampUsec > right;
     };
 
+static qint64 timestampUs(const vms::event::ActionData& event)
+{
+    return event.eventParams.eventTimestampUsec;
+}
+
+static qint64 timestampMs(const vms::event::ActionData& event)
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::microseconds(timestampUs(event))).count();
+}
+
 } // namespace
 
 EventSearchListModel::Private::Private(EventSearchListModel* q):
@@ -131,17 +142,23 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
             m_prefetch = success ? std::move(data) : vms::event::ActionDataList();
             m_success = success;
 
-            if (m_prefetch.size() < kFetchBatchSize)
+            if (m_prefetch.empty())
             {
-                completionHandler(0);
+                qDebug() << "Pre-fetched no events";
             }
             else
             {
-                completionHandler(std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::microseconds(m_prefetch.front().eventParams.eventTimestampUsec))
-                        .count() + 1 /*discard last ms*/);
+                qDebug() << "Pre-fetched" << m_prefetch.size() << "events from"
+                    << debugTimestampToString(timestampMs(m_prefetch.back())) << "to"
+                    << debugTimestampToString(timestampMs(m_prefetch.front()));
             }
+
+            completionHandler(m_prefetch.size() >= kFetchBatchSize
+                ? timestampMs(m_prefetch.back()) + 1 /*discard last ms*/
+                : 0);
         };
+
+    qDebug() << "Requesting events from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
 
     m_currentFetchId = getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
     return m_currentFetchId != rest::Handle();
@@ -155,7 +172,10 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_currentFetchId = rest::Handle();
 
     if (!m_success)
+    {
+        qDebug() << "Committing no events";
         return;
+    }
 
     const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::milliseconds(latestStartTimeMs)).count();
@@ -168,10 +188,18 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
+        qDebug() << "Committing" << count << "events from"
+            << debugTimestampToString(timestampMs(m_prefetch[count-1])) << "to"
+            << debugTimestampToString(timestampMs(m_prefetch.front()));
+
         ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(),
             std::make_move_iterator(m_prefetch.begin()),
             std::make_move_iterator(end));
+    }
+    else
+    {
+        qDebug() << "Committing no events";
     }
 
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
@@ -195,6 +223,9 @@ void EventSearchListModel::Private::periodicUpdate()
             if (success && !data.empty())
                 addNewlyReceivedEvents(std::move(data));
         };
+
+    qDebug() << "Requesting new events from" << debugTimestampToString(m_latestTimeMs)
+        << "to infinity";
 
     m_currentUpdateId = getEvents(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);

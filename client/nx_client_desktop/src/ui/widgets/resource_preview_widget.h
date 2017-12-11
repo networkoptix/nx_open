@@ -34,6 +34,9 @@ public:
     QPalette::ColorRole borderRole() const;
     void setBorderRole(QPalette::ColorRole role);
 
+    QRectF highlight() const;
+    void setHighlight(const QRectF& relativeRect);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
@@ -52,4 +55,5 @@ private:
     QPixmap m_preview;
     QPointer<QnImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;
+    QRectF m_highlight;
 };

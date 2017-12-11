@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src)
 
-set(BUILD_SHARED_LIBS ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
@@ -14,10 +13,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
     -pedantic \
 ")
 
+set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
 include(nx_kit.cmake)
 
 # Test for ini_config disabled via -DNX_INI_CONFIG_DISABLED.
-add_library(disabled_ini_config_ut
+add_library(disabled_ini_config_ut SHARED
     src/nx/kit/ini_config.cpp
     src/nx/kit/test.cpp
     unit_tests/ini_config_ut.cpp

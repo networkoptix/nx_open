@@ -200,6 +200,16 @@ void EventTile::setPreview(QnImageProvider* value)
     ui->previewWidget->setHidden(!value);
 }
 
+QRectF EventTile::previewHighlight() const
+{
+    return ui->previewWidget->highlight();
+}
+
+void EventTile::setPreviewHighlight(const QRectF& relativeRect)
+{
+    ui->previewWidget->setHighlight(relativeRect);
+}
+
 CommandActionPtr EventTile::action() const
 {
     return m_action;

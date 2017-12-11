@@ -31,7 +31,7 @@ bool Playlist::parse(const nx::String& str)
         if (trimmedLine.isEmpty())
             continue;
 
-        const auto entryType = 
+        const auto entryType =
             trimmedLine.startsWith('#') ? EntryType::directive : EntryType::location;
         entries.push_back(Entry(entryType, (QByteArray)trimmedLine));
     }

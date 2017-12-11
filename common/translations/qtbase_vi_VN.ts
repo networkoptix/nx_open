@@ -216,11 +216,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Sao chép</translation>
+      <translation>bản sao</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Dán</translation>
+      <translation>dán</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -518,7 +518,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;xóa bỏ</translation>
+      <translation>&amp;Xóa bỏ</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -530,7 +530,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>Tất cả các tệp (*)</translation>
+      <translation>tất cả các file (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -722,15 +722,15 @@ Do you want to delete it anyway?</source>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp; OK</translation>
+      <translation>&amp;Xác nhận</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;tiết kiệm</translation>
+      <translation>&amp;Lưu</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;hủy bỏ</translation>
+      <translation>&amp;Hủy bỏ</translation>
     </message>
     <message>
       <source>&amp;Close</source>
@@ -907,7 +907,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation>&amp; Yes</translation>
+      <translation>&amp;Có</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
@@ -1118,7 +1118,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Tải về</translation>
+      <translation>Tải xuống</translation>
     </message>
   </context>
   <context>

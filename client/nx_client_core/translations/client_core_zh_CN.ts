@@ -88,7 +88,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>所有者︰ %1</translation>
+      <translation>所有者：%1</translation>
     </message>
     <message>
       <source>Your System</source>

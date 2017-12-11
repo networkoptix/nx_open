@@ -36,15 +36,6 @@ using CreateCursorCompletionHandler =
         ResultCode /*resultCode*/,
         std::unique_ptr<AbstractCursor> /*cursor*/)>;
 
-struct TimePeriodsLookupOptions
-{
-    /**
-     * If distance between two time periods less than this value,
-     * then those periods SHOULD be merged ignoring gap.
-     */
-    std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
-};
-
 /**
  * NOTE: Every method of this class is asynchronous if other not specified.
  * Generally, any error does not mean storage cannot continue.
@@ -151,6 +142,8 @@ private:
         std::int64_t eventId,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
+    void prepareCursorQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
+
     nx::utils::db::DBResult selectObjects(
         nx::utils::db::QueryContext* queryContext,
         const Filter& filter,
@@ -172,12 +165,14 @@ private:
         nx::utils::db::SqlQuery& selectEventsQuery,
         const Filter& filter,
         std::vector<DetectedObject>* result);
-
     void loadObject(
         nx::utils::db::SqlQuery* selectEventsQuery,
         DetectedObject* object);
-
     void mergeObjects(DetectedObject from, DetectedObject* to);
+
+    void queryTrackInfo(
+        nx::utils::db::QueryContext* queryContext,
+        std::vector<DetectedObject>* result);
 
     nx::utils::db::DBResult selectTimePeriods(
         nx::utils::db::QueryContext* queryContext,

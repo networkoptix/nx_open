@@ -45,6 +45,13 @@ EventPanel::Private::Private(EventPanel* q):
 
     connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
         this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
+
+    connect(m_eventsWidget, &EventSearchWidget::analyticsSearchByAreaEnabledChanged, this,
+        [this](bool enabled)
+        {
+            if (m_currentMediaWidget)
+                m_currentMediaWidget->setAnalyticsSearchModeEnabled(enabled);
+        });
 }
 
 EventPanel::Private::~Private()
@@ -95,6 +102,8 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     m_mediaWidgetConnections.reset();
 
+    m_eventsWidget->setAnalyticsSearchByAreaEnabled(false);
+
     m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(
         this->q->context()->display()->widget(Qn::CentralRole));
 
@@ -108,14 +117,22 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         return;
 
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
+
     *m_mediaWidgetConnections << connect(
-        m_currentMediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled, this,
+        m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled, this,
         [this](bool enabled)
         {
             if (enabled)
                 m_cameraTab->setCurrentWidget(m_motionWidget);
             else
                 m_cameraTab->setCurrentWidget(m_eventsWidget);
+        });
+
+    *m_mediaWidgetConnections << connect(
+        m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
+        [this](const QRectF& relativeRect)
+        {
+            m_eventsWidget->setAnalyticsSearchRect(relativeRect);
         });
 }
 

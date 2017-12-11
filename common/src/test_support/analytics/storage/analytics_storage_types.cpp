@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <QtCore/QStringList>
+
 #include <nx/utils/random.h>
 
 namespace nx {
@@ -22,7 +24,34 @@ QString generateFreeText()
 
 } // namespace
 
-Filter generateRandomFilter()
+//-------------------------------------------------------------------------------------------------
+
+void AttributeDictionary::initialize(int attributeCount, int valuesPerAttribute)
+{
+    m_words.resize(attributeCount * valuesPerAttribute);
+    for (auto& word: m_words)
+        word = QString::fromLatin1(nx::utils::random::generateName(7));
+}
+
+common::metadata::Attribute AttributeDictionary::getRandomAttribute() const
+{
+    return common::metadata::Attribute{
+        nx::utils::random::choice(m_words),
+        nx::utils::random::choice(m_words)};
+}
+
+QString AttributeDictionary::getRandomText() const
+{
+    const int elementsToConcat = nx::utils::random::number<int>(1, 2);
+    QStringList result;
+    for (int i = 0; i < elementsToConcat; ++i)
+        result.push_back(nx::utils::random::choice(m_words));
+    return result.join(L' ');
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
 {
     Filter filter;
 
@@ -51,7 +80,11 @@ Filter generateRandomFilter()
     // TODO: requiredAttributes;
 
     if (nx::utils::random::number<bool>())
-        filter.freeText = generateFreeText();
+    {
+        filter.freeText = attributeDictionary
+            ? attributeDictionary->getRandomText()
+            : generateFreeText();
+    }
 
     filter.sortOrder = nx::utils::random::number<bool>()
         ? Qt::SortOrder::AscendingOrder
@@ -60,8 +93,13 @@ Filter generateRandomFilter()
     return filter;
 }
 
-common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount)
+common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
+    int eventCount,
+    const AttributeDictionary* attributeDictionary)
 {
+    const int minAttributeCount = 0;
+    const int maxAttributeCount = 7;
+
     auto packet = std::make_shared<common::metadata::DetectionMetadataPacket>();
     packet->deviceId = QnUuid::createUuid();
     packet->timestampUsec = nx::utils::random::number<qint64>();
@@ -81,9 +119,16 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount
         detectedObject.boundingBox.setHeight(nx::utils::random::number<float>(
             0,
             1 - detectedObject.boundingBox.topLeft().y()));
-        detectedObject.labels.push_back(common::metadata::Attribute{
-            QString::fromUtf8(nx::utils::random::generateName(7)),
-            QString::fromUtf8(nx::utils::random::generateName(7))});
+        detectedObject.labels.resize(nx::utils::random::number<int>(
+            minAttributeCount, maxAttributeCount));
+        for (auto& attribute: detectedObject.labels)
+        {
+            attribute = attributeDictionary
+                ? attributeDictionary->getRandomAttribute()
+                : common::metadata::Attribute{
+                    QString::fromUtf8(nx::utils::random::generateName(7)),
+                    QString::fromUtf8(nx::utils::random::generateName(7))};
+        }
         packet->objects.push_back(std::move(detectedObject));
     }
 

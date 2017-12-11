@@ -16,7 +16,7 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class EventHandler: public nx::sdk::metadata::AbstractMetadataHandler
+class MetadataHandler: public nx::sdk::metadata::AbstractMetadataHandler
 {
 public:
     // TODO: #mike: Separate error handling from metadata handling.
@@ -30,26 +30,27 @@ public:
 
     void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
+
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
+
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
+
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::AbstractEventMetadataPacket> packet);
-    void handleMetadataPacket(
+
+    void handleObjectsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::AbstractObjectsMetadataPacket> packet);
 
     void handleMetadataEvent(
         nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedEvent> eventData,
         qint64 timestampUsec);
-    void handleMetadataObject(
-        nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedObject> eventData,
-        qint64 timestampUsec);
+
 private:
     QnSecurityCamResourcePtr m_resource;
     QnUuid m_pluginId;
     QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
-    QnAbstractDataReceptor* m_dataReceptor;
-
+    QnAbstractDataReceptor* m_dataReceptor = nullptr;
 };
 
 } // namespace metadata

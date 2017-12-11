@@ -3,8 +3,10 @@
 #include "../event_search_widget.h"
 #include "search_widget_base_p.h"
 
+class QnMediaResourceWidget;
 class QnSearchLineEdit;
 class QPushButton;
+class QCheckBox;
 
 namespace nx {
 
@@ -27,10 +29,16 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    void setAnalyticsSearchRect(const QRectF& relativeRect);
+
+    bool analyticsSearchByAreaEnabled() const;
+    void setAnalyticsSearchByAreaEnabled(bool value);
+
 private:
     void setupSuperTypeButton();
     void setupEventTypeButton();
-    void updateEventTypeButtonVisibility();
+    void setupSelectAreaCheckBox();
+    void updateButtonVisibility();
 
 private:
     EventSearchWidget* q = nullptr;
@@ -38,6 +46,7 @@ private:
     QnSearchLineEdit* const m_searchLineEdit = nullptr;
     QPushButton* const m_superTypeButton = nullptr;
     QPushButton* const m_eventTypeButton = nullptr;
+    QCheckBox* const m_selectAreaCheckBox = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
 };
 

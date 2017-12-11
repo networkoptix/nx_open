@@ -1,5 +1,4 @@
-#ifndef PCP_CLIENT_H
-#define PCP_CLIENT_H
+#pragma once
 
 #include <nx/network/socket_factory.h>
 #include <nx/utils/subscription.h>
@@ -36,5 +35,3 @@ private:
 };
 
 } // namespace pcp
-
-#endif // PCP_CLIENT_H

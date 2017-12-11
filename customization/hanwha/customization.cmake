@@ -21,7 +21,7 @@ set(productUrl "https://www.hanwhasecurity.com/wave")
 set(supportUrl "http://wavevms.com/support")
 set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail "http://wavevms.com/support")
+set(licenseEmail "<br><a href="http://wavevms.com/support">http://wavevms.com/support</a><br>")
 
 set(installer.name "wave")
 set(android.packageName "com.hanwhasecurity.wavemobile")

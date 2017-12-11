@@ -11,10 +11,9 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/mediaserver/metadata/event_handler.h>
+#include <nx/mediaserver/metadata/metadata_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 
-#include <nx/api/analytics/supported_events.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
@@ -155,7 +154,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         }
 
         auto& context = m_contexts[camera->getId()];
-        std::unique_ptr<EventHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
+        std::unique_ptr<MetadataHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
         if (manager->queryInterface(IID_ConsumingMetadataManager))
             handler->registerDataReceptor(&context);
 
@@ -183,7 +182,7 @@ void ManagerPool::releaseResourceMetadataManagersUnsafe(const QnSecurityCamResou
     context.setManagersInitialized(false);
 }
 
-EventHandler* ManagerPool::createMetadataHandler(
+MetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
     const QnUuid& pluginId)
 {
@@ -191,7 +190,7 @@ EventHandler* ManagerPool::createMetadataHandler(
     if (!camera)
         return nullptr;
 
-    auto handler = new EventHandler();
+    auto handler = new MetadataHandler();
     handler->setResource(camera);
     handler->setPluginId(pluginId);
 

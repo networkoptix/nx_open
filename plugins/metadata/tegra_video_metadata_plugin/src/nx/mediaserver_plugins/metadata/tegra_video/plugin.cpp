@@ -116,16 +116,16 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                     "name": {
                         "value": "Human entered the area.",
                         "localization": {
-                            "ru_RU": "Human leaved the area (translated to Russian)"
+                            "ru_RU": "Chelovek voznik (stub for Russian text)"
                         }
                     }
                 },
                 {
                     "typeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
                     "name": {
-                        "value": "Human leaved the area",
+                        "value": "Human left the area",
                         "localization": {
-                            "ru_RU": "Human leaved the area (translated to Russian)"
+                            "ru_RU": "Chelovek svalil (stub for Russian text)"
                         }
                     }
                 }
@@ -136,7 +136,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                     "name": {
                         "value": "Car",
                         "localization": {
-                            "ru_RU": "Car (translated to Russian)"
+                            "ru_RU": "Mashina (stub for Russian text)"
                         }
                     }
                 },
@@ -145,12 +145,11 @@ const char* Plugin::capabilitiesManifest(Error* error) const
                     "name": {
                         "value": "Human",
                         "localization": {
-                            "ru_RU": "Human (translated to Russian)"
+                            "ru_RU": "Chelovek (stub for Russian text)"
                         }
                     }
                 }
             ],
-
 
             "options": "needDeepCopyForMediaFrame"
         }

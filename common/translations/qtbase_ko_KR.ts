@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Options</source>
-      <translation>옵션</translation>
+      <translation>옵션:</translation>
     </message>
     <message>
       <source>Setting</source>
@@ -360,7 +360,7 @@ Press ESC to cancel</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>형식</translation>
+      <translation>유형</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -699,7 +699,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>형식</translation>
+      <translation>유형</translation>
     </message>
     <message>
       <source>Date Modified</source>

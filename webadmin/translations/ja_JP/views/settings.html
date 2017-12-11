@@ -47,12 +47,12 @@
                     </div>
                     <div>
                         <h3>再起動</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>                            
+<button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Adminパスワードの変更</h3>
+                            <h3>adminパスワードの変更</h3>
                             <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます<br>　　
 それ以外は回復パスワードのみを変更</p>
                             <div class="col-sm-6">
@@ -61,7 +61,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">パスワードの変更</button>
+                                        ng-click="changePassword()">パスワードを変更</button>
                             </div>
                         </form>
                     </div>

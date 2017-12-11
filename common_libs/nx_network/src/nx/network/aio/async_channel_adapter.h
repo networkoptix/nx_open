@@ -12,7 +12,7 @@ namespace aio {
 
 /**
  * Adapts type Adaptee to AbstractAsyncChannel.
- * @param AdapteePtr can be raw pointer or smart pointer. 
+ * @param AdapteePtr can be raw pointer or smart pointer.
  * In latter case AsyncChannelAdapter takes adaptee ownership.
  */
 template <typename AdapteePtr>

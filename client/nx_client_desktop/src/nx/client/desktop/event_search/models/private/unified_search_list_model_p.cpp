@@ -134,6 +134,14 @@ void UnifiedSearchListModel::Private::setSelectedEventType(vms::event::EventType
     updateModels();
 }
 
+void UnifiedSearchListModel::Private::setAnalyticsSearchRect(const QRectF& relativeRect)
+{
+    m_analyticsModel->setFilterRect(relativeRect);
+
+    if (m_filter.testFlag(Type::analytics))
+        updateModels();
+}
+
 void UnifiedSearchListModel::Private::updateModels()
 {
     if (m_currentFetchGuard)

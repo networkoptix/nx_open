@@ -317,7 +317,7 @@ angular.module('nxCommon')
                                 if (scope.vgSrc) {
                                     scope.vgApi.load(getFormatSrc('hls'));
 
-                                    scope.vgApi.addEventListener("playing", function(){
+                                    scope.vgApi.addEventListener("loadeddata", function(){
                                         scope.loading = false;  // Video is ready - disable loading
                                         crashCount = 0;
                                     });

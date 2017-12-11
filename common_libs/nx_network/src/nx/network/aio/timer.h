@@ -28,7 +28,7 @@ public:
     Timer(const Timer&) = delete;
     Timer& operator=(const Timer&) = delete;
 
-    /** 
+    /**
      * NOTE: If timer is already started, this method overwrites timer, not adds a new one!
      */
     void start(

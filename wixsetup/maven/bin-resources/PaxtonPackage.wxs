@@ -5,7 +5,7 @@
             <MsiPackage
                 Id="PaxtonPackage"
                 Name="$(var.PaxtonMsiName)"
-                SourceFile="bin/strip/$(var.PaxtonMsiName)"
+                SourceFile="$(var.InstallerTargetDir)/$(var.PaxtonMsiName)"
                 Vital="yes"
                 Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />

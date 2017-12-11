@@ -23,7 +23,7 @@ def generate_fonts():
         'ClientFonts.wxs',
         'ClientFontsComponent',
         'ClientFontsDir',
-        'var.ClientFontsDir')
+        'var.ClientFontsSourceDir')
 
 def generate_help():
     clientHelpFile = 'ClientHelp.wxs'
@@ -38,8 +38,8 @@ def generate_help():
     fragments = (
         (r'''Id="jquery.js"''', '''Id="skawixjquery.js"'''),
         (r'''Id="index.html"''', '''Id="skawixindex.html"'''),
-		(r'''Id="calendar_checked.png"''', '''Id="skawixcalendar_checked.png"'''),
-		(r'''Id="live_checked.png"''', '''Id="skawixlive_checked.png"'''),
+        (r'''Id="calendar_checked.png"''', '''Id="skawixcalendar_checked.png"'''),
+        (r'''Id="live_checked.png"''', '''Id="skawixlive_checked.png"'''),
         )
 
     text = open(clientHelpFile, 'r').read()
@@ -79,19 +79,19 @@ def generate_nxtool_qml():
 
 def generate_client_vox():
     harvest_dir(
-        '${ClientVoxSourceDir}',
+        '${VoxSourceDir}',
         'ClientVox.wxs',
         'ClientVoxComponent',
         '${customization}VoxDir',
-        'var.ClientVoxSourceDir')
+        'var.VoxSourceDir')
 
 def generate_server_vox():
     harvest_dir(
-        '${ClientVoxSourceDir}',
+        '${VoxSourceDir}',
         'ServerVox.wxs',
         'ServerVoxComponent',
         '${customization}ServerVoxDir',
-        'var.ClientVoxSourceDir')
+        'var.VoxSourceDir')
 
 def generate_vcrt_14_client():
     harvest_dir(

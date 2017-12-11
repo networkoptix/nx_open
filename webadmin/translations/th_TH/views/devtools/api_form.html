@@ -29,7 +29,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">กำลังส่งคำขอ...</label>
+        <label class="col-sm-2 control-label">URL ที่ร้องขอ</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
         </div>
@@ -137,7 +137,7 @@
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="usePassword"> รหัสผ่าน </label>
+        <label class="col-sm-2 control-label" for="usePassword">รหัสผ่าน</label>
         <div class="col-sm-10">
             <input id="usePassword" type="text" class="form-control input-sm"
                    ng-model="apiMethod.password">
@@ -146,7 +146,7 @@
 
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">URL ที่ร้องขอ</label>
+        <label class="col-sm-2 control-label">กำลังส่งคำขอ...</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
             <p class="help-block" ng-if="clipboardSupported">

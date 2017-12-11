@@ -29,7 +29,7 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class EventHandler;
+class MetadataHandler;
 
 class ManagerPool final:
     public Connective<QObject>
@@ -71,7 +71,7 @@ private:
 
     void releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& camera);
 
-    EventHandler* createMetadataHandler(
+    MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const QnUuid& pluginId);
 

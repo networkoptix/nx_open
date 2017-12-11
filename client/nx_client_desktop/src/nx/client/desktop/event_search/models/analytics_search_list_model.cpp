@@ -31,6 +31,11 @@ void AnalyticsSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camer
     d->setCamera(camera);
 }
 
+void AnalyticsSearchListModel::setFilterRect(const QRectF& relativeRect)
+{
+    d->setFilterRect(relativeRect);
+}
+
 void AnalyticsSearchListModel::clear()
 {
     d->clear();
@@ -46,7 +51,7 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
     if (!isValid(index))
         return QVariant();
 
-    const auto object = d->object(index.row());
+    const auto& object = d->object(index.row());
     NX_ASSERT(!object.track.empty());
 
     static const auto kDefaultLocale = QString();
@@ -71,6 +76,11 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
 
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(d->camera());
+
+        case Qn::ItemZoomRectRole:
+            return QVariant::fromValue(object.track.empty()
+                ? QRectF()
+                : object.track.front().boundingBox);
 
         default:
             return base_type::data(index, role);
