@@ -317,6 +317,8 @@ void ThirdPartyStreamReader::closeStream()
 
     if( m_builtinStreamReader.get() )
         m_builtinStreamReader->closeStream();
+    m_videoTimeHelpers.clear();
+    m_audioTimeHelpers.clear();
 }
 
 bool ThirdPartyStreamReader::isStreamOpened() const
