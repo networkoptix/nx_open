@@ -5,11 +5,15 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
 
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/search_line_edit.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
@@ -46,12 +50,14 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     m_searchLineEdit(new QnSearchLineEdit(m_headerWidget)),
     m_superTypeButton(new QPushButton(m_headerWidget)),
     m_eventTypeButton(new QPushButton(m_headerWidget)),
+    m_selectAreaCheckBox(new QCheckBox(m_headerWidget)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
     m_searchLineEdit->setTextChangedSignalFilterMs(std::chrono::milliseconds(kFilterDelay).count());
 
     setupSuperTypeButton();
     setupEventTypeButton();
+    setupSelectAreaCheckBox();
 
     auto buttonsHolder = new QWidget(m_headerWidget);
     auto buttonsLayout = new QVBoxLayout(buttonsHolder);
@@ -61,6 +67,8 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     buttonsLayout->setAlignment(m_superTypeButton, Qt::AlignLeft);
     buttonsLayout->addWidget(m_eventTypeButton);
     buttonsLayout->setAlignment(m_eventTypeButton, Qt::AlignLeft);
+    buttonsLayout->addWidget(m_selectAreaCheckBox);
+    buttonsLayout->setAlignment(m_selectAreaCheckBox, Qt::AlignLeft);
 
     auto layout = m_headerWidget->layout();
     layout->addWidget(m_searchLineEdit);
@@ -104,7 +112,7 @@ void EventSearchWidget::Private::setupSuperTypeButton()
                     m_superTypeButton->setIcon(icon);
                     m_superTypeButton->setText(title);
                     m_model->setFilter(filter);
-                    updateEventTypeButtonVisibility();
+                    updateButtonVisibility();
             });
         };
 
@@ -153,13 +161,47 @@ void EventSearchWidget::Private::setupEventTypeButton()
     m_eventTypeButton->setMenu(eventFilterMenu);
 }
 
-void EventSearchWidget::Private::updateEventTypeButtonVisibility()
+void EventSearchWidget::Private::setupSelectAreaCheckBox()
 {
-    const bool hidden = m_model->filter() != int(UnifiedSearchListModel::Type::events);
-    if (m_eventTypeButton->isHidden() == hidden)
+    m_selectAreaCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_selectAreaCheckBox->setFixedHeight(kTextButtonHeight);
+    m_selectAreaCheckBox->setText(tr("Select Area"));
+
+    connect(m_selectAreaCheckBox, &QCheckBox::stateChanged, this,
+        [this]()
+        {
+            const bool enabled = analyticsSearchByAreaEnabled();
+            if (!enabled)
+                m_model->setAnalyticsSearchRect(QRectF());
+
+            emit q->analyticsSearchByAreaEnabledChanged(enabled);
+        });
+}
+
+void EventSearchWidget::Private::updateButtonVisibility()
+{
+    bool updated = false;
+
+    const bool typeButtonHidden = m_model->filter() != int(UnifiedSearchListModel::Type::events);
+    if (m_eventTypeButton->isHidden() != typeButtonHidden)
+    {
+        m_eventTypeButton->setHidden(typeButtonHidden);
+        updated = true;
+    }
+
+    const bool selectAreaHidden = !m_model->filter().testFlag(
+        UnifiedSearchListModel::Type::analytics);
+
+    if (m_selectAreaCheckBox->isHidden() != selectAreaHidden)
+    {
+        m_selectAreaCheckBox->setHidden(selectAreaHidden);
+        emit q->analyticsSearchByAreaEnabledChanged(analyticsSearchByAreaEnabled());
+        updated = true;
+    }
+
+    if (!updated)
         return;
 
-    m_eventTypeButton->setHidden(hidden);
     for (auto w = m_eventTypeButton->parentWidget(); w != nullptr; w = w->parentWidget())
     {
         if (w->layout())
@@ -176,6 +218,22 @@ void EventSearchWidget::Private::setCamera(const QnVirtualCameraResourcePtr& cam
 {
     m_model->setCamera(camera);
 }
+
+void EventSearchWidget::Private::setAnalyticsSearchRect(const QRectF& relativeRect)
+{
+    m_model->setAnalyticsSearchRect(relativeRect);
+}
+
+bool EventSearchWidget::Private::analyticsSearchByAreaEnabled() const
+{
+    return m_selectAreaCheckBox->isChecked() && !m_selectAreaCheckBox->isHidden();
+}
+
+void EventSearchWidget::Private::setAnalyticsSearchByAreaEnabled(bool value)
+{
+    m_selectAreaCheckBox->setChecked(value);
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

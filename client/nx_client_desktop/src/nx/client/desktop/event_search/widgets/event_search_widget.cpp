@@ -25,6 +25,21 @@ void EventSearchWidget::setCamera(const QnVirtualCameraResourcePtr& camera)
     d->setCamera(camera);
 }
 
+void EventSearchWidget::setAnalyticsSearchRect(const QRectF& relativeRect)
+{
+    d->setAnalyticsSearchRect(relativeRect);
+}
+
+bool EventSearchWidget::analyticsSearchByAreaEnabled() const
+{
+    return d->analyticsSearchByAreaEnabled();
+}
+
+void EventSearchWidget::setAnalyticsSearchByAreaEnabled(bool value)
+{
+    d->setAnalyticsSearchByAreaEnabled(value);
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

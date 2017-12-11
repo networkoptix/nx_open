@@ -61,6 +61,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
+#include <nx/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
@@ -372,6 +373,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     initIoModuleOverlay();
     ensureTwoWayAudioWidget();
     initAreaHighlightOverlay();
+    initAreaSelectOverlay();
 
     /* Set up buttons. */
     createButtons();
@@ -572,6 +574,18 @@ void QnMediaResourceWidget::initIoModuleOverlay()
     }
 }
 
+void QnMediaResourceWidget::initAreaSelectOverlay()
+{
+    if (!hasVideo())
+        return;
+
+    m_areaSelectOverlayWidget = new AreaSelectOverlayWidget(m_compositeOverlay);
+    addOverlayWidget(m_areaSelectOverlayWidget, detail::OverlayParams(Visible, true, true));
+
+    connect(m_areaSelectOverlayWidget, &AreaSelectOverlayWidget::selectedAreaChanged,
+        this, &QnMediaResourceWidget::analyticsSearchAreaSelected);
+}
+
 void QnMediaResourceWidget::initAreaHighlightOverlay()
 {
     if (!hasVideo())
@@ -628,6 +642,15 @@ void QnMediaResourceWidget::initStatusOverlayController()
              const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
              changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), true);
          });
+}
+
+void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
+{
+    m_areaSelectOverlayWidget->setActive(enabled);
+    if (enabled)
+        setMotionSearchModeEnabled(false);
+    else
+        m_areaSelectOverlayWidget->clearSelectedArea();
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
@@ -2644,6 +2667,7 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
         action(action::ToggleTimelineAction)->setChecked(true);
+        m_areaSelectOverlayWidget->setActive(false);
     }
 
     setOption(WindowResizingForbidden, enabled);

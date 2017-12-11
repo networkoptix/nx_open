@@ -2,6 +2,7 @@
 
 #include "../event_panel.h"
 
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
 #include <nx/utils/disconnect_helper.h>
@@ -43,7 +44,7 @@ private:
     EventSearchWidget* m_eventsWidget = nullptr;
     MotionSearchWidget* m_motionWidget = nullptr;
 
-    QnMediaResourceWidget* m_currentMediaWidget = nullptr;
+    QPointer<QnMediaResourceWidget> m_currentMediaWidget;
     QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
 
     enum class Tab
