@@ -45,7 +45,7 @@ public:
         NX_CRITICAL(m_runningSubscriptionId == kInvalidSubscriptionId);
     }
 
-    /** 
+    /**
      * Subscribes handler for this event.
      * @param subscriptionId This value can be used to unsubscribe
      * NOTE: do not use blocking operations inside @param handler.
@@ -61,7 +61,7 @@ public:
         m_handlers.emplace(*subscriptionId, std::move(handler));
     }
 
-    /** 
+    /**
      * @param subscriptionId Value returned by Subscription::subscribe
      * NOTE: Can be safely called with in event handler
      * NOTE: If event handler is running in another thread, blocks until handler has returned
@@ -81,7 +81,7 @@ public:
         m_handlers.erase(subscriptionId);
     }
 
-    /** 
+    /**
      * Notifies all subscribers about the event.
      */
     void notify(Data... data)
@@ -99,7 +99,7 @@ public:
             m_cond.wakeAll();
             currentSubscriptionIter->second(data...);
             lk.relock();
-            currentSubscriptionIter = 
+            currentSubscriptionIter =
                 m_handlers.upper_bound(m_runningSubscriptionId);
         }
 

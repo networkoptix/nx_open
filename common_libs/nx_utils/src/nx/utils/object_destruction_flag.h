@@ -4,7 +4,7 @@ namespace nx {
 namespace utils {
 
 /**
- * ObjectDestructionFlag and ObjectDestructionFlag::Watcher are used to allow 
+ * ObjectDestructionFlag and ObjectDestructionFlag::Watcher are used to allow
  * "this" destruction in some event handler.
  * Example:
  * @code{.cpp}

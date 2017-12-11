@@ -1,8 +1,10 @@
-#include <QtNetwork/QHostAddress>
-#include <QtCore/QRegExp>
 #include <cctype>
 
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QRegExp>
+
 #include <nx/utils/log/assert.h>
+
 #include "url.h"
 
 namespace nx {

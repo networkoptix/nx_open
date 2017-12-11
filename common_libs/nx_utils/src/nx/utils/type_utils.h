@@ -1,14 +1,8 @@
-/**********************************************************
-* Apr 27, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
 
 namespace nx {
 namespace utils {
@@ -44,7 +38,7 @@ struct Apply<0>
 
 }   //namespace detail
 
-/** Calls f passing it members of tuple t as arguments */
+/** Calls f passing it members of tuple t as arguments. */
 template<typename F, typename T>
 inline auto expandTupleIntoArgs(F && f, T && t)->
 decltype(detail::Apply<
@@ -56,9 +50,10 @@ decltype(detail::Apply<
 }
 
 
-/** Converts unique_ptr of one type to another using static_cast.
-    Consumes original unique_ptr. Actually moves memory to a new unique_ptr
-*/
+/**
+ * Converts unique_ptr of one type to another using static_cast.
+ * Consumes original unique_ptr. Actually moves memory to a new unique_ptr.
+ */
 template<typename ResultType, typename InitialType, typename DeleterType>
 std::unique_ptr<ResultType, DeleterType>
 static_unique_ptr_cast(std::unique_ptr<InitialType, DeleterType>&& sourcePtr)
@@ -93,10 +88,11 @@ std::shared_ptr<Object> wrapShared(Object* ptr, Deleter deleter)
 }
 
 
-/** tuple_first_element<default_type, tuple_type>.
-    tuple_first_element::type is typedefed to default_type if tuple_type is empty. 
-    Otherwise, to the type of tuple's first element
-*/
+/**
+ * tuple_first_element<default_type, tuple_type>.
+ * tuple_first_element::type is typedefed to default_type if tuple_type is empty.
+ * Otherwise, to the type of tuple's first element.
+ */
 template<typename DefaultType, typename T> struct tuple_first_element;
 
 template<typename DefaultType, typename Head, typename... Args>
@@ -111,5 +107,5 @@ struct tuple_first_element<DefaultType, std::tuple<>>
     typedef DefaultType type;
 };
 
-}   //namespace utils
-}   //namespace nx
+} // namespace utils
+} // namespace nx
