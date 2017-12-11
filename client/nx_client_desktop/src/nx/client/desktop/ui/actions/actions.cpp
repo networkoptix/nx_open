@@ -757,7 +757,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
-        .condition(ConditionWrapper(new ExportCondition(false)));
+        .condition(ConditionWrapper(new ExportCondition()));
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)

@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Тип события:</translation>
     </message>
   </context>
   <context>
@@ -338,7 +338,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -361,7 +361,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Информация о закладке</translation>
     </message>
     <message>
       <location/>
@@ -371,17 +371,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Ширина области</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Размер шрифта</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Включить описание</translation>
     </message>
   </context>
   <context>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -531,7 +531,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Остановить</translation>
+      <translation>Заканчивается</translation>
     </message>
     <message>
       <location/>
@@ -650,7 +650,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -665,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>По умолчанию</translation>
+      <translation>Сбросить настройки</translation>
     </message>
     <message>
       <location/>
@@ -690,42 +690,42 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Настройки камеры</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Настройки качества и частоты кадров (FPS) в расписании записи станут неактуальными.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Вычислять битрейт на GOP вместо битрейта в секунду</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Это увеличит битрейт для камеры.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Вторичный поток</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Включить вторичный поток</translation>
     </message>
     <message>
       <location/>
@@ -740,17 +740,17 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>Архив</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Потоковое вещание</translation>
     </message>
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -779,7 +779,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -827,7 +827,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Битрейт</translation>
     </message>
   </context>
   <context>
@@ -1053,6 +1053,16 @@
       <source>HTTP URL</source>
       <translation>URL HTTPS</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1067,12 +1077,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Настройки экспорта</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Сделать доступным только для чтения</translation>
     </message>
   </context>
   <context>
@@ -1080,22 +1090,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Настройки экспорта</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Применить фильтры</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Вращение, Развёртка, Улучшение изображения и т. д.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>Применение фильтров и добавление наложений требует перекодирования, что увеличит использование процессора и может занять значительное время.</translation>
     </message>
   </context>
   <context>
@@ -1131,22 +1141,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Экспорт видео</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Отдельная камера</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Настройки экспорта</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Мульти видео</translation>
     </message>
   </context>
   <context>
@@ -1324,12 +1334,12 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Прозрачность</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>По-умолчанию</translation>
     </message>
     <message>
       <location/>
@@ -1725,7 +1735,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>Шкала времени</translation>
+      <translation>Режим времени</translation>
     </message>
     <message>
       <location/>
@@ -1750,12 +1760,12 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>сек</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Цикличность тура</translation>
     </message>
   </context>
   <context>
@@ -1776,7 +1786,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Авторизация</translation>
+      <translation>Аутентификация</translation>
     </message>
     <message>
       <location/>
@@ -2048,7 +2058,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Логин:</translation>
+      <translation>Имя пользователя:</translation>
     </message>
     <message>
       <location/>
@@ -2186,7 +2196,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation>Настройки</translation>
+      <translation>Параметры</translation>
     </message>
     <message>
       <location/>
@@ -2234,7 +2244,7 @@
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>&amp;Удалить...</translation>
+      <translation>Удалить...</translation>
     </message>
     <message>
       <location/>
@@ -2247,7 +2257,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation>Настройки видеостен</translation>
+      <translation>Настройки видеостены</translation>
     </message>
     <message>
       <location/>
@@ -2265,32 +2275,32 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Быстрая прокрутка</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Изначальная длина фрагмента</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Длина после экспорта</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Скорость</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Интервал между кадрами</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Сбросить скорость</translation>
     </message>
   </context>
   <context>
@@ -2346,7 +2356,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>секунды</translation>
     </message>
   </context>
   <context>
@@ -2512,7 +2522,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>сек</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -2573,7 +2583,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Авторизация</translation>
+      <translation>Аутентификация</translation>
     </message>
     <message>
       <location/>
@@ -2583,7 +2593,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>Детекция движения</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <location/>
@@ -2638,7 +2648,7 @@
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Производитель</translation>
+      <translation>Производитель:</translation>
     </message>
     <message>
       <location/>
@@ -2663,7 +2673,7 @@
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
     <message>
       <location/>
@@ -2747,7 +2757,7 @@
     <message>
       <location/>
       <source>User:</source>
-      <translation>Имя пользователя:</translation>
+      <translation>Пользователь:</translation>
     </message>
     <message>
       <location/>
@@ -2767,7 +2777,7 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2902,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Логин:</translation>
+      <translation>Имя пользователя:</translation>
     </message>
     <message>
       <location/>
@@ -2905,7 +2915,7 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>Роли</translation>
+      <translation>Role</translation>
     </message>
     <message>
       <location/>
@@ -2951,7 +2961,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Текст</translation>
     </message>
     <message>
       <location/>
@@ -2961,17 +2971,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Размер шрифта</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Введите обычный текст или HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Ширина области</translation>
     </message>
   </context>
   <context>
@@ -2992,17 +3002,17 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Отметки времени</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Размер шрифта</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Формат</translation>
     </message>
     <message>
       <location/>
@@ -3079,7 +3089,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
   </context>
   <context>

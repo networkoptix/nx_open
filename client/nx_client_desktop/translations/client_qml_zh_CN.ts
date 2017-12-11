@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>不可到达</translation>
+      <translation>不可取得</translation>
     </message>
     <message>
       <source>New Server</source>

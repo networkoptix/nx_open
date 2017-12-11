@@ -59,7 +59,7 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                시스템 이름이 필요합니다.
+                시스템명을 입력하세요.
             </div>
         </div>
 
@@ -475,16 +475,19 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">취소</button>     <button class="btn btn-default"
+            ng-click="cancel()">취소</button>
+    <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="next()">다음 <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
+ ng-click="next()">다음 <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">완료</button>
+ ng-click="finish()">종료</button>
 </div>

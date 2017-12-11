@@ -107,7 +107,7 @@ def light_command(output_file, input_folder, extensions):
     command += common_light_options()
     for extension in extensions:
         command += ['-ext', '{0}.dll'.format(extension)]
-    
+
     return command
 
 def light(output_file, input_folder, extensions):

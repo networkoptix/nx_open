@@ -11,6 +11,9 @@ set(minilauncher.binary.name "applauncher-bin")
 set(mediaserver.name "${company.name} Media Server")
 set(mediaserver.display.name "${display.product.name} Media Server")
 set(testcamera.binary.name "testcamera")
+set(installation.root "/opt/${deb.customization.company.name}")
+set(launcher.version.file "launcher.version")
+set(client.mediafolder.name "${product.name} Media")
 
 if(WINDOWS)
     set(client.binary.name "${product.name}.exe")
@@ -24,16 +27,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(protocol_handler_app_name "${display.product.name} Client.app")
 endif()
 
-set(client.mediafolder.name "${product.name} Media")
-
 if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     set(liteMode "true")
 else()
     set(liteMode "false")
 endif()
-
-set(launcher.version.file "launcher.version")
-set(installation.root "/opt/${deb.customization.company.name}")
 
 hg_changeset(${PROJECT_SOURCE_DIR} changeSet)
 hg_branch(${PROJECT_SOURCE_DIR} branch)

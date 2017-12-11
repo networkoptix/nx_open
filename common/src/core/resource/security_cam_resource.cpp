@@ -1432,6 +1432,6 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
     const QAuthenticator& auth, QString* outErrorString)
 {
     if (outErrorString)
-        *outErrorString = tr("Operation is not permitted.");
+        *outErrorString = lit("Operation is not permitted.");
     return false;
 }

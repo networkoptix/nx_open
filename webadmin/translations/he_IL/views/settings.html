@@ -46,7 +46,7 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>
                     </div>
                     <div>
-                        <h3>הפעל מחדש</h3>
+                        <h3>איתחול</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">הפעל מחדש את השרת</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">אתחול מחדש</button></p>
                     </div>
                     <div ng-if="user.isOwner">
@@ -59,7 +59,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">שנה סיסמה</button>
+                                        ng-click="changePassword()">שנה סיסמא</button>
                             </div>
                         </form>
                     </div>
@@ -124,7 +124,7 @@
                                     <tr>
                                         <td><label for="timeZone">אזור זמן</label></td>
                                         <td><label for="date">תאריך</label></td>
-                                        <td><label for="time">שעה</label></td>
+                                        <td><label for="time">זמן</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>

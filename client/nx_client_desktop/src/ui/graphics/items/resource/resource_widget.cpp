@@ -910,27 +910,29 @@ void QnResourceWidget::updateHud(bool animate)
 
     /* Motion mask widget should not have overlays at all */
 
-    bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
+    const bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
                                    && !options().testFlag(ActivityPresence));
 
-    bool overlaysCanBeVisible = (!isInactiveInFullScreen
-                                 && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
+    const bool overlaysCanBeVisible = (!isInactiveInFullScreen
+                                 && !options().testFlag(InfoOverlaysForbidden));
 
-    bool detailsVisible = m_options.testFlag(DisplayInfo);
-    if (QnImageButtonWidget *infoButton = titleBar()->rightButtonsBar()->button(Qn::InfoButton))
+    const bool detailsVisible = m_options.testFlag(DisplayInfo);
+    if (auto infoButton = titleBar()->rightButtonsBar()->button(Qn::InfoButton))
         infoButton->setChecked(detailsVisible);
 
-    bool alwaysShowName = m_options.testFlag(AlwaysShowName);
+    const bool alwaysShowName = m_options.testFlag(AlwaysShowName);
 
     const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
         && !m_mouseInWidget;
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
     const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
-    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());
+    const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible &&
+        (m_mouseInWidget || qnRuntime->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
-    const bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_hudOverlay->position()));
+    const bool updatePositionTextRequired = showPosition
+        && !isOverlayWidgetVisible(m_hudOverlay->position());
     setOverlayWidgetVisible(m_hudOverlay->position(), showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
@@ -1062,6 +1064,9 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
+    if (!m_mouseInWidget)
+        hoverEnterEvent(event);
+
     const bool animate = display()->animationAllowed();
 
     setOverlayVisible(true, animate);

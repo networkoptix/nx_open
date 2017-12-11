@@ -46,7 +46,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>ลบ​บุ๊ค​มา​ร์ค</translation>
+      <translation>ลบบุ๊คมาร์ค</translation>
     </message>
     <message>
       <source>Export bookmark</source>
@@ -175,7 +175,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Video Wall ใหม่....</translation>
+      <translation>สร้างจอแสดงผลใหม่...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -288,7 +288,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>เข้าสู่ระบบ %1</translation>
+      <translation>เข้าสู่ระบบ %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -490,7 +490,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>จัดการ...</translation>
+      <translation>การจัดการ...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
@@ -936,7 +936,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -990,16 +990,16 @@ to view more bookmarks</source>
       <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
-    </message>
-    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation type="unfinished">Settings are not available for .EXE files.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -1041,7 +1041,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>ข้างบน</translation>
+      <translation>ด้านบน</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1137,7 +1137,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน</translation>
+      <translation>รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน.</translation>
     </message>
     <message>
       <source>Short</source>
@@ -1157,7 +1157,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น</translation>
+      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น.</translation>
     </message>
     <message>
       <source>Long</source>
@@ -1336,7 +1336,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1408,7 +1408,7 @@ to view more bookmarks</source>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>คัดลอกส่วนที่เลือกไปยังคลิปบอร์ด</translation>
+      <translation>คัดลอกเลือกไปที่คลิปบอร์ด</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1424,7 +1424,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices</source>
-      <translation>อุปกรณ์</translation>
+      <translation>อุุปกรณ์</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -1505,7 +1505,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>ไม่ทราบ</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1513,7 +1513,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1521,11 +1521,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>ดูถ่ายทอดสด</translation>
+      <translation>ดู ภาพสด</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>ดูที่ เก็บไว้</translation>
+      <translation>ดูที่เก็บ</translation>
     </message>
     <message>
       <source>Exporting video</source>
@@ -1611,7 +1611,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>รายละเอียด</translation>
+      <translation>&amp;รายละเอียด</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1836,7 +1836,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>ทางด่วน</translation>
+      <translation>เร่งด่วน</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -1915,7 +1915,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices</source>
-      <translation>อุปกรณ์</translation>
+      <translation>อุุปกรณ์</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -1997,11 +1997,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Source</source>
-      <translation>ต้นทาง</translation>
+      <translation>ทรัพยากร</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>กระทำ</translation>
+      <translation>การกระทำ</translation>
     </message>
     <message>
       <source>Target</source>
@@ -2145,7 +2145,7 @@ to view more bookmarks</source>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -2317,7 +2317,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>ขอบ</translation>
     </message>
   </context>
   <context>
@@ -2340,11 +2340,11 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>คัดลอกคลิปบอร์ดที่เลือก</translation>
+      <translation>คัดลอกเลือกไปที่คลิปบอร์ด</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>เลือกไฟล์ที่จะนำออก...</translation>
+      <translation>เลือกส่งออกไปยังแฟ้ม...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -2403,7 +2403,7 @@ to view more bookmarks</source>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>กำลังบันทึก</translation>
+      <translation>การบันทึก</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2411,7 +2411,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ผู้ขาย</translation>
+      <translation>ผู้ติดต่อ:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2431,7 +2431,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>เซอร์ฟเวอร์</translation>
+      <translation>เซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -2594,7 +2594,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -3047,7 +3047,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>การเชื่อมต่อ</translation>
+      <translation>เชื่อมต่อ</translation>
     </message>
   </context>
   <context>
@@ -3146,22 +3146,22 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
     </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation type="unfinished"> Ask your system administrator to do it.</translation>
-    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
         <numerusform>Set Password</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
+      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3184,11 +3184,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
+      <translation>ไม่สามารถเริ่มต้น เข้ารหัส วีดีโอ.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
+      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3227,7 +3227,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3265,7 +3265,7 @@ to %1</source>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
+      <translation>ยกเลิกการเชื่อมต่อระบบจาก %1?</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
@@ -3297,7 +3297,7 @@ to %1</source>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>ล้าง Filter</translation>
+      <translation>ล้าง ตัวกรอง</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
@@ -3352,7 +3352,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>รายละเอียด</translation>
+      <translation>&amp;รายละเอียด</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3398,6 +3398,10 @@ to %1</source>
       <source>Auto</source>
       <translation>อัตโนมัติ</translation>
     </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
+    </message>
   </context>
   <context>
     <name>QnExecPtzPresetPolicy</name>
@@ -3438,7 +3442,7 @@ to %1</source>
     <message>
       <source>Never</source>
       <comment>Failover priority</comment>
-      <translation>ไม่ต้อง</translation>
+      <translation>ตลอด</translation>
     </message>
     <message>
       <source>Low</source>
@@ -3505,7 +3509,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -3593,7 +3597,7 @@ to %1</source>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation>ชนิด</translation>
+      <translation>ประเภท</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3606,7 +3610,7 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>ไม่ทราบ</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3767,11 +3771,11 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>อีเมล</translation>
+      <translation>อีเมลล์</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3837,7 +3841,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>กุญแจรหัส</translation>
+      <translation>คีร์ใบอนุญาติ:</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3852,11 +3856,11 @@ to %1</source>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation>ชนิด</translation>
+      <translation>ประเภท</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>กุญแจรหัส</translation>
+      <translation>คีร์ใบอนุญาติ:</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3864,7 +3868,7 @@ to %1</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>เซร์อฟเวอร์</translation>
+      <translation>เซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Never</source>
@@ -4071,7 +4075,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>ลบออก</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4095,7 +4099,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
+      <translation>คีย์สัญญาอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
@@ -4196,7 +4200,7 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>รูปลักษณะและความรู้สึก</translation>
+      <translation>รูปลักษณ์ และ การใช้งาน</translation>
     </message>
     <message>
       <source>Screen Recording</source>
@@ -4308,7 +4312,7 @@ to %1</source>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ยินดีต้อนรับสู่ %1</translation>
+      <translation>ยินดีต้อนรับสู่ %1!</translation>
     </message>
   </context>
   <context>
@@ -4390,7 +4394,7 @@ to %1</source>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>ภาพสด</translation>
+      <translation>สด</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4402,7 +4406,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>โมดูล I/O</translation>
+      <translation>I/O โมดูล</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -4768,7 +4772,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>โฮม</translation>
+      <translation>หน้าหลัก</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4883,7 +4887,7 @@ to %1</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>แทน</translation>
+      <translation>เร่งด่วน</translation>
     </message>
     <message>
       <source>Position</source>
@@ -4914,7 +4918,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Best</source>
@@ -4997,7 +5001,7 @@ to %1</source>
     </message>
     <message>
       <source>Device</source>
-      <translation>อุปกรณ์</translation>
+      <translation>อุุปกรณ์</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -5386,7 +5390,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n ผู้ใช้</numerusform>
+        <numerusform>ผู้ใช้ %n</numerusform>
       </translation>
     </message>
   </context>
@@ -6026,7 +6030,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>ใบอนุญาติใช้งาน</translation>
+      <translation>เปิดใช้งานใบอนุญาต</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6041,8 +6045,8 @@ to %1</source>
       <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation type="unfinished">Set For This Camera</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
@@ -6053,7 +6057,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>เลือกไฟล์ที่จะนำออก...</translation>
+      <translation>เลือกส่งออกไปยังแฟ้ม...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -6077,7 +6081,7 @@ to %1</source>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>เทราไบต์</translation>
+      <translation>TB</translation>
     </message>
   </context>
   <context>
@@ -6195,7 +6199,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>ลบออก</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6215,7 +6219,7 @@ to %1</source>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -6417,7 +6421,7 @@ to %1</source>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>ผู้ใช้บางคนไม่ได้ตั้งค่าอยู่อีเมล</translation>
+      <translation>ผู้ใช้บางคนไม่ได้ตั้งค่าอยู่อีเมล.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -6453,7 +6457,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>การซิงโครไนซ์ที่เก็บข้อมูลระยะไกล</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6612,7 +6616,7 @@ to %1</source>
     <name>QnTwoStepFileDialog</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Select file...</source>
@@ -6735,7 +6739,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6792,7 +6796,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6938,7 +6942,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7089,7 +7093,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>บุ๊คมาร์ค</translation>
+      <translation>บุ๊คมาร์ก</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7109,7 +7113,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation>ลบบุ๊คมาร์ค?</translation>
+      <translation>ลบ​บุ๊ค​มา​ร์ค?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
@@ -7338,7 +7342,7 @@ to %1</source>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>จอแสดงผล</translation>
+      <translation>วีดีโอ กำแพง</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -7376,7 +7380,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>หยุดกำแพงวิดีโอหรือไม่?</translation>
+      <translation>หยุด Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7448,7 +7452,7 @@ to %1</source>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน</translation>
+      <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน.</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
@@ -7679,7 +7683,7 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>รีวิวอย่างรวดเร็ว</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -7695,7 +7699,7 @@ to %1</source>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>ประทับเวลา</translation>
     </message>
     <message>
       <source>Add Image</source>
@@ -7707,7 +7711,7 @@ to %1</source>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>ภาพ:</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -7742,7 +7746,7 @@ to %1</source>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>โฟลเดอร์</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7754,7 +7758,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
   </context>
   <context>
@@ -7803,7 +7807,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>แบบกำหนดเอง</translation>
     </message>
   </context>
   <context>
@@ -7936,7 +7940,7 @@ to %1</source>
     </message>
     <message>
       <source>No Timestamp</source>
-      <translation>การประทับเวลาไม่มี</translation>
+      <translation>ไม่มีการประทับเวลา</translation>
     </message>
     <message>
       <source>Top Left Corner (requires transcoding)</source>
@@ -8208,7 +8212,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>อีเมล</translation>
+      <translation>อีเมลล์</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8310,7 +8314,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์...</translation>
+      <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -8376,7 +8380,7 @@ to %1</source>
     </message>
     <message>
       <source>Server</source>
-      <translation>เซอร์ฟเวอร์</translation>
+      <translation>เซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
@@ -8423,8 +8427,8 @@ to %1</source>
       <translation type="unfinished">Failed to change password</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>

@@ -628,7 +628,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>不明</translation>
+      <translation>未知の値</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -663,7 +663,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message>
       <source>%1 MB</source>

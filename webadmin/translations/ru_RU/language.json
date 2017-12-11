@@ -116,7 +116,7 @@
     "common": {
         "systemOffline": "Система не в сети",
         "cameraLinks": {
-            "copyToClipboard": "скопировать в буфер обмена",
+            "copyToClipboard": "копировать в буфер",
             "highStream": "Выс. кач-во",
             "copyDefaultText": "копировать",
             "unknown": "Неизвестный",

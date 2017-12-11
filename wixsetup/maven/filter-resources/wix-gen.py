@@ -38,8 +38,8 @@ def generate_help():
     fragments = (
         (r'''Id="jquery.js"''', '''Id="skawixjquery.js"'''),
         (r'''Id="index.html"''', '''Id="skawixindex.html"'''),
-		(r'''Id="calendar_checked.png"''', '''Id="skawixcalendar_checked.png"'''),
-		(r'''Id="live_checked.png"''', '''Id="skawixlive_checked.png"'''),
+        (r'''Id="calendar_checked.png"''', '''Id="skawixcalendar_checked.png"'''),
+        (r'''Id="live_checked.png"''', '''Id="skawixlive_checked.png"'''),
         )
 
     text = open(clientHelpFile, 'r').read()

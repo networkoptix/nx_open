@@ -116,7 +116,7 @@
     "common": {
         "systemOffline": "Sistema está desconectado",
         "cameraLinks": {
-            "copyToClipboard": "copiar al portapapeles",
+            "copyToClipboard": "copiar a portapapeles",
             "highStream": "Corriente de alta",
             "copyDefaultText": "copiar",
             "unknown": "Uesconocido",

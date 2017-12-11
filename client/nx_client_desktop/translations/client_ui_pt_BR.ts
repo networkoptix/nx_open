@@ -57,7 +57,7 @@
     <message>
       <location/>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gama</translation>
     </message>
     <message>
       <location/>
@@ -143,7 +143,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Instantâneo</translation>
+      <translation>Instante</translation>
     </message>
   </context>
   <context>
@@ -184,17 +184,17 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>A visualizar arquivos</translation>
+      <translation>A ver arquivos</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>A exportar vídeo</translation>
+      <translation>A Exportar vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>A visualizar em directo</translation>
+      <translation>A ver Live</translation>
     </message>
     <message>
       <location/>
@@ -287,7 +287,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Começar</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>&amp;Descrição</translation>
+      <translation>Descrição</translation>
     </message>
     <message>
       <location/>
@@ -470,7 +470,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Nas</translation>
     </message>
   </context>
   <context>
@@ -665,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurar Padrões</translation>
+      <translation>Restaurar Predefinições</translation>
     </message>
     <message>
       <location/>
@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Definições da Câmara</translation>
     </message>
     <message>
       <location/>
@@ -792,7 +792,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições de Agenda</translation>
+      <translation>Definições da Agenda</translation>
     </message>
     <message>
       <location/>
@@ -1008,7 +1008,7 @@
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos os Servidores estão Offline. Os Logs não estão disponíveis.</translation>
+      <translation>Todos os servidores estão offline. Os Log's não estão disponíveis.</translation>
     </message>
     <message>
       <location/>
@@ -1052,6 +1052,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation type="unfinished">HTTP URL</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1448,7 +1458,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL Servidor</translation>
     </message>
     <message>
       <location/>
@@ -1476,12 +1486,12 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter Utilizador através do LDAP...</translation>
+      <translation>Obter utilizador a partir do LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>A carregar...</translation>
     </message>
     <message>
       <location/>
@@ -1598,7 +1608,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Activar Licença Gratuita</translation>
+      <translation>Activar licença gratuita</translation>
     </message>
     <message>
       <location/>
@@ -1677,7 +1687,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
     <message>
       <location/>
@@ -1692,7 +1702,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
     <message>
       <location/>
@@ -1705,7 +1715,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Aspecto e Ambiente</translation>
+      <translation>Aspecto e Comportamento</translation>
     </message>
     <message>
       <location/>
@@ -1791,12 +1801,12 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <translation>Activar Áudio</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Em gravação</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <location/>
@@ -1939,7 +1949,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Assignar a Video Wall...</translation>
+      <translation>Associar a Video Wall...</translation>
     </message>
     <message>
       <location/>
@@ -2209,7 +2219,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter utilizador a partir do LDAP...</translation>
+      <translation>Obter Utilizador através do LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2290,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Velocidade</translation>
     </message>
     <message>
       <location/>
@@ -2412,7 +2422,7 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation>Pesquisar</translation>
+      <translation>Pesquisa</translation>
     </message>
   </context>
   <context>
@@ -2486,7 +2496,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Porto</translation>
     </message>
   </context>
   <context>
@@ -2578,7 +2588,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>Em gravação</translation>
     </message>
     <message>
       <location/>
@@ -2598,7 +2608,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Activar Áudio</translation>
+      <translation>Habilitar áudio</translation>
     </message>
     <message>
       <location/>
@@ -2943,7 +2953,7 @@
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Aviso! Esta opção irá tornar irrelevantes as definições na agenda de gravação em relação à "Qualidade e Frame Rate (FPS)".</translation>
+      <translation>Aviso! Esta opção irá tornar irrelevante as definições de Qualidade e Frame Rate (FPS) na Agenda de Gravação.</translation>
     </message>
   </context>
   <context>
@@ -3002,7 +3012,7 @@
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Formato</translation>
     </message>
     <message>
       <location/>
@@ -3087,7 +3097,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições da Agenda</translation>
+      <translation>Definições de Agenda</translation>
     </message>
     <message>
       <location/>

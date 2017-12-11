@@ -990,15 +990,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Settings are not available for .EXE files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Local files, server monitor widgets and webpages will not be exported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3182,16 +3182,16 @@ to %1</source>
         <source>Some of selected cameras requires password to be set up.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source> Ask your system administrator to do it.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Set Password</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Ask your system administrator to do it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3439,6 +3439,10 @@ to %1</source>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
         <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6115,7 +6119,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set For This Camera</source>
+        <source>Set for this camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8537,7 +8541,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to change passwords on %1 of %2 cameras</source>
+        <source>Failed to change password on %1 of %2 cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

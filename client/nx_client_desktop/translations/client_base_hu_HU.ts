@@ -51,7 +51,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Könyvjelző exportlása</translation>
     </message>
   </context>
   <context>
@@ -855,15 +855,15 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>Analitika indítása...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Néhány kamera beállításához jelszó szükséges</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Video exportálása...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -871,15 +871,15 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Felbontás...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>Cella képarány...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>Cellatávolság...</translation>
     </message>
   </context>
   <context>
@@ -991,16 +991,16 @@ több könyvjelző megjelenítéséhez</translation>
       <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
-    </message>
-    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation type="unfinished">Settings are not available for .EXE files.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -1011,23 +1011,23 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 média-fájl</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>%1 futtatható media-fájl (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>%1 futtatható media-fájl (x86)</translation>
     </message>
   </context>
   <context>
@@ -1163,11 +1163,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Hosszú</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>A jelszó csak latin betűkből, számokból és szimbólumokból %1 állhat.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -2342,7 +2342,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2626,7 +2626,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -3183,16 +3183,16 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
     </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation type="unfinished"> Ask your system administrator to do it.</translation>
-    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
         <numerusform>Set Password</numerusform>
         <numerusform>Set Password</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -3441,6 +3441,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -6117,8 +6121,8 @@ to %1</source>
       <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation type="unfinished">Set For This Camera</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
@@ -6530,7 +6534,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Rögzített videók távoli szinkronizálása</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -7787,7 +7791,7 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Gyors áttekintés</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -7803,7 +7807,7 @@ to %1</source>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Időbélyeg</translation>
     </message>
     <message>
       <source>Add Image</source>
@@ -7815,7 +7819,7 @@ to %1</source>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Kép</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -7850,7 +7854,7 @@ to %1</source>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Mappa</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7911,7 +7915,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Egyéni</translation>
     </message>
   </context>
   <context>
@@ -7961,16 +7965,16 @@ to %1</source>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Sikertelen exportálás</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Nem lehet írni a fájlt</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>A %1 más export által használva.</translation>
     </message>
   </context>
   <context>
@@ -8180,14 +8184,14 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>Nincsenek támogatott eseménytípusok</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>Ez az esemény akkor aktiválódik, ha az Analitikai Esemény minden feltételnek megfelel. Ha a kulcsszó mező üres, minden esetben megfelel. Ha nem, akkor felel meg ha a vonatkozó mező tartalmazza valamelyik kulcsszót.</translation>
     </message>
   </context>
   <context>
@@ -8536,11 +8540,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>A jelszó módosítása sikertelen</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>
