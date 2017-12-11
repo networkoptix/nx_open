@@ -630,7 +630,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
     const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
     return camerasCount > 1
-        ? tr("Set For All %n Cameras", nullptr, camerasCount)
+        ? tr("Set for all %n Cameras", nullptr, camerasCount)
         : QString();
 }
 

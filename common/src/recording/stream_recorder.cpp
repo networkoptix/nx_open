@@ -113,7 +113,7 @@ QString QnStreamRecorder::errorString(StreamRecorderError errCode)
         case StreamRecorderError::invalidResourceType:
             return tr("Invalid resource type for data export.");
         case StreamRecorderError::dataNotFound:
-            return tr("No data was exported.");
+            return tr("No data exported.");
         default:
             return QString();
     }
