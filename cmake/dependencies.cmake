@@ -78,7 +78,6 @@ function(nx_detect_package_versions)
         openssl
         ffmpeg
         quazip
-        onvif
         sigar
         openldap
         sasl2
