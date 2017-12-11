@@ -31,6 +31,11 @@ void AnalyticsSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camer
     d->setCamera(camera);
 }
 
+void AnalyticsSearchListModel::setFilterRect(const QRectF& relativeRect)
+{
+    d->setFilterRect(relativeRect);
+}
+
 void AnalyticsSearchListModel::clear()
 {
     d->clear();

@@ -38,6 +38,8 @@ public:
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);
 
+    void setAnalyticsSearchRect(const QRectF& relativeRect);
+
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 

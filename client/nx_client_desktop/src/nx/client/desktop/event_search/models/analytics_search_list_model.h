@@ -22,6 +22,8 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    void setFilterRect(const QRectF& relativeRect);
+
     void clear();
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

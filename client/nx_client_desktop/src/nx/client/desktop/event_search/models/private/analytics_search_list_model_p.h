@@ -36,6 +36,8 @@ public:
     int count() const;
     const analytics::storage::DetectedObject& object(int index) const;
 
+    void setFilterRect(const QRectF& relativeRect);
+
     void clear();
 
     bool canFetchMore() const;
@@ -61,6 +63,7 @@ private:
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
+    QRectF m_filterRect;
     QScopedPointer<QTimer> m_updateTimer;
     QPointer<QTimer> m_dataChangedTimer;
     media::AbstractMetadataConsumerPtr m_metadataSource;

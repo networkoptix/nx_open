@@ -130,6 +130,15 @@ const analytics::storage::DetectedObject& AnalyticsSearchListModel::Private::obj
     return m_data[index];
 }
 
+void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect)
+{
+    if (m_filterRect == relativeRect)
+        return;
+
+    clear();
+    m_filterRect = relativeRect;
+}
+
 void AnalyticsSearchListModel::Private::clear()
 {
     ScopedReset reset(q, !m_data.empty());
@@ -273,6 +282,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
     request.timePeriod = QnTimePeriod::fromInterval(0, m_earliestTimeMs - 1);
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;
+    request.boundingBox = m_filterRect;
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)]
@@ -325,6 +335,9 @@ void AnalyticsSearchListModel::Private::processMetadata(
 
         if (index < 0)
         {
+            if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                continue;
+
             analytics::storage::DetectedObject newObject;
             newObject.objectId = item.objectId;
             newObject.objectTypeId = item.objectTypeId;
@@ -423,7 +436,7 @@ QString AnalyticsSearchListModel::Private::description(
         rows += kRowTemplate.arg(attribute.name, attribute.value);
 
     const auto color = QPalette().color(QPalette::WindowText);
-    result += kCss.arg(color.name()) + kTableTemplate.arg(rows);
+    result += lit("<br>") + kCss.arg(color.name()) + kTableTemplate.arg(rows);
 
     return result;
 }

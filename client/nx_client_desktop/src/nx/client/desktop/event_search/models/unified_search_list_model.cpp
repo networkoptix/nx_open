@@ -55,6 +55,11 @@ void UnifiedSearchListModel::fetchMore(const QModelIndex& /*parent*/)
     d->fetchMore();
 }
 
+void UnifiedSearchListModel::setAnalyticsSearchRect(const QRectF& relativeRect)
+{
+    d->setAnalyticsSearchRect(relativeRect);
+}
+
 } // namespace
 } // namespace client
 } // namespace nx
