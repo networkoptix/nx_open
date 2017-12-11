@@ -142,7 +142,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         {
             // TODO: #vkutin Optimize.
             removeTiles(sourceFirst, sourceLast - sourceFirst + 1);
-    });
+        });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
         [this](const QModelIndex& /*parent*/, int sourceFirst, int sourceLast,
