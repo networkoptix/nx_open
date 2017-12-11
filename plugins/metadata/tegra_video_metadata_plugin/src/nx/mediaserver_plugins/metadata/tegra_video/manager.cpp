@@ -134,8 +134,7 @@ Error Manager::putData(AbstractDataPacket* dataPacket)
 
 Error Manager::stopFetchingMetadata()
 {
-    NX_OUTPUT << __func__ << "() BEGIN";
-
+    NX_OUTPUT << __func__ << "() -> noError";
     return Error::noError;
 }
 

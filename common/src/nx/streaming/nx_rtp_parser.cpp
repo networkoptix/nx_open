@@ -1,32 +1,73 @@
 #include "nx_rtp_parser.h"
 
+#include <nx/utils/log/log.h>
+
+#include <analytics/common/object_detection_metadata.h>
+
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/config.h>
+#include <nx/streaming/ini.h>
 
 #include <motion/motion_detection.h>
 
-QnNxRtpParser::QnNxRtpParser()
-:
+QnNxRtpParser::QnNxRtpParser(const QString& debugSourceId):
+    m_debugSourceId(debugSourceId),
     QnRtpVideoStreamParser(),
     m_nextDataPacketBuffer(nullptr),
     m_position(AV_NOPTS_VALUE),
     m_isAudioEnabled(true)
 {
-
+    if (nxStreamingIni().analyticsMetadataLogFilePrefix[0])
+    {
+        m_analyticsMetadataLogFile.setFileName(
+            QLatin1String(nxStreamingIni().analyticsMetadataLogFilePrefix)
+                + m_debugSourceId + lit(".log"));
+        if (!m_analyticsMetadataLogFile.open(QIODevice::WriteOnly))
+        {
+            NX_ERROR(this) << lm("Unable to create analytics metadata log file \"%1\".")
+                .arg(m_analyticsMetadataLogFile.fileName());
+        }
+        else
+        {
+            NX_WARNING(this) << lm("Created analytics metadata log file \"%1\".")
+                .arg(m_analyticsMetadataLogFile.fileName());
+            m_isAnalyticsMetadataLogFileOpened = true;
+        }
+    }
 }
 
 QnNxRtpParser::~QnNxRtpParser()
 {
-
+    if (m_isAnalyticsMetadataLogFileOpened)
+        m_analyticsMetadataLogFile.close();
 }
 
 void QnNxRtpParser::setSDPInfo(QList<QByteArray>)
 {
 
+}
+
+void QnNxRtpParser::writeDetectionMetadataToLogFile(const QnAbstractMediaDataPtr& metadata)
+{
+    nx::common::metadata::DetectionMetadataPacketPtr data =
+        nx::common::metadata::fromMetadataPacket(
+            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+    if (!data)
+    {
+        NX_ERROR(this) << "Unable to deserialize detection metadata.";
+        return;
+    }
+
+    const QString metadataStr = toString(*data);
+    const qint64 dPtsUs = m_nextDataPacket->timestamp - m_lastFramePtsUs;
+    m_analyticsMetadataLogFile.write(
+        lm("dPts %1%2 ms\n").args(dPtsUs >= 0 ? "+" : "", (500 + dPtsUs) / 1000).toUtf8());
+    m_analyticsMetadataLogFile.write(metadataStr.toUtf8());
+    m_analyticsMetadataLogFile.flush();
 }
 
 bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const QnRtspStatistic&, bool& gotData)
@@ -61,7 +102,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             if (dataSize < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
                 return false;
 
-            QnAbstractMediaData::DataType dataType = (QnAbstractMediaData::DataType) *payload++;
+            const QnAbstractMediaData::DataType dataType =
+                (QnAbstractMediaData::DataType) *(payload++);
             quint32 timestampHigh = ntohl(*(quint32*) payload);
             dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
             payload  += 4; // deserialize timeStamp high part
@@ -165,6 +207,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (context)
                     m_nextDataPacket->compressionType = context->getCodecId();
                 m_nextDataPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
+
+                // TODO: Investigate whether this code is needed.
                 //m_nextDataPacket->channelNumber = channelNum;
                 /*
                 if (mediaPacket->timestamp < 0x40000000 && m_prevTimestamp[ssrc] > 0xc0000000)
@@ -174,9 +218,19 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             }
         }
 
-        if (m_nextDataPacket) {
-            NX_ASSERT( m_nextDataPacketBuffer );
-            m_nextDataPacketBuffer->write((const char*)payload, dataSize);
+        if (m_nextDataPacket)
+        {
+            NX_ASSERT(m_nextDataPacketBuffer);
+            m_nextDataPacketBuffer->write((const char*) payload, dataSize);
+
+            if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
+                m_lastFramePtsUs = m_nextDataPacket->timestamp;
+
+            if (nxStreamingIni().analyticsMetadataLogFilePrefix[0]
+                && m_nextDataPacket->dataType == QnAbstractMediaData::GENERIC_METADATA)
+            {
+                writeDetectionMetadataToLogFile(m_nextDataPacket);
+            }
         }
 
         if (rtpHeader->marker)

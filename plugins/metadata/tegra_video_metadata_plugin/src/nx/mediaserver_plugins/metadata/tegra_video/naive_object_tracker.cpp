@@ -84,14 +84,14 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const TegraVideo::Rect& boundin
         auto& rect = itr->second.rect;
         auto speed = itr->second.speed;
         double currentDistance = std::numeric_limits<double>::max();
-        if (ini().postProcApplySpeedForDistanceCalculation)
+        if (ini().postprocApplySpeedForDistanceCalculation)
         {
             QVector2D speed = itr->second.speed;
             if (speed.isNull())
             {
                 speed = QVector2D(
                     predictXSpeedForRectangle(itr->second.rect),
-                    (double)ini().postProcDefaultYSpeed / 1000);
+                    (double) ini().postprocDefaultYSpeed / 1000);
             }
 
             currentDistance = distance(
@@ -109,7 +109,7 @@ NaiveObjectTracker::findAndMarkSameObjectInCache(const TegraVideo::Rect& boundin
         }
     }
 
-    auto minimalSimilarityDistance = (double)ini().postProcSimilarityThreshold / 1000;
+    auto minimalSimilarityDistance = (double)ini().postprocSimilarityThreshold / 1000;
     bool sameObjectWasFound = closestRect != m_cachedObjects.end()
         && minDistance < minimalSimilarityDistance;
 
@@ -127,7 +127,7 @@ void NaiveObjectTracker::addObjectToCache(const QnUuid& id, const TegraVideo::Re
     CachedObject object;
     object.id = id;
     object.rect = boundingBox;
-    object.lifetime = ini().postProcObjectLifetime;
+    object.lifetime = ini().postprocObjectLifetime;
     object.found = true;
 
     assignRandomAttributes(&object);
@@ -145,15 +145,15 @@ void NaiveObjectTracker::updateObjectInCache(const QnUuid& id, const TegraVideo:
     cached.rect = boundingBox;
     cached.speed = calculateSpeed(cached.rect, boundingBox);
 
-    const auto borderThreshold = (double)ini().postProcBottomBorderBound / 100;
+    const auto borderThreshold = (double)ini().postprocBottomBorderBound / 100;
     const bool isNearBorder = bottomRightX(cached.rect) > borderThreshold
         || bottomRightY(cached.rect) > borderThreshold
         || cached.rect.x < 1 - borderThreshold;
 
     if (isNearBorder)
-        cached.lifetime = ini().postProcBottomBorderLifetime;
+        cached.lifetime = ini().postprocBottomBorderLifetime;
     else
-        cached.lifetime = ini().postProcObjectLifetime;
+        cached.lifetime = ini().postprocObjectLifetime;
 }
 
 void NaiveObjectTracker::removeExpiredObjectsFromCache()
@@ -181,14 +181,14 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         auto object = new nx::sdk::metadata::CommonDetectedObject();
         auto& cached = item.second;
 
-        bool needToApplySpeed = ini().postProcApplySpeedToCachedRectangles
+        bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles
             && (cached.speed.x() < cached.speed.y() || cached.speed.isNull());
 
         if (needToApplySpeed)
         {
             const auto speed = QVector2D(
                 predictXSpeedForRectangle(cached.rect),
-                (double)ini().postProcDefaultYSpeed / 1000);
+                (double)ini().postprocDefaultYSpeed / 1000);
 
             cached.rect = applySpeedToRectangle(cached.rect, speed);
 
@@ -278,7 +278,7 @@ double NaiveObjectTracker::distance(const TegraVideo::Rect& first, const TegraVi
         QVector2D(0.0, 1.0),
         centerVector);
 
-    if (dotProduct < 0 && rectCenterDistance > ini().postProcMaxBackVectorLength)
+    if (dotProduct < 0 && rectCenterDistance > ini().postprocMaxBackVectorLength)
         return std::numeric_limits<double>::max();
 
     return rectCenterDistance - dotProduct;
@@ -302,17 +302,17 @@ TegraVideo::Rect NaiveObjectTracker::correctRectangle(const TegraVideo::Rect& re
     auto x = center.x();
     auto y = center.y();
 
-    double xFirstZoneCorrection = (double)ini().postProcXfirstZoneCorrection / 1000;
-    double yFirstZoneCorrection = (double)ini().postProcYfirstZoneCorrection / 1000;
+    double xFirstZoneCorrection = (double)ini().postprocXfirstZoneCorrection / 1000;
+    double yFirstZoneCorrection = (double)ini().postprocYfirstZoneCorrection / 1000;
 
-    double xSecondZoneCorrection = (double)ini().postProcXsecondZoneCorrection / 1000;
-    double ySecondZoneCorrection = (double)ini().postProcYsecondZoneCorrection / 1000;
+    double xSecondZoneCorrection = (double)ini().postprocXsecondZoneCorrection / 1000;
+    double ySecondZoneCorrection = (double)ini().postprocYsecondZoneCorrection / 1000;
 
-    double xThirdZoneCorrection = (double)ini().postProcXthirdZoneCorrection / 1000;
-    double yThirdZoneCorrection = (double)ini().postProcYthirdZoneCorrection / 1000;
+    double xThirdZoneCorrection = (double)ini().postprocXthirdZoneCorrection / 1000;
+    double yThirdZoneCorrection = (double)ini().postprocYthirdZoneCorrection / 1000;
 
-    double firstZoneBound = (double)ini().postProcFirstZoneBound / 100;
-    double secondZoneBound = (double)ini().postProcSecondZoneBound / 100;
+    double firstZoneBound = (double)ini().postprocFirstZoneBound / 100;
+    double secondZoneBound = (double)ini().postprocSecondZoneBound / 100;
 
     if (x < firstZoneBound)
     {
@@ -339,12 +339,12 @@ double NaiveObjectTracker::predictXSpeedForRectangle(const TegraVideo::Rect& rec
 {
     auto x = rectangleCenter(rect).x();
 
-    if (x < (double)ini().postProcFirstZoneBound / 100)
-        return (double)ini().postProcXfirstZoneCorrection / 1000;
-    else if (x > (double) ini().postProcSecondZoneBound / 100)
-        return (double)ini().postProcXthirdZoneCorrection / 1000;
+    if (x < (double)ini().postprocFirstZoneBound / 100)
+        return (double)ini().postprocXfirstZoneCorrection / 1000;
+    else if (x > (double) ini().postprocSecondZoneBound / 100)
+        return (double)ini().postprocXthirdZoneCorrection / 1000;
     else
-        return (double)ini().postProcXsecondZoneCorrection / 1000;
+        return (double)ini().postprocXsecondZoneCorrection / 1000;
 }
 
 void NaiveObjectTracker::assignRandomAttributes(CachedObject* outCachedObject)
@@ -382,18 +382,24 @@ QString NaiveObjectTracker::randomAttributeValue(const QString& attributeName) c
 
 bool NaiveObjectTracker::isTooBig(const TegraVideo::Rect& rectangle)
 {
-    return (ini().postProcMaxObjectWidth != 0
-            && rectangle.width > (float) ini().postProcMaxObjectWidth / 100)
-        || (ini().postProcMaxObjectHeight != 0
-            && rectangle.height > (float) ini().postProcMaxObjectHeight / 100);
+    return
+        (ini().postprocMaxObjectWidth != 0
+            && rectangle.width > (float) ini().postprocMaxObjectWidth / 100
+        ) ||
+        (ini().postprocMaxObjectHeight != 0
+            && rectangle.height > (float) ini().postprocMaxObjectHeight / 100
+        );
 }
 
 bool NaiveObjectTracker::isTooSmall(const TegraVideo::Rect& rectangle)
 {
-    return (ini().postProcMinObjectWidth != 0
-            && rectangle.width < (float) ini().postProcMinObjectWidth / 100)
-        || (ini().postProcMinObjectHeight != 0
-            && rectangle.height < (float) ini().postProcMinObjectHeight / 100);
+    return
+        (ini().postprocMinObjectWidth != 0
+            && rectangle.width < (float) ini().postprocMinObjectWidth / 100
+        ) ||
+        (ini().postprocMinObjectHeight != 0
+            && rectangle.height < (float) ini().postprocMinObjectHeight / 100
+        );
 }
 
 float NaiveObjectTracker::bottomRightX(const TegraVideo::Rect& rectangle)

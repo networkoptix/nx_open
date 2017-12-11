@@ -749,7 +749,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     QMap<int, QnNxRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
     {
-        auto parser = new QnNxRtpParser();
+        auto parser = new QnNxRtpParser(
+            lm("%1-%2").args(m_camera->getUserDefinedName(), channelNum));
         // TODO: Use nx_http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
@@ -783,7 +784,7 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     bool needSendRequest = !m_opened || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
     if (!needSendRequest)
         return;
-    
+
     bool fromLive = newReverseMode && m_position == DATETIME_NOW;
     m_blockReopening = false;
 
