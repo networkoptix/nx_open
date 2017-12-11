@@ -59,7 +59,7 @@ QString toString(const DetectionMetadataPacket& packet)
     QString s = lit("PTS ") + QString::number(packet.timestampUsec)
         + lit(", durationUs ") + QString::number(packet.durationUsec)
         + lit(", deviceId ") + packet.deviceId.toString()
-        + lit(", objects: ") + QString::number(packet.objects.size()) + "\n";
+        + lit(", objects: ") + QString::number(packet.objects.size()) + lit("\n");
 
     for (const auto& object: packet.objects)
     {
