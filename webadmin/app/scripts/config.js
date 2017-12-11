@@ -38,6 +38,7 @@ var Config = {
     dateInternalFormat:'yyyy-MM-ddThh:mm:ss',
 
     visualLog: false,
+    allowCastMode: false, //Allows usage of chromecast for webm only
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events

@@ -28,5 +28,6 @@
     "auto": "Auto",
     "high": "High",
     "low": "Low"
-  }
+  },
+  "chromeCastWarning": "Chromecast feature is resource intensive and may cause issues on your server."
 }

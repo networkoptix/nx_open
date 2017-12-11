@@ -2,9 +2,9 @@
 
 angular.module('nxCommon').controller('ViewCtrl',
             ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast',
-              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'dialogs',
+              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast,
-              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, dialogs) {
+              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
         var channels = {
             Auto: 'lo',
@@ -34,9 +34,13 @@ angular.module('nxCommon').controller('ViewCtrl',
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
 
-        if($scope.castMode){
-            dialogs.alert("Warning!!! This feature is resource intensive and may cause issues on your server.", "Chrome Cast: Beta Version!!!");
-        }
+        var castAlert = false;
+        $scope.showWarning = function(){
+            if(!castAlert){
+                alert(L.common.chromeCastWarning);
+                castAlert = true;
+            }
+        };
 
         $scope.positionProvider = null;
         $scope.activeVideoRecords = null;

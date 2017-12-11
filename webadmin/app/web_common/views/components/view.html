@@ -36,8 +36,8 @@
                                     <div class="webclient-panel webclient-bottom-border">
                                         <div class="pull-right" >
                                             <div class="video-title-buffer">&nbsp;</div>
-                                            <span ng-if="debugMode || (castMode && showCastButton)" class="video-icon">
-                                                <button class="cast-button" is="google-cast-button" id="castbutton"></button>
+                                            <span ng-if="debugMode || showCastButton" class="video-icon">
+                                                <button class="cast-button" is="google-cast-button" id="castbutton" ng-click="showWarning()"></button>
                                             </span>
                                             <div class="btn-group video-settings-icon">
                                                 <span class="video-icon" data-toggle="dropdown" href="#">
