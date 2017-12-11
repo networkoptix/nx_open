@@ -26,6 +26,10 @@ public:
 
     void setObjectTypeId(const QnUuid& objectTypeId);
 
+    void setAttributeOptions(
+        const QString& attributeName,
+        const std::vector<QString>& attributeValues);
+
 private:
     struct CachedObject
     {
@@ -34,10 +38,12 @@ private:
         int lifetime = 1;
         QVector2D speed; //< relative units per frame
         bool found = false;
+        std::map<QString, QString> attributes;
     };
 
 private:
-    boost::optional<CachedObject> findAndMarkSameObjectInCache(const TegraVideo::Rect& boundingBox);
+    boost::optional<CachedObject> findAndMarkSameObjectInCache(
+        const TegraVideo::Rect& boundingBox);
 
     void unmarkFoundObjectsInCache();
 
@@ -66,6 +72,10 @@ private:
 
     double predictXSpeedForRectangle(const TegraVideo::Rect& rect);
 
+    void assignRandomAttributes(CachedObject* outCachedObject);
+
+    QString randomAttributeValue(const QString& attributeName) const;
+
     static bool isTooBig(const TegraVideo::Rect& rectangle);
     static bool isTooSmall(const TegraVideo::Rect& rectangle);
     static float bottomRightX(const TegraVideo::Rect& rectangle);
@@ -76,6 +86,7 @@ private:
 private:
     std::map<QnUuid, CachedObject> m_cachedObjects;
     QnUuid m_objectTypeId;
+    std::map<QString, std::vector<QString>> m_attributeOptions;
 };
 
 } // namespace tegra_video

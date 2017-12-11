@@ -1,11 +1,8 @@
 # Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 
-set(library_type)
-if(WIN32)
-    set(library_type SHARED)
-endif()
+set(nxKitLibraryType "" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
-add_library(nx_kit ${library_type}
+add_library(nx_kit ${nxKitLibraryType}
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/debug.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/ini_config.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/test.cpp

@@ -41,6 +41,7 @@ class RecordingStatusHelper;
 class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
 class AreaHighlightOverlayWidget;
+class AreaSelectOverlayWidget;
 
 namespace ui {
 namespace graphics {
@@ -171,6 +172,8 @@ public:
     bool isAnalyticsEnabled() const;
     void setAnalyticsEnabled(bool analyticsEnabled);
 
+    void setAnalyticsSearchModeEnabled(bool enabled);
+
     nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
 
 signals:
@@ -182,7 +185,9 @@ signals:
     void positionChanged(qint64 positionUtcMs);
     void motionSearchModeEnabled(bool enabled);
     void zoomWindowCreationModeEnabled(bool enabled);
+    void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
+    void analyticsSearchAreaSelected(const QRectF& relativeRect);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -332,6 +337,7 @@ private:
     void initDisplay();
     void initSoftwareTriggers();
     void initIoModuleOverlay();
+    void initAreaSelectOverlay();
     void initAreaHighlightOverlay();
     void initStatusOverlayController();
 
@@ -410,6 +416,7 @@ private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
+    nx::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 

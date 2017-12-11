@@ -50,11 +50,14 @@ enum class AttributeType
     // Other more specific types as DateTime, Coordinates, Temperature ???
 };
 
-struct Attribute
+class Attribute //< TODO: #dmishin rename to AbstractAttribute
 {
-    AttributeType type = AttributeType::undefined;
-    char* name = nullptr;
-    char* value = nullptr;
+public:
+    virtual ~Attribute() {};
+
+    virtual const nx::sdk::AttributeType type() const = 0;
+    virtual const char* name() const = 0;
+    virtual const char* value()const = 0;
 };
 
 enum class Error

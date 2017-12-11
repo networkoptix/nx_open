@@ -519,6 +519,11 @@ bool QnAbstractCompressedMetadata::containTime(const qint64 timeUsec) const
     return false;
 }
 
+qint64 QnAbstractCompressedMetadata::duration() const
+{
+    return m_duration;
+}
+
 //------------------------------------ QnCompressedMetadata --------------------------------------
 
 QnCompressedMetadata::QnCompressedMetadata(MetadataType type):

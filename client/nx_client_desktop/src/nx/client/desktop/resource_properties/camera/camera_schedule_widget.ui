@@ -944,7 +944,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Copy Schedule...</string>
+               <string>Copy Schedule to...</string>
               </property>
              </widget>
             </item>

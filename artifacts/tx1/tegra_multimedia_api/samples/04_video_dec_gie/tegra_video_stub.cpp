@@ -5,6 +5,8 @@
  * */
 
 #include <string>
+#include <vector>
+#include <algorithm>
 
 #define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
 #include <nx/kit/debug.h>
@@ -13,12 +15,20 @@
 
 namespace {
 
+struct PointF
+{
+    float x = 0;
+    float y = 0;
+};
+
 class Stub: public TegraVideo
 {
 public:
     Stub()
     {
         NX_OUTPUT << __func__ << "()";
+
+        initializeRectangles();
     }
 
     virtual ~Stub() override
@@ -68,28 +78,11 @@ public:
     virtual bool pullRectsForFrame(
         Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override
     {
-        NX_OUTPUT << __func__ << "() -> false";
+        NX_OUTPUT << __func__ << "() -> true";
 
         *outPtsUs = m_ptsUs;
-
-        // Produce 2 stub rects.
-        if (maxRectsCount < 2)
-        {
-            NX_PRINT << __func__ << "(): ERROR: "
-                << "maxRectsCount expected >= 2, actual " << maxRectsCount;
-            return false;
-        }
-        *outRectsCount = 2;
-
-        outRects[0].x = 0.1f;
-        outRects[0].y = 0.2f;
-        outRects[0].width = 0.7f;
-        outRects[0].height = 0.5f;
-
-        outRects[1].x = 0.2f;
-        outRects[1].y = 0.1f;
-        outRects[1].width = 0.4f;
-        outRects[1].height = 0.8f;
+        makeRectangles(outRects, maxRectsCount, outRectsCount);
+        m_hasMetadata = false;
 
         return true;
     }
@@ -97,6 +90,55 @@ public:
     virtual bool hasMetadata() const override
     {
         return m_hasMetadata;
+    }
+
+private:
+    void initializeRectangles()
+    {
+        const auto numberOfRectangles = ini().stubNumberOfRectangles;
+        m_currentRectangleCenters.resize(numberOfRectangles);
+
+        for (auto i = 0; i < numberOfRectangles; ++i)
+        {
+            PointF center;
+            center.x = (i + 0.5f) * 1.0f / numberOfRectangles;
+            center.y = 0;
+            m_currentRectangleCenters[i] = center;
+        }
+    }
+
+    void makeRectangles(Rect outRects[], int maxRectsCount, int* outRectsCount)
+    {
+        *outRectsCount = 0;
+        const auto width = (float)ini().stubRectangleWidth / 100;
+        const auto height = (float)ini().stubRectangleWidth / 100;
+        const auto rectangleCount = std::min(ini().stubNumberOfRectangles, maxRectsCount);
+
+        for (int i = 0; i < rectangleCount; ++i)
+        {
+            auto& center = m_currentRectangleCenters[i];
+            center.y += 0.02;
+            if (center.y > 1)
+                center.y = 0;
+
+            outRects[i] = makeRectangleFromCenter(center);
+            ++(*outRectsCount);
+        }
+    }
+
+    Rect makeRectangleFromCenter(const PointF& center)
+    {
+        const auto width = (float)ini().stubRectangleWidth / 100;
+        const auto height = (float)ini().stubRectangleWidth / 100;
+
+        Rect rectangle;
+        rectangle.x = std::max(0.0f, std::min(1.0f, center.x - width / 2));
+        rectangle.y = std::max(0.0f, std::min(1.0f, center.y - height / 2));
+
+        rectangle.width = std::min(1.0f - rectangle.x, width);
+        rectangle.height = std::min(1.0f - rectangle.y, height);
+
+        return rectangle;
     }
 
 private:
@@ -109,6 +151,8 @@ private:
     int m_netHeight = 0;
 
     bool m_hasMetadata = false;
+
+    std::vector<PointF> m_currentRectangleCenters;
 };
 
 } // namespace

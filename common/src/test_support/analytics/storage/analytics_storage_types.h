@@ -7,9 +7,22 @@ namespace analytics {
 namespace storage {
 namespace test {
 
-Filter generateRandomFilter();
+class AttributeDictionary
+{
+public:
+    void initialize(int attributeCount, int valuesPerAttribute);
+    common::metadata::Attribute getRandomAttribute() const;
+    QString getRandomText() const;
 
-common::metadata::DetectionMetadataPacketPtr generateRandomPacket(int eventCount);
+private:
+    std::vector<QString> m_words;
+};
+
+Filter generateRandomFilter(const AttributeDictionary* attributeDictionary = nullptr);
+
+common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
+    int eventCount,
+    const AttributeDictionary* attributeDictionary = nullptr);
 
 } // namespace test
 } // namespace storage

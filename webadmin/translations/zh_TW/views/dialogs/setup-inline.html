@@ -60,7 +60,7 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                必須有系統名稱
+                系統名稱為必填欄位
             </div>
         </div>
 
@@ -271,7 +271,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                兩次密碼輸入不一致
+                密碼不匹配
             </div>
         </div>
     </form>
@@ -496,5 +496,5 @@
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">結束</button>
+ ng-click="finish()">完成</button>
 </div>

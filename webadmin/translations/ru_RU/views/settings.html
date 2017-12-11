@@ -48,14 +48,12 @@
                     </div>
                     <div>
                         <h3>Перезапуск</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Перезапустить сервер</button>
-                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Перезагрузить</button></p>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Перезапустить сервер</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Перезагрузить</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>Изменить пароль администратора</h3>
-                            <p>Если система локальная  (не подключена к облаку), это изменит пароль для пользователя "admin" и пароль восстановления (пользователь "root") на некоторых серверах.
-                                <br>В другом случае это изменит только пароль восстановления.</p>
+                            <p>Если система локальная  (не подключена к облаку), это изменит пароль для пользователя "admin" и пароль восстановления (пользователь "root") на некоторых серверах. <br>В другом случае это изменит только пароль восстановления.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>

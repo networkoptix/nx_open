@@ -37,7 +37,7 @@
                     </div>
 
                     <div>
-                        <h3>Server herstellen</h3>
+                        <h3>Reset server</h3>
                         <p>Met deze actie wordt deze server teruggezet naar de standaardinstellingen (de database en de configuratie zullen worden gewist).
                             De server zal worden losgemaakt van het huidige systeem. Het videoarchief zal intact blijven.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrieksinstellingen herstellen</button></p>
@@ -54,7 +54,7 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Wijzig admin wachtwoord</h3>
+                            <h3>Verander het administrator wachtwoord</h3>
                             <p>Als het systeem niet is aangesloten op de cloud, dan zal het wachtwoord voor de  gebruiker "admin" en het herstel (root) wachtwoord gewijzigd worden op de servers.<br> Anders zal alleen het recovery wachtwoord gewijzigd worden.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>

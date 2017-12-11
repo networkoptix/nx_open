@@ -660,7 +660,7 @@ void QnRtspClient::parseSDP()
             isBackChannel = true;
         }
     }
-    if (mapNum >= 0)
+    if (mapNum >= 0) 
     {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);

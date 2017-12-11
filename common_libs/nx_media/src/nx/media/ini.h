@@ -7,7 +7,7 @@ namespace media {
 
 struct Ini: public nx::kit::IniConfig
 {
-    Ini(): IniConfig("nx_media.ini") {}
+    Ini(): IniConfig("nx_media.ini") { reload(); }
 
     NX_INI_STRING("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
     NX_INI_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
@@ -16,6 +16,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(-1, hwVideoY, "If not -1, override hardware video window Y.");
     NX_INI_INT(-1, hwVideoWidth, "If not -1, override hardware video window width.");
     NX_INI_INT(-1, hwVideoHeight, "If not -1, override hardware video window height.");
+    NX_INI_INT(2000, allowedAnalyticsMetadataDelayMs,
+        "Allowed delay to display old analytics metadata before new is received.");
     NX_INI_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
     NX_INI_FLAG(0, unlimitFfmpegMaxResolution, "");
 };

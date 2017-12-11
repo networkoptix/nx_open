@@ -95,7 +95,7 @@ void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
 
-    NX_INFO(this, "Started");
+    NX_VERBOSE(this, "Started");
     beforeRun();
 
     while(!needToStop())
@@ -168,7 +168,7 @@ void QnAbstractArchiveStreamReader::run()
     }
 
     afterRun();
-    NX_INFO(this, "Stopped");
+    NX_VERBOSE(this, "Stopped");
 }
 
 void QnAbstractArchiveStreamReader::setNoDataHandler(

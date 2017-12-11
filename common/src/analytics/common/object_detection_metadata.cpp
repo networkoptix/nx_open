@@ -1,6 +1,6 @@
 #include "object_detection_metadata.h"
 
-#include <tuple>
+#include <nx/kit/debug.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/media_data_packet.h>
@@ -56,8 +56,40 @@ bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& s
 
 QString toString(const DetectionMetadataPacket& packet)
 {
-    return lm("deviceId = %1, timestampUsec = %2, durationUsec = %3")
-        .args(packet.deviceId, packet.timestampUsec, packet.durationUsec);
+    QString s = lit("PTS ") + QString::number(packet.timestampUsec)
+        + lit(", durationUs ") + QString::number(packet.durationUsec)
+        + lit(", deviceId ") + packet.deviceId.toString()
+        + lit(", objects: ") + QString::number(packet.objects.size()) + lit("\n");
+
+    for (const auto& object: packet.objects)
+    {
+        s += lit("    x ") + QString::number(object.boundingBox.x())
+            + lit(", y ") + QString::number(object.boundingBox.y())
+            + lit(", w ") + QString::number(object.boundingBox.width())
+            + lit(", h ") + QString::number(object.boundingBox.height())
+            + lit(", id ") + object.objectId.toString()
+            + lit(", typeId ") + object.objectTypeId.toString()
+            + lit(", labels [");
+
+        bool isLabelFirst = true;
+        for (const auto& label: object.labels)
+        {
+            if (isLabelFirst)
+            {
+                s += lit(", ");
+                isLabelFirst = false;
+            }
+            s += label.name + lit("=\"")
+                + QString::fromStdString(
+                    //< Properly escape the value string.
+                    nx::kit::debug::toString(label.value.toUtf8().constData()))
+                + lit("\"");
+        }
+
+        s += lit("]\n");
+    }
+
+    return s;
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -37,13 +38,15 @@ struct DetectedObject
     QnUuid objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
     std::vector<common::metadata::Attribute> attributes;
+    qint64 firstAppearanceTimeUsec = 0;
+    qint64 lastAppearanceTimeUsec = 0;
     std::vector<ObjectPosition> track;
 
     bool operator==(const DetectedObject& right) const;
 };
 
 #define DetectedObject_analytics_storage_Fields \
-    (objectId)(objectTypeId)(attributes)(track)
+    (objectId)(objectTypeId)(attributes)(firstAppearanceTimeUsec)(lastAppearanceTimeUsec)(track)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
@@ -64,10 +67,14 @@ struct Filter
      * Search is done across all attributes (names and values).
      */
     QString freeText;
+
+    // TODO: #ak Move result options to a separate struct.
+
     /**
      * Zero value is treated as no limit.
      */
     int maxObjectsToSelect = 0;
+    int maxTrackSize = 1;
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
     bool operator==(const Filter& right) const;
@@ -83,6 +90,17 @@ QString toString(const Filter& filter);
 #define Filter_analytics_storage_Fields \
     (deviceId)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
+
+//-------------------------------------------------------------------------------------------------
+
+struct TimePeriodsLookupOptions
+{
+    /**
+     * If distance between two time periods less than this value,
+     * then those periods SHOULD be merged ignoring gap.
+     */
+    std::chrono::milliseconds detailLevel = std::chrono::milliseconds::zero();
+};
 
 //-------------------------------------------------------------------------------------------------
 

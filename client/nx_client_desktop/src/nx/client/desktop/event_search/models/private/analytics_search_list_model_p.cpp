@@ -33,12 +33,6 @@ static constexpr int kFetchBatchSize = 25;
 
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(30);
 
-static qint64 startTimeUs(const DetectedObject& object)
-{
-    NX_ASSERT(!object.track.empty());
-    return object.track.empty() ? 0 : object.track.front().timestampUsec;
-}
-
 static void advanceObject(analytics::storage::DetectedObject& object,
     analytics::storage::ObjectPosition&& position)
 {
@@ -52,19 +46,19 @@ static void advanceObject(analytics::storage::DetectedObject& object,
         }
     }
 
-    object.track.push_back(position);
+    object.lastAppearanceTimeUsec = position.timestampUsec;
 }
 
 static const auto lowerBoundPredicate =
     [](const DetectedObject& left, qint64 right)
     {
-        return startTimeUs(left) > right;
+        return left.firstAppearanceTimeUsec > right;
     };
 
 static const auto upperBoundPredicate =
     [](qint64 left, const DetectedObject& right)
     {
-        return left > startTimeUs(right);
+        return left > right.firstAppearanceTimeUsec;
     };
 
 } // namespace
@@ -136,6 +130,15 @@ const analytics::storage::DetectedObject& AnalyticsSearchListModel::Private::obj
     return m_data[index];
 }
 
+void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect)
+{
+    if (m_filterRect == relativeRect)
+        return;
+
+    clear();
+    m_filterRect = relativeRect;
+}
+
 void AnalyticsSearchListModel::Private::clear()
 {
     ScopedReset reset(q, !m_data.empty());
@@ -168,11 +171,24 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
             m_prefetch = success ? std::move(data) : analytics::storage::LookupResult();
             m_success = success;
 
+            if (m_prefetch.empty())
+            {
+                qDebug() << "Pre-fetched no analytics";
+            }
+            else
+            {
+                qDebug() << "Pre-fetched" << m_prefetch.size() << "analytics from"
+                    << debugTimestampToString(startTimeMs(m_prefetch.back())) << "to"
+                    << debugTimestampToString(startTimeMs(m_prefetch.front()));
+            }
+
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
             completionHandler(m_prefetch.size() >= kFetchBatchSize
-                ? startTimeMs(m_prefetch.front()) + 1 /*discard last ms*/
+                ? startTimeMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
         };
+
+    qDebug() << "Requesting analytics from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
 
     m_currentFetchId = getObjects(0, m_earliestTimeMs - 1, dataReceived, kFetchBatchSize);
     return m_currentFetchId != rest::Handle();
@@ -186,7 +202,10 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_currentFetchId = rest::Handle();
 
     if (!m_success)
+    {
+        qDebug() << "Committing no analytics";
         return;
+    }
 
     const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::milliseconds(latestStartTimeMs)).count();
@@ -199,10 +218,18 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
+        qDebug() << "Committing" << count << "analytics from"
+            << debugTimestampToString(startTimeMs(m_prefetch[count - 1])) << "to"
+            << debugTimestampToString(startTimeMs(m_prefetch.front()));
+
         ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(),
             std::make_move_iterator(m_prefetch.begin()),
             std::make_move_iterator(end));
+    }
+    else
+    {
+        qDebug() << "Committing no analytics";
     }
 
     m_fetchedAll = m_prefetch.empty();
@@ -229,6 +256,9 @@ void AnalyticsSearchListModel::Private::periodicUpdate()
                 addNewlyReceivedObjects(std::move(data));
         };
 
+    qDebug() << "Requesting new analytics from" << debugTimestampToString(m_latestTimeMs)
+        << "to infinity";
+
     m_currentUpdateId = getObjects(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);
 }
@@ -252,6 +282,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
     request.timePeriod = QnTimePeriod::fromInterval(0, m_earliestTimeMs - 1);
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;
+    request.boundingBox = m_filterRect;
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)]
@@ -304,11 +335,16 @@ void AnalyticsSearchListModel::Private::processMetadata(
 
         if (index < 0)
         {
+            if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                continue;
+
             analytics::storage::DetectedObject newObject;
             newObject.objectId = item.objectId;
             newObject.objectTypeId = item.objectTypeId;
             newObject.attributes = std::move(item.labels);
             newObject.track.push_back(pos);
+            newObject.firstAppearanceTimeUsec = pos.timestampUsec;
+            newObject.lastAppearanceTimeUsec = pos.timestampUsec;
             newObjects.push_back(std::move(newObject));
         }
         else
@@ -318,7 +354,7 @@ void AnalyticsSearchListModel::Private::processMetadata(
             finishedObjects.remove(item.objectId);
 
             const auto emitDataChanged =
-                [this, timeUs = startTimeUs(m_data[index]), id = m_data[index].objectId]()
+                [this, timeUs = m_data[index].firstAppearanceTimeUsec, id = m_data[index].objectId]()
                 {
                     static const QVector<int> kUpdateRoles
                         {Qt::ToolTipRole, Qn::DescriptionTextRole};
@@ -371,10 +407,11 @@ QString AnalyticsSearchListModel::Private::description(
 
     const auto timeWatcher = q->context()->instance<QnWorkbenchServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTimeMs(object));
-    const auto durationUs = object.track.back().durationUsec
-        + (object.track.back().timestampUsec - object.track.front().timestampUsec);
+    // TODO: #vkutin Is this duration formula good enough for us?
+    //   Or we need to add some "lastAppearanceDurationUsec"?
+    const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    return lit("%1: %2<br>%3: %4")
+    result = lit("%1: %2<br>%3: %4")
         .arg(tr("Start"))
         .arg(start.toString(Qt::RFC2822Date))
         .arg(tr("Duration"))
@@ -386,7 +423,7 @@ QString AnalyticsSearchListModel::Private::description(
 
     static const auto kCss = QString::fromLatin1(R"(
             <style type = 'text/css'>
-                th { color: %1; font-weight: normal; }
+                th { color: %1; font-weight: normal; text-align: left; }
             </style>)");
 
     static const auto kTableTemplate = lit("<table cellpadding='0' cellspacing='0'>%1</table>");
@@ -395,11 +432,11 @@ QString AnalyticsSearchListModel::Private::description(
         + lit("<td>%2</td></tr>");
 
     QString rows;
-    for (const auto& attribute : object.attributes)
+    for (const auto& attribute: object.attributes)
         rows += kRowTemplate.arg(attribute.name, attribute.value);
 
     const auto color = QPalette().color(QPalette::WindowText);
-    result += kCss.arg(color.name()) + kTableTemplate.arg(rows);
+    result += lit("<br>") + kCss.arg(color.name()) + kTableTemplate.arg(rows);
 
     return result;
 }
@@ -408,7 +445,7 @@ qint64 AnalyticsSearchListModel::Private::startTimeMs(
     const analytics::storage::DetectedObject& object)
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::microseconds(startTimeUs(object))).count();
+        std::chrono::microseconds(object.firstAppearanceTimeUsec)).count();
 }
 
 } // namespace

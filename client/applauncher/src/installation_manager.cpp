@@ -169,6 +169,9 @@ void InstallationManager::updateInstalledVersionsInformation()
     m_installationByVersion = std::move(installations);
     lk.unlock();
 
+    if (m_installationByVersion.empty())
+        NX_LOG(lit("No client versions found"), cl_logWARNING);
+
     createGhosts();
 }
 

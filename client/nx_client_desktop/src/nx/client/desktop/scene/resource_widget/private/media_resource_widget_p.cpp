@@ -36,8 +36,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
     isIoModule(camera && camera->hasFlags(Qn::io_module)),
     motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider()),
     analyticsMetadataProvider(
-        AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
-    analyticsController(new WidgetAnalyticsController())
+        AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource))
 {
     QSignalBlocker blocker(this);
 

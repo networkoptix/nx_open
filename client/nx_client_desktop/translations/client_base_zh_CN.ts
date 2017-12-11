@@ -51,7 +51,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>导出书签</translation>
     </message>
   </context>
   <context>
@@ -289,7 +289,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>登录到 %1</translation>
+      <translation>登录到 %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -311,7 +311,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>事件规则</translation>
+      <translation>事件规则...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -855,15 +855,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>启动分析...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>某些相机需要设置密码</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>导出视频...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -871,15 +871,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>分辨率</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>改变宽高比...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>网格间距：</translation>
     </message>
   </context>
   <context>
@@ -937,7 +937,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>出现未知的错误。</translation>
+      <translation>未知的错误.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -976,58 +976,58 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>所选过滤器需要转码，这将增加CPU使用率，可能需要很长时间。</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>不建议使用AVI格式导出带有音轨的非连续录制。</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>我们建议将视频从该相机中导出为 &quot;多视频&quot; 以避免降级。</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
+      <translation>您即将导出长视频。它可能需要超过千兆字节的硬盘空间，需要几分钟才能完成。</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>设置不可用于.EXE文件。</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>本地文件，服务器监视器小部件和网页将不会被导出。</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>音频视频交错</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4第14部分</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 個媒體檔案</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>可执行文件%1媒体文件（x64）</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>可执行文件%1媒体文件（x86）</translation>
     </message>
   </context>
   <context>
@@ -1162,40 +1162,40 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>长</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>允许只拉丁文字母、 数字和符号键盘%1。</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>密码应包含%n字符，符号或数字的不同组合</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>密码必须至少 %n 个字符长。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>密码不得超过 %n 个字符</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>密码不得包含%n或更多连续的字符。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>密码不应当包含%n重复字符</numerusform>
       </translation>
     </message>
   </context>
@@ -1207,7 +1207,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>共享视窗</translation>
+      <translation>共享的布局</translation>
     </message>
     <message>
       <source>All</source>
@@ -1365,7 +1365,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>摄像机与资源</translation>
+      <translation>所有的摄像机与资源</translation>
     </message>
   </context>
   <context>
@@ -1809,11 +1809,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>所有设备</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>所有摄像机</translation>
+      <translation>任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -1887,11 +1887,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>所有设备</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>所有摄像机</translation>
+      <translation>任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -1924,11 +1924,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>所有设备</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>所有摄像机</translation>
+      <translation>任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -2197,8 +2197,8 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message numerus="yes">
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">
-        <numerusform>Analytics is not available for %1</numerusform>
+      <translation>
+        <numerusform>分析不可用于%1</numerusform>
       </translation>
     </message>
   </context>
@@ -2302,7 +2302,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>不更改</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2318,7 +2318,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2495,7 +2495,7 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>密码不得与摄像机的用户名称相同</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2503,7 +2503,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>重复输入密码</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2511,7 +2511,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>密码长度应至少为8个符号，并包含不同类型的字符。</translation>
     </message>
   </context>
   <context>
@@ -2595,15 +2595,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mb/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>较少设置</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>更多设置</translation>
     </message>
   </context>
   <context>
@@ -3141,21 +3141,21 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>本相机需要设置密码。</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
-    </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation type="unfinished"> Ask your system administrator to do it.</translation>
+      <translation>某些选定的相机需要设置密码。</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
+      <translation>
+        <numerusform>设置密码</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -3398,6 +3398,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>自动</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -4176,8 +4180,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>使用授权预览 %n 摄像机</numerusform>
       </translation>
     </message>
   </context>
@@ -4295,7 +4299,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>忘记密码?</translation>
+      <translation>忘记密码？</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4309,7 +4313,7 @@ to %1</source>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>欢迎来到 %1</translation>
+      <translation>欢迎来到 %1!</translation>
     </message>
   </context>
   <context>
@@ -4424,8 +4428,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set For All %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set For All %n Cameras</numerusform>
+      <translation>
+        <numerusform>为所有%n相机设置</numerusform>
       </translation>
     </message>
   </context>
@@ -4465,7 +4469,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>无法联网系统</translation>
+      <translation>无法合并系统</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
@@ -4485,11 +4489,11 @@ to %1</source>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将很快合并</translation>
+      <translation>系统将于短期内合并</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>您将被重新连接。</translation>
+      <translation>将重连.</translation>
     </message>
   </context>
   <context>
@@ -4523,11 +4527,11 @@ to %1</source>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>启用副码流</translation>
+      <translation>启用次码流</translation>
     </message>
     <message>
       <source>multiple values</source>
-      <translation>多个值</translation>
+      <translation>多重取值</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -4570,7 +4574,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>NVR摄像机不支持不同步的播放</translation>
     </message>
   </context>
   <context>
@@ -4667,7 +4671,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>设置密码</translation>
     </message>
   </context>
   <context>
@@ -5266,7 +5270,7 @@ to %1</source>
     <name>QnScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>所有</translation>
+      <translation>全部</translation>
     </message>
   </context>
   <context>
@@ -5353,7 +5357,7 @@ to %1</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>任何服务器</translation>
+      <translation>所有服务器</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -5378,7 +5382,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5884,7 +5888,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
+      <translation>密码不能为空.</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5943,7 +5947,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>网络链接错误</translation>
+      <translation>网络错误</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -6016,7 +6020,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O模块设置</translation>
+      <translation>I/O 模板设置</translation>
     </message>
     <message>
       <source>Diagnostics</source>
@@ -6036,15 +6040,15 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>连接太多</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>需要密码</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation type="unfinished">Set For This Camera</translation>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
     </message>
   </context>
   <context>
@@ -6138,11 +6142,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>存档备份完成於 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>档案备份被完成 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>下次备份时程为 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>下一次备份被定于 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6455,11 +6459,11 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>远程归档同步</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>刪除存档完整性问题</translation>
     </message>
   </context>
   <context>
@@ -6516,7 +6520,7 @@ to %1</source>
     </message>
     <message>
       <source>Time</source>
-      <translation>时间</translation>
+      <translation>时效性</translation>
     </message>
   </context>
   <context>
@@ -6527,11 +6531,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>系统时间与Internet同步，不依赖于服务器上的本地时间。</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>系统时间与所选服务器上的本地时间同步，并且不取决于其他服务器上的本地时间。</translation>
     </message>
   </context>
   <context>
@@ -6995,7 +6999,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
+      <translation>密码不能为空.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7144,7 +7148,7 @@ to %1</source>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将于短期内合并</translation>
+      <translation>系统将很快合并</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
@@ -7635,38 +7639,38 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>动态</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>不支持的数据导出媒体。</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>所选格式不被FFMPEG库支持。</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>FFMPEG库错误。</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>视频或音频编解码器与选定格式不兼容。</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>文件写入错误</translation>
     </message>
     <message>
       <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <translation>没有数据导出。</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>内部错误</translation>
     </message>
   </context>
   <context>
@@ -7681,70 +7685,70 @@ to %1</source>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>快速审查</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>导出设置</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>添加时间戳</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>删除时间戳</translation>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>时间戳</translation>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>添加图像</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>删除图像</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>图片:</translation>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>添加文字</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>删除文字</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>文字</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>重置速度</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>添加书签信息</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>刪除书签信息</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>书签信息</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>目录</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7767,7 +7771,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>图像（%1）</translation>
     </message>
     <message>
       <source>Error</source>
@@ -7775,7 +7779,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>无法载入图像。</translation>
     </message>
   </context>
   <context>
@@ -7786,7 +7790,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>不是相机</translation>
     </message>
   </context>
   <context>
@@ -7805,22 +7809,22 @@ to %1</source>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>自定义</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>将布局分辨率设置为&quot;自动&quot;以提高性能。</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>要导出快速审查，视频长度应至少 %n 秒。</numerusform>
       </translation>
     </message>
   </context>
@@ -7828,7 +7832,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>长</translation>
     </message>
     <message>
       <source>Short</source>
@@ -7839,14 +7843,14 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 分析</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>停止导出</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -7854,16 +7858,16 @@ to %1</source>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>导出失败</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>无法写入文件。</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 正在被另一个导出使用。</translation>
     </message>
   </context>
   <context>
@@ -8073,14 +8077,14 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>没有支持的事件类型</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>仅当分析事件符合上述所有条件时，才会触发事件。如果关键字字段为空，则始终满足条件。如果不是，则在分析事件的相应字段包含任何关键字的情况下满足条件。</translation>
     </message>
   </context>
   <context>
@@ -8140,7 +8144,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
   </context>
   <context>
@@ -8422,11 +8426,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>变更密码失败</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>
@@ -8467,7 +8471,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>删除幻灯片 %1？</translation>
     </message>
   </context>
   <context>

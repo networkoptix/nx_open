@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">การตั้งค่าขั้นสูง</a>
+        <a href="" ng-click="next('advanced', true)">การตั้งค่าระบบขั้นสูง</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>การตั้งค่าระบบขั้นสูง</h2>
+    <h2>การตั้งค่าขั้นสูง</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -258,7 +258,7 @@
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
                     forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
             <div class="help-block">
-                ต้องกรอกทุกช่อง
+                ต้องระบุทุกช่อง
             </div>
         </div>
 
@@ -330,7 +330,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>กำลังผสานระบบ ...</h2>
+    <h2>ผสานระบบ ...</h2>
     <p class="master-description">กำลังพยายามเชื่อมต่อกับระบบ</p>
 </div>
 
@@ -460,7 +460,7 @@
         <div class="col-xs-6">
             <div class="text-center"><b>ใช้โปรแกรม {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">โฮสต์</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">พอร์ท</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">พอร์ต</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
             <div class="col-xs-6 text-right">เข้าสู่ระบบ</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">รหัสผ่าน</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>

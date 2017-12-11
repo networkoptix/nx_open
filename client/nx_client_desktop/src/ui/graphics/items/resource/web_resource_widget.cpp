@@ -79,6 +79,12 @@ void QnWebResourceWidget::setupOverlays()
             buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
         });
 
+        // Should force HUD to update details text with new URL
+        connect(m_webView, &QnGraphicsWebView::loadStarted, this, [this]()
+        {
+            this->updateDetailsText();
+        });
+
         auto reloadButton = createStatisticAwareButton(lit("web_widget_reload"));
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
         connect(reloadButton, &QnImageButtonWidget::clicked, this, [this]()
@@ -170,5 +176,14 @@ Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, 
 
 QString QnWebResourceWidget::calculateDetailsText() const
 {
-    return resource()->getUrl();
+    NX_ASSERT(m_webView != nullptr, Q_FUNC_INFO, "webview widget is null");
+    const int kMaxUrlDisplayLength = 96;
+    // Truncating URL if it is too long to display properly
+    // I could strip query part from URL, but some sites, like youtibe will be stripped too much
+    QString details = m_webView->url().toString();
+    if (details.length() > kMaxUrlDisplayLength)
+    {
+        details = details.left(kMaxUrlDisplayLength) + QString::fromUtf8("...");
+    }
+    return details;
 }

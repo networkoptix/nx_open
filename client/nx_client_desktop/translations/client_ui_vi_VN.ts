@@ -272,7 +272,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbit / s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <location/>
@@ -399,7 +399,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>&amp;miêu tả</translation>
+      <translation>Miêu tả</translation>
     </message>
     <message>
       <location/>
@@ -470,7 +470,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>於</translation>
     </message>
   </context>
   <context>
@@ -498,7 +498,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Kiểm tra</translation>
+      <translation>Thử</translation>
     </message>
   </context>
   <context>
@@ -665,7 +665,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Khôi phục mặc định</translation>
+      <translation>khôi phục mặc định</translation>
     </message>
     <message>
       <location/>
@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Cài đặt Camera</translation>
     </message>
     <message>
       <location/>
@@ -720,7 +720,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Luồng dữ liệu phụ</translation>
     </message>
     <message>
       <location/>
@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -847,7 +847,7 @@
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Pre-recording</translation>
     </message>
     <message>
       <location/>
@@ -892,7 +892,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>Chế độ pnic:</translation>
+      <translation>Chế độ panic:</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Tốc độ</translation>
     </message>
   </context>
   <context>
@@ -918,7 +918,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Giữ trạng thái đăng nhập</translation>
+      <translation>Duy trì đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -1013,7 +1013,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
   </context>
   <context>
@@ -1052,6 +1052,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation>URL HTTP</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1448,7 +1458,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL Máy chủ</translation>
+      <translation>URL máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -1519,12 +1529,12 @@
     <message>
       <location/>
       <source>License Key:</source>
-      <translation>Mã bản quyền:</translation>
+      <translation>Key bản quyền:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation>Tính năng</translation>
+      <translation>Các tính năng</translation>
     </message>
     <message>
       <location/>
@@ -1618,7 +1628,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Khóa bản quyền không hợp lệ</translation>
+      <translation>Key bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <location/>
@@ -1628,7 +1638,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>Id phần cứng</translation>
+      <translation>Id Phần cứng</translation>
     </message>
   </context>
   <context>
@@ -1672,7 +1682,7 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation>Máy chủ</translation>
+      <translation>Host</translation>
     </message>
     <message>
       <location/>
@@ -1755,7 +1765,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Chu kỳ Tour</translation>
     </message>
   </context>
   <context>
@@ -1860,7 +1870,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Sự kiện</translation>
+      <translation>Những sự kiện</translation>
     </message>
   </context>
   <context>
@@ -1931,7 +1941,7 @@
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation>Phím nóng:</translation>
+      <translation>Hotkeys:</translation>
     </message>
   </context>
   <context>
@@ -2012,7 +2022,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Duy trì đăng nhập</translation>
+      <translation>Giữ trạng thái đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -2265,7 +2275,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Xem nhanh</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2290,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Tốc độ</translation>
     </message>
     <message>
       <location/>
@@ -2593,7 +2603,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Chế độ Expert</translation>
+      <translation>Xuất khẩu</translation>
     </message>
     <message>
       <location/>
@@ -2992,7 +3002,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Dấu thời gian</translation>
     </message>
     <message>
       <location/>
@@ -3002,7 +3012,7 @@
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Định dạng</translation>
     </message>
     <message>
       <location/>
@@ -3060,7 +3070,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>Nhóm người dùng</translation>
+      <translation>Kiểu người dùng</translation>
     </message>
     <message>
       <location/>

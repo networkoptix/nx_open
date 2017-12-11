@@ -1,0 +1,92 @@
+Common cab files:
+    2: cmnff1.cab: Common FFMpeg 1
+        avcodec
+        avdevice
+        avfilter
+        avformat
+        avutil
+    3: cmnff2.cab: Common FFMpeg 2
+        swscale
+        swresample
+        libogg
+        libvorbis
+        libmp3lame
+    4: cmnlib1.cab: Common Libraries 1
+        nx_utils
+        nx_network
+        udt
+        nx_kit
+    5: cmnicu.cab: Common ICU
+        icudt58
+        icuin58
+        icuuc58
+    6: cmnlib2.cab: Common Libraries 2
+        quazip
+        ssl_libeay32
+        ssl_ssleay32
+    7: cmnqt1.cab: Common Qt 1
+        Qt5Core
+        Qt5Gui
+    8: cmnqt2.cab: Common Qt 2
+        Qt5Multimedia
+        Qt5Network
+        Qt5Xml
+        Qt5XmlPatterns
+        Qt5Concurrent
+        Qt5Sql
+    9: cmnqtui.cab: Common Qt Ui
+        Qt5Widgets
+        qwindows
+
+Client cab files:
+    1: clmisc.cab: Client Misc
+        NovFileAssociation
+    10: clqt1.cab: Client Qt Libraries 1
+        Qt5OpenGL
+        Qt5WebChannel
+        Qt5PrintSupport
+        Qt5MultimediaWidgets
+        Qt5MultimediaQuick_p
+        Qt5Qml
+        Qt5Quick
+        Qt5QuickWidgets
+        Qt5LabsTemplates
+    11: clqt2.cab: Client Qt Libraries 2
+        Qt5WebKit
+        Qt5WebKitWidgets
+    12: clqtpl.cab: Client Qt Plugins
+        qgif
+        qjpeg
+        qtiff
+        dsengine
+        qtmedia_audioengine
+        qtaudio_windows
+    13: cllibs.cab: Client Libraries
+        nx_vms_utils
+        OpenAL32
+        quicksyncdecoder
+        hw_decoding_conf
+    14: clexec.cab: Client Executables
+        minilauncher.exe
+        applauncher.exe
+        client.exe
+        launcherVersionFile
+        
+Server cab files:
+    1: srvmisc.cab:
+        -
+    10: srvlib.cab:
+        genericrtspplugin
+        mjpg_link
+        generic_multicast_plugin
+        hanwha_metadata_plugin
+        sigar
+        qtcore4
+        vmaxproxy.exe
+        ServerWebData
+        Qt5WebSockets
+        acs_stream_source_mr
+        VmaxProxyPid
+    11: srvexec.cab: Server Executables
+        mediaserver.exe
+        

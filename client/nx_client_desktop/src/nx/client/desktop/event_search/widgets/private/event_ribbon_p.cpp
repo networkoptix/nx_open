@@ -137,12 +137,25 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
                 updateTile(m_tiles[i], first.sibling(i, 0));
         });
 
-    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
-        [this]()
+    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeMoved, this,
+        [this](const QModelIndex& /*sourceParent*/, int sourceFirst, int sourceLast)
         {
-            NX_ASSERT(false, Q_FUNC_INFO, "EventRibbon doesn't support model rows moving!");
-            clear(); // Handle as full reset.
-            insertNewTiles(0, m_model->rowCount());
+            // TODO: #vkutin Optimize.
+            removeTiles(sourceFirst, sourceLast - sourceFirst + 1);
+        });
+
+    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
+        [this](const QModelIndex& /*parent*/, int sourceFirst, int sourceLast,
+            const QModelIndex& /*destinationParent*/, int destinationIndex)
+        {
+            // TODO: #vkutin Optimize.
+            NX_ASSERT(destinationIndex < sourceFirst || destinationIndex > sourceLast + 1);
+            const auto count = sourceLast - sourceFirst + 1;
+            const auto position = destinationIndex < sourceFirst
+                ? destinationIndex
+                : destinationIndex - count;
+
+            insertNewTiles(position, count);
         });
 }
 
@@ -217,6 +230,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         tile));
 
     tile->preview()->loadAsync();
+    tile->setPreviewHighlight(index.data(Qn::ItemZoomRectRole).value<QRectF>());
 }
 
 void EventRibbon::Private::debugCheckGeometries()

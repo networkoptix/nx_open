@@ -88,6 +88,11 @@ bool BookmarkSearchListModel::Private::prefetch(PrefetchCompletionHandler comple
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = kFetchBatchSize;
 
+    qDebug() << "Requesting bookmarks from 0 to" << (
+        m_earliestTimeMs != std::numeric_limits<qint64>::max()
+            ? debugTimestampToString(m_earliestTimeMs - 1)
+            : lit("infinity"));
+
     m_currentFetchId = qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
         [this, completionHandler, guard = QPointer<QObject>(this)]
             (bool success, const QnCameraBookmarkList& bookmarks, int requestId)
@@ -99,9 +104,20 @@ bool BookmarkSearchListModel::Private::prefetch(PrefetchCompletionHandler comple
             m_prefetch = success ? std::move(bookmarks) : QnCameraBookmarkList();
             m_success = success;
 
+            if (m_prefetch.empty())
+            {
+                qDebug() << "Pre-fetched no bookmarks";
+            }
+            else
+            {
+                qDebug() << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
+                    << debugTimestampToString(m_prefetch.back().startTimeMs) << "to"
+                    << debugTimestampToString(m_prefetch.front().startTimeMs);
+            }
+
             completionHandler(m_prefetch.size() < kFetchBatchSize
                 ? 0
-                : m_prefetch.front().startTimeMs + 1/*discard last ms*/);
+                : m_prefetch.back().startTimeMs + 1/*discard last ms*/);
         });
 
     return m_currentFetchId != 0;
@@ -115,7 +131,10 @@ void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_currentFetchId = 0;
 
     if (!m_success)
+    {
+        qDebug() << "Committing no bookmarks";
         return;
+    }
 
     const auto end = std::upper_bound(m_prefetch.cbegin(), m_prefetch.cend(),
         latestStartTimeMs, upperBoundPredicate);
@@ -125,11 +144,19 @@ void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
 
     if (count > 0)
     {
+        qDebug() << "Committing" << count << "bookmarks from"
+            << debugTimestampToString(m_prefetch[count - 1].startTimeMs) << "to"
+            << debugTimestampToString(m_prefetch.front().startTimeMs);
+
         ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(), m_prefetch.cbegin(), end);
 
         for (auto iter = m_prefetch.cbegin(); iter != end; ++iter)
             m_guidToTimestampMs[iter->guid] = iter->startTimeMs;
+    }
+    else
+    {
+        qDebug() << "Committing no bookmarks";
     }
 
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;

@@ -84,7 +84,7 @@
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
 
                 <Component Id="ServerSigar">
-                    <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6" />
+                    <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="10" />
                 </Component>
 
                 <?if $(var.vmax) = true?>
@@ -187,7 +187,7 @@
                 <File Id="Qt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8"/>
             </Component>
             <Component>
-                <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll" DiskId="8"/>
+                <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll" DiskId="10"/>
             </Component>
 
             <Component>
@@ -219,7 +219,7 @@
         <?if $(var.vmax) = true?>
         <ComponentGroup Id="VmaxProxySDK" Directory="$(var.customization)VmaxDir">
             <Component>
-                <File Id="acs_stream_source_mr.dll.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll" DiskId="10"/>
+                <File Id="acs_stream_source_mr.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll" DiskId="10"/>
             </Component>
             <Component>
                 <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="$(var.SourceDir)/vmaxproxy/pid.dat" DiskId="10"/>

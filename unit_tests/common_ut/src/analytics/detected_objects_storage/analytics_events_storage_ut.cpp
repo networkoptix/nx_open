@@ -122,7 +122,7 @@ protected:
     }
 
     void andLookupResultEquals(
-        std::vector<DetectedObject> expected)
+        const std::vector<DetectedObject>& expected)
     {
         ASSERT_EQ(expected, m_prevLookupResult->eventsFound);
     }
@@ -147,6 +147,57 @@ protected:
                 objectPosition.deviceId = packet->deviceId;
 
                 result.push_back(std::move(detectedObject));
+            }
+        }
+
+        // Groupping object track.
+        std::sort(
+            result.begin(), result.end(),
+            [](const DetectedObject& left, const DetectedObject& right)
+            {
+                return left.objectId < right.objectId;
+            });
+
+        for (auto it = result.begin(); it != result.end();)
+        {
+            auto nextIter = std::next(it);
+            if (nextIter == result.end())
+                break;
+
+            if (it->objectId == nextIter->objectId)
+            {
+                // Merging.
+                it->firstAppearanceTimeUsec =
+                    std::min(it->firstAppearanceTimeUsec, nextIter->firstAppearanceTimeUsec);
+                it->lastAppearanceTimeUsec =
+                    std::max(it->lastAppearanceTimeUsec, nextIter->lastAppearanceTimeUsec);
+                std::move(
+                    nextIter->track.begin(), nextIter->track.end(),
+                    std::back_inserter(it->track));
+                std::move(
+                    nextIter->attributes.begin(), nextIter->attributes.end(),
+                    std::back_inserter(it->attributes));
+                result.erase(nextIter);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        for (auto& detectedObject: result)
+        {
+            std::sort(
+                detectedObject.track.begin(), detectedObject.track.end(),
+                [](const ObjectPosition& left, const ObjectPosition& right)
+                    { return left.timestampUsec < right.timestampUsec; });
+
+            if (!detectedObject.track.empty())
+            {
+                detectedObject.firstAppearanceTimeUsec =
+                    detectedObject.track.begin()->timestampUsec;
+                detectedObject.lastAppearanceTimeUsec =
+                    detectedObject.track.rbegin()->timestampUsec;
             }
         }
 
@@ -183,6 +234,19 @@ protected:
 
         if (filter.maxObjectsToSelect > 0 && (int)objects.size() > filter.maxObjectsToSelect)
             objects.erase(objects.begin() + filter.maxObjectsToSelect, objects.end());
+
+        if (filter.maxTrackSize > 0)
+        {
+            for (auto& object: objects)
+            {
+                if ((int) object.track.size() > filter.maxTrackSize)
+                {
+                    object.track.erase(
+                        object.track.begin() + filter.maxTrackSize,
+                        object.track.end());
+                }
+            }
+        }
 
         return objects;
     }
@@ -254,6 +318,12 @@ private:
             return false;
         }
 
+        if (!filter.freeText.isEmpty() &&
+            !matchAttributes(detectedObject.attributes, filter.freeText))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -261,13 +331,13 @@ private:
         const Filter& filter,
         const ObjectPosition& data)
     {
-        if (!filter.boundingBox.isNull())
-        {
-            if (!filter.boundingBox.intersects(data.boundingBox))
-                return false;
-        }
+        if (!satisfiesCommonConditions(filter, data))
+            return false;
 
-        return satisfiesCommonConditions(filter, data);
+        if (!filter.boundingBox.isNull() && !filter.boundingBox.intersects(data.boundingBox))
+            return false;
+
+        return true;
     }
 
     bool satisfiesFilter(
@@ -305,6 +375,15 @@ private:
                 return false;
         }
 
+        if (!filter.freeText.isEmpty())
+        {
+            bool isFilterSatisfied = false;
+            for (const auto& object: data.objects)
+                isFilterSatisfied |= matchAttributes(object.labels, filter.freeText);
+            if (!isFilterSatisfied)
+                return false;
+        }
+
         return satisfiesCommonConditions(filter, data);
     }
 
@@ -318,6 +397,32 @@ private:
             !filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
         {
             return false;
+        }
+
+        return true;
+    }
+
+    bool matchAttributes(
+        const std::vector<nx::common::metadata::Attribute>& attributes,
+        const QString& filter)
+    {
+        const auto filterWords = filter.split(L' ');
+        // Attributes have to contain all words.
+        for (const auto& filterWord: filterWords)
+        {
+            bool found = false;
+            for (const auto& attribute: attributes)
+            {
+                if (attribute.name.indexOf(filterWord) != -1 ||
+                    attribute.value.indexOf(filterWord) != -1)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+                return false;
         }
 
         return true;
@@ -352,6 +457,7 @@ public:
             std::chrono::system_clock::from_time_t(0),
             std::chrono::system_clock::from_time_t(0))
     {
+        m_attributeDictionary.initialize(5, 2);
     }
 
 protected:
@@ -404,10 +510,21 @@ protected:
         m_filter.objectTypeId.push_back(randomObject.objectTypeId);
     }
 
-    void addLimitToFilter()
+    void addMaxObjectsLimitToFilter()
     {
         m_filter.maxObjectsToSelect = filterObjects(
             toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
+    }
+
+    void addMaxTrackLengthLimitToFilter()
+    {
+        // TODO: #ak Currently, only 1 track element can be returned.
+        m_filter.maxTrackSize = 1;
+    }
+
+    void addRandomTextFoundInDataToFilter()
+    {
+        m_filter.freeText = m_attributeDictionary.getRandomText();
     }
 
     void addRandomBoundingBoxToFilter()
@@ -438,10 +555,47 @@ protected:
             addRandomObjectTypeIdToFilter();
 
         if (nx::utils::random::number<bool>())
-            addLimitToFilter();
+            addMaxObjectsLimitToFilter();
+
+        if (nx::utils::random::number<bool>())
+            addRandomTextFoundInDataToFilter();
 
         if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
+
+        if (nx::utils::random::number<bool>())
+            addRandomTextFoundInDataToFilter();
+    }
+
+    void givenObjectWithLongTrack()
+    {
+        using namespace std::chrono;
+
+        m_specificObjectId = QnUuid::createUuid();
+        auto analyticsDataPackets = generateEventsByCriteria();
+
+        qint64 objectTrackStartTime = std::numeric_limits<qint64>::max();
+        qint64 objectTrackEndTime = std::numeric_limits<qint64>::min();
+
+        for (auto& packet: analyticsDataPackets)
+        {
+            objectTrackStartTime = std::min(objectTrackStartTime, packet->timestampUsec);
+            objectTrackEndTime =
+                std::max(objectTrackEndTime, packet->timestampUsec + packet->durationUsec);
+
+            for (auto& object: packet->objects)
+            {
+                object.objectId = m_specificObjectId;
+                object.objectTypeId = m_specificObjectId;
+            }
+        }
+
+        m_specificObjectTimePeriod.setStartTime(
+            duration_cast<milliseconds>(microseconds(objectTrackStartTime)));
+        m_specificObjectTimePeriod.setDuration(
+            duration_cast<milliseconds>(microseconds(objectTrackEndTime - objectTrackStartTime)));
+
+        saveAnalyticsDataPackets(analyticsDataPackets);
     }
 
     void setSortOrder(Qt::SortOrder sortOrder)
@@ -490,15 +644,40 @@ protected:
         whenLookupObjects();
     }
 
-    void whenLookupWithLimit()
+    void whenLookupWithMaxObjectsLimit()
     {
-        addLimitToFilter();
+        addMaxObjectsLimitToFilter();
+        whenLookupObjects();
+    }
+
+    void whenLookupWithMaxTrackLengthLimit()
+    {
+        m_filter.objectId = m_specificObjectId;
+        addMaxTrackLengthLimitToFilter();
+        //m_filter.maxTrackSize = 1;
+
+        whenLookupObjects();
+    }
+
+    void whenLookupByRandomTextFoundInData()
+    {
+        addRandomTextFoundInDataToFilter();
         whenLookupObjects();
     }
 
     void whenLookupByRandomBoundingBox()
     {
         addRandomBoundingBoxToFilter();
+        whenLookupObjects();
+    }
+
+    void whenLookupByRandomNonEmptyTimePeriodCoveringPartOfTrack()
+    {
+        m_filter.objectId = m_specificObjectId;
+        m_filter.timePeriod.setStartTime(
+            m_specificObjectTimePeriod.startTime() + m_specificObjectTimePeriod.duration() / 3);
+        m_filter.timePeriod.setDuration(m_specificObjectTimePeriod.duration() / 3);
+
         whenLookupObjects();
     }
 
@@ -524,6 +703,9 @@ private:
         m_allowedTimeRange;
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_analyticsDataPackets;
     Filter m_filter;
+    QnUuid m_specificObjectId;
+    QnTimePeriod m_specificObjectTimePeriod;
+    AttributeDictionary m_attributeDictionary;
 
     void generateVariousEvents()
     {
@@ -536,7 +718,7 @@ private:
             std::chrono::system_clock::now() - std::chrono::hours(24),
             std::chrono::system_clock::now());
 
-        generateEventsByCriteria();
+        saveAnalyticsDataPackets(generateEventsByCriteria());
     }
 
     void setAllowedDeviceIds(std::vector<QnUuid> deviceIds)
@@ -552,18 +734,18 @@ private:
         m_allowedTimeRange.second = end;
     }
 
-    void generateEventsByCriteria()
+    std::vector<common::metadata::DetectionMetadataPacketPtr> generateEventsByCriteria()
     {
         using namespace std::chrono;
 
         const int eventsPerDevice = 11;
 
-        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> analyticsDataPackets;
+        std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
         for (const auto& deviceId: m_allowedDeviceIds)
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
-                auto packet = generateRandomPacket(1);
+                auto packet = generateRandomPacket(1, &m_attributeDictionary);
                 packet->deviceId = deviceId;
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
@@ -585,13 +767,16 @@ private:
                 analyticsDataPackets.push_back(generateRandomPacket(1));
         }
 
-        m_analyticsDataPackets = analyticsDataPackets;
-        saveAnalyticsDataPackets(std::move(analyticsDataPackets));
+        return analyticsDataPackets;
     }
 
     void saveAnalyticsDataPackets(
-        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> analyticsDataPackets)
+        std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets)
     {
+        std::copy(
+            analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            std::back_inserter(m_analyticsDataPackets));
+
         for (const auto& packet: analyticsDataPackets)
             whenIssueSavePacket(packet);
 
@@ -624,9 +809,23 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_by_empty_time_period)
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsEventsStorageLookup, lookup_result_limit)
+TEST_F(AnalyticsEventsStorageLookup, full_track_timestamps)
 {
-    whenLookupWithLimit();
+    givenObjectWithLongTrack();
+    whenLookupByRandomNonEmptyTimePeriodCoveringPartOfTrack();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, max_objects_limit)
+{
+    whenLookupWithMaxObjectsLimit();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, max_track_length_limit)
+{
+    givenObjectWithLongTrack();
+    whenLookupWithMaxTrackLengthLimit();
     thenResultMatchesExpectations();
 }
 
@@ -650,9 +849,12 @@ TEST_F(AnalyticsEventsStorageLookup, sort_lookup_result_by_timestamp_descending)
     thenResultMatchesExpectations();
 }
 
-// Advanced Lookup.
+TEST_F(AnalyticsEventsStorageLookup, full_text_search)
+{
+    whenLookupByRandomTextFoundInData();
+    thenResultMatchesExpectations();
+}
 
-// TEST_F(AnalyticsEventsStorage, full_text_search)
 // TEST_F(AnalyticsEventsStorage, lookup_by_attribute_value)
 
 TEST_F(AnalyticsEventsStorageLookup, lookup_by_bounding_box)
