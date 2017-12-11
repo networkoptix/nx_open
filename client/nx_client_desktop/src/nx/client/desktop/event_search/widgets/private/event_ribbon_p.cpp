@@ -217,6 +217,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         tile));
 
     tile->preview()->loadAsync();
+    tile->setPreviewHighlight(index.data(Qn::ItemZoomRectRole).value<QRectF>());
 }
 
 void EventRibbon::Private::debugCheckGeometries()

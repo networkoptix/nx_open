@@ -142,6 +142,20 @@ void QnResourcePreviewWidget::setBorderRole(QPalette::ColorRole role)
     update();
 }
 
+QRectF QnResourcePreviewWidget::highlight() const
+{
+    return m_highlight;
+}
+
+void QnResourcePreviewWidget::setHighlight(const QRectF& relativeRect)
+{
+    if (m_highlight == relativeRect)
+        return;
+
+    m_highlight = relativeRect;
+    update();
+}
+
 void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
@@ -170,6 +184,16 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
             paintSize.toSize(), QRect(QPoint(), size()));
         painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
         painter.drawPixmap(paintRect, m_preview);
+
+        if (m_highlight.isEmpty())
+            return;
+
+        // Dim everything around highlighted area.
+        QPainterPath path;
+        path.addRegion(QRegion(paintRect).subtracted(
+            Geometry::subRect(paintRect, m_highlight).toAlignedRect()));
+        static const auto kDimmerColor = QColor("#70000000"); //< TODO: #vkutin Customize.
+        painter.fillPath(path, kDimmerColor);
     }
 }
 
