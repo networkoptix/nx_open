@@ -32,6 +32,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
+const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
@@ -127,6 +128,12 @@ public:
      */
     bool isAutoUpdateThumbnailsEnabled() const;
     void setAutoUpdateThumbnailsEnabled(bool value);
+
+    /**
+     * Override maximum allowed scene items count.
+     */
+    int maxSceneItemsOverride() const;
+    void setMaxSceneItemsOverride(int value);
 
     /**
      * Send text email instead of HTML email in event rules/actions
@@ -265,8 +272,10 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
-    bool hanwhaDeleteProfilesOnInitIfNeeded() const;
-    void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
+    #if defined(ENABLE_HANWHA)
+        bool hanwhaDeleteProfilesOnInitIfNeeded() const;
+        void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
+    #endif
 
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
@@ -286,6 +295,7 @@ signals:
     void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoUpdateThumbnailsChanged();
+    void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
@@ -317,6 +327,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
+    QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
@@ -393,7 +404,9 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;
 
-    QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
+    #if defined(ENABLE_HANWHA)
+        QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
+    #endif
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor;
 

@@ -2,14 +2,15 @@
    Initial task https://networkoptix.atlassian.net/browse/TEST-177
 '''
 
-import time
 import logging
-import pytest
-from test_utils.utils import bool_to_str, str_to_bool, datetime_utc_now
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.rest_api import ServerRestApiError, HttpError
-import server_api_data_generators as generator
+import time
 
+import pytest
+
+import server_api_data_generators as generator
+from test_utils.rest_api import RestApiError, HttpError
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
+from test_utils.utils import bool_to_str, str_to_bool, datetime_utc_now
 
 log = logging.getLogger(__name__)
 
@@ -122,7 +123,7 @@ def test_merge_cloud_with_local(server_factory, cloud_account, test_system_setti
     two = server_factory('two')
 
     # Merge systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(RestApiError) as x_info:
         two.merge_systems(one)
     assert x_info.value.error_string == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
 
@@ -139,11 +140,11 @@ def test_merge_cloud_systems(server_factory, cloud_account):
     two = server_factory('two', setup_cloud_account=cloud_account)
 
     # Merge 2 cloud systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(RestApiError) as x_info:
         two.merge_systems(one)
     assert x_info.value.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(RestApiError) as x_info:
         two.merge_systems(one, take_remote_settings=True)
     assert x_info.value.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 

@@ -72,14 +72,19 @@ public:
         const QString& cgi,
         const QString& submenu,
         const QString& action,
-        std::map<QString, QString> parameters);
+        const Parameters& parameters);
+
+    static QUrl buildRequestUrl(
+        const HanwhaSharedResourceContext* sharedContext,
+        const QString& path,
+        const Parameters& parameters);
 
 private:
     QUrl buildRequestUrl(
         const QString& cgi,
         const QString& submenu,
         const QString& action,
-        std::map<QString, QString> parameters) const;
+        const Parameters& parameters) const;
 
     QUrl buildAttributesUrl(const QString& attributesPath) const;
 

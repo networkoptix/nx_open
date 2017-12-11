@@ -20,25 +20,29 @@ public:
     virtual ~HanwhaRemoteArchiveManager() = default;
 
     virtual bool listAvailableArchiveEntries(
-        std::vector<nx::core::resource::RemoteArchiveChunk>* outArchiveEntries,
+        nx::core::resource::OverlappedRemoteChunks* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
-
-    virtual void setOnAvailabaleEntriesUpdatedCallback(EntriesUpdatedCallback callback) override;
 
     virtual bool fetchArchiveEntry(
         const QString& entryId,
         nx::core::resource::BufferType* outBuffer) override;
 
-    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate() override;
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate(
+        const nx::core::resource::RemoteArchiveChunk& chunk) override;
 
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) override;
 
     virtual nx::core::resource::RemoteArchiveCapabilities capabilities() const override;
 
+    virtual nx::core::resource::RemoteArchiveSynchronizationSettings settings() const;
+
+    virtual void beforeSynchronization() override;
+
+    virtual void afterSynchronization(bool isSynchronizationSuccessful) override;
+
 private:
     HanwhaResource* m_resource;
-    EntriesUpdatedCallback m_callback;
 };
 
 } // namespace plugins

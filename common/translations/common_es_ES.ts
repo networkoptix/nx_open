@@ -487,6 +487,14 @@
       <source>Time Licenses</source>
       <translation>Licencias de tiempo</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Licencias Bridge</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -775,6 +783,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Tipo de recurso no válido para la exportación de datos.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation>No se exportaron datos.</translation>
     </message>
   </context>
   <context>
@@ -1505,6 +1517,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Confirmar</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Evento de Analiticas</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 En %2</translation>
     </message>
   </context>
   <context>

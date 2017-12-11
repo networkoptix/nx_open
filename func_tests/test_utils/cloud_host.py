@@ -1,8 +1,10 @@
-import logging
 import datetime
+import logging
+
 import requests
-from .rest_api import HttpError, CloudRestApi
+
 from .imap import IMAPConnection
+from .rest_api import HttpError, RestApi
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ class CloudAccount(object):
         self.name = name
         self.customization = customization
         self.host = host
-        self.rest_api = CloudRestApi('cloud-host:%s' % name, self.url, user, password)
+        self.rest_api = RestApi('cloud-host:%s' % name, self.url, username=user, password=password)
 
     def __repr__(self):
         return '%r @ %r' % (self.name, self.url)

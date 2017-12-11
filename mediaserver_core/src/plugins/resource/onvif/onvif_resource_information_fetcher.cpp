@@ -58,8 +58,10 @@ static const char* IGNORE_VENDORS[][2] =
     {"Network Optix", "*"}, // Nx cameras
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
     {"Network Optix", "*"}, // Nx Cameras
-    {"Hanwha Techwin*", "*" },
-    {"Samsung Techwin*", "*" }
+    #if defined(ENABLE_HANWHA)
+        {"Hanwha Techwin*", "*" },
+        {"Samsung Techwin*", "*" },
+    #endif
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)

@@ -3,6 +3,8 @@
 #include <memory>
 #include <atomic>
 
+#include <QThreadPool>
+
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
@@ -52,7 +54,6 @@ struct QnManualCameraInfo
     QnAbstractResourceSearcher* searcher;
     QString uniqueId;
 };
-typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
 class QnAbstractResourceSearcher;
 
@@ -118,9 +119,9 @@ public:
     void setReady(bool ready);
 
     /** Returns number of cameras that were sucessfully added. */
-    int registerManualCameras(const QnManualCameraInfoMap& cameras);
-    bool containManualCamera(const QString& url);
-    void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
+    int registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
+    bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
+    QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;
 
@@ -134,6 +135,8 @@ public:
     void addResourcesImmediatly(QnResourceList& resources);
 
     static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
+
+    QThreadPool* threadPool();
 
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
@@ -170,10 +173,12 @@ private:
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 private:
-    QnMutex m_searchersListMutex;
+    QThreadPool m_threadPool;
+
+    mutable QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QnManualCameraInfoMap m_manualCameraMap;
+    QMap<QString, QnManualCameraInfo> m_manualCameraByUniqueId;
 
     bool m_server;
     std::atomic<bool> m_ready;

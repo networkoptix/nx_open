@@ -4,7 +4,7 @@
 </div>
 <form class="form" name="loginForm" novalidate ng-controller="LoginCtrl">
     <div class="modal-body" collapse="!authorized">
-        Xác thực...
+        Xác thực ...
     </div>
     <div class="modal-body" ng-if="!authorized" collapse="authorized">
         <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">

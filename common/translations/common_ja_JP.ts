@@ -486,6 +486,14 @@
       <source>Time Licenses</source>
       <translation>タイムライセンス</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>ブリッジ</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>ブリッジライセンス</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -764,6 +772,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>データ エクスポートに無効なリソースタイプ</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation>データはエクスポートされませんでした</translation>
     </message>
   </context>
   <context>
@@ -1294,7 +1306,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 時, 開始: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n, %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1474,6 +1486,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>承認</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>解析イベント</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 の %1</translation>
     </message>
   </context>
   <context>

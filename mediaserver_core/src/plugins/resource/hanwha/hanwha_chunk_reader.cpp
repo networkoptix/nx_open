@@ -1,10 +1,11 @@
-#if defined(ENABLE_HANWHA)
+﻿#if defined(ENABLE_HANWHA)
 
 #include <QtCore/QDateTime>
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/synctime.h>
 #include <core/resource/network_resource.h>
 
@@ -17,9 +18,12 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+namespace {
+
 static const int kMaxAllowedChannelNumber = 64;
-static const QByteArray kStartTimeParamName("StartTime");
-static const QByteArray kEndTimeParamName("EndTime");
+static const nx::Buffer kStartTimeParamName("StartTime");
+static const nx::Buffer kEndTimeParamName("EndTime");
+static const QString kOverlappedIdListParameter = lit("OverlappedIDList");
 
 static const std::chrono::seconds kUpdateChunksDelay(60);
 static const std::chrono::seconds kResendRequestIfFail(10);
@@ -34,261 +38,485 @@ static const QDateTime kMaxDateTime = QDateTime::fromString(
     lit("2037-12-31 00:00:00"),
     kDateTimeFormat);
 
-static const std::chrono::milliseconds kHttpTimeout(8000);
+static const std::chrono::milliseconds kHttpTimeout(10000);
+static const std::chrono::milliseconds kTimelineCacheTime(10000);
 
-HanwhaChunkLoader::HanwhaChunkLoader():
-    m_httpClient(new nx_http::AsyncClient())
+} // namespace
+
+using namespace nx::core::resource;
+
+HanwhaChunkLoader::HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext):
+    m_resourceContext(resourceContext)
 {
 }
 
 HanwhaChunkLoader::~HanwhaChunkLoader()
 {
-    m_terminated = true;
-    if (m_nextRequestTimerId)
-        nx::utils::TimerManager::instance()->deleteTimer(m_nextRequestTimerId);
-    m_httpClient->pleaseStopSync();
-}
-
-void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
-{
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_state != State::initial)
-            return; //< Already started
-
-        const auto information = resourceContext->information();
-        if (!information)
-        {
-            NX_DEBUG(this, lit("Unable to fetch channel number"));
-            return; //< Unable to start without channel number.
-        }
-
-        m_hasSearchRecordingPeriodSubmenu = false;
-        const auto searchRecordingPeriodAttribute = information->attributes.attribute<bool>(
-            lit("Recording/SearchPeriod"));
-
-        if (searchRecordingPeriodAttribute != boost::none)
-            m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.get();
-
-        m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
-        m_maxChannels = information->channelCount;
-        m_resourceContext = resourceContext;
-        m_state = nextState(m_state);
-        NX_DEBUG(this, lm("Started for %1 channels on %2")
-            .args(m_maxChannels, resourceContext->url()));
+        m_terminated = true;
     }
 
-    sendRequest();
+    if (m_nextRequestTimerId)
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_nextRequestTimerId);
+
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
+}
+
+void HanwhaChunkLoader::start(bool isNvr)
+{
+    QnMutexLocker lock(&m_mutex);
+    setUpThreadUnsafe();
+
+    if (isNvr)
+    {
+        m_state = nextState(m_state);
+        m_started = true;
+        NX_DEBUG(this, lm("Started for %1 channels on %2")
+            .args(m_maxChannels, m_resourceContext->url()));
+
+        sendRequest();
+    }
 }
 
 bool HanwhaChunkLoader::isStarted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state != State::initial;
+    return m_started;
 }
+
+qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto startTimeUs = std::numeric_limits<qint64>::max();
+
+    for (const auto& entry: m_chunks)
+    {
+        const auto overlappedId = entry.first;
+        const auto& chunksByChannel = entry.second;
+
+        NX_ASSERT(chunksByChannel.size() > channelNumber);
+        if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
+            continue;
+
+        const auto earliestChunkStartTimeUs =
+            chunksByChannel[channelNumber].front().startTimeMs * 1000;
+
+        if (earliestChunkStartTimeUs < startTimeUs)
+            startTimeUs = earliestChunkStartTimeUs;
+
+        if (m_startTimeUs != AV_NOPTS_VALUE)
+            startTimeUs = std::max(startTimeUs, m_startTimeUs);
+    }
+
+    if (startTimeUs == std::numeric_limits<int64_t>::max())
+        return AV_NOPTS_VALUE;
+
+    return startTimeUs;
+}
+
+qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
+{
+    QnMutexLocker lock(&m_mutex);
+    int64_t endTimeUs = std::numeric_limits<int64_t>::max();
+
+    for (const auto& entry: m_chunks)
+    {
+        const auto overlappedId = entry.first;
+        const auto& chunksByChannel = entry.second;
+
+        NX_ASSERT(chunksByChannel.size() > channelNumber);
+        if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
+            continue;
+
+        const auto latestChunkEndTimeUs = chunksByChannel[channelNumber].back().endTimeMs() * 1000;
+        if (latestChunkEndTimeUs > endTimeUs)
+            endTimeUs = latestChunkEndTimeUs;
+    }
+
+    if (endTimeUs == std::numeric_limits<int64_t>::min())
+        return AV_NOPTS_VALUE;
+
+    return endTimeUs;
+}
+
+std::map<int, QnTimePeriodList> HanwhaChunkLoader::overlappedTimeline(int channelNumber) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return overlappedTimelineThreadUnsafe(channelNumber);
+}
+
+OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineSync(int channelNumber)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    NX_ASSERT(!m_started);
+    if (m_started)
+        return OverlappedTimePeriods();
+
+    if (timeSinceLastTimelineUpdate() < kTimelineCacheTime)
+        return overlappedTimelineThreadUnsafe(channelNumber);
+
+    if (m_state == State::initial)
+    {
+        m_state = nextState(State::initial);
+        sendRequest();
+    }
+
+    while (m_state != State::initial)
+        m_wait.wait(&m_mutex);
+
+    return overlappedTimelineThreadUnsafe(channelNumber);
+}
+
+void HanwhaChunkLoader::setTimeZoneShift(std::chrono::seconds timeZoneShift)
+{
+    m_timeZoneShift = timeZoneShift;
+}
+
+std::chrono::seconds HanwhaChunkLoader::timeZoneShift() const
+{
+    return m_timeZoneShift;
+}
+
+boost::optional<int> HanwhaChunkLoader::overlappedId() const
+{
+    QnMutexLocker lock(&m_mutex);
+    NX_ASSERT(m_isNvr, lit("Method should be called only for NVRs"));
+    if (m_isNvr)
+        return m_overlappedIds.front();
+
+    // For cameras we should import all chunks from all overlapped IDs.
+    return boost::none;
+}
+
+void HanwhaChunkLoader::setEnableUtcTime(bool enableUtcTime)
+{
+    m_isUtcEnabled = enableUtcTime;
+}
+
+void HanwhaChunkLoader::setEnableSearchRecordingPeriodRetieval(bool enableRetrieval)
+{
+    m_isSearchRecordingPeriodRetrievalEnabled = enableRetrieval;
+}
+
+QString HanwhaChunkLoader::convertDateToString(const QDateTime& dateTime) const
+{
+    return dateTime.toString(m_isUtcEnabled ? kHanwhaUtcDateTimeFormat : kHanwhaDateTimeFormat);
+}
+
+bool HanwhaChunkLoader::hasBounds() const
+{
+    return m_hasSearchRecordingPeriodSubmenu
+        && m_isSearchRecordingPeriodRetrievalEnabled
+        && m_isNvr;
+}
+
+//------------------------------------------------------------------------------------------------
 
 void HanwhaChunkLoader::sendRequest()
 {
+    if (m_terminated)
+        return;
+
     switch (m_state)
     {
-        case State::updateTimeRange:
-            sendUpdateTimeRangeRequest();
+        case State::loadingRecordingPeriod:
+            sendRecordingPeriodRequest();
             break;
-        case State::loadingChunks:
-            sendLoadChunksRequest();
+        case State::loadingOverlappedIds:
+            sendOverlappedIdRequest();
+            break;
+        case State::loadingTimeline:
+            sendTimelineRequest();
             break;
         default:
+            NX_ASSERT(false, lit("Wrong state, should not be here."));
             break;
     }
 }
 
-void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
+void HanwhaChunkLoader::sendRecordingPeriodRequest()
 {
+    if (m_terminated)
+        return;
+
     prepareHttpClient();
 
     // TODO: Check for 'attributes/Recording/Support/SearchPeriod' and use only if it's supported,
     // otherwise we have to load all periods constantly and clean them up by timeout.
-    const auto loadChunksUrl = buildUrl(
+    const auto recordingPeriodUrl = HanwhaRequestHelper::buildRequestUrl(
+        m_resourceContext,
         lit("recording/searchrecordingperiod/view"),
         {
-            {lit("Type"), lit("All")},
-            {lit("ResultsInUTC"), m_isUtcEnabled ? kHanwhaTrue : kHanwhaFalse}
+            {kHanwhaRecordingTypeProperty, kHanwhaAll},
+            {kHanwhaResultsInUtcProperty, m_isUtcEnabled ? kHanwhaTrue : kHanwhaFalse}
         });
 
-    m_httpClient->setOnDone([this](){onHttpClientDone();});
+    NX_DEBUG(this, lm("Sending recording period request. Url: %1").arg(recordingPeriodUrl));
+
     m_httpClient->setOnSomeMessageBodyAvailable(nullptr);
-
-    // TODO: Use m_resourceConext->requestSemaphore().
-    m_httpClient->doGet(loadChunksUrl);
+    m_httpClient->doGet(recordingPeriodUrl); //< TODO: Use m_resourceConext->requestSemaphore().
 }
 
-qint64 HanwhaChunkLoader::latestChunkTimeMs() const
+void HanwhaChunkLoader::sendOverlappedIdRequest()
 {
-    qint64 resultMs = 0;
-    for (const auto& timePeriods: m_chunks)
-    {
-        if (!timePeriods.empty())
-            resultMs = std::max(resultMs, timePeriods.back().startTimeMs);
-    }
+    if (m_terminated)
+        return;
 
-    QnMutexLocker lock(&m_mutex);
-    if (m_startTimeUsec == AV_NOPTS_VALUE)
-        return resultMs;
-
-    return std::max(resultMs, m_startTimeUsec / 1000);
-}
-
-void HanwhaChunkLoader::sendLoadChunksRequest()
-{
     prepareHttpClient();
+    const auto overlappedIdListUrl = HanwhaRequestHelper::buildRequestUrl(
+        m_resourceContext,
+        lit("recording/overlapped/view"),
+        {
+            {kHanwhaChannelIdListProperty, makeChannelIdListString()},
+            {kHanwhaFromDateProperty, makeStartDateTimeString()},
+            {kHanwhaToDateProperty, makeEndDateTimeSting()}
+        });
 
+    NX_DEBUG(this, lm("Sending overlapped ID request. URL: %1").arg(overlappedIdListUrl));
+    m_httpClient->doGet(overlappedIdListUrl);
+}
+
+void HanwhaChunkLoader::sendTimelineRequest()
+{
+    if (m_terminated)
+        return;
+
+    NX_ASSERT(!m_overlappedIds.empty());
+    if (m_overlappedIds.empty())
     {
-        QnMutexLocker lock(&m_mutex);
-        m_newChunks.clear();
+        m_state = State::loadingOverlappedIds;
+        setError();
+        scheduleNextRequest(kResendRequestIfFail);
+        return;
     }
 
-    auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-        kUpdateChunksDelay).count();
+    NX_ASSERT(m_currentOverlappedId != m_overlappedIds.cend());
+    if (m_currentOverlappedId == m_overlappedIds.cend())
+    {
+        m_state = State::loadingOverlappedIds;
+        setError();
+        scheduleNextRequest(kResendRequestIfFail);
+        return;
+    }
 
-    const auto timeZoneShift = m_isUtcEnabled
-        ? std::chrono::seconds::zero()
-        : std::chrono::seconds(m_timeZoneShift);
-
-    auto startDateTime = hasBounds()
-        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, timeZoneShift)
-        : kMinDateTime;
-
-    auto endDateTime = hasBounds()
-        ? QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1)
-        : kMaxDateTime;
-
+    m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
     if (!hasBounds())
     {
-        m_startTimeUsec = AV_NOPTS_VALUE;
-        m_endTimeUsec = AV_NOPTS_VALUE;
+        m_startTimeUs = AV_NOPTS_VALUE;
+        m_endTimeUs = AV_NOPTS_VALUE;
     }
 
-    using P = std::pair<QString, QString>;
-    std::map<QString, QString> parameters = {
-        P(lit("Type"), lit("All")),
-        P(lit("FromDate"), convertDateToString(startDateTime)),
-        P(lit("ToDate"), convertDateToString(endDateTime))
+    const auto overlappedId = m_isNvr
+        ? QString::number(m_overlappedIds.front())
+        : QString::number(*m_currentOverlappedId);
+
+    using P = HanwhaRequestHelper::Parameters::value_type;
+    HanwhaRequestHelper::Parameters parameters = {
+        P(kHanwhaRecordingTypeProperty, kHanwhaAll),
+        P(kHanwhaFromDateProperty, makeStartDateTimeString()),
+        P(kHanwhaToDateProperty, makeEndDateTimeSting()),
+        P(kHanwhaOverlappedIdProperty, overlappedId)
     };
 
     if (m_isNvr)
-    {
-        QStringList channelsParam;
-        for (int i = 0; i < m_maxChannels; ++i)
-            channelsParam << QString::number(i);
+        parameters.emplace(kHanwhaChannelIdListProperty, makeChannelIdListString());
 
-        parameters.emplace(lit("ChannelIDList"), channelsParam.join(','));
-    }
-
-    const auto loadChunksUrl = buildUrl(
+    const auto timelineUrl = HanwhaRequestHelper::buildRequestUrl(
+        m_resourceContext,
         lit("recording/timeline/view"),
         parameters);
 
-    m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
-    m_httpClient->setOnSomeMessageBodyAvailable([this](){onGotChunkData();});
-    m_httpClient->setOnDone([this](){onHttpClientDone();});
-
-    // TODO: Use m_resourceConext->requestSemaphore().
-    m_httpClient->doGet(loadChunksUrl);
+    NX_DEBUG(this, lm("Sending timeline request, URL: %1").arg(timelineUrl));
+    prepareHttpClient();
+    m_httpClient->setOnSomeMessageBodyAvailable([this]() { at_gotChunkData(); });
+    m_httpClient->doGet(timelineUrl); //< TODO: Use m_resourceConext->requestSemaphore().
 }
 
-void HanwhaChunkLoader::onHttpClientDone()
+void HanwhaChunkLoader::handleSuccessfulRecordingPeriodResponse()
 {
+    if (m_terminated)
+        return;
+
+    NX_ASSERT(m_state == State::loadingRecordingPeriod);
+    if (m_state != State::loadingRecordingPeriod)
+    {
+        m_state = nextState(State::initial);
+        setError();
+        return scheduleNextRequest(kResendRequestIfFail);
+    }
+
+    NX_DEBUG(this, lit("Handling successful recording period response."));
+
+    parseTimeRangeData(m_httpClient->fetchMessageBodyBuffer());
+    m_state = nextState(m_state);
+    m_wait.wakeAll();
+    sendRequest(); //< Send next request immediately
+}
+
+void HanwhaChunkLoader::handleSuccessfulOverlappedIdResponse()
+{
+    if (m_terminated)
+        return;
+
+    NX_ASSERT(m_state == State::loadingOverlappedIds);
+    if (m_state != State::loadingOverlappedIds)
+    {
+        m_state = nextState(State::initial);
+        setError();
+        return scheduleNextRequest(kResendRequestIfFail);
+    }
+
+    NX_DEBUG(this, lit("Handling successful overlapped ID response"));
+
+    m_overlappedIds.clear();
+    parseOverlappedIdListData(m_httpClient->fetchMessageBodyBuffer());
+    if (m_overlappedIds.empty())
+    {
+        NX_DEBUG(this, lit("Overlapped ID list is empty. Trying one more time."));
+        setError();
+        scheduleNextRequest(kResendRequestIfFail);
+        return;
+    }
+
+    m_newChunks.clear();
+    m_currentOverlappedId = m_overlappedIds.cbegin();
+    m_state = nextState(m_state);
+    sendRequest();
+}
+
+void HanwhaChunkLoader::handleSuccessfulTimelineResponse()
+{
+    if (m_terminated)
+        return;
+
+    NX_ASSERT(m_state == State::loadingTimeline);
+    if (m_state != State::loadingTimeline)
+    {
+        m_state = nextState(State::initial);
+        setError();
+        scheduleNextRequest(kResendRequestIfFail);
+    }
+
+    NX_DEBUG(this, lit("Handling successful timeline response."));
+    // In case of edge archive import we should load chunks for all existing overlapped IDs.
+    if (!m_isNvr)
+    {
+        ++m_currentOverlappedId;
+        if (m_currentOverlappedId != m_overlappedIds.cend())
+        {
+            NX_DEBUG(
+                this,
+                lm("Camera has more overlapped data. Asking for overlapped timline %1")
+                    .arg(*m_currentOverlappedId));
+
+            sendTimelineRequest();
+            return;
+        }
+    }
+
+    if (isEdge()) //< Cameras sometimes send unordered list of chunks.
+    {
+        sortTimeline(&m_newChunks);
+        m_chunks.swap(m_newChunks);
+    }
+
+    m_lastTimelineUpdate = std::chrono::milliseconds(
+        qnSyncTime->currentMSecsSinceEpoch());
+
+    m_state = nextState(m_state);
+    m_wait.wakeAll();
+    scheduleNextRequest(kUpdateChunksDelay); //< Send next request after delay
+}
+
+bool HanwhaChunkLoader::handleHttpError()
+{
+    auto scopeGuard = makeScopeGuard(
+        [this]()
+        {
+            setError();
+            scheduleNextRequest(kResendRequestIfFail);
+        });
+
     if (m_httpClient->state() == nx_http::AsyncClient::sFailed)
     {
-        NX_WARNING(this, lm("Http request %1 failed with error %2")
-            .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
+        NX_WARNING(
+            this,
+            lm("HTTP request %1 failed with error %2")
+                .args(
+                    m_httpClient->contentLocationUrl(),
+                    m_httpClient->lastSysErrorCode()));
 
-        setError();
-        m_wait.wakeAll();
-        startTimerForNextRequest(kResendRequestIfFail);
-        return;
+        return true;
     }
 
     const auto statusCode = m_httpClient->response()->statusLine.statusCode;
     if (statusCode != nx_http::StatusCode::ok)
     {
-        NX_WARNING(this, lm("Http request %1 failed with status code %2")
-            .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
+        NX_WARNING(
+            this,
+            lm("HTTP request %1 failed with status code %2")
+                .args(
+                    m_httpClient->contentLocationUrl(),
+                    statusCode));
 
-        setError();
-        m_wait.wakeAll();
-        startTimerForNextRequest(kResendRequestIfFail);
-        return;
+        return true;
     }
 
-    NX_VERBOSE(this, lm("Http request %1 succeeded with status code %2")
-        .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
-
-    if (m_state == State::loadingChunks)
-    {
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (!hasBounds())
-                m_chunks.swap(m_newChunks);
-            m_errorOccured = false;
-            m_chunksLoadedAtLeastOnce = true;
-        }
-
-        m_state = nextState(m_state);
-        m_wait.wakeAll();
-        startTimerForNextRequest(kUpdateChunksDelay); //< Send next request after delay
-    }
-    else if (m_state == State::updateTimeRange)
-    {
-        parseTimeRangeData(m_httpClient->fetchMessageBodyBuffer());
-        m_timeRangeLoadedAtLeastOnce = true;
-        m_errorOccured = false;
-        m_state = nextState(m_state);
-        m_wait.wakeAll();
-        sendRequest(); //< Send next request immediately
-    }
+    scopeGuard.disarm();
+    return false;
 }
 
-void HanwhaChunkLoader::startTimerForNextRequest(const std::chrono::milliseconds& delay)
+boost::optional<HanwhaChunkLoader::Parameter> HanwhaChunkLoader::parseLine(
+    const nx::Buffer& line) const
 {
-    if (m_terminated)
-        return;
+    const auto separatorPosition = line.indexOf('=');
+    if (separatorPosition < 0)
+        return boost::none;
 
-    m_nextRequestTimerId = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&HanwhaChunkLoader::sendRequest, this),
-        delay);
+    return Parameter(
+        line.left(separatorPosition).trimmed(),
+        line.mid(separatorPosition + 1).trimmed());
 }
 
-void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
+void HanwhaChunkLoader::parseTimeRangeData(const nx::Buffer& data)
 {
-    qint64 startTimeUsec = AV_NOPTS_VALUE;
-    qint64 endTimeUsec = AV_NOPTS_VALUE;
-    for (const auto& line: data.split(L'\n'))
+    NX_ASSERT(hasBounds());
+    auto startTimeUs = AV_NOPTS_VALUE;
+    auto endTimeUs = AV_NOPTS_VALUE;
+    for (const auto& line: data.split('\n'))
     {
-        const auto params = line.trimmed().split(L'=');
+        const auto params = line.trimmed().split('=');
         if (params.size() == 2)
         {
-            QByteArray fieldName = params[0];
-            QByteArray fieldValue = params[1];
+            const auto& fieldName = params[0];
+            const auto& fieldValue = params[1];
 
             if (fieldName == kStartTimeParamName)
-                startTimeUsec = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
+                startTimeUs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
             else if (fieldName == kEndTimeParamName)
-                endTimeUsec = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
+                endTimeUs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
         }
     }
 
-    if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE)
+    if (startTimeUs != AV_NOPTS_VALUE && endTimeUs != AV_NOPTS_VALUE)
     {
-        m_startTimeUsec = startTimeUsec;
-        m_endTimeUsec = endTimeUsec;
-        const auto startTimeMs = m_startTimeUsec / 1000;
+        m_startTimeUs = startTimeUs;
+        m_endTimeUs = endTimeUs;
+        const auto startTimeMs = m_startTimeUs / 1000;
 
-        QnMutexLocker lock(&m_mutex);
-        for (auto& chunks: m_chunks)
+        for (auto& entry: m_chunks)
         {
-            while (!chunks.isEmpty() && chunks.first().endTimeMs() < startTimeMs)
-                chunks.pop_front();
+            const auto overlappedId = entry.first;
+            auto& chunksByChannel = entry.second;
+
+            for (auto& chunks: chunksByChannel)
+            {
+                while (!chunks.isEmpty() && chunks.first().endTimeMs() < startTimeMs)
+                    chunks.pop_front();
+            }
         }
     }
     else
@@ -297,43 +525,13 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
     }
 }
 
-void HanwhaChunkLoader::onGotChunkData()
+bool HanwhaChunkLoader::parseTimelineData(const nx::Buffer& line, qint64 currentTimeMs)
 {
-    // This function should be fast because of large amount of records for recorded data
-
-    auto buffer = m_unfinishedLine;
-    buffer.append(m_httpClient->fetchMessageBodyBuffer());
-    int index = buffer.lastIndexOf('\n');
-    if (index == -1)
-    {
-        m_unfinishedLine = buffer;
-        return;
-    }
-
-    m_unfinishedLine = buffer.mid(index + 1);
-    buffer.truncate(index);
-
-    QList<QByteArray> lines = buffer.split('\n');
-    NX_VERBOSE(this, lm("%1 got %2 lines of chunk data")
-        .args(m_httpClient->contentLocationUrl(), lines.size()));
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-        for (const auto& line: lines)
-            parseChunkData(line.trimmed(), currentTimeMs);
-    }
-
-    emit gotChunks();
-}
-
-bool HanwhaChunkLoader::parseChunkData(const QByteArray& line, qint64 currentTimeMs)
-{
-    const auto channelNumberPos = line.indexOf(L'.') + 1;
+    const auto channelNumberPos = line.indexOf('.') + 1;
     if (channelNumberPos == 0)
         return true; //< Skip header line
 
-    const auto channelNumberPosEnd = line.indexOf(L'.', channelNumberPos + 1);
+    const auto channelNumberPosEnd = line.indexOf('.', channelNumberPos + 1);
     const auto channelNumber = line.mid(
         channelNumberPos,
         channelNumberPosEnd - channelNumberPos)
@@ -346,9 +544,13 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line, qint64 currentTim
         return false;
     }
 
+    NX_ASSERT(m_currentOverlappedId != m_overlappedIds.cend());
+    if (m_currentOverlappedId == m_overlappedIds.cend())
+        return false;
+
     auto& chunksByChannel = hasBounds()
-        ? m_chunks
-        : m_newChunks;
+        ? m_chunks[*m_currentOverlappedId]
+        : m_newChunks[*m_currentOverlappedId];
 
     if (chunksByChannel.size() <= channelNumber)
         chunksByChannel.resize(channelNumber + 1);
@@ -374,10 +576,14 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line, qint64 currentTim
         }
 
         QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
-        if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())
+        if (m_startTimeUs == AV_NOPTS_VALUE || chunks.isEmpty())
+            m_startTimeUs = timePeriod.startTimeMs * 1000;
+
+        if (!m_isNvr)
         {
+            // We shouldn't merge periods for cameras because of bug
+            // with streaming on borders of chunks.
             chunks.push_back(timePeriod);
-            m_startTimeUsec = timePeriod.startTimeMs * 1000;
         }
         else
         {
@@ -390,136 +596,296 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line, qint64 currentTim
     return true;
 }
 
-qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
+void HanwhaChunkLoader::parseOverlappedIdListData(const nx::Buffer& data)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
-        return AV_NOPTS_VALUE;
+    for (const auto& line: data.split('\n'))
+    {
+        const auto parameter = parseLine(line.trimmed());
+        if (parameter == boost::none)
+            continue;
 
-    auto result = m_chunks[channelNumber].front().startTimeMs * 1000;
-    if (m_startTimeUsec != AV_NOPTS_VALUE)
-        result = std::max(m_startTimeUsec, result);
+        if (parameter->name != kOverlappedIdListParameter)
+            continue;
 
-    return result;
-}
+        const auto split = parameter->value.split(L',');
+        if (split.isEmpty())
+            continue;
 
-qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
-{
-    QnMutexLocker lock(&m_mutex);
-    if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
-        return AV_NOPTS_VALUE;
-
-    return m_chunks[channelNumber].last().endTimeMs() * 1000;
-}
-
-QnTimePeriodList HanwhaChunkLoader::chunks(int channelNumber) const
-{
-    QnMutexLocker lock(&m_mutex);
-    return chunksUnsafe(channelNumber);
-}
-
-QnTimePeriodList HanwhaChunkLoader::chunksSync(int channelNumber) const
-{
-    QnMutexLocker lock(&m_mutex);
-
-    while (!m_chunksLoadedAtLeastOnce && !m_errorOccured)
-        m_wait.wait(&m_mutex);
-
-    return chunksUnsafe(channelNumber);
-}
-
-QnTimePeriodList HanwhaChunkLoader::chunksUnsafe(int channelNumber) const
-{
-    const qint64 startTimeMs = m_startTimeUsec / 1000;
-    const qint64 endTimeMs = m_endTimeUsec / 1000;
-    if (m_chunks.size() <= channelNumber)
-        return QnTimePeriodList();
-
-    QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
-
-    if (hasBounds())
-        return m_chunks[channelNumber].intersected(boundingPeriod);
-
-    return m_chunks[channelNumber];
-}
-
-void HanwhaChunkLoader::setError()
-{
-    m_errorOccured = true;
-    m_chunksLoadedAtLeastOnce = false;
-    m_timeRangeLoadedAtLeastOnce = false;
-}
-
-HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
-{
-    if (!hasBounds())
-        return State::loadingChunks;
-
-    if (currentState == State::updateTimeRange)
-        return State::loadingChunks;
-
-    return State::updateTimeRange;
-}
-
-void HanwhaChunkLoader::setTimeZoneShift(std::chrono::seconds timeZoneShift)
-{
-    m_timeZoneShift = timeZoneShift;
-}
-
-std::chrono::seconds HanwhaChunkLoader::timeZoneShift() const
-{
-    return m_timeZoneShift;
-}
-
-void HanwhaChunkLoader::setEnableUtcTime(bool enableUtcTime)
-{
-    m_isUtcEnabled = enableUtcTime;
-}
-
-void HanwhaChunkLoader::setEnableSearchRecordingPeriodRetieval(bool enableRetrieval)
-{
-    m_isSearchRecordingPeriodRetrievalEnabled = enableRetrieval;
-}
-
-QString HanwhaChunkLoader::convertDateToString(const QDateTime& dateTime) const
-{
-    return dateTime.toString(m_isUtcEnabled ? kHanwhaUtcDateTimeFormat : kHanwhaDateTimeFormat);
-}
-
-bool HanwhaChunkLoader::hasBounds() const
-{
-    return m_hasSearchRecordingPeriodSubmenu
-        && m_isSearchRecordingPeriodRetrievalEnabled;
-}
-
-QUrl HanwhaChunkLoader::buildUrl(
-    const QString& path,
-    std::map<QString, QString> parameters) const
-{
-    const auto split = path.split(L'/');
-    if (split.size() != 3)
-        return QUrl();
-
-    auto url = m_resourceContext->url();
-    url.setPath(lit("/stw-cgi/%1.cgi").arg(split[0].trimmed()));
-
-    QUrlQuery query;
-    query.addQueryItem(lit("msubmenu"), split[1].trimmed());
-    query.addQueryItem(lit("action"), split[2].trimmed());
-    for (const auto& parameter : parameters)
-        query.addQueryItem(parameter.first, parameter.second);
-
-    url.setQuery(query);
-    return url;
+        for (const auto& idString: split)
+        {
+            bool success = false;
+            auto id = idString.trimmed().toInt(&success);
+            if (success)
+                m_overlappedIds.push_back(id);
+        }
+    }
 }
 
 void HanwhaChunkLoader::prepareHttpClient()
 {
     const auto authenticator = m_resourceContext->authenticator();
-    QnMutexLocker lock(&m_mutex);
+    m_httpClient = std::make_unique<nx_http::AsyncClient>();
     m_httpClient->setUserName(authenticator.user());
     m_httpClient->setUserPassword(authenticator.password());
+    m_httpClient->setSendTimeout(kHttpTimeout);
     m_httpClient->setResponseReadTimeout(kHttpTimeout);
+    m_httpClient->setOnDone([this](){ at_httpClientDone(); });
+}
+
+void HanwhaChunkLoader::scheduleNextRequest(const std::chrono::milliseconds& delay)
+{
+    if (m_terminated)
+        return;
+
+    if (!m_started)
+        return;
+
+    m_nextRequestTimerId = nx::utils::TimerManager::instance()->addTimer(
+        [this](nx::utils::TimerId timerId)
+        {
+            if (timerId != m_nextRequestTimerId)
+                return;
+
+            QnMutexLocker lock(&m_mutex);
+            sendRequest();
+        },
+        delay);
+}
+
+qint64 HanwhaChunkLoader::latestChunkTimeMs() const
+{
+    qint64 resultMs = 0;
+    for (const auto& entry: m_chunks)
+    {
+        const auto overlappedId = entry.first;
+        const auto& chunksByChannel = entry.second;
+
+        for (const auto& chunks: chunksByChannel)
+        {
+            if (!chunks.empty())
+                resultMs = std::max(resultMs, chunks.back().startTimeMs);
+        }
+    }
+
+    if (m_startTimeUs == AV_NOPTS_VALUE)
+        return resultMs;
+
+    return std::max(resultMs, m_startTimeUs / 1000);
+}
+
+void HanwhaChunkLoader::sortTimeline(OverlappedChunks* outTimeline) const
+{
+    for (auto& entry: *outTimeline)
+    {
+        for (auto& channelEntry: entry.second)
+        {
+            std::sort(
+                channelEntry.begin(),
+                channelEntry.end(),
+                [](const QnTimePeriod& lhs, const QnTimePeriod& rhs)
+                {
+                    return lhs.startTimeMs < rhs.startTimeMs;
+                });
+        }
+    }
+}
+
+void HanwhaChunkLoader::setError()
+{
+    if (!m_started)
+        m_state = State::initial;
+
+    m_wait.wakeAll();
+}
+
+HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
+{
+    switch (currentState)
+    {
+        case State::initial:
+        {
+            return hasBounds()
+                ? State::loadingRecordingPeriod
+                : State::loadingOverlappedIds;
+        }
+        case State::loadingTimeline:
+        {
+            if (!m_started)
+                return State::initial;
+
+            return hasBounds()
+                ? State::loadingRecordingPeriod
+                : State::loadingOverlappedIds;
+        }
+        case State::loadingRecordingPeriod:
+        {
+            return State::loadingOverlappedIds;
+        }
+        case State::loadingOverlappedIds:
+        {
+            return State::loadingTimeline;
+        }
+        default:
+        {
+            NX_ASSERT(false, lit("Wrong state, should not be here"));
+            return State::loadingOverlappedIds;
+        }
+    }
+}
+
+QString HanwhaChunkLoader::makeChannelIdListString() const
+{
+    QStringList channels;
+    for (int i = 0; i < m_maxChannels; ++i)
+        channels << QString::number(i);
+
+    return channels.join(L',');
+}
+
+QString HanwhaChunkLoader::makeStartDateTimeString() const
+{
+    auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        kUpdateChunksDelay).count();
+
+    const auto timeZoneShift = m_isUtcEnabled
+        ? std::chrono::seconds::zero()
+        : std::chrono::seconds(m_timeZoneShift);
+
+    auto startDateTime = hasBounds()
+        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, timeZoneShift)
+        : kMinDateTime;
+
+    return convertDateToString(startDateTime);
+}
+
+QString HanwhaChunkLoader::makeEndDateTimeSting() const
+{
+    auto endDateTime = hasBounds()
+        ? QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1)
+        : kMaxDateTime;
+
+    return convertDateToString(endDateTime);
+}
+
+std::chrono::milliseconds HanwhaChunkLoader::timeSinceLastTimelineUpdate() const
+{
+    return std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch())
+        - m_lastTimelineUpdate;
+}
+
+void HanwhaChunkLoader::setUpThreadUnsafe()
+{
+    if (m_state != State::initial)
+        return; //< Already started
+
+    const auto information = m_resourceContext->information();
+    if (!information)
+        return; //< Unable to start without channel number.
+
+    m_hasSearchRecordingPeriodSubmenu = false;
+    const auto searchRecordingPeriodAttribute = information->attributes.attribute<bool>(
+        lit("Recording/SearchPeriod"));
+
+    if (searchRecordingPeriodAttribute != boost::none)
+        m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.get();
+
+    m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
+    m_maxChannels = information->channelCount;
+}
+
+OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineThreadUnsafe(
+    int channelNumber) const
+{
+    const bool needToRestrictPeriods = hasBounds()
+        && m_startTimeUs != AV_NOPTS_VALUE
+        && m_endTimeUs != AV_NOPTS_VALUE;
+
+    const auto startTimeMs = m_startTimeUs / 1000;
+    const auto endTimeMs = m_endTimeUs / 1000;
+    QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
+
+    OverlappedTimePeriods result;
+    for (const auto& entry : m_chunks)
+    {
+        const auto overlappedId = entry.first;
+        const auto& chunksByChannel = entry.second;
+
+        if (chunksByChannel.size() < channelNumber + 1)
+            continue;
+
+        if (needToRestrictPeriods)
+            result[overlappedId] = chunksByChannel[channelNumber].intersected(boundingPeriod);
+        else
+            result[overlappedId] = chunksByChannel[channelNumber];
+    }
+
+    return result;
+}
+
+void HanwhaChunkLoader::at_httpClientDone()
+{
+    if (m_terminated)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+    if (handleHttpError())
+        return; //< Some error has occurred
+
+    NX_VERBOSE(this, lm("Http request %1 succeeded with status code %2")
+        .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
+
+    switch (m_state)
+    {
+        case State::loadingRecordingPeriod:
+            handleSuccessfulRecordingPeriodResponse();
+            break;
+        case State::loadingOverlappedIds:
+            handleSuccessfulOverlappedIdResponse();
+            break;
+        case State::loadingTimeline:
+            handleSuccessfulTimelineResponse();
+            break;
+        default:
+            NX_ASSERT(false, lit("Wrong state, shouldn't be here"));
+    }
+}
+
+void HanwhaChunkLoader::at_gotChunkData()
+{
+    if (m_terminated)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+    // This function should be fast because of large amount of records for recorded data
+    auto buffer = m_unfinishedLine;
+    buffer.append(m_httpClient->fetchMessageBodyBuffer());
+    int index = buffer.lastIndexOf('\n');
+    if (index == -1)
+    {
+        m_unfinishedLine = buffer;
+        return;
+    }
+
+    m_unfinishedLine = buffer.mid(index + 1);
+    buffer.truncate(index);
+
+    const auto lines = buffer.split('\n');
+    NX_VERBOSE(this, lm("%1 got %2 lines of chunk data")
+        .args(m_httpClient->contentLocationUrl(), lines.size()));
+
+    const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    for (const auto& line: lines)
+        parseTimelineData(line.trimmed(), currentTimeMs);
+}
+
+bool HanwhaChunkLoader::isEdge() const
+{
+    return !m_isNvr;
+}
+
+bool HanwhaChunkLoader::isNvr() const
+{
+    return m_isNvr;
 }
 
 } // namespace plugins

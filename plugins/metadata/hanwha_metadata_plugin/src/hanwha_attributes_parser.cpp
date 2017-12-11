@@ -1,3 +1,5 @@
+#if defined(ENABLED_HANWHA)
+
 #include "hanwha_attributes_parser.h"
 
 #include <iostream>
@@ -112,3 +114,4 @@ bool HanwhaAttributesParser::readChannelEvents(QXmlStreamReader& reader)
 } // namespace mediaserver
 } // namespace nx
 
+#endif // defined(ENABLED_HANWHA)

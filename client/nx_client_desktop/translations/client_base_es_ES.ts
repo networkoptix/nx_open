@@ -48,6 +48,10 @@ to view more bookmarks</source>
       <source>Delete bookmark</source>
       <translation>Borrar marcador</translation>
     </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>Exportar marcadores</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -477,22 +481,6 @@ to view more bookmarks</source>
       <translation>Ocultar info</translation>
     </message>
     <message>
-      <source>Change Resolution...</source>
-      <translation>Cambiar resolución...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Automático</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Bajo</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Alto</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -705,14 +693,6 @@ to view more bookmarks</source>
       <translation>Combinar con sistema conectado en ese momento...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Cambiar la proporción de aspecto de la célula...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Cambiar el espaciado de celda...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>Ninguno</translation>
     </message>
@@ -872,6 +852,34 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Hacer Showreel</translation>
     </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>Iniciar el Analíticas...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Algunas cámaras requieren que se establezcan contraseñas</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>Exportar Video...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>Exportar marcadores...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>Resolución...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>Relación de Aspecto de Celda...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>Espaciado de Celda...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -961,6 +969,64 @@ to view more bookmarks</source>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
       <translation>El Id de hardware del servidor con esta licencia no coincide con el Id de hardware en el que se activó la licencia.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Los ajustes elegidos requieren transcodificación. Aumentará el uso de la CPU y puede tomar un tiempo significativo.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>No se recomienda el formato AVI para exportar una grabación no continua con pista de audio.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Recomendamos exportar video desde esta cámara como &quot;Multi Video&quot; para evitar la reducción de escala.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Estás a punto de exportar un video largo. Puede requerir más de un gigabyte de espacio del disco duro y tomar varios minutos para completar.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .EXE files.</source>
+      <translation>La configuración no está disponible para archivos .EXE.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Los archivos locales, los widgets del monitor del servidor y las páginas web no se exportarán.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio y vídeo entrelazado</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 Parte 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 Archivo multimedia</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>Eejecutables %1 Archivo Multimedia (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>Eejecutables %1 Archivo Multimedia (x86)</translation>
     </message>
   </context>
   <context>
@@ -1079,10 +1145,6 @@ to view more bookmarks</source>
       <translation>Corto</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>La contraseña debe tener al menos 8 caracteres.</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>Común</translation>
     </message>
@@ -1097,6 +1159,49 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Se permiten sólo letras, números y símbolos de teclado.</translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>Largo</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Solo se permiten letras latinas, números y símbolos de teclado %1.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>La contraseña debe contener %n combinaciones diferentes de caracteres, símbolos o dígitos</numerusform>
+        <numerusform>La contraseña debe contener %n combinaciones diferentes de caracteres, símbolos o dígitos</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>La contraseña debe tener al menos %n caracteres de longitud.</numerusform>
+        <numerusform>La contraseña debe tener al menos %n caracteres de longitud.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>La contraseña no debe tener más de %n caracteres.</numerusform>
+        <numerusform>La contraseña no debe tener más de %n caracteres.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation>
+        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos.</numerusform>
+        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation>
+        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos.</numerusform>
+        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1231,13 +1336,6 @@ to view more bookmarks</source>
     <message>
       <source>Client is not connected to any System</source>
       <translation>Cliente no está conectado en ningún sistema</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>Solo-Lectura</translation>
     </message>
   </context>
   <context>
@@ -2117,6 +2215,16 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message numerus="yes">
+      <source>Analytics is not available for %1</source>
+      <translation>
+        <numerusform>Analíticas no está disponible para %1</numerusform>
+        <numerusform>Analíticas no está disponible para %1</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
@@ -2214,6 +2322,26 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>Secundaria</translation>
+    </message>
+    <message>
+      <source>Don&apos;t change</source>
+      <translation>Don&apos;t cambio</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Bajo</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Mediano</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Alto</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2393,6 +2521,29 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
+      <translation>Contraseña no debe ser igual al nombre de usuario de la cámara</translation>
+    </message>
+    <message>
+      <source>New Password</source>
+      <translation>Nueva contraseña</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Repetir contraseña</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Las contraseñas no coinciden.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>La contraseña debe tener al menos 8 símbolos de largo y contener diferentes tipos de caracteres.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
@@ -2471,6 +2622,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>Para activar o ajustar, vaya a la &quot;pestaña&quot; Moción en ajustes de la cámara.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Menos configuraciones</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Más configuraciones</translation>
     </message>
   </context>
   <context>
@@ -3011,6 +3174,28 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Esta cámara requiere contraseña para ser configurada.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>Algunas de las cámaras seleccionadas requieren que se configure una contraseña.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set Password</source>
+      <translation>
+        <numerusform>Configurar contraseña</numerusform>
+        <numerusform>Configurar contraseña</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -3256,6 +3441,10 @@ a %1</translation>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -3549,38 +3738,6 @@ a %1</translation>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>Error al desactivar el puerto de E/S %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportación a &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>No se pudo exportar el dispositivo %1.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>No se pudo exportar cámara %1.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Ha ocurrido un error desconocido.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>No se pudo exportar módulo %1.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>No se pudo crear el archivo de salida %1...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>El archivo &quot;%1&quot; es utilizado por otro proceso. Intenta otro nombre.</translation>
     </message>
   </context>
   <context>
@@ -4058,13 +4215,6 @@ a %1</translation>
   <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>Use licencias análogas para ver estas cámaras %n</numerusform>
-        <numerusform>Use licencias análogas para ver estas cámaras %n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
         <numerusform>Use licencia para el %n dispositivo seleccionado</numerusform>
@@ -4083,6 +4233,13 @@ a %1</translation>
       <translation>
         <numerusform>Use licencia para el %n de Módulo de E/S</numerusform>
         <numerusform>Use licencias para los %n de Módulos de E/S</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>Usa licencias para ver estas %n cámaras</numerusform>
+        <numerusform>Usa licencias para ver estas %n cámaras</numerusform>
       </translation>
     </message>
   </context>
@@ -4327,6 +4484,13 @@ a %1</translation>
       <source>Disabled by schedule</source>
       <translation>Deshabilitado por horario</translation>
     </message>
+    <message numerus="yes">
+      <source>Set For All %n Cameras</source>
+      <translation>
+        <numerusform>Configurar para todas las cámaras de %n</numerusform>
+        <numerusform>Configurar para todas las cámaras de %n</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4467,6 +4631,10 @@ a %1</translation>
       <source>Previous Chunk</source>
       <translation>Fragmento anterior</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>Las cámaras NVR no son compatibles con la reproducción no sincronizada</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4560,6 +4728,10 @@ a %1</translation>
     <message>
       <source>Acknowledge</source>
       <translation>Reconocer</translation>
+    </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Configurar Contraseña</translation>
     </message>
   </context>
   <context>
@@ -5939,6 +6111,18 @@ a %1</translation>
       <source>Please check authentication information</source>
       <translation>Compruebe la información de autenticación</translation>
     </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>DEMASIADAS CONEXIONES</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>SE REQUIERE CONTRASEÑA</translation>
+    </message>
+    <message>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6234,10 +6418,6 @@ a %1</translation>
       <translation>Sistema está en modo seguro</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Almacenamiento está lleno</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Almacenamiento no está configurado</translation>
     </message>
@@ -6280,10 +6460,6 @@ a %1</translation>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Reconstrucción de índice archivo es cancelado por el usuario en el siguiente servidor:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>El almacenamiento esta lleno en el siguiente servidor:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6357,7 +6533,11 @@ a %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Sincronización de archivo remoto</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>Problema de integridad del archivo</translation>
     </message>
   </context>
   <context>
@@ -6420,16 +6600,16 @@ a %1</translation>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>La hora del sistema se sincroniza con Internet y es independiente de los horarios locales del servidor.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>La hora del sistema se sincroniza con la hora local del servidor seleccionado y es independiente de otros servidores.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>Ningún servidor tiene acceso a Internet. El tiempo no esta siendo sincronizado.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>La hora del sistema se sincroniza con Internet y no depende de la hora local en los servidores.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>La hora del sistema se sincroniza con Internet y no depende de la hora local en los servidores.</translation>
     </message>
   </context>
   <context>
@@ -7047,177 +7227,6 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Archivos ejecutables %1 Media (x 64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Archivos ejecutables %1 Media (x 86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Exportando diseño</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Exportar vídeo como...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Marcas de tiempo:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Exportando vídeo</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportando a &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>Exportar diseño como...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 archivo de medios (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Aplicar filtros: Rotación, Dewarping, mejora de la imagen, relación de aspecto personalizada (requiere transcodificación)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>exportado</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Sin marca de tiempo</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Esquina superior izquierda (requiere transcodificación)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Esquina superior derecha (requiere transcodificación)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Esquina inferior izquierda (requiere transcodificación)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Esquina inferior derecha (requiere transcodificación)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>Guardar diseño local como...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Crear archivo de sólo lectura.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>Archivo ya utilizado para la grabación</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Elija otro nombre o espere hasta que finalice la grabación.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>Estás a punto de exportar un video largo</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Puede requerir más de un gigabyte de espacio de disco duro y tomar varios minutos para completar.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>¿Exportar de todos modos?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>¿Exportar a AVI de todos modos?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>Formato seleccionado no recomendado</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Para evitar reduccion del video, los formatos NOV o EXE se recomiendan para esta cámara.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>¿Exportar con transcodificación?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>Aumentará el uso de la CPU y puede tomar un tiempo significativo.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>Formato EXE no recomendado</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>¿Exportar a EXE de todos modos?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Fallo al exportar Multi-Video</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>No se permiten archivos locales para exportar Multi-Video</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>Elimine todos los archivos locales del diseño y vuelva a intentarlo.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Exportar</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>Estás a punto de exportar un montón de video</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Se seleccionó un período demasiado corto</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Para la exportación en Revisión Rápida, la longitud del video debe ser por lo menos 10 segundos.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Exportación completada</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Error al exportar vídeo</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>No se recomienda el formato AVI</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Para exportar una grabación no continua se recomienda MKV o algún otro formato.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>Los archivos EXE de más de 4 GB no se pueden abrir haciendo doble clic debido a una limitación de Windows.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -7732,6 +7741,459 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>Dinámico</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Medios no compatibles para la exportación de datos.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>El formato seleccionado no es compatible con la biblioteca FFMPEG.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>Error de biblioteca FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>El códec de video o audio no es compatible con el formato seleccionado.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Error al escribir archivo.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation>No se exportaron datos.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Error interno</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>exportado</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportar</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Revisión Rápida</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Exportar Ajustes</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Añadir marca de tiempo</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Eliminar marca de tiempo</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Marcas de tiempo</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Añadir imagen</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Borrar imagen</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Imagen</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Añadir texto</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Eliminar texto</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Texto</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Restablecer velocidad</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Añadir información de marcador</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Eliminar la información de marcador</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Información de marcadores</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Carpeta</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Nombre</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>El nombre no puede estar vacío.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Seleccione carpeta...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Seleccione el archivo...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>Imágenes (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Error</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>La imagen no puede ser cargada.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>NO HAY DATOS</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>NO ES UNA CÁMARA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Bajo</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Alto</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Personalizado</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Establezca la resolución del diseño en &quot;Auto&quot; para aumentar el rendimiento.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Para exportar, la duración del video de la Revisión Rápida debe ser de al menos %n segundos.</numerusform>
+        <numerusform>Para exportar, la duración del video de la Revisión Rápida debe ser de al menos %n segundos.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>Largo</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Corto</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 Analíticas</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>Detener exportación</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Exportación completada</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Error de exportación</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>No se puede escribir archivo</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 está en uso por otra exportación.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>El archivo &quot;%1&quot; es utilizado por otro proceso. Intenta otro nombre.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>No se pudo crear el archivo de salida %1...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>Ha ocurrido un error desconocido.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exportación a &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>No se pudo exportar el dispositivo %1.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>No se pudo exportar cámara %1.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>No se pudo exportar módulo %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Archivos ejecutables %1 Media (x 64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Archivos ejecutables %1 Media (x 86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>Archivo ya utilizado para la grabación</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>Elija otro nombre o espere hasta que finalice la grabación.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>Exportando diseño</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video</source>
+      <translation>Estás a punto de exportar un video largo</translation>
+    </message>
+    <message>
+      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Puede requerir más de un gigabyte de espacio de disco duro y tomar varios minutos para completar.</translation>
+    </message>
+    <message>
+      <source>Export anyway?</source>
+      <translation>¿Exportar de todos modos?</translation>
+    </message>
+    <message>
+      <source>Export Video As...</source>
+      <translation>Exportar vídeo como...</translation>
+    </message>
+    <message>
+      <source>No Timestamp</source>
+      <translation>Sin marca de tiempo</translation>
+    </message>
+    <message>
+      <source>Top Left Corner (requires transcoding)</source>
+      <translation>Esquina superior izquierda (requiere transcodificación)</translation>
+    </message>
+    <message>
+      <source>Top Right Corner (requires transcoding)</source>
+      <translation>Esquina superior derecha (requiere transcodificación)</translation>
+    </message>
+    <message>
+      <source>Bottom Left Corner (requires transcoding)</source>
+      <translation>Esquina inferior izquierda (requiere transcodificación)</translation>
+    </message>
+    <message>
+      <source>Bottom Right Corner (requires transcoding)</source>
+      <translation>Esquina inferior derecha (requiere transcodificación)</translation>
+    </message>
+    <message>
+      <source>Timestamps:</source>
+      <translation>Marcas de tiempo:</translation>
+    </message>
+    <message>
+      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+      <translation>Aplicar filtros: Rotación, Dewarping, mejora de la imagen, relación de aspecto personalizada (requiere transcodificación)</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended</source>
+      <translation>No se recomienda el formato AVI</translation>
+    </message>
+    <message>
+      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+      <translation>Para exportar una grabación no continua se recomienda MKV o algún otro formato.</translation>
+    </message>
+    <message>
+      <source>Export to AVI anyway?</source>
+      <translation>¿Exportar a AVI de todos modos?</translation>
+    </message>
+    <message>
+      <source>Selected format not recommended</source>
+      <translation>Formato seleccionado no recomendado</translation>
+    </message>
+    <message>
+      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
+      <translation>Para evitar reduccion del video, los formatos NOV o EXE se recomiendan para esta cámara.</translation>
+    </message>
+    <message>
+      <source>Export with transcoding?</source>
+      <translation>¿Exportar con transcodificación?</translation>
+    </message>
+    <message>
+      <source>It will increase CPU usage and may take significant time.</source>
+      <translation>Aumentará el uso de la CPU y puede tomar un tiempo significativo.</translation>
+    </message>
+    <message>
+      <source>Exporting Video</source>
+      <translation>Exportando vídeo</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exportación a &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>Formato EXE no recomendado</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>Los archivos EXE de más de 4 GB no se pueden abrir haciendo doble clic debido a una limitación de Windows.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>¿Exportar a EXE de todos modos?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>Fallo al exportar Multi-Video</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>No se permiten archivos locales para exportar Multi-Video</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>Elimine todos los archivos locales del diseño y vuelva a intentarlo.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>Guardar diseño local como...</translation>
+    </message>
+    <message>
+      <source>Export Layout As...</source>
+      <translation>Exportar diseño como...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>exportado</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 archivo de medios (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>Crear archivo de sólo lectura.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportar</translation>
+    </message>
+    <message>
+      <source>You are about to export a lot of video</source>
+      <translation>Estás a punto de exportar un montón de video</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>Se seleccionó un período demasiado corto</translation>
+    </message>
+    <message>
+      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
+      <translation>Para la exportación en Revisión Rápida, la longitud del video debe ser por lo menos 10 segundos.</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Exportación completada</translation>
+    </message>
+    <message>
+      <source>Failed to export video</source>
+      <translation>Error al exportar vídeo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>Ningún tipo de evento soportado</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>Evento se activará sólo si la Analítica de Eventos cumple todas las condiciones anteriores. Si un campo de palabra clave está vacío, siempre se cumple la condición. Si no es así, se cumple la condición si el campo correspondiente de análisis contiene las claves.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -8075,6 +8537,14 @@ a %1</translation>
       <source>Failed to open server web page</source>
       <translation>Error al abrir la página web del servidor</translation>
     </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>Error al cambiar la contraseña</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -8114,7 +8584,7 @@ a %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>¿Eliminar Showreel %1?</translation>
     </message>
   </context>
   <context>

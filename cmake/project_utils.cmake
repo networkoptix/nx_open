@@ -44,8 +44,16 @@ function(nx_add_target name type)
     endif()
 
     if(resources)
-        nx_generate_qrc("${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc" ${resources})
-        qt5_add_resources(rcc_files "${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc")
+        nx_generate_qrc(
+            ${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc
+            ${resources}
+            USED_FILES_VARIABLE qrc_dependencies
+        )
+        nx_add_qrc(
+            ${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc
+            rcc_files
+            DEPENDS ${qrc_dependencies}
+        )
     endif()
 
     set(sources ${cpp_files} ${moc_files} ${rcc_files} ${qm_files})

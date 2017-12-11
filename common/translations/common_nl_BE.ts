@@ -486,6 +486,14 @@
       <source>Time Licenses</source>
       <translation>Tijdlicenties</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Bridge licentie</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -775,6 +783,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>Ongeldig brontype voor gegevensuitvoer.</translation>
     </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation>Geen gegevens geëxporteerd.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -996,7 +1008,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Live Viewer</translation>
+      <translation>Live kijker</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1047,7 +1059,7 @@
     </message>
     <message>
       <source>Write to log</source>
-      <translation>Schrijf weg naar het log</translation>
+      <translation>Schrijf weg naar het logboek</translation>
     </message>
     <message>
       <source>Show notification</source>
@@ -1075,7 +1087,7 @@
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Toon op alarm layout</translation>
+      <translation>Toon op alarm scherm</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
@@ -1457,20 +1469,20 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n Gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n Rollen</numerusform>
-        <numerusform>%n Rollen</numerusform>
+        <numerusform>%n Profielen</numerusform>
+        <numerusform>%n Profielen</numerusform>
       </translation>
     </message>
     <message>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Bevestigen</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analytics evenement</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 op %2</translation>
     </message>
   </context>
   <context>

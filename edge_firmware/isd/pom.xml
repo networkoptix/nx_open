@@ -52,4 +52,24 @@
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>linux-edge1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>edge1</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages>cpro gdb</rdep.packages>
+            </properties>
+        </profile>
+    </profiles>
 </project>

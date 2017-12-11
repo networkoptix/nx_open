@@ -17,6 +17,13 @@
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/serialization/json.h>
 
+namespace {
+
+static const int kWidthRoundingFactor = 16;
+static const int kHeightRoundingFactor = 4;
+
+} // namespace
+
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
@@ -145,7 +152,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
-    //bool lineAmountSpecified = false;
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         QSize srcResolution = findSavedResolution(video);
@@ -154,14 +160,17 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 
         m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
-        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
+        // Round resolution height.
+        m_resolution.setHeight(
+            qPower2Round((unsigned) m_resolution.height(), kHeightRoundingFactor));
 
-        float ar = srcResolution.width() / (float) srcResolution.height();
+        float ar = srcResolution.width() / (float)srcResolution.height();
         m_resolution.setWidth(m_resolution.height() * ar);
-        m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
-        //lineAmountSpecified = true;
+        // Round resolution width.
+        m_resolution.setWidth(qPower2Round((unsigned) m_resolution.width(), kWidthRoundingFactor));
     }
-    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty()) {
+    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())
+    {
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 

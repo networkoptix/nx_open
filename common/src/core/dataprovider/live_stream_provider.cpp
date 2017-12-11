@@ -68,7 +68,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         m_motionEstimation[i].setChannelNum(i);
 
-        if (i == 0)
+        if (i == 0 && nx::analytics::ini().enableDetectionPlugin)
         {
             auto commonModule = res->commonModule();
             if (!commonModule)
@@ -177,7 +177,7 @@ void QnLiveStreamProvider::setParams(const QnLiveStreamParams& params)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (auto owner = getOwner()) 
+        if (auto owner = getOwner())
         {
             QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)

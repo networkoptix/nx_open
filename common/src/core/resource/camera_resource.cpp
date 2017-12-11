@@ -10,17 +10,18 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_data.h>
+#include <core/resource/resource_data_structures.h>
+#include <nx_ec/ec_api.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
-#include <utils/math/math.h>
 #include <utils/crypt/symmetrical.h>
-#include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
-#include <core/resource_access/user_access_data.h>
-#include <nx_ec/ec_api.h>
-#include <common/static_common_module.h>
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
+#include <utils/math/math.h>
 
 namespace {
 
@@ -109,18 +110,21 @@ float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution
     return result;
 }
 
-QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, float aspectRatio,
-                                              double maxResolutionSquare, const QList<QSize>& resolutionList,
-                                              double* coeff)
+QSize QnPhysicalCameraResource::getNearestResolution(
+    const QSize& resolution,
+    float aspectRatio,
+    double maxResolutionArea,
+    const QList<QSize>& resolutionList,
+    double* coeff)
 {
 	if (coeff)
 		*coeff = INT_MAX;
 
     double requestSquare = resolution.width() * resolution.height();
-    if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
+    if (requestSquare < MAX_EPS || requestSquare > maxResolutionArea) return EMPTY_RESOLUTION_PAIR;
 
     int bestIndex = -1;
-    double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
+    double bestMatchCoeff = maxResolutionArea > MAX_EPS ? (maxResolutionArea / requestSquare) : INT_MAX;
 
     for (int i = 0; i < resolutionList.size(); ++i) {
         QSize tmp;
@@ -153,6 +157,35 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
+QSize QnPhysicalCameraResource::closestResolution(
+    const QSize& idealResolution,
+    float aspectRatio,
+    const QSize& maxResolution,
+    const QList<QSize>& resolutionList,
+    double* outCoefficient)
+{
+    const auto maxResolutionArea = maxResolution.width() * maxResolution.height();
+
+    QSize result = getNearestResolution(
+        idealResolution,
+        aspectRatio,
+        maxResolutionArea,
+        resolutionList,
+        outCoefficient);
+
+    if (result == EMPTY_RESOLUTION_PAIR)
+    {
+        result = getNearestResolution(
+            idealResolution,
+            0.0,
+            maxResolutionArea,
+            resolutionList,
+            outCoefficient); //< Try to get resolution ignoring aspect ration
+    }
+
+    return result;
+}
+
 CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
 {
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
@@ -171,6 +204,8 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
     m_lastCredentials = credentials;
     return CameraDiagnostics::NoErrorResult();
 }
+
+
 
 bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams )
 {
@@ -404,7 +439,6 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 }
 
 // --------------- QnVirtualCameraResource ----------------------
-
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
     QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);

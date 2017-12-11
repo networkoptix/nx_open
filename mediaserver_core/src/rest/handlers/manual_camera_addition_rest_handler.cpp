@@ -16,25 +16,6 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <common/common_module.h>
 
-class ManualSearchThreadPoolHolder
-{
-public:
-    QThreadPool pool;
-
-    ManualSearchThreadPoolHolder()
-    {
-        pool.setMaxThreadCount(
-            #ifdef __arm__
-                8
-            #else
-                32
-            #endif
-        );
-    }
-};
-
-static ManualSearchThreadPoolHolder manualSearchThreadPoolHolder;
-
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
 }
@@ -81,17 +62,10 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         // Consider using async fsm here (this one should be quite simple).
         // NOTE: boost::bind is here temporarily, until nx::utils::concurrent::run supports arbitrary
         // number of arguments.
+        const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
         m_searchProcessRuns.insert(processUuid,
-            nx::utils::concurrent::run(
-                &manualSearchThreadPoolHolder.pool,
-                boost::bind(
-                    &QnManualCameraSearcher::run,
-                    searcher,
-                    &manualSearchThreadPoolHolder.pool,
-                    addr1,
-                    addr2,
-                    auth,
-                    port)));
+            nx::utils::concurrent::run(threadPool, boost::bind(
+                &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
     }
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
@@ -195,7 +169,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     auth.setUser(data.user);
     auth.setPassword(data.password);
 
-    QnManualCameraInfoMap infoMap;
+    std::vector<QnManualCameraInfo> cameraList;
     for (const auto& camera: data.cameras)
     {
         QUrl url(camera.url);
@@ -215,15 +189,15 @@ int QnManualCameraAdditionRestHandler::addCameras(
             return CODE_INVALID_PARAMETER;
         }
 
-        infoMap.insert(camera.url, info);
+        cameraList.push_back(info);
     }
 
-    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(infoMap);
+    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
     if (registered > 0)
     {
         QnAuditRecord auditRecord =
             qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
-        for (const QnManualCameraInfo& info: infoMap)
+        for (const QnManualCameraInfo& info: cameraList)
         {
             if (!info.uniqueId.isEmpty())
                 auditRecord.resources.push_back(QnNetworkResource::physicalIdToId(info.uniqueId));

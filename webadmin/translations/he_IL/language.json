@@ -11,7 +11,7 @@
         "errorNoNetwork": "מכשיר זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
     },
     "passwordRequirements": {
-        "minLengthMessage": "סיסמה חייבת להכיל לפחות 8 תווים",
+        "minLengthMessage": "סיסמא חייבת להכיל לפחות 8 תווים",
         "requiredMessage": "רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
         "weakMessage": "הסיסמא צריכה להכיל סוגים שונים של סמלים",
         "strongMessage": "סיסמה חזקה!",
@@ -116,7 +116,7 @@
     "common": {
         "systemOffline": "השרת אינו זמין",
         "cameraLinks": {
-            "copyToClipboard": "העתק ללוח",
+            "copyToClipboard": "העתק ללוח העריכה",
             "highStream": "תזרים ראשי",
             "copyDefaultText": "העתק",
             "unknown": "לא ידוע",

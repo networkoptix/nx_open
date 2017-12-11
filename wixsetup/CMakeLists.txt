@@ -16,6 +16,7 @@ ExternalProject_Add(
         -DCONFIG_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}
         -DROOT_DIR=${CMAKE_SOURCE_DIR}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DwixDirectory=${wix_directory}
 )
 
 nx_copy_bin_resources(${bin_resources} "${CMAKE_CURRENT_BINARY_DIR}")

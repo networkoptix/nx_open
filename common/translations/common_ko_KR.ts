@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -416,7 +416,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>비디오 월</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>시작:</translation>
+      <translation>시작</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -486,6 +486,14 @@
       <source>Time Licenses</source>
       <translation>Time Licenses</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation type="unfinished">Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation type="unfinished">Bridge Licenses</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -542,7 +550,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -647,11 +655,11 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>알수 없음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>무료 인증키</translation>
+      <translation>무료 라이센스</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -690,7 +698,7 @@
     </message>
     <message>
       <source>Best</source>
-      <translation>최적</translation>
+      <translation>최고</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -765,6 +773,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
     </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation type="unfinished">No data was exported.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -835,7 +847,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>월</translation>
+      <translation>분</translation>
     </message>
     <message>
       <source>y</source>
@@ -986,7 +998,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>사용자 지정.</translation>
+      <translation>사용자 정의</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1425,7 +1437,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation>Trigger 이름</translation>
+      <translation>트리거 이름</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1473,7 +1485,16 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>확인</translation>
+      <translation>확인함</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 에서 %1</translation>
     </message>
   </context>
   <context>

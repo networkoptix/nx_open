@@ -163,7 +163,7 @@ private:
 
     bool enableDuplexMode() const;
 
-    bool initialize2WayAudio(CLSimpleHTTPClient* const http);
+    bool initializeAudio(CLSimpleHTTPClient* const http);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts);

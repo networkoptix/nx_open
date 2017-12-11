@@ -49,6 +49,10 @@ to view more bookmarks</source>
       <source>Delete bookmark</source>
       <translation>Удалить закладку</translation>
     </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>Экспортировать закладку</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -478,22 +482,6 @@ to view more bookmarks</source>
       <translation>Скрыть информацию</translation>
     </message>
     <message>
-      <source>Change Resolution...</source>
-      <translation>Изменить разрешение...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Авто</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Низкое</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Высокое</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -706,14 +694,6 @@ to view more bookmarks</source>
       <translation>Присоединить сервер к текущей системе...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Соотношение сторон ячеек...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Расстояние между ячейками...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>Нет</translation>
     </message>
@@ -873,6 +853,34 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Сделать прокрутку</translation>
     </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>Запустить аналитику...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Некоторые камеры требуют установки паролей</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>Экспортировать видео...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>Экспорт закладки...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>Разрешение...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>Соотношение сторон ячеек...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>Расстояние между ячейками...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -962,6 +970,64 @@ to view more bookmarks</source>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
       <translation>Аппаратный идентификатор сервера с этой лицензией не соответствует идентификатору сервера, на котором она была активирована.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Выбранные настройки требуют перекодирования. Это увеличит нагрузку на процессор и может занять значительное время.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>Формат AVI не рекомендуется использовать для экспорта запись с перерывами и с аудиодорожкой.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Мы рекомендуем экспортировать видео с этой камеры как "Multi Video" чтобы избежать ухудшения качества.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Вы собираетесь экспортировать длинное видео. Это может потребовать более одного гигабайта пространства на жестком диске и занять несколько минут.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .EXE files.</source>
+      <translation>Настройки не доступны для файлов .EXE.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Локальные файлы, виджеты мониторинга серверов и веб-страницы экспортироваться не будут.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio Video Interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation type="unfinished">MPEG-4 Part 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 Файл мультимедиа</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>Исполняемый медиа файл %1 (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>Исполняемый медиа файл %1 (x86)</translation>
     </message>
   </context>
   <context>
@@ -1081,10 +1147,6 @@ to view more bookmarks</source>
       <translation>Короткий</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>Пароль должен содержать минимум 8 символов.</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>Типичный</translation>
     </message>
@@ -1099,6 +1161,54 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Допускаются только латинские буквы, цифры и символы.</translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation type="unfinished">Long</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Допускаются только латинские буквы, цифры и символы %1.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>Пароль должен содержать %n различную комбинацию букв, символов или цифр</numerusform>
+        <numerusform>Пароль должен содержать %n различные комбинации букв, символов или цифр</numerusform>
+        <numerusform>Пароль должен содержать %n различных комбинаций букв, символов или цифр</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>Пароль должен содержать минимум %n символ.</numerusform>
+        <numerusform>Пароль должен содержать минимум %n символа.</numerusform>
+        <numerusform>Пароль должен содержать минимум %n символов.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>Пароль должен быть длиной не более %n символа.</numerusform>
+        <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
+        <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1193,7 +1303,7 @@ to view more bookmarks</source>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -1236,13 +1346,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>Только для чтения</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1264,7 +1367,7 @@ to view more bookmarks</source>
       <translation>
         <numerusform>...и ещё %n</numerusform>
         <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и еще %n</numerusform>
+        <numerusform>...и ещё %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1301,7 +1404,7 @@ to view more bookmarks</source>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation>Воспроизведение</translation>
+      <translation>Воспроизвести</translation>
     </message>
     <message>
       <source>User settings...</source>
@@ -1389,7 +1492,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
       <translation>
-        <numerusform>Эта камера была удалена из системы</numerusform>
+        <numerusform>Эти камеры были удалены из системы</numerusform>
         <numerusform>Эти камеры были удалены из системы</numerusform>
         <numerusform>Эти камеры были удалены из системы</numerusform>
       </translation>
@@ -1397,7 +1500,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These servers are removed from System</source>
       <translation>
-        <numerusform>Этот сервер был удален из системы</numerusform>
+        <numerusform>Эти серверы были удалены из системы</numerusform>
         <numerusform>Эти серверы были удалены из системы</numerusform>
         <numerusform>Эти серверы были удалены из системы</numerusform>
       </translation>
@@ -1413,7 +1516,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These resources are removed from System</source>
       <translation>
-        <numerusform>Этот ресурс был удален из системы</numerusform>
+        <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
         <numerusform>Эти ресурсы были удалены из системы</numerusform>
       </translation>
@@ -1744,7 +1847,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation>Любая камера</translation>
     </message>
   </context>
   <context>
@@ -1818,7 +1921,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Любой сервер</translation>
+      <translation>Любой Сервер</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -1826,7 +1929,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation>Любая камера</translation>
     </message>
   </context>
   <context>
@@ -1863,7 +1966,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation>Любая камера</translation>
     </message>
   </context>
   <context>
@@ -2043,8 +2146,8 @@ to view more bookmarks</source>
       <source>%n devices added.</source>
       <translation>
         <numerusform>%n device added.</numerusform>
-        <numerusform>Добавлено %n устройства.</numerusform>
-        <numerusform>Добавлено %n устройств.</numerusform>
+        <numerusform>%n device added.</numerusform>
+        <numerusform>%n device added.</numerusform>
       </translation>
     </message>
     <message>
@@ -2055,8 +2158,8 @@ to view more bookmarks</source>
       <source>Failed to add %n devices</source>
       <translation>
         <numerusform>Failed to add %n device</numerusform>
-        <numerusform>Не удалось добавить %n устройства</numerusform>
-        <numerusform>Не удалось добавить %n устройств</numerusform>
+        <numerusform>Failed to add %n device</numerusform>
+        <numerusform>Failed to add %n device</numerusform>
       </translation>
     </message>
     <message>
@@ -2135,6 +2238,17 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message numerus="yes">
+      <source>Analytics is not available for %1</source>
+      <translation type="unfinished">
+        <numerusform>Аналитика недоступна для %1</numerusform>
+        <numerusform>Analytics is not available for %1</numerusform>
+        <numerusform>Analytics is not available for %1</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
@@ -2142,12 +2256,12 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>Выберите камеру</translation>
+      <translation>Выбрать камеру</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <translation>
-        <numerusform>%1 не поддерживает двусторонний звук</numerusform>
+        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         <numerusform>%1 не поддерживают двусторонний звук</numerusform>
       </translation>
@@ -2233,6 +2347,26 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>Вторичный</translation>
+    </message>
+    <message>
+      <source>Don&apos;t change</source>
+      <translation>Не менять</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Низкий</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Средний</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Высокий</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
     </message>
   </context>
   <context>
@@ -2418,6 +2552,29 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
+      <translation>Пароль на камере не должен быть такой же как имя пользователя</translation>
+    </message>
+    <message>
+      <source>New Password</source>
+      <translation>Новый пароль</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Повторите Пароль</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Введённые пароли не совпадают.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>Пароль должен содержать не менее 8 символов и содержать разные типы символов.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
@@ -2498,6 +2655,18 @@ to view more bookmarks</source>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>Чтобы включить или настроить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры.</translation>
     </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Мбит/с</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Меньше настроек</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Больше настроек</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
@@ -2561,24 +2730,24 @@ to view more bookmarks</source>
       <source>Changes to the following %n devices are not saved:</source>
       <translation>
         <numerusform>Changes to the following %n device are not saved:</numerusform>
-        <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
-        <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
+        <numerusform>Changes to the following %n device are not saved:</numerusform>
+        <numerusform>Changes to the following %n device are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
       <translation>
         <numerusform>Changes to the following %n camera are not saved:</numerusform>
-        <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
-        <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
+        <numerusform>Changes to the following %n camera are not saved:</numerusform>
+        <numerusform>Changes to the following %n camera are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
       <translation>
         <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-        <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
-        <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
+        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
+        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
       </translation>
     </message>
     <message>
@@ -2698,7 +2867,7 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation>Неверный Email / пароль</translation>
+      <translation>Неправильная электронная почта или пароль</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
@@ -2740,7 +2909,7 @@ to %1</source>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Создать учётную запись</translation>
+      <translation>Зарегистрироваться</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -2867,11 +3036,11 @@ to %1</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Скачать</translation>
+      <translation>Загрузить</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation>Перезагрузить</translation>
+      <translation>Перезапуск</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3041,10 +3210,33 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Эта камера требует установки пароля.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>Некоторые из выбранных камер требуют установки пароля.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set Password</source>
+      <translation>
+        <numerusform>Установить пароль</numerusform>
+        <numerusform>Установить пароли</numerusform>
+        <numerusform>Установить пароли</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Невозможно инициализировать звуковой кодек.</translation>
+      <translation>Ошибка инициализации кодировщика видео.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3110,7 +3302,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3261,9 +3453,9 @@ to %1</source>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
-        <numerusform>and %n more user...</numerusform>
         <numerusform>and %n more users...</numerusform>
-        <numerusform>и ещё %n пользователей...</numerusform>
+        <numerusform>and %n more users...</numerusform>
+        <numerusform>and %n more users...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3291,7 +3483,11 @@ to %1</source>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -3569,7 +3765,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>multiple values</source>
@@ -3585,38 +3781,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>Не удалось включить %1 порт ввода/вывода</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Экспорт в &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>Невозможно экспортировать устройство %1.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>Невозможно экспортировать камеру %1.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Произошла неизвестная ошибка.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>Невозможно экспортировать устройство %1.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>Невозможно открыть файл вывода %1...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; используется другим процессом. Пожалуйста, используйте другое имя.</translation>
     </message>
   </context>
   <context>
@@ -3639,7 +3803,7 @@ to %1</source>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation>Ошибка загрузки изображения</translation>
+      <translation>Ошибка загрузки изображения на сервер</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
@@ -3843,8 +4007,8 @@ to %1</source>
       <source>License expires in %n days</source>
       <translation>
         <numerusform>License expires in %n day</numerusform>
-        <numerusform>Срок действия истекает через %n дня</numerusform>
-        <numerusform>Срок действия истекает через %n дней</numerusform>
+        <numerusform>License expires in %n day</numerusform>
+        <numerusform>License expires in %n day</numerusform>
       </translation>
     </message>
     <message>
@@ -4105,14 +4269,6 @@ to %1</source>
   <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>Использовать аналоговую лицензию для просмотра %n камеры</numerusform>
-        <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
-        <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
         <numerusform>Использовать лицензии для %n выбранного устройства</numerusform>
@@ -4134,6 +4290,14 @@ to %1</source>
         <numerusform>Использовать лицензии для %n выбранного модуля ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Use licenses to view these %n cameras</numerusform>
+        <numerusform>Use licenses to view these %n cameras</numerusform>
+        <numerusform>Use licenses to view these %n cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -4165,7 +4329,7 @@ to %1</source>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Расширенные</translation>
+      <translation>Дополнительные</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
@@ -4247,7 +4411,7 @@ to %1</source>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Создать учётную запись</translation>
+      <translation>Зарегистрироваться</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4378,6 +4542,14 @@ to %1</source>
       <source>Disabled by schedule</source>
       <translation>Отключено по расписанию</translation>
     </message>
+    <message numerus="yes">
+      <source>Set For All %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set For All %n Cameras</numerusform>
+        <numerusform>Set For All %n Cameras</numerusform>
+        <numerusform>Set For All %n Cameras</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4454,7 +4626,7 @@ to %1</source>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Сбросить</translation>
+      <translation>Сброс</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4518,12 +4690,16 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>Предыдущий фрагмент</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>Камеры с NVR не поддерживают асинхронное воспроизведение</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation>Байт/с</translation>
+      <translation>Бит/с</translation>
     </message>
     <message>
       <source>MB/s</source>
@@ -4540,8 +4716,8 @@ to %1</source>
       <source>%n more notifications</source>
       <translation>
         <numerusform>%n more notification</numerusform>
-        <numerusform>Ещё %n уведомления</numerusform>
-        <numerusform>Ещё %n уведомлений</numerusform>
+        <numerusform>%n more notification</numerusform>
+        <numerusform>%n more notification</numerusform>
       </translation>
     </message>
   </context>
@@ -4612,6 +4788,10 @@ to %1</source>
     <message>
       <source>Acknowledge</source>
       <translation>Подтвердить</translation>
+    </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Установить пароли</translation>
     </message>
   </context>
   <context>
@@ -4869,7 +5049,7 @@ to %1</source>
     </message>
     <message>
       <source>Best</source>
-      <translation>Наилучшее</translation>
+      <translation>Лучшее</translation>
     </message>
     <message>
       <source>Average</source>
@@ -4964,19 +5144,19 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 ТБ</translation>
+      <translation>%1 Тб</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ГБ</translation>
+      <translation>%1 Гб</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation>
         <numerusform>Total %1 %n device</numerusform>
-        <numerusform>Всего %1 %n устройства</numerusform>
-        <numerusform>Всего %1 %n устройств</numerusform>
+        <numerusform>Total %1 %n device</numerusform>
+        <numerusform>Total %1 %n device</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4984,8 +5164,8 @@ to %1</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation>
         <numerusform>Total %1 %n camera</numerusform>
-        <numerusform>Всего %1 %n камеры</numerusform>
-        <numerusform>Всего %1 %n камер</numerusform>
+        <numerusform>Total %1 %n camera</numerusform>
+        <numerusform>Total %1 %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4993,8 +5173,8 @@ to %1</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation>
         <numerusform>Total %1 %n I/O module</numerusform>
-        <numerusform>Всего %1 %n модуля ввода-вывода</numerusform>
-        <numerusform>Всего %1 %n модулей ввода-вывода</numerusform>
+        <numerusform>Total %1 %n I/O module</numerusform>
+        <numerusform>Total %1 %n I/O module</numerusform>
       </translation>
     </message>
     <message>
@@ -5226,7 +5406,7 @@ to %1</source>
     <name>QnScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>Все</translation>
+      <translation>Всех</translation>
     </message>
   </context>
   <context>
@@ -5327,8 +5507,8 @@ to %1</source>
       <source>%n Servers</source>
       <translation>
         <numerusform>%n Server</numerusform>
-        <numerusform>%n сервера</numerusform>
-        <numerusform>%n серверов</numerusform>
+        <numerusform>%n Server</numerusform>
+        <numerusform>%n Server</numerusform>
       </translation>
     </message>
   </context>
@@ -5350,8 +5530,8 @@ to %1</source>
       <source>%n Users</source>
       <translation>
         <numerusform>%n User</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователь</numerusform>
       </translation>
     </message>
   </context>
@@ -5639,8 +5819,8 @@ to %1</source>
       <source>Not enough free space at %n Servers:</source>
       <translation>
         <numerusform>Not enough free space at %n Server:</numerusform>
-        <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
-        <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
+        <numerusform>Not enough free space at %n Server:</numerusform>
+        <numerusform>Not enough free space at %n Server:</numerusform>
       </translation>
     </message>
     <message>
@@ -5856,7 +6036,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>Пароль должен быть задан.</translation>
+      <translation>Пароль не может быть пустым.</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -6006,12 +6186,24 @@ to %1</source>
       <source>Please check authentication information</source>
       <translation>Пожалуйста, проверьте настройки аутентификации</translation>
     </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>СЛИШКОМ МНОГО СОЕДИНЕНИЙ</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>ТРЕБУЕТСЯ ПАРОЛЬ</translation>
+    </message>
+    <message>
+      <source>Set for this camera</source>
+      <translation type="unfinished">Set for this camera</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Выделить все</translation>
+      <translation>Выделить всё</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6060,11 +6252,11 @@ to %1</source>
     </message>
     <message>
       <source>Main</source>
-      <translation>Главное</translation>
+      <translation>Основное</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Резервное</translation>
+      <translation>Резервное копирование</translation>
     </message>
     <message>
       <source>Add more drives to use them as backup storage.</source>
@@ -6183,15 +6375,15 @@ to %1</source>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Резервное</translation>
+      <translation>Резервное копирование</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation>Главное</translation>
+      <translation>Основное</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ГБ</translation>
+      <translation>%1 Гб</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6302,10 +6494,6 @@ to %1</source>
       <translation>Система запущена в безопасном режиме</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Нет места на хранилище</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Хранилище не настроено</translation>
     </message>
@@ -6348,10 +6536,6 @@ to %1</source>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
       <translation>Восстановление архива отменено позьзователем на сервере:</translation>
-    </message>
-    <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Нет места на хранилище на сервере:</translation>
     </message>
     <message>
       <source>Storage is not configured on the following Server:</source>
@@ -6425,7 +6609,11 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Синхронизация удаленного архива</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>Обнаружена проблема целостности архива</translation>
     </message>
   </context>
   <context>
@@ -6488,16 +6676,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>Системное время синхронизируется с локальным временем выбранного сервера и не зависит от других серверов.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>Ни один сервер не подключен к сети Интернет. Время не синхронизируется.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>Системное время синхронизируется с сетью Интернет и не зависит от местного времени на серверах.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>Системное время синхронизируется с местным временем на выбранном сервере и не зависит от местного времени на других серверах.</translation>
     </message>
   </context>
   <context>
@@ -6640,40 +6828,40 @@ to %1</source>
       <source>The problem is caused by %n servers:</source>
       <translation>
         <numerusform>The problem is caused by %n server:</numerusform>
-        <numerusform>Проблема вызвана %n серверами:</numerusform>
-        <numerusform>Проблема вызвана %n серверами:</numerusform>
+        <numerusform>The problem is caused by %n server:</numerusform>
+        <numerusform>The problem is caused by %n server:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation>
         <numerusform>No free space left on %n server:</numerusform>
-        <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
-        <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
+        <numerusform>No free space left on %n server:</numerusform>
+        <numerusform>No free space left on %n server:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation>
         <numerusform>%n server is not responding:</numerusform>
-        <numerusform>%n сервера не отвечает:</numerusform>
-        <numerusform>%n серверов не отвечает:</numerusform>
+        <numerusform>%n server is not responding:</numerusform>
+        <numerusform>%n server is not responding:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
         <numerusform>%n server has gone offline:</numerusform>
-        <numerusform>%n сервера вышло из сети:</numerusform>
-        <numerusform>%n серверов вышло из сети:</numerusform>
+        <numerusform>%n server has gone offline:</numerusform>
+        <numerusform>%n server has gone offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
       <translation>
         <numerusform>Authentication failed for %n server:</numerusform>
-        <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
-        <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
+        <numerusform>Authentication failed for %n server:</numerusform>
+        <numerusform>Authentication failed for %n server:</numerusform>
       </translation>
     </message>
     <message>
@@ -6713,7 +6901,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6770,7 +6958,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6918,7 +7106,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6973,7 +7161,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>Пароль должен быть задан.</translation>
+      <translation>Пароль не может быть пустым.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7017,7 +7205,7 @@ to %1</source>
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
       <translation>
-        <numerusform>ПК %1 - дисплей %2</numerusform>
+        <numerusform>ПК %1 - дисплеи %2</numerusform>
         <numerusform>ПК %1 - дисплеи %2</numerusform>
         <numerusform>ПК %1 - дисплеи %2</numerusform>
       </translation>
@@ -7123,177 +7311,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchExportHandler</name>
-    <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Исполняемый медиафайл %1 (х64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Исполняемый медиафайл %1 (х86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Экспорт раскладки</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Экспортировать видео как...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Отметки времени:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Экспорт видео</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Экспорт в &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>Экспортировать раскладку как...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 Медиафайл (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Применить фильтры: Переворот, Развертка, Коррекция изображения, Соотношение сторон (требуется транскодирование)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>экспортирован(о)</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Без отметок времени</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Верхний левый угол (требуется перекодирование)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Верхний правый угол (требуется перекодирование)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Нижний левый угол (требуется перекодирование)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Нижний правый угол (требуется перекодирование)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>Сохранить раскладку как...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Сделать доступным только для чтения.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>Файл уже используется для записи</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Пожалуйста, выберите другое имя или дождитесь завершения записи.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>Вы собираетесь экспортировать длинное видео</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Это может потребовать более гигабайта дискового пространства и занять несколько минут.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>Все равно экспортировать?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>Все равно экспортировать в AVI?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>Не рекомендуется использовать выбранный формат</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Чтобы избежать понижения разрешения видео, для этой камеры рекомендуется запись в форматы EXE или NOV.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>Экспортировать с перекодированием?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>Это увеличит использование процессора и может занять значительное время.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>EXE формат не рекомендуется</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>Все равно экспортировать в EXE?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Не удалось экспортировать Мульти-Видео</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>Мульти видео экспорт не может включать Локальные файлы</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>Удалите все локальные файлы из раскладки и повторите попытку.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Экспорт</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>Вы собираетесь экспортировать много видео</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Выбран слишком короткий период</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Для экспорта с быстрой прокруткой длина видео должна быть не менее 10 секунд.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Экспорт завершён</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Не удалось экспортировать видео</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>Не рекомендуется использовать формат AVI</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Для экспорта записи c перерывами рекомендуется MKV или другой формат.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>Из-за ограничений Windows EXE-файлы более 4 ГБ не могут быть открыты двойным щелчком мыши.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -7374,8 +7391,8 @@ to %1</source>
       <source>Failed to delete %n items:</source>
       <translation>
         <numerusform>Failed to delete %n item:</numerusform>
-        <numerusform>Не удалось удалить %n элемента:</numerusform>
-        <numerusform>Не удалось удалить %n элементов:</numerusform>
+        <numerusform>Failed to delete %n item:</numerusform>
+        <numerusform>Failed to delete %n item:</numerusform>
       </translation>
     </message>
     <message>
@@ -7742,9 +7759,9 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемент?</numerusform>
+        <numerusform>Удалить %n элементов?</numerusform>
+        <numerusform>Удалить %n элементов?</numerusform>
+        <numerusform>Удалить %n элементов?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7798,8 +7815,8 @@ to %1</source>
       <source>%n users</source>
       <translation>
         <numerusform>%n user</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n user</numerusform>
+        <numerusform>%n user</numerusform>
       </translation>
     </message>
   </context>
@@ -7828,6 +7845,460 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Для отображения локальных файлов на видеостене, пожалуйста, поместите их на видеостену на компьютере, с которого она управляется.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>Динамич.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Неподдерживаемые тип данных для экспорта данных.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>Выбранный формат не поддерживается библиотекой FFMPEG.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>Ошибка библиотеки FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Видео или аудио кодек несовместим с выбранным форматом.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Ошибка записи файла.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation>Нет данных для экспорта.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Внутренняя ошибка</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>экспортирован(о)</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Экспорт</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Быстрая прокрутка</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Настройки экспорта</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Добавить отметку времени</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Удалить отметку времени</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Отметки времени</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Добавить изображение</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Удалить изображение</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Изображение</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Добавить текст</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Удалить текст</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Текст</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Сбросить скорость</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Добавить информацию о закладке</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Удалить информацию о закладке</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Информация о закладке</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Папка</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>Имя не может быть пустым.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Выбрать каталог...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Выбрать файл...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>Изображения (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Ошибка</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>Невозможно загрузить изображение.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>НЕТ ДАННЫХ</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>НЕ КАМЕРА</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Низкий</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Высокий</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Особые</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Установите разрешение &quot;Auto&quot; на раскладке чтобы увеличить производительность.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунды.</numerusform>
+        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
+        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation type="unfinished">Long</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Короткий</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation type="unfinished">%1 Analytics</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>Остановить экспорт</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Экспорт завершён</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Ошибка экспорта</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Не удается записать файл</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 используется другим процессом экспорта.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>Файл &quot;%1&quot; используется другим процессом. Пожалуйста, используйте другое имя.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>Невозможно открыть файл вывода %1...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>Произошла неизвестная ошибка.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Экспорт в &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>Невозможно экспортировать устройство %1.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>Невозможно экспортировать камеру %1.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>Невозможно экспортировать устройство %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Исполняемый медиафайл %1 (х64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Исполняемый медиафайл %1 (х86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>Файл уже используется для записи</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>Пожалуйста, выберите другое имя или дождитесь завершения записи.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>Экспорт раскладки</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video</source>
+      <translation>Вы собираетесь экспортировать длинное видео</translation>
+    </message>
+    <message>
+      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Это может потребовать более гигабайта дискового пространства и занять несколько минут.</translation>
+    </message>
+    <message>
+      <source>Export anyway?</source>
+      <translation>Все равно экспортировать?</translation>
+    </message>
+    <message>
+      <source>Export Video As...</source>
+      <translation>Экспортировать видео как...</translation>
+    </message>
+    <message>
+      <source>No Timestamp</source>
+      <translation>Без отметок времени</translation>
+    </message>
+    <message>
+      <source>Top Left Corner (requires transcoding)</source>
+      <translation>Верхний левый угол (требуется перекодирование)</translation>
+    </message>
+    <message>
+      <source>Top Right Corner (requires transcoding)</source>
+      <translation>Верхний правый угол (требуется перекодирование)</translation>
+    </message>
+    <message>
+      <source>Bottom Left Corner (requires transcoding)</source>
+      <translation>Нижний левый угол (требуется перекодирование)</translation>
+    </message>
+    <message>
+      <source>Bottom Right Corner (requires transcoding)</source>
+      <translation>Нижний правый угол (требуется перекодирование)</translation>
+    </message>
+    <message>
+      <source>Timestamps:</source>
+      <translation>Отметки времени:</translation>
+    </message>
+    <message>
+      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+      <translation>Применить фильтры: Переворот, Развертка, Коррекция изображения, Соотношение сторон (требуется транскодирование)</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended</source>
+      <translation>Не рекомендуется использовать формат AVI</translation>
+    </message>
+    <message>
+      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+      <translation>Для экспорта записи c перерывами рекомендуется MKV или другой формат.</translation>
+    </message>
+    <message>
+      <source>Export to AVI anyway?</source>
+      <translation>Все равно экспортировать в AVI?</translation>
+    </message>
+    <message>
+      <source>Selected format not recommended</source>
+      <translation>Не рекомендуется использовать выбранный формат</translation>
+    </message>
+    <message>
+      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
+      <translation>Чтобы избежать понижения разрешения видео, для этой камеры рекомендуется запись в форматы EXE или NOV.</translation>
+    </message>
+    <message>
+      <source>Export with transcoding?</source>
+      <translation>Экспортировать с перекодированием?</translation>
+    </message>
+    <message>
+      <source>It will increase CPU usage and may take significant time.</source>
+      <translation>Это увеличит нагрузку на процессор и может занять значительное время.</translation>
+    </message>
+    <message>
+      <source>Exporting Video</source>
+      <translation>Экспорт видео</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Экспорт в &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>EXE формат не рекомендуется</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>Из-за ограничений Windows EXE-файлы более 4 ГБ не могут быть открыты двойным щелчком мыши.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>Все равно экспортировать в EXE?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>Не удалось экспортировать Мульти-Видео</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>Мульти видео экспорт не может включать Локальные файлы</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>Удалите все локальные файлы из раскладки и повторите попытку.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>Сохранить раскладку как...</translation>
+    </message>
+    <message>
+      <source>Export Layout As...</source>
+      <translation>Экспортировать раскладку как...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>экспортирован(о)</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 Медиафайл (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>Сделать доступным только для чтения.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Экспорт</translation>
+    </message>
+    <message>
+      <source>You are about to export a lot of video</source>
+      <translation>Вы собираетесь экспортировать много видео</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>Выбран слишком короткий период</translation>
+    </message>
+    <message>
+      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
+      <translation>Для экспорта с быстрой прокруткой длина видео должна быть не менее 10 секунд.</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Экспорт завершён</translation>
+    </message>
+    <message>
+      <source>Failed to export video</source>
+      <translation>Не удалось экспортировать видео</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>Нет поддерживаемых типов событий</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
     </message>
   </context>
   <context>
@@ -7913,7 +8384,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation>Остановить маршрут обхода</translation>
+      <translation>Закончить тур</translation>
     </message>
     <message>
       <source>Start Tour</source>
@@ -7993,24 +8464,24 @@ to %1</source>
       <source>Failed to move %n devices</source>
       <translation>
         <numerusform>Failed to move %n device</numerusform>
-        <numerusform>Не удалось переместить %n устройства</numerusform>
-        <numerusform>Не удалось переместить %n устройств</numerusform>
+        <numerusform>Failed to move %n device</numerusform>
+        <numerusform>Failed to move %n device</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
       <translation>
         <numerusform>Failed to move %n camera</numerusform>
-        <numerusform>Не удалось переместить %n камеры</numerusform>
-        <numerusform>Не удалось переместить %n камер</numerusform>
+        <numerusform>Failed to move %n camera</numerusform>
+        <numerusform>Failed to move %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
       <translation>
         <numerusform>Failed to move %n I/O Module</numerusform>
-        <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
-        <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
+        <numerusform>Failed to move %n I/O Module</numerusform>
+        <numerusform>Failed to move %n I/O Module</numerusform>
       </translation>
     </message>
     <message>
@@ -8181,6 +8652,14 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>Не удалось открыть web-страницу сервера</translation>
     </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>Не удалось изменить пароль</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -8220,7 +8699,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Удалить прокрутку %1?</translation>
     </message>
   </context>
   <context>

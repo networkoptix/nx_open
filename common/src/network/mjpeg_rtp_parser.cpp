@@ -249,10 +249,10 @@ int QnMjpegRtpParser::makeHeaders(
         p = MakeDRIHeader(p, dri);
 
     const int bytesLeft = sizeof(m_hdrBuffer) - (p - start);
-    if (m_extendedJPegHeader.size() > 0 && m_extendedJPegHeader.size() < bytesLeft)
+    if (m_extendedJpegHeader.size() > 0 && m_extendedJpegHeader.size() < bytesLeft)
     {
-        memcpy(p, m_extendedJPegHeader.data(), m_extendedJPegHeader.size());
-        p += m_extendedJPegHeader.size();
+        memcpy(p, m_extendedJpegHeader.data(), m_extendedJpegHeader.size());
+        p += m_extendedJpegHeader.size();
         return p - start;
     }
 
@@ -385,14 +385,15 @@ bool QnMjpegRtpParser::parseMjpegExtension(const quint8* data, int size)
     while (size > 0 && data[size - 1] == 0xff)
         --size;
 
-    m_extendedJPegHeader.resize(size);
+    m_extendedJpegHeader.resize(size);
     if (size > 0)
-        memcpy(m_extendedJPegHeader.data(), data, size);
+        memcpy(m_extendedJpegHeader.data(), data, size);
     if (size >= 9)
     {
         quint16 markerType = (data[0] << 8) + data[1];
         if (markerType == 0xffc0)
         {
+            // Ffmpeg SOF header. Extract size from offset [5..8]
             m_frameHeight = (data[5] << 8) + data[6];
             m_frameWidth = (data[7] << 8) + data[8];
         }
@@ -500,7 +501,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         {
             resolutionWorkaroundLogged = true;
             NX_LOG(lit(
-                "[mjpeg_rtp_parser] Camera reports resolution 112 x 1792, assuming 3840 x 2160 (~4K)"),
+                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)"),
                 cl_logDEBUG1);
         }
         width = 3840 / 8;
@@ -579,7 +580,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         }
 
         if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height ||
-           !m_extendedJPegHeader.empty())
+           !m_extendedJpegHeader.empty())
         {
             if (jpegQ != 255)
             {

@@ -1,25 +1,26 @@
 #pragma once
+
 #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <nx/streaming/archive_delegate_wrapper.h>
 #include <motion/motion_estimation.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-class AviMotionArchiveDelegate: public QnAviArchiveDelegate
+class MotionDelegateWrapper: public ArchiveDelegateWrapper
 {
-    using base_type = QnAviArchiveDelegate;
-
+    using base_type = ArchiveDelegateWrapper;
 public:
-    AviMotionArchiveDelegate();
+    MotionDelegateWrapper(std::unique_ptr<QnAbstractArchiveDelegate> delegate);
 
     virtual QnAbstractMediaDataPtr getNextData() override;
+
     virtual void setMotionRegion(const QnMotionRegion& region) override;
 
 private:
-    QnMetaDataV1Ptr analyzeMotion(const QnAbstractMediaDataPtr& video);
+    QnMetaDataV1Ptr analyzeMotion(const QnAbstractMediaDataPtr& media);
 
 private:
     mutable QnMutex m_mutex;
@@ -31,4 +32,4 @@ private:
 } // namespace mediaserver_core
 } // namespace nx
 
-#endif // defined(ENABLE_SOFTWARE_MOTION_DETECTION)
+#endif // ENABLE_SOFTWARE_MOTION

@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>Còn trống</translation>
+      <translation>Trống</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -485,6 +485,14 @@
     <message>
       <source>Time Licenses</source>
       <translation>Bản quyền theo thời gian</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation type="unfinished">Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation type="unfinished">Bridge Licenses</translation>
     </message>
   </context>
   <context>
@@ -764,6 +772,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Loại tài nguyên không hợp lệ để xuất dữ liệu.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation type="unfinished">No data was exported.</translation>
     </message>
   </context>
   <context>
@@ -1474,6 +1486,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Công nhận</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 đến %2</translation>
     </message>
   </context>
   <context>

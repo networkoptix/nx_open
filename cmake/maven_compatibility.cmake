@@ -21,10 +21,6 @@ set(ClientVoxSourceDir "${CMAKE_CURRENT_BINARY_DIR}/bin/vox")
 set(installer.target.dir ${build.configuration})
 set(bin_source_dir "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin")
 
-# Artifact names
-set(artifact.name.server "${artifact.name.prefix}-server-${artifact.name.suffix}")
-set(artifact.name.server_update "${artifact.name.prefix}-server_update-${artifact.name.suffix}")
-
 set(artifact.name.client "${client_distribution_name}")
 set(artifact.name.server "${server_distribution_name}")
 set(artifact.name.bundle "${bundle_distribution_name}")

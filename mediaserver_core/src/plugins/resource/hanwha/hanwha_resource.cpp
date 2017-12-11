@@ -10,6 +10,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <QtCore/QMap>
 
@@ -34,6 +35,8 @@
 #include <api/global_settings.h>
 
 #include <media_server/media_server_module.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -588,11 +591,7 @@ SessionContextPtr HanwhaResource::session(
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
 {
-    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
-    const auto overlappedId = sharedContext()->currentOverlappedId();
-    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
-
-    return std::move(delegate);
+    return std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -662,6 +661,17 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
+    if (!minFirmwareVersion.isEmpty() &&
+        !getFirmware().isEmpty()
+        && minFirmwareVersion > getFirmware())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Please update firmware for this device. Minimal supported firmware: '%1'. Device firmware: '%2'.")
+            .arg(minFirmwareVersion).arg(getFirmware()));
+    }
+
     result = initMedia();
     if (!result)
         return result;
@@ -688,7 +698,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
 
     initMediaStreamCapabilities();
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive);
+    sharedContext->startServices(hasVideoArchive, isNvr());
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -1130,15 +1140,22 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    bool hasRemoteArchive = !isNvr();
+    if (!ini().enableEdge || isNvr())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
+        return CameraDiagnostics::NoErrorResult();
+    }
 
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(lit("recording/storage"));
     if (!response.isSuccessful())
+    {
+        setCameraCapability(Qn::RemoteArchiveCapability, false);
         return CameraDiagnostics::NoErrorResult();
+    }
 
     const auto storageEnabled = response.parameter<bool>(lit("Enable"));
-    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
+    const bool hasRemoteArchive = (storageEnabled != boost::none) && *storageEnabled;
     setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
 
     return CameraDiagnostics::NoErrorResult();
@@ -1729,9 +1746,19 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
         return toHanwhaString(defaultEntropyCodingForStream(role));
     else if (parameter == kBitrateProperty)
     {
-        int bitrateKbps = mediaCapabilityForRole(role).defaultBitrateKbps;
-        if (bitrateKbps > 0)
-            return QString::number(bitrateKbps);
+        auto camera = qnCameraPool->getVideoCamera(toSharedPointer());
+        if (!camera)
+            return QString::number(defaultBitrateForStream(role));
+
+        QnLiveStreamProviderPtr provider = role == Qn::ConnectionRole::CR_LiveVideo
+            ? camera->getPrimaryReader()
+            : camera->getSecondaryReader();
+
+        if (!provider)
+            QString::number(defaultBitrateForStream(role));
+
+        const auto liveStreamParameters = provider->getLiveParams();
+        return QString::number(streamBitrate(role, liveStreamParameters));
     }
     else if (parameter == kFramePriorityProperty)
         return lit("FrameRate");
@@ -1760,7 +1787,7 @@ QSize HanwhaResource::bestSecondaryResolution(
     const QSize& primaryResolution,
     const std::vector<QSize>& resolutionList) const
 {
-    if (primaryResolution.height() == 0)
+    if (primaryResolution.isEmpty())
     {
         NX_WARNING(
             this,
@@ -1769,46 +1796,15 @@ QSize HanwhaResource::bestSecondaryResolution(
         return QSize();
     }
 
-    const auto primaryAspectRatio =
-        (double)primaryResolution.width() / primaryResolution.height();
+    QList<QSize> resolutions; //< TODO: #dmishin get rid of this.
+    for (const auto& resolution: resolutionList)
+        resolutions.push_back(resolution);
 
-    QSize secondaryResolution;
-    double minAspectDiff = std::numeric_limits<double>::max();
-
-    for (const auto& res: resolutionList)
-    {
-        const auto width = res.width();
-        const auto height = res.height();
-
-        if (width * height > kHanwhaMaxSecondaryStreamArea)
-            continue;
-
-        if (height == 0)
-        {
-            NX_WARNING(
-                this,
-                lit("Finding secondary resolution: wrong resolution. Resolution height is 0"));
-            continue;
-        }
-
-        const auto secondaryAspectRatio = (double)width / height;
-        const auto diff = std::abs(primaryAspectRatio - secondaryAspectRatio);
-
-        if (diff < minAspectDiff)
-        {
-            minAspectDiff = diff;
-            secondaryResolution = res;
-        }
-    }
-
-    if (!secondaryResolution.isNull())
-        return secondaryResolution;
-
-    NX_WARNING(
-        this,
-        lit("Can not find secondary resolution of appropriate size, using the smallest one"));
-
-    return resolutionList[resolutionList.size() -1];
+    return closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+        getResolutionAspectRatio(primaryResolution),
+        SECONDARY_STREAM_MAX_RESOLUTION,
+        resolutions);
 }
 
 QnCameraAdvancedParams HanwhaResource::filterParameters(
@@ -2557,9 +2553,8 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
         ? kHanwhaPrimaryNxProfileSuffix
         : kHanwhaSecondaryNxProfileSuffix;
 
-    auto appName = QnAppInfo::productNameLong()
-        .mid(0, maxLength - suffix.length())
-        .remove(QRegExp("[^a-zA-Z]"));
+    auto appName = QnAppInfo::productNameLong().splitRef(' ').last().toString()
+        .remove(QRegExp("[^a-zA-Z]")).left(maxLength - suffix.length());
 
     return appName + suffix;
 }
@@ -2583,7 +2578,13 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    return sharedContext()->chunks(getChannel());
+    const auto& timeline = sharedContext()->overlappedTimeline(getChannel());
+    const auto numberOfOverlappedIds = timeline.size();
+    NX_ASSERT(numberOfOverlappedIds <= 1, lit("There should be only one overlapped ID for NVR"));
+    if (numberOfOverlappedIds != 1)
+        return QnTimePeriodList();
+
+    return timeline.cbegin()->second;
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(

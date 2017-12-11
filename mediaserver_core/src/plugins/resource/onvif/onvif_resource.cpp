@@ -42,16 +42,17 @@
 #include "core/onvif/onvif_config_data.h"
 
 #include <plugins/resource/onvif/imaging/onvif_imaging_proxy.h>
+#include <plugins/resource/onvif/onvif_audio_transmitter.h>
 #include <plugins/resource/onvif/onvif_maintenance_proxy.h>
 
 #include <nx/fusion/model_functions.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <core/resource/resource_data_structures.h>
+#include <core/dataconsumer/basic_audio_transmitter.h>
 
 #include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
 #include <common/static_common_module.h>
-#include <core/dataconsumer/basic_audio_transmitter.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -932,11 +933,13 @@ QSize QnPlOnvifResource::findSecondaryResolution(const QSize& primaryRes, const 
         }
     }
 
-    float currentAspect = getResolutionAspectRatio(primaryRes);
-    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
-    QSize result = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSquare, secondaryResList, matchCoeff);
-    if (result == EMPTY_RESOLUTION_PAIR)
-        result = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSquare, secondaryResList, matchCoeff); // try to get resolution ignoring aspect ration
+    auto result = closestResolution(
+        SECONDARY_STREAM_DEFAULT_RESOLUTION,
+        getResolutionAspectRatio(primaryRes),
+        SECONDARY_STREAM_MAX_RESOLUTION,
+        secondaryResList,
+        matchCoeff);
+
     return result;
 }
 
@@ -2623,12 +2626,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlOnvifResource::detectVideoSourceCount()
-{
-    return (bool) fetchVideoSourceToken();
-}
-
-CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
+CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEncoders)
 {
     QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
@@ -2670,7 +2668,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
     QnMutexLocker lock( &m_mutex );
     m_videoSourceToken = QString::fromStdString(conf->token);
 
-    if (m_maxChannels > 1)
+    if (limitedByEncoders && m_maxChannels > 1)
     {
         VideoConfigsReq confRequest;
         VideoConfigsResp confResponse;
@@ -2725,7 +2723,7 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 {
-    CameraDiagnostics::Result result = fetchVideoSourceToken();
+    CameraDiagnostics::Result result = fetchChannelCount();
     if (!result)
     {
         if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
@@ -4229,31 +4227,76 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const
 
 bool QnPlOnvifResource::initializeTwoWayAudio()
 {
-    // TODO: move this function to the PhysicalCamResource class
+    if (initializeTwoWayAudioByResourceData())
+        return true;
+
+    MediaSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(),
+        getAuth().user(), getAuth().password(), m_timeDrift);
+
+    _onvifMedia__GetAudioOutputs request;
+    _onvifMedia__GetAudioOutputsResponse response;
+    const int result = soapWrapper.getAudioOutputs(request, response);
+    if (result != SOAP_OK && result != SOAP_MUSTUNDERSTAND)
+    {
+        NX_DEBUG(this, lm("Filed to fetch audio outputs from %1").arg(soapWrapper.endpoint()));
+        return false;
+    }
+
+    if (!response.AudioOutputs.empty())
+    {
+        m_audioTransmitter.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
+        return true;
+    }
+
+    NX_DEBUG(this, lm("No sutable audio outputs are detected on %1").arg(soapWrapper.endpoint()));
+    return false;
+}
+
+bool QnPlOnvifResource::initializeTwoWayAudioByResourceData()
+{
     const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
-    if (params.codec.isEmpty() || params.urlPath.isEmpty())
-        return false;
+    if (params.engine.toLower() == QString("onvif"))
+    {
+        m_audioTransmitter.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
+    }
+    else if (params.engine.toLower() == QString("basic") || params.engine.isEmpty())
+    {
+        if (params.codec.isEmpty() || params.urlPath.isEmpty())
+            return false;
 
-    QnAudioFormat format;
-    format.setCodec(params.codec);
-    format.setSampleRate(params.sampleRate * 1000);
-    format.setChannelCount(params.channels);
-    auto audioTransmitter = new QnBasicAudioTransmitter(this);
-    m_audioTransmitter.reset(audioTransmitter);
-    m_audioTransmitter->setOutputFormat(format);
-    m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
-    audioTransmitter->setContentType(params.contentType.toUtf8());
-    if (params.noAuth)
-        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::noAuth);
-    else if (params.useBasicAuth)
-        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::basicAuth);
+        auto audioTransmitter = std::make_unique<QnBasicAudioTransmitter>(this);
+        audioTransmitter->setContentType(params.contentType.toUtf8());
+
+        if (params.noAuth)
+            audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::noAuth);
+        else if (params.useBasicAuth)
+            audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::basicAuth);
+        else
+            audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::digestAndBasicAuth);
+
+        QUrl srcUrl(getUrl());
+        QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+        audioTransmitter->setTransmissionUrl(url);
+
+        m_audioTransmitter.reset(audioTransmitter.release());
+    }
     else
-        audioTransmitter->setAuthPolicy(QnBasicAudioTransmitter::AuthPolicy::digestAndBasicAuth);
+    {
+        NX_ASSERT(false, lm("Unsupported 2WayAudio engine: %1").arg(params.engine));
+    }
 
-    QUrl srcUrl(getUrl());
-    QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
-    audioTransmitter->setTransmissionUrl(url);
+    if (!params.codec.isEmpty())
+    {
+        QnAudioFormat format;
+        format.setCodec(params.codec);
+        format.setSampleRate(params.sampleRate * 1000);
+        format.setChannelCount(params.channels);
+        m_audioTransmitter->setOutputFormat(format);
+    }
+
+    if (params.bitrateKbps != 0)
+        m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
 
     return true;
 }

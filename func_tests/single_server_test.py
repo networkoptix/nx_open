@@ -1,15 +1,19 @@
-from datetime import datetime, timedelta
+import logging
 import os
 import time
+import warnings
+from datetime import datetime, timedelta
+
 import pytest
 import pytz
 import requests
-import logging
-from test_utils.utils import log_list
-from test_utils.server import TimePeriod
+import urllib3.exceptions
+from requests.auth import HTTPDigestAuth
+
 import server_api_data_generators as generator
 from test_utils.rest_api import HttpError
-from requests.auth import HTTPDigestAuth
+from test_utils.server import TimePeriod
+from test_utils.utils import log_list, wait_until
 
 log = logging.getLogger(__name__)
 
@@ -170,3 +174,69 @@ def test_static_vulnerability(server):
     url = server.rest_api.url + 'static/../../test.file'
     response = requests.get(url)
     assert response.status_code == 403
+
+
+# https://networkoptix.atlassian.net/browse/VMS-7775
+def test_auth_with_time_changed(timeless_server):
+    url = timeless_server.rest_api.url + 'ec2/getCurrentTime'
+
+    timeless_server.host.set_time(datetime.now(pytz.utc))
+    assert wait_until(lambda: timeless_server.get_time().is_close_to(datetime.now(pytz.utc)))
+
+    shift = timedelta(days=3)
+
+    response = requests.get(url, auth=HTTPDigestAuth(timeless_server.user, timeless_server.password))
+    authorization_header_value = response.request.headers['Authorization']
+    log.info(authorization_header_value)
+    response = requests.get(url, headers={'Authorization': authorization_header_value})
+    response.raise_for_status()
+
+    timeless_server.host.set_time(datetime.now(pytz.utc) + shift)
+    assert wait_until(lambda: timeless_server.get_time().is_close_to(datetime.now(pytz.utc) + shift))
+
+    response = requests.get(url, headers={'Authorization': authorization_header_value})
+    assert response.status_code != 401, "Cannot authenticate after time changed on server"
+    response.raise_for_status()
+
+
+def test_uptime_is_monotonic(timeless_server):
+    timeless_server.host.set_time(datetime.now(pytz.utc))
+    first_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
+    if not isinstance(first_uptime, (int, float)):
+        log.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
+    new_time = timeless_server.host.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
+    assert wait_until(lambda: timeless_server.get_time().is_close_to(new_time))
+    second_uptime = timeless_server.rest_api.api.statistics.GET()['uptimeMs']
+    if not isinstance(first_uptime, (int, float)):
+        log.warning("Type of uptimeMs is %s but expected to be numeric.", type(second_uptime).__name__)
+    assert float(first_uptime) < float(second_uptime)
+
+
+def test_frequent_restarts(server):
+    """Test for server restart REST api and functional test wrapper for it."""
+    # Loop is unfolded here so that we can see which exact line is failed.
+    server.restart_via_api(timeout=timedelta(seconds=10))
+    server.restart_via_api(timeout=timedelta(seconds=10))
+    server.restart_via_api(timeout=timedelta(seconds=10))
+
+
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7808")
+@pytest.mark.xfail(reason="https://networkoptix.atlassian.net/browse/VMS-7809")
+@pytest.mark.parametrize('path', [
+    '/ec2/getFullInfoExtraSuffix', '/api/pingExtraSuffix',  # VMS-7809: Matches by prefix and returns 200.
+    '/api/nonExistent', '/ec2/nonExistent'])  # VMS-7809: Redirects with 301 but not returns 404.
+def test_non_existent_api_endpoints(server, path):
+    auth = HTTPDigestAuth(server.user, server.password)
+    response = requests.get(server.rest_api_url.rstrip('/') + path, auth=auth, allow_redirects=False)
+    assert response.status_code == 404, "Expected 404 but got %r"
+
+
+def test_https_verification(server_factory):
+    server = server_factory('server', http_schema='https')
+    url = server.rest_api_url.rstrip('/') + '/api/ping'
+    with warnings.catch_warnings(record=True) as warning_list:
+        response = requests.get(url, verify=server.rest_api.ca_cert)
+    assert response.status_code == 200
+    for warning in warning_list:
+        log.warning("Warning collected: %s.", warning)
+        assert not isinstance(warning, urllib3.exceptions.InsecureRequestWarning)

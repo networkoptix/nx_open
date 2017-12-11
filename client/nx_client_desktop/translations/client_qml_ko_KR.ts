@@ -28,15 +28,15 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Save password</source>
-      <translation>비밀번호 저장</translation>
+      <translation>패스워드 저장</translation>
     </message>
     <message>
       <source>Auto-login</source>

@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro desconhecido.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Não foi possível alocar o stream para gravação.</translation>
+      <translation>Não foi possível alocar o stream de saída para gravação.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Começar</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -486,20 +486,28 @@
       <source>Time Licenses</source>
       <translation type="unfinished">Time Licenses</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation type="unfinished">Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation type="unfinished">Bridge Licenses</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>É usada %n %2 de um total de %1.</numerusform>
+        <numerusform>São usadas %n %2 de um total de %1.</numerusform>
         <numerusform>São usadas %n %2 de um total de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>Será usada %n %2 de um total de %1.</numerusform>
+        <numerusform>Serão usadas %n %2 de um total de %1.</numerusform>
         <numerusform>Serão usadas %n %2 de um total de %1.</numerusform>
       </translation>
     </message>
@@ -688,15 +696,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixo</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Médio</translation>
+      <translation>Média</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Alta</translation>
     </message>
     <message>
       <source>Best</source>
@@ -774,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation type="unfinished">Invalid resource type for data export.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation type="unfinished">No data was exported.</translation>
     </message>
   </context>
   <context>
@@ -911,9 +923,9 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minutos</numerusform>
+        <numerusform>minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1295,7 +1307,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <translation>MAC #%1: %2  {1:?} {2?}</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation type="unfinished">Acknowledge</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 em %2</translation>
     </message>
   </context>
   <context>

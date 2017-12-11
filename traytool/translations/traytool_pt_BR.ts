@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>O servidor parou</translation>
     </message>
     <message>
       <source>Server has been started</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>pausado</translation>
     </message>
     <message>
       <source>pausing</source>

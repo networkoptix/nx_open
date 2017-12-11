@@ -17,6 +17,68 @@
 
     "version": "1.0",
     "data": [
+
+        {
+            "keys": [
+                "Hanwha|PRN-4011"
+            ],
+            "minimalFirmwareVersion":  "v1.08_171018"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-3010"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-2011"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-2010"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-1610S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-1610"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-810S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-410S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|QRN-810"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|QRN-410"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+
         {
             "keys": [
                 "Sony|SNC-VM772R"
@@ -52,10 +114,10 @@
 
             "2WayAudio":
             {
-                "codec": "AAC",
+                "codec": "ALAW",
                 "bitrateKbps": 64,
-                "sampleRate": 16,
-                "urlPath": "/audio-out/aac16_64.cgi",
+                "sampleRate": 8,
+                "urlPath": "/audio-out/g711_64.cgi",
                 "contentType": "",
                 "useBasicAuth": true
             }
@@ -2101,6 +2163,35 @@
                 "Surveillance Camera|DVB-4100-VS"
             ],
             "ignoreCameraTimeIfBigJitter": true
+        },
+        {
+            "keys": [
+                "DW|DWC-MD421D",
+                "DW|DWC-MD421TIR",
+                "DW|DWC-MV421D",
+                "DW|DWC-MV421TIR",
+                "DW|DWC-MB421TIR",
+                "DW|DWC-MD421DB",
+                "DW|DWC-MD421TIRB",
+                "DW|DWC-MV421DB",
+                "DW|DWC-MV421TIRB",
+                "DW|DWC-MD44WA",
+                "DW|DWC-MD44WiA",
+                "DW|DWC-MV44WA",
+                "DW|DWC-MV44WiA",
+                "DW|DWC-MB44WiA",
+                "DW|DWC-MB44iALPR",
+                "DW|DWC-MB44Wi650",
+                "DW|DWC-MD44WAB",
+                "DW|DWC-MD44WiAB",
+                "DW|DWC-MV44WAB",
+                "DW|DWC-MV44WiAB",
+                "DW|DWC-PB6M4T",
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MV85DiA",
+                "DW|DWC-MB45DiA"
+            ],
+            "2WayAudio": { "engine": "onvif" }
         }
     ]
 }

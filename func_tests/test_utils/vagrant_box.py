@@ -1,22 +1,21 @@
 '''Vagrant wrappers classes'''
 
+import logging
 import os
 import os.path
-import logging
-import re
-import time
 import tempfile
-import shutil
-import pytz
+
 import jinja2
 import vagrant
 import vagrant.compat
+
+from test_utils.ca import CA
 from .host import ProcessError, RemoteSshHost, host_from_config
-from .vbox_manage import VBoxManage
-from .vagrant_box_config import DEFAULT_NATNET1, BoxConfig
-from .server_installation import ServerInstallation
-from .server_ctl import VagrantBoxServerCtl
 from .server import Server
+from .server_ctl import VagrantBoxServerCtl
+from .server_installation import ServerInstallation
+from .vagrant_box_config import DEFAULT_NATNET1, BoxConfig
+from .vbox_manage import VBoxManage
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +56,7 @@ class VagrantBoxFactory(object):
     def __init__(self, cache, options, config_factory):
         self._cache = cache
         self._bin_dir = options.bin_dir
+        self._ca = CA(os.path.join(options.work_dir, 'ca'))
         self._vagrant_private_key_path = None  # defined for remote ssh vm host
         self._config_factory = config_factory
         self._vm_host = host_from_config(options.vm_ssh_host_config)
@@ -117,6 +117,7 @@ class VagrantBoxFactory(object):
             self._ssh_config_path,
             self._vm_host,
             config,
+            self._ca,
             is_running)
 
     def _init_running_boxes(self):
@@ -216,7 +217,7 @@ class VagrantBoxFactory(object):
 class VagrantBox(object):
 
     def __init__(self, bin_dir, vagrant_dir, vagrant, vagrant_private_key_path,
-                 ssh_config_path, vm_host, config, is_running=False):
+                 ssh_config_path, vm_host, config, ca, is_running=False):
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir
         self._vagrant = vagrant
@@ -230,6 +231,7 @@ class VagrantBox(object):
         self.is_allocated = False
         self._server_ctl = None
         self._installation = None
+        self._ca = ca
 
     def __str__(self):
         return '%s vm_name=%s timezone=%s' % (self.name, self.vm_name, self.timezone or '?')
@@ -269,6 +271,7 @@ class VagrantBox(object):
             f.write(self._vagrant.ssh_config(self.name))
             f.flush()
             self._box_host('vagrant', f.name).run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
+            self._patch_sshd_config(self._box_host('root', f.name))
         self.is_running = True
 
     def destroy(self):
@@ -280,7 +283,7 @@ class VagrantBox(object):
         assert self.host, 'Not initialized (init method was not called)'
         rest_api_url = '%s://%s:%d/' % (server_config.http_schema, self._vm_host.host, self.config.rest_api_forwarded_port)
         return Server(server_config.name, self.host, self._installation, self._server_ctl,
-                      rest_api_url, server_config.rest_api_timeout, timezone=self.timezone)
+                      rest_api_url, self._ca, server_config.rest_api_timeout, timezone=self.timezone)
         
     def _box_host(self, user, ssh_config_path=None):
         return RemoteSshHost(self.name, self.name, user, self._vagrant_private_key_path,
@@ -295,3 +298,17 @@ class VagrantBox(object):
             file_path = file_path_format.format(test_dir=test_dir, bin_dir=self._bin_dir)
             assert os.path.isfile(file_path), '%s is expected but is missing' % file_path
             self._vm_host.put_file(file_path, self._vagrant_dir)
+
+    @staticmethod
+    def _patch_sshd_config(root_ssh_host):
+        sshd_config_path = '/etc/ssh/sshd_config'
+        settings = root_ssh_host.read_file(sshd_config_path).split('\n')  # Preserve new line at the end!
+        old_setting = 'UsePAM yes'
+        new_setting = 'UsePAM no'
+        try:
+            old_setting_line_index = settings.index(old_setting)
+        except ValueError:
+            assert False, "Wanted to replace %s with %s but couldn't fine latter" % (old_setting, new_setting)
+        settings[old_setting_line_index] = new_setting
+        root_ssh_host.write_file(sshd_config_path, '\n'.join(settings))
+        root_ssh_host.run_command(['service', 'ssh', 'reload'])

@@ -28,6 +28,8 @@ SYMLINK_INSTALL_PATH=""
 # to these .so files will be created in the regular LIB_INSTALL_DIR.
 ALT_LIB_INSTALL_PATH=""
 
+OUTPUT_DIR=${DISTRIB_OUTPUT_DIR:-"$CURRENT_BUILD_DIR"}
+
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
     SYMLINK_INSTALL_PATH="opt/$CUSTOMIZATION"
@@ -191,7 +193,7 @@ copyBuildLibs()
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*; do
+        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*; do
             if [[ $FILE != *.debug ]]; then
                 echo "Copying $(basename "$FILE")"
                 copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
@@ -200,7 +202,7 @@ copyBuildLibs()
     done
     for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"; do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*; do
+        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*; do
             if [ -f "$FILE" ]; then
                 echo "Copying (optional) $(basename "$FILE")"
                 copyLib "$FILE" "$LIB_INSTALL_DIR" "$ALT_LIB_INSTALL_DIR" "/$ALT_LIB_INSTALL_PATH"
@@ -257,7 +259,7 @@ copyQtLibs()
 copyBins()
 {
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR"
-    local BINS_TO_COPY=(
+    local -r BINS_TO_COPY=(
         mediaserver
         external.dat
     )
@@ -281,6 +283,10 @@ copyBins()
             local FILE
             for FILE in "$BIN_BUILD_DIR/plugins/"*; do
                 if [[ $FILE != *.debug ]]; then
+                    if [ "$CUSTOMIZATION" != "hanwha" ] && [[ "$FILE" == *hanwha* ]]; then
+                        continue
+                    fi
+
                     echo "Copying plugins/$(basename "$FILE")"
                     cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
                 fi
@@ -353,14 +359,16 @@ copyDebs()
 # [in] LIB_INSTALL_DIR
 copyBpiLiteClient()
 {
+    local -r LITE_CLIENT_BIN_DIR="$INSTALL_DIR/lite_client/bin"
+
     if [ -d "$LIB_BUILD_DIR/ffmpeg" ]; then
         echo "Copying libs of a dedicated ffmpeg for Lite Client's proxydecoder"
         cp -r "$LIB_BUILD_DIR/ffmpeg" "$LIB_INSTALL_DIR/"
     fi
 
     echo "Copying lite_client bin"
-    mkdir -p "$INSTALL_DIR/lite_client/bin"
-    cp "$BIN_BUILD_DIR/mobile_client" "$INSTALL_DIR/lite_client/bin/"
+    mkdir -p "$LITE_CLIENT_BIN_DIR"
+    cp "$BIN_BUILD_DIR/mobile_client" "$LITE_CLIENT_BIN_DIR/"
 
     echo "Creating symlink for rpath needed by mediaserver binary"
     ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
@@ -369,30 +377,33 @@ copyBpiLiteClient()
     ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
 
     echo "Creating symlink for rpath needed by Qt plugins"
-    ln -s "../../lib" "$INSTALL_DIR/lite_client/bin/lib"
+    ln -s "../../lib" "$LITE_CLIENT_BIN_DIR/lib"
 
     # Copy directories needed for lite client.
     local DIRS_TO_COPY=(
-        fonts # packages/any/roboto-fonts/bin/
-        egldeviceintegrations # $QT_DIR/plugins/
-        imageformats # $QT_DIR/plugins/
-        platforms # $QT_DIR/plugins/
-        qml # $QT_DIR/
-        libexec # $QT_DIR/
+        fonts #< packages/any/roboto-fonts/bin/
+        egldeviceintegrations #< $QT_DIR/plugins/
+        imageformats #< $QT_DIR/plugins/
+        platforms #< $QT_DIR/plugins/
+        qml #< $QT_DIR/
+        libexec #< $QT_DIR/
     )
     local DIR
     for DIR in "${DIRS_TO_COPY[@]}"; do
         echo "Copying directory (to Lite Client bin/) $DIR"
-        cp -r "$BIN_BUILD_DIR/$DIR" "$INSTALL_DIR/lite_client/bin/"
+        cp -r "$BIN_BUILD_DIR/$DIR" "$LITE_CLIENT_BIN_DIR/"
     done
 
-    mkdir -p "$INSTALL_DIR/lite_client/bin/translations"
-    echo "Copying (to lite_client/bin/) Qt translations"
-    cp -r "$QT_DIR/translations" "$INSTALL_DIR/lite_client/bin/"
+    echo "Copying Qt translations"
+    cp -r "$QT_DIR/translations" "$LITE_CLIENT_BIN_DIR/"
+
     # TODO: Investigate how to get rid of "resources" duplication.
-    echo "Copying (to lite_client/bin/ and lite_client/libexec/) Qt resources"
-    cp -r "$QT_DIR/resources" "$INSTALL_DIR/lite_client/bin/"
-    cp -r "$QT_DIR/resources/"* "$INSTALL_DIR/lite_client/bin/libexec/"
+    echo "Copying Qt resources"
+    cp -r "$QT_DIR/resources" "$LITE_CLIENT_BIN_DIR/"
+    cp -r "$QT_DIR/resources/"* "$LITE_CLIENT_BIN_DIR/libexec/"
+
+    echo "Copying qt.conf"
+    cp -r "$SOURCE_DIR/common/maven/bin-resources/resources/qt/etc/qt.conf" "$LITE_CLIENT_BIN_DIR/"
 }
 
 # [in] TAR_DIR
@@ -413,6 +424,13 @@ copyBpiSpecificFiles()
     echo "Copying $CONF_FILE (used for factory reset) to $TOOLS_PATH/"
     mkdir -p "$TOOLS_DIR"
     cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$CONF_FILE" "$TOOLS_DIR/"
+}
+
+copyEdge1SpecificFiles()
+{
+    local -r GDB_DIR="$INSTALL_DIR/mediaserver/bin"
+    echo "Copying gdb to $GDB_DIR/"
+    cp -r "$PACKAGES_DIR/gdb"/* "$GDB_DIR/"
 }
 
 # [in] INSTALL_DIR
@@ -460,12 +478,13 @@ copyLibcIfNeeded()
     # then be made in install.sh on the box.
     if [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]; then
         echo "Copying libstdc++ (Banana Pi)"
-        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.s"* "$LIB_INSTALL_DIR/"
+        cp -r "$PACKAGES_DIR/libstdc++-6.0.19/lib/libstdc++.so"* "$LIB_INSTALL_DIR/"
     fi
 }
 
 # [in] WORK_DIR
 # [in] TAR_DIR
+# [in] OUTPUT_DIR
 buildInstaller()
 {
     echo ""
@@ -474,21 +493,21 @@ buildInstaller()
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
     fi
-    createArchive "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
+    createArchive "$OUTPUT_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
 
     echo ""
     echo "Creating \"update\" .zip"
     local -r ZIP_DIR="$WORK_DIR/zip"
     mkdir -p "$ZIP_DIR"
-    cp -r "$CURRENT_BUILD_DIR/$TAR_FILENAME" "$ZIP_DIR/"
+    cp -r "$OUTPUT_DIR/$TAR_FILENAME" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/update.* "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/install.sh "$ZIP_DIR/"
-    createArchive "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
-    cp "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$CURRENT_BUILD_DIR/$ZIP_INSTALLER_FILENAME"
+    createArchive "$OUTPUT_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
+    cp "$OUTPUT_DIR/$ZIP_FILENAME" "$OUTPUT_DIR/$ZIP_INSTALLER_FILENAME"
 }
 
 # [in] WORK_DIR
-# [in] TAR_DIR
+# [in] OUTPUT_DIR
 buildDebugSymbolsArchive()
 {
     echo ""
@@ -515,7 +534,7 @@ buildDebugSymbolsArchive()
         echo "  No .debug files found"
     else
         createArchive \
-            "$CURRENT_BUILD_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
+            "$OUTPUT_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
     fi
 }
 
@@ -527,7 +546,7 @@ main()
     local -i VERBOSE
     parseArgs "$@"
 
-    local -r WORK_DIR=$(mktemp -d)
+    local -r WORK_DIR="$BUILD_DIR/arm_installer"
     rm -rf "$WORK_DIR"
 
     local -r TAR_DIR="$WORK_DIR/tar"
@@ -535,7 +554,7 @@ main()
     local -r LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
     local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
 
-    echo "Creating installer in $WORK_DIR (please delete it on failure)."
+    echo "Creating installer in $WORK_DIR (will be deleted on success)."
 
     if [ $VERBOSE = 0 ]; then
         redirectOutput "$BUILD_DIR/create_arm_installer.log"
@@ -571,6 +590,8 @@ main()
         if [ $LITE_CLIENT = 1 ]; then
             copyBpiLiteClient
         fi
+    elif [ "$BOX" = "edge1" ]; then
+        copyEdge1SpecificFiles
     fi
 
     buildInstaller

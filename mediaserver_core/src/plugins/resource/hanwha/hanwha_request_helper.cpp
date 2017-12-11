@@ -124,7 +124,7 @@ QUrl HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
-    std::map<QString, QString> parameters)
+    const HanwhaRequestHelper::Parameters& parameters)
 {
     QUrlQuery query;
 
@@ -143,9 +143,35 @@ QUrl HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
-    std::map<QString, QString> parameters) const
+    const HanwhaRequestHelper::Parameters& parameters) const
 {
     return buildRequestUrl(m_resourceContext->url(), cgi, submenu, action, std::move(parameters));
+}
+
+QUrl HanwhaRequestHelper::buildRequestUrl(
+    const HanwhaSharedResourceContext* sharedContext,
+    const QString& path,
+    const Parameters& parameters)
+{
+    NX_ASSERT(sharedContext, lit("No shared context provided."));
+    if (!sharedContext)
+        return QUrl();
+
+    const auto split = path.split(L'/');
+    if (split.size() != 3)
+        return QUrl();
+
+    auto url = sharedContext->url();
+    url.setPath(lit("/stw-cgi/%1.cgi").arg(split[0].trimmed()));
+
+    QUrlQuery query;
+    query.addQueryItem(lit("msubmenu"), split[1].trimmed());
+    query.addQueryItem(lit("action"), split[2].trimmed());
+    for (const auto& parameter : parameters)
+        query.addQueryItem(parameter.first, parameter.second);
+
+    url.setQuery(query);
+    return url;
 }
 
 QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const

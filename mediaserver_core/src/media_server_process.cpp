@@ -21,6 +21,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
+#include <QtCore/QThreadPool>
 #include <QtConcurrent/QtConcurrent>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
@@ -318,6 +319,8 @@ const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static QString kLogTag = toString(typeid(MediaServerProcess));
+
+static const int kMinimalGlobalThreadPoolSize = 4;
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -1411,18 +1414,20 @@ void MediaServerProcess::loadResourcesFromECS(
         messageProcessor->resetPropertyList(kvPairs);
 
         /* Properties and attributes must be read before processing cameras because of getAuth() method */
-        QnManualCameraInfoMap manualCameras;
+        std::vector<QnManualCameraInfo> manualCameras;
         for (const auto &camera : cameras)
         {
             messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
             if (camera.manuallyAdded)
             {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
-                if (resType)
+                if (const auto resourceType = qnResTypePool->getResourceType(camera.typeId))
                 {
-                    const auto auth = QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId);
-                    manualCameras.insert(camera.url,
-                        QnManualCameraInfo(QUrl(camera.url), auth, resType->getName()));
+                    QnManualCameraInfo info(
+                        QUrl(camera.url),
+                        QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId),
+                        resourceType->getName());
+
+                    manualCameras.push_back(std::move(info));
                 }
                 else
                 {
@@ -2401,8 +2406,59 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
         &event::EventConnector::at_fileIntegrityCheckFailed);
 }
 
+class TcpLogReceiverConnection: public QnTCPConnectionProcessor
+{
+public:
+    TcpLogReceiverConnection(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+        QnTCPConnectionProcessor(socket, owner),
+        m_socket(socket),
+        m_file(closeDirPath(getDataDirectory()) + lit("log/external_device.log"))
+    {
+        m_file.open(QFile::WriteOnly);
+        socket->setRecvTimeout(1000 * 3);
+    }
+    virtual ~TcpLogReceiverConnection() override { stop(); }
+protected:
+    virtual void run() override
+    {
+        while (true)
+        {
+            quint8 buffer[1024 * 16];
+            int bytesRead = m_socket->recv(buffer, sizeof(buffer));
+            if (bytesRead < 1 && SystemError::getLastOSErrorCode() != SystemError::timedOut)
+                break; //< Connection closed
+            m_file.write((const char*)buffer, bytesRead);
+            m_file.flush();
+        }
+    }
+private:
+    QSharedPointer<AbstractStreamSocket> m_socket;
+    QFile m_file;
+};
+
+class TcpLogReceiver : public QnTcpListener
+{
+public:
+    TcpLogReceiver(
+        QnCommonModule* commonModule, const QHostAddress& address, int port):
+        QnTcpListener(commonModule, address, port)
+    {
+    }
+    virtual ~TcpLogReceiver() override { stop(); }
+
+protected:
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+    {
+        return new TcpLogReceiverConnection(clientSocket, this);
+    }
+};
+
 void MediaServerProcess::run()
 {
+    // All managers use QnConcurent with blocking tasks, this huck is required to avoid deleays.
+    if (QThreadPool::globalInstance()->maxThreadCount() < kMinimalGlobalThreadPoolSize)
+        QThreadPool::globalInstance()->setMaxThreadCount(kMinimalGlobalThreadPoolSize);
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
@@ -2424,6 +2480,15 @@ void MediaServerProcess::run()
     SocketFactory::setIpVersion(ipVersion);
 
     m_serverModule = serverModule;
+
+    // Start plain TCP listener and write data to a separate log file.
+    const int tcpLogPort = qnServerModule->roSettings()->value("tcpLogPort").toInt();
+    if (tcpLogPort)
+    {
+        std::unique_ptr<TcpLogReceiver> logReceiver(new TcpLogReceiver(
+            commonModule(), QHostAddress::Any, tcpLogPort));
+        logReceiver->start();
+    }
 
     if (!m_obsoleteGuid.isNull())
         commonModule()->setObsoleteServerGuid(m_obsoleteGuid);

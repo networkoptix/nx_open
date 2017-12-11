@@ -486,6 +486,14 @@
       <source>Time Licenses</source>
       <translation>Deneme Lisansları</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation type="unfinished">Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation type="unfinished">Bridge Licenses</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -774,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Data aktarma için geçersiz kaynak tipi.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation type="unfinished">No data was exported.</translation>
     </message>
   </context>
   <context>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 de %1</translation>
     </message>
   </context>
   <context>

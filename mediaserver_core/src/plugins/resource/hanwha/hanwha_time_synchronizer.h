@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_request_helper.h"
 
 #include <nx/network/http/http_async_client.h>
@@ -28,10 +30,10 @@ public:
     void setTimeSynchronizationEnabled(bool enabled);
     using TimeZoneShiftHandler = utils::MoveOnlyFunc<void(std::chrono::seconds)>;
     void setTimeZoneShiftHandler(TimeZoneShiftHandler handler);
+    void setDateTime(const QDateTime& dateTime);
 
 private:
     void verifyDateTime();
-    void setDateTime(const QDateTime& dateTime);
     void retryVerificationIn(std::chrono::milliseconds timeout);
     void updateTimeZoneShift(std::chrono::seconds value);
     void fireStartPromises();
@@ -54,3 +56,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

@@ -118,7 +118,7 @@
         "cameraLinks": {
             "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
             "highStream": "สตรีมสูง",
-            "copyDefaultText": "สำเนา",
+            "copyDefaultText": "คัดลอก",
             "unknown": "ม่รู้จัก",
             "lowStream": "สตรีมต่ำ",
             "transcoding": "การแปลงรหัส",

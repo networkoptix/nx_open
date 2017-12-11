@@ -1,14 +1,16 @@
 'Support for installing servers on physical hosts, controlled by yaml test config'
 
-import os.path
 import logging
+import os.path
 import uuid
-from .utils import is_list_inst
-from .template_renderer import TemplateRenderer
+
+from test_utils.ca import CA
 from .host import SshHostConfig, host_from_config
+from .server import Server
 from .server_ctl import MEDIASERVER_DIR, SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .server_installation import MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL, ServerInstallation
-from .server import Server
+from .template_renderer import TemplateRenderer
+from .utils import is_list_inst
 
 log = logging.getLogger(__name__)
 
@@ -58,11 +60,11 @@ class PhysicalInstallationHostConfig(object):
 
 class PhysicalInstallationCtl(object):
 
-    def __init__(self, mediaserver_dist_path, customization_company_name, config_list):
+    def __init__(self, mediaserver_dist_path, customization_company_name, config_list, ca):
         assert is_list_inst(config_list, PhysicalInstallationHostConfig), repr(config_list)
         self.config_list = config_list
         self.installation_hosts = [
-            PhysicalInstallationHost.from_config(config, mediaserver_dist_path, customization_company_name) for config in config_list]
+            PhysicalInstallationHost.from_config(config, mediaserver_dist_path, customization_company_name, ca) for config in config_list]
         self._available_hosts = self.installation_hosts[:]
 
     # will unpack [new] distributive and reinstall servers
@@ -92,16 +94,17 @@ class PhysicalInstallationCtl(object):
 class PhysicalInstallationHost(object):
 
     @classmethod
-    def from_config(cls, config, mediaserver_dist_path, customization_company_name):
+    def from_config(cls, config, mediaserver_dist_path, customization_company_name, ca):
         return cls(config.name, host_from_config(config.location), config.root_dir, config.limit,
-                   mediaserver_dist_path, customization_company_name)
+                   mediaserver_dist_path, customization_company_name, ca)
 
-    def __init__(self, name, host, root_dir, limit, mediaserver_dist_path, customization_company_name):
+    def __init__(self, name, host, root_dir, limit, mediaserver_dist_path, customization_company_name, ca):
         self._name = name
         self._host = host  # Host (LocalHost or RemoteSshHost)
         self._root_dir = host.expand_path(root_dir)
         self._limit = limit
         self._mediaserver_dist_path = mediaserver_dist_path
+        self._ca = ca
         self._customization_company_name = customization_company_name
         self._template_renderer = TemplateRenderer()
         self._dist_unpacked = self._host.dir_exists(self.unpacked_mediaserver_dir)
@@ -159,8 +162,8 @@ class PhysicalInstallationHost(object):
         server_port = self._installation_server_port(self._installations.index(installation))
         rest_api_url = '%s://%s:%d/' % (config.http_schema, self._host.host, server_port)
         server_ctl = PhysicalHostServerCtl(self._host, installation.dir)
-        server = Server(config.name, self._host, installation, server_ctl, rest_api_url,
-                        config.rest_api_timeout, internal_ip_port=server_port, timezone=self._timezone)
+        server = Server(config.name, self._host, installation, server_ctl, rest_api_url, self._ca,
+                        rest_api_timeout=config.rest_api_timeout, internal_ip_port=server_port, timezone=self._timezone)
         self._allocated_server_list.append(server)
         return server
 

@@ -217,6 +217,8 @@
 
         <additionalQrcPaths/>
 
+        <distribution_output_dir/>
+
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
@@ -540,6 +542,18 @@
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
+        </profile>
+        <profile>
+            <id>not-hanwha</id>
+            <activation>
+                <property>
+                    <name>customization</name>
+                    <value>!hanwha</value>
+                </property>
+            </activation>
+            <properties>
+                <customization.defines>DISABLE_HANWHA</customization.defines>
+            </properties>
         </profile>
         <profile>
             <id>desktop</id>
@@ -878,10 +892,9 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA DISABLE_SOFTWARE_MOTION_DETECTION EDGE_SERVER debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA DISABLE_SOFTWARE_MOTION_DETECTION EDGE_SERVER</additional.defines>
                 <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
-                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>

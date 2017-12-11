@@ -47,7 +47,6 @@ class QnStreamRecorder:
 {
     Q_OBJECT
 
-    using MotionHandler = std::function<bool(const QnConstMetaDataV1Ptr& motion)>;
 public:
     static QString errorString(StreamRecorderError errCode);
 
@@ -95,8 +94,6 @@ public:
 
     void disableRegisterFile(bool disable);
 
-    void setSaveMotionHandler(MotionHandler handler);
-
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
 #endif
@@ -126,12 +123,6 @@ public:
     void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
 
     int64_t lastFileSize() const;
-
-    void setRecordingBounds(
-        const std::chrono::microseconds& startTime,
-        const std::chrono::microseconds& endTime);
-
-    void setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler);
 
 signals:
     void recordingStarted();
@@ -211,8 +202,6 @@ protected:
     qint64 m_startDateTime;
     int m_currentTimeZone;
     std::vector<StreamRecorderContext> m_recordingContextVector;
-    boost::optional<std::chrono::microseconds> m_startRecordingBound;
-    boost::optional<std::chrono::microseconds> m_endRecordingBound;
 
 private:
     bool m_waitEOF;
@@ -260,10 +249,7 @@ private:
 
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
-    MotionHandler m_motionHandler;
     int64_t m_lastFileSize = 0;
-
-    std::function<void()> m_endOfRecordingHandler;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

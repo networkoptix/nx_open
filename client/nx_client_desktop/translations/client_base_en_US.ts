@@ -990,15 +990,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Settings are not available for .EXE files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Local files, server monitor widgets and webpages will not be exported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1253,6 +1253,33 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2314,6 +2341,10 @@ to view more bookmarks</source>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Edge</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -3151,16 +3182,16 @@ to %1</source>
         <source>Some of selected cameras requires password to be set up.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source> Ask your system administrator to do it.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Set Password</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Ask your system administrator to do it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3408,6 +3439,10 @@ to %1</source>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
         <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6084,7 +6119,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set For This Camera</source>
+        <source>Set for this camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6564,15 +6599,15 @@ to %1</source>
 <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-        <source>System time is synchronized with the Internet and is independent from server local times.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No server has Internet access. Time is not being synchronized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8506,7 +8541,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to change passwords on %1 of %2 cameras</source>
+        <source>Failed to change password on %1 of %2 cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

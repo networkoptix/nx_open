@@ -11,8 +11,9 @@
 namespace nx {
 namespace analytics {
 
-DetectionPluginFactory::DetectionPluginFactory(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+DetectionPluginFactory::DetectionPluginFactory(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent),
     m_instanceCount(0)
 {
 }

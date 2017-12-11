@@ -18,13 +18,10 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 # Support section
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
-set(supportUrl "https://sync.wavevms.com/content/support")
+set(supportUrl "http://wavevms.com/support")
 set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail
-    "<br><a href=\"mailto:WAVELicense@hanwha.com\">WAVELicense@hanwha.com</a> (for US customers),<br>
-    <a href=\"mailto:eucctv.help@hanwha.com\">eucctv.help@hanwha.com</a> (for European customers)<br>"
-)
+set(licenseEmail "<br><a href="http://wavevms.com/support">http://wavevms.com/support</a><br>")
 
 set(installer.name "wave")
 set(android.packageName "com.hanwhasecurity.wavemobile")

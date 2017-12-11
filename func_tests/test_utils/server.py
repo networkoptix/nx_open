@@ -3,28 +3,27 @@
 Allows working with servers from functional tests - start/stop, setup, configure, access rest api, storage, etc.
 '''
 
-import os.path
-import logging
 import base64
-import uuid
-import urllib
-import hashlib
-import time
 import datetime
+import hashlib
+import logging
+import os.path
+import time
+import urllib
+import uuid
 import tempfile
-import calendar
-import pytz
-import tzlocal
-import requests.exceptions
-import pytest
-from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now
-from .rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT, HttpError, ServerRestApi
-from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
-from .camera import make_schedule_task, Camera, SampleMediaFile
-from .media_stream import open_media_stream
-from .host import Host, LocalHost
-from .cloud_host import CloudAccount
 
+import pytest
+import pytz
+import requests.exceptions
+
+from .camera import make_schedule_task, Camera, SampleMediaFile
+from .cloud_host import CloudAccount
+from .host import Host, LocalHost
+from .media_stream import open_media_stream
+from .rest_api import REST_API_USER, REST_API_PASSWORD, HttpError, RestApi
+from .utils import is_list_inst, datetime_utc_to_timestamp, datetime_utc_now, RunningTime
+from .vagrant_box_config import MEDIASERVER_LISTEN_PORT
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -102,7 +101,7 @@ class Server(object):
     _st_stopped = object()
     _st_starting = object()
 
-    def __init__(self, name, host, installation, server_ctl, rest_api_url,
+    def __init__(self, name, host, installation, server_ctl, rest_api_url, ca,
                  rest_api_timeout=None, internal_ip_port=None, timezone=None):
         assert name, repr(name)
         assert isinstance(host, Host), repr(host)
@@ -112,7 +111,8 @@ class Server(object):
         self._installation = installation
         self._server_ctl = server_ctl
         self.rest_api_url = rest_api_url
-        self.rest_api = ServerRestApi(self.title, self.rest_api_url, REST_API_USER, REST_API_PASSWORD, rest_api_timeout)
+        self._ca = ca
+        self.rest_api = RestApi(self.title, self.rest_api_url, timeout=rest_api_timeout, ca_cert=self._ca.cert_path)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
@@ -155,6 +155,7 @@ class Server(object):
             if was_started:
                 self.stop_service()
             self._installation.cleanup_var_dir()
+            self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
@@ -243,12 +244,6 @@ class Server(object):
         self.internal_ip_address = iflist[-1]['ipAddr']
         self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
-    def _safe_api_call(self, fn, *args, **kw):
-        try:
-            return fn(*args, **kw)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            return None
-
     def get_system_settings(self):
         response = self.rest_api.api.systemSettings.GET()
         return response['settings']
@@ -269,29 +264,48 @@ class Server(object):
         if was_started:
             self.stop_service()
         self._installation.cleanup_var_dir()
+        self._installation.put_key_and_cert(self._ca.generate_key_and_cert())
         if was_started:
             self.start_service()
 
-    def restart(self, timeout=30):
-        t = time.time()
-        uptime = self.get_uptime()
+    def restart_via_api(self, timeout=MEDIASERVER_START_TIMEOUT):
+        old_runtime_id = self.rest_api.api.moduleInformation.GET()['runtimeId']
+        log.info("Runtime id before restart: %s", old_runtime_id)
+        started_at = datetime.datetime.now(pytz.utc)
         self.rest_api.api.restart.GET()
-        while time.time() - t < timeout:
-            new_uptime = self._safe_api_call(self.get_uptime)
-            if new_uptime and new_uptime < uptime:
-                self.load_system_settings(log_settings=True)
-                return
-            log.debug('Server did not restart yet, waiting...')
-            time.sleep(0.5)
-        assert False, 'Server %r did not restart in %s seconds' % (self, timeout)
+        sleep_time_sec = timeout.total_seconds() / 100.
+        failed_connections = 0
+        while True:
+            try:
+                response = self.rest_api.api.moduleInformation.GET()
+            except requests.ConnectionError as e:
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't started, caught %r, timed out." % e
+                log.debug("Expected failed connection: %r", e)
+                failed_connections += 1
+                time.sleep(sleep_time_sec)
+                continue
+            new_runtime_id = response['runtimeId']
+            if new_runtime_id == old_runtime_id:
+                if failed_connections > 0:
+                    assert False, "Runtime id remains same after failed connections."
+                if datetime.datetime.now(pytz.utc) - started_at > timeout:
+                    assert False, "Server hasn't stopped, timed out."
+                log.warning("Server hasn't stopped yet, delay is acceptable.")
+                time.sleep(sleep_time_sec)
+                continue
+            log.info("Server restarted successfully, new runtime id is %s", new_runtime_id)
+            break
 
     def make_core_dump(self):
         self._server_ctl.make_core_dump()
         self._state = self._st_stopped
 
-    def get_uptime(self):
-        response = self.rest_api.api.statistics.GET()
-        return datetime.timedelta(seconds=int(response['uptimeMs'])/1000.)
+    def get_time(self):
+        started_at = datetime.datetime.now(pytz.utc)
+        time_response = self.rest_api.ec2.getCurrentTime.GET()
+        received = datetime.datetime.fromtimestamp(float(time_response['value']) / 1000., pytz.utc)
+        return RunningTime(received, datetime.datetime.now(pytz.utc) - started_at)
 
     def reset_config(self, **kw):
         self._installation.reset_config(**kw)
@@ -469,11 +483,6 @@ class Storage(object):
         self.host = host
         self.dir = dir
         self.timezone = timezone or host.get_timezone()
-
-    def cleanup(self):
-        self.host.run_command(['rm', '-rf',
-                               os.path.join(self.dir, 'low_quality'),
-                               os.path.join(self.dir, 'hi_quality')])
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)

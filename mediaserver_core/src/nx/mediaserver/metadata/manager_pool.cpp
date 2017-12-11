@@ -10,14 +10,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/api/analytics/device_manifest.h>
+#include <nx/api/analytics/supported_events.h>
 #include <nx/fusion/serialization/json.h>
-
 #include <nx/mediaserver/metadata/event_handler.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
-
-#include <nx/api/analytics/supported_events.h>
-#include <nx/api/analytics/device_manifest.h>
-
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver {
@@ -96,7 +94,21 @@ void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
         resource.data(), &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
+    connect(
+        resource.data(), &QnResource::urlChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource.data(), &QnResource::propertyChanged,
+        this, &ManagerPool::at_propertyChanged);
+
     handleResourceChanges(resource);
+}
+
+void ManagerPool::at_propertyChanged(const QnResourcePtr& resource, const QString& name)
+{
+    if (name == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
+        handleResourceChanges(resource);
 }
 
 void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
@@ -145,7 +157,6 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
     releaseResourceMetadataManagers(camera);
 
     auto plugins = availablePlugins();
-
     for (auto& plugin: plugins)
     {
         auto manager = createMetadataManager(camera, plugin);
@@ -166,6 +177,7 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
         if (!handler)
             continue;
 
+        NX_DEBUG(this, lm("Camera %1 got new manager %2").args(cameraId, typeid(*manager)));
         m_contexts.emplace(
             camera->getId(),
             ResourceMetadataContext(manager, handler));
@@ -189,19 +201,20 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
 
 void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
 {
-    auto id = resource->getId();
-    auto range  = m_contexts.erase(id);
+    const auto id = resource->getId();
+    const auto removedCount = m_contexts.erase(id);
+    NX_DEBUG(this, lm("Camera %1 lost all %2 managers %2").args(id, removedCount));
 }
 
 AbstractMetadataHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
     const QnUuid& pluginId)
 {
-    auto handler = new EventHandler();
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return nullptr;
 
+    auto handler = new EventHandler();
     handler->setResource(camera);
     handler->setPluginId(pluginId);
 
@@ -214,17 +227,14 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
     if (!camera)
         return;
 
+    releaseResourceMetadataManagers(camera);
+    if (canFetchMetadataFromResource(camera))
+        createMetadataManagersForResource(camera);
+
     auto resourceId = camera->getId();
     auto events = qnServerModule
         ->metadataRuleWatcher()
         ->watchedEventsForResource(resourceId);
-
-    if (canFetchMetadataFromResource(camera))
-    {
-        auto context = m_contexts.find(resourceId);
-        if (context == m_contexts.cend())
-            createMetadataManagersForResource(camera);
-    }
 
     fetchMetadataForResource(resourceId, events);
 }
@@ -243,6 +253,7 @@ bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& c
 
 bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid>& eventTypeIds)
 {
+    // FIXME: Currently we always use a single random plugin for each resource on each request.
     auto context = m_contexts.find(resourceId);
     if (context == m_contexts.cend())
         return false;
@@ -256,6 +267,7 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     else
         result = manager->startFetchingMetadata(handler.get()); //< TODO: #dmishin pass event types.
 
+    NX_DEBUG(this, lm("Camera %1 start fetching for %2").args(resourceId, typeid(*manager)));
     return result == Error::noError;
 }
 

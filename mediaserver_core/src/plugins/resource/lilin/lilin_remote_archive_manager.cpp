@@ -32,6 +32,13 @@ static const QString kDeleteOkResponse("del OK");
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
 static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
+static const std::chrono::minutes kMaxChunkDuration(1);
+
+static const std::chrono::milliseconds kWaitBeforeSync(30000);
+static const int kNumberOfSyncCycles = 2;
+static const int kDefaultOverlappedId = 0;
+static const int kTriesPerChunk = 2;
+
 } // namespace
 
 using namespace nx::core::resource;
@@ -42,17 +49,19 @@ LilinRemoteArchiveManager::LilinRemoteArchiveManager(LilinResource* resource):
 }
 
 bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
-    std::vector<RemoteArchiveEntry>* outArchiveEntries,
+    OverlappedRemoteChunks* outArchiveEntries,
     int64_t startTimeMs,
     int64_t endTimeMs)
 {
+    using namespace std::chrono;
+
     auto dirs = getDirectoryList();
 
     std::vector<QString> files;
     for (const auto& dir : dirs)
         fetchFileList(dir, &files);
 
-    auto driftSeconds = m_resource->getTimeDrift();
+    auto driftMs = m_resource->getTimeDrift();
     auto fileCount = files.size();
     for (auto i = 0; i < files.size(); ++i)
     {
@@ -70,25 +79,18 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
                 continue;
         }
 
-        const int64_t kMillisecondsInMinute = 60000;
-
-        auto duration = nextChunkStartMs
+        auto durationMs = nextChunkStartMs
             ? nextChunkStartMs.get() - currentChunkStartMs.get()
-            : kMillisecondsInMinute;
+            : duration_cast<milliseconds>(kMaxChunkDuration).count();
 
-        outArchiveEntries->emplace_back(
+        (*outArchiveEntries)[kDefaultOverlappedId].emplace_back(
             files[i],
-            currentChunkStartMs.get() - driftSeconds,
-            duration);
+            currentChunkStartMs.get() - driftMs,
+            durationMs,
+            kDefaultOverlappedId);
     }
 
     return true;
-}
-
-void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
-    std::function<void(const std::vector<RemoteArchiveEntry>&)> /*callback*/)
-{
-    // Do nothing.
 }
 
 bool LilinRemoteArchiveManager::fetchArchiveEntry(const QString& entryId, BufferType* outBuffer)
@@ -238,9 +240,30 @@ RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
     return RemoteArchiveCapability::RemoveChunkCapability;
 }
 
-std::unique_ptr<QnAbstractArchiveDelegate> LilinRemoteArchiveManager::archiveDelegate()
+std::unique_ptr<QnAbstractArchiveDelegate> LilinRemoteArchiveManager::archiveDelegate(
+    const RemoteArchiveChunk& /*chunk*/)
 {
     return nullptr;
+}
+
+void LilinRemoteArchiveManager::beforeSynchronization()
+{
+    // Do nothing.
+}
+
+void LilinRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuccessful*/)
+{
+    // Do nothing.
+}
+
+RemoteArchiveSynchronizationSettings LilinRemoteArchiveManager::settings() const
+{
+    return {
+        kWaitBeforeSync,
+        std::chrono::milliseconds::zero(),
+        kNumberOfSyncCycles,
+        kTriesPerChunk
+    };
 }
 
 } // namespace plugins

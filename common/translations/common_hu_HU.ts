@@ -486,6 +486,14 @@
       <source>Time Licenses</source>
       <translation>Idő licencek</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Bridge licenc</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -774,6 +782,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
+    </message>
+    <message>
+      <source>No data was exported.</source>
+      <translation>Nincs adat exportálva.</translation>
     </message>
   </context>
   <context>
@@ -1504,6 +1516,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Nyugtázás</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analitikai esemény</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 ezen %2</translation>
     </message>
   </context>
   <context>

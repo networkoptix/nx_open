@@ -93,7 +93,7 @@ Unknown realm.</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation>시스템</translation>
+      <translation>귀하의 시스템</translation>
     </message>
   </context>
   <context>
@@ -117,7 +117,7 @@ Unknown realm.</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation>시스템</translation>
+      <translation>귀하의 시스템</translation>
     </message>
   </context>
 </TS>

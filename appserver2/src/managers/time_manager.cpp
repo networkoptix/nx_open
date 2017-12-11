@@ -425,7 +425,12 @@ qint64 TimeSynchronizationManager::getSyncTime() const
 
 ApiTimeData TimeSynchronizationManager::getTimeInfo() const
 {
-    const auto& resPool = m_messageBus->commonModule()->resourcePool();
+    std::vector<QnUuid> allServerIds;
+    if (const auto& resourcePool = m_messageBus->commonModule()->resourcePool())
+    {
+        for (const auto& server: resourcePool->getAllServers(Qn::AnyStatus))
+            allServerIds.push_back(server->getId());
+    }
 
     QnMutexLocker lock(&m_mutex);
     ApiTimeData result;
@@ -437,20 +442,16 @@ ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
         result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
 
-    if (resPool)
+    for (const auto& serverId: allServerIds)
     {
-        const auto allServers = resPool->getAllServers(Qn::AnyStatus);
-        for (const auto& server: allServers)
+        const auto s = serverId.toByteArray();
+        if (m_usedTimeSyncInfo.timePriorityKey.seed == crc32(0, (const Bytef*) s.constData(), s.size()))
         {
-            const auto guidStr = server->getId().toByteArray();
-            if (m_usedTimeSyncInfo.timePriorityKey.seed ==
-                crc32(0, (const Bytef*)guidStr.constData(), guidStr.size()))
-            {
-                result.primaryTimeServerGuid = server->getId();
-                break;
-            }
+            result.primaryTimeServerGuid = serverId;
+            break;
         }
     }
+
     return result;
 }
 

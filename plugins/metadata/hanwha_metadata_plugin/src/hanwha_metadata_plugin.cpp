@@ -1,4 +1,6 @@
-﻿#include "hanwha_metadata_plugin.h"
+﻿#if defined(ENABLED_HANWHA)
+
+#include "hanwha_metadata_plugin.h"
 #include "hanwha_metadata_manager.h"
 #include "hanwha_common.h"
 #include "hanwha_attributes_parser.h"
@@ -318,3 +320,5 @@ extern "C" {
     }
 
 } // extern "C"
+
+#endif // defined(ENABLED_HANWHA)

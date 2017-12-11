@@ -1,5 +1,6 @@
-import os.path
 import logging
+import os.path
+
 from .core_file_traceback import create_core_file_traceback
 from .server import ServerConfig
 
