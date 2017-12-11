@@ -411,7 +411,7 @@ QString AnalyticsSearchListModel::Private::description(
     //   Or we need to add some "lastAppearanceDurationUsec"?
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
-    return lit("%1: %2<br>%3: %4")
+    result = lit("%1: %2<br>%3: %4")
         .arg(tr("Start"))
         .arg(start.toString(Qt::RFC2822Date))
         .arg(tr("Duration"))
@@ -423,7 +423,7 @@ QString AnalyticsSearchListModel::Private::description(
 
     static const auto kCss = QString::fromLatin1(R"(
             <style type = 'text/css'>
-                th { color: %1; font-weight: normal; }
+                th { color: %1; font-weight: normal; text-align: left; }
             </style>)");
 
     static const auto kTableTemplate = lit("<table cellpadding='0' cellspacing='0'>%1</table>");
