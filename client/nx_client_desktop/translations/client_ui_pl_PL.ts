@@ -1053,6 +1053,16 @@
       <source>HTTP URL</source>
       <translation>URL HTTP</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>Typ uwierzytelniania</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>Typ zapytania</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>

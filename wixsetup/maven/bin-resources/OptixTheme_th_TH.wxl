@@ -25,7 +25,7 @@
   <String Id="InstallInstallButton">ยอมรับและติดตั้ง</String>
   <String Id="InstallCloseButton">ปิด</String>
   <String Id="OptionsHeader">ตัวเลือกการตั้งค่า</String>
-  <String Id="OptionsLocationLabel">ติดตั้งสถานที่:</String>
+  <String Id="OptionsLocationLabel">ตำแหน่งการติดตั้ง:</String>
   <String Id="OptionsBrowseButton">เรียกดู</String>
   <String Id="OptionsOkButton">ตกลง</String>
   <String Id="OptionsCancelButton">ยกเลิก</String>

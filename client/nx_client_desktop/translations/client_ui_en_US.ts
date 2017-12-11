@@ -1053,6 +1053,16 @@
         <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Authentication type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Request type</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ExecPtzPresetBusinessActionWidget</name>

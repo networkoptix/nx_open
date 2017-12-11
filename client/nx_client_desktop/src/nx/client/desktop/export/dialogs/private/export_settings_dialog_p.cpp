@@ -851,7 +851,7 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                 case ExportMediaValidator::Result::tooBigExeFile:
                     return ExportSettingsDialog::tr("Exported .EXE file will have size over 4 GB "
                         "and cannot be opened by double-click in Windows. "
-                        "It can be played only in Nx Witness Client.");
+                        "It can be played only in %1 Client.").arg(QnAppInfo::organizationName());
 
                 case ExportMediaValidator::Result::transcodingInBinaryIsNotSupported:
                     return ExportSettingsDialog::tr("Settings are not available for .EXE files.");

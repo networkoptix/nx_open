@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>ブリッジ</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>ブリッジライセンス</translation>
     </message>
   </context>
   <context>
@@ -652,13 +652,6 @@
     </message>
   </context>
   <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-      <source>Operation is not permitted.</source>
-      <translation type="unfinished">Operation is not permitted.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
@@ -781,8 +774,8 @@
       <translation>データ エクスポートに無効なリソースタイプ</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -1313,7 +1306,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 時, 開始: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n, %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1496,12 +1489,12 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>解析イベント</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%2 の %1</translation>
     </message>
   </context>
   <context>

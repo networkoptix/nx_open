@@ -1053,6 +1053,16 @@
       <source>HTTP URL</source>
       <translation>HTTP-URL</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>Authentifizierungstyp</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>Anforderungstyp</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -2992,7 +3002,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Zeitstempel</translation>
+      <translation>Zeitmarke</translation>
     </message>
     <message>
       <location/>

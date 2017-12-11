@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kamera Ayarları</translation>
     </message>
     <message>
       <location/>
@@ -720,7 +720,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>İkincil akış</translation>
     </message>
     <message>
       <location/>
@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
   </context>
   <context>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bitrate</translation>
     </message>
   </context>
   <context>
@@ -1052,6 +1052,16 @@
       <location/>
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation type="unfinished">Authentication type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1324,7 +1334,7 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Opasite</translation>
     </message>
     <message>
       <location/>
@@ -1755,7 +1765,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Tur periyodu</translation>
     </message>
   </context>
   <context>
@@ -2265,7 +2275,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Hızlı gözden geçirme</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2290,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Hız</translation>
     </message>
     <message>
       <location/>
@@ -2992,7 +3002,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Zaman Bilgisi</translation>
     </message>
     <message>
       <location/>
@@ -3002,7 +3012,7 @@
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Biçim</translation>
     </message>
     <message>
       <location/>

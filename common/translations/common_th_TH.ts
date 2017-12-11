@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>ไม่สามารถจัดการ สตรีมเอาร์พุต สำหรับการบันทึก.</translation>
+      <translation>ไม่สามารถจัดการส่งออกสตรีม สำหรับการบันทึก.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -420,7 +420,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I / O โมดูล</translation>
+      <translation>I/O โมดูล</translation>
     </message>
     <message>
       <source>Start</source>
@@ -652,17 +652,10 @@
     </message>
   </context>
   <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-      <source>Operation is not permitted.</source>
-      <translation type="unfinished">Operation is not permitted.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>ไม่ระบุ</translation>
+      <translation>ม่รู้จัก</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -781,8 +774,8 @@
       <translation>ประเภทรีซอร์สไม่ถูกต้องสำหรับการส่งออกข้อมูล</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -1453,7 +1446,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>ผู้ใช้ %n</numerusform>
+        <numerusform>%n ผู้ใช้</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1501,7 +1494,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 ที่ %2</translation>
     </message>
   </context>
   <context>

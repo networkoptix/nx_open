@@ -672,13 +672,6 @@
     </message>
   </context>
   <context>
-    <name>QnSecurityCamResource</name>
-    <message>
-      <source>Operation is not permitted.</source>
-      <translation>Operacja nie jest dozwolona.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
@@ -801,8 +794,8 @@
       <translation>Nieprawidłowy typ zasobu do eksportowania danych.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Dane nie zostały wyeksportowane.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

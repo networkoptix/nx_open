@@ -315,15 +315,15 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Lista de dispositivos</translation>
+      <translation>Listagem de Dispositivos</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Lista de Câmaras</translation>
+      <translation>Listagem de Câmaras</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>Fundir Sistemas...</translation>
+      <translation>"Fundir" Sistemas... (Merge)</translation>
     </message>
     <message>
       <source>About...</source>
@@ -427,7 +427,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Associar a Video Wall...</translation>
+      <translation>Assignar a Video Wall...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -703,7 +703,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Médio</translation>
+      <translation>Média</translation>
     </message>
     <message>
       <source>Large</source>
@@ -731,7 +731,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Frame Anterior</translation>
+      <translation>Fame Anterior</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -739,11 +739,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>Para Início</translation>
+      <translation>P/ Início</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>Para Final</translation>
+      <translation>P/ Final</translation>
     </message>
     <message>
       <source>Volume Down</source>
@@ -991,16 +991,16 @@ to view more bookmarks</translation>
       <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in Nx Witness Client.</translation>
-    </message>
-    <message>
       <source>Settings are not available for .EXE files.</source>
       <translation type="unfinished">Settings are not available for .EXE files.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
       <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -1050,7 +1050,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Abaixo</translation>
+      <translation>Fundo</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1070,7 +1070,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Scroll Esquerda</translation>
+      <translation>Scroll para Esquerda</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1078,7 +1078,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Scroll Direita</translation>
+      <translation>Scroll para Direita</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -1345,7 +1345,7 @@ to view more bookmarks</translation>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>A carregar...</translation>
+      <translation>A Carregar...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1381,7 +1381,7 @@ to view more bookmarks</translation>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>Melhoramento de imagem</translation>
+      <translation>Melhoria de Imagem</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
@@ -1418,15 +1418,15 @@ to view more bookmarks</translation>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar Selecção para o Clipboard</translation>
+      <translation>Copiar selecção para ClipBoard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar Selecção para o Ficheiro...</translation>
+      <translation>Exportar a selecção para ficheiro...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Todos</translation>
+      <translation>Seleccionar todos</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1536,15 +1536,15 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>A ver Live</translation>
+      <translation>A visualizar em directo</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>A ver arquivos</translation>
+      <translation>A visualizar arquivos</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>A Exportar vídeo</translation>
+      <translation>A exportar vídeo</translation>
     </message>
     <message>
       <source>System name changed</source>
@@ -1627,7 +1627,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Descrição</translation>
+      <translation>&amp;Descrição</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1740,7 +1740,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>You have %n notifications</source>
       <translation>
-        <numerusform>Tem %n notificação</numerusform>
+        <numerusform>Tem %n notificações</numerusform>
         <numerusform>Tem %n notificações</numerusform>
       </translation>
     </message>
@@ -1800,14 +1800,14 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%1 of %n devices</source>
       <translation>
-        <numerusform>%1 de %n dispositivo</numerusform>
+        <numerusform>%1 de %n dispositivos</numerusform>
         <numerusform>%1 de %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
       <translation>
-        <numerusform>%1 de %n câmara</numerusform>
+        <numerusform>%1 de %n câmaras</numerusform>
         <numerusform>%1 de %n câmaras</numerusform>
       </translation>
     </message>
@@ -1822,7 +1822,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
       <translation>
-        <numerusform>%1 de %n módulo I/O</numerusform>
+        <numerusform>%1 de %n módulos I/O</numerusform>
         <numerusform>%1 de %n módulos I/O</numerusform>
       </translation>
     </message>
@@ -1857,7 +1857,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Instante</translation>
+      <translation>Instantâneo</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -1886,7 +1886,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
       <translation>
-        <numerusform>Câmara origem e mais %n câmara</numerusform>
+        <numerusform>Câmara origem e mais %n câmaras</numerusform>
         <numerusform>Câmara origem e mais %n câmaras</numerusform>
       </translation>
     </message>
@@ -1925,7 +1925,7 @@ to view more bookmarks</translation>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>nas</translation>
+      <translation>em</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -2091,7 +2091,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation>
-        <numerusform>%n dispositivo encontrado</numerusform>
+        <numerusform>%n dispositivos encontrados</numerusform>
         <numerusform>%n dispositivos encontrados</numerusform>
       </translation>
     </message>
@@ -2332,15 +2332,15 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixa</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Média</translation>
+      <translation>Médio</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alta</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -2359,7 +2359,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <translation>
-        <numerusform>%1 não tem porta de entrada</numerusform>
+        <numerusform>%1 não tem portas de entrada</numerusform>
         <numerusform>%1 não tem portas de entrada</numerusform>
       </translation>
     </message>
@@ -2368,15 +2368,15 @@ to view more bookmarks</translation>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar Selecção para ClipBoard</translation>
+      <translation>Copiar selecção para ClipBoard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar Selecção para Ficheiro...</translation>
+      <translation>Exportar a selecção para ficheiro...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Todos</translation>
+      <translation>Seleccionar todos</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2390,23 +2390,23 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Listagem de Dispositivos</translation>
+      <translation>Lista de dispositivos</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Listagem de Câmaras</translation>
+      <translation>Lista de Câmaras</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation>
-        <numerusform>%n dispositivo encontrado</numerusform>
+        <numerusform>%n dispositivos encontrados</numerusform>
         <numerusform>%n dispositivos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
       <translation>
-        <numerusform>%n câmara encontrada</numerusform>
+        <numerusform>%n câmaras encontradas</numerusform>
         <numerusform>%n câmaras encontradas</numerusform>
       </translation>
     </message>
@@ -2421,7 +2421,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%n I/O modules found</source>
       <translation>
-        <numerusform>%n módulo I/O encontrado</numerusform>
+        <numerusform>%n módulos I/O encontrados</numerusform>
         <numerusform>%n módulos I/O encontrados</numerusform>
       </translation>
     </message>
@@ -2434,7 +2434,7 @@ to view more bookmarks</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>Gravando</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2442,7 +2442,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante</translation>
+      <translation>Fabricante:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2518,7 +2518,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <translation>
-        <numerusform>%1 não tem porta de saída/relé</numerusform>
+        <numerusform>%1 não tem portas de saída/relés</numerusform>
         <numerusform>%1 não tem portas de saída/relés</numerusform>
       </translation>
     </message>
@@ -2551,7 +2551,7 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>Recording is disabled for %1</source>
       <translation>
-        <numerusform>Gravação desabilitada para %1</numerusform>
+        <numerusform>Gravações desabilitadas para %1</numerusform>
         <numerusform>Gravações desabilitadas para %1</numerusform>
       </translation>
     </message>
@@ -2628,7 +2628,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbps</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -3187,10 +3187,6 @@ to %1</translation>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
     </message>
-    <message>
-      <source> Ask your system administrator to do it.</source>
-      <translation type="unfinished"> Ask your system administrator to do it.</translation>
-    </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
@@ -3198,12 +3194,16 @@ to %1</translation>
         <numerusform>Set Password</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Não foi possível iniciar o encoder de áudio.</translation>
+      <translation>Não foi possível inicializar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3226,11 +3226,11 @@ to %1</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Não foi possível inicializar o encoder de vídeo.</translation>
+      <translation>Não foi possível inicializar o encoder do video.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Não foi possível inicializar o encoder de áudio.</translation>
+      <translation>Não foi possível iniciar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3327,15 +3327,15 @@ to %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar selecção para ClipBoard</translation>
+      <translation>Copiar Selecção para ClipBoard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar a selecção para ficheiro...</translation>
+      <translation>Exportar Selecção para Ficheiro...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar todos</translation>
+      <translation>Seleccionar Todos</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3396,7 +3396,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Descrição</translation>
+      <translation>&amp;Descrição</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3406,7 +3406,7 @@ to %1</translation>
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation>
-        <numerusform>%1 (%n vez)</numerusform>
+        <numerusform>%1 (%n vezes)</numerusform>
         <numerusform>%1 (%n vezes)</numerusform>
       </translation>
     </message>
@@ -3445,6 +3445,10 @@ to %1</translation>
     <message>
       <source>Auto</source>
       <translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
@@ -3491,17 +3495,17 @@ to %1</translation>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>Baixa</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation>Média</translation>
+      <translation>Médio</translation>
     </message>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>Alta</translation>
+      <translation>Alto</translation>
     </message>
   </context>
   <context>
@@ -3783,7 +3787,7 @@ to %1</translation>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation>Teste</translation>
+      <translation>Testar</translation>
     </message>
     <message>
       <source>Test failed</source>
@@ -3793,7 +3797,7 @@ to %1</translation>
       <source>Test completed successfully: %n users found.</source>
       <translation>
         <numerusform>Teste terminado com sucesso: %n utilizador encontrado.</numerusform>
-        <numerusform>Teste terminado com sucesso: %n utilizadores encontrados.</numerusform>
+        <numerusform>Teste terminado com sucesso: %n utilizador encontrado.</numerusform>
       </translation>
     </message>
   </context>
@@ -3886,7 +3890,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3905,7 +3909,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <source>Status</source>
@@ -4189,7 +4193,7 @@ to %1</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>Activar licença gratuita</translation>
+      <translation>Activar Licença Gratuita</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -4197,7 +4201,7 @@ to %1</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
-      <translation>Todos (*.*)</translation>
+      <translation>Todos ficheiros (*.*)</translation>
     </message>
     <message>
       <source>Failed to open file</source>
@@ -4217,21 +4221,21 @@ to %1</translation>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
-        <numerusform>Utilizar licenças para o %n dispositivo seleccionado</numerusform>
+        <numerusform>Utilizar licenças para os %n dispositivos seleccionados</numerusform>
         <numerusform>Utilizar licenças para os %n dispositivos seleccionados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
-        <numerusform>Utilizar licenças para a %n câmara seleccionada</numerusform>
+        <numerusform>Utilizar licenças para as %n câmaras seleccionadas</numerusform>
         <numerusform>Utilizar licenças para as %n câmaras seleccionadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
-        <numerusform>Utilizar licenças para o %n módulo I/O seleccionado</numerusform>
+        <numerusform>Utilizar licenças para os %n módulos I/O seleccionados</numerusform>
         <numerusform>Utilizar licenças para os %n módulos I/O seleccionados</numerusform>
       </translation>
     </message>
@@ -4259,7 +4263,7 @@ to %1</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Aspecto e Comportamento</translation>
+      <translation>Aspecto e Ambiente</translation>
     </message>
     <message>
       <source>Screen Recording</source>
@@ -4414,7 +4418,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Seleccionar Ficheiro...</translation>
+      <translation>Seleccionar ficheiro...</translation>
     </message>
     <message>
       <source>No image</source>
@@ -4445,7 +4449,7 @@ to %1</translation>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation>Melhoria de Imagem</translation>
+      <translation>Melhoramento de imagem</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -4453,7 +4457,7 @@ to %1</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>AO VIVO</translation>
+      <translation>Em Directo</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4485,10 +4489,10 @@ to %1</translation>
       <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
+      <source>Set for all %n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Set For All %n Cameras</numerusform>
-        <numerusform>Set For All %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -4605,7 +4609,7 @@ to %1</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Fame Anterior</translation>
+      <translation>Frame Anterior</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -4617,7 +4621,7 @@ to %1</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>P/ Início</translation>
+      <translation>Para Início</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -4625,7 +4629,7 @@ to %1</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>P/ Final</translation>
+      <translation>Para Final</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -4681,7 +4685,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Seleccionar ficheiro...</translation>
+      <translation>Seleccionar Ficheiro...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
@@ -4854,14 +4858,14 @@ to %1</translation>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
       <translation>
-        <numerusform>Este preset será activado após %n minuto de inactividade</numerusform>
+        <numerusform>Este preset será activado após %n minutos de inactividade</numerusform>
         <numerusform>Este preset será activado após %n minutos de inactividade</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>O Tour tem %n posição idêntica</numerusform>
+        <numerusform>O Tour tem %n posições idênticas</numerusform>
         <numerusform>O Tour tem %n posições idênticas</numerusform>
       </translation>
     </message>
@@ -4931,11 +4935,11 @@ to %1</translation>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation>Menor</translation>
+      <translation>O Mais Baixo</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixo</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4943,7 +4947,7 @@ to %1</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Alta</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -4951,7 +4955,7 @@ to %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Instante</translation>
+      <translation>Instantâneo</translation>
     </message>
     <message>
       <source>Position</source>
@@ -5353,7 +5357,7 @@ to %1</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Pesquisar</translation>
     </message>
   </context>
   <context>
@@ -6121,8 +6125,8 @@ to %1</translation>
       <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
-      <source>Set For This Camera</source>
-      <translation type="unfinished">Set For This Camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -6416,7 +6420,7 @@ to %1</translation>
     </message>
     <message>
       <source>System is in safe mode</source>
-      <translation>O sistema está em modo Safe</translation>
+      <translation>O Sistema está em modo Safe</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -6752,35 +6756,35 @@ to %1</translation>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
       <translation>
-        <numerusform>O problema está a ser causado por %n servidor:</numerusform>
+        <numerusform>O problema está a ser causado por %n servidores:</numerusform>
         <numerusform>O problema está a ser causado por %n servidores:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation>
-        <numerusform>Sem espaço livre em %n servidor:</numerusform>
+        <numerusform>Sem espaço livre em %n servidores:</numerusform>
         <numerusform>Sem espaço livre em %n servidores:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation>
-        <numerusform>%n Servidor não está a responder:</numerusform>
+        <numerusform>%n Servidores não estão a responder:</numerusform>
         <numerusform>%n Servidores não estão a responder:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
-        <numerusform>%n Servidor ficaram offline:</numerusform>
+        <numerusform>%n Servidores ficaram offline:</numerusform>
         <numerusform>%n Servidores ficaram offline:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
       <translation>
-        <numerusform>A autenticação falhou para %n servidor:</numerusform>
+        <numerusform>A autenticação falhou para %n servidores:</numerusform>
         <numerusform>A autenticação falhou para %n servidores:</numerusform>
       </translation>
     </message>
@@ -7318,7 +7322,7 @@ to %1</translation>
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
       <source>System is in safe mode</source>
-      <translation>O Sistema está em modo Safe</translation>
+      <translation>O sistema está em modo Safe</translation>
     </message>
   </context>
   <context>
@@ -7771,12 +7775,12 @@ to %1</translation>
       <translation type="unfinished">File write error.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation type="unfinished">Internal error</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -7819,7 +7823,7 @@ to %1</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imagem</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -7854,7 +7858,7 @@ to %1</translation>
     <name>nx::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Pasta</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7907,11 +7911,11 @@ to %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixa</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alta</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8454,7 +8458,7 @@ to %1</translation>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
       <translation>
-        <numerusform>Tem a certeza que quer apagar permanentemente este %n ficheiro?</numerusform>
+        <numerusform>Tem a certeza que quer apagar permanentemente estes %n ficheiros?</numerusform>
         <numerusform>Tem a certeza que quer apagar permanentemente estes %n ficheiros?</numerusform>
       </translation>
     </message>
@@ -8543,8 +8547,8 @@ to %1</translation>
       <translation type="unfinished">Failed to change password</translation>
     </message>
     <message>
-      <source>Failed to change passwords on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change passwords on %1 of %2 cameras</translation>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
   </context>
   <context>
