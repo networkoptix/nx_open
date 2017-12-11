@@ -15,8 +15,8 @@
 #include <motion/motion_detection.h>
 
 QnNxRtpParser::QnNxRtpParser(const QString& debugSourceId):
-    m_debugSourceId(debugSourceId),
     QnRtpVideoStreamParser(),
+    m_debugSourceId(debugSourceId),
     m_nextDataPacketBuffer(nullptr),
     m_position(AV_NOPTS_VALUE),
     m_isAudioEnabled(true)
