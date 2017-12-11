@@ -383,17 +383,17 @@ QString NaiveObjectTracker::randomAttributeValue(const QString& attributeName) c
 bool NaiveObjectTracker::isTooBig(const TegraVideo::Rect& rectangle)
 {
     return (ini().postProcMaxObjectWidth != 0
-            && rectangle.width > ini().postProcMaxObjectWidth / 100)
+            && rectangle.width > (float) ini().postProcMaxObjectWidth / 100)
         || (ini().postProcMaxObjectHeight != 0
-            && rectangle.height > ini().postProcMaxObjectHeight / 100);
+            && rectangle.height > (float) ini().postProcMaxObjectHeight / 100);
 }
 
 bool NaiveObjectTracker::isTooSmall(const TegraVideo::Rect& rectangle)
 {
     return (ini().postProcMinObjectWidth != 0
-            && rectangle.width < ini().postProcMinObjectWidth / 100)
+            && rectangle.width < (float) ini().postProcMinObjectWidth / 100)
         || (ini().postProcMinObjectHeight != 0
-            && rectangle.height < ini().postProcMinObjectHeight / 100);
+            && rectangle.height < (float) ini().postProcMinObjectHeight / 100);
 }
 
 float NaiveObjectTracker::bottomRightX(const TegraVideo::Rect& rectangle)

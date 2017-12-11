@@ -20,7 +20,7 @@ struct TegraVideoIniConfig: public nx::kit::IniConfig
     NX_INI_INT(-1, cropRectY, "-1 means 0.");
     NX_INI_INT(-1, cropRectW, "-1 means taking frame width.");
     NX_INI_INT(-1, cropRectH, "-1 means taking frame height.");
-    NX_INI_INT(-1, maxInferenceFps, "-1 means unlimited. This value will be divided by 10.");
+    NX_INI_INT(70, maxInferenceFps, "-1 means unlimited. This value will be divided by 10.");
 
 
     NX_INI_INT(2, stubNumberOfRectangles, "Number of test rectangles.");
