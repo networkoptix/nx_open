@@ -4,6 +4,7 @@
 #ifdef ENABLE_THIRD_PARTY
 
 #include <algorithm>
+#include <nx/utils/std/cpp14.h>
 
 #include <QtCore/QTextStream>
 
