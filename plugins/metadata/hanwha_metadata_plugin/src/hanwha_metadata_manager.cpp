@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "hanwha_common.h"
 #include "hanwha_metadata_manager.h"
@@ -154,4 +154,4 @@ void HanwhaMetadataManager::setMonitor(HanwhaMetadataMonitor* monitor)
 } // namespace mediaserver
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

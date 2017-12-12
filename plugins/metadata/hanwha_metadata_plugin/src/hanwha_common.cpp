@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "hanwha_common.h"
 
@@ -58,4 +58,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::DriverManifest, (json), DriverManifest_
 } // mediaserver
 } // nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)
