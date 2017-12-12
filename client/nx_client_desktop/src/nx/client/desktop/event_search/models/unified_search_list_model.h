@@ -44,7 +44,8 @@ public:
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
 signals:
-    void fetchDone();
+    void fetchAboutToBeCommitted(QPrivateSignal);
+    void fetchCommitted(QPrivateSignal);
 
 private:
     using base_type::setModels;

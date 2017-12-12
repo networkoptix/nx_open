@@ -86,14 +86,24 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     setModel(new SubsetListModel(m_sortFilterModel, 0, QModelIndex(), this));
 
-    connect(m_model, &UnifiedSearchListModel::fetchDone, this,
+    connect(m_model, &UnifiedSearchListModel::fetchAboutToBeCommitted, this,
+        [this]() { m_previousRowCount = m_sortFilterModel->rowCount(); });
+
+    connect(m_model, &UnifiedSearchListModel::fetchCommitted, this,
         [this]()
         {
+            // If client-side filtering is not active, do nothing.
             const bool hasClientSideFilter = !m_sortFilterModel->filterWildcard().isEmpty();
             if (!hasClientSideFilter)
                 return;
 
-            static const int kReFetchDelayMs = 10;
+            // If fetch produced enough records after filtering, do nothing.
+            const auto kReFetchCountThreshold = 15;
+            if (m_sortFilterModel->rowCount() - m_previousRowCount > kReFetchCountThreshold)
+                return;
+
+            // Queue more fetch after a short delay.
+            static const int kReFetchDelayMs = 50;
             queueFetchMoreIfNeeded(kReFetchDelayMs);
         });
 }

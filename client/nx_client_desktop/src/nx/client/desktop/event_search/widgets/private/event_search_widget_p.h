@@ -50,6 +50,7 @@ private:
     QPushButton* const m_eventTypeButton = nullptr;
     QCheckBox* const m_selectAreaCheckBox = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    int m_previousRowCount = 0;
 };
 
 } // namespace
