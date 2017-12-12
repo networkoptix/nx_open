@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
-            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords',
+            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', '$q',
               'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
-    function ($scope, $rootScope, $location, $routeParams, cameraRecords,
+    function ($scope, $rootScope, $location, $routeParams, cameraRecords, $q,
               camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
         var channels = {
@@ -292,7 +292,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         //On player error update source to cause player to restart
         $scope.crashCount = 0;
 
-        function reloadSource(forceLive){
+        function handleVideoError(forceLive){
             var showError = $scope.crashCount < Config.webclient.maxCrashCount;
             if(showError){
                 updateVideoSource($scope.positionProvider.liveMode || forceLive
@@ -304,15 +304,18 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
             return !showError;
         }
+
         $scope.playerHandler = function(error){
             if(error){
                 return $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
-                   return reloadSource(jumpToLive);
+                   return handleVideoError(jumpToLive);
+                },function(){
+                    return true;
                 });
             }
-            else{
-                $scope.crashCount = 0;
-            }
+
+            $scope.crashCount = 0;
+            return $q.resolve(false);
         };
 
         $scope.selectFormat = function(format){

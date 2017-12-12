@@ -340,8 +340,10 @@ angular.module('nxCommon')
                 function playerErrorHandler(error){
                     scope.loading = false; // Some error happended - stop loading
                     resetPlayer();
-                    scope.playerHandler(error).then(function(result){
-                        scope.videoFlags.errorLoading = result;
+                    scope.playerHandler(error).then(function(error){
+                        scope.videoFlags.errorLoading = error;
+                    }, function(error){
+                        scope.videoFlags.errorLoading = error;
                     });
                     console.error(error);
                 }
