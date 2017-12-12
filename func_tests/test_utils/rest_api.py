@@ -32,7 +32,7 @@ def _to_get_param(python_value):
         return 'true' if python_value else 'false'
     if isinstance(python_value, (int, float, str, bytes, unicode)):
         return str(python_value)
-    assert False, "Object of type "
+    assert False, "Cannot use %r of type %s as GET parameter." % (python_value, type(python_value).__name__)
 
 
 class HttpError(Exception):
@@ -76,14 +76,14 @@ class _RestApiProxy(object):
     # noinspection PyPep8Naming
     def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
         params = {name: _to_get_param(value) for name, value in kw.items()}
-        return self._api.request('GET', self._path, raise_exception, timeout, headers=headers, params=params)
+        return self._api.request('GET', self._path, raise_exception, timeout=timeout, headers=headers, params=params)
 
     # noinspection PyPep8Naming
     def POST(self, raise_exception=True, timeout=None, headers=None, json=None, **kw):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
-        return self._api.request('POST', self._path, raise_exception, timeout, headers=headers, json=json)
+        return self._api.request('POST', self._path, raise_exception, timeout=timeout, headers=headers, json=json)
 
 
 class RestApi(object):
@@ -100,12 +100,22 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(self, server_name, root_url, username=REST_API_USER, password=REST_API_PASSWORD, timeout=None):
+    def __init__(
+            self,
+            server_name, root_url,
+            username=REST_API_USER, password=REST_API_PASSWORD,
+            timeout=None,
+            ca_cert=None,
+            ):
         self.server_name = server_name
         self._root_url = root_url.rstrip('/')
         self.url = self._root_url + '/'
+        assert timeout is None or isinstance(timeout, datetime.timedelta), repr(timeout)
         self._default_timeout = timeout or REST_API_TIMEOUT
         self._session = requests.Session()
+        if ca_cert is not None:
+            self.ca_cert = ca_cert
+            log.info("We will trust CA cert: %s.", self.ca_cert)
         self._auth = HTTPDigestAuth(username, password)
 
     def __enter__(self):
@@ -183,14 +193,12 @@ class RestApi(object):
     def request(self, method, path, raise_exception=True, new_connection=False, timeout=None, **kwargs):
         log.debug('%r: %s %s\n%s', self, method, path, json.dumps(kwargs))
         try:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', InsecureRequestWarning)
-                make_request = requests.request if new_connection else self._session.request
-                response = make_request(
-                    method, self._root_url + path,
-                    auth=self._auth,
-                    timeout=(timeout or self._default_timeout).total_seconds(),
-                    verify=False, **kwargs)
+            make_request = requests.request if new_connection else self._session.request
+            response = make_request(
+                method, self._root_url + path,
+                auth=self._auth,
+                timeout=(timeout or self._default_timeout).total_seconds(),
+                verify=self.ca_cert, **kwargs)
         except requests.ConnectionError as e:
             if not new_connection:
                 log.error("Try new connection after %r.", e)

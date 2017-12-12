@@ -88,11 +88,8 @@ include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
 
-if(CMAKE_CROSSCOMPILING)
-    set(QT_PREFIX "..")
-else()
-    set(QT_PREFIX "${QT_DIR}")
-endif()
+nx_create_dev_qt_conf()
+
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")

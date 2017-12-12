@@ -399,7 +399,7 @@ copyBpiLiteClient()
     cp -r "$QT_DIR/resources/"* "$LITE_CLIENT_BIN_DIR/libexec/"
 
     echo "Copying qt.conf"
-    cp -r "$SOURCE_DIR/common/static-resources/qt/etc/qt.conf" "$LITE_CLIENT_BIN_DIR/"
+    cp -r "$SOURCE_DIR/common/maven/bin-resources/resources/qt/etc/qt.conf" "$LITE_CLIENT_BIN_DIR/"
 }
 
 # [in] TAR_DIR

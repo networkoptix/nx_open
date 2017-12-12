@@ -50,10 +50,7 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
-    void at_replyReceived(int status, const QnTimeReply &reply, int handle);
-
 private:
     QTimer* m_timer;
-    QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
     QHash<QnMediaServerResourcePtr, qint64> m_utcOffsetByResource;
 };
