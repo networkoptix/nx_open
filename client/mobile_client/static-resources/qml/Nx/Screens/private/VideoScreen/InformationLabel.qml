@@ -92,8 +92,8 @@ Pane
         }
         InformationText
         {
-            text: d.codec +
-                (d.isHwAccelerated ? qsTr(" (%1)").arg("HW") : "")
+            text: d.codec
+                + (d.isHwAccelerated ? qsTr(" (%1)").arg("HW") : "")
         }
         InformationText
         {
