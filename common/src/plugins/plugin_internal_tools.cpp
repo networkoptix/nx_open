@@ -32,7 +32,7 @@ namespace sdk {
 
 QString toString(const nx::sdk::ResourceInfo& resourceInfo)
 {
-    lm(
+    return lm(
         "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
         .args(
             resourceInfo.vendor,
