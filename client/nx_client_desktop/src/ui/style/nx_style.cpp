@@ -527,20 +527,6 @@ namespace
 
 } // unnamed namespace
 
-
-QnNxStylePrivate::QnNxStylePrivate() :
-    QCommonStylePrivate(),
-    palette(),
-    idleAnimator(nullptr),
-    stateAnimator(nullptr),
-    lastProxiedWidgetUnderMouse(nullptr)
-{
-    Q_Q(QnNxStyle);
-
-    idleAnimator = new QnNoptixStyleAnimator(q);
-    stateAnimator = new QnNoptixStyleAnimator(q);
-}
-
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
@@ -595,6 +581,10 @@ QnNxStyle::QnNxStyle() :
                     mouseEvent->buttons(), mouseEvent->modifiers()), Qt::HighEventPriority);
             });
     }
+}
+
+QnNxStyle::~QnNxStyle()
+{
 }
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
@@ -3831,7 +3821,7 @@ void QnNxStyle::polish(QWidget *widget)
             };
 
             QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
-            comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
+            comboBox->setItemDelegate(new QnStyledComboBoxDelegate(comboBox));
         }
     }
 

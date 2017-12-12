@@ -1,5 +1,6 @@
 #include "default_password_alert_bar.h"
 
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QHBoxLayout>
 
 #include <core/resource/camera_resource.h>
@@ -21,47 +22,43 @@ QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
     connect(this, &QnDefaultPasswordAlertBar::targetCamerasChanged,
         this, &QnDefaultPasswordAlertBar::updateState);
     connect(m_setPasswordButton, &QPushButton::clicked, this,
-        [this]() { emit changeDefaultPasswordRequest(m_multipleSourceCameras); });
+        [this]() { emit changeDefaultPasswordRequest(); });
 
-    setCameras(QnVirtualCameraResourceList());
+    updateState();
 }
 
-void QnDefaultPasswordAlertBar::setCameras(const QnVirtualCameraResourceList& cameras)
+QnDefaultPasswordAlertBar::~QnDefaultPasswordAlertBar()
 {
-    const auto target = cameras.filtered(
-        [](const QnVirtualCameraResourcePtr& camera)
-        {
-            return camera->needsToChangeDefaultPassword();
-        });
-
-    bool update = setMultipleSourceCameras(cameras.size() > 1);
-    update |= setTargetCameras(target);
-    if (update)
-        updateState();
 }
 
-QnVirtualCameraResourceList QnDefaultPasswordAlertBar::targetCameras() const
+QnVirtualCameraResourceSet QnDefaultPasswordAlertBar::cameras() const
 {
-    return m_targetCameras;
+    return m_cameras;
 }
 
-bool QnDefaultPasswordAlertBar::setMultipleSourceCameras(bool value)
+void QnDefaultPasswordAlertBar::setCameras(const QnVirtualCameraResourceSet& cameras)
 {
-    if (m_multipleSourceCameras == value)
-        return false;
+    if (m_cameras == cameras)
+        return;
 
-    m_multipleSourceCameras = value;
-    return true;
-}
+    m_cameras = cameras;
 
-bool QnDefaultPasswordAlertBar::setTargetCameras(const QnVirtualCameraResourceList& cameras)
-{
-    if (m_targetCameras == cameras)
-        return false;
-
-    m_targetCameras = cameras;
+    updateState();
     emit targetCamerasChanged();
-    return true;
+}
+
+bool QnDefaultPasswordAlertBar::useMultipleForm() const
+{
+    return m_useMultipleForm;
+}
+
+void QnDefaultPasswordAlertBar::setUseMultipleForm(bool value)
+{
+    if (m_useMultipleForm == value)
+        return;
+
+    m_useMultipleForm = value;
+    updateState();
 }
 
 void QnDefaultPasswordAlertBar::updateState()
@@ -75,13 +72,13 @@ void QnDefaultPasswordAlertBar::updateState()
 
     const bool hasAdminAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;
-    if (m_targetCameras.isEmpty())
+    if (m_cameras.empty())
         setText(QString());
-    else if (m_multipleSourceCameras)
+    else if (m_useMultipleForm)
         setText(kMultipleCameraAlertText + suffix);
     else
         setText(kSingleCameraAlertText + suffix);
 
-    m_setPasswordButton->setText(tr("Set Password", nullptr, m_targetCameras.size()));
+    m_setPasswordButton->setText(tr("Set Password", "", m_cameras.size()));
     m_setPasswordButton->setVisible(hasAdminAccess);
 }

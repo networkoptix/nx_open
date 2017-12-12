@@ -189,7 +189,8 @@ QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const boo
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraMotionPolicy>(cameras);
-    return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
+    return genericCameraText<QnCameraMotionPolicy>(cameras, detailed,
+        tr("Recording or motion detection is disabled for %1"), invalid);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -227,7 +228,8 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraRecordingPolicy>(cameras);
-    return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", invalid), invalid);
+    return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed,
+        tr("Recording is disabled for %1"), invalid);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -245,7 +247,7 @@ QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const 
 
     int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(cameras);
     return genericCameraText<QnCameraAnalyticsPolicy>(cameras, detailed,
-        tr("Analytics is not available for %1", "", invalid), invalid);
+        tr("Analytics is not available for %1"), invalid);
 }
 
 //-------------------------------------------------------------------------------------------------

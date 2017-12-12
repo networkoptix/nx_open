@@ -55,8 +55,9 @@ private slots:
 private:
     void updateReadOnly();
     void saveCameras(const QnVirtualCameraResourceList &cameras);
+    void setupDefaultPasswordListener();
     void handleCamerasWithDefaultPasswordChanged();
-    void handleChangeDefaultPasswordRequest(bool showSingleCamera);
+    void handleChangeDefaultPasswordRequest();
 
 private:
     CameraSettingsWidget* m_settingsWidget;

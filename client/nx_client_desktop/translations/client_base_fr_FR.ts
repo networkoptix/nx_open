@@ -2217,12 +2217,9 @@ pour afficher plus de signets</translation>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation>
-        <numerusform>Analytique n’est pas disponible pour %1</numerusform>
-        <numerusform>Analytique n’est pas disponible pour %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2496,12 +2493,9 @@ pour afficher plus de signets</translation>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>L'enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
-        <numerusform>L'enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2546,12 +2540,9 @@ pour afficher plus de signets</translation>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>L'enreg.est désactivé pour %1</numerusform>
-        <numerusform>L'enreg. est désactivé pour %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -3194,7 +3185,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Demandez à votre administrateur système de le faire.</translation>
     </message>
   </context>
   <context>
@@ -4487,10 +4478,10 @@ to %1</source>
       <translation>Désactivé selon l'horaire</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
-      <translation>
-        <numerusform>Définir pour %n Caméra</numerusform>
-        <numerusform>Définir pour toutes les %n Caméras</numerusform>
+      <source>Set for all %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6123,8 +6114,8 @@ to %1</source>
       <translation>MOT DE PASSE REQUIS</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7773,12 +7764,12 @@ to %1</source>
       <translation>Erreur d'écriture de fichier.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Aucune donnée exportée.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>Erreur interne</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

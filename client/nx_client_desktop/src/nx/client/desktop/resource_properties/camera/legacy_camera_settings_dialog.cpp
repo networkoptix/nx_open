@@ -25,7 +25,9 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include "camera_settings_widget.h"
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
+using namespace nx::client::desktop;
 namespace {
 
 static const int kMinimumWidth = 900; //< do not set minimum height
@@ -116,6 +118,8 @@ LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
             setCameras(cameras);
     });
 
+    setupDefaultPasswordListener();
+
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(m_buttonBox);
     safeModeWatcher->addControlledWidget(m_okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
@@ -131,14 +135,20 @@ LegacyCameraSettingsDialog::~LegacyCameraSettingsDialog()
 
 void LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest(bool showSingleCamera)
 {
-    const auto parameters = action::Parameters(m_defaultPasswordAlert->targetCameras())
-        .withArgument(Qn::ShowSingleCameraRole, showSingleCamera);
+    const auto cameras = QnVirtualCameraResourceList(m_defaultPasswordAlert->cameras().toList());
+    const auto parameters = action::Parameters(cameras)
+        .withArgument(Qn::ForceShowCamerasList, m_defaultPasswordAlert->useMultipleForm());
     menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
 }
 
 void LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged()
 {
-    m_settingsWidget->setLockedMode(!m_defaultPasswordAlert->targetCameras().isEmpty());
+    const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto cameras = defaultPasswordWatcher->camerasWithDefaultPassword().toSet()
+        .intersect(m_settingsWidget->cameras().toSet());
+
+    m_defaultPasswordAlert->setCameras(cameras);
+    m_settingsWidget->setLockedMode(!cameras.empty());
 }
 
 void LegacyCameraSettingsDialog::retranslateUi()
@@ -299,7 +309,8 @@ bool LegacyCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& c
     }
 
     m_settingsWidget->setCameras(cameras);
-    m_defaultPasswordAlert->setCameras(cameras);
+    m_defaultPasswordAlert->setUseMultipleForm(cameras.size() > 1);
+
     handleCamerasWithDefaultPasswordChanged();
 
     retranslateUi();
@@ -375,6 +386,14 @@ void LegacyCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &
         };
 
     qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, callback);
+}
+
+void LegacyCameraSettingsDialog::setupDefaultPasswordListener()
+{
+    const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
+        &QnCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
+    handleCamerasWithDefaultPasswordChanged();
 }
 
 void LegacyCameraSettingsDialog::at_openButton_clicked()

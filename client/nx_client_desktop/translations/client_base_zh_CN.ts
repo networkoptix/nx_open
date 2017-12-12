@@ -1000,7 +1000,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>导出的.EXE文件的大小超过4 GB，无法在Windows中双击打开。它只能在 %1 Client中播放。</translation>
     </message>
   </context>
   <context>
@@ -2195,11 +2195,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation>
-        <numerusform>分析不可用于%1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2468,11 +2466,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>%1 录像或移动侦测功能已禁用</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2516,11 +2512,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>%1 的录像功能关闭</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -3155,7 +3149,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>要求您的系统管理员执行此操作。</translation>
     </message>
   </context>
   <context>
@@ -3401,7 +3395,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>基本</translation>
     </message>
   </context>
   <context>
@@ -4427,7 +4421,7 @@ to %1</source>
       <translation>已按计划禁用</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
+      <source>Set for all %n Cameras</source>
       <translation>
         <numerusform>为所有%n相机设置</numerusform>
       </translation>
@@ -6047,8 +6041,8 @@ to %1</source>
       <translation>需要密码</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation>为此相机设置</translation>
     </message>
   </context>
   <context>
@@ -7665,12 +7659,12 @@ to %1</source>
       <translation>文件写入错误</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>没有数据导出。</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>内部错误</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>没有数据导出。</translation>
     </message>
   </context>
   <context>
@@ -8430,7 +8424,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
     </message>
   </context>
   <context>
