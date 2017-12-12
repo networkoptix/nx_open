@@ -150,7 +150,9 @@ private:
         std::vector<DetectedObject>* result);
 
     void prepareLookupQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
-    nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(const Filter& filter);
+    nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(
+        const Filter& filter,
+        QString* eventsFilteredByFreeTextSubQuery);
     void addObjectTypeIdToFilter(
         const std::vector<QnUuid>& objectTypeIds,
         nx::utils::db::InnerJoinFilterFields* sqlFilter);

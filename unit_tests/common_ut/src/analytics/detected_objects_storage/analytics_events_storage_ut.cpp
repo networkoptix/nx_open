@@ -558,9 +558,6 @@ protected:
             addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
-            addRandomTextFoundInDataToFilter();
-
-        if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
 
         if (nx::utils::random::number<bool>())
@@ -997,7 +994,8 @@ protected:
 
     void andResultMatchesExpectations()
     {
-        ASSERT_EQ(expectedLookupResult(), std::get<1>(m_prevLookupResult));
+        const auto expected = expectedLookupResult();
+        ASSERT_EQ(expected, std::get<1>(m_prevLookupResult));
     }
 
 private:
