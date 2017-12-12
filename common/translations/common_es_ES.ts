@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>No se exportaron datos.</translation>
     </message>
   </context>
   <context>

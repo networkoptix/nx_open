@@ -877,29 +877,53 @@ ActionVisibility RemoveBookmarksCondition::check(const Parameters& parameters, Q
     return EnabledAction;
 }
 
-PreviewCondition::PreviewCondition():
-    ExportCondition(true)
-{
-}
-
 ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
-    QnMediaResourcePtr media = parameters.resource().dynamicCast<QnMediaResource>();
+    const auto resource = parameters.resource();
+    const auto media = resource.dynamicCast<QnMediaResource>();
     if (!media)
         return InvisibleAction;
 
-    bool isImage = media->toResource()->flags() & Qn::still_image;
-    if (isImage)
+    if (resource->hasFlags(Qn::still_image))
         return InvisibleAction;
 
-    bool isPanoramic = media->getVideoLayout(0)->channelCount() > 1;
+    const bool isPanoramic = media->getVideoLayout()->channelCount() > 1;
     if (isPanoramic)
         return InvisibleAction;
 
-    if (context->workbench()->currentLayout()->isSearchLayout())
-        return EnabledAction;
+    if (parameters.scope() == SceneScope)
+    {
+        if (!context->workbench()->currentLayout()->isSearchLayout())
+            return InvisibleAction;
 
-    return ExportCondition::check(parameters, context);
+        const auto widget = parameters.widget();
+        NX_ASSERT(widget);
+        const auto period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
+        const auto periods = widget->item()->data(Qn::TimePeriodsRole).value<QnTimePeriodList>();
+        if (period.isEmpty() || periods.empty())
+            return InvisibleAction;
+
+       if (!periods.intersects(period))
+           return DisabledAction;
+
+       return EnabledAction;
+    }
+
+    const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
+
+    /// If parameters contain periods it means we need current selected item
+    if (containsAvailablePeriods && !context->workbench()->item(Qn::CentralRole))
+        return DisabledAction;
+
+    if (containsAvailablePeriods && resource->hasFlags(Qn::sync))
+    {
+        const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+        const auto periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
+        if (!periods.intersects(period))
+            return DisabledAction;
+    }
+
+    return EnabledAction;
 }
 
 ActionVisibility PanicCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
