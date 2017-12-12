@@ -34,6 +34,7 @@ public:
 
 public:
     QnNxStyle();
+    virtual ~QnNxStyle() override;
 
     void setGenericPalette(const QnGenericPalette &palette);
     const QnGenericPalette &genericPalette() const;

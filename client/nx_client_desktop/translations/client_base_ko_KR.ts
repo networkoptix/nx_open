@@ -979,46 +979,46 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>AVI 방식으로 오디오와 함께 비 연속적인 녹화를 권장 하지 않습니다.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>다운 스케일링을 피하려면이 카메라의 비디오를 &quot;다중 비디오&quot; 로 내보내는 것이 좋습니다.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation>장시간 비디오를 내 보내려고 합니다. 기가비트용량의 HDD 공간이 필요할 수 있으며 완료하는 데 몇 분이 걸릴 수 있습니다.</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>.EXE 파일에 대한 설정을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>로컬 파일, 서버모니링 위젯 및 웹 페이지는 내보낼 수 없습니다.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>백업 .EXE 의 파일의 크기가 4GB 이상이며 이 파일은 Windows에서 더블 클릭하여 열 수 없습니다. %1 클라이언트에서만 재생할 수 있습니다.</translation>
+      <translation>저장된 .EXE 의 파일의 크기는 4GB 이상이고 Windows환경에서는 더블 클릭으로 재생 할 수 없습니다. 단, %1 클라이언트에서는 재생 할 수 있습니다.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>오디오 비디오 삽입</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 미디어파일</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
@@ -2194,11 +2194,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">
-        <numerusform>Analytics is not available for %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2467,11 +2465,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>%1의 녹화와 움직임 검출이 비활성화됩니다.</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2515,11 +2511,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>%1의 저장이 비활성화 됩니다.</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -3154,7 +3148,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>시스템 관리자에게 요청하십시오.</translation>
     </message>
   </context>
   <context>
@@ -3400,7 +3394,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>기본 사항</translation>
     </message>
   </context>
   <context>
@@ -4427,8 +4421,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>모든 %n 카메라에 설정 됨</numerusform>
       </translation>
     </message>
   </context>
@@ -6047,7 +6041,7 @@ to %1</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>이 카메라에 대한 설정</translation>
     </message>
   </context>
   <context>
@@ -7669,7 +7663,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>내 보낼 데이타가 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -8429,7 +8423,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>%2 카메라의 %1에 암호를 변경하지 못했습니다.</translation>
     </message>
   </context>
   <context>

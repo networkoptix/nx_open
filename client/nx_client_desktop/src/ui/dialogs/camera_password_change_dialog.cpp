@@ -44,7 +44,7 @@ Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraRes
 QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     const QString& password,
     const QnVirtualCameraResourceList& cameras,
-    bool showSingleCameraList,
+    bool forceShowCamerasList,
     QWidget* parent)
     :
     base_type(parent),
@@ -59,8 +59,7 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     }
 
     ui->resourcesWidget->setResources(cameras);
-    if (cameras.size() == 1 && !showSingleCameraList)
-        ui->resourcesPanel->setVisible(false);
+    ui->resourcesPanel->setVisible(forceShowCamerasList || cameras.size() > 1);
 
     ui->passwordEdit->setTitle(tr("New Password"));
     ui->confirmPasswordEdit->setTitle(tr("Repeat Password"));

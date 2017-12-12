@@ -2217,12 +2217,9 @@ több könyvjelző megjelenítéséhez</translation>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">
-        <numerusform>Analytics is not available for %1</numerusform>
-        <numerusform>Analytics is not available for %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2496,12 +2493,9 @@ több könyvjelző megjelenítéséhez</translation>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Rögzítés vagy mozgásérzékelés kikapcsolva %1</numerusform>
-        <numerusform>Rögzítés vagy mozgásérzékelés kikapcsolva %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2546,12 +2540,9 @@ több könyvjelző megjelenítéséhez</translation>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>%1 rögzítése letiltva</numerusform>
-        <numerusform>%1 rögzítése letiltva</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -7795,7 +7786,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Beállítások exportálása</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
@@ -7847,7 +7838,7 @@ to %1</source>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Könyvjelző info</translation>
     </message>
   </context>
   <context>
@@ -7939,7 +7930,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Hosszú</translation>
     </message>
     <message>
       <source>Short</source>

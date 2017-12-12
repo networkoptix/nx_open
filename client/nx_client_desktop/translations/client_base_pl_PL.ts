@@ -2238,13 +2238,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation>
-        <numerusform>Analityka nie jest dostępna dla %1</numerusform>
-        <numerusform>Analityka nie jest dostępna dla %1</numerusform>
-        <numerusform>Analityka nie jest dostępna dla %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2523,13 +2519,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Nagrywanie lub detekcja ruchu są wyłączone dla %1</numerusform>
-        <numerusform>Nagrywanie lub detekcja ruchu są wyłączone dla %1</numerusform>
-        <numerusform>Nagrywanie lub detekcja ruchu są wyłączone dla %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2575,13 +2567,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Nagrywanie jest wyłączone dla %1</numerusform>
-        <numerusform>Nagrywanie jest wyłączone dla %1</numerusform>
-        <numerusform>Nagrywanie jest wyłączone dla %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
