@@ -5,6 +5,7 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_internal_tools.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -47,11 +48,13 @@ ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
 
 ManagerPool::~ManagerPool()
 {
+    NX_DEBUG(this, lit("Destroying metadata manager pool."));
     disconnect(this);
 }
 
 void ManagerPool::init()
 {
+    NX_DEBUG(this, lit("Initializing metdata manager pool."));
     auto resourcePool = m_serverModule->commonModule()->resourcePool();
 
     connect(
@@ -86,6 +89,11 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    NX_VERBOSE(
+        this,
+        lm("Resource %1 (%2) has been added.")
+            .args(resource->getName(), resource->getId()));
+
     connect(
         resource.data(), &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
@@ -108,11 +116,23 @@ void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 void ManagerPool::at_propertyChanged(const QnResourcePtr& resource, const QString& name)
 {
     if (name == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
+    {
+        NX_DEBUG(
+            this,
+            lm("Credentials have been changed for resource %1 (%2)")
+                .args(resource->getName(), resource->getId()));
+
         handleResourceChanges(resource);
+    }
 }
 
 void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
 {
+    NX_VERBOSE(
+        this,
+        lm("Resource %1 (%2) has been removed.")
+            .args(resource->getName(), resource->getId()));
+
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
@@ -122,6 +142,10 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
 
 void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 {
+    NX_VERBOSE(
+        this,
+        lm("Rules have been updated. Affected resources: %1").arg(affectedResources));
+
     for (const auto& resourceId: affectedResources)
     {
         auto resource = m_serverModule
@@ -152,32 +176,70 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
 
     auto cameraId = camera->getId();
     if (!canFetchMetadataFromResource(camera))
+    {
+        NX_DEBUG(
+            this,
+            lm("Metadata from resource %1 (%2) can not be fetched.")
+                .args(camera->getUserDefinedName(), camera->getId()));
         return;
+    }
 
     releaseResourceMetadataManagers(camera);
 
     auto plugins = availablePlugins();
     for (auto& plugin: plugins)
     {
+        NX_ASSERT(plugin, lm("Plugin pointer is invalid."));
+        if (!plugin)
+            continue;
+
+        NX_DEBUG(
+            this,
+            lm("Trying to create metadata manager for resource %1 (%2) using plugin %3.")
+                .args(camera->getUserDefinedName(), camera->getId(), plugin->name()));
+
         auto manager = createMetadataManager(camera, plugin);
         if (!manager)
+        {
+            NX_DEBUG(
+                this,
+                lm("Plugin %1 can not create metadata manager for resource %2 (%3).")
+                    .args(plugin->name(), camera->getUserDefinedName(), camera->getId()));
             continue;
+        }
 
         nxpt::ScopedRef<AbstractMetadataManager> managerGuard(manager, false);
-
         auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
+        {
+            NX_DEBUG(
+                this,
+                lm("Plugin %1 provides invalid plugin manifest.")
+                    .args(plugin->name()));
             continue;
+        }
 
         auto deviceManifest = addManifestToCamera(camera, manager);
         if (!deviceManifest)
+        {
+            NX_DEBUG(
+                this,
+                lm("Plugin %1 provides invalid device manifest for resource %2 (%3).")
+                    .args(plugin->name(), camera->getUserDefinedName(), camera->getId()));
             continue;
+        }
 
         auto handler = createMetadataHandler(camera, pluginManifest->driverId);
         if (!handler)
+        {
+            NX_DEBUG(
+                this,
+                lm("Unable to create metadata handler for resource %1 (%2).")
+                    .args(camera->getUserDefinedName(), camera->getId()));
             continue;
+        }
 
-        NX_DEBUG(this, lm("Camera %1 got new manager %2").args(cameraId, typeid(*manager)));
+        NX_DEBUG(this, lm("Camera %1 got new manager %2.").args(cameraId, typeid(*manager)));
         m_contexts.emplace(
             camera->getId(),
             ResourceMetadataContext(manager, handler));
@@ -190,11 +252,31 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
     const QnSecurityCamResourcePtr& camera,
     AbstractMetadataPlugin* plugin) const
 {
+    NX_ASSERT(camera && plugin);
+    if (!camera || !plugin)
+        return nullptr;
+
+    NX_DEBUG(
+        this,
+        lm("Creating metadata manager for resource %1 (%2).")
+            .args(camera->getUserDefinedName(), camera->getId()));
+
     Error error = Error::noError;
     ResourceInfo resourceInfo;
     bool success = resourceInfoFromResource(camera, &resourceInfo);
     if (!success)
+    {
+        NX_WARNING(
+            this,
+            lm("Can not create resource info from resource %1 (%2)")
+                .args(camera->getUserDefinedName(), camera->getId()));
         return nullptr;
+    }
+
+    NX_DEBUG(
+        this,
+        lm("Resource info for resource %1 (%2): %3")
+        .args(camera->getUserDefinedName(), camera->getId(), resourceInfo));
 
     return plugin->managerForResource(resourceInfo, &error);
 }
@@ -212,7 +294,13 @@ AbstractMetadataHandler* ManagerPool::createMetadataHandler(
 {
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
+    {
+        NX_ERROR(
+            this,
+            lm("Resource %1 (%2) is not an instance of SecurityCameResource")
+                .args(resource->getName(), resource->getId()));
         return nullptr;
+    }
 
     auto handler = new EventHandler();
     handler->setResource(camera);
@@ -223,13 +311,31 @@ AbstractMetadataHandler* ManagerPool::createMetadataHandler(
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
+    NX_VERBOSE(
+        this,
+        lm("Handling resource changes for resource %1 (%2)")
+            .args(resource->getName(), resource->getId()));
+
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
+    {
+        NX_ERROR(
+            this,
+            lm("Resource %1 (%2) is not an instance of SecurityCamResource.")
+                .args(resource->getName(), resource->getId()));
         return;
+    }
 
     releaseResourceMetadataManagers(camera);
     if (canFetchMetadataFromResource(camera))
+    {
+        NX_DEBUG(
+            this,
+            lm("Creating metadata managers for resource %1 (%2).")
+                .args(camera->getUserDefinedName(), camera->getId()));
+
         createMetadataManagersForResource(camera);
+    }
 
     auto resourceId = camera->getId();
     auto events = qnServerModule
@@ -246,6 +352,18 @@ bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& c
 
     const auto status = camera->getStatus();
     const auto flags = camera->flags();
+
+    NX_VERBOSE(
+        this,
+        lm("Determining if metadata can be fetched from resource: "
+            "is foreign resource: %1, "
+            "is desktop camera: %2, "
+            "is resource status ok: %3")
+            .args(
+                flags.testFlag(Qn::foreigner),
+                flags.testFlag(Qn::desktop_camera),
+                (status == Qn::Online || status == Qn::Recording)));
+
     return !flags.testFlag(Qn::foreigner)
         && !flags.testFlag(Qn::desktop_camera)
         && (status == Qn::Online || status == Qn::Recording);
@@ -256,18 +374,38 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     // FIXME: Currently we always use a single random plugin for each resource on each request.
     auto context = m_contexts.find(resourceId);
     if (context == m_contexts.cend())
+    {
+        NX_ERROR(
+            this,
+            lm("Could not find metadata context for resource %1")
+                .arg(resourceId));
+
         return false;
+    }
 
     auto& manager = context->second.manager;
     auto& handler = context->second.handler;
     Error result = Error::unknownError;
 
     if (eventTypeIds.empty())
-        result = manager->stopFetchingMetadata();
-    else
-        result = manager->startFetchingMetadata(handler.get()); //< TODO: #dmishin pass event types.
+    {
+        NX_DEBUG(
+            this,
+            lm("Event list is empty, stopping metdata fetching for resource %1.")
+                .arg(resourceId));
 
-    NX_DEBUG(this, lm("Camera %1 start fetching for %2").args(resourceId, typeid(*manager)));
+        result = manager->stopFetchingMetadata();
+    }
+    else
+    {
+        NX_DEBUG(
+            this,
+            lm("Starting metadata fetching for resource %1. Event list is %2")
+                .args(resourceId, eventTypeIds));
+
+        result = manager->startFetchingMetadata(handler.get()); //< TODO: #dmishin pass event types.
+    }
+
     return result == Error::noError;
 }
 
@@ -280,6 +418,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
         ->getResourceById<QnMediaServerResource>(
             m_serverModule->commonModule()->moduleGUID());
 
+    NX_ASSERT(server, lm("Can not obtain current server resource."));
     if (!server)
         return boost::none;
 
@@ -288,7 +427,13 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
         plugin->capabilitiesManifest(&error));
 
     if (!pluginManifest || error != Error::noError)
+    {
+        NX_ERROR(
+            this,
+            lm("Can not deserialize plugin manifest from plugin %1").arg(plugin->name()));
+
         boost::none;
+    }
 
     bool overwritten = false;
     auto existingManifests = server->analyticsDrivers();
@@ -323,7 +468,13 @@ boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCame
         manager->capabilitiesManifest(&error));
 
     if (!deviceManifest || error != Error::noError)
+    {
+        NX_ERROR(
+            this,
+            lm("Can not fetch or deserialize manifest for resource %1 (%2)")
+                .args(camera->getUserDefinedName(), camera->getId()));
         return boost::none;
+    }
 
     camera->setAnalyticsSupportedEvents(deviceManifest->supportedEventTypes);
     camera->saveParams();
