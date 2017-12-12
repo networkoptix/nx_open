@@ -3814,7 +3814,7 @@ void QnNxStyle::polish(QWidget *widget)
             };
 
             QnTypedPropertyBackup<const QMetaObject*, QComboBox>::backup(comboBox, getDelegateClass, setDelegateClass, kDelegateClassBackupId);
-            comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
+            comboBox->setItemDelegate(new QnStyledComboBoxDelegate(comboBox));
         }
     }
 
