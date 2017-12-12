@@ -774,8 +774,8 @@
       <translation>データ エクスポートに無効なリソースタイプ</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>データはエクスポートされませんでした</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

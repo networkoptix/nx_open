@@ -185,7 +185,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                     {
                         return action::Parameters(
                             defaultPasswordWatcher->camerasWithDefaultPassword())
-                            .withArgument(Qn::ShowSingleCameraRole, true);
+                            .withArgument(Qn::ForceShowCamerasList, true);
                     };
 
                 m_currentDefaultPasswordChangeWidget = addCustomPopup(

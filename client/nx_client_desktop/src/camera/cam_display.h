@@ -189,6 +189,7 @@ private:
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
 
+    void moveTimestampTo(qint64 timestampUs);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
