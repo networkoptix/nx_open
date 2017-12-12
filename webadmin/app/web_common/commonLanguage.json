@@ -29,5 +29,5 @@
     "high": "High",
     "low": "Low"
   },
-  "chromeCastWarning": "Chromecast feature is resource intensive and may cause issues on your server."
+  "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server."
 }

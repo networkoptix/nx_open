@@ -18,7 +18,6 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.systemAPI = systemAPI;
 
         $scope.debugMode = Config.allowDebugMode;
-        $scope.castMode = Config.allowCastMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
@@ -248,7 +247,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if($scope.castMode || $scope.debugMode){
+            if(Config.betaCastMode || $scope.debugMode){
                 var streamInfo = {};
                 var streamType = "webm";
 

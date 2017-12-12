@@ -222,7 +222,7 @@ var Config = {
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
     globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
-    allowCastMode: false, //Allows usage of chromecast for webm only
+    betaCastMode: false, //Enables limited usage of chromecast
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
