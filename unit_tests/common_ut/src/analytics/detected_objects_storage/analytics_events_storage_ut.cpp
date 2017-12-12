@@ -256,10 +256,10 @@ protected:
         const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& right)
     {
         ASSERT_EQ(left.size(), right.size());
-        //for (std::size_t i = 0; i < left.size(); ++i)
-        //{
-        //    ASSERT_EQ(*left[i], *right[i]);
-        //}
+        for (std::size_t i = 0; i < left.size(); ++i)
+        {
+            ASSERT_EQ(*left[i], *right[i]);
+        }
     }
 
     std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filterPackets(
@@ -277,6 +277,26 @@ protected:
             });
 
         return filteredPackets;
+    }
+
+    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> sortPacketsByTimestamp(
+        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> packets,
+        Qt::SortOrder sortOrder)
+    {
+        using namespace common::metadata;
+
+        std::sort(
+            packets.begin(), packets.end(),
+            [sortOrder](
+                const ConstDetectionMetadataPacketPtr& left,
+                const ConstDetectionMetadataPacketPtr& right)
+            {
+                return sortOrder == Qt::AscendingOrder
+                    ? left->timestampUsec < right->timestampUsec
+                    : left->timestampUsec > right->timestampUsec;
+            });
+
+        return packets;
     }
 
     EventsStorage& eventsStorage()
@@ -556,9 +576,6 @@ protected:
 
         if (nx::utils::random::number<bool>())
             addMaxObjectsLimitToFilter();
-
-        if (nx::utils::random::number<bool>())
-            addRandomTextFoundInDataToFilter();
 
         if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
@@ -924,7 +941,11 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        assertEqual(filterPackets(filter(), analyticsDataPackets()), m_packetsRead);
+        assertEqual(
+            sortPacketsByTimestamp(
+                filterPackets(filter(), analyticsDataPackets()),
+                filter().sortOrder),
+            m_packetsRead);
     }
 
 private:
@@ -949,10 +970,9 @@ private:
 TEST_F(AnalyticsEventsStorageCursor, cursor_provides_all_matched_data)
 {
     givenRandomFilter();
-    setSortOrder(Qt::SortOrder::DescendingOrder);
+    setSortOrder(nx::utils::random::number<bool>() ? Qt::AscendingOrder : Qt::DescendingOrder);
 
     whenReadDataUsingCursor();
-
     thenResultMatchesExpectations();
 }
 
@@ -997,7 +1017,8 @@ protected:
 
     void andResultMatchesExpectations()
     {
-        ASSERT_EQ(expectedLookupResult(), std::get<1>(m_prevLookupResult));
+        const auto expected = expectedLookupResult();
+        ASSERT_EQ(expected, std::get<1>(m_prevLookupResult));
     }
 
 private:

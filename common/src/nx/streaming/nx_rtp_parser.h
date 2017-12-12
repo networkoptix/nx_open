@@ -12,7 +12,7 @@ class QnNxRtpParser: public QnRtpVideoStreamParser
 {
 public:
     /** @param debugSourceId Human-readable stream source id for logging. */
-    QnNxRtpParser(const QString& debugSourceId);
+    QnNxRtpParser(const QString& debugSourceId = QString());
 
     virtual ~QnNxRtpParser();
 

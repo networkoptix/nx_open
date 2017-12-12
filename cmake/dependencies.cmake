@@ -69,23 +69,18 @@ function(nx_detect_package_versions)
         _set_version(qt "5.6.3")
     endif()
 
-    _set_version(festival-vox ${_festival_version})
-    _set_version(help ${customization}-${releaseVersion.short})
-
     foreach(pkg
         qt
         boost
         openssl
         ffmpeg
-        quazip
         sigar
         openldap
         sasl2
         openal
         libjpeg-turbo
-        festival festival-vox
+        festival
         directx
-        help
         cassandra
     )
         if("${_${pkg}_version}" STREQUAL "")
@@ -149,6 +144,7 @@ function(nx_get_dependencies)
     if(box STREQUAL "tx1")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(tegra_video)
+        nx_rdep_add_package(jetpack)
     endif()
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")
@@ -173,7 +169,7 @@ function(nx_get_dependencies)
 
     if(haveDesktopClient)
         nx_rdep_add_package(any/qtsingleapplication)
-        nx_rdep_add_package(any/help)
+        nx_rdep_add_package(any/help-${customization}-${releaseVersion.short})
     endif()
 
     if(haveMobileClient)
@@ -187,10 +183,8 @@ function(nx_get_dependencies)
 
     if((haveServer OR haveDesktopClient) AND NOT box STREQUAL "edge1")
         nx_rdep_add_package(festival)
-        if(NOT "${festival-vox_version}" STREQUAL "system")
-            nx_rdep_add_package(any/festival-vox PATH_VARIABLE festival_vox_directory)
-            set(festival_vox_directory ${festival_vox_directory} PARENT_SCOPE)
-        endif()
+        nx_rdep_add_package(any/festival-vox-${festival_version}
+            PATH_VARIABLE festival_vox_directory)
     endif()
 
     if(ANDROID OR IOS)

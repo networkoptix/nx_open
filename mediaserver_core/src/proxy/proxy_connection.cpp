@@ -458,6 +458,7 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
     QnRoute dstRoute;
     if (!updateClientRequest(dstUrl, dstRoute))
     {
+        NX_VERBOSE(this, lm("Failed to find destination url"));
         d->socket->close();
         return false;
     }
@@ -465,9 +466,14 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
     if (dstRoute.id.isNull() && d->accessRights.userId.isNull())
         return false; //< Do not allow direct IP connect for unauthorized users.
 
+    NX_VERBOSE(this, lm("Found destination url %1").args(dstUrl));
+
     d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
     if (d->lastConnectedUrl.isEmpty())
+    {
+        NX_VERBOSE(this, lm("Failed to open connection to the target %1").args(dstUrl));
         return false; // invalid dst address
+    }
 
     d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
 
@@ -487,6 +493,8 @@ void QnProxyConnectionProcessor::run()
     }
 
     parseRequest();
+
+    NX_VERBOSE(this, lm("Proxying request to %1").args(d->request.requestLine.url));
 
     if (!openProxyDstConnection())
         return;
@@ -511,6 +519,8 @@ void QnProxyConnectionProcessor::run()
 
 void QnProxyConnectionProcessor::doRawProxy()
 {
+    NX_VERBOSE(this, lm("Performing RAW proxy"));
+
     Q_D(QnProxyConnectionProcessor);
     nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
 
@@ -537,6 +547,8 @@ void QnProxyConnectionProcessor::doRawProxy()
 
 void QnProxyConnectionProcessor::doSmartProxy()
 {
+    NX_VERBOSE(this, lm("Performing \"smart\" proxy"));
+
     Q_D(QnProxyConnectionProcessor);
     nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
     d->clientRequest.clear();
@@ -554,7 +566,12 @@ void QnProxyConnectionProcessor::doSmartProxy()
         if (readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
         {
             if (readed < 1)
+            {
+                const auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_VERBOSE(this, lm("Proxying finished with system result code")
+                    .args(SystemError::toString(systemErrorCode)));
                 return;
+            }
 
             someBytesRead1 = true;
 
@@ -587,6 +604,8 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
                     if (d->lastConnectedUrl.isEmpty())
                     {
+                        NX_VERBOSE(this, lm("Failed to connect to destination %1 during \"smart\" proxying")
+                            .args(dstUrl));
                         d->socket->close();
                         return; // invalid dst address
                     }
@@ -608,7 +627,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
 
         bool someBytesRead2 = false;
         if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
+        {
+            NX_VERBOSE(this, lm("Error during proxying data"));
             return;
+        }
 
         if (!someBytesRead1 && !someBytesRead2)
             std::this_thread::sleep_for(kPollTimeout);

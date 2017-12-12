@@ -1178,7 +1178,7 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
     if (ini.enableAnalytics && ini.externalMetadata)
         qnMetadataAnalyticsController->gotFrame(m_resource->toResourcePtr(), video->timestamp);
 
-    auto & queue = m_lastMetadata[video->channelNumber];
+    auto& queue = m_lastMetadata[video->channelNumber];
     if (queue.empty())
         return;
     auto itr = queue.upper_bound(video->timestamp);

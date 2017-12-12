@@ -181,7 +181,9 @@ void EventsStorage::prepareCursorQuery(
     const Filter& filter,
     nx::utils::db::SqlQuery* query)
 {
-    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString eventsFilteredByFreeTextSubQuery;
+    const auto sqlQueryFilter =
+        prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
     QString sqlQueryFilterStr;
     if (!sqlQueryFilter.empty())
     {
@@ -193,10 +195,11 @@ void EventsStorage::prepareCursorQuery(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
-        FROM event
-        %1
-        ORDER BY timestamp_usec_utc %2, object_id %2;
+        FROM %1
+        %2
+        ORDER BY timestamp_usec_utc %3, object_id %3;
     )sql").args(
+        eventsFilteredByFreeTextSubQuery,
         sqlQueryFilterStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
     nx::utils::db::bindFields(query, sqlQueryFilter);
@@ -223,7 +226,9 @@ void EventsStorage::prepareLookupQuery(
     const Filter& filter,
     nx::utils::db::SqlQuery* query)
 {
-    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString eventsFilteredByFreeTextSubQuery;
+    const auto sqlQueryFilter =
+        prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
     QString sqlQueryFilterStr;
     if (!sqlQueryFilter.empty())
     {
@@ -234,15 +239,6 @@ void EventsStorage::prepareLookupQuery(
     QString sqlLimitStr;
     if (filter.maxObjectsToSelect > 0)
         sqlLimitStr = lm("LIMIT %1").args(filter.maxObjectsToSelect).toQString();
-
-    QString freeTextFilter;
-    if (!filter.freeText.isEmpty())
-    {
-        freeTextFilter = lm(R"sql(
-            (SELECT rowid, * FROM event
-             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1'))
-        )sql").args(filter.freeText);
-    }
 
     query->prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
@@ -258,7 +254,7 @@ void EventsStorage::prepareLookupQuery(
         WHERE e.rowid=objects.r
         ORDER BY timestamp_usec_utc %4
     )sql").args(
-        freeTextFilter.isEmpty() ? QString::fromLatin1("event") : freeTextFilter,
+        eventsFilteredByFreeTextSubQuery,
         sqlQueryFilterStr,
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
@@ -266,7 +262,8 @@ void EventsStorage::prepareLookupQuery(
 }
 
 nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
-    const Filter& filter)
+    const Filter& filter,
+    QString* eventsFilteredByFreeTextSubQuery)
 {
     nx::utils::db::InnerJoinFilterFields sqlFilter;
     if (!filter.deviceId.isNull())
@@ -291,6 +288,19 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
 
     if (!filter.boundingBox.isNull())
         addBoundingBoxToFilter(filter.boundingBox, &sqlFilter);
+
+    if (!filter.freeText.isEmpty())
+    {
+        *eventsFilteredByFreeTextSubQuery = lm(R"sql(
+            (SELECT rowid, *
+             FROM event
+             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1'))
+        )sql").args(filter.freeText);
+    }
+    else
+    {
+        *eventsFilteredByFreeTextSubQuery = lit("event");
+    }
 
     return sqlFilter;
 }
@@ -482,7 +492,9 @@ nx::utils::db::DBResult EventsStorage::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    const auto sqlQueryFilter = prepareSqlFilterExpression(filter);
+    QString eventsFilteredByFreeTextSubQuery;
+    const auto sqlQueryFilter =
+        prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
     QString sqlQueryFilterStr;
     if (!sqlQueryFilter.empty())
     {
@@ -496,10 +508,10 @@ nx::utils::db::DBResult EventsStorage::selectTimePeriods(
     query.setForwardOnly(true);
     query.prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec
-        FROM event
-        %1
+        FROM %1
+        %2
         ORDER BY timestamp_usec_utc ASC
-    )sql").args(sqlQueryFilterStr));
+    )sql").args(eventsFilteredByFreeTextSubQuery, sqlQueryFilterStr));
     nx::utils::db::bindFields(&query, sqlQueryFilter);
 
     query.exec();
