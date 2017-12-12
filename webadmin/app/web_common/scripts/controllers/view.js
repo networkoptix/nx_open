@@ -195,7 +195,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             if($scope.playerAPI) {
                 // Pause playing
                 $scope.playerAPI.pause();
-                $scope.playerAPI = null;
             }
             updateAvailableResolutions();
             var live = !playingPosition;
