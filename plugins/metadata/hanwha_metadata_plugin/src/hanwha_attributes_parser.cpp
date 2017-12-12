@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "hanwha_attributes_parser.h"
 
@@ -22,7 +22,7 @@ static const QString kSystemEventParameter = lit("SystemEvent");
 bool HanwhaAttributesParser::parseCgi(const QString& content)
 {
     QXmlStreamReader reader(content);
-    
+
     if (!readCgi(reader))
         return false;
 
@@ -31,7 +31,7 @@ bool HanwhaAttributesParser::parseCgi(const QString& content)
 
     if (!readMonitorAction(reader))
         return false;
-    
+
     if (!readChannelEvents(reader))
         return false;
 
@@ -53,7 +53,7 @@ bool HanwhaAttributesParser::readCgi(QXmlStreamReader& reader)
 
     if (reader.name() != "cgi")
         return false;
-    
+
     while (reader.readNextStartElement())
     {
         if (reader.name() == "submenu" && (reader.attributes().value("name") == "eventstatus"))
@@ -114,4 +114,4 @@ bool HanwhaAttributesParser::readChannelEvents(QXmlStreamReader& reader)
 } // namespace mediaserver
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

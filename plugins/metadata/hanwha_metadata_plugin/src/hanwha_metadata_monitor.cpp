@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "hanwha_metadata_monitor.h"
 #include "hanwha_bytestream_filter.h"
@@ -157,4 +157,4 @@ void HanwhaMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr http
 } // namespace mediaserver
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)
