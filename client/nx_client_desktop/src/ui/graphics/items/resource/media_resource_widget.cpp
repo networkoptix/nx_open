@@ -578,10 +578,10 @@ void QnMediaResourceWidget::initStatusOverlayController()
          return;
 
      const auto changeCameraPassword =
-         [this](const QnVirtualCameraResourceList& cameras, bool showSingleCamera)
+         [this](const QnVirtualCameraResourceList& cameras, bool forceShowCamerasList)
          {
              auto parameters = action::Parameters(cameras);
-             parameters.setArgument(Qn::ShowSingleCameraRole, showSingleCamera);
+             parameters.setArgument(Qn::ForceShowCamerasList, forceShowCamerasList);
              menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
          };
 

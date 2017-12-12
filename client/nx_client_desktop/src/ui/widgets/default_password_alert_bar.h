@@ -1,9 +1,11 @@
-#include <QtWidgets/QPushButton>
+#pragma once
 
 #include <ui/widgets/common/alert_bar.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
+
+class QPushButton;
 
 class QnDefaultPasswordAlertBar: public QnAlertBar, public QnWorkbenchContextAware
 {
@@ -11,25 +13,24 @@ class QnDefaultPasswordAlertBar: public QnAlertBar, public QnWorkbenchContextAwa
     using base_type = QnWorkbenchContextAware;
 
 public:
-    QnDefaultPasswordAlertBar(QWidget* parent = nullptr);
+    explicit QnDefaultPasswordAlertBar(QWidget* parent = nullptr);
+    virtual ~QnDefaultPasswordAlertBar() override;
 
-    void setCameras(const QnVirtualCameraResourceList& cameras);
+    QnVirtualCameraResourceSet cameras() const;
+    void setCameras(const QnVirtualCameraResourceSet& cameras);
 
-    QnVirtualCameraResourceList targetCameras() const;
+    bool useMultipleForm() const;
+    void setUseMultipleForm(bool value);
 
 private:
-    bool setTargetCameras(const QnVirtualCameraResourceList& cameras);
-
-    bool setMultipleSourceCameras(bool value);
-
     void updateState();
 
 signals:
-    void changeDefaultPasswordRequest(bool showSingleCamera);
+    void changeDefaultPasswordRequest();
     void targetCamerasChanged();
 
 private:
     QPushButton* m_setPasswordButton = nullptr;
-    QnVirtualCameraResourceList m_targetCameras;
-    bool m_multipleSourceCameras;
+    QnVirtualCameraResourceSet m_cameras;
+    bool m_useMultipleForm = false;
 };
