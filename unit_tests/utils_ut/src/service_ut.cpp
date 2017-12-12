@@ -68,7 +68,7 @@ protected:
         return std::make_unique<ServiceSettings>(m_dataDir);
     }
 
-    virtual int serviceMain(const AbstractServiceSettings& settings) override
+    virtual int serviceMain(const AbstractServiceSettings& /*settings*/) override
     {
         return runMainLoop();
     }
