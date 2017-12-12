@@ -26,7 +26,7 @@ def log_error(error, user_email, type, message, customization, attempt):
                 attempt,
                 traceback.format_exc())
 
-    if error == SMTPConnectError:
+    if isinstance(error, SMTPException):
         logger.warning(error_formatted)
     else:
         logger.error(error_formatted)
