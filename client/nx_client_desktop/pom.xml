@@ -30,7 +30,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl ffmpeg quazip festival any/festival-vox any/roboto-fonts any/help</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip festival any/festival-vox any/roboto-fonts any/help-${customization}-3.1.1</rdep.packages>
         <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
 
         <additionalQrcPaths>${basedir}/skins/${defaultSkin}</additionalQrcPaths>
