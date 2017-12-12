@@ -143,13 +143,19 @@ RandomAccessContainer reverseWords(
 template<typename InputIt, typename T>
 bool contains(InputIt first, InputIt last, const T& value)
 {
-    return std::count(first, last, value) == 1;
+    using RangeElement = decltype(*first);
+    return std::any_of(
+        first, last,
+        [&value](const RangeElement& elementValue)
+        {
+            return elementValue == value;
+        });
 }
 
 template<typename InputIt, typename UnaryPredicate>
 bool contains_if(InputIt first, InputIt last, UnaryPredicate p)
 {
-    return std::count(first, last, p) == 1;
+    return std::any_of(first, last, p);
 }
 
 } // namespace utils
