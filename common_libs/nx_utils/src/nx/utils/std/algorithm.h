@@ -125,7 +125,7 @@ typename std::pair<
 }
 
 /**
- * E.g., given inbox.google.com returns com.google.inbox
+ * E.g., reverseWords("test.example.com", '.') returns "com.example.test".
  */
 template<typename RandomAccessContainer, typename Separator>
 RandomAccessContainer reverseWords(
