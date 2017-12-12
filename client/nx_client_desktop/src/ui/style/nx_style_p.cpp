@@ -81,6 +81,17 @@ QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos)
 
 } // namespace
 
+QnNxStylePrivate::QnNxStylePrivate() :
+    QCommonStylePrivate(),
+    idleAnimator(new QnNoptixStyleAnimator()),
+    stateAnimator(new QnNoptixStyleAnimator())
+{
+}
+
+QnNxStylePrivate::~QnNxStylePrivate()
+{
+}
+
 QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const
 {
     return palette.color(color);
