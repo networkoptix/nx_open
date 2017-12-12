@@ -2216,12 +2216,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation>
-        <numerusform>Analíticas no está disponible para %1</numerusform>
-        <numerusform>Analíticas no está disponible para %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2495,12 +2492,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Detección de movimiento o grabación está desactivada por %1</numerusform>
-        <numerusform>Detección de movimiento o grabación está desactivada por %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2545,12 +2539,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Grabación está desactivada por %1</numerusform>
-        <numerusform>Grabaciónes están desactivadas por %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
