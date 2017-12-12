@@ -247,7 +247,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if(Config.betaCastMode || $scope.debugMode){
+            if(Config.allowCastMode || $scope.debugMode){
                 var streamInfo = {};
                 var streamType = "webm";
 
