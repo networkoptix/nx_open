@@ -65,3 +65,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

@@ -33,7 +33,7 @@ private:
     boost::optional<int> eventRegion(const QString& eventSource) const;
     bool isEventActive(const QString& eventSourceState) const;
     Hanwha::EventItemType eventItemType(const QString& eventSource, const QString& eventState) const;
-    
+
 private:
     const Hanwha::DriverManifest m_manifest;
     Handler m_handler;
