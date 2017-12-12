@@ -14,6 +14,7 @@
 #include <ui/widgets/common/search_line_edit.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <utils/common/delayed.h>
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
@@ -47,6 +48,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     base_type(q),
     q(q),
     m_model(new UnifiedSearchListModel(this)),
+    m_sortFilterModel(new EventSortFilterModel(this)),
     m_searchLineEdit(new QnSearchLineEdit(m_headerWidget)),
     m_superTypeButton(new QPushButton(m_headerWidget)),
     m_eventTypeButton(new QPushButton(m_headerWidget)),
@@ -74,16 +76,26 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     layout->addWidget(m_searchLineEdit);
     layout->addWidget(buttonsHolder);
 
-    auto sortModel = new EventSortFilterModel(this);
-    sortModel->setSourceModel(m_model);
-    sortModel->setFilterRole(Qn::ResourceSearchStringRole);
-    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    sortModel->setTriggeringRoles({Qn::TimestampRole});
+    m_sortFilterModel->setSourceModel(m_model);
+    m_sortFilterModel->setFilterRole(Qn::ResourceSearchStringRole);
+    m_sortFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_sortFilterModel->setTriggeringRoles({Qn::TimestampRole});
 
     connect(m_searchLineEdit, &QnSearchLineEdit::textChanged,
-        sortModel, &EventSortFilterModel::setFilterWildcard);
+        m_sortFilterModel, &EventSortFilterModel::setFilterWildcard);
 
-    setModel(new SubsetListModel(sortModel, 0, QModelIndex(), this));
+    setModel(new SubsetListModel(m_sortFilterModel, 0, QModelIndex(), this));
+
+    connect(m_model, &UnifiedSearchListModel::fetchDone, this,
+        [this]()
+        {
+            const bool hasClientSideFilter = !m_sortFilterModel->filterWildcard().isEmpty();
+            if (!hasClientSideFilter)
+                return;
+
+            static const int kReFetchDelayMs = 10;
+            queueFetchMoreIfNeeded(kReFetchDelayMs);
+        });
 }
 
 EventSearchWidget::Private::~Private()

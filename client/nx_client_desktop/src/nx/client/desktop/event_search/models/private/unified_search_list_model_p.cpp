@@ -57,6 +57,7 @@ void UnifiedSearchListModel::Private::fetchMore()
                 m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
 
             m_fetchingTypes = Types();
+            emit q->fetchDone();
 
             if (m_needToUpdateModels)
             {
