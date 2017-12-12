@@ -55,7 +55,6 @@ StandaloneTimerManager::TimerGuard& StandaloneTimerManager::TimerGuard::operator
     return *this;
 }
 
-//!Cancels timer and blocks until running handler returns
 void StandaloneTimerManager::TimerGuard::reset()
 {
     if (!m_timerID)
@@ -81,21 +80,21 @@ StandaloneTimerManager::TimerGuard::operator bool_type() const
     return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
 }
 
-bool StandaloneTimerManager::TimerGuard::operator==(const StandaloneTimerManager::TimerGuard& right) const
+bool StandaloneTimerManager::TimerGuard::operator==(
+    const StandaloneTimerManager::TimerGuard& right) const
 {
     return m_timerID == right.m_timerID;
 }
 
-bool StandaloneTimerManager::TimerGuard::operator!=(const StandaloneTimerManager::TimerGuard& right) const
+bool StandaloneTimerManager::TimerGuard::operator!=(
+    const StandaloneTimerManager::TimerGuard& right) const
 {
     return m_timerID != right.m_timerID;
 }
 
+//-------------------------------------------------------------------------------------------------
 
-
-
-StandaloneTimerManager::StandaloneTimerManager()
-:
+StandaloneTimerManager::StandaloneTimerManager():
     m_terminated(false),
     m_runningTaskID(0)
 {
@@ -183,12 +182,12 @@ bool StandaloneTimerManager::modifyTimerDelay(
 
     QnMutexLocker lk(&m_mtx);
     if (m_runningTaskID == timerID)
-        return false; //timer being executed at the moment
+        return false; //< Timer being executed at the moment.
 
-                      //fetching handler
+    // Fetching handler.
     auto taskIter = m_taskToTime.find(timerID);
     if (taskIter == m_taskToTime.end())
-        return false;   //no timer with requested id
+        return false; //< No timer with requested id.
     auto handlerIter = m_timeToTask.find(std::make_pair(taskIter->second, timerID));
     NX_ASSERT(handlerIter != m_timeToTask.end());
 
@@ -387,10 +386,9 @@ uint64_t StandaloneTimerManager::generateNextTimerId()
     return timerID;
 }
 
+//-------------------------------------------------------------------------------------------------
 
-
-StandaloneTimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func)
-:
+StandaloneTimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func):
     func(std::move(_func)),
     singleShot(true)
 {
