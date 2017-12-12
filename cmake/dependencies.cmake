@@ -70,7 +70,6 @@ function(nx_detect_package_versions)
     endif()
 
     _set_version(festival-vox ${_festival_version})
-    _set_version(help ${customization}-${releaseVersion.short})
 
     foreach(pkg
         qt
@@ -84,7 +83,6 @@ function(nx_detect_package_versions)
         libjpeg-turbo
         festival festival-vox
         directx
-        help
         cassandra
     )
         if("${_${pkg}_version}" STREQUAL "")
@@ -173,7 +171,7 @@ function(nx_get_dependencies)
 
     if(haveDesktopClient)
         nx_rdep_add_package(any/qtsingleapplication)
-        nx_rdep_add_package(any/help)
+        nx_rdep_add_package(any/help-${customization}-${releaseVersion.short})
     endif()
 
     if(haveMobileClient)
