@@ -1,5 +1,4 @@
 #include "plugin_internal_tools.h"
-#include <nx/sdk/common.h>
 #include <nx/utils/log/log.h>
 
 #ifdef Q_OS_WIN
