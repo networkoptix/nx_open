@@ -8,6 +8,7 @@
 #include <rest/helpers/request_helpers.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/file_system.h>
+#include <nx/fusion/serialization/lexical.h>
 
 using nx::vms::common::p2p::downloader::Downloader;
 using nx::vms::common::p2p::downloader::FileInformation;
@@ -175,6 +176,16 @@ int Helper::handleAddDownload(const QString& fileName)
         fileInfo.url = nx::utils::Url(urlString);
         if (!fileInfo.url.isValid())
             return makeInvalidParameterError("url");
+    }
+
+    const auto peerPolicyString = params.value("peerPolicy");
+    if (!peerPolicyString.isEmpty())
+    {
+        bool deserialized = false;
+        fileInfo.peerPolicy = QnLexical::deserialized<FileInformation::PeerPolicy>(
+            peerPolicyString,
+            FileInformation::PeerPolicy::urlOnly,
+            &deserialized);
     }
 
     const auto errorCode = downloader->addFile(fileInfo);
