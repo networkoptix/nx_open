@@ -4228,7 +4228,7 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     if (initializeTwoWayAudioByResourceData())
         return true;
 
-    MediaSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(),
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(),
         getAuth().user(), getAuth().password(), m_timeDrift);
 
     _onvifMedia__GetAudioOutputs request;
@@ -4236,17 +4236,20 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     const int result = soapWrapper.getAudioOutputs(request, response);
     if (result != SOAP_OK && result != SOAP_MUSTUNDERSTAND)
     {
-        NX_DEBUG(this, lm("Filed to fetch audio outputs from %1").arg(soapWrapper.endpoint()));
+        NX_VERBOSE(this, lm("Filed to fetch audio outputs from %1").arg(soapWrapper.endpoint()));
         return false;
     }
 
     if (!response.AudioOutputs.empty())
     {
+        NX_VERBOSE(this, lm("Detected audio output %1 on %2").args(
+            response.AudioOutputs.front()->token, soapWrapper.endpoint()));
+
         m_audioTransmitter.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
         return true;
     }
 
-    NX_DEBUG(this, lm("No sutable audio outputs are detected on %1").arg(soapWrapper.endpoint()));
+    NX_VERBOSE(this, lm("No sutable audio outputs are detected on %1").arg(soapWrapper.endpoint()));
     return false;
 }
 
