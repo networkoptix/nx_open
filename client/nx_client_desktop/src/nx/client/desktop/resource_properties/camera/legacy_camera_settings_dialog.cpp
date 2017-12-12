@@ -133,7 +133,7 @@ LegacyCameraSettingsDialog::~LegacyCameraSettingsDialog()
 {
 }
 
-void LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest(bool showSingleCamera)
+void LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest()
 {
     const auto cameras = QnVirtualCameraResourceList(m_defaultPasswordAlert->cameras().toList());
     const auto parameters = action::Parameters(cameras)
@@ -392,7 +392,7 @@ void LegacyCameraSettingsDialog::setupDefaultPasswordListener()
 {
     const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
     connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
-        &QnCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
+        &LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
     handleCamerasWithDefaultPasswordChanged();
 }
 
