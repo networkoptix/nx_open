@@ -42,7 +42,7 @@ public:
         all = 1 << 0,
         byPlatform = 1 << 1,
     };
-    Q_DECLARE_FLAGS(PeerPolicies, PeerPolicy)
+    Q_ENUM(PeerPolicy)
 
     QString name;
     qint64 size = -1;
@@ -51,12 +51,10 @@ public:
     qint64 chunkSize = 0;
     Status status = Status::notFound;
     QBitArray downloadedChunks;
-    PeerPolicies peerPolicy = PeerPolicy::urlOnly;
+    PeerPolicy peerPolicy = PeerPolicy::urlOnly;
 };
 #define FileInformation_Fields \
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)(peerPolicy)
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(FileInformation::PeerPolicies)
 
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))

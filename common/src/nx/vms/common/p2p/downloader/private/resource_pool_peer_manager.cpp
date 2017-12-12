@@ -279,7 +279,7 @@ ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* c
 }
 
 AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
-    FileInformation::PeerPolicies peerPolicy)
+    FileInformation::PeerPolicy peerPolicy)
 {
     return new ResourcePoolPeerManager(
         commonModule(),

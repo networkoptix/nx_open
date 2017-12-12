@@ -66,7 +66,7 @@ class AbstractPeerManagerFactory
 {
 public:
     virtual ~AbstractPeerManagerFactory();
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerPolicies peerPolicies) = 0;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerPolicy peerPolicy) = 0;
 };
 
 } // namespace downloader

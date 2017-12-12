@@ -15,19 +15,21 @@ namespace {
 using namespace impl;
 
 static AbstractPeerSelectorPtr createPeerSelector(
-    FileInformation::PeerPolicies peerPolicy,
+    FileInformation::PeerPolicy peerPolicy,
     QnCommonModule* commonModule)
 {
-    if (peerPolicy.testFlag(FileInformation::PeerPolicy::all))
-        return AllPeersSelector::create();
-
-    if (peerPolicy.testFlag(FileInformation::PeerPolicy::urlOnly))
-        return EmptyPeerSelector::create();
-
-    if (peerPolicy.testFlag(FileInformation::PeerPolicy::byPlatform))
-        return ByPlatformPeerSelector::create(commonModule->moduleInformation().systemInformation);
-
-    return AbstractPeerSelectorPtr();
+    switch (peerPolicy)
+    {
+        case FileInformation::PeerPolicy::urlOnly:
+            return EmptyPeerSelector::create();
+        case FileInformation::PeerPolicy::byPlatform:
+            return ByPlatformPeerSelector::create(
+                commonModule->moduleInformation().systemInformation);
+        case FileInformation::PeerPolicy::all:
+            return AllPeerSelector::create();
+        default:
+            return AbstractPeerSelectorPtr();
+    }
 }
 
 } // namespace
@@ -35,7 +37,7 @@ static AbstractPeerSelectorPtr createPeerSelector(
 PeerSelectorFactoryFactoryFunc PeerSelectorFactory::m_peerSelectorFactoryFactoryFunc = nullptr;
 
 AbstractPeerSelectorPtr PeerSelectorFactory::create(
-    FileInformation::PeerPolicies peerPolicy,
+    FileInformation::PeerPolicy peerPolicy,
     QnCommonModule* commonModule)
 {
     if (m_peerSelectorFactoryFactoryFunc != nullptr)
