@@ -1,13 +1,13 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QUrl>
 #include <QtCore/QJsonValue>
 #include <QtXml/QtXml>
-#include <boost/optional.hpp>
 
 namespace nx {
 namespace utils {
-
 
 class NX_UTILS_API Url
 {
@@ -21,7 +21,6 @@ public:
 
     Url(Url&& /*other*/) = default;
     Url& operator=(Url&& /*other*/) = default;
-
 
     inline void swap(Url& other) Q_DECL_NOTHROW { m_url.swap(other.m_url); }
 

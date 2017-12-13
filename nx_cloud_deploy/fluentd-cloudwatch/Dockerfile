@@ -5,7 +5,7 @@ USER root
 RUN apk --no-cache --update add git sudo build-base ruby-dev && \
     gem install --no-rdoc --no-ri specific_install && \
     gem install --no-rdoc --no-ri aws-sdk-cloudwatchlogs -v "=1.2.0" && \
-    gem specific_install -l https://github.com/vigasin/fluent-plugin-cloudwatch-logs -r b67d89e3243c25ea52e9b83e2fd3399a3a93c042 && \
+    gem specific_install -l https://github.com/vigasin/fluent-plugin-cloudwatch-logs -r b77a947e98cb29be7d72fb265e1e816b1d60c00a && \
     gem install --no-rdoc --no-ri fluent-plugin-kubernetes_metadata_filter && \
     rm -rf /usr/lib/ruby/gems/2.3.0/cache/*.gem  && gem sources -c && \
     apk del sudo build-base ruby-dev git && rm -rf /var/cache/apk/*
