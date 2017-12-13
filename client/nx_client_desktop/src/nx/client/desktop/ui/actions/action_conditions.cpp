@@ -858,8 +858,23 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
     if (isPanoramic)
         return InvisibleAction;
 
-    if (context->workbench()->currentLayout()->isSearchLayout())
-        return EnabledAction;
+    if (parameters.scope() == SceneScope)
+    {
+        if (!context->workbench()->currentLayout()->isSearchLayout())
+            return InvisibleAction;
+
+        const auto widget = parameters.widget();
+        NX_ASSERT(widget);
+        const auto period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
+        const auto periods = widget->item()->data(Qn::TimePeriodsRole).value<QnTimePeriodList>();
+        if (period.isEmpty() || periods.empty())
+            return InvisibleAction;
+
+       if (!periods.intersects(period))
+           return DisabledAction;
+
+       return EnabledAction;
+    }
 
     const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
 

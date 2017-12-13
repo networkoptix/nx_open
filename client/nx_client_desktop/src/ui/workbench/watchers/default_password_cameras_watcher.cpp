@@ -20,11 +20,22 @@ struct DefaultPasswordCamerasWatcher::Private
         const auto status = camera->getStatus();
         const bool canChangePassword = (status == Qn::Online) || (status == Qn::Recording);
 
+        bool changed = false;
         if (canChangePassword && camera->needsToChangeDefaultPassword())
+        {
+            changed = !camerasWithDefaultPassword.contains(camera);
             camerasWithDefaultPassword.insert(camera);
+        }
         else
-            camerasWithDefaultPassword.remove(camera);
-        updateNotificationVisible();
+        {
+            changed = camerasWithDefaultPassword.remove(camera);
+        }
+
+        if (changed)
+        {
+            emit q->cameraListChanged();
+            updateNotificationVisible();
+        }
     }
 
     void updateNotificationVisible()

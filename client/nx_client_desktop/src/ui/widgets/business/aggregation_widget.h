@@ -28,9 +28,6 @@ signals:
     void valueChanged();
 
 private:
-    void updateMinimumValue();
-
-private:
     QScopedPointer<Ui::AggregationWidget> ui;
 };
 

@@ -271,7 +271,7 @@ namespace Qn
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
-		ShowSingleCameraRole,                       /**< Used for default password dialog. */
+        ForceShowCamerasList,                       /**< Used for default password dialog. */
         ParentWidgetRole,                           /** Used for dialg's parent widget*/
 
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */

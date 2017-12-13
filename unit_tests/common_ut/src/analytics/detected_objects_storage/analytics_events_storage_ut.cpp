@@ -98,7 +98,7 @@ protected:
 
     void andLookupResultMatches(
         const Filter& filter,
-        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& expected)
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
     {
         auto objects = toDetectedObjects(expected);
 
@@ -128,7 +128,7 @@ protected:
     }
 
     std::vector<DetectedObject> toDetectedObjects(
-        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& analyticsDataPackets)
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets)
     {
         std::vector<DetectedObject> result;
         for (const auto& packet: analyticsDataPackets)
@@ -251,22 +251,21 @@ protected:
         return objects;
     }
 
-    void assertEqual(
-        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& left,
-        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& right)
+    template<typename ContainerOne, typename ContainerTwo>
+    void assertEqual(const ContainerOne& left, const ContainerTwo& right)
     {
         ASSERT_EQ(left.size(), right.size());
-        //for (std::size_t i = 0; i < left.size(); ++i)
-        //{
-        //    ASSERT_EQ(*left[i], *right[i]);
-        //}
+        for (std::size_t i = 0; i < left.size(); ++i)
+        {
+            ASSERT_EQ(*left[i], *right[i]);
+        }
     }
 
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filterPackets(
+    std::vector<common::metadata::DetectionMetadataPacketPtr> filterPackets(
         const Filter& filter,
-        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> packets)
+        std::vector<common::metadata::DetectionMetadataPacketPtr> packets)
     {
-        std::vector<common::metadata::ConstDetectionMetadataPacketPtr> filteredPackets;
+        std::vector<common::metadata::DetectionMetadataPacketPtr> filteredPackets;
         std::copy_if(
             packets.begin(),
             packets.end(),
@@ -277,6 +276,46 @@ protected:
             });
 
         return filteredPackets;
+    }
+
+    std::vector<common::metadata::DetectionMetadataPacketPtr> sortPacketsByTimestamp(
+        std::vector<common::metadata::DetectionMetadataPacketPtr> packets,
+        Qt::SortOrder sortOrder)
+    {
+        using namespace common::metadata;
+
+        std::sort(
+            packets.begin(), packets.end(),
+            [sortOrder](
+                const ConstDetectionMetadataPacketPtr& leftPacket,
+                const ConstDetectionMetadataPacketPtr& rightPacket)
+            {
+                const auto& leftValue =
+                    std::tie(leftPacket->timestampUsec, leftPacket->durationUsec);
+                const auto& rightValue =
+                    std::tie(rightPacket->timestampUsec, rightPacket->durationUsec);
+
+                return sortOrder == Qt::AscendingOrder
+                    ? leftValue < rightValue
+                    : leftValue > rightValue;
+            });
+
+        // Sorting objects in packets by objectId.
+        for (auto& packet: packets)
+        {
+            std::sort(
+                packet->objects.begin(), packet->objects.end(),
+                [sortOrder](
+                    const nx::common::metadata::DetectedObject& left,
+                    const nx::common::metadata::DetectedObject& right)
+                {
+                    return sortOrder == Qt::AscendingOrder
+                        ? left.objectId < right.objectId
+                        : left.objectId > right.objectId;
+                });
+        }
+
+        return packets;
     }
 
     EventsStorage& eventsStorage()
@@ -293,7 +332,7 @@ private:
 
     std::unique_ptr<EventsStorage> m_eventsStorage;
     Settings m_settings;
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_analyticsDataPackets;
+    std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
     nx::utils::SyncQueue<ResultCode> m_savePacketResultQueue;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
     boost::optional<LookupResult> m_prevLookupResult;
@@ -558,9 +597,6 @@ protected:
             addMaxObjectsLimitToFilter();
 
         if (nx::utils::random::number<bool>())
-            addRandomTextFoundInDataToFilter();
-
-        if (nx::utils::random::number<bool>())
             addRandomBoundingBoxToFilter();
 
         if (nx::utils::random::number<bool>())
@@ -692,46 +728,9 @@ protected:
         return m_filter;
     }
 
-    const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& analyticsDataPackets() const
+    const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets() const
     {
         return m_analyticsDataPackets;
-    }
-
-private:
-    std::vector<QnUuid> m_allowedDeviceIds;
-    std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
-        m_allowedTimeRange;
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_analyticsDataPackets;
-    Filter m_filter;
-    QnUuid m_specificObjectId;
-    QnTimePeriod m_specificObjectTimePeriod;
-    AttributeDictionary m_attributeDictionary;
-
-    void generateVariousEvents()
-    {
-        std::vector<QnUuid> deviceIds;
-        for (int i = 0; i < 3; ++i)
-            deviceIds.push_back(QnUuid::createUuid());
-        setAllowedDeviceIds(deviceIds);
-
-        setAllowedTimeRange(
-            std::chrono::system_clock::now() - std::chrono::hours(24),
-            std::chrono::system_clock::now());
-
-        saveAnalyticsDataPackets(generateEventsByCriteria());
-    }
-
-    void setAllowedDeviceIds(std::vector<QnUuid> deviceIds)
-    {
-        m_allowedDeviceIds = std::move(deviceIds);
-    }
-
-    void setAllowedTimeRange(
-        std::chrono::system_clock::time_point start,
-        std::chrono::system_clock::time_point end)
-    {
-        m_allowedTimeRange.first = start;
-        m_allowedTimeRange.second = end;
     }
 
     std::vector<common::metadata::DetectionMetadataPacketPtr> generateEventsByCriteria()
@@ -741,7 +740,7 @@ private:
         const int eventsPerDevice = 11;
 
         std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
-        for (const auto& deviceId: m_allowedDeviceIds)
+        for (const auto& deviceId : m_allowedDeviceIds)
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
@@ -782,6 +781,74 @@ private:
 
         for (const auto& packet: analyticsDataPackets)
             thenSaveSucceeded();
+    }
+
+    void aggregateAnalyticsDataPacketsByTimestamp()
+    {
+        if (m_analyticsDataPackets.empty())
+            return;
+
+        m_analyticsDataPackets =
+            sortPacketsByTimestamp(m_analyticsDataPackets, Qt::SortOrder::AscendingOrder);
+
+        auto prevPacketIter = m_analyticsDataPackets.begin();
+        for (auto it = std::next(prevPacketIter);
+            it != m_analyticsDataPackets.end();
+            )
+        {
+            if ((*it)->timestampUsec == (*prevPacketIter)->timestampUsec &&
+                (*it)->deviceId == (*prevPacketIter)->deviceId)
+            {
+                std::move(
+                    (*it)->objects.begin(), (*it)->objects.end(),
+                    std::back_inserter((*prevPacketIter)->objects));
+                (*prevPacketIter)->durationUsec =
+                    std::max((*it)->durationUsec, (*prevPacketIter)->durationUsec);
+                it = m_analyticsDataPackets.erase(it);
+            }
+            else
+            {
+                prevPacketIter = it;
+                ++it;
+            }
+        }
+    }
+
+private:
+    std::vector<QnUuid> m_allowedDeviceIds;
+    std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
+        m_allowedTimeRange;
+    std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
+    Filter m_filter;
+    QnUuid m_specificObjectId;
+    QnTimePeriod m_specificObjectTimePeriod;
+    AttributeDictionary m_attributeDictionary;
+
+    void generateVariousEvents()
+    {
+        std::vector<QnUuid> deviceIds;
+        for (int i = 0; i < 3; ++i)
+            deviceIds.push_back(QnUuid::createUuid());
+        setAllowedDeviceIds(deviceIds);
+
+        setAllowedTimeRange(
+            std::chrono::system_clock::now() - std::chrono::hours(24),
+            std::chrono::system_clock::now());
+
+        saveAnalyticsDataPackets(generateEventsByCriteria());
+    }
+
+    void setAllowedDeviceIds(std::vector<QnUuid> deviceIds)
+    {
+        m_allowedDeviceIds = std::move(deviceIds);
+    }
+
+    void setAllowedTimeRange(
+        std::chrono::system_clock::time_point start,
+        std::chrono::system_clock::time_point end)
+    {
+        m_allowedTimeRange.first = start;
+        m_allowedTimeRange.second = end;
     }
 };
 
@@ -899,6 +966,21 @@ class AnalyticsEventsStorageCursor:
     using base_type = AnalyticsEventsStorageLookup;
 
 protected:
+    void givenDetectedObjectsWithSameTimestamp()
+    {
+        auto newPackets = generateEventsByCriteria();
+        newPackets.erase(std::next(newPackets.begin()), newPackets.end());
+
+        const auto existingPackets = analyticsDataPackets();
+        const auto& existingPacket = nx::utils::random::choice(existingPackets);
+
+        newPackets.front()->deviceId = existingPacket->deviceId;
+        newPackets.front()->timestampUsec = existingPacket->timestampUsec;
+
+        saveAnalyticsDataPackets(std::move(newPackets));
+        aggregateAnalyticsDataPacketsByTimestamp();
+    }
+
     void whenReadDataUsingCursor()
     {
         whenCreateCursor();
@@ -924,7 +1006,16 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        assertEqual(filterPackets(filter(), analyticsDataPackets()), m_packetsRead);
+        assertEqual(
+            sortPacketsByTimestamp(
+                filterPackets(filter(), analyticsDataPackets()),
+                filter().sortOrder),
+            m_packetsRead);
+    }
+
+    void andObjectsWithSameTimestampAreDeiveredInSinglePacket()
+    {
+        // TODO
     }
 
 private:
@@ -949,14 +1040,21 @@ private:
 TEST_F(AnalyticsEventsStorageCursor, cursor_provides_all_matched_data)
 {
     givenRandomFilter();
-    setSortOrder(Qt::SortOrder::DescendingOrder);
+    setSortOrder(nx::utils::random::number<bool>() ? Qt::AscendingOrder : Qt::DescendingOrder);
+
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageCursor, aggregates_objects_with_same_timestamp)
+{
+    givenDetectedObjectsWithSameTimestamp();
 
     whenReadDataUsingCursor();
 
     thenResultMatchesExpectations();
+    andObjectsWithSameTimestampAreDeiveredInSinglePacket();
 }
-
-//TEST_F(AnalyticsEventsStorage, many_concurrent_cursors)
 
 //-------------------------------------------------------------------------------------------------
 // Time periods lookup.
@@ -997,7 +1095,8 @@ protected:
 
     void andResultMatchesExpectations()
     {
-        ASSERT_EQ(expectedLookupResult(), std::get<1>(m_prevLookupResult));
+        const auto expected = expectedLookupResult();
+        ASSERT_EQ(expected, std::get<1>(m_prevLookupResult));
     }
 
 private:
@@ -1018,7 +1117,7 @@ private:
     }
 
     QnTimePeriodList toTimePeriods(
-        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& packets,
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& packets,
         TimePeriodsLookupOptions lookupOptions)
     {
         using namespace std::chrono;

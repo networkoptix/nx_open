@@ -999,7 +999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Exportierte .EXE-Datei hat eine Größe von mehr als 4 GB und kann nicht durch Doppelklicken in Windows geöffnet werden. Es kann nur im %1-Client abgespielt werden.</translation>
     </message>
   </context>
   <context>
@@ -2216,12 +2216,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation>
-        <numerusform>Analytik ist nicht verfügbar für %1</numerusform>
-        <numerusform>Analytik ist nicht verfügbar für %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2495,12 +2492,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Aufnahme oder Bewegungserkennung deaktiviert für %1</numerusform>
-        <numerusform>Aufnahme oder Bewegungserkennung deaktiviert für %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2545,12 +2539,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Aufnahme deaktiviert für %1</numerusform>
-        <numerusform>Aufnahmen deaktiviert für %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -3189,7 +3180,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Bitten Sie Ihren Systemadministrator, dies zu tun.</translation>
     </message>
   </context>
   <context>
@@ -3441,7 +3432,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Basic</translation>
     </message>
   </context>
   <context>
@@ -4482,9 +4473,9 @@ to %1</source>
       <translation>Nach Zeitplan deaktiviert</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
+      <source>Set for all %n Cameras</source>
       <translation>
-        <numerusform>Für alle %n Kameras festlegen</numerusform>
+        <numerusform>Für %n Kamera festlegen</numerusform>
         <numerusform>Für alle %n Kameras festlegen</numerusform>
       </translation>
     </message>
@@ -6118,8 +6109,8 @@ to %1</source>
       <translation>PASSWORT ERFORDERLICH</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation>Für diese Kamera setzen</translation>
     </message>
   </context>
   <context>
@@ -7768,12 +7759,12 @@ to %1</source>
       <translation>Fehler beim Schreiben der Datei.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Keine Daten wurden exportiert.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>Interner Fehler</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Keine Daten wurden exportiert.</translation>
     </message>
   </context>
   <context>
@@ -8541,7 +8532,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
     </message>
   </context>
   <context>

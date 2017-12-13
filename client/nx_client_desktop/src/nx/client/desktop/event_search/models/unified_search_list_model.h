@@ -43,6 +43,10 @@ public:
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
+signals:
+    void fetchAboutToBeCommitted(QPrivateSignal);
+    void fetchCommitted(QPrivateSignal);
+
 private:
     using base_type::setModels;
 

@@ -115,8 +115,8 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="QSpinBox" name="fixedDurationSpinBox">
+   <item row="1" column="3" colspan="2">
+    <widget class="QnTimeDurationWidget" name="fixedDuration">
      <property name="maximum">
       <number>9999</number>
      </property>
@@ -125,18 +125,16 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4" colspan="2">
-    <widget class="QLabel" name="fixedDurationSuffixLabel">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>seconds</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnTimeDurationWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/business/time_duration_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

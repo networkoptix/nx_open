@@ -2196,11 +2196,9 @@ to view more bookmarks</translation>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">
-        <numerusform>Analytics is not available for %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2469,11 +2467,9 @@ to view more bookmarks</translation>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">
-        <numerusform>Recording or motion detection is disabled for %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2517,11 +2513,9 @@ to view more bookmarks</translation>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">
-        <numerusform>Recording is disabled for %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -4432,9 +4426,9 @@ to %1</translation>
       <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
+      <source>Set for all %n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Set For All %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6052,8 +6046,8 @@ to %1</translation>
       <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7670,12 +7664,12 @@ to %1</translation>
       <translation type="unfinished">File write error.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation type="unfinished">Internal error</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

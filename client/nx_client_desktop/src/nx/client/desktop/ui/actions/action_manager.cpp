@@ -370,14 +370,14 @@ QMenu* Manager::newMenuRecursive(const Action* parent, ActionScope scope, const 
 
     if (parent->childFactory())
     {
-        QList<QAction*> actions = parent->childFactory()->newActions(parameters, nullptr);
+        QList<QAction*> actions = parent->childFactory()->newActions(parameters, result);
 
         if (!actions.isEmpty())
         {
             if (!result->isEmpty())
                 result->addSeparator();
 
-            foreach(QAction* action, actions)
+            for(auto action: actions)
             {
                 action->setParent(result);
                 result->addAction(action);

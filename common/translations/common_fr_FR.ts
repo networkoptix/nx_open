@@ -784,8 +784,8 @@
       <translation>Type de ressource invalide pour l’exportation de données.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Aucune donnée exportée.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
