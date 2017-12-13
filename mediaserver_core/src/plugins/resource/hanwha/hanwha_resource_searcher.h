@@ -17,7 +17,7 @@ namespace plugins {
 
 class HanwhaResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
-	public nx_upnp::SearchHandler
+    public nx_upnp::SearchAutoHandler
 {
 public:
     HanwhaResourceSearcher(QnCommonModule* commonModule);

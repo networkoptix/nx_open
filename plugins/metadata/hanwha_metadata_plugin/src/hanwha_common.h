@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <QtCore/QString>
 #include <QtCore/QFlag>
 
@@ -17,7 +19,7 @@ namespace plugins {
 struct Hanwha
 {
     Q_GADGET
-    Q_ENUMS(EventTypeFlag EventItemType)       
+    Q_ENUMS(EventTypeFlag EventItemType)
     Q_FLAGS(EventTypeFlags)
 
 public:
@@ -104,3 +106,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::mediaserver::plugins::Hanwha::EventItemType),
     (metatype)(numeric)(lexical)
 )
+
+#endif // defined(ENABLE_HANWHA)
