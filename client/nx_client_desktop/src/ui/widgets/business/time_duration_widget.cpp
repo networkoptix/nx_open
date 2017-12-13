@@ -8,11 +8,11 @@ namespace client {
 namespace desktop {
 
 constexpr int kSeconds = 1;
-constexpr int kSecondsPerMinute = kSeconds * 60;
-constexpr int kSecondsPerHour = kSecondsPerMinute * 60;
-constexpr int kSecondsPerDay = kSecondsPerHour * 24;
+constexpr int kSecondsInMinute = kSeconds * 60;
+constexpr int kSecondsPerHour = kSecondsInMinute * 60;
+constexpr int kSecondsInDay = kSecondsPerHour * 24;
 
-TimeDurationWidget::TimeDurationWidget(QWidget *parent) :
+TimeDurationWidget::TimeDurationWidget(QWidget *parent):
     base_type(parent),
     ui(new Ui::TimeDurationWidget)
 {
@@ -71,15 +71,16 @@ void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
     switch (suffix)
     {
     case QnTimeStrings::Suffix::Minutes:
-        period = kSecondsPerMinute;
+        period = kSecondsInMinute;
         break;
     case QnTimeStrings::Suffix::Hours:
         period = kSecondsPerHour;
         break;
     case QnTimeStrings::Suffix::Days:
-        period = kSecondsPerDay;
+        period = kSecondsInDay;
         break;
     default:
+        NX_ASSERT(false, "Suffix is not supported");
         return;
     }
 
@@ -108,7 +109,7 @@ int TimeDurationWidget::value() const
     return ui->valueSpinBox->value() * ui->periodComboBox->itemData(ui->periodComboBox->currentIndex()).toInt();
 }
 
-QWidget* TimeDurationWidget::lastTabItem()
+QWidget* TimeDurationWidget::lastTabItem() const
 {
     return ui->periodComboBox;
 }

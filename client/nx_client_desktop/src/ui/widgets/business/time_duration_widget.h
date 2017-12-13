@@ -10,14 +10,14 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class TimeDurationWidget : public QWidget
+class TimeDurationWidget: public QWidget
 {
     Q_OBJECT
 
     typedef QWidget base_type;
 
 public:
-    explicit TimeDurationWidget(QWidget *parent = 0);
+    explicit TimeDurationWidget(QWidget *parent);
     virtual ~TimeDurationWidget() override;
 
     // Add duration usffix to dropdown box
@@ -29,7 +29,7 @@ public:
 
     void setMaximum(int value);
 
-    QWidget *lastTabItem();
+    QWidget *lastTabItem() const;
 
 signals:
     void valueChanged();
@@ -39,6 +39,7 @@ private:
 
 private:
     QScopedPointer<Ui::TimeDurationWidget> ui;
+    QWidget* myWidget = nullptr;
 };
 
 } // namespace desktop

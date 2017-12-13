@@ -4,13 +4,21 @@
 
 namespace Ui { class AggregationWidget; }
 
-class QnAggregationWidget : public QWidget
+namespace Ui { class TimeDurationWidget; }
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+class AggregationWidget: public QWidget
 {
     Q_OBJECT
 
+    typedef QWidget base_type;
+
 public:
-    explicit QnAggregationWidget(QWidget *parent = 0);
-    ~QnAggregationWidget();
+    explicit AggregationWidget(QWidget* parent);
+    virtual ~AggregationWidget() override;
 
     void setValue(int secs);
     int value() const;
@@ -19,7 +27,7 @@ public:
 
     static int optimalWidth();
 
-    QWidget *lastTabItem();
+    QWidget* lastTabItem() const;
 
 signals:
     void valueChanged();
@@ -28,3 +36,6 @@ private:
     QScopedPointer<Ui::AggregationWidget> ui;
 };
 
+} // namespace desktop
+} // namespace client
+} // namespace nx
