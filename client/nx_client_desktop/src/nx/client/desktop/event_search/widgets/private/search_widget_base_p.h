@@ -27,6 +27,9 @@ public:
 protected:
     void setModel(QAbstractListModel* model);
 
+    void fetchMoreIfNeeded();
+    void queueFetchMoreIfNeeded(int delayMs);
+
 protected:
     QWidget* const m_headerWidget = nullptr;
     EventRibbon* const m_ribbon = nullptr;

@@ -774,7 +774,7 @@
       <translation>無效的資料匯出資源類型.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
+      <source>No data exported.</source>
       <translation>未匯出任何資料.</translation>
     </message>
   </context>

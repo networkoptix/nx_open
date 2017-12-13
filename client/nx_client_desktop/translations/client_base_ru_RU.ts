@@ -1000,7 +1000,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Экспортированный файл .EXE будет иметь размер более 4 ГБ и не может быть открыт двойным щелчком в Windows. Его можно воспроизводить только в %1 клиенте.</translation>
     </message>
   </context>
   <context>
@@ -1015,7 +1015,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4, часть 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1164,7 +1164,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Длинный</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
@@ -1196,18 +1196,18 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>Пароль не должен содержать %n или более последовательный символ.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более последовательных символа.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>Пароль не должен содержать %n или более повторяющийся символ.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более повторяющихся символа.</numerusform>
+        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
       </translation>
     </message>
   </context>
@@ -2239,13 +2239,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">
-        <numerusform>Аналитика недоступна для %1</numerusform>
-        <numerusform>Analytics is not available for %1</numerusform>
-        <numerusform>Analytics is not available for %1</numerusform>
-      </translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
@@ -2524,13 +2520,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Запись или детекция движения отключены для %1</numerusform>
-        <numerusform>Запись или детекция движения отключены для %1</numerusform>
-        <numerusform>Запись или детекция движения отключены для %1</numerusform>
-      </translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -2576,13 +2568,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Запись для %1 отключена</numerusform>
-        <numerusform>Запись для %1 отключена</numerusform>
-        <numerusform>Запись для %1 отключена</numerusform>
-      </translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
@@ -3229,7 +3217,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Для этого следует обратиться к системному администратору.</translation>
     </message>
   </context>
   <context>
@@ -3487,7 +3475,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Основной</translation>
     </message>
   </context>
   <context>
@@ -4294,10 +4282,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>Использовать лицензию для %n выбранной камеры</numerusform>
+        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
+        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
       </translation>
     </message>
   </context>
@@ -4543,11 +4531,11 @@ to %1</source>
       <translation>Отключено по расписанию</translation>
     </message>
     <message numerus="yes">
-      <source>Set For All %n Cameras</source>
+      <source>Set for all %n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Set For All %n Cameras</numerusform>
-        <numerusform>Set For All %n Cameras</numerusform>
-        <numerusform>Set For All %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
   </context>
@@ -6195,8 +6183,8 @@ to %1</source>
       <translation>ТРЕБУЕТСЯ ПАРОЛЬ</translation>
     </message>
     <message>
-      <source>Set for this camera</source>
-      <translation type="unfinished">Set for this camera</translation>
+      <source>Set for this Camera</source>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
   </context>
   <context>
@@ -7877,12 +7865,12 @@ to %1</source>
       <translation>Ошибка записи файла.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Нет данных для экспорта.</translation>
-    </message>
-    <message>
       <source>Internal error</source>
       <translation>Внутренняя ошибка</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>
@@ -8046,7 +8034,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Длинный</translation>
     </message>
     <message>
       <source>Short</source>
@@ -8057,7 +8045,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>Аналитика %1</translation>
     </message>
   </context>
   <context>

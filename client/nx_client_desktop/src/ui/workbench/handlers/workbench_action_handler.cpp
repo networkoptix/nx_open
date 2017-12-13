@@ -707,7 +707,7 @@ void ActionHandler::showMultipleCamerasErrorMessage(
 void ActionHandler::changeDefaultPasswords(
     const QString& previousPassword,
     const QnVirtualCameraResourceList& cameras,
-    bool showSingleCamera)
+    bool forceShowCamerasList)
 {
     const auto server = commonModule()->currentServer();
     const auto serverConnection = server ? server->restConnection() : rest::QnConnectionPtr();
@@ -718,7 +718,7 @@ void ActionHandler::changeDefaultPasswords(
     }
 
     QnCameraPasswordChangeDialog dialog(
-        previousPassword, cameras, showSingleCamera, mainWindowWidget());
+        previousPassword, cameras, forceShowCamerasList, mainWindowWidget());
     if (dialog.exec() != QDialog::Accepted)
         return;
 
@@ -731,7 +731,7 @@ void ActionHandler::changeDefaultPasswords(
     const auto password = dialog.password();
     const auto guard = QPointer<ActionHandler>(this);
     const auto completionGuard = QnRaiiGuard::createDestructible(
-        [this, guard, cameras, errorResultsStorage, password, showSingleCamera]()
+        [this, guard, cameras, errorResultsStorage, password, forceShowCamerasList]()
         {
             if (!guard || errorResultsStorage->isEmpty())
                 return;
@@ -773,7 +773,7 @@ void ActionHandler::changeDefaultPasswords(
             else
                 showSingleCameraErrorMessage(explanation);
 
-            changeDefaultPasswords(password, camerasWithError, showSingleCamera);
+            changeDefaultPasswords(password, camerasWithError, forceShowCamerasList);
         });
 
     for (const auto camera: cameras)
@@ -811,8 +811,8 @@ void ActionHandler::at_changeDefaultCameraPassword_triggered()
         return;
     }
 
-    const bool showSingleCameraList = parameters.argument(Qn::ShowSingleCameraRole, false);
-    changeDefaultPasswords(QString(), camerasWithDefaultPassword, showSingleCameraList);
+    const bool forceShowCamerasList = parameters.argument(Qn::ForceShowCamerasList, false);
+    changeDefaultPasswords(QString(), camerasWithDefaultPassword, forceShowCamerasList);
 }
 
 void ActionHandler::at_openInLayoutAction_triggered()
@@ -1624,19 +1624,27 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if (!periods.empty()) {
-
+    if (!periods.empty())
+    {
         QnTimePeriodList localPeriods = periods.intersected(period);
+        NX_ASSERT(!localPeriods.empty());
 
-        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
-        if (startDelta > 0) { //user selected period before the first chunk
-            period.startTimeMs += startDelta;
-            period.durationMs -= startDelta;
-        }
+        if (!localPeriods.empty())
+        {
+            // Check if user selected period before the first chunk.
+            const qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
+            if (startDelta > 0)
+            {
+                period.startTimeMs += startDelta;
+                period.durationMs -= startDelta;
+            }
 
-        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
-        if (endDelta > 0) { // user selected period after the last chunk
-            period.durationMs -= endDelta;
+            // Check if user selected period after the last chunk.
+            const qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
+            if (endDelta > 0)
+            {
+                period.durationMs -= endDelta;
+            }
         }
     }
 

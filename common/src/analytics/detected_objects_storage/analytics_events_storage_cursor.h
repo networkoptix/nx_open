@@ -32,9 +32,14 @@ public:
 
 private:
     std::unique_ptr<nx::utils::db::Cursor<DetectedObject>> m_dbCursor;
+    common::metadata::DetectionMetadataPacketPtr m_nextPacket;
 
     common::metadata::DetectionMetadataPacketPtr toDetectionMetadataPacket(
         DetectedObject detectedObject);
+    void addToPacket(
+        DetectedObject detectedObject,
+        common::metadata::DetectionMetadataPacket* packet);
+    nx::common::metadata::DetectedObject toMetadataObject(DetectedObject detectedObject);
 };
 
 } // namespace storage

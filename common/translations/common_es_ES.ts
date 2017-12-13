@@ -785,7 +785,7 @@
       <translation>Tipo de recurso no válido para la exportación de datos.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
+      <source>No data exported.</source>
       <translation>No se exportaron datos.</translation>
     </message>
   </context>

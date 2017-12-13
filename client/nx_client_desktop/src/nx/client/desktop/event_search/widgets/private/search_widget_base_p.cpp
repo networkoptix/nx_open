@@ -6,6 +6,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <ui/style/helper.h>
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
@@ -48,29 +49,34 @@ void EventSearchWidgetPrivateBase::setModel(QAbstractListModel* model)
 {
     m_ribbon->setModel(model);
 
-    const auto fetchMoreIfNeeded =
-        [this]()
-        {
-            if (!m_ribbon->isVisible())
-                return;
-
-            const auto scrollBar = m_ribbon->scrollBar();
-            if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
-                return;
-
-            if (!m_ribbon->model()->canFetchMore(QModelIndex()))
-                return;
-
-            m_ribbon->model()->fetchMore(QModelIndex());
-        };
-
     connect(model, &QAbstractItemModel::rowsRemoved,
-        this, fetchMoreIfNeeded, Qt::QueuedConnection);
+        this, &EventSearchWidgetPrivateBase::fetchMoreIfNeeded, Qt::QueuedConnection);
 
     connect(m_ribbon->scrollBar(), &QScrollBar::valueChanged,
-        this, fetchMoreIfNeeded, Qt::QueuedConnection);
+        this, &EventSearchWidgetPrivateBase::fetchMoreIfNeeded, Qt::QueuedConnection);
 
-    installEventHandler(m_ribbon, QEvent::Show, this, fetchMoreIfNeeded);
+    installEventHandler(m_ribbon, QEvent::Show,
+        this, &EventSearchWidgetPrivateBase::fetchMoreIfNeeded);
+}
+
+void EventSearchWidgetPrivateBase::fetchMoreIfNeeded()
+{
+    if (!m_ribbon->isVisible())
+        return;
+
+    const auto scrollBar = m_ribbon->scrollBar();
+    if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
+        return;
+
+    if (!m_ribbon->model()->canFetchMore(QModelIndex()))
+        return;
+
+    m_ribbon->model()->fetchMore(QModelIndex());
+}
+
+void EventSearchWidgetPrivateBase::queueFetchMoreIfNeeded(int delayMs)
+{
+    executeDelayedParented([this]() { fetchMoreIfNeeded(); }, delayMs, this);
 }
 
 } // namespace detail

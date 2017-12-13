@@ -75,10 +75,9 @@ QString toString(const DetectionMetadataPacket& packet)
         for (const auto& label: object.labels)
         {
             if (isLabelFirst)
-            {
-                s += lit(", ");
                 isLabelFirst = false;
-            }
+            else
+                s += lit(", ");
             s += label.name + lit("=\"")
                 + QString::fromStdString(
                     //< Properly escape the value string.

@@ -794,8 +794,8 @@
       <translation>Недопустимый тип ресурса для экспорта данных.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation>Нет данных для экспорта.</translation>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
     </message>
   </context>
   <context>

@@ -371,7 +371,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Breedte van het tekstvak</translation>
     </message>
     <message>
       <location/>
@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Authenticatietype</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Type aanvraag</translation>
     </message>
   </context>
   <context>
@@ -2981,7 +2981,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Breedte van het tekstvak</translation>
     </message>
   </context>
   <context>

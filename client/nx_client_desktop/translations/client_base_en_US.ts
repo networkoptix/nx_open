@@ -2218,12 +2218,9 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnCameraAnalyticsPolicy</name>
-    <message numerus="yes">
+    <message>
         <source>Analytics is not available for %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2497,12 +2494,9 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation>
-            <numerusform>Recording or motion detection is disabled on %1</numerusform>
-            <numerusform>Recording or motion detection is disabled on %1</numerusform>
-        </translation>
+        <translation type="unfinished">Recording or motion detection is disabled on %1</translation>
     </message>
 </context>
 <context>
@@ -2547,12 +2541,9 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
         <source>Recording is disabled for %1</source>
-        <translation>
-            <numerusform>Recording is disabled for %1.</numerusform>
-            <numerusform>Recording is disabled for %1.</numerusform>
-        </translation>
+        <translation type="unfinished">Recording is disabled for %1.</translation>
     </message>
 </context>
 <context>
@@ -4484,7 +4475,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Set For All %n Cameras</source>
+        <source>Set for all %n Cameras</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -6119,7 +6110,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set for this camera</source>
+        <source>Set for this Camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7769,11 +7760,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No data was exported.</source>
+        <source>Internal error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Internal error</source>
+        <source>No data exported.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

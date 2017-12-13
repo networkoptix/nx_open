@@ -44,55 +44,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="periodWidget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="everyLabel">
-        <property name="text">
+     <widget class="QLabel" name="everyLabel">
+       <property name="text">
          <string>No more than once per</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="valueSpinBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="correctionMode">
-         <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-        <property name="value">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="periodComboBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="currentIndex">
-         <number>-1</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+       </property>
+     </widget>
+   </item>
+   <item>
+     <widget class="QnTimeDurationWidget" name="periodWidget" native="true">
+     </widget>
    </item>
    <item>
     <widget class="QLabel" name="instantLabel">
@@ -116,6 +76,14 @@
    </item>
   </layout>
  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>QnTimeDurationWidget</class>
+      <extends>QWidget</extends>
+      <header location="global">ui/widgets/business/time_duration_widget.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
  <resources/>
  <connections/>
 </ui>

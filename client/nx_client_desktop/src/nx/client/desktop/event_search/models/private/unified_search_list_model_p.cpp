@@ -47,6 +47,11 @@ void UnifiedSearchListModel::Private::fetchMore()
             if (!guard)
                 return;
 
+            const bool emitSignals = !m_needToUpdateModels;
+
+            if (emitSignals)
+                emit q->fetchAboutToBeCommitted(UnifiedSearchListModel::QPrivateSignal());
+
             if (m_fetchingTypes.testFlag(Type::events))
                 m_eventsModel->commitPrefetch(m_latestStartTimeMs);
 
@@ -57,6 +62,9 @@ void UnifiedSearchListModel::Private::fetchMore()
                 m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
 
             m_fetchingTypes = Types();
+
+            if (emitSignals)
+                emit q->fetchCommitted(UnifiedSearchListModel::QPrivateSignal());
 
             if (m_needToUpdateModels)
             {

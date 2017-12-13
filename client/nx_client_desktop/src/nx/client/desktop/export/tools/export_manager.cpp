@@ -171,7 +171,7 @@ QString ExportProcess::errorString(ExportProcessError error)
             return tr("File write error.");
 
         case ExportProcessError::dataNotFound:
-            return tr("No data was exported.");
+            return tr("No data exported.");
 
         default:
             NX_ASSERT(false, "Should never get here");

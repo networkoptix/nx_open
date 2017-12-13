@@ -28,6 +28,7 @@ private:
     void handleResourceRemoved(const QnResourcePtr& resource);
 
 signals:
+    void cameraListChanged();
     void notificationIsVisibleChanged();
 
 private:
