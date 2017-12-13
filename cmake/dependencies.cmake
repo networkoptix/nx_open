@@ -75,7 +75,6 @@ function(nx_detect_package_versions)
         _set_version(quazip "0.7")
     endif()
     _set_version(festival-vox ${_festival_version})
-    _set_version(help ${customization}-${releaseVersion.short})
 
     foreach(pkg
         qt
@@ -92,7 +91,6 @@ function(nx_detect_package_versions)
         festival festival-vox
         gtest gmock
         directx
-        help
     )
         nx_set_variable_if_empty(${pkg}_version ${_${pkg}_version})
         nx_expose_to_parent_scope(${pkg}_version)
@@ -180,7 +178,7 @@ function(nx_get_dependencies)
 
     if(haveDesktopClient)
         nx_rdep_add_package(any/qtsingleapplication)
-        nx_rdep_add_package(any/help)
+        nx_rdep_add_package(any/help-${customization}-3.1.1)
     endif()
 
     if(haveMobileClient)
