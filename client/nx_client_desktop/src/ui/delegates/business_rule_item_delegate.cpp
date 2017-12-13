@@ -237,7 +237,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& 
         }
         case Column::aggregation:
         {
-            return QnAggregationWidget::optimalWidth();
+            return nx::client::desktop::AggregationWidget::optimalWidth();
         }
         default:
             break;
@@ -372,7 +372,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         }
         case Column::aggregation:
         {
-            QnAggregationWidget* widget = new QnAggregationWidget(parent);
+            nx::client::desktop::AggregationWidget* widget = new nx::client::desktop::AggregationWidget(parent);
             widget->setShort(true);
             return widget;
         }
@@ -423,7 +423,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             }
             return;
         case Column::aggregation:
-            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor))
+            if (nx::client::desktop::AggregationWidget* widget = dynamic_cast<nx::client::desktop::AggregationWidget *>(editor))
             {
                 widget->setValue(index.data(Qt::EditRole).toInt());
                 connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
@@ -458,7 +458,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             }
             return;
         case Column::aggregation:
-            if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor))
+            if (nx::client::desktop::AggregationWidget* widget = dynamic_cast<nx::client::desktop::AggregationWidget *>(editor))
             {
                 model->setData(index, widget->value());
             }

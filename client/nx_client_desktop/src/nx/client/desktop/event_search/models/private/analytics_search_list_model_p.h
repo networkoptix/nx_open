@@ -44,6 +44,8 @@ public:
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commitPrefetch(qint64 latestStartTimeMs);
 
+    bool defaultAction(int index) const;
+
     QString description(const analytics::storage::DetectedObject& object) const;
     static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
 

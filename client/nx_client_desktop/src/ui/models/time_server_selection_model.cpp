@@ -205,19 +205,26 @@ void QnTimeServerSelectionModel::updateTimeOffset()
     auto apiConnection = server->restConnection();
     m_currentRequest = apiConnection->getTimeOfServersAsync(
         [this, apiConnection]
-        (bool success, int handle, rest::MultiServerTimeData data)
+            (bool success, rest::Handle handle, rest::MultiServerTimeData data)
         {
-            auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
+            if (m_currentRequest != handle)
+                return;
+
+            m_currentRequest = rest::Handle(); //< Reset.
+            if (!success)
+                return;
+
+            const auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
             for (const auto& record: data.data)
             {
-                /* Store received value to use it later. */
-                qint64 offset = record.timeSinseEpochMs - syncTime;
+                // Store received value to use it later.
+                const auto offset = record.timeSinseEpochMs - syncTime;
                 m_serverOffsetCache[record.serverId] = offset;
                 PRINT_DEBUG("get time for peer " + peerId.toByteArray());
 
-                /* Check if the server is already online. */
-                int idx = nx::utils::algorithm::index_of(m_items,
-                    [record](const Item& item)
+                // Check if the server is already online.
+                const auto idx = nx::utils::algorithm::index_of(m_items,
+                    [&record](const Item& item)
                     {
                         return item.peerId == record.serverId;
                     });
@@ -230,7 +237,6 @@ void QnTimeServerSelectionModel::updateTimeOffset()
                 PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
                 emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
             }
-            m_currentRequest = rest::Handle(); //< reset
         });
 }
 

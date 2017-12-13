@@ -94,7 +94,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     ui->secondStreamQualityComboBox->addItem(tr("Medium"), Qn::SSQualityMedium);
     ui->secondStreamQualityComboBox->addItem(tr("High"), Qn::SSQualityHigh);
 
-    ui->iconLabel->setPixmap(qnSkin->pixmap("legacy/warning.png"));
+    ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
     ui->iconLabel->setScaledContents(true);
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled,

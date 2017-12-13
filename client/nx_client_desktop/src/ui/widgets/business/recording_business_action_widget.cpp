@@ -35,8 +35,8 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
     connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
         {
-            ui->fixedDurationSpinBox->setEnabled(checked);
-            ui->fixedDurationSuffixLabel->setEnabled(checked);
+            ui->fixedDuration->setEnabled(checked);
+            //ui->fixedDurationSuffixLabel->setEnabled(checked);
 
             // Prolonged type of event has changed. In case of instant
             // action event state should be updated.
@@ -46,8 +46,10 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
             emit paramsChanged();
         });
 
-    connect(ui->fixedDurationSpinBox, QnSpinboxIntValueChanged, this,
-        &QnRecordingBusinessActionWidget::paramsChanged);
+    ui->fixedDuration->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+    ui->fixedDuration->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+
+    connect(ui->fixedDuration, SIGNAL(valueChanged()), this, SLOT(paramsChanged()));
 }
 
 QnRecordingBusinessActionWidget::~QnRecordingBusinessActionWidget()
@@ -59,10 +61,8 @@ void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *a
     setTabOrder(before,                 ui->qualityComboBox);
     setTabOrder(ui->qualityComboBox,    ui->fpsSpinBox);
     setTabOrder(ui->fpsSpinBox,         ui->afterSpinBox);
-    setTabOrder(ui->afterSpinBox, ui->fixedDurationCheckBox);
-    setTabOrder(ui->fixedDurationCheckBox, ui->fixedDurationSpinBox);
-    setTabOrder(ui->fixedDurationSpinBox, after);
-
+    setTabOrder(ui->afterSpinBox, ui->fixedDuration);
+    setTabOrder(ui->fixedDuration, after);
 }
 
 void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
@@ -108,7 +108,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
         int fixedDuration = params.durationMs / 1000;
         ui->fixedDurationCheckBox->setChecked(fixedDuration > 0);
         if (fixedDuration > 0)
-            ui->fixedDurationSpinBox->setValue(fixedDuration);
+            ui->fixedDuration->setValue(fixedDuration);
 
         ui->afterSpinBox->setEnabled(!ui->fixedDurationCheckBox->isChecked());
         ui->afterLabel->setEnabled(ui->afterSpinBox->isEnabled());
@@ -128,7 +128,7 @@ void QnRecordingBusinessActionWidget::paramsChanged()
         ui->qualityComboBox->currentIndex()).toInt();
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked()
-        ? ui->fixedDurationSpinBox->value() * 1000
+        ? ui->fixedDuration->value() * 1000
         : 0;
 
     model()->setActionParams(params);

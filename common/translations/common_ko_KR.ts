@@ -774,8 +774,8 @@
       <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
     </message>
     <message>
-      <source>No data was exported.</source>
-      <translation type="unfinished">No data was exported.</translation>
+      <source>No data exported.</source>
+      <translation>내 보낼 데이타가 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>분석 이벤트</translation>
     </message>
     <message>
       <source>%1 at %2</source>

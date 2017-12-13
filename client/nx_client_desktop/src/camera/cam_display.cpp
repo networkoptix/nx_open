@@ -1202,6 +1202,33 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
     queue.erase(queue.begin(), itr);
 }
 
+void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
+{
+    //performing before locking m_timeMutex. Otherwise we could get dead-lock between this thread and a setSpeed, called from main thread.
+    //E.g. overrideTimestampOfNextFrameToRender waits for frames rendered, setSpeed (main thread) waits for m_timeMutex
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+        m_display[i]->flushFramesToRenderer();
+
+    m_timeMutex.lock();
+    m_lastDecodedTime = AV_NOPTS_VALUE;
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        if (m_display[i])
+            m_display[i]->overrideTimestampOfNextFrameToRender(timestampUs);
+        m_nextReverseTime[i] = AV_NOPTS_VALUE;
+    }
+
+    if (m_buffering && m_executingJump == 0)
+    {
+        m_buffering = 0;
+        m_timeMutex.unlock();
+        if (m_extTimeSrc)
+            m_extTimeSrc->onBufferingFinished(this);
+        unblockTimeValue();
+    }
+    else
+        m_timeMutex.unlock();
+}
+
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
@@ -1218,9 +1245,20 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     m_hasVideo = m_resource->hasVideo(data->dataProvider);
 
+    if (media->dataType == QnAbstractMediaData::VIDEO ||
+        media->dataType == QnAbstractMediaData::AUDIO)
+    {
+        if (m_lastMediaEvent != Qn::MediaStreamEvent::NoEvent && m_extTimeSrc)
+        {
+            qint64 currentTime = m_extTimeSrc->getCurrentTime();
+            if (currentTime != AV_NOPTS_VALUE)
+                m_archiveReader->jumpTo(currentTime, currentTime);
+        }
+        m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
+    }
+
     if (media->dataType != QnAbstractMediaData::EMPTY_DATA)
     {
-        m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
         bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
 
         m_timeMutex.lock();
@@ -1301,6 +1339,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
             m_lastMediaEvent = mediaEvent;
             m_lastMediaEventTimeout.restart();
+            moveTimestampTo(m_speed >= 0 ? DATETIME_NOW : 0);
         }
         else
         {
@@ -1405,30 +1444,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 m_display[i]->overrideTimestampOfNextFrameToRender(m_lastDecodedTime);
             }
             */
-
-            //performing before locking m_timeMutex. Otherwise we could get dead-lock between this thread and a setSpeed, called from main thread.
-                //E.g. overrideTimestampOfNextFrameToRender waits for frames rendered, setSpeed (main thread) waits for m_timeMutex
-            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
-                m_display[i]->flushFramesToRenderer();
-
-            m_timeMutex.lock();
-            m_lastDecodedTime = AV_NOPTS_VALUE;
-            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                if( m_display[i] )
-                    m_display[i]->overrideTimestampOfNextFrameToRender(emptyData->timestamp);
-                m_nextReverseTime[i] = AV_NOPTS_VALUE;
-            }
-
-            if (m_buffering && m_executingJump == 0)
-            {
-                m_buffering = 0;
-                m_timeMutex.unlock();
-                if (m_extTimeSrc)
-                    m_extTimeSrc->onBufferingFinished(this);
-                unblockTimeValue();
-            }
-            else
-                m_timeMutex.unlock();
+            moveTimestampTo(emptyData->timestamp);
         }
         else {
             QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(emptyData->dataProvider);

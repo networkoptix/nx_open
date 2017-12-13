@@ -142,18 +142,56 @@ void QnResourcePreviewWidget::setBorderRole(QPalette::ColorRole role)
     update();
 }
 
-QRectF QnResourcePreviewWidget::highlight() const
+QRectF QnResourcePreviewWidget::highlightRect() const
 {
-    return m_highlight;
+    return m_highlightRect;
 }
 
-void QnResourcePreviewWidget::setHighlight(const QRectF& relativeRect)
+void QnResourcePreviewWidget::setHighlightRect(const QRectF& relativeRect)
 {
-    if (m_highlight == relativeRect)
+    if (m_highlightRect == relativeRect)
         return;
 
-    m_highlight = relativeRect;
+    m_highlightRect = relativeRect;
     update();
+}
+
+QnResourcePreviewWidget::CropMode QnResourcePreviewWidget::cropMode() const
+{
+    return m_cropMode;
+}
+
+void QnResourcePreviewWidget::setCropMode(CropMode value)
+{
+    if (m_cropMode == value)
+        return;
+
+    m_cropMode = value;
+    update();
+}
+
+bool QnResourcePreviewWidget::cropRequired() const
+{
+    if (m_highlightRect.isEmpty())
+        return false;
+
+    switch (m_cropMode)
+    {
+        case CropMode::never:
+            return false;
+
+        case CropMode::always:
+            return true;
+
+        case CropMode::hovered:
+            return underMouse();
+
+        case CropMode::notHovered:
+            return !underMouse();
+    }
+
+    NX_ASSERT(false); //< Should never happen.
+    return false;
 }
 
 void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
@@ -178,25 +216,43 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
     }
     else
     {
-        const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
-        const auto paintSize = Geometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
-        const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-            paintSize.toSize(), QRect(QPoint(), size()));
         painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-        painter.drawPixmap(paintRect, m_preview);
 
-        if (m_highlight.isEmpty())
-            return;
+        if (cropRequired())
+        {
+            const auto sourceSize = Geometry::cwiseMul(m_highlightRect.size(),
+                m_preview.size() / m_preview.devicePixelRatio());
 
-        // Dim everything around highlighted area.
-        QPainterPath path;
-        const auto highlightRect = Geometry::subRect(paintRect, m_highlight).toAlignedRect();
-        path.addRegion(QRegion(paintRect).subtracted(highlightRect));
-        static const auto kDimmerColor = QColor("#70000000"); //< TODO: #vkutin Customize.
-        painter.fillPath(path, kDimmerColor);
-        // Paint frame.
-        painter.setPen(palette().highlight().color());
-        painter.drawRect(highlightRect);
+            const auto paintSize = Geometry::scaled(sourceSize, size(), Qt::KeepAspectRatio);
+            const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+                paintSize.toSize(), rect());
+
+            painter.drawPixmap(paintRect, m_preview,
+                Geometry::subRect(m_preview.rect(), m_highlightRect));
+        }
+        else
+        {
+            const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
+
+            const auto paintSize = Geometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
+            const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+                paintSize.toSize(), rect());
+
+            painter.drawPixmap(paintRect, m_preview);
+
+            if (m_highlightRect.isEmpty())
+                return;
+
+            // Dim everything around highlighted area.
+            QPainterPath path;
+            const auto highlightRect = Geometry::subRect(paintRect, m_highlightRect).toAlignedRect();
+            path.addRegion(QRegion(paintRect).subtracted(highlightRect));
+            painter.fillPath(path, palette().alternateBase());
+
+            // Paint frame.
+            painter.setPen(palette().highlight().color());
+            painter.drawRect(highlightRect);
+        }
     }
 }
 

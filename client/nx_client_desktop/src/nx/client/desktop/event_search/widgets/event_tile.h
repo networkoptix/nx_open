@@ -65,8 +65,8 @@ public:
     QnImageProvider* preview() const;
     void setPreview(QnImageProvider* value);
 
-    QRectF previewHighlight() const;
-    void setPreviewHighlight(const QRectF& relativeRect);
+    QRectF previewCropRect() const;
+    void setPreviewCropRect(const QRectF& relativeRect);
 
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
@@ -75,6 +75,9 @@ public:
     int autoCloseTimeMs() const;
     int autoCloseRemainingMs() const;
     void setAutoCloseTimeMs(int value);
+
+    bool busyIndicatorVisible() const;
+    void setBusyIndicatorVisible(bool value);
 
 signals:
     void clicked();

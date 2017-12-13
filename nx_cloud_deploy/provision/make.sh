@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=provision
-VERSION=1.2
+VERSION=1.3
 REPOSITORY_PATH=/common
 
 function stage()

@@ -56,6 +56,8 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->setHidden(true);
     ui->previewWidget->setHidden(true);
 
+    ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
+
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
@@ -77,6 +79,15 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
+
+    ui->busyIndicator->setContentsMargins(
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding);
+
+    ui->busyIndicator->setHidden(true);
+    ui->mainWidget->setHidden(true);
 
     connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
@@ -134,7 +145,7 @@ QString EventTile::title() const
 void EventTile::setTitle(const QString& value)
 {
     ui->nameLabel->setText(value);
-    ui->nameLabel->setHidden(value.isEmpty());
+    ui->mainWidget->setHidden(value.isEmpty());
 }
 
 QColor EventTile::titleColor() const
@@ -168,7 +179,7 @@ QString EventTile::timestamp() const
 void EventTile::setTimestamp(const QString& value)
 {
     ui->timestampLabel->setText(value);
-    ui->timestampLabel->setHidden(value.isEmpty());
+    ui->timestampLabel->setHidden(value.isEmpty() || !m_closeButton->isHidden());
 }
 
 QPixmap EventTile::icon() const
@@ -200,14 +211,14 @@ void EventTile::setPreview(QnImageProvider* value)
     ui->previewWidget->setHidden(!value);
 }
 
-QRectF EventTile::previewHighlight() const
+QRectF EventTile::previewCropRect() const
 {
-    return ui->previewWidget->highlight();
+    return ui->previewWidget->highlightRect();
 }
 
-void EventTile::setPreviewHighlight(const QRectF& relativeRect)
+void EventTile::setPreviewCropRect(const QRectF& relativeRect)
 {
-    ui->previewWidget->setHighlight(relativeRect);
+    ui->previewWidget->setHighlightRect(relativeRect);
 }
 
 CommandActionPtr EventTile::action() const
@@ -223,6 +234,9 @@ void EventTile::setAction(const CommandActionPtr& value)
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
 {
+    if (ui->mainWidget->isHidden())
+        return;
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::NoPen);
@@ -268,7 +282,7 @@ bool EventTile::event(QEvent* event)
 void EventTile::handleHoverChanged(bool hovered)
 {
     const auto showCloseButton = hovered & m_closeable;
-    ui->timestampLabel->setHidden(showCloseButton);
+    ui->timestampLabel->setHidden(showCloseButton || ui->timestampLabel->text().isEmpty());
     m_closeButton->setVisible(showCloseButton);
     updateBackgroundRole(hovered && !m_closeButton->underMouse());
 
@@ -324,6 +338,16 @@ void EventTile::setAutoCloseTimeMs(int value)
         m_autoCloseTimer->setInterval(value);
     else
         m_autoCloseTimer = executeDelayedParented(autoClose, value, this);
+}
+
+bool EventTile::busyIndicatorVisible() const
+{
+    return !ui->busyIndicator->isHidden();
+}
+
+void EventTile::setBusyIndicatorVisible(bool value)
+{
+    ui->busyIndicator->setVisible(value);
 }
 
 } // namespace

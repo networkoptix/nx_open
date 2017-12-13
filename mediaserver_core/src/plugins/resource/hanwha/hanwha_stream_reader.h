@@ -69,6 +69,7 @@ private:
     qint64 m_lastTimestampUsec = AV_NOPTS_VALUE;
     nx::utils::ElapsedTimer m_timeSinceLastFrame;
     boost::optional<nx::core::resource::OverlappedId> m_overlappedId;
+    HanwhaProfileParameters m_prevProfileParameters;
 };
 
 } // namespace plugins

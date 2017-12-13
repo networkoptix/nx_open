@@ -87,6 +87,21 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
     }
 }
 
+bool AnalyticsSearchListModel::setData(const QModelIndex& index, const QVariant& /*value*/, int role)
+{
+    if (!index.isValid() || index.model() != this)
+        return false;
+
+    switch (role)
+    {
+        case Qn::DefaultNotificationRole:
+            return d->defaultAction(index.row());
+
+        default:
+            return false;
+    }
+}
+
 bool AnalyticsSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
     return d->canFetchMore();

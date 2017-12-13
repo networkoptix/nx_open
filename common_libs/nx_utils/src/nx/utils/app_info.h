@@ -57,8 +57,7 @@ public:
     {
         return isWindows() && !isWin64();
     }
-    
 };
 
-} // namespace nx
 } // namespace utils
+} // namespace nx

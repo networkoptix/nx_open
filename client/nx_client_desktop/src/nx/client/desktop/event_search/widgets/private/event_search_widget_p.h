@@ -4,6 +4,7 @@
 #include "search_widget_base_p.h"
 
 class QnMediaResourceWidget;
+class QnSortFilterListModel;
 class QnSearchLineEdit;
 class QPushButton;
 class QCheckBox;
@@ -43,11 +44,13 @@ private:
 private:
     EventSearchWidget* q = nullptr;
     UnifiedSearchListModel* const m_model = nullptr;
+    QnSortFilterListModel* const m_sortFilterModel = nullptr;
     QnSearchLineEdit* const m_searchLineEdit = nullptr;
     QPushButton* const m_superTypeButton = nullptr;
     QPushButton* const m_eventTypeButton = nullptr;
     QCheckBox* const m_selectAreaCheckBox = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    int m_previousRowCount = 0;
 };
 
 } // namespace

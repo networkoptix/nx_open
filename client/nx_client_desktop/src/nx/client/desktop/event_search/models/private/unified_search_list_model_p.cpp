@@ -6,6 +6,7 @@
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
+#include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -17,9 +18,10 @@ UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
     q(q),
     m_eventsModel(new EventSearchListModel(q)),
     m_bookmarksModel(new BookmarkSearchListModel(q)),
-    m_analyticsModel(new AnalyticsSearchListModel(q))
+    m_analyticsModel(new AnalyticsSearchListModel(q)),
+    m_busyIndicatorModel(new BusyIndicatorModel(q))
 {
-    q->setModels({m_eventsModel, m_bookmarksModel, m_analyticsModel});
+    q->setModels({m_eventsModel, m_bookmarksModel, m_analyticsModel, m_busyIndicatorModel});
 }
 
 UnifiedSearchListModel::Private::~Private()
@@ -47,6 +49,12 @@ void UnifiedSearchListModel::Private::fetchMore()
             if (!guard)
                 return;
 
+            m_busyIndicatorModel->setActive(false);
+
+            const bool emitSignals = !m_needToUpdateModels;
+            if (emitSignals)
+                emit q->fetchAboutToBeCommitted(UnifiedSearchListModel::QPrivateSignal());
+
             if (m_fetchingTypes.testFlag(Type::events))
                 m_eventsModel->commitPrefetch(m_latestStartTimeMs);
 
@@ -57,6 +65,9 @@ void UnifiedSearchListModel::Private::fetchMore()
                 m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
 
             m_fetchingTypes = Types();
+
+            if (emitSignals)
+                emit q->fetchCommitted(UnifiedSearchListModel::QPrivateSignal());
 
             if (m_needToUpdateModels)
             {
@@ -86,6 +97,9 @@ void UnifiedSearchListModel::Private::fetchMore()
 
     if (m_analyticsModel->prefetchAsync(prefetchCompletionHandler))
         m_fetchingTypes |= Type::analytics;
+
+    if (m_fetchingTypes != 0)
+        m_busyIndicatorModel->setActive(true);
 }
 
 QnVirtualCameraResourcePtr UnifiedSearchListModel::Private::camera() const

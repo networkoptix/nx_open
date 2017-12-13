@@ -271,7 +271,7 @@ namespace Qn
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
-		ShowSingleCameraRole,                       /**< Used for default password dialog. */
+        ForceShowCamerasList,                       /**< Used for default password dialog. */
         ParentWidgetRole,                           /** Used for dialg's parent widget*/
 
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
@@ -282,6 +282,8 @@ namespace Qn
         ResourceListRole,                           /**< Resource list (QnResourceList). */
         PreviewTimeRole,                            /**< Role for camera preview time in milliseconds since epoch (qint64). */
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (int). */
+        BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
+        ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

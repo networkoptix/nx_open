@@ -19,7 +19,7 @@ public:
     QnCameraPasswordChangeDialog(
         const QString& password,
         const QnVirtualCameraResourceList& cameras,
-        bool showSingleCameraList,
+        bool forceShowCamerasList,
         QWidget* parent = nullptr);
 
     virtual ~QnCameraPasswordChangeDialog();

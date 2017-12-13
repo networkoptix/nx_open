@@ -8,7 +8,6 @@
 
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
-//#include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace nx {
 namespace client {

@@ -604,10 +604,10 @@ void QnMediaResourceWidget::initStatusOverlayController()
          return;
 
      const auto changeCameraPassword =
-         [this](const QnVirtualCameraResourceList& cameras, bool showSingleCamera)
+         [this](const QnVirtualCameraResourceList& cameras, bool forceShowCamerasList)
          {
              auto parameters = action::Parameters(cameras);
-             parameters.setArgument(Qn::ShowSingleCameraRole, showSingleCamera);
+             parameters.setArgument(Qn::ForceShowCamerasList, forceShowCamerasList);
              menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
          };
 
@@ -648,9 +648,15 @@ void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
-        setMotionSearchModeEnabled(false);
+    {
+        titleBar()->rightButtonsBar()->setButtonsChecked(
+            Qn::MotionSearchButton | Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton,
+            false);
+    }
     else
+    {
         m_areaSelectOverlayWidget->clearSelectedArea();
+    }
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
@@ -665,7 +671,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
     const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
     return camerasCount > 1
-        ? tr("Set For All %n Cameras", nullptr, camerasCount)
+        ? tr("Set for all %n Cameras", nullptr, camerasCount)
         : QString();
 }
 
