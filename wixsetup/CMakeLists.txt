@@ -84,3 +84,13 @@ add_custom_target(generate_update_packages ALL
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
 )
+
+add_custom_target(generate_client_debug_package ALL
+    COMMENT "Preparing client debug package..."
+    DEPENDS
+        desktop_client
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_client_debug_package.py
+        "--config" ${config_file}
+        "--output" ${distribution_output_dir}
+)

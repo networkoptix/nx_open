@@ -30,6 +30,7 @@ sign_description: '${company.name} ${display.product.name}'
 # Distrib names
 client_distribution_name: '${client_distribution_name}'
 client_update_distribution_name: '${client_update_distribution_name}'
+client_debug_distribution_name: '${client_debug_distribution_name}'
 server_distribution_name: '${server_distribution_name}'
 bundle_distribution_name: '${bundle_distribution_name}'
 servertool_distribution_name: '${servertool_distribution_name}'
