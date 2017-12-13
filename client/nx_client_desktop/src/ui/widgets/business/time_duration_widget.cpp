@@ -3,84 +3,81 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
-namespace {
-    const int defaultOptimalWidth = 300;
+namespace nx {
+namespace client {
+namespace desktop {
 
-    enum {
-        second = 1,
-        minute = second * 60,
-        hour = minute * 60,
-        day = hour * 24
-    };
-}
+constexpr int kSeconds = 1;
+constexpr int kSecondsPerMinute = kSeconds * 60;
+constexpr int kSecondsPerHour = kSecondsPerMinute * 60;
+constexpr int kSecondsPerDay = kSecondsPerHour * 24;
 
-QnTimeDurationWidget::QnTimeDurationWidget(QWidget *parent) :
-    QWidget(parent),
+TimeDurationWidget::TimeDurationWidget(QWidget *parent) :
+    base_type(parent),
     ui(new Ui::TimeDurationWidget)
 {
     ui->setupUi(this);
+    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kSeconds);
 
-    QSize minSize(this->minimumSize());
-    minSize.setWidth(defaultOptimalWidth);
-    setMinimumSize(minSize);
+    connect(ui->periodComboBox, QnComboboxCurrentIndexChanged, this, 
+        [this]
+        {
+            updateMinimumValue();
+            emit valueChanged();
+        });
 
-    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), second);
+    connect(ui->valueSpinBox, QnSpinboxIntValueChanged, this, 
+        [this](int value) 
+        {
+            if (value == 0) 
+            {
+                int index = ui->periodComboBox->currentIndex();
+                NX_ASSERT(index > 0, "Invalid minimum value for the minimal period.");
+                if (index == 0) 
+                {
+                    ui->valueSpinBox->setValue(1);
+                } 
+                else 
+                {
+                    {
+                        QSignalBlocker blocker(ui->periodComboBox);
+                        ui->periodComboBox->setCurrentIndex(index - 1);
+                    }
+                    updateMinimumValue();
 
-    connect(ui->periodComboBox,     QnComboboxCurrentIndexChanged, this, [this]() {
-        updateMinimumValue();
-        emit valueChanged();
-    });
-
-    connect(ui->valueSpinBox,       QnSpinboxIntValueChanged, this, [this](int value) {
-        if (value == 0) {
-            int index = ui->periodComboBox->currentIndex();
-            NX_ASSERT(index > 0, Q_FUNC_INFO, "Invalid minimum value for the minimal period.");
-            if (index == 0) {
-                ui->valueSpinBox->setValue(1);
-            } else {
-                ui->periodComboBox->blockSignals(true);
-                ui->periodComboBox->setCurrentIndex(index - 1);
-                ui->periodComboBox->blockSignals(false);
-                updateMinimumValue();
-
-                int intervalSec = ui->periodComboBox->itemData(index).toInt();
-                int value = intervalSec / ui->periodComboBox->itemData(index - 1).toInt();
-                ui->valueSpinBox->setValue(value - 1);
+                    int intervalSec = ui->periodComboBox->itemData(index).toInt();
+                    int value = intervalSec / ui->periodComboBox->itemData(index - 1).toInt();
+                    ui->valueSpinBox->setValue(value - 1);
+                }
             }
-        }
-        emit valueChanged();
-    });
+            emit valueChanged();
+        });
 }
 
-QnTimeDurationWidget::~QnTimeDurationWidget()
+TimeDurationWidget::~TimeDurationWidget()
 {
 }
 
-void QnTimeDurationWidget::setMaximum(int value)
+void TimeDurationWidget::setMaximum(int value)
 {
-    this->ui->valueSpinBox->setMaximum(value);
+    ui->valueSpinBox->setMaximum(value);
 }
 
-void QnTimeDurationWidget::setEnabled(bool value)
-{
-    this->ui->valueSpinBox->setEnabled(value);
-    this->ui->periodComboBox->setEnabled(value);
-}
-
-void QnTimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
+void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
 {
     QString suffixName = QnTimeStrings::longSuffix(suffix);
+
     int period = 1;
     switch (suffix)
     {
     case QnTimeStrings::Suffix::Minutes:
-        period = minute;
+        period = kSecondsPerMinute;
         break;
     case QnTimeStrings::Suffix::Hours:
-        period = hour;
+        period = kSecondsPerHour;
         break;
     case QnTimeStrings::Suffix::Days:
-        period = day;
+        period = kSecondsPerDay;
         break;
     default:
         return;
@@ -89,8 +86,10 @@ void QnTimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
     ui->periodComboBox->addItem(suffixName, period);
 }
 
-void QnTimeDurationWidget::setValue(int secs) {
-    if (secs > 0) {
+void TimeDurationWidget::setValue(int secs)
+{
+    if (secs > 0) 
+    {
         int idx = 0;
         while (idx < ui->periodComboBox->count() - 1
                && secs >= ui->periodComboBox->itemData(idx + 1).toInt()
@@ -104,19 +103,21 @@ void QnTimeDurationWidget::setValue(int secs) {
     }
 }
 
-int QnTimeDurationWidget::value() const {
-    return  ui->valueSpinBox->value() * ui->periodComboBox->itemData(ui->periodComboBox->currentIndex()).toInt();
+int TimeDurationWidget::value() const
+{
+    return ui->valueSpinBox->value() * ui->periodComboBox->itemData(ui->periodComboBox->currentIndex()).toInt();
 }
 
-QWidget *QnTimeDurationWidget::lastTabItem()
+QWidget* TimeDurationWidget::lastTabItem()
 {
     return ui->periodComboBox;
 }
 
-int QnTimeDurationWidget::optimalWidth() {
-    return defaultOptimalWidth;
-}
-
-void QnTimeDurationWidget::updateMinimumValue() {
+void TimeDurationWidget::updateMinimumValue()
+{
     ui->valueSpinBox->setMinimum(ui->periodComboBox->currentIndex() == 0 ? 1 : 0);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

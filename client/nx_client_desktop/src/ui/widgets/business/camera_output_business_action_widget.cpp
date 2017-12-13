@@ -27,7 +27,6 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* 
     connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
         {
-            //ui->fixedDurationSpinBox->setEnabled(checked);
             ui->timeDuration->setEnabled(checked);
 
             // Prolonged type of event has changed. In case of instant
@@ -37,6 +36,8 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* 
 
             emit paramsChanged();
         });
+
+    ui->fixedDurationCheckBox->setCheckable(true);
 
     connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);

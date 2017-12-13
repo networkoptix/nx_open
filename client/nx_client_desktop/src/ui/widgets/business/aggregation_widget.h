@@ -1,11 +1,8 @@
-#ifndef AGGREGATION_WIDGET_H
-#define AGGREGATION_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
-namespace Ui {
-    class AggregationWidget;
-}
+namespace Ui { class AggregationWidget; }
 
 class QnAggregationWidget : public QWidget
 {
@@ -15,7 +12,7 @@ public:
     explicit QnAggregationWidget(QWidget *parent = 0);
     ~QnAggregationWidget();
 
-    Q_SLOT void setValue(int secs);
+    void setValue(int secs);
     int value() const;
 
     void setShort(bool value);
@@ -31,4 +28,3 @@ private:
     QScopedPointer<Ui::AggregationWidget> ui;
 };
 
-#endif // AGGREGATION_WIDGET_H

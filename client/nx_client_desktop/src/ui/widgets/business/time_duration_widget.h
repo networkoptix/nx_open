@@ -1,31 +1,31 @@
-#ifndef TIME_DURATION_WIDGET_H
-#define TIME_DURATION_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
 #include <text/time_strings.h>
 
-namespace Ui {
-    class TimeDurationWidget;
-}
+namespace Ui { class TimeDurationWidget; }
 
-class QnTimeDurationWidget : public QWidget
+namespace nx {
+namespace client {
+namespace desktop {
+
+class TimeDurationWidget : public QWidget
 {
     Q_OBJECT
 
+    typedef QWidget base_type;
+
 public:
-    explicit QnTimeDurationWidget(QWidget *parent = 0);
-    ~QnTimeDurationWidget();
+    explicit TimeDurationWidget(QWidget *parent = 0);
+    virtual ~TimeDurationWidget() override;
 
     // Add duration usffix to dropdown box
     // This should be called before setValue
     void addDurationSuffix(QnTimeStrings::Suffix suffix);
-    Q_SLOT void setValue(int secs);
+
+    void setValue(int secs);
     int value() const;
-
-    static int optimalWidth();
-
-    void setEnabled(bool value);
 
     void setMaximum(int value);
 
@@ -41,4 +41,6 @@ private:
     QScopedPointer<Ui::TimeDurationWidget> ui;
 };
 
-#endif // AGGREGATION_WIDGET_H
+} // namespace desktop
+} // namespace client
+} // namespace nx
