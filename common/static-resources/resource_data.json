@@ -1779,7 +1779,7 @@
         },
         {
             "keys": [
-                "DW|*|A*"
+                "DW|*|A*", "CPRO|*|A*"
             ],
             "showUrl": true,
             "urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
@@ -2090,6 +2090,20 @@
             ],
             "isMacAddressMandatory": false
         },
+        {
+            "keys": [
+                "Hikvision|DS-2DP1636Z-D"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201,VideoEncoderToken_202",
+                    "VideoEncoderToken_301,VideoEncoderToken_302"
+                ]
+            }
+        },        
         {
             "keys": [
                 "IQA*|IQEYE*"
