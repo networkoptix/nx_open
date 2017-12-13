@@ -3,13 +3,12 @@
 import argparse
 import fnmatch
 import os
-import sys
 import zipfile
 import yaml
 
 common_qt_libraries = [
     'Core',
-     'Gui']
+    'Gui']
 
 client_qt_libraries = [
     'Multimedia',
@@ -43,6 +42,7 @@ client_qt_plugins = [
 common_nx_libraries = ['nx_utils', 'nx_network', 'nx_kit', 'udt']
 client_nx_libraries = ['nx_vms_utils']
 
+
 def find_files_by_template(dir, template):
     for file in fnmatch.filter(os.listdir(dir), template):
         yield os.path.join(dir, file)
@@ -55,7 +55,13 @@ def find_all_files(dir):
 
 
 def ffmpeg_files(source_dir):
-    templates = ['av*.dll', 'libogg*.dll', 'libvorbis*.dll', 'libmp3*.dll', 'swscale-*.dll', 'swresample-*.dll']
+    templates = [
+        'av*.dll',
+        'libogg*.dll',
+        'libvorbis*.dll',
+        'libmp3*.dll',
+        'swscale-*.dll',
+        'swresample-*.dll']
     for template in templates:
         for file in find_files_by_template(source_dir, template):
             yield file
@@ -73,14 +79,14 @@ def openal_files(source_dir):
 def quazip_files(source_dir):
     yield os.path.join(source_dir, 'quazip.dll')
 
+
 '''
-        <?if $(var.quicksync) = true ?>
-        <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
-                                    <File Id="quicksyncdecoder.dll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
-        <File Id="hw_decoding_conf.xml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
-                            </ComponentGroup>
-        <?endif?>
+<?if $(var.quicksync) = true ?>
+<File Id="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
+<File Id="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
+<?endif?>
 '''
+
 
 def icu_files(qt_bin_dir):
     for file in find_files_by_template(qt_bin_dir, 'icu*.dll'):
@@ -102,7 +108,7 @@ def nx_files(source_dir, libs):
         yield os.path.join(source_dir, '{}.dll'.format(lib))
 
 
-def zip_files(zip, files, rel_path, target_path = '.'):
+def zip_files(zip, files, rel_path, target_path='.'):
     for file in files:
         zip.write(file, os.path.join(target_path, os.path.relpath(file, rel_path)))
 
@@ -110,6 +116,7 @@ def zip_files(zip, files, rel_path, target_path = '.'):
 def zip_package(zip, package_directory):
     bin_directory = os.path.join(package_directory, 'bin')
     zip_files(zip, find_all_files(bin_directory), bin_directory)
+
 
 def create_client_update_file(
     binaries_dir,
@@ -123,7 +130,7 @@ def create_client_update_file(
     launcher_version_name,
     minilauncher_binary_name,
     client_update_file
-    ):
+):
     with zipfile.ZipFile(client_update_file, "w", zipfile.ZIP_DEFLATED) as zip:
         zip_files(zip, ffmpeg_files(binaries_dir), binaries_dir)
         zip_files(zip, openssl_files(binaries_dir), binaries_dir)
@@ -161,21 +168,21 @@ def main():
     with open(args.config, 'r') as f:
         config = yaml.load(f)
 
-    client_update_file = os.path.join(args.output, config['client_distribution_name']) + '.zip'
+    client_update_file = os.path.join(
+        args.output, config['client_update_distribution_name']) + '.zip'
     create_client_update_file(
-        binaries_dir = config['bin_source_dir'],
-        qt_dir = config['qt_directory'],
-        vcredist_directory = config['vcredist_directory'],
-        vox_dir = config['festival_vox_directory'],
-        fonts_dir = config['fonts_directory'],
-        client_qml_dir = config['client_qml_dir'],
-        help_directory = config['help_directory'],
-        client_binary_name = config['client_binary_name'],
-        launcher_version_name = config['launcher_version_file'],
-        minilauncher_binary_name = config['minilauncher_binary_name'],
-        client_update_file = client_update_file)
+        binaries_dir=config['bin_source_dir'],
+        qt_dir=config['qt_directory'],
+        vcredist_directory=config['vcredist_directory'],
+        vox_dir=config['festival_vox_directory'],
+        fonts_dir=config['fonts_directory'],
+        client_qml_dir=config['client_qml_dir'],
+        help_directory=config['help_directory'],
+        client_binary_name=config['client_binary_name'],
+        launcher_version_name=config['launcher_version_file'],
+        minilauncher_binary_name=config['minilauncher_binary_name'],
+        client_update_file=client_update_file)
 
 
 if __name__ == '__main__':
     main()
-
