@@ -195,7 +195,20 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 {
     NX_EXPECT(tile && index.isValid());
 
-    tile->setTitle(index.data(Qt::DisplayRole).toString());
+    // Check whether the tile is a special busy indicator tile.
+    const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
+    if (busyIndicatorVisibility.isValid())
+    {
+        tile->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
+        return;
+    }
+
+    // Check whether the tile is a special separator tile.
+    const auto title = index.data(Qt::DisplayRole).toString();
+    if (title.isEmpty())
+        return;
+
+    tile->setTitle(title);
     tile->setIcon(index.data(Qt::DecorationRole).value<QPixmap>());
     tile->setTimestamp(index.data(Qn::TimestampTextRole).toString());
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());

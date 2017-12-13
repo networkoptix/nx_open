@@ -76,6 +76,9 @@ public:
     int autoCloseRemainingMs() const;
     void setAutoCloseTimeMs(int value);
 
+    bool busyIndicatorVisible() const;
+    void setBusyIndicatorVisible(bool value);
+
 signals:
     void clicked();
 

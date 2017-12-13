@@ -19,6 +19,7 @@ namespace desktop {
 class EventSearchListModel;
 class BookmarkSearchListModel;
 class AnalyticsSearchListModel;
+class BusyIndicatorModel;
 
 class UnifiedSearchListModel::Private: public QObject
 {
@@ -54,9 +55,10 @@ private:
     Types m_filter = Type::all;
     vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
 
-    EventSearchListModel* const m_eventsModel;
-    BookmarkSearchListModel* const m_bookmarksModel;
-    AnalyticsSearchListModel* const m_analyticsModel;
+    EventSearchListModel* const m_eventsModel = nullptr;
+    BookmarkSearchListModel* const m_bookmarksModel = nullptr;
+    AnalyticsSearchListModel* const m_analyticsModel = nullptr;
+    BusyIndicatorModel* const m_busyIndicatorModel = nullptr;
 
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     qint64 m_latestTimeMs = -1;
