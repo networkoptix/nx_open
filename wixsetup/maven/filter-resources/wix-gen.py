@@ -51,7 +51,7 @@ def generate_help():
 
 def generate_client_qml():
     harvest_dir(
-        environment.client_qml_source_dir
+        environment.client_qml_source_dir,
         'ClientQml.wxs',
         'ClientQmlComponent',
         'ClientQml',
