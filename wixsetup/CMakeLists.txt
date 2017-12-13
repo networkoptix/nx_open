@@ -94,3 +94,16 @@ add_custom_target(generate_client_debug_package ALL
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
 )
+
+add_custom_target(generate_libs_debug_package ALL
+    COMMENT "Preparing libs debug package..."
+    DEPENDS
+        nx_network
+        nx_utils
+        nx_vms_utils
+        udt
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py
+        "--config" ${config_file}
+        "--output" ${distribution_output_dir}
+)

@@ -6,10 +6,15 @@ import zipfile
 import yaml
 
 
-def create_client_debug_file(binaries_dir, output_filename):
-    pdb_filename = 'desktop_client.pdb'
+def create_libs_debug_file(binaries_dir, output_filename):
+    pdb_filenames = [
+        'nx_network.pdb',
+        'nx_utils.pdb',
+        'nx_vms_utils.pdb',
+        'udt.pdb']
     with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
-        zip.write(os.path.join(binaries_dir, pdb_filename), pdb_filename)
+        for pdb_filename in pdb_filenames:
+            zip.write(os.path.join(binaries_dir, pdb_filename), pdb_filename)
 
 
 def main():
@@ -22,8 +27,8 @@ def main():
         config = yaml.load(f)
 
     output_filename = os.path.join(
-        args.output, config['client_debug_distribution_name']) + '.zip'
-    create_client_debug_file(
+        args.output, config['libs_debug_distribution_name']) + '.zip'
+    create_libs_debug_file(
         binaries_dir=config['bin_source_dir'],
         output_filename=output_filename)
 
