@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <ui/graphics/items/controls/time_slider.h>
 #include <ui/style/helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -17,6 +18,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <utils/common/delayed.h>
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
 #include <nx/client/core/utils/human_readable.h>
@@ -398,6 +400,23 @@ int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId, qint64 ti
         [&objectId](const DetectedObject& item) { return item.objectId == objectId; });
 
     return iter != range.second ? int(std::distance(m_data.cbegin(), iter)) : -1;
+}
+
+bool AnalyticsSearchListModel::Private::defaultAction(int index) const
+{
+    // TODO: #vkutin Introduce a new QnAction instead of direct access.
+    if (auto slider = q->navigator()->timeSlider())
+    {
+        const QnScopedTypedPropertyRollback<bool, QnTimeSlider> downRollback(slider,
+            &QnTimeSlider::setSliderDown,
+            &QnTimeSlider::isSliderDown,
+            true);
+
+        slider->setValue(startTimeMs(m_data[index]));
+        return true;
+    }
+
+    return false;
 }
 
 QString AnalyticsSearchListModel::Private::description(
