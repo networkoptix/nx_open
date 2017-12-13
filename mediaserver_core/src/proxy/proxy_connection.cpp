@@ -568,7 +568,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
             if (readed < 1)
             {
                 const auto systemErrorCode = SystemError::getLastOSErrorCode();
-                NX_VERBOSE(this, lm("Proxying finished with system result code")
+                NX_VERBOSE(this, lm("Proxying finished with system result code %1")
                     .args(SystemError::toString(systemErrorCode)));
                 return;
             }
