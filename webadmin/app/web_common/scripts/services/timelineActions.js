@@ -469,6 +469,7 @@ TimelineActions.prototype.scrollbarSliderDragEnd = function(){
 TimelineActions.prototype.timelineDragStart = function(mouseX){
     this.scaleManager.stopWatching();
     this.catchTimeline = mouseX;
+    this.scaleManager.dragStartDate = this.scaleManager.screenCoordinateToDate(mouseX);
 };
 TimelineActions.prototype.timelineDrag = function(mouseX){
     if(this.catchTimeline) {
@@ -482,6 +483,7 @@ TimelineActions.prototype.timelineDragEnd = function(){
     if(this.catchTimeline) {
         this.scaleManager.releaseWatching();
         this.catchTimeline = false;
+        this.scaleManager.dragStartDate = null;
     }
 };
 
