@@ -34,7 +34,8 @@ static constexpr int kScrollBarStep = 16;
 // When tile becomes visible its true height can be computed and used.
 static constexpr int kApproximateTileHeight = 40;
 
-static constexpr int kDefaultThumbnailSize = 224;
+static constexpr int kDefaultThumbnailWidth = 224;
+static constexpr int kMaximumThumbnailWidth = 1024;
 static constexpr int kMultiThumbnailSpacing = 1;
 
 QSize minimumWidgetSize(QWidget* widget)
@@ -219,18 +220,23 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         return;
 
     const auto previewTimeMs = index.data(Qn::PreviewTimeRole).value<qint64>();
+    const auto previewCropRect = index.data(Qn::ItemZoomRectRole).value<QRectF>();
+    const auto thumbnailWidth = previewCropRect.isEmpty()
+        ? kDefaultThumbnailWidth
+        : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+
     tile->setPreview(new QnSingleThumbnailLoader(
         camera,
         previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
         QnThumbnailRequestData::kDefaultRotation,
-        QSize(kDefaultThumbnailSize, 0),
+        QSize(thumbnailWidth, 0),
         QnThumbnailRequestData::JpgFormat,
         QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
         QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
         tile));
 
     tile->preview()->loadAsync();
-    tile->setPreviewHighlight(index.data(Qn::ItemZoomRectRole).value<QRectF>());
+    tile->setPreviewCropRect(previewCropRect);
 }
 
 void EventRibbon::Private::debugCheckGeometries()

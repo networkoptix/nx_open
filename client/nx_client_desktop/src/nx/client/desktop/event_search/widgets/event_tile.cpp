@@ -56,6 +56,8 @@ EventTile::EventTile(QWidget* parent):
     ui->timestampLabel->setHidden(true);
     ui->previewWidget->setHidden(true);
 
+    ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
+
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
@@ -200,14 +202,14 @@ void EventTile::setPreview(QnImageProvider* value)
     ui->previewWidget->setHidden(!value);
 }
 
-QRectF EventTile::previewHighlight() const
+QRectF EventTile::previewCropRect() const
 {
-    return ui->previewWidget->highlight();
+    return ui->previewWidget->highlightRect();
 }
 
-void EventTile::setPreviewHighlight(const QRectF& relativeRect)
+void EventTile::setPreviewCropRect(const QRectF& relativeRect)
 {
-    ui->previewWidget->setHighlight(relativeRect);
+    ui->previewWidget->setHighlightRect(relativeRect);
 }
 
 CommandActionPtr EventTile::action() const
