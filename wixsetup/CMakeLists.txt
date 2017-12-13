@@ -3,7 +3,7 @@ set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")
 set(filter_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources")
 set(ClientHelpSourceDir "${bin_source_dir}/help")
 set(VoxSourceDir "${bin_source_dir}/vox")
-set(ClientQmlDir "${CMAKE_CURRENT_BINARY_DIR}/clientqml")
+set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 
@@ -29,9 +29,29 @@ nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 
-add_custom_target(wixsetup ALL
+
+set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
+nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
+
+set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
+# This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
+set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
+
+add_custom_target(collect_qml_dependencies ALL
     DEPENDS
         desktop_client
+    COMMENT "Collecting QML libraries..."
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
+        "--config" ${config_file}
+        "--source" ${desktop_client_executable}
+        "--qml-root" ${desktop_client_qml_root}
+        "--output" ${client_qml_dir}
+    )
+
+add_custom_target(wixsetup ALL
+    DEPENDS
+        collect_qml_dependencies
         applauncher
         traytool
         mediaserver
@@ -47,22 +67,22 @@ add_custom_target(wixsetup ALL
     COMMAND ${CMAKE_COMMAND} -E copy
         "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
     COMMAND ${CMAKE_COMMAND} -E copy
-        "${bin_source_dir}/desktop_client.exe" "${bin_source_dir}/${client.binary.name}"
+        "${desktop_client_executable}" "${bin_source_dir}/${client.binary.name}"
     COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
     COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
 )
 
 add_custom_target(generate_update_packages ALL
     COMMENT "Preparing update and debug packages ..."
-    DEPENDS wixsetup
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup
-    COMMAND ${PYTHON_EXECUTABLE} generate_update_packages.py 
+    DEPENDS collect_qml_dependencies
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_update_packages.py
         "--binaries" ${bin_source_dir}
         "--qt" ${QT_DIR}
         "--redist" ${VC14RedistPath}
         "--vox" ${festival_vox_directory}
         "--fonts" ${fonts_directory}
-        "--client-qml" ${ClientQmlDir}
+        "--client-qml" ${client_qml_dir}
         "--client-update" ${client_update_distribution_name}
         "--client-binary-name" ${product.name}
         "--launcher-version" ${launcher.version.file}
