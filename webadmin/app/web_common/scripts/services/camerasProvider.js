@@ -322,7 +322,9 @@ angular.module('nxCommon')
             var self = this;
             return self.systemAPI.getServerTimes().then(function(result){
                 var serverOffsets = result.data.reply;
-                _.each(result.data.reply, function(server){
+                _.each(serverOffsets, function(server){
+                    //Typo with server api so we check for both spellings
+                    //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
                     var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
                     self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
                 });
