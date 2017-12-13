@@ -412,7 +412,7 @@ bool AnalyticsSearchListModel::Private::defaultAction(int index) const
             &QnTimeSlider::isSliderDown,
             true);
 
-        slider->setValue(startTimeMs(m_data[index]));
+        slider->setValue(startTimeMs(m_data[index]), true);
         return true;
     }
 
