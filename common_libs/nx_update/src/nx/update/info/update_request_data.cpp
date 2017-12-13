@@ -1,3 +1,4 @@
+#include <utils/common/app_info.h>
 #include "update_request_data.h"
 
 namespace nx {

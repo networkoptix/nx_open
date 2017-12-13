@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <nx/update/info/file_data.h>
 #include <nx/update/info/result_code.h>
 #include <nx/update/info/update_request_data.h>
@@ -21,6 +22,8 @@ public:
     virtual bool fromByteArray(const QByteArray& rawData) = 0;
     virtual bool equals(AbstractUpdateRegistry* other) const = 0;
 };
+
+using AbstractUpdateRegistryPtr = std::unique_ptr<AbstractUpdateRegistry>;
 
 } // namespace info
 } // namespace update

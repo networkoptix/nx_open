@@ -13,6 +13,8 @@ enum class ResultCode
     noData
 };
 
+NX_UPDATE_API QString toString(ResultCode resultCode);
+
 } // namespace info
 } // namespace update
 } // namespace nx

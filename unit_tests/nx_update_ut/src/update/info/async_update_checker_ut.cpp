@@ -194,8 +194,8 @@ protected:
     {
         using namespace std::placeholders;
         m_asyncUpdateChecker.check(
-            kBaseUrl,
-            std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2));
+            std::bind(&AsyncUpdateChecker::onCheckCompleted, this, _1, _2),
+            kBaseUrl);
     }
 
     void thenCorrectUpdateRegistryShouldBeReturned()

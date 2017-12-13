@@ -9,6 +9,8 @@ namespace nx {
 namespace update {
 namespace info {
 
+const QString kDefaultUrl = "http://updates.networkoptix.com";
+
 namespace {
 
 using namespace detail::data_parser;
@@ -201,11 +203,25 @@ AsyncUpdateChecker::~AsyncUpdateChecker()
 {
 }
 
-void AsyncUpdateChecker::check(const QString& baseUrl, UpdateCheckCallback callback)
+void AsyncUpdateChecker::check(UpdateCheckCallback callback, const QString& baseUrl)
 {
     m_impl->check(baseUrl, std::move(callback));
 }
 
+QString toString(ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case ResultCode::noData: return "No data";
+        case ResultCode::getRawDataError: return "Failed to get raw response data";
+        case ResultCode::ok: return "Success";
+        case ResultCode::parseError: return "Failed to parse received response";
+        case ResultCode::timeout: return "Timeout occured while waiting for the response";
+        default:
+            NX_ASSERT(false);
+            return "";
+    }
+}
 } // namespace info
 } // namespace update
 } // namespace nx
