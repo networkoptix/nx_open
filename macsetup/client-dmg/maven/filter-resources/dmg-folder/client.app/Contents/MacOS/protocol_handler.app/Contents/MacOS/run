@@ -1,2 +1,2 @@
 cd "$1"
-'./${client.binary.name}' $2
+'./@client.binary.name@' $2
