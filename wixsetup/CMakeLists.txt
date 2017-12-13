@@ -42,7 +42,6 @@ add_custom_target(wixsetup ALL
         mjpg_link
         generic_multicast_plugin
         hanwha_metadata_plugin
-        generate_update_packages
     COMMENT "Creating installer..."
     # TODO move python to cmake
     COMMAND ${CMAKE_COMMAND} -E copy
