@@ -6,6 +6,7 @@ set(VoxSourceDir "${bin_source_dir}/vox")
 set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
+set(VC14RedistPath "${vcredist_directory}")
 
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
 file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
@@ -74,18 +75,12 @@ add_custom_target(wixsetup ALL
 
 add_custom_target(generate_update_packages ALL
     COMMENT "Preparing update and debug packages ..."
-    DEPENDS collect_qml_dependencies
+    DEPENDS
+        collect_qml_dependencies
+        applauncher
+        minilauncher
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
     COMMAND ${PYTHON_EXECUTABLE} generate_update_packages.py
-        "--binaries" ${bin_source_dir}
-        "--qt" ${QT_DIR}
-        "--redist" ${VC14RedistPath}
-        "--vox" ${festival_vox_directory}
-        "--fonts" ${fonts_directory}
-        "--client-qml" ${client_qml_dir}
-        "--client-update" ${client_update_distribution_name}
-        "--client-binary-name" ${product.name}
-        "--launcher-version" ${launcher.version.file}
-        "--minilauncher-binary-name" ${minilauncher.binary.name}
+        "--config" ${config_file}
         "--output" ${distribution_output_dir}
 )

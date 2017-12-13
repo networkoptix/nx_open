@@ -9,11 +9,16 @@ distribution_output_dir: '${distribution_output_dir}'
 # Source directories
 bin_source_dir: '${bin_source_dir}'
 vox_source_dir: '${VoxSourceDir}'
-vcrt14_source_dir: '${VC14RedistPath}/bin'
-client_qml_source_dir: '${client_qml_dir}'
-client_help_source_dir: '${ClientHelpSourceDir}'
-client_fonts_source_dir: '${ClientFontsDir}'
-client_background_source_dir: '${ClientBgSourceDir}'
+vcredist_directory: '${vcredist_directory}'
+client_qml_dir: '${client_qml_dir}'
+help_directory: '${help_directory}'
+festival_vox_directory: '${festival_vox_directory}'
+fonts_directory: '${fonts_directory}'
+
+# Source binaries
+client_binary_name: '${product.name}'
+minilauncher_binary_name: '${minilauncher.binary.name}'
+launcher_version_file: '${launcher.version.file}'
 
 # Signing section
 signtool_directory: '${signtool_directory}/bin'
