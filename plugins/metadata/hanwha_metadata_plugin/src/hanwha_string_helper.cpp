@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "hanwha_string_helper.h"
 #include "hanwha_common.h"
@@ -62,4 +62,4 @@ QString HanwhaStringHelper::buildDescription(
 } // namespace mediaserver
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

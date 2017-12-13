@@ -193,10 +193,9 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     helper.setIgnoreMutexAnalyzer(true);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
     // Some cameras have bug: they could close connection with delay.
-    // It affect newly opened connections. Don't change parameters to prevent it.
+    // It affects newly opened connections. Don't change parameters to prevent it.
     if (m_prevProfileParameters == profileParameters)
         return CameraDiagnostics::NoErrorResult();
-    m_prevProfileParameters = profileParameters;
 
     m_hanwhaResource->beforeConfigureStream(getRole());
     const auto response = helper.update(lit("media/videoprofile"), profileParameters);
@@ -210,6 +209,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
                 response.errorString()));
     }
 
+    m_prevProfileParameters = profileParameters;
     return CameraDiagnostics::NoErrorResult();
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include <boost/optional/optional.hpp>
 
@@ -33,7 +33,7 @@ private:
     boost::optional<int> eventRegion(const QString& eventSource) const;
     bool isEventActive(const QString& eventSourceState) const;
     Hanwha::EventItemType eventItemType(const QString& eventSource, const QString& eventState) const;
-    
+
 private:
     const Hanwha::DriverManifest m_manifest;
     Handler m_handler;
@@ -43,4 +43,4 @@ private:
 } // namespace mediaserver
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

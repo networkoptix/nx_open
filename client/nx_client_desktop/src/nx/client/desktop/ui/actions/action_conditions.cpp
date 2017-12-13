@@ -887,6 +887,12 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, QnWorkben
     if (resource->hasFlags(Qn::still_image))
         return InvisibleAction;
 
+    if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
+    {
+        if (camera->isDtsBased())
+            return DisabledAction;
+    }
+
     const bool isPanoramic = media->getVideoLayout()->channelCount() > 1;
     if (isPanoramic)
         return InvisibleAction;

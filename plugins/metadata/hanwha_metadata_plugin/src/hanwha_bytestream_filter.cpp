@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "hanwha_bytestream_filter.h"
 #include "hanwha_common.h"
@@ -84,7 +84,7 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
     event.isActive = isEventActive(eventState);
     event.itemType = eventItemType(eventSource, eventState);
     event.fullEventName = eventSource;
-    
+
     event.caption = HanwhaStringHelper::buildCaption(
         m_manifest,
         eventTypeId,
@@ -164,4 +164,4 @@ Hanwha::EventItemType HanwhaBytestreamFilter::eventItemType(
 } // namespace mediaserver
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

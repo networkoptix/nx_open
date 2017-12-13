@@ -1,4 +1,4 @@
-﻿#if defined(ENABLED_HANWHA)
+﻿#if defined(ENABLE_HANWHA)
 
 #include "hanwha_metadata_plugin.h"
 #include "hanwha_metadata_manager.h"
@@ -321,4 +321,4 @@ extern "C" {
 
 } // extern "C"
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)
