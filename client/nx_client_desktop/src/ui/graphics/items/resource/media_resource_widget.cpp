@@ -648,9 +648,15 @@ void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
-        setMotionSearchModeEnabled(false);
+    {
+        titleBar()->rightButtonsBar()->setButtonsChecked(
+            Qn::MotionSearchButton | Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton,
+            false);
+    }
     else
+    {
         m_areaSelectOverlayWidget->clearSelectedArea();
+    }
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
