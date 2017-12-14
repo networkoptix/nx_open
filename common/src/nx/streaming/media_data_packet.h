@@ -119,8 +119,8 @@ public:
         AUDIO,
         CONTAINER,
         META_V1,
-        GENERIC_METADATA,
-        EMPTY_DATA
+        EMPTY_DATA,
+        GENERIC_METADATA
     };
 
 public:
