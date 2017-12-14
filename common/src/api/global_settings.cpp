@@ -67,6 +67,9 @@ namespace
     const QString kRtpTimeoutMs(lit("rtpTimeoutMs"));
     const int kRtpTimeoutMsDefault(10000);
 
+    const QString kRtspClientMaxSessionDurationKey(lit("maxRtspConnectDurationSeconds"));
+    const std::chrono::seconds kRtspClientMaxSessionDurationDefault(0);
+
     const QString kCloudConnectUdpHolePunchingEnabled(lit("cloudConnectUdpHolePunchingEnabled"));
     const bool kCloudConnectUdpHolePunchingEnabledDefault = true;
 
@@ -392,6 +395,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kRtpTimeoutMsDefault,
         this);
 
+    m_maxRtspConnectDuration = new QnLexicalResourcePropertyAdaptor<int>(
+        kRtspClientMaxSessionDurationKey,
+        kRtspClientMaxSessionDurationDefault.count(),
+        this);
+
     m_cloudConnectUdpHolePunchingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kCloudConnectUdpHolePunchingEnabled,
         kCloudConnectUdpHolePunchingEnabledDefault,
@@ -457,6 +465,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
         << m_rtpFrameTimeoutMs
+        << m_maxRtspConnectDuration
         << m_cloudConnectUdpHolePunchingEnabledAdaptor
         << m_cloudConnectRelayingEnabledAdaptor
         << m_edgeRecordingEnabledAdaptor
@@ -1032,6 +1041,16 @@ int QnGlobalSettings::rtpFrameTimeoutMs() const
 void QnGlobalSettings::setRtpFrameTimeoutMs(int newValue)
 {
     m_rtpFrameTimeoutMs->setValue(newValue);
+}
+
+std::chrono::seconds QnGlobalSettings::maxRtspConnectDuration() const
+{
+    return std::chrono::seconds(m_maxRtspConnectDuration->value());
+}
+
+void QnGlobalSettings::setMaxRtspConnectDuration(std::chrono::seconds newValue)
+{
+    m_maxRtspConnectDuration->setValue(newValue.count());
 }
 
 int QnGlobalSettings::maxRecorderQueueSizeBytes() const

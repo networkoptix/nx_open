@@ -107,6 +107,8 @@ var Config = {
         proxyConnectTimeoutSec: {label: 'Proxy connection timeout (seconds)', type: 'number'},
         crossdomainEnabled: {label: 'Enable web client', type: 'checkbox'},
 
+        maxRtspConnectDurationSec: {label: 'Maximum duration for RTSP connection (seconds)', type: 'number'},
+
         statisticsReportLastNumber: {label: 'Statistics report - last number', type: 'static'},
         statisticsReportLastTime: {label: 'Statistics report - last time', type: 'static'},
         statisticsReportServerApi: {label: 'Statistics server api', type: 'text'},
