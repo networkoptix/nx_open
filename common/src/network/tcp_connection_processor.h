@@ -34,6 +34,7 @@ public:
     /**
      * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
      * \param outContentLen If Content-Length header found, saves its value to \a *outContentLen (if not null)
+     * Returns -1 if message parsing fails, 0 if message is incomplete and message size if it is comlete.
      */
     static int isFullMessage(
         const QByteArray& message,

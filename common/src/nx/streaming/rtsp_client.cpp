@@ -1567,7 +1567,21 @@ bool QnRtspClient::processTextResponseInsideBinData()
     quint8* curPtr = m_responseBuffer;
     quint8* bEnd = m_responseBuffer+m_responseBufferLen;
     for(; curPtr < bEnd && *curPtr != '$'; curPtr++);
-    if (curPtr < bEnd || QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData((const char*)m_responseBuffer, m_responseBufferLen)))
+
+    bool isReadyToProcess = curPtr < bEnd;
+    if (!isReadyToProcess)
+    {
+        const auto messageSize = QnTCPConnectionProcessor::isFullMessage(
+            QByteArray::fromRawData((const char*)m_responseBuffer, m_responseBufferLen));
+
+        if (messageSize < 0)
+            return false;
+
+        if (messageSize > 0)
+            isReadyToProcess = true;
+    }
+
+    if (isReadyToProcess)
     {
         QByteArray textResponse;
         textResponse.append((const char*) m_responseBuffer, curPtr - m_responseBuffer);
@@ -1578,6 +1592,7 @@ bool QnRtspClient::processTextResponseInsideBinData()
             parseRangeHeader(tmp);
         emit gotTextResponse(textResponse);
     }
+
     return true;
 }
 
@@ -1740,6 +1755,9 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
         else {
             // text data
             int msgLen = QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData((const char*)m_responseBuffer, m_responseBufferLen));
+            if (msgLen < 0)
+                return false;
+
             if (msgLen > 0)
             {
                 response = QByteArray((const char*) m_responseBuffer, msgLen);

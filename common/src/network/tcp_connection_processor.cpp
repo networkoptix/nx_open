@@ -110,15 +110,24 @@ int QnTCPConnectionProcessor::isFullMessage(
             else if (lRequest[i] == '\n' || lRequest[i] == '\r')
                 break;
         }
+
+        bool isOk = false;
         if (posStart >= 0)
-            contentLen = lRequest.mid(posStart, posEnd - posStart+1).toInt();
+            contentLen = lRequest.mid(posStart, posEnd - posStart+1).toInt(&isOk);
+
+        if (!isOk || contentLen < 0)
+            return -1;
     }
 
     QByteArray dblDelim = delimiter + delimiter;
     const int dblDelimPos = message.indexOf(dblDelim);
     if (dblDelimPos == -1)
         return 0;
+
     const int expectedSize = dblDelimPos + dblDelim.size() + contentLen;
+    if (expectedSize < dblDelimPos + dblDelim.size())
+        return -1;
+
     if( fullMessageSize )
         *fullMessageSize = expectedSize;
     if (expectedSize > message.size())
@@ -379,7 +388,11 @@ bool QnTCPConnectionProcessor::readRequest()
         {
             //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (isFullMessage(d->clientRequest, &fullHttpMessageSize))
+            const auto messageSize = isFullMessage(d->clientRequest, &fullHttpMessageSize);
+            if (messageSize < 0)
+                return false;
+
+            if (messageSize)
             {
                 NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
                     arg(d->socket->getForeignAddress().toString()).

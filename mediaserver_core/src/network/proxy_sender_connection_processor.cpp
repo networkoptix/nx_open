@@ -69,7 +69,12 @@ QByteArray QnProxySenderConnection::readProxyResponse()
             return QByteArray();
         bufLen += bytesRead;
         QByteArray result = QByteArray::fromRawData((const char*) buffer, (int) bufLen);
-        if (QnTCPConnectionProcessor::isFullMessage(result))
+
+        const auto messageSize = QnTCPConnectionProcessor::isFullMessage(result);
+        if (messageSize < 0)
+            return QByteArray();
+
+        if (messageSize > 0)
             return result;
     }
 

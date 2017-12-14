@@ -559,7 +559,11 @@ void QnProxyConnectionProcessor::doSmartProxy()
             someBytesRead1 = true;
 
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (isFullMessage(d->clientRequest))
+            const auto messageSize = isFullMessage(d->clientRequest);
+            if (messageSize < 0)
+                return;
+
+            if (messageSize > 0)
             {
                 parseRequest();
                 QString path = d->request.requestLine.url.path();
