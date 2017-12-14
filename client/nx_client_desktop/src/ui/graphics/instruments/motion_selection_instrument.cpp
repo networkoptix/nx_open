@@ -51,6 +51,12 @@ bool blocksMotionSelection(QGraphicsItem* item)
     return false;
 }
 
+// Auto-start drag by timer must be disabled.
+static constexpr int kStartDragTimeMs = -1;
+
+// Drag must be started as early as possible when we can distinguish move from click.
+static constexpr int kStartDragDistance = 5;
+
 } // namespace
 
 
@@ -69,7 +75,8 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     m_pen = item->pen();
     m_brush = item->brush();
 
-    dragProcessor()->setStartDragTime(0);
+    dragProcessor()->setStartDragTime(kStartDragTimeMs);
+    dragProcessor()->setStartDragDistance(kStartDragDistance);
 }
 
 MotionSelectionInstrument::~MotionSelectionInstrument()
@@ -280,6 +287,9 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
     setItemUnderMouse(item);
 
     updateButtonUnderCursor(viewport, event);
+
+    if (m_widget)
+        dragProcessor()->mouseMoveEvent(viewport, event);
 
     // Make sure selection will not stop while we are dragging over widget.
     const bool isDrag = dragProcessor()->isRunning() && event->buttons().testFlag(Qt::LeftButton);
