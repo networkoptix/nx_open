@@ -57,6 +57,7 @@ void HanwhaMetadataMonitor::stopMonitoring()
             if (m_httpClient)
                 m_httpClient->pleaseStopSync();
 
+            m_timer.pleaseStopSync();
             promise.set_value();
         });
 

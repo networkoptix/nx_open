@@ -165,12 +165,18 @@ namespace QnXmlTag {
     const QString paramNotes            = lit("notes");
     const QString paramUnit             = lit("unit");
     const QString paramResync           = lit("resync");
+    const QString paramDefaultValue     = lit("defaultValue");
+    const QString paramShouldKeepInitialValue = lit("shouldKeepInitialValue");
+    const QString paramBindDefaultToMinimum = lit("bindDefaultToMinimum");
 
-    const QString dependenciesRoot      = lit("dependencies");
-    const QString dependenciesShow      = lit("dependencies-ranges");
-    const QString conditionalShow       = lit("conditional-show");
-    const QString dependenciesRanges    = lit("dependencies-ranges");
-    const QString conditionalRange      = lit("conditional-range");
+    const QString dependenciesRoot          = lit("dependencies");
+    const QString dependenciesShow          = lit("dependencies-ranges");
+    const QString dependenciesRanges        = lit("dependencies-ranges");
+    const QString dependenciesTrigger       = lit("dependencies-trigger");
+
+    const QString conditionalShow           = lit("conditional-show");
+    const QString conditionalRange          = lit("conditional-range");
+    const QString conditionalTrigger        = lit("conditional-triggger");
 
     const QString dependencyId          = lit("id");
     const QString conditionId           = lit("id");
@@ -267,6 +273,11 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementX
     param.notes = elementXml.attribute(QnXmlTag::paramNotes);
     param.unit = elementXml.attribute(QnXmlTag::paramUnit);
     param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
+    param.shouldKeepInitialValue = parseBooleanXmlValue(
+        elementXml.attribute(QnXmlTag::paramShouldKeepInitialValue));
+
+    param.bindDefaultToMinimum = parseBooleanXmlValue(
+        elementXml.attribute(QnXmlTag::paramBindDefaultToMinimum));
 
     auto childNodes = elementXml.childNodes();
 
@@ -337,6 +348,10 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
             dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = depNode.attribute(QnXmlTag::paramRange);
             dependency.internalRange = depNode.attribute(QnXmlTag::paramInternalRange);
+        }
+        else if (depNode.nodeName() == QnXmlTag::conditionalTrigger)
+        {
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::trigger;
         }
 
         dependency.id = depNode.attribute(QnXmlTag::dependencyId);

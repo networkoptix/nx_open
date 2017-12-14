@@ -285,7 +285,9 @@
                         dataType="Number"
                         writeCmd="update"
                         unit="Kbit/s"
-                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true">
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
+                        shouldKeepInitialValue="true"
+                        bindDefaultToMinimum="true">
                 </param>
 
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"

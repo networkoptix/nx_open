@@ -28,7 +28,13 @@ QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const Q
     setLayout(m_layout);
 }
 
-class QnBoolCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
+void QnAbstractCameraAdvancedParamWidget::setRange(const QString& /*range*/)
+{
+    NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
+}
+
+class QnBoolCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget
+{
 public:
     QnBoolCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
         QnAbstractCameraAdvancedParamWidget(parameter, parent),

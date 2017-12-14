@@ -21,6 +21,7 @@ public:
 	void loadValues(const QnCameraAdvancedParamValueList &params);
 
 	void clear();
+
 signals:
 	void paramValueChanged(const QString &id, const QString &value);
 
@@ -57,6 +58,9 @@ private:
 	QStackedWidget* m_contentsWidget;
 	QHash<QString, QnAbstractCameraAdvancedParamWidget*> m_paramWidgetsById;
     QHash<QString, QWidget*> m_paramLabelsById;
+    QMap<QString, QVector<std::function<void()>>> m_handlerChains;
+    QHash<QString, QnCameraAdvancedParameter> m_parametersById;
+    QVector<QMetaObject::Connection> m_handlerChainConnections;
 };
 
 #endif //QN_CAMERA_ADVANCED_PARAM_WIDGETS_MANAGER_H
