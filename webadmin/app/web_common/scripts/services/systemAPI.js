@@ -319,14 +319,14 @@ angular.module('nxCommon')
             }
             return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet(), true);
         };
-        ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
+        ServerConnection.prototype.webmUrl = function(cameraId, position, resolution, force){
             var data = {
                 resolution:resolution
             };
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/media/' + cleanId(cameraId) + '.webm?rt' , data, this.authGet());
+            return this._setGetParams('/media/' + cleanId(cameraId) + '.webm?rt' , data, this.authGet(), force);
         };
         /* End of formatting urls */
 

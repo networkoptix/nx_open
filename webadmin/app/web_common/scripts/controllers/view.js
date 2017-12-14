@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
+            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast',
             ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', '$q',
               'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
+    function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast,
     function ($scope, $rootScope, $location, $routeParams, cameraRecords, $q,
               camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
@@ -32,6 +34,14 @@ angular.module('nxCommon').controller('ViewCtrl',
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
+
+        var castAlert = false;
+        $scope.showWarning = function(){
+            if(!castAlert){
+                alert(L.common.chromeCastWarning);
+                castAlert = true;
+            }
+        };
 
         $scope.positionProvider = null;
         $scope.activeVideoRecords = null;
@@ -238,6 +248,27 @@ angular.module('nxCommon').controller('ViewCtrl',
             });
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
+
+            if(Config.allowCastMode || $scope.debugMode){
+                var streamInfo = {};
+                var streamType = "webm";
+
+                if($scope.debugMode){
+                    streamType = $scope.player == "webm" ? "webm" : "hls";
+                }
+
+                streamInfo.src = streamType == "webm" ? systemAPI.webmUrl(cameraId, !live && playingPosition, resolution, true)
+                                                         : systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls);
+                streamInfo.title = $scope.activeCamera.name;
+
+                if(cameraSupports(streamType) || $scope.debugMode){
+                    $scope.showCastButton = true;
+                    chromeCast.load(streamInfo, streamType);
+                }
+                else{
+                    $scope.showCastButton = false;
+                }
+            }
         }
 
 
