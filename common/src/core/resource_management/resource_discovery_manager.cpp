@@ -561,16 +561,23 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
         return QnNetworkResourcePtr();
 
     const auto& resPool = netRes->commonModule()->resourcePool();
-    auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
-    if (existResource)
-        return existResource;
+    auto existRes = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
+    if (existRes)
+    {
+        bool sameIp = existRes->getHostAddress() == netRes->getHostAddress();
+        return sameIp ? existRes : QnVirtualCameraResourcePtr();
+    }
 
     for (const auto& existRes: resPool->getResources<QnVirtualCameraResource>())
     {
         bool sameChannels = netRes->getChannel() == existRes->getChannel();
         bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
+        bool sameIp = existRes->getHostAddress() == netRes->getHostAddress();
         if (sameChannels && sameMACs)
-            return existRes;
+        {
+            bool sameIp = existRes->getHostAddress() == netRes->getHostAddress();
+            return sameIp ? existRes : QnVirtualCameraResourcePtr();
+        }
     }
 
     return QnNetworkResourcePtr();
