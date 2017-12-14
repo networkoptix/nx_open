@@ -999,7 +999,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
     </message>
   </context>
   <context>
@@ -3148,7 +3148,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>システム管理者に依頼してください</translation>
     </message>
   </context>
   <context>
@@ -3394,7 +3394,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>ベーシック</translation>
     </message>
   </context>
   <context>
@@ -4421,8 +4421,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>全ての %n カメラに設定</numerusform>
       </translation>
     </message>
   </context>
@@ -6041,7 +6041,7 @@ to %1</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>このカメラに設定</translation>
     </message>
   </context>
   <context>
@@ -7663,7 +7663,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>データはエクスポートされませんでした</translation>
     </message>
   </context>
   <context>
@@ -8423,7 +8423,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>%2 カメラの %1 のパスワードを変更できませんでした</translation>
     </message>
   </context>
   <context>
