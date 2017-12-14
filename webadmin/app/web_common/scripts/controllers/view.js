@@ -1,11 +1,9 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
-            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast',
-            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', '$q',
+            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
               'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
-    function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast,
-    function ($scope, $rootScope, $location, $routeParams, cameraRecords, $q,
+    function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
               camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
         var channels = {
