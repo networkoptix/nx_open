@@ -1223,6 +1223,7 @@ void socketAcceptCancelSync(
     const ServerSocketMaker& serverMaker, StopType stopType)
 {
     auto server = serverMaker();
+    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count()));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));

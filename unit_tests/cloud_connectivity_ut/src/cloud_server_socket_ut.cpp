@@ -51,7 +51,7 @@ public:
 
     ~FakeTcpTunnelConnection()
     {
-        m_addressManager.remove(m_server->getLocalAddress());
+        stopWhileInAioThread();
         NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
     }
 
@@ -87,6 +87,8 @@ private:
 
     virtual void stopWhileInAioThread() override
     {
+        if (m_server)
+            m_addressManager.remove(m_server->getLocalAddress());
         m_server.reset();
     }
 
