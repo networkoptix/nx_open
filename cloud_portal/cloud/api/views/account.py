@@ -40,12 +40,20 @@ def register(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def login(request):
-    # authorize user here
-    # return user
-    require_params(request, ('email', 'password'))
-    email = request.data['email'].lower()
-    password = request.data['password']
-    user = django.contrib.auth.authenticate(username=email, password=password)
+    user = None
+    if 'login' in request.session and 'password' in request.session:
+        email = request.session['login']
+        password = request.session['password']
+        user = django.contrib.auth.authenticate(username=email, password=password)
+
+    if user is None:
+        # authorize user here
+        # return user
+        require_params(request, ('email', 'password'))
+        email = request.data['email'].lower()
+        password = request.data['password']
+        user = django.contrib.auth.authenticate(username=email, password=password)
+
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
