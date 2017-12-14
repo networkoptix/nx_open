@@ -130,10 +130,10 @@ int showIds()
 void setupIds()
 {
     if (setreuid(geteuid(), geteuid()) != 0)
-        throw std::runtime_error("setreuid has filed");
+        throw std::runtime_error("setreuid has failed");
 
     if (setregid(getegid(), getegid()) != 0)
-        throw std::runtime_error("setregid has filed");
+        throw std::runtime_error("setregid has failed");
 }
 
 } // namespace root_tool
