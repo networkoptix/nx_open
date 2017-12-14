@@ -121,7 +121,7 @@ TimelineActions.prototype.animateScroll = function(targetPosition, linear){
     this.scope.scrollTarget = this.scaleManager.scroll();
     self.delayWatchingPlayingPosition();
     self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':'dryResistance',
-            linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration * 2).
+            linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration).
         then(
         function(){
             self.scrollingNow = false;
