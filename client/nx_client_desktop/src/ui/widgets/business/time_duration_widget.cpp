@@ -19,25 +19,25 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
     ui->setupUi(this);
     ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kSeconds);
 
-    connect(ui->periodComboBox, QnComboboxCurrentIndexChanged, this, 
+    connect(ui->periodComboBox, QnComboboxCurrentIndexChanged, this,
         [this]
         {
             updateMinimumValue();
             emit valueChanged();
         });
 
-    connect(ui->valueSpinBox, QnSpinboxIntValueChanged, this, 
-        [this](int value) 
+    connect(ui->valueSpinBox, QnSpinboxIntValueChanged, this,
+        [this](int value)
         {
-            if (value == 0) 
+            if (value == 0)
             {
                 int index = ui->periodComboBox->currentIndex();
                 NX_ASSERT(index > 0, "Invalid minimum value for the minimal period.");
-                if (index == 0) 
+                if (index == 0)
                 {
                     ui->valueSpinBox->setValue(1);
-                } 
-                else 
+                }
+                else
                 {
                     {
                         QSignalBlocker blocker(ui->periodComboBox);
@@ -89,7 +89,7 @@ void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
 
 void TimeDurationWidget::setValue(int secs)
 {
-    if (secs > 0) 
+    if (secs > 0)
     {
         int idx = 0;
         while (idx < ui->periodComboBox->count() - 1
