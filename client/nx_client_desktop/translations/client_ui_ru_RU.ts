@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Тип аутентификации</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Тип запроса</translation>
     </message>
   </context>
   <context>
@@ -2648,7 +2648,7 @@
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Производитель:</translation>
+      <translation>Производитель</translation>
     </message>
     <message>
       <location/>

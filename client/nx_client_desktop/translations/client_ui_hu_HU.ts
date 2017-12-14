@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Hitelesítés típusa</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Kérelem típusa</translation>
     </message>
   </context>
   <context>
@@ -1082,7 +1082,7 @@
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Legyen csak olvasható</translation>
     </message>
   </context>
   <context>
@@ -1090,22 +1090,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Beállítások exportálása</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Szűrők alkalmazása</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Forgatás, dewarping, kép javítása stb...</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>A kiválasztott szűrők alkalmazása átkódolást igényel. Ez növeli a CPU használatát, a művelet hosszabb időt vehet igénybe.</translation>
     </message>
   </context>
   <context>
@@ -1141,22 +1141,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Video exportálás</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Egyetlen kamera</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Beállítások exportálása</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multi-videó</translation>
     </message>
   </context>
   <context>
@@ -1334,12 +1334,12 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Áttetszőség</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Alapértelmezett</translation>
     </message>
     <message>
       <location/>
@@ -2280,12 +2280,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Kezdeti videóhossz</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Exportált videóhossz</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Frame időköz</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Sebesség visszaállítása</translation>
     </message>
   </context>
   <context>
@@ -2961,7 +2961,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Szöveg</translation>
     </message>
     <message>
       <location/>
@@ -2971,17 +2971,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Betűméret</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Adjon meg sima szöveget vagy HTML-t</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Terület szélesség</translation>
     </message>
   </context>
   <context>
@@ -3007,7 +3007,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Betűméret</translation>
     </message>
     <message>
       <location/>

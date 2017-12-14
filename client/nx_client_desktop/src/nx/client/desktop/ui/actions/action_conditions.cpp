@@ -765,25 +765,33 @@ ExportCondition::ExportCondition(bool centralItemRequired):
 
 ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
-    if (!parameters.hasArgument(Qn::TimePeriodRole))
-        return InvisibleAction;
+    const bool hasBookmark = parameters.hasArgument(Qn::CameraBookmarkRole);
+    const bool hasPeriod = parameters.hasArgument(Qn::TimePeriodRole);
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    QnTimePeriod period;
+    QnResourcePtr resource;
+    if (hasBookmark)
+    {
+        const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+        resource = context->resourcePool()->getResourceById(bookmark.cameraId);
+        period = QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);
+    }
+    else if (hasPeriod)
+    {
+        resource = parameters.resource();
+        period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    }
+    else
+    {
+        return InvisibleAction;
+    }
+
     if (periodType(period) != NormalTimePeriod)
         return DisabledAction;
 
     // Export selection
     if (m_centralItemRequired)
     {
-        auto resource = parameters.resource();
-
-        const bool hasBookmark = parameters.hasArgument(Qn::CameraBookmarkRole);
-        if (hasBookmark)
-        {
-            const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
-            resource = context->resourcePool()->getResourceById(bookmark.cameraId);
-        }
-
         if (!resource.dynamicCast<QnMediaResource>())
             return InvisibleAction;
 
