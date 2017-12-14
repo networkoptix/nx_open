@@ -279,7 +279,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
         if (!context.isManagerInitialized())
             createMetadataManagersForResourceUnsafe(camera);
         auto events = qnServerModule->metadataRuleWatcher()->watchedEventsForResource(resourceId);
-        fetchMetadataForResourceUnsafe(context, events);
+        fetchMetadataForResourceUnsafe(resourceId, context, events);
     }
     else
     {
@@ -303,7 +303,7 @@ bool ManagerPool::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
             .args(
                 flags.testFlag(Qn::foreigner),
                 flags.testFlag(Qn::desktop_camera),
-                (status == Qn::Online || status == Qn::Recording)));
+                (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording)));
 
     if (flags.testFlag(Qn::foreigner) || flags.testFlag(Qn::desktop_camera))
         return false;
@@ -311,7 +311,10 @@ bool ManagerPool::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
     return camera->getStatus() >= Qn::Online;
 }
 
-void ManagerPool::fetchMetadataForResourceUnsafe(ResourceMetadataContext& context, QSet<QnUuid>& eventTypeIds)
+void ManagerPool::fetchMetadataForResourceUnsafe(
+    const QnUuid& resourceId,
+    ResourceMetadataContext& context,
+    QSet<QnUuid>& eventTypeIds)
 {
     for (auto& data: context.managers())
     {

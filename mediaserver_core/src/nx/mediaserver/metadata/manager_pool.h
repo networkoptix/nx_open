@@ -79,7 +79,10 @@ private:
 
     bool isCameraAlive(const QnSecurityCamResourcePtr& camera) const;
 
-    void fetchMetadataForResourceUnsafe(ResourceMetadataContext& context, QSet<QnUuid>& eventTypeIds);
+    void fetchMetadataForResourceUnsafe(
+        const QnUuid& resourceId,
+        ResourceMetadataContext& context, 
+        QSet<QnUuid>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const
