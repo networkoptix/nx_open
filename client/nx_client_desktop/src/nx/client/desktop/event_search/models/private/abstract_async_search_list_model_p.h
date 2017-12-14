@@ -7,9 +7,6 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 
-class QTimer;
-class QnUuid;
-
 namespace nx {
 namespace client {
 namespace desktop {
