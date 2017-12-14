@@ -36,6 +36,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.positionProvider = null;
         $scope.activeVideoRecords = null;
         $scope.activeCamera = null;
+        $scope.player = null;
 
         $scope.showCameraPanel = true;
 
@@ -390,8 +391,12 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         //timeFromUrl is used if we have a time from the url if not then set to false
         var timeFromUrl = $routeParams.time || null;
-        $scope.$watch('activeCamera', function(){
+        $scope.$watch('activeCamera', function(prevCamera, newCamera){
+            if(prevCamera == newCamera){
+                return;
+            }
             if(!$scope.activeCamera){
+                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
                 return;
             }
             $scope.player = null;
@@ -401,6 +406,13 @@ angular.module('nxCommon').controller('ViewCtrl',
             timeFromUrl = timeFromUrl || null;
             $scope.updateCamera(timeFromUrl);
             timeFromUrl = null;
+
+            //When camera is changed request offset for camera
+            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
+            if(serverOffset){
+                timeManager.setOffset(serverOffset);
+            }
+            $scope.showCameraPanel = !$scope.activeCamera;
         });
 
         $scope.$watch('player', function(){
@@ -420,24 +432,6 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         timeManager.init(Config.webclient.useServerTime);
 
-        //if camera doesnt exist get from camerasProvider
-        function setActiveCamera(camera){
-            $scope.activeCamera = camera;
-            if(!$scope.activeCamera){
-                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
-            }
-
-            // User server time offset of current server (server camera belongs to)
-            if($scope.activeCamera){
-                var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-                if(serverOffset){
-                    timeManager.setOffset(serverOffset);
-                }
-            }
-
-            $scope.showCameraPanel = !$scope.activeCamera;
-        }
-
         systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
             $scope.canViewArchive = result;
             return $scope.camerasProvider.requestResources();
@@ -445,8 +439,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             // instead of requesting gettime once - we request it for all servers to know each timezone
             return $scope.camerasProvider.getServerTimes();
         }).then(function(){
-            setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
-
+            $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
             $scope.ready = true;
             $timeout(updateHeights);
             $scope.camerasProvider.startPoll();
@@ -505,7 +498,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
 
-            setActiveCamera($scope.camerasProvider.getCamera(next.params.cameraId));
+            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
         });
 
         $('html').addClass('webclient-page');
