@@ -19,7 +19,7 @@ static const nxpl::NX_GUID kLineCrossingEventGuid
 static const nxpl::NX_GUID kObjectInTheAreaEventGuid
     = {{0xB0, 0xE6, 0x40, 0x44, 0xFF, 0xA3, 0x4B, 0x7F, 0x80, 0x7A, 0x06, 0x0C, 0x1F, 0xE5, 0xA0, 0x4C}};
 
-} // namespace 
+} // namespace
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
@@ -49,7 +49,7 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    
+
     stopFetchingMetadataUnsafe();
     m_handler = handler;
 
@@ -91,7 +91,7 @@ const char* StubMetadataManager::capabilitiesManifest(Error* error) const
 StubMetadataManager::~StubMetadataManager()
 {
     stopFetchingMetadata();
-    std::cout << "Destroying metadata manager!" << (uintptr_t)this;
+    std::cout << "Destroying metadata manager!" << (uintptr_t)this << std::endl;
 }
 
 
@@ -128,11 +128,11 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     detectedEvent->setIsActive(m_counter == 1);
     detectedEvent->setEventTypeId(m_eventTypeId);
 
-    std::cout << "#### Firing event!!!! " 
+    std::cout << "#### Firing event!!!! "
         << "Type: " << (m_eventTypeId == kLineCrossingEventGuid ? "Line crossing" :  "Object detection") << " "
         << "Is active: " << (m_counter == 1) << " "
-        << m_counter 
-        << std::endl; 
+        << m_counter
+        << std::endl;
 
 
     auto eventPacket = new CommonEventMetadataPacket();
