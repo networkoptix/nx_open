@@ -1,4 +1,5 @@
 #include "plugin_internal_tools.h"
+#include <nx/utils/log/log.h>
 
 #ifdef Q_OS_WIN
 #include <WinSock2.h>
@@ -39,3 +40,23 @@ nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
 }
 
 } // namespace nxpt
+
+namespace nx {
+namespace sdk {
+
+QString toString(const nx::sdk::ResourceInfo& resourceInfo)
+{
+    return lm(
+        "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
+        .args(
+            resourceInfo.vendor,
+            resourceInfo.model,
+            resourceInfo.firmware,
+            resourceInfo.uid,
+            resourceInfo.sharedId,
+            resourceInfo.url,
+            resourceInfo.channel).toQString();
+}
+
+} // namespace sdk
+} // namespace nx

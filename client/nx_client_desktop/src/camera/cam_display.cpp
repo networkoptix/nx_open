@@ -1229,6 +1229,40 @@ void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
         m_timeMutex.unlock();
 }
 
+void QnCamDisplay::processFillerPacket(
+    qint64 timestampUs,
+    QnAbstractStreamDataProvider* dataProvider,
+    QnAbstractMediaData::MediaFlags flags)
+{
+    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+    m_emptyPacketCounter++;
+    // empty data signal about EOF, or read/network error. So, check counter before EOF signaling
+    //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
+    bool isFillerPacket = timestampUs > 0 && timestampUs < DATETIME_NOW;
+    if (m_emptyPacketCounter >= 3 || isFillerPacket)
+    {
+        bool isLive = flags & QnAbstractMediaData::MediaFlags_LIVE;
+        if (m_extTimeSrc &&
+            !isLive &&
+            isVideoCamera &&
+            !m_eofSignalSended &&
+            !isFillerPacket &&
+            (!m_lastMediaEventTimeout.isValid() ||
+                m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay)))
+        {
+            m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+            m_eofSignalSended = true;
+        }
+
+        moveTimestampTo(timestampUs);
+    }
+    else {
+        QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(dataProvider);
+        if (archive && archive->isSingleShotMode())
+            archive->needMoreData();
+    }
+}
+
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
@@ -1268,10 +1302,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
 
     float speed = m_speed;
-    bool speedIsNegative = speed < 0;
-    bool dataIsNegative = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
-    if (speedIsNegative != dataIsNegative)
-        return true; // skip data
+    if (media->dataType != QnAbstractMediaData::GENERIC_METADATA)
+    {
+        bool speedIsNegative = speed < 0;
+        bool dataIsNegative = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
+        if (speedIsNegative != dataIsNegative)
+            return true; // skip data
+    }
 
     if (m_prevSpeed != speed || m_executingChangeSpeed)
     {
@@ -1338,8 +1375,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 QString::fromLatin1(data));
 
             m_lastMediaEvent = mediaEvent;
-            m_lastMediaEventTimeout.restart();
-            moveTimestampTo(m_speed >= 0 ? DATETIME_NOW : 0);
+            if (!m_lastMediaEventTimeout.isValid())
+                m_lastMediaEventTimeout.restart();
+
+            processFillerPacket(
+                m_speed >= 0 ? DATETIME_NOW : 0,
+                metadata->dataProvider,
+                QnAbstractMediaData::MediaFlags_None);
         }
         else
         {
@@ -1416,41 +1458,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             // in that case MediaFlags_AfterEOF is set and we should process the packet normally.
             return true;
         }
-
-        m_emptyPacketCounter++;
-        // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
-        bool isFillerPacket =  emptyData->timestamp > 0 && emptyData->timestamp < DATETIME_NOW;
-        if (m_emptyPacketCounter >= 3 || isFillerPacket)
-        {
-            bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            if (m_extTimeSrc &&
-                !isLive &&
-                isVideoCamera &&
-                !m_eofSignalSended &&
-                !isFillerPacket &&
-                (!m_lastMediaEventTimeout.isValid() ||
-                  m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay)))
-            {
-                m_extTimeSrc->onEofReached(this, true); // jump to live if needed
-                m_eofSignalSended = true;
-            }
-
-            /*
-            // One camera from several sync cameras may reach BOF/EOF
-            // move current time position to the edge to prevent other cameras blocking
-            m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
-            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                m_display[i]->overrideTimestampOfNextFrameToRender(m_lastDecodedTime);
-            }
-            */
-            moveTimestampTo(emptyData->timestamp);
-        }
-        else {
-            QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(emptyData->dataProvider);
-            if (archive && archive->isSingleShotMode())
-                archive->needMoreData();
-        }
+        processFillerPacket(emptyData->timestamp, emptyData->dataProvider, emptyData->flags);
         return true;
     }
     else

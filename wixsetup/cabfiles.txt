@@ -71,7 +71,7 @@ Client cab files:
         applauncher.exe
         client.exe
         launcherVersionFile
-        
+
 Server cab files:
     1: srvmisc.cab:
         -
@@ -89,4 +89,4 @@ Server cab files:
         VmaxProxyPid
     11: srvexec.cab: Server Executables
         mediaserver.exe
-        
+

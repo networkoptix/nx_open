@@ -3,22 +3,45 @@
 import argparse
 import fnmatch
 import os
-import sys
 import zipfile
+import yaml
 
-common_qt_libraries = ['Core', 'Gui']
-client_qt_libraries = ['Multimedia', 'Network', 'Xml', 'XmlPatterns', 'Concurrent',
-    'Sql', 'Widgets', 'OpenGL', 'WebChannel', 'PrintSupport', 'MultimediaWidgets',
-    'MultimediaQuick_p', 'Qml', 'Quick', 'QuickWidgets', 'LabsTemplates', 'WebKit',
+common_qt_libraries = [
+    'Core',
+    'Gui']
+
+client_qt_libraries = [
+    'Multimedia',
+    'Network',
+    'Xml',
+    'XmlPatterns',
+    'Concurrent',
+    'Sql',
+    'Widgets',
+    'OpenGL',
+    'WebChannel',
+    'PrintSupport',
+    'MultimediaWidgets',
+    'MultimediaQuick_p',
+    'Qml',
+    'Quick',
+    'QuickWidgets',
+    'LabsTemplates',
+    'WebKit',
     'WebKitWidgets']
 
-client_qt_plugins = ['imageformats/qgif.dll', 'imageformats/qjpeg.dll', 'imageformats/qtiff.dll',
-    'mediaservice/dsengine.dll', 'mediaservice/qtmedia_audioengine.dll',
+client_qt_plugins = [
+    'imageformats/qgif.dll',
+    'imageformats/qjpeg.dll',
+    'imageformats/qtiff.dll',
+    'mediaservice/dsengine.dll',
+    'mediaservice/qtmedia_audioengine.dll',
     'audio/qtaudio_windows.dll',
     'platforms/qwindows.dll']
 
 common_nx_libraries = ['nx_utils', 'nx_network', 'nx_kit', 'udt']
 client_nx_libraries = ['nx_vms_utils']
+
 
 def find_files_by_template(dir, template):
     for file in fnmatch.filter(os.listdir(dir), template):
@@ -32,7 +55,13 @@ def find_all_files(dir):
 
 
 def ffmpeg_files(source_dir):
-    templates = ['av*.dll', 'libogg*.dll', 'libvorbis*.dll', 'libmp3*.dll', 'swscale-*.dll', 'swresample-*.dll']
+    templates = [
+        'av*.dll',
+        'libogg*.dll',
+        'libvorbis*.dll',
+        'libmp3*.dll',
+        'swscale-*.dll',
+        'swresample-*.dll']
     for template in templates:
         for file in find_files_by_template(source_dir, template):
             yield file
@@ -50,14 +79,14 @@ def openal_files(source_dir):
 def quazip_files(source_dir):
     yield os.path.join(source_dir, 'quazip.dll')
 
+
 '''
-        <?if $(var.quicksync) = true ?>
-        <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
-                                    <File Id="quicksyncdecoder.dll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
-        <File Id="hw_decoding_conf.xml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
-                            </ComponentGroup>
-        <?endif?>
+<?if $(var.quicksync) = true ?>
+<File Id="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
+<File Id="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
+<?endif?>
 '''
+
 
 def icu_files(qt_bin_dir):
     for file in find_files_by_template(qt_bin_dir, 'icu*.dll'):
@@ -79,23 +108,29 @@ def nx_files(source_dir, libs):
         yield os.path.join(source_dir, '{}.dll'.format(lib))
 
 
-def zip_files(zip, files, rel_path, target_path = '.'):
+def zip_files(zip, files, rel_path, target_path='.'):
     for file in files:
         zip.write(file, os.path.join(target_path, os.path.relpath(file, rel_path)))
+
+
+def zip_package(zip, package_directory):
+    bin_directory = os.path.join(package_directory, 'bin')
+    zip_files(zip, find_all_files(bin_directory), bin_directory)
 
 
 def create_client_update_file(
     binaries_dir,
     qt_dir,
-    redist_dir,
+    vcredist_directory,
     vox_dir,
     fonts_dir,
     client_qml_dir,
+    help_directory,
     client_binary_name,
     launcher_version_name,
     minilauncher_binary_name,
     client_update_file
-    ):
+):
     with zipfile.ZipFile(client_update_file, "w", zipfile.ZIP_DEFLATED) as zip:
         zip_files(zip, ffmpeg_files(binaries_dir), binaries_dir)
         zip_files(zip, openssl_files(binaries_dir), binaries_dir)
@@ -113,14 +148,10 @@ def create_client_update_file(
         qt_plugins_dir = os.path.join(qt_dir, 'plugins')
         zip_files(zip, qt_plugins_files(qt_plugins_dir), qt_plugins_dir)
 
-        redist_bin_dir = os.path.join(redist_dir, 'bin')
-        zip_files(zip, find_all_files(redist_bin_dir), redist_bin_dir)
-
-        vox_bin_dir = os.path.join(vox_dir, 'bin')
-        zip_files(zip, find_all_files(vox_bin_dir), vox_bin_dir)
-
-        fonts_bin_dir = os.path.join(fonts_dir, 'bin')
-        zip_files(zip, find_all_files(fonts_bin_dir), fonts_bin_dir)
+        zip_package(zip, help_directory)
+        zip_package(zip, vcredist_directory)
+        zip_package(zip, vox_dir)
+        zip_package(zip, fonts_dir)
 
         zip.write(os.path.join(binaries_dir, 'desktop_client.exe'), client_binary_name + '.exe')
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')
@@ -130,33 +161,28 @@ def create_client_update_file(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--binaries', help="Compiled binaries directory", required=True)
-    parser.add_argument('--qt', help="Qt directory", required=True)
-    parser.add_argument('--redist', help="MSVC Redistributable directory", required=True)
-    parser.add_argument('--vox', help="Festival vox directory", required=True)
-    parser.add_argument('--fonts', help="Fonts directory", required=True)
-    parser.add_argument('--client-qml', help="Client QML directory", required=True)
-    parser.add_argument('--client-update', help="Client package distribution name", required=True)
-    parser.add_argument('--client-binary-name', help="Client binary name", required=True)
-    parser.add_argument('--launcher-version', help="Launcher version file name", required=True)
-    parser.add_argument('--minilauncher-binary-name', help="Minilauncher binary name", required=True)
+    parser.add_argument('--config', help="Config file", required=True)
     parser.add_argument('--output', help="Output directory", required=True)
     args = parser.parse_args()
 
-    client_update_file = os.path.join(args.output, args.client_update) + '.zip'
+    with open(args.config, 'r') as f:
+        config = yaml.load(f)
+
+    client_update_file = os.path.join(
+        args.output, config['client_update_distribution_name']) + '.zip'
     create_client_update_file(
-        args.binaries,
-        args.qt,
-        args.redist,
-        args.vox,
-        args.fonts,
-        args.client_qml,
-        args.client_binary_name,
-        args.launcher_version,
-        args.minilauncher_binary_name,
-        client_update_file)
+        binaries_dir=config['bin_source_dir'],
+        qt_dir=config['qt_directory'],
+        vcredist_directory=config['vcredist_directory'],
+        vox_dir=config['festival_vox_directory'],
+        fonts_dir=config['fonts_directory'],
+        client_qml_dir=config['client_qml_dir'],
+        help_directory=config['help_directory'],
+        client_binary_name=config['client_binary_name'],
+        launcher_version_name=config['launcher_version_file'],
+        minilauncher_binary_name=config['minilauncher_binary_name'],
+        client_update_file=client_update_file)
 
 
 if __name__ == '__main__':
     main()
-

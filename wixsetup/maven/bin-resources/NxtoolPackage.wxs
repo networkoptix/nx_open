@@ -5,7 +5,7 @@
             <MsiPackage
                 Id="NxtoolPackage"
                 Name="$(var.NxtoolMsiName)"
-                SourceFile="$(var.InstallerTargetDir)/$(var.NxtoolMsiName)"
+                SourceFile="$(var.NxToolMsiFile)"
                 Vital="yes"
                 Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />

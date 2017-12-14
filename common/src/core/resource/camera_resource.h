@@ -58,7 +58,7 @@ private:
 
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
-const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 360);
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource

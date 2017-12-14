@@ -1000,7 +1000,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Le fichier .EXE exporté aura une taille supérieure à 4 Go et ne pourra pas être ouvert en double-cliquant par Windows. Il peut être joué que dans %1 Client.</translation>
     </message>
   </context>
   <context>
@@ -3437,7 +3437,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>De base</translation>
     </message>
   </context>
   <context>
@@ -4479,9 +4479,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Définir pour toutes les %n Caméras</numerusform>
+        <numerusform>Définir pour toutes les %n Caméras</numerusform>
       </translation>
     </message>
   </context>
@@ -6115,7 +6115,7 @@ to %1</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Définir pour cette Сaméra</translation>
     </message>
   </context>
   <context>
@@ -7769,7 +7769,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Aucune donnée exportée.</translation>
     </message>
   </context>
   <context>
@@ -8537,7 +8537,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>Échec de modification des mots de passe sur %1 de %2 caméras</translation>
     </message>
   </context>
   <context>
