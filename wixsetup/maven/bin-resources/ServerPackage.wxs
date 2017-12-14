@@ -7,7 +7,7 @@
             <MsiPackage
                 Id="ServerPackage"
                 Name="$(var.ServerMsiName)"
-                SourceFile="$(var.InstallerTargetDir)/$(var.ServerMsiName)"
+                SourceFile="$(var.ServerStrippedMsiFile)"
                 InstallCondition="InstallServerOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"
                 Compressed="yes">

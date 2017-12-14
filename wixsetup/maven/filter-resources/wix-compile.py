@@ -19,146 +19,233 @@ if environment.distribution_output_dir:
     installer_target_dir = environment.distribution_output_dir
 
 client_msi_name = environment.client_distribution_name + '.msi'
-server_msi_name = environment.server_distribution_name + '.msi'
+client_exe_name = environment.client_distribution_name + '.exe'
+client_stripped_file = os.path.join(engine_tmp_folder, 'client-strip.msi')
+client_msi_file = os.path.join(installer_target_dir, client_msi_name)
+client_exe_file = os.path.join(installer_target_dir, client_exe_name)
 
-wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension',
+server_msi_name = environment.server_distribution_name + '.msi'
+server_exe_name = environment.server_distribution_name + '.exe'
+server_stripped_file = os.path.join(engine_tmp_folder, 'server-strip.msi')
+server_msi_file = os.path.join(installer_target_dir, server_msi_name)
+server_exe_file = os.path.join(installer_target_dir, server_exe_name)
+
+bundle_exe_name = environment.bundle_distribution_name + '.exe'
+bundle_exe_file = os.path.join(installer_target_dir, bundle_exe_name)
+
+nxtool_msi_name = environment.servertool_distribution_name + '.msi'
+nxtool_msi_file = os.path.join(engine_tmp_folder, 'nxtool.msi')
+nxtool_exe_name = environment.servertool_distribution_name + '.exe'
+nxtool_exe_file = os.path.join(installer_target_dir, nxtool_exe_name)
+
+paxton_stripped_file = os.path.join(engine_tmp_folder, 'paxton-strip.msi')
+paxton_exe_name = environment.paxton_distribution_name + '.exe'
+paxton_exe_file = os.path.join(installer_target_dir, paxton_exe_name)
+
+wix_extensions = [
+    'WixFirewallExtension',
+    'WixUtilExtension',
+    'WixUIExtension',
     'WixBalExtensionExt']
 
-client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg',
-    'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg',
-    'SelectionWarning', 'Product-client-only']
-server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14',
-    'MyExitDialog', 'UpgradeDlg', 'SelectionWarning', 'Product-server-only']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14',
-    'MyExitDialog', 'UpgradeDlg', 'SelectionWarning', 'Product-nxtool']
-paxton_components = ['AxClient', 'ClientQml', 'ClientFonts', 'ClientVox', 'PaxtonVcrt14',
+client_components = [
+    'Associations',
+    'ClientDlg',
+    'ClientFonts',
+    'ClientVox',
+    'ClientBg',
+    'ClientQml',
+    'Client',
+    'ClientHelp',
+    'ClientVcrt14',
+    'MyExitDialog',
+    'UpgradeDlg',
+    'SelectionWarning',
+    'Product-client-only']
+
+server_components = [
+    'ServerVox',
+    'Server',
+    'traytool',
+    'ServerVcrt14',
+    'TraytoolVcrt14',
+    'MyExitDialog',
+    'UpgradeDlg',
+    'SelectionWarning',
+    'Product-server-only']
+
+nxtool_components = [
+    'NxtoolDlg',
+    'Nxtool',
+    'NxtoolQuickControls',
+    'NxtoolVcrt14',
+    'MyExitDialog',
+    'UpgradeDlg',
+    'SelectionWarning',
+    'Product-nxtool']
+
+paxton_components = [
+    'AxClient',
+    'ClientQml',
+    'ClientFonts',
+    'ClientVox',
+    'PaxtonVcrt14',
     'Product-paxton']
 
 client_exe_components = ['ArchCheck', 'ClientPackage', 'Product-client-exe']
 server_exe_components = ['ArchCheck', 'ServerPackage', 'Product-server-exe']
-full_exe_components   = ['ArchCheck', 'ClientPackage', 'ServerPackage', 'Product-full-exe']
+full_exe_components = ['ArchCheck', 'ClientPackage', 'ServerPackage', 'Product-full-exe']
 nxtool_exe_components = ['ArchCheck', 'NxtoolPackage', 'Product-nxtool-exe']
 paxton_exe_components = ['PaxtonPackage', 'Product-paxton-exe']
+
 
 def candle_and_light(project, filename, components, candle_variables):
     candle_output_folder = os.path.join(engine_tmp_folder, project)
     candle(candle_output_folder, components, candle_variables, wix_extensions)
-    target_file = os.path.join(installer_target_dir, filename)
-    light(target_file, candle_output_folder, wix_extensions)
-    return target_file
+    light(filename, candle_output_folder, wix_extensions)
 
 
 def build_msi(project, filename, components, candle_variables):
-    target_file = candle_and_light(project, filename, components, candle_variables)
+    candle_and_light(project, filename, components, candle_variables)
     if sign_binaries_option:
-        sign(target_file)
+        sign(filename)
 
 
 def build_exe(project, filename, components, candle_variables):
-    target_file = candle_and_light(project, filename, components, candle_variables)
+    candle_and_light(project, filename, components, candle_variables)
     if sign_binaries_option:
         engine_filename = project + '.engine.exe'
         engine_path = os.path.join(engine_tmp_folder, engine_filename)
-        extract_engine(target_file, engine_path),               # Extract engine
-        sign(engine_path),                                      # Sign it
-        reattach_engine(engine_path, target_file, target_file), # Reattach signed engine
-        sign(target_file)                                       # Sign the bundle
+        extract_engine(filename, engine_path),             # Extract engine
+        sign(engine_path),                                 # Sign it
+        reattach_engine(engine_path, filename, filename),  # Reattach signed engine
+        sign(filename)                                     # Sign the bundle
 
 
-def build_client_strip():
+def set_embedded_cabs(params, value):
+    params['NoStrip'] = ('yes' if value else 'no')
+
+
+def build_client():
     candle_msi_variables = {
-        'NoStrip': 'no',
-        'ClientFontsSourceDir' : environment.client_fonts_source_dir,
+        'ClientFontsSourceDir': environment.client_fonts_source_dir,
         'VoxSourceDir': environment.vox_source_dir,
         'Vcrt14SrcDir': environment.vcrt14_source_dir,
         'ClientQmlDir': environment.client_qml_source_dir,
         'ClientHelpSourceDir': environment.client_help_source_dir,
         'ClientBgSourceDir': environment.client_background_source_dir
-        }
-    build_msi('client-msi', client_msi_name, client_components, candle_msi_variables)
+    }
+    set_embedded_cabs(candle_msi_variables, True)
+    build_msi('client-msi', client_msi_file, client_components, candle_msi_variables)
+
+    set_embedded_cabs(candle_msi_variables, False)
+    build_msi('client-strip', client_stripped_file, client_components, candle_msi_variables)
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'ClientMsiName': client_msi_name
-        }
-    build_exe('client-exe', environment.client_distribution_name + '.exe',
-        client_exe_components, candle_exe_variables)
+        'ClientMsiName': client_msi_name,
+        'ClientStrippedMsiFile': client_stripped_file
+    }
+    build_exe(
+        'client-exe',
+        client_exe_file,
+        client_exe_components,
+        candle_exe_variables)
 
 
-def build_server_strip():
+def build_server():
     candle_msi_variables = {
-        'NoStrip': 'no',
         'VoxSourceDir': environment.vox_source_dir,
         'Vcrt14SrcDir': environment.vcrt14_source_dir
-        }
-    build_msi('server-msi', server_msi_name, server_components, candle_msi_variables)
+    }
+    set_embedded_cabs(candle_msi_variables, True)
+    build_msi('server-msi', server_msi_file, server_components, candle_msi_variables)
+
+    set_embedded_cabs(candle_msi_variables, False)
+    build_msi('server-msi', server_stripped_file, server_components, candle_msi_variables)
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'ServerMsiName': server_msi_name
+        'ServerMsiName': server_msi_name,
+        'ServerStrippedMsiFile': server_stripped_file
     }
-    build_exe('server-exe', environment.server_distribution_name + '.exe',
-        server_exe_components, candle_exe_variables)
+    build_exe(
+        'server-exe',
+        server_exe_file,
+        server_exe_components,
+        candle_exe_variables)
 
 
 def build_bundle():
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
         'ClientMsiName': client_msi_name,
-        'ServerMsiName': server_msi_name
+        'ServerMsiName': server_msi_name,
+        'ClientStrippedMsiFile': client_stripped_file,
+        'ServerStrippedMsiFile': server_stripped_file
     }
-    build_exe('bundle-exe', environment.bundle_distribution_name + '.exe', full_exe_components,
+    build_exe(
+        'bundle-exe',
+        bundle_exe_file,
+        full_exe_components,
         candle_exe_variables)
 
 
 def build_nxtool():
-    nxtool_msi_name = environment.servertool_distribution_name + '.msi'
     candle_msi_variables = {
         'NxtoolVcrt14DstDir': '${customization}NxtoolDir',
         'NxtoolQuickControlsDir': '${NxtoolQuickControlsDir}',
         'NxtoolQmlDir': '${project.build.directory}/nxtoolqml'
-        }
-    build_msi('nxtool-msi', nxtool_msi_name, nxtool_components, candle_msi_variables)
+    }
+    build_msi('nxtool-msi', nxtool_msi_file, nxtool_components, candle_msi_variables)
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'NxtoolMsiName': nxtool_msi_name
-        }
-    build_exe('nxtool-exe', environment.servertool_distribution_name + '.exe',
-        nxtool_exe_components, candle_exe_variables)
+        'NxtoolMsiName': nxtool_msi_name,
+        'NxToolMsiFile': nxtool_msi_file
+    }
+    build_exe(
+        'nxtool-exe',
+        nxtool_exe_file,
+        nxtool_exe_components,
+        candle_exe_variables)
 
 
 def build_paxton():
-    paxton_msi_name = environment.paxton_distribution_name + '.msi'
     candle_msi_variables = {
-        'NoStrip': 'no',
         'VoxSourceDir': environment.vox_source_dir,
         'Vcrt14SrcDir': environment.vcrt14_source_dir,
         'ClientQmlDir': environment.client_qml_source_dir,
         'ClientHelpSourceDir': environment.client_help_source_dir,
-        'ClientFontsDir' : environment.client_fonts_source_dir,
+        'ClientFontsDir': environment.client_fonts_source_dir,
         'ClientBgSourceDir': environment.client_background_source_dir,
-        'PaxtonVcrt14DstDir': '${customization}_${release.version}.${buildNumber}_Paxton' # WTF
-        }
-    build_msi('paxton-msi', paxton_msi_name, paxton_components, candle_msi_variables)
+        'PaxtonVcrt14DstDir': '${customization}_${release.version}.${buildNumber}_Paxton'  # WTF
+    }
+    set_embedded_cabs(candle_msi_variables, False)
+    build_msi('paxton-msi', paxton_stripped_file, paxton_components, candle_msi_variables)
 
     candle_exe_variables = {
         'InstallerTargetDir': installer_target_dir,
-        'PaxtonMsiName': client_msi_name
-        }
-    build_exe('paxton-exe', environment.paxton_distribution_name + '.exe',
-        paxton_exe_components, candle_exe_variables)
+        'PaxtonMsiName': client_msi_name,
+        'PaxtonStrippedMsiFile': paxton_stripped_file
+    }
+    build_exe(
+        'paxton-exe',
+        paxton_exe_file,
+        paxton_exe_components,
+        candle_exe_variables)
 
 
 def main():
-    build_client_strip()
-    build_server_strip()
+    build_client()
+    build_server()
     build_bundle()
     if build_paxton_option:
         build_paxton()
 
     if build_nxtool_option:
         build_nxtool()
+
 
 if __name__ == '__main__':
     main()
