@@ -7,6 +7,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace utils {
@@ -96,6 +97,9 @@ protected:
     {
         using namespace std::placeholders;
 
+        if (!m_initialServiceStartTime)
+            m_initialServiceStartTime = std::chrono::system_clock::now();
+
         m_serviceContext = std::make_unique<ServiceContext>(testDataDir());
         m_serviceContext->service.setOnAbnormalTerminationDetected(
             std::bind(&Service::saveAbnormalTerminationReport, this, _1));
@@ -127,7 +131,17 @@ protected:
 
     void thenAbnormalTerminationIsReported()
     {
-        m_abnormalTerminationReports.pop();
+        m_lastReceivedReport = m_abnormalTerminationReports.pop();
+    }
+
+    void andReportedTimeIsCorrect()
+    {
+        using namespace std::chrono;
+
+        ASSERT_GE(
+            m_lastReceivedReport.startTime,
+            nx::utils::floor<seconds>(*m_initialServiceStartTime));
+        ASSERT_LE(m_lastReceivedReport.startTime, system_clock::now());
     }
 
     void thenAbnormalTerminationIsNotReported()
@@ -158,6 +172,8 @@ private:
     std::unique_ptr<ServiceContext> m_serviceContextBak;
     std::vector<const char*> m_args;
     nx::utils::SyncQueue<ServiceStartInfo> m_abnormalTerminationReports;
+    ServiceStartInfo m_lastReceivedReport;
+    boost::optional<std::chrono::system_clock::time_point> m_initialServiceStartTime;
 
     void saveAbnormalTerminationReport(ServiceStartInfo serviceStartInfo)
     {
@@ -168,8 +184,11 @@ private:
 TEST_F(Service, abnormal_termination_is_reported_if_start_info_file_is_present)
 {
     givenServiceNotCorrectlyStopped();
+
     whenRestartService();
+
     thenAbnormalTerminationIsReported();
+    andReportedTimeIsCorrect();
 }
 
 TEST_F(Service, abnormal_termination_is_not_reported_after_correct_restart)

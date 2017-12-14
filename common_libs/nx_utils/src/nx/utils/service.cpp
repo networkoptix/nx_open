@@ -149,6 +149,7 @@ ServiceStartInfo Service::readStartInfoFile()
 void Service::writeStartInfo()
 {
     ServiceStartInfo serviceStartInfo;
+    serviceStartInfo.startTime = std::chrono::system_clock::now();
 
     QFile startInfoFile(m_startInfoFilePath);
     if (startInfoFile.open(QIODevice::WriteOnly))
