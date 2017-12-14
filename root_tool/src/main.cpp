@@ -5,12 +5,12 @@ static int showHelp()
     std::cout
         << "Usage: root_tool <command> <args...>" << std::endl
         << "Supported commands:" << std::endl
-        << "    mount <url> <directory> [<user> [<password>]]" << std::endl
-        << "    unmount <source|directory>" << std::endl
-        << "    chown <file_or_directory_path>" << std::endl
-        << "    touch <file_path>" << std::endl
-        << "    mkdir <directory_path>" << std::endl
-        << "    install <deb_package>" << std::endl;
+        << " mount <url> <directory> [<user> [<password>]]" << std::endl
+        << " unmount <url|directory>" << std::endl
+        << " chown <file_or_directory_path>" << std::endl
+        << " touch <file_path>" << std::endl
+        << " mkdir <directory_path>" << std::endl
+        << " install <deb_package>" << std::endl;
 
     return 0;
 }
@@ -35,16 +35,19 @@ static std::string getArg(const char**& argv, const char* error)
 
 int main(int /*argc*/, const char** argv)
 {
-    ++argv; //< Binary name.
     try
     {
-        std::string command = getArg(argv, "command is required");
+        if (argv == nullptr || *argv == nullptr)
+            throw std::runtime_error("This program is not supposed to be used without argv.");
+
+        ++argv; //< Binary name.
+        const auto command = getArg(argv, "command is required");
         nx::root_tool::setupIds();
 
-        if (command == std::string("-h") || command == std::string("--help"))
+        if (command == "-h" || command == "--help")
             return showHelp();
 
-        if (command == std::string("mount"))
+        if (command == "mount")
         {
             const auto url = getArg(argv, "<url> is required");
             const auto directory = getArg(argv, "<directory> is required");
@@ -53,26 +56,25 @@ int main(int /*argc*/, const char** argv)
             return nx::root_tool::mount(url, directory, user, password);
         }
 
-        if (command == std::string("umount") || command == std::string("unmount"))
+        if (command == "umount" || command == "unmount")
             return nx::root_tool::unmount(getArg(argv, "<source> or <directory> is required"));
 
-        if (command == std::string("chown"))
-            return nx::root_tool::chengeOwner(getArg(argv, "<file_or_directory_path> is required"));
+        if (command == "chown")
+            return nx::root_tool::changeOwner(getArg(argv, "<file_or_directory_path> is required"));
 
-        if (command == std::string("touch"))
-            return nx::root_tool::chengeOwner(getArg(argv, "<file_path> is required"));
+        if (command == "touch")
+            return nx::root_tool::changeOwner(getArg(argv, "<file_path> is required"));
 
-        if (command == std::string("mkdir"))
-            return nx::root_tool::chengeOwner(getArg(argv, "<directory_path> is required"));
+        if (command == "mkdir")
+            return nx::root_tool::changeOwner(getArg(argv, "<directory_path> is required"));
 
-        if (command == std::string("install"))
+        if (command == "install")
             return nx::root_tool::install(getArg(argv, "<deb_package> is required"));
 
-        if (command == std::string("ids"))
+        if (command == "ids")
             return nx::root_tool::showIds();
 
         throw std::invalid_argument("Unknown command: " + command);
-
     }
     catch (const std::invalid_argument& exception)
     {

@@ -24,7 +24,7 @@ static void checkMountPermissions(const std::string& directory)
 
 static void checkOwnerPermissions(const std::string& path)
 {
-    static const std::set<std::string> kForbiddenOwnershipPaths = { "/" };
+    static const std::set<std::string> kForbiddenOwnershipPaths = {"/"};
     static const std::set<std::string> kForbiddenOwnershipPrefixes = {
         "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run",
         "/sbin", "/snap", "/srv", "/sys", "/usr", "/var"};
@@ -50,7 +50,7 @@ static int execute(const std::string& command)
 
     std::ostringstream output;
     char buffer[1024];
-    while (fgets(buffer, sizeof(buffer), pipe) != NULL)
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
         output << buffer;
 
     if (pclose(pipe) != 0)
@@ -86,7 +86,7 @@ int unmount(Argument directory)
     return execute("umount '" + directory + "'");
 }
 
-int chengeOwner(Argument path)
+int changeOwner(Argument path)
 {
     checkOwnerPermissions(path);
 
@@ -99,14 +99,14 @@ int touchFile(Argument filePath)
 {
     checkOwnerPermissions(filePath);
     execute("touch '" + filePath + "'"); //< TODO: use file open+close;
-    return chengeOwner(filePath);
+    return changeOwner(filePath);
 }
 
 int makeDirectory(Argument directoryPath)
 {
     checkOwnerPermissions(directoryPath);
     execute("mkdir -p '" + directoryPath + "'"); //< TODO: use syscall
-    return chengeOwner(directoryPath);
+    return changeOwner(directoryPath);
 }
 
 int install(Argument debPackage)

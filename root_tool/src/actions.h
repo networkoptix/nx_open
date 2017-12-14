@@ -18,7 +18,7 @@ int mount(Argument url, Argument directory, OptionalArgument username, OptionalA
 int unmount(Argument directory);
 
 /** Changes path ownership to real UID and GID. */
-int chengeOwner(Argument path);
+int changeOwner(Argument path);
 
 /** Touches a file and gives ownership to real UID and GID. */
 int touchFile(Argument filePath);
