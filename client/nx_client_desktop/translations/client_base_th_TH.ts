@@ -50,7 +50,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>ส่งออกบุ๊กมาร์ก</translation>
     </message>
   </context>
   <context>
@@ -854,15 +854,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>เริ่มต้นวิเคราะห์</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>กล้องบางตัวต้องใช้รหัสผ่านในการตั้งค่า</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>ส่งออกวิดีโอ </translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -870,15 +870,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>ความละเอียด </translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>อัตราส่วนของเซลล์</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>ระยะห่างระหว่างเซลล์</translation>
     </message>
   </context>
   <context>
@@ -975,58 +975,58 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>การตั้งค่าที่เลือกจะต้องมีการแปลงรหัส จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>ไม่แนะนำให้ใช้รูปแบบ AVI เพื่อส่งออกการบันทึกที่ไม่ต่อเนื่องพร้อมเสียง</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>เราขอแนะนำให้ส่งออกวิดีโอจากกล้องนี้เป็น &quot;Multi Video&quot; เพื่อหลีกเลี่ยงการลดขนาด</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation>คุณกำลังจะส่งออกวิดีโอยาว อาจต้องใช้พื้นที่ฮาร์ดดิสก์เป็นจำนวนมากและใช้เวลาหลายนาทีในการดำเนินการ</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>ไม่มีการตั้งค่าสำหรับ ไฟล์ EXE</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>แฟ้มภายในเครื่อง เครื่องมือตรวจสอบเซิร์ฟเวอร์ และเว็บเพจจะไม่ถูกส่งออก</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>ไฟล์. EXE ที่เอ็กซ์พอร์ตจะมีขนาดมากกว่า 4 GB และไม่สามารถเปิดได้ด้วยการดับเบิลคลิกใน Windows สามารถเล่นได้เฉพาะใน %1 Client</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>แทรกเสียงวิดีโอ</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>Mpeg-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>ไฟล์สื่อ %1</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64) (*.exe)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>ไฟล์มีเดีย (x86) ปฏิบัติการได้ %1</translation>
     </message>
   </context>
   <context>
@@ -1161,40 +1161,40 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>ยาว</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์ %1 เท่านั้น</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>รหัสผ่านควรมี %n ชุดค่าผสมที่แตกต่างกันของอักขระสัญลักษณ์หรือตัวเลข</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>รหัสผ่านต้องมีความยาวอย่างน้อย %n อักขระ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>รหัสผ่านต้องมีความยาวไม่เกิน %n อักขระ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>รหัสผ่านต้องไม่มี %n อักขระขึ้นไปพร้อมกัน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>รหัสผ่านไม่ควรประกอบด้วย %n อักขระขึ้นไป</numerusform>
       </translation>
     </message>
   </context>
@@ -2299,7 +2299,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>เปลี่ยน Don&apos;t</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2490,7 +2490,7 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>รหัสผ่าน shouldn&apos;t เท่ากับชื่อผู้ใช้ camera&apos;s</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2498,7 +2498,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>ใส่รหัสอีกครั้ง</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2506,7 +2506,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>รหัสผ่านควรมีสัญลักษณ์น้อย 8 ยาว และประกอบด้วยอักขระที่แตกต่างกันไป</translation>
     </message>
   </context>
   <context>
@@ -2592,11 +2592,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>การตั้งค่าภายในระบบ</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>การตั้งค่าเพิ่มเติม</translation>
     </message>
   </context>
   <context>
@@ -3134,21 +3134,21 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>กล้องนี้ต้องใช้รหัสผ่านเพื่อตั้งค่า</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
+      <translation>บางกล้องที่เลือกจะต้องใช้รหัสผ่านเพื่อตั้งค่า</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
+      <translation>
+        <numerusform>ตั้งรหัสผ่าน</numerusform>
       </translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>ขอให้ผู้ดูแลระบบของคุณทำเช่นนั้น</translation>
     </message>
   </context>
   <context>
@@ -3394,7 +3394,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>พื้นฐาน</translation>
     </message>
   </context>
   <context>
@@ -4173,8 +4173,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</numerusform>
       </translation>
     </message>
   </context>
@@ -4421,8 +4421,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>ตั้งค่าสำหรับกล้อง %n ทั้งหมด</numerusform>
       </translation>
     </message>
   </context>
@@ -4567,7 +4567,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>กล้อง NVR ไม่สนับสนุนการเล่นที่ไม่ตรงกัน</translation>
     </message>
   </context>
   <context>
@@ -4664,7 +4664,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>ตั้งรหัสผ่าน</translation>
     </message>
   </context>
   <context>
@@ -6032,15 +6032,15 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>การเชื่อมต่อมากเกินไป</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>จำเป็นต้องใช้รหัสผ่าน</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>ตั้งค่าสำหรับกล้องนี้</translation>
     </message>
   </context>
   <context>
@@ -6455,7 +6455,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>ตรวจพบปัญหาความสมบูรณ์ของที่เก็บถาวร</translation>
     </message>
   </context>
   <context>
@@ -6523,11 +6523,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>เวลาของระบบจะตรงกับอินเทอร์เน็ตและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>เวลาของระบบถูกซิงโครไนซ์กับเวลาท้องถิ่นบนเซิร์ฟเวอร์ที่เลือกและไม่ได้ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์อื่น</translation>
     </message>
   </context>
   <context>
@@ -7631,7 +7631,7 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>ไดนามิก</translation>
     </message>
   </context>
   <context>
@@ -8463,7 +8463,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>ลบ Showreel %1 หรือไม่?</translation>
     </message>
   </context>
   <context>

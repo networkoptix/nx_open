@@ -763,14 +763,29 @@ ActionVisibility TimePeriodCondition::check(const Parameters& parameters, QnWork
 
 ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
-    if (!parameters.hasArgument(Qn::TimePeriodRole))
-        return InvisibleAction;
+    const bool hasBookmark = parameters.hasArgument(Qn::CameraBookmarkRole);
+    const bool hasPeriod = parameters.hasArgument(Qn::TimePeriodRole);
 
-    const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    QnTimePeriod period;
+    QnResourceList resources;
+    if (hasBookmark)
+    {
+        const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+        resources.push_back(context->resourcePool()->getResourceById(bookmark.cameraId));
+        period = QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);
+    }
+    else if (hasPeriod)
+    {
+        resources = ParameterTypes::resources(context->display()->widgets());
+        period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    }
+    else
+    {
+        return InvisibleAction;
+    }
+
     if (periodType(period) != NormalTimePeriod)
         return DisabledAction;
-
-    const auto resources = ParameterTypes::resources(context->display()->widgets());
 
     auto errorLevel = InvisibleAction;
     const auto cameraManager = qnClientModule->cameraDataManager();

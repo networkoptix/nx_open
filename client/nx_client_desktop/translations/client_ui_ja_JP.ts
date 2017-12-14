@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>認証タイプ</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>要求のタイプ</translation>
     </message>
   </context>
   <context>
