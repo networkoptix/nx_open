@@ -288,15 +288,6 @@
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
                         shouldKeepInitialValue="true"
                         bindDefaultToMinimum="true">
-                    <dependencies>
-                        <dependencies-trigger>
-                            <conditional-trigger>
-                                <condition
-                                    watch="SECONDARY%media/videoprofile/FrameRate"
-                                    condition="valueChanged"/>
-                            </conditional-trigger>
-                        </dependencies-trigger>
-                    </dependencies>
                 </param>
 
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
