@@ -763,6 +763,8 @@ void initialize(Manager* manager, Action* root)
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
+        .conditionalText(ContextMenu::tr("Export Bookmark..."),
+            condition::hasArgument(Qn::CameraBookmarkRole))
         .condition(ConditionWrapper(new ExportCondition(true))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
