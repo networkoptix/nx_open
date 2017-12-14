@@ -92,10 +92,17 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 {
     QnMutexLocker lk(&m_mutex);
 
-    auto tcpServerSocket =  SocketFactory::createStreamServerSocket();
-    if (!tcpServerSocket->setReuseAddrFlag(true) ||
-        !tcpServerSocket->bind(localAddress) ||
-        !tcpServerSocket->listen())
+    std::unique_ptr<AbstractStreamServerSocket> tcpServerSocket;
+    if (m_preparedTcpSocket
+        && m_preparedTcpSocket->getLocalAddress().toString() == localAddress.toString())
+    {
+        tcpServerSocket = std::move(m_preparedTcpSocket);
+    }
+
+    if (!tcpServerSocket)
+        tcpServerSocket = createAndPrepareTcpSocket(localAddress);
+
+    if (!tcpServerSocket)
     {
         setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
@@ -242,6 +249,25 @@ bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& reques
 void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
 {
     m_unauthorizedForwardingPaths.insert(lit("/") + path + lit("/"));
+}
+
+void QnUniversalTcpListener::setPreparedTcpSocket(std::unique_ptr<AbstractStreamServerSocket> socket)
+{
+    m_preparedTcpSocket = std::move(socket);
+}
+
+std::unique_ptr<AbstractStreamServerSocket> QnUniversalTcpListener::createAndPrepareTcpSocket(
+    const SocketAddress& localAddress)
+{
+    auto socket = SocketFactory::createStreamServerSocket();
+    if (!socket->setReuseAddrFlag(true) ||
+        !socket->bind(localAddress) ||
+        !socket->listen())
+    {
+        return nullptr;
+    }
+
+    return socket;
 }
 
 nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const

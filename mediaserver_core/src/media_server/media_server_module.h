@@ -22,6 +22,7 @@ namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
+class RootTool;
 
 namespace metadata {
 
@@ -75,6 +76,9 @@ public:
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
 
+    void initializeRootTool();
+    nx::mediaserver::RootTool* rootTool() const;
+
 private:
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
@@ -97,6 +101,7 @@ private:
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
+    std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

@@ -6,6 +6,8 @@
 #include "storage_manager.h"
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 10;
@@ -65,9 +67,15 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    int rez = std::remove(fileName.toLatin1().constData());
-    if (rez == 0)
+    if (std::remove(fileName.toLatin1().constData()))
         return true;
+
+    if (const auto rootTool = qnServerModule->rootTool())
+    {
+        if (rootTool->changeOwner(fileName) && std::remove(fileName.toLatin1().constData()))
+            return true;
+    }
+
     auto lastErr = SystemError::getLastOSErrorCode();
     return lastErr == SystemError::fileNotFound || lastErr == SystemError::pathNotFound;
 }

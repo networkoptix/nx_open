@@ -21,6 +21,17 @@
         <arch.depends />
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>root_tool</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/root_tool/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
     <build>
         <directory>${arch}</directory>
         <outputDirectory>${arch}</outputDirectory>

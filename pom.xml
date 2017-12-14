@@ -88,6 +88,7 @@
         <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
         <hanwha_metadata_plugin.guid>{414bb961-a348-4e39-ac20-4e65e1d246ca}</hanwha_metadata_plugin.guid>
         <stub_metadata_plugin.guid>{8f5484ec-6bea-4a9c-8746-9e49d6fea726}</stub_metadata_plugin.guid>
+        <root_tool.guid>{366783da-a82c-11e7-b026-57c39dec835a}</root_tool.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -124,6 +125,7 @@
         <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
         <hanwha_metadata_plugin.name>${company.name} Hanwha metadata plugin</hanwha_metadata_plugin.name>
         <stub_metadata_plugin.name>${company.name} Stub metadata plugin</stub_metadata_plugin.name>
+        <root_tool.name>${company.name} Root tool</root_tool.name>
 
         <product.display.title>${product.title}</product.display.title>
 
@@ -841,7 +843,7 @@
                 <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-
+                <module>root_tool</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>

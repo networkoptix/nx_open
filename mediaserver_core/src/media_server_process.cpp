@@ -270,6 +270,7 @@
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/utils/platform/current_process.cpp>
 #include <rest/handlers/change_camera_password_rest_handler.h>
 
 #if !defined(EDGE_SERVER)
@@ -1032,6 +1033,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     parseCommandLineParameters(argc, argv);
 
+    // TODO: Other platforms?
+    #ifdef __linux__
+        if (!m_cmdLineArguments.crashDirectory.isEmpty())
+            linux_exception::setCrashDirectory(m_cmdLineArguments.crashDirectory.toStdString());
+    #endif
+
     m_settings.reset(new MSSettings(
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
@@ -1083,6 +1090,8 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         lit("Force ip version"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.createFakeData, "--create-fake-data", NULL,
         lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.crashDirectory, "--crash-directory", NULL,
+        lit("Directory to save and send crash reports."), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
@@ -1969,8 +1978,12 @@ bool MediaServerProcess::initTcpListener(
 
     registerRestHandlers(cloudManagerGroup, m_universalTcpListener, messageBus);
 
+    if (m_preparedTcpServerSocket)
+        m_universalTcpListener->setPreparedTcpSocket(std::move(m_preparedTcpServerSocket));
+
     if (!m_universalTcpListener->bindToLocalAddress())
         return false;
+
     m_universalTcpListener->setDefaultPage("/static/index.html");
 
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
@@ -2044,6 +2057,44 @@ void MediaServerProcess::initializeCloudConnect()
             nx::network::cloud::TunnelAcceptorFactory::instance().setRelayingEnabled(
                 commonModule()->globalSettings()->cloudConnectRelayingEnabled());
         });
+}
+
+void MediaServerProcess::changeSystemUser(const QString& userName)
+{
+    // Change owner of all data files, so mediaserver can use them as different user.
+    const std::vector<QString> chmodPaths =
+    {
+        qnServerModule->roSettings()->fileName(),
+        qnServerModule->runTimeSettings()->fileName(),
+        getDataDirectory(),
+    };
+    for (const auto& path: chmodPaths)
+    {
+        const auto command = lm("chown -R '%1' '%2'").args(userName, path);
+        if (::system(command.toUtf8().data()) != 0) //< Let the errors to reach stdout and stderr.
+        {
+            qWarning().noquote() << "!!! WARNING: Unable to:" << command;
+            return; //< Server will not be able to run without access to these files.
+        }
+    }
+
+    // Prealocate TCP socket in case if some system port is required, e.g. 80.
+    const int port = qnServerModule->roSettings()->value(
+        nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    m_preparedTcpServerSocket = QnUniversalTcpListener::createAndPrepareTcpSocket(
+        SocketAddress(HostAddress::anyHost, port));
+    if (!m_preparedTcpServerSocket)
+    {
+        qWarning().noquote() << "!!! WARNING: Unable to prealocate socket on port" << port << ":"
+            << SystemError::getLastOSErrorText();
+    }
+
+    // Everything else what require root permissions is supposed to be done by root_tool.
+    if (!nx::utils::CurrentProcess::changeUser(userName))
+    {
+        qWarning().noquote() << "!!! Warning: Unable to change user to" << userName << ":"
+            << SystemError::getLastOSErrorText();
+    }
 }
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
@@ -2314,21 +2365,19 @@ void MediaServerProcess::updateGuidIfNeeded()
         setObsoleteGuid(obsoleteGuid);
 }
 
-void MediaServerProcess::serviceModeInit()
+nx::utils::log::Settings MediaServerProcess::logSettings(
+    const QString& argValue, const QString& settingsKey, const QString& defaultValue)
 {
     const auto settings = qnServerModule->roSettings();
-    const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    nx::utils::log::Settings logSettings;
-    logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
-    logSettings.directory = settings->value("logDir").toString();
-    logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
-    logSettings.updateDirectoryIfEmpty(getDataDirectory());
+    nx::utils::log::Settings s;
+    s.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
+    s.directory = settings->value("logDir").toString();
+    s.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
+    s.updateDirectoryIfEmpty(getDataDirectory());
 
-    // TODO: Generalize nx::utils::log::Settings parsing from QSetting and cmdLineArguments
-    // for mediaserver and all clients.
     const auto makeLevel =
-        [&](const QString& argValue, const QString& settingsKey, const QString& defaultValue)
+        [&]()
         {
             const auto settingsValue = settings->value(settingsKey);
             const auto settingsLevel = nx::utils::log::levelFromString(settingsValue.toString());
@@ -2346,38 +2395,55 @@ void MediaServerProcess::serviceModeInit()
             return nx::utils::log::Settings::kDefaultLevel;
         };
 
+    s.level = makeLevel();
     for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
-        logSettings.exceptionFilers.insert(filter);
+        s.exceptionFilers.insert(filter);
 
-    logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel", "");
-    nx::utils::log::initialize(logSettings, qApp->applicationName(), binaryPath);
+    return s;
+}
+
+void MediaServerProcess::initializeLogging()
+{
+    const auto binaryPath = QFile::decodeName(m_argv[0]);
+    nx::utils::log::initialize(
+        logSettings(cmdLineArguments().logLevel, "logLevel", ""),
+        qApp->applicationName(), binaryPath);
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
-        settings->setValue("logFile", path->replace(lit(".log"), QString()));
+        qnServerModule->roSettings()->setValue("logFile", path->replace(lit(".log"), QString()));
     else
-        settings->remove("logFile");
+        qnServerModule->roSettings()->remove("logFile");
 
-    logSettings.level = makeLevel(cmdLineArguments().httpLogLevel, "http-log-level", "none");
     nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
+        logSettings(cmdLineArguments().httpLogLevel, "http-log-level", "none"),
+        qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level = makeLevel(cmdLineArguments().hwLogLevel, "hwLoglevel", "info");
     nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
+        logSettings(cmdLineArguments().hwLogLevel, "hwLoglevel", "info"),
+        qApp->applicationName(), binaryPath,
         QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
 
-    logSettings.level = makeLevel(cmdLineArguments().ec2TranLogLevel, "tranLogLevel", "none");
     nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
+        logSettings(cmdLineArguments().ec2TranLogLevel, "tranLogLevel", "none"),
+        qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level = makeLevel(cmdLineArguments().permissionsLogLevel, "permissionsLogLevel", "none");
     nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
+        logSettings(cmdLineArguments().ec2TranLogLevel, "tranLogLevel", "none"),
+        qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+}
+
+void MediaServerProcess::initializeHardwareId()
+{
+    const auto binaryPath = QFile::decodeName(m_argv[0]);
+    nx::utils::log::initialize(
+        logSettings(cmdLineArguments().hwLogLevel, "hwLoglevel", "info"),
+        qApp->applicationName(), binaryPath,
+        QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
 
     LLUtil::initHardwareId(qnServerModule->roSettings());
     updateGuidIfNeeded();
@@ -2467,7 +2533,18 @@ void MediaServerProcess::run()
     qnServerModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
-        serviceModeInit();
+        initializeHardwareId();
+
+    // This is better to do before any files get open, so new user can access them without problems.
+    const auto systemUser = qnServerModule->roSettings()->value(nx_ms_conf::SYSTEM_USER).toString();
+    if (!systemUser.isEmpty())
+        changeSystemUser(systemUser);
+
+    if (m_serviceMode)
+    {
+        initializeLogging();
+        qnServerModule->initializeRootTool();
+    }
 
     updateAllowedInterfaces();
 
