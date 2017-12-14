@@ -982,7 +982,7 @@ function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initial
         live: false,
         forcedToStop:false
     };
-    this.dragStartDate = null;
+    this.dragDate = null;
 
 
     this.levels = {
