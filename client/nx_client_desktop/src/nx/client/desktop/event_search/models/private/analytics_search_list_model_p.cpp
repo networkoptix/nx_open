@@ -148,10 +148,10 @@ void AnalyticsSearchListModel::Private::clear()
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
-    m_prefetchCompletionHandler = PrefetchCompletionHandler();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     m_currentFetchId = rest::Handle();
+    m_prefetchCompletionHandler = PrefetchCompletionHandler();
 }
 
 bool AnalyticsSearchListModel::Private::canFetchMore() const

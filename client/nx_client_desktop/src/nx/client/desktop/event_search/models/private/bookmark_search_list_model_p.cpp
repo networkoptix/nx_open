@@ -67,10 +67,10 @@ void BookmarkSearchListModel::Private::clear()
     m_data.clear();
     m_guidToTimestampMs.clear();
     m_prefetch.clear();
-    m_prefetchCompletionHandler = PrefetchCompletionHandler();
     m_fetchedAll = false;
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
     m_currentFetchId = 0;
+    m_prefetchCompletionHandler = PrefetchCompletionHandler();
 }
 
 bool BookmarkSearchListModel::Private::canFetchMore() const

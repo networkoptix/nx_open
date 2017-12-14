@@ -78,6 +78,9 @@ void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& 
 
     clear();
     m_camera = camera;
+
+    if (m_camera)
+        m_updateTimer->start();
 }
 
 vms::event::EventType EventSearchListModel::Private::selectedEventType() const
@@ -113,11 +116,11 @@ void EventSearchListModel::Private::clear()
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
-    m_prefetchCompletionHandler = PrefetchCompletionHandler();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     m_currentFetchId = rest::Handle();
     m_currentUpdateId = rest::Handle();
+    m_prefetchCompletionHandler = PrefetchCompletionHandler();
 
     if (m_camera)
         m_updateTimer->start();
