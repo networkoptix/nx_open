@@ -1034,7 +1034,7 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     parseCommandLineParameters(argc, argv);
 
     // TODO: Other platforms?
-    #ifdef __linux__
+    #if defined(__linux__)
         if (!m_cmdLineArguments.crashDirectory.isEmpty())
             linux_exception::setCrashDirectory(m_cmdLineArguments.crashDirectory.toStdString());
     #endif
@@ -2071,28 +2071,28 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     for (const auto& path: chmodPaths)
     {
         const auto command = lm("chown -R '%1' '%2'").args(userName, path);
-        if (::system(command.toUtf8().data()) != 0) //< Let the errors to reach stdout and stderr.
+        if (::system(command.toUtf8().data()) != 0) //< Let the errors reach stdout and stderr.
         {
-            qWarning().noquote() << "!!! WARNING: Unable to:" << command;
+            qWarning().noquote() << "WARNING: Unable to:" << command;
             return; //< Server will not be able to run without access to these files.
         }
     }
 
-    // Prealocate TCP socket in case if some system port is required, e.g. 80.
+    // Preallocate TCP socket in case if some system port is required, e.g. 80.
     const int port = qnServerModule->roSettings()->value(
         nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     m_preparedTcpServerSocket = QnUniversalTcpListener::createAndPrepareTcpSocket(
         SocketAddress(HostAddress::anyHost, port));
     if (!m_preparedTcpServerSocket)
     {
-        qWarning().noquote() << "!!! WARNING: Unable to prealocate socket on port" << port << ":"
+        qWarning().noquote() << "WARNING: Unable to prealocate socket on port" << port << ":"
             << SystemError::getLastOSErrorText();
     }
 
     // Everything else what require root permissions is supposed to be done by root_tool.
     if (!nx::utils::CurrentProcess::changeUser(userName))
     {
-        qWarning().noquote() << "!!! Warning: Unable to change user to" << userName << ":"
+        qWarning().noquote() << "WARNING: Unable to change user to" << userName << ":"
             << SystemError::getLastOSErrorText();
     }
 }
