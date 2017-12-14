@@ -88,6 +88,11 @@ QString AbstractEventListModel::debugTimestampToString(qint64 timestampMs)
     return QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
 }
 
+bool AbstractEventListModel::fetchInProgress() const
+{
+    return false; //< By default fetch is considered synchronous.
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

@@ -143,9 +143,12 @@ void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect
 
 void AnalyticsSearchListModel::Private::clear()
 {
+    qDebug() << "Clear analytics model";
+
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
+    m_prefetchCompletionHandler = PrefetchCompletionHandler();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     m_currentFetchId = rest::Handle();
@@ -153,7 +156,7 @@ void AnalyticsSearchListModel::Private::clear()
 
 bool AnalyticsSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !m_currentFetchId
+    return !m_fetchedAll && m_camera && !fetchInProgress()
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -163,13 +166,15 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
         return false;
 
     const auto dataReceived =
-        [this, completionHandler]
-            (bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
+        [this](bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
         {
             if (m_currentFetchId != handle)
                 return;
 
-            NX_ASSERT(m_prefetch.empty());
+            NX_ASSERT(m_prefetch.empty() && m_prefetchCompletionHandler);
+            if (!m_prefetchCompletionHandler)
+                return;
+
             m_prefetch = success ? std::move(data) : analytics::storage::LookupResult();
             m_success = success;
 
@@ -185,15 +190,21 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
             }
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
-            completionHandler(m_prefetch.size() >= kFetchBatchSize
+            m_prefetchCompletionHandler(m_prefetch.size() >= kFetchBatchSize
                 ? startTimeMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
+
+            m_prefetchCompletionHandler = PrefetchCompletionHandler();
         };
 
     qDebug() << "Requesting analytics from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
 
     m_currentFetchId = getObjects(0, m_earliestTimeMs - 1, dataReceived, kFetchBatchSize);
-    return m_currentFetchId != rest::Handle();
+    if (!m_currentFetchId)
+        return false;
+
+    m_prefetchCompletionHandler = completionHandler;
+    return true;
 }
 
 void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
@@ -237,6 +248,11 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_fetchedAll = m_prefetch.empty();
     m_earliestTimeMs = latestStartTimeMs;
     m_prefetch.clear();
+}
+
+bool AnalyticsSearchListModel::Private::fetchInProgress() const
+{
+    return m_currentFetchId != rest::Handle();
 }
 
 void AnalyticsSearchListModel::Private::periodicUpdate()

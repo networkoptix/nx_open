@@ -61,10 +61,13 @@ const QnCameraBookmark& BookmarkSearchListModel::Private::bookmark(int index) co
 
 void BookmarkSearchListModel::Private::clear()
 {
+    qDebug() << "Clear bookmarks model";
+
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_guidToTimestampMs.clear();
     m_prefetch.clear();
+    m_prefetchCompletionHandler = PrefetchCompletionHandler();
     m_fetchedAll = false;
     m_earliestTimeMs = std::numeric_limits<qint64>::max();
     m_currentFetchId = 0;
@@ -72,7 +75,7 @@ void BookmarkSearchListModel::Private::clear()
 
 bool BookmarkSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !m_currentFetchId
+    return !m_fetchedAll && m_camera && !fetchInProgress()
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission);
 }
 
@@ -94,13 +97,16 @@ bool BookmarkSearchListModel::Private::prefetch(PrefetchCompletionHandler comple
             : lit("infinity"));
 
     m_currentFetchId = qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
-        [this, completionHandler, guard = QPointer<QObject>(this)]
+        [this, guard = QPointer<QObject>(this)]
             (bool success, const QnCameraBookmarkList& bookmarks, int requestId)
         {
             if (!guard || requestId != m_currentFetchId)
                 return;
 
-            NX_ASSERT(m_prefetch.empty());
+            NX_ASSERT(m_prefetch.empty() && m_prefetchCompletionHandler);
+            if (!m_prefetchCompletionHandler)
+                return;
+
             m_prefetch = success ? std::move(bookmarks) : QnCameraBookmarkList();
             m_success = success;
 
@@ -115,12 +121,18 @@ bool BookmarkSearchListModel::Private::prefetch(PrefetchCompletionHandler comple
                     << debugTimestampToString(m_prefetch.front().startTimeMs);
             }
 
-            completionHandler(m_prefetch.size() < kFetchBatchSize
+            m_prefetchCompletionHandler(m_prefetch.size() < kFetchBatchSize
                 ? 0
                 : m_prefetch.back().startTimeMs + 1/*discard last ms*/);
+
+            m_prefetchCompletionHandler = PrefetchCompletionHandler();
         });
 
-    return m_currentFetchId != 0;
+    if (!m_currentFetchId)
+        return false;
+
+    m_prefetchCompletionHandler = completionHandler;
+    return true;
 }
 
 void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
@@ -162,6 +174,11 @@ void BookmarkSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
     m_earliestTimeMs = latestStartTimeMs;
     m_prefetch.clear();
+}
+
+bool BookmarkSearchListModel::Private::fetchInProgress() const
+{
+    return m_currentFetchId != 0;
 }
 
 void BookmarkSearchListModel::Private::watchBookmarkChanges()

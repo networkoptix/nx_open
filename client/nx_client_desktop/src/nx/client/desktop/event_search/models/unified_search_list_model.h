@@ -45,7 +45,7 @@ public:
 
 signals:
     void fetchAboutToBeCommitted(QPrivateSignal);
-    void fetchCommitted(QPrivateSignal);
+    void fetchCommitted(int rowsAdded, QPrivateSignal);
 
 private:
     using base_type::setModels;

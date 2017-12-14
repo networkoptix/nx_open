@@ -27,6 +27,9 @@ public:
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
+    //< Override this function if descendant model has asynchronous fetch.
+    virtual bool fetchInProgress() const;
+
     // An alternative to fetchMore that does not insert new rows immediately but calls
     //   completionHandler instead. To finalize fetch commitPrefetch must be called.
     //   Must return false and do nothing if previous fetch is not committed yet.

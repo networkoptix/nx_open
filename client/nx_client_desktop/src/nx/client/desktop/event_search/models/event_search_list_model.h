@@ -34,6 +34,7 @@ public:
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual bool prefetchAsync(PrefetchCompletionHandler completionHandler) override;
     virtual void commitPrefetch(qint64 keyLimitFromSync) override;
+    virtual bool fetchInProgress() const override;
 
 private:
     class Private;

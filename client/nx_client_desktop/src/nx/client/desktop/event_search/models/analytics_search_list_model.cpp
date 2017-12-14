@@ -117,6 +117,11 @@ void AnalyticsSearchListModel::commitPrefetch(qint64 keyLimitFromSync)
     d->commitPrefetch(keyLimitFromSync);
 }
 
+bool AnalyticsSearchListModel::fetchInProgress() const
+{
+    return d->fetchInProgress();
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

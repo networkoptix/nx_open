@@ -106,6 +106,11 @@ void EventSearchListModel::commitPrefetch(qint64 keyLimitFromSync)
     d->commitPrefetch(keyLimitFromSync);
 }
 
+bool EventSearchListModel::fetchInProgress() const
+{
+    return d->fetchInProgress();
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

@@ -106,11 +106,14 @@ const vms::event::ActionData& EventSearchListModel::Private::getEvent(int index)
 
 void EventSearchListModel::Private::clear()
 {
+    qDebug() << "Clear events model";
+
     m_updateTimer->stop();
 
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
+    m_prefetchCompletionHandler = PrefetchCompletionHandler();
     m_fetchedAll = false;
     m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     m_currentFetchId = rest::Handle();
@@ -122,7 +125,7 @@ void EventSearchListModel::Private::clear()
 
 bool EventSearchListModel::Private::canFetchMore() const
 {
-    return !m_fetchedAll && m_camera && !m_currentFetchId
+    return !m_fetchedAll && m_camera && !fetchInProgress()
         && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
@@ -132,13 +135,15 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
         return false;
 
     const auto eventsReceived =
-        [this, completionHandler]
-            (bool success, rest::Handle handle, vms::event::ActionDataList&& data)
+        [this](bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
             if (handle != m_currentFetchId)
                 return;
 
-            NX_ASSERT(m_prefetch.empty());
+            NX_ASSERT(m_prefetch.empty() && m_prefetchCompletionHandler);
+            if (!m_prefetchCompletionHandler)
+                return;
+
             m_prefetch = success ? std::move(data) : vms::event::ActionDataList();
             m_success = success;
 
@@ -153,15 +158,21 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
                     << debugTimestampToString(timestampMs(m_prefetch.front()));
             }
 
-            completionHandler(m_prefetch.size() >= kFetchBatchSize
+            m_prefetchCompletionHandler(m_prefetch.size() >= kFetchBatchSize
                 ? timestampMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
+
+            m_prefetchCompletionHandler = PrefetchCompletionHandler();
         };
 
     qDebug() << "Requesting events from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
 
     m_currentFetchId = getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
-    return m_currentFetchId != rest::Handle();
+    if (!m_currentFetchId)
+        return false;
+
+    m_prefetchCompletionHandler = completionHandler;
+    return true;
 }
 
 void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
@@ -205,6 +216,11 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
     m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
     m_earliestTimeMs = latestStartTimeMs;
     m_prefetch.clear();
+}
+
+bool EventSearchListModel::Private::fetchInProgress() const
+{
+    return m_currentFetchId != rest::Handle();
 }
 
 void EventSearchListModel::Private::periodicUpdate()

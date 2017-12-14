@@ -48,6 +48,8 @@ public:
 
 private:
     void updateModels();
+    void ensureFetchMore();
+    bool fetchInProgress() const;
 
 private:
     UnifiedSearchListModel* const q = nullptr;
@@ -64,11 +66,8 @@ private:
     qint64 m_latestTimeMs = -1;
 
     QWeakPointer<QnRaiiGuard> m_currentFetchGuard;
-    Types m_fetchingTypes;
     qint64 m_latestStartTimeMs = -1; //< Synchronization point used during fetch.
-
-    // A flag to request updateModels() call after current fetch finishes:
-    bool m_needToUpdateModels = false;
+    bool m_queuedFetchMore = false;
 };
 
 } // namespace

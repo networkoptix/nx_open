@@ -36,6 +36,7 @@ public:
     bool canFetchMore() const;
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commitPrefetch(qint64 latestStartTimeMs);
+    bool fetchInProgress() const;
 
     static QPixmap pixmap();
     static QColor color();
@@ -54,6 +55,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     int m_currentFetchId = 0;
+    PrefetchCompletionHandler m_prefetchCompletionHandler;
     bool m_fetchedAll = false;
     bool m_success = true;
 

@@ -91,6 +91,11 @@ void BookmarkSearchListModel::commitPrefetch(qint64 keyLimitFromSync)
     d->commitPrefetch(keyLimitFromSync);
 }
 
+bool BookmarkSearchListModel::fetchInProgress() const
+{
+    return d->fetchInProgress();
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

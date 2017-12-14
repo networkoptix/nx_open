@@ -43,6 +43,7 @@ public:
     bool canFetchMore() const;
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commitPrefetch(qint64 latestStartTimeMs);
+    bool fetchInProgress() const;
 
     bool defaultAction(int index) const;
 
@@ -74,6 +75,7 @@ private:
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     rest::Handle m_currentFetchId = rest::Handle();
     rest::Handle m_currentUpdateId = rest::Handle();
+    PrefetchCompletionHandler m_prefetchCompletionHandler;
     bool m_fetchedAll = false;
     bool m_success = true;
 
