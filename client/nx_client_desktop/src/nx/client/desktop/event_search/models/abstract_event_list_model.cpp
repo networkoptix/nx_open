@@ -56,15 +56,6 @@ void AbstractEventListModel::fetchMore(const QModelIndex& /*parent*/)
 {
 }
 
-bool AbstractEventListModel::prefetchAsync(PrefetchCompletionHandler /*completionHandler*/)
-{
-    return false;
-}
-
-void AbstractEventListModel::commitPrefetch(qint64 /*keyLimitFromSync*/)
-{
-}
-
 bool AbstractEventListModel::isValid(const QModelIndex& index) const
 {
     return index.model() == this && !index.parent().isValid() && index.column() == 0
@@ -86,11 +77,6 @@ QString AbstractEventListModel::timestampText(qint64 timestampMs) const
 QString AbstractEventListModel::debugTimestampToString(qint64 timestampMs)
 {
     return QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
-}
-
-bool AbstractEventListModel::fetchInProgress() const
-{
-    return false; //< By default fetch is considered synchronous.
 }
 
 } // namespace

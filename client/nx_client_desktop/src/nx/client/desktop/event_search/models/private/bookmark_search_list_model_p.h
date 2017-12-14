@@ -10,36 +10,32 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
+
 class QnUuid;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class BookmarkSearchListModel::Private: public QObject
+class BookmarkSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = AbstractAsyncSearchListModel::Private;
 
 public:
     explicit Private(BookmarkSearchListModel* q);
     virtual ~Private() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    virtual int count() const override;
+    virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
-    int count() const;
-    const QnCameraBookmark& bookmark(int index) const;
+    virtual void clear() override;
 
-    void clear();
-
-    bool canFetchMore() const;
-    bool prefetch(PrefetchCompletionHandler completionHandler);
-    void commitPrefetch(qint64 latestStartTimeMs);
-    bool fetchInProgress() const;
-
-    static QPixmap pixmap();
-    static QColor color();
+protected:
+    virtual rest::Handle requestPrefetch(qint64 latestTimeMs) override;
+    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
+    virtual bool hasAccessRights() const override;
 
 private:
     void watchBookmarkChanges();
@@ -50,18 +46,15 @@ private:
 
     int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
 
+    static QPixmap pixmap();
+    static QColor color();
+
 private:
     BookmarkSearchListModel* const q = nullptr;
-    QnVirtualCameraResourcePtr m_camera;
-    qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    int m_currentFetchId = 0;
-    PrefetchCompletionHandler m_prefetchCompletionHandler;
-    bool m_fetchedAll = false;
-    bool m_success = true;
-
     QnCameraBookmarkList m_prefetch;
     std::deque<QnCameraBookmark> m_data;
     QHash<QnUuid, qint64> m_guidToTimestampMs;
+    bool m_success = true;
 };
 
 } // namespace

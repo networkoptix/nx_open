@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/software_trigger_pixmaps.h>
@@ -53,7 +54,7 @@ static qint64 timestampMs(const vms::event::ActionData& event)
 } // namespace
 
 EventSearchListModel::Private::Private(EventSearchListModel* q):
-    base_type(),
+    base_type(q),
     q(q),
     m_updateTimer(new QTimer()),
     m_helper(new vms::event::StringsHelper(q->commonModule()))
@@ -66,20 +67,14 @@ EventSearchListModel::Private::~Private()
 {
 }
 
-QnVirtualCameraResourcePtr EventSearchListModel::Private::camera() const
-{
-    return m_camera;
-}
-
 void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (m_camera == camera)
+    if (camera == this->camera())
         return;
 
-    clear();
-    m_camera = camera;
+    base_type::setCamera(camera);
 
-    if (m_camera)
+    if (camera)
         m_updateTimer->start();
 }
 
@@ -102,9 +97,46 @@ int EventSearchListModel::Private::count() const
     return int(m_data.size());
 }
 
-const vms::event::ActionData& EventSearchListModel::Private::getEvent(int index) const
+QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
+    bool& handled) const
 {
-    return m_data[index];
+    const auto& event = m_data[index.row()];
+    handled = true;
+
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return title(event.eventParams.eventType);
+
+        case Qt::DecorationRole:
+            return QVariant::fromValue(pixmap(event.eventParams));
+
+        case Qt::ForegroundRole:
+            return QVariant::fromValue(color(event.eventParams.eventType));
+
+        case Qn::DescriptionTextRole:
+            return description(event.eventParams);
+
+        case Qn::PreviewTimeRole:
+            if (!hasPreview(event.eventParams.eventType))
+                return QVariant();
+            /*fallthrough*/
+        case Qn::TimestampRole:
+            return QVariant::fromValue(std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::microseconds(event.eventParams.eventTimestampUsec)).count());
+
+        case Qn::ResourceRole:
+            return hasPreview(event.eventParams.eventType)
+                ? QVariant::fromValue<QnResourcePtr>(camera())
+                : QVariant();
+
+        case Qn::HelpTopicIdRole:
+            return Qn::Empty_Help;
+
+        default:
+            handled = false;
+            return QVariant();
+    }
 }
 
 void EventSearchListModel::Private::clear()
@@ -116,35 +148,25 @@ void EventSearchListModel::Private::clear()
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
-    m_fetchedAll = false;
-    m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    m_currentFetchId = rest::Handle();
     m_currentUpdateId = rest::Handle();
-    m_prefetchCompletionHandler = PrefetchCompletionHandler();
+    m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    base_type::clear();
 
-    if (m_camera)
+    if (camera())
         m_updateTimer->start();
 }
 
-bool EventSearchListModel::Private::canFetchMore() const
+bool EventSearchListModel::Private::hasAccessRights() const
 {
-    return !m_fetchedAll && m_camera && !fetchInProgress()
-        && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
-bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
+rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 latestTimeMs)
 {
-    if (!canFetchMore() || !completionHandler)
-        return false;
-
     const auto eventsReceived =
         [this](bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
-            if (handle != m_currentFetchId)
-                return;
-
-            NX_ASSERT(m_prefetch.empty() && m_prefetchCompletionHandler);
-            if (!m_prefetchCompletionHandler)
+            if (shouldSkipResponse(handle))
                 return;
 
             m_prefetch = success ? std::move(data) : vms::event::ActionDataList();
@@ -161,41 +183,28 @@ bool EventSearchListModel::Private::prefetch(PrefetchCompletionHandler completio
                     << debugTimestampToString(timestampMs(m_prefetch.front()));
             }
 
-            m_prefetchCompletionHandler(m_prefetch.size() >= kFetchBatchSize
+            complete(m_prefetch.size() >= kFetchBatchSize
                 ? timestampMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
-
-            m_prefetchCompletionHandler = PrefetchCompletionHandler();
         };
 
-    qDebug() << "Requesting events from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
-
-    m_currentFetchId = getEvents(0, m_earliestTimeMs - 1, eventsReceived, kFetchBatchSize);
-    if (!m_currentFetchId)
-        return false;
-
-    m_prefetchCompletionHandler = completionHandler;
-    return true;
+    qDebug() << "Requesting events from 0 to" << debugTimestampToString(latestTimeMs);
+    return getEvents(0, latestTimeMs, eventsReceived, kFetchBatchSize);
 }
 
-void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
+bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
 {
-    if (!m_currentFetchId)
-        return;
-
-    m_currentFetchId = rest::Handle();
-
     if (!m_success)
     {
         qDebug() << "Committing no events";
-        return;
+        return false;
     }
 
-    const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::milliseconds(latestStartTimeMs)).count();
+    const auto earliestTimeToCommitUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::milliseconds(earliestTimeToCommitMs)).count();
 
     const auto end = std::upper_bound(m_prefetch.begin(), m_prefetch.end(),
-        latestTimeUs, upperBoundPredicate);
+        earliestTimeToCommitUs, upperBoundPredicate);
 
     const auto first = this->count();
     const auto count = std::distance(m_prefetch.begin(), end);
@@ -216,14 +225,9 @@ void EventSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
         qDebug() << "Committing no events";
     }
 
-    m_fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
-    m_earliestTimeMs = latestStartTimeMs;
+    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
     m_prefetch.clear();
-}
-
-bool EventSearchListModel::Private::fetchInProgress() const
-{
-    return m_currentFetchId != rest::Handle();
+    return true;
 }
 
 void EventSearchListModel::Private::periodicUpdate()
@@ -302,7 +306,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
 rest::Handle EventSearchListModel::Private::getEvents(qint64 startMs, qint64 endMs,
     GetCallback callback, int limit)
 {
-    if (!m_camera || !callback)
+    if (!camera() || !callback)
         return false;
 
     const auto server = q->commonModule()->currentServer();
@@ -311,7 +315,7 @@ rest::Handle EventSearchListModel::Private::getEvents(qint64 startMs, qint64 end
         return false;
 
     QnEventLogMultiserverRequestData request;
-    request.filter.cameras.push_back(m_camera);
+    request.filter.cameras.push_back(camera());
     request.filter.period = QnTimePeriod::fromInterval(startMs, endMs);
     request.filter.eventType = m_selectedEventType;
     request.order = Qt::DescendingOrder;

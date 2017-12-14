@@ -11,7 +11,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -22,6 +24,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
 namespace client {
@@ -66,7 +69,7 @@ static const auto upperBoundPredicate =
 } // namespace
 
 AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
-    base_type(),
+    base_type(q),
     q(q),
     m_updateTimer(new QTimer()),
     m_metadataSource(createMetadataSource())
@@ -88,29 +91,23 @@ media::SignalingMetadataConsumer* AnalyticsSearchListModel::Private::createMetad
     return metadataSource;
 }
 
-QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera() const
-{
-    return m_camera;
-}
-
 void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (m_camera == camera)
+    if (camera == this->camera())
         return;
 
-    clear();
-    m_camera = camera;
+    base_type::setCamera(camera);
 
     if (m_display)
         m_display->removeMetadataConsumer(m_metadataSource);
 
     m_display.reset();
 
-    if (!m_camera)
+    if (!camera)
         return;
 
     auto widget = qobject_cast<QnMediaResourceWidget*>(q->navigator()->currentWidget());
-    NX_ASSERT(widget && widget->resource() == m_camera);
+    NX_ASSERT(widget && widget->resource() == camera);
 
     if (!widget)
         return;
@@ -127,9 +124,49 @@ int AnalyticsSearchListModel::Private::count() const
     return int(m_data.size());
 }
 
-const analytics::storage::DetectedObject& AnalyticsSearchListModel::Private::object(int index) const
+QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int role,
+    bool& handled) const
 {
-    return m_data[index];
+    const auto& object = m_data[index.row()];
+    handled = true;
+
+    static const auto kDefaultLocale = QString();
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return vms::event::AnalyticsHelper::objectName(camera(),
+                object.objectTypeId, kDefaultLocale);
+
+        case Qt::DecorationRole:
+            return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
+
+        case Qn::DescriptionTextRole:
+            return description(object);
+
+        case Qn::TimestampRole:
+        case Qn::PreviewTimeRole:
+            return startTimeMs(object);
+
+        case Qn::HelpTopicIdRole:
+            return Qn::Empty_Help;
+
+        case Qn::ResourceRole:
+            return QVariant::fromValue<QnResourcePtr>(camera());
+
+        case Qn::ItemZoomRectRole:
+            return QVariant::fromValue(object.track.empty()
+                ? QRectF()
+                : object.track.front().boundingBox);
+
+        default:
+            handled = false;
+            return QVariant();
+    }
+}
+
+QRectF AnalyticsSearchListModel::Private::filterRect() const
+{
+    return m_filterRect;
 }
 
 void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect)
@@ -145,34 +182,28 @@ void AnalyticsSearchListModel::Private::clear()
 {
     qDebug() << "Clear analytics model";
 
+    m_updateTimer->stop();
+
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
-    m_fetchedAll = false;
-    m_earliestTimeMs = m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    m_currentFetchId = rest::Handle();
-    m_prefetchCompletionHandler = PrefetchCompletionHandler();
+    base_type::clear();
+
+    if (camera())
+        m_updateTimer->start();
 }
 
-bool AnalyticsSearchListModel::Private::canFetchMore() const
+bool AnalyticsSearchListModel::Private::hasAccessRights() const
 {
-    return !m_fetchedAll && m_camera && !fetchInProgress()
-        && q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
-bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
+rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 latestTimeMs)
 {
-    if (!canFetchMore() || !completionHandler)
-        return false;
-
     const auto dataReceived =
         [this](bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
         {
-            if (m_currentFetchId != handle)
-                return;
-
-            NX_ASSERT(m_prefetch.empty() && m_prefetchCompletionHandler);
-            if (!m_prefetchCompletionHandler)
+            if (shouldSkipResponse(handle))
                 return;
 
             m_prefetch = success ? std::move(data) : analytics::storage::LookupResult();
@@ -190,38 +221,25 @@ bool AnalyticsSearchListModel::Private::prefetch(PrefetchCompletionHandler compl
             }
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
-            m_prefetchCompletionHandler(m_prefetch.size() >= kFetchBatchSize
+            complete(m_prefetch.size() >= kFetchBatchSize
                 ? startTimeMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
-
-            m_prefetchCompletionHandler = PrefetchCompletionHandler();
         };
 
-    qDebug() << "Requesting analytics from 0 to" << debugTimestampToString(m_earliestTimeMs - 1);
-
-    m_currentFetchId = getObjects(0, m_earliestTimeMs - 1, dataReceived, kFetchBatchSize);
-    if (!m_currentFetchId)
-        return false;
-
-    m_prefetchCompletionHandler = completionHandler;
-    return true;
+    qDebug() << "Requesting analytics from 0 to" << debugTimestampToString(latestTimeMs);
+    return getObjects(0, latestTimeMs, dataReceived, kFetchBatchSize);
 }
 
-void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
+bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
 {
-    if (!m_currentFetchId)
-        return;
-
-    m_currentFetchId = rest::Handle();
-
     if (!m_success)
     {
         qDebug() << "Committing no analytics";
-        return;
+        return false;
     }
 
     const auto latestTimeUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::milliseconds(latestStartTimeMs)).count();
+        std::chrono::milliseconds(earliestTimeToCommitMs)).count();
 
     const auto end = std::upper_bound(m_prefetch.begin(), m_prefetch.end(),
         latestTimeUs, upperBoundPredicate);
@@ -245,14 +263,9 @@ void AnalyticsSearchListModel::Private::commitPrefetch(qint64 latestStartTimeMs)
         qDebug() << "Committing no analytics";
     }
 
-    m_fetchedAll = m_prefetch.empty();
-    m_earliestTimeMs = latestStartTimeMs;
+    fetchedAll = m_prefetch.empty();
     m_prefetch.clear();
-}
-
-bool AnalyticsSearchListModel::Private::fetchInProgress() const
-{
-    return m_currentFetchId != rest::Handle();
+    return true;
 }
 
 void AnalyticsSearchListModel::Private::periodicUpdate()
@@ -296,8 +309,8 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
         return false;
 
     analytics::storage::Filter request;
-    request.deviceId = m_camera->getId();
-    request.timePeriod = QnTimePeriod::fromInterval(0, m_earliestTimeMs - 1);
+    request.deviceId = camera()->getId();
+    request.timePeriod = QnTimePeriod::fromInterval(startMs, endMs);
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;
     request.boundingBox = m_filterRect;
