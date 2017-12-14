@@ -168,9 +168,9 @@ void UnifiedSearchListModel::Private::setAnalyticsSearchRect(const QRectF& relat
 
 void UnifiedSearchListModel::Private::clear()
 {
-    m_eventsModel->setCamera(QnVirtualCameraResourcePtr());
-    m_bookmarksModel->setCamera(QnVirtualCameraResourcePtr());
-    m_analyticsModel->setCamera(QnVirtualCameraResourcePtr());
+    m_eventsModel->clear();
+    m_bookmarksModel->clear();
+    m_analyticsModel->clear();
 }
 
 void UnifiedSearchListModel::Private::updateModels()
