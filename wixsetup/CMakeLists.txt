@@ -38,31 +38,11 @@ set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
 # This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
 set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
 
-add_custom_target(collect_qml_dependencies ALL
-    DEPENDS
-        desktop_client
-    COMMENT "Collecting QML libraries..."
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-    COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-        "--config" ${config_file}
-        "--source" ${desktop_client_executable}
-        "--qml-root" ${desktop_client_qml_root}
-        "--output" ${client_qml_dir}
-    )
+
 
 add_custom_target(wixsetup ALL
     DEPENDS
-        collect_qml_dependencies
-        applauncher
-        traytool
-        mediaserver
-        minilauncher
         customactions
-        testcamera
-        genericrtspplugin
-        mjpg_link
-        generic_multicast_plugin
-        hanwha_metadata_plugin
     COMMENT "Creating installer..."
     # TODO move python to cmake
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -73,7 +53,25 @@ add_custom_target(wixsetup ALL
     COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
 )
 
-add_custom_target(generate_update_packages ALL
+if(withTestCamera)
+    add_dependencies(wixsetup testcamera)
+endif()
+
+if(withDesktopClient)
+    add_custom_target(collect_qml_dependencies ALL
+        DEPENDS
+            desktop_client
+        COMMENT "Collecting QML libraries..."
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
+            "--config" ${config_file}
+            "--source" ${desktop_client_executable}
+            "--qml-root" ${desktop_client_qml_root}
+            "--output" ${client_qml_dir}
+        )
+    add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
+
+    add_custom_target(generate_update_packages ALL
     COMMENT "Preparing update and debug packages ..."
     DEPENDS
         collect_qml_dependencies
@@ -83,27 +81,60 @@ add_custom_target(generate_update_packages ALL
     COMMAND ${PYTHON_EXECUTABLE} generate_update_packages.py
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
-)
+    )
 
-add_custom_target(generate_client_debug_package ALL
-    COMMENT "Preparing client debug package..."
-    DEPENDS
-        desktop_client
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-    COMMAND ${PYTHON_EXECUTABLE} generate_client_debug_package.py
-        "--config" ${config_file}
-        "--output" ${distribution_output_dir}
-)
+    add_custom_target(generate_client_debug_package ALL
+        COMMENT "Preparing client debug package..."
+        DEPENDS
+            desktop_client
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_client_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
 
-add_custom_target(generate_libs_debug_package ALL
-    COMMENT "Preparing libs debug package..."
-    DEPENDS
-        nx_network
-        nx_utils
-        nx_vms_utils
-        udt
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-    COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py
-        "--config" ${config_file}
-        "--output" ${distribution_output_dir}
-)
+if(withMediaServer)
+    add_dependencies(wixsetup
+        mediaserver
+        genericrtspplugin
+        mjpg_link
+        generic_multicast_plugin)
+
+    if(TARGET hanwha_metadata_plugin)
+        add_dependencies(wixsetup hanwha_metadata_plugin)
+    endif()
+
+    if(withTrayTool)
+        add_dependencies(wixsetup traytool)
+    endif()
+endif()
+
+
+if(withDesktopClient OR withMediaServer OR withTestCamera)
+    add_custom_target(generate_libs_debug_package ALL
+        COMMENT "Preparing libs debug package..."
+        DEPENDS
+            nx_network
+            nx_utils
+            nx_vms_utils
+            udt
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+
+    add_custom_target(generate_misc_debug_package ALL
+        COMMENT "Preparing misc debug package..."
+        DEPENDS
+            applauncher
+            minilauncher
+            traytool
+            testcamera
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
