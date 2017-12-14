@@ -68,10 +68,7 @@ AbstractMetadataManager* StubMetadataPlugin::managerForResource(
 {
     *outError = Error::noError;
 
-    auto manager = new StubMetadataManager();
-    manager->addRef();
-
-    return manager;
+    return new StubMetadataManager();
 }
 
 AbstractSerializer* StubMetadataPlugin::serializerForType(

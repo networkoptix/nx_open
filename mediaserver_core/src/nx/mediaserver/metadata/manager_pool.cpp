@@ -193,6 +193,8 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
         if (!plugin)
             continue;
 
+        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*releaseRef*/ false);
+
         NX_DEBUG(
             this,
             lm("Trying to create metadata manager for resource %1 (%2) using plugin %3.")
@@ -432,7 +434,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
             this,
             lm("Can not deserialize plugin manifest from plugin %1").arg(plugin->name()));
 
-        boost::none;
+        return boost::none;
     }
 
     bool overwritten = false;
