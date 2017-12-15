@@ -15,17 +15,9 @@
     <number>16</number>
    </property>
    <item>
-    <widget class="QWidget" name="widget_2" native="true">
+    <widget class="QWidget" name="warningContainer" native="true">
      <property name="autoFillBackground">
       <bool>false</bool>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">#widget_2 {
-border-style: solid;
-border-color: rgb(255, 0, 0);
-border-width: 1px;
-border-radius: 2;
-}</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
        <property name="leftMargin">
@@ -57,11 +49,6 @@ border-radius: 2;
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-         </font>
         </property>
         <property name="text">
          <string>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</string>
