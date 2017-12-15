@@ -5,13 +5,11 @@ import os
 import zipfile
 import yaml
 
-from environment import zip_files_to, find_files_by_template, find_all_files
+import environment as e
 
-common_qt_libraries = [
+qt_libraries = [
     'Core',
-    'Gui']
-
-client_qt_libraries = [
+    'Gui',
     'Multimedia',
     'Network',
     'Xml',
@@ -31,7 +29,7 @@ client_qt_libraries = [
     'WebKit',
     'WebKitWidgets']
 
-client_qt_plugins = [
+qt_plugins = [
     'imageformats/qgif.dll',
     'imageformats/qjpeg.dll',
     'imageformats/qtiff.dll',
@@ -40,67 +38,7 @@ client_qt_plugins = [
     'audio/qtaudio_windows.dll',
     'platforms/qwindows.dll']
 
-common_nx_libraries = ['nx_utils', 'nx_network', 'nx_kit', 'udt']
-client_nx_libraries = ['nx_vms_utils']
-
-
-def ffmpeg_files(source_dir):
-    templates = [
-        'av*.dll',
-        'libogg*.dll',
-        'libvorbis*.dll',
-        'libmp3*.dll',
-        'swscale-*.dll',
-        'swresample-*.dll']
-    for template in templates:
-        for file in find_files_by_template(source_dir, template):
-            yield file
-
-
-def openssl_files(source_dir):
-    yield os.path.join(source_dir, 'libeay32.dll')
-    yield os.path.join(source_dir, 'ssleay32.dll')
-
-
-def openal_files(source_dir):
-    yield os.path.join(source_dir, 'OpenAL32.dll')
-
-
-def quazip_files_to(source_dir):
-    yield os.path.join(source_dir, 'quazip.dll')
-
-
-'''
-<?if $(var.quicksync) = true ?>
-<File Id="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
-<File Id="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
-<?endif?>
-'''
-
-
-def icu_files(qt_bin_dir):
-    for file in find_files_by_template(qt_bin_dir, 'icu*.dll'):
-        yield file
-
-
-def qt_files(qt_bin_dir, libs):
-    for lib in libs:
-        yield os.path.join(qt_bin_dir, 'Qt5{}.dll'.format(lib))
-
-
-def qt_plugins_files(qt_plugins_dir):
-    for lib in client_qt_plugins:
-        yield os.path.join(qt_plugins_dir, lib)
-
-
-def nx_files(source_dir, libs):
-    for lib in libs:
-        yield os.path.join(source_dir, '{}.dll'.format(lib))
-
-
-def zip_package(zip, package_directory):
-    bin_directory = os.path.join(package_directory, 'bin')
-    zip_files_to(zip, find_all_files(bin_directory), bin_directory)
+nx_libraries = ['nx_vms_utils', 'nx_utils', 'nx_network', 'nx_kit', 'udt']
 
 
 def create_client_update_file(
@@ -115,36 +53,42 @@ def create_client_update_file(
     launcher_version_name,
     minilauncher_binary_name,
     client_update_files_directory,
-    client_update_file
+    output_file
 ):
-    with zipfile.ZipFile(client_update_file, "w", zipfile.ZIP_DEFLATED) as zip:
-        zip_files_to(zip, ffmpeg_files(binaries_dir), binaries_dir)
-        zip_files_to(zip, openssl_files(binaries_dir), binaries_dir)
-        zip_files_to(zip, openal_files(binaries_dir), binaries_dir)
-        zip_files_to(zip, quazip_files_to(binaries_dir), binaries_dir)
-        zip_files_to(zip, nx_files(binaries_dir, common_nx_libraries), binaries_dir)
-        zip_files_to(zip, nx_files(binaries_dir, client_nx_libraries), binaries_dir)
-        zip_files_to(zip, find_all_files(client_update_files_directory),
-                     client_update_files_directory)
+    with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
+        e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
+        e.zip_files_to(zip, e.openssl_files(binaries_dir), binaries_dir)
+        e.zip_files_to(zip, e.openal_files(binaries_dir), binaries_dir)
+        e.zip_files_to(zip, e.quazip_files_to(binaries_dir), binaries_dir)
+        e.zip_files_to(zip, e.nx_files(binaries_dir, nx_libraries), binaries_dir)
+        e.zip_files_to(zip, e.find_all_files(client_update_files_directory),
+                       client_update_files_directory)
 
         qt_bin_dir = os.path.join(qt_dir, 'bin')
-        zip_files_to(zip, icu_files(qt_bin_dir), qt_bin_dir)
-        zip_files_to(zip, qt_files(qt_bin_dir, common_qt_libraries), qt_bin_dir)
-        zip_files_to(zip, qt_files(qt_bin_dir, client_qt_libraries), qt_bin_dir)
-        zip_files_to(zip, find_all_files(client_qml_dir), client_qml_dir, 'qml')
+        e.zip_files_to(zip, e.icu_files(qt_bin_dir), qt_bin_dir)
+        e.zip_files_to(zip, e.qt_files(qt_bin_dir, qt_libraries), qt_bin_dir)
+        e.zip_files_to(zip, e.find_all_files(client_qml_dir), client_qml_dir, 'qml')
 
         qt_plugins_dir = os.path.join(qt_dir, 'plugins')
-        zip_files_to(zip, qt_plugins_files(qt_plugins_dir), qt_plugins_dir)
+        e.zip_files_to(zip, e.qt_plugins_files(qt_plugins_dir, qt_plugins), qt_plugins_dir)
 
-        zip_package(zip, help_directory)
-        zip_package(zip, vcredist_directory)
-        zip_package(zip, vox_dir)
-        zip_package(zip, fonts_dir)
+        e.zip_rdep_package_to(zip, help_directory)
+        e.zip_rdep_package_to(zip, vcredist_directory)
+        e.zip_rdep_package_to(zip, vox_dir)
+        e.zip_rdep_package_to(zip, fonts_dir)
 
         zip.write(os.path.join(binaries_dir, 'desktop_client.exe'), client_binary_name + '.exe')
         zip.write(os.path.join(binaries_dir, 'applauncher.exe'), 'applauncher.exe')
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
         zip.write(os.path.join(binaries_dir, 'minilauncher.exe'), minilauncher_binary_name)
+
+
+'''
+<?if $(var.quicksync) = true ?>
+<File Id="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
+<File Id="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>
+<?endif?>
+'''
 
 
 def main():
@@ -156,7 +100,7 @@ def main():
     with open(args.config, 'r') as f:
         config = yaml.load(f)
 
-    client_update_file = os.path.join(
+    output_file = os.path.join(
         args.output, config['client_update_distribution_name']) + '.zip'
     create_client_update_file(
         binaries_dir=config['bin_source_dir'],
@@ -170,7 +114,7 @@ def main():
         launcher_version_name=config['launcher_version_file'],
         minilauncher_binary_name=config['minilauncher_binary_name'],
         client_update_files_directory=config['client_update_files_directory'],
-        client_update_file=client_update_file)
+        output_file=output_file)
 
 
 if __name__ == '__main__':

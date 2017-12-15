@@ -59,6 +59,16 @@ add_custom_target(wixsetup ALL
 
 if(withTestCamera)
     add_dependencies(wixsetup testcamera)
+
+    add_custom_target(generate_testcamera_package ALL
+        COMMENT "Preparing testcamera package..."
+        DEPENDS
+            testcamera
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_testcamera_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
 endif()
 
 if(withDesktopClient)
