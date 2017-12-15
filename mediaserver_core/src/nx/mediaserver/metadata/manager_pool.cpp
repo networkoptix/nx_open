@@ -159,7 +159,7 @@ nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins
 
 void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
 {
-    for (auto& plugin: availablePlugins())
+    for (AbstractMetadataPlugin* const plugin: availablePlugins())
     {
         nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*increaseRef*/ false);
 
@@ -168,16 +168,18 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         if (!manager)
             continue;
 
-        auto pluginManifest = addManifestToServer(plugin);
+        const auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
             continue; //< Error already logged.
 
-        auto deviceManifest = addManifestToCamera(camera, manager.get());
+        const auto deviceManifest = addManifestToCamera(camera, manager.get());
         if (!deviceManifest)
             continue; //< Error already logged.
 
         auto& context = m_contexts[camera->getId()];
-        std::unique_ptr<MetadataHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
+        std::unique_ptr<MetadataHandler> handler(
+            createMetadataHandler(camera, pluginManifest->driverId));
+
         if (auto consumingMetadataManager = nxpt::ScopedRef<AbstractConsumingMetadataManager>(
             manager->queryInterface(IID_ConsumingMetadataManager)))
         {
@@ -502,7 +504,7 @@ void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* vi
         using namespace nx::sdk::metadata;
         nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
             (AbstractConsumingMetadataManager*)
-            data.manager->queryInterface(IID_ConsumingMetadataManager), false);
+            data.manager->queryInterface(IID_ConsumingMetadataManager), /*increaseRef*/ false);
         if (!manager)
             return;
         bool needDeepCopy = data.manifest.capabilities.testFlag(
