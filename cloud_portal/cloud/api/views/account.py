@@ -44,7 +44,10 @@ def login(request):
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']
-        user = django.contrib.auth.authenticate(username=email, password=password)
+        try:
+            user = django.contrib.auth.authenticate(username=email, password=password)
+        except APINotAuthorisedException:
+            pass
 
     if user is None:
         # authorize user here
