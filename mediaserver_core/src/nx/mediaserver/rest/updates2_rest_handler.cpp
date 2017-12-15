@@ -2,6 +2,7 @@
 #include "updates2_rest_handler.h"
 #include <utils/common/app_info.h>
 #include <nx/network/app_info.h>
+#include <nx/api/updates2/available_update_info_data.h>
 
 
 namespace nx {
@@ -15,28 +16,21 @@ class GetUpdateInfoHelper
 public:
     GetUpdateInfoHelper()
     {
+        setNegativeResponseBody();
         m_updateRegistry = update::info::checkSync();
         if (m_updateRegistry == nullptr)
-        {
-            m_statusCode = nx_http::StatusCode::internalServerError;
             return;
-        }
 
         if (findUpdateInfo())
-        {
-            QJson::serialize(m_version, &m_responseBody);
-            m_statusCode = nx_http::StatusCode::ok;
-        }
+            QJson::serialize(api::AvailableUpdatesInfo(m_version.toString()), &m_responseBody);
     }
 
-    nx_http::StatusCode::Value statusCode() const { return m_statusCode; }
     QByteArray responseBody() const { return m_responseBody; }
 
 private:
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
     QByteArray m_responseBody;
     QnSoftwareVersion m_version;
-    nx_http::StatusCode::Value m_statusCode = nx_http::StatusCode::notFound;
 
     bool findUpdateInfo()
     {
@@ -53,8 +47,14 @@ private:
             QnAppInfo::customizationName(),
             QnSoftwareVersion(QnAppInfo::applicationVersion()));
     }
+
+    void setNegativeResponseBody()
+    {
+        QJson::serialize(api::AvailableUpdatesInfo(), &m_responseBody);
+    }
 };
 
+static const QString kUpdates2Path = "/updates2";
 } // namespace
 
 int Updates2RestHandler::executeGet(
@@ -64,10 +64,14 @@ int Updates2RestHandler::executeGet(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
 {
-    NX_ASSERT(path == "/updates2");
+    NX_ASSERT(path == kUpdates2Path);
+    if (path != kUpdates2Path)
+        return nx_http::StatusCode::notFound;
+
     GetUpdateInfoHelper getUpdateInfoHelper;
     result = getUpdateInfoHelper.responseBody();
-    return getUpdateInfoHelper.statusCode();
+
+    return nx_http::StatusCode::ok;
 }
 
 int Updates2RestHandler::executePost(

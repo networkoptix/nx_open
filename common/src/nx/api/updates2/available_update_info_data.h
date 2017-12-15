@@ -11,6 +11,9 @@ namespace api {
 struct AvailableUpdatesInfo
 {
     QString version;
+
+    AvailableUpdatesInfo(const QString& version): version(version) {}
+    AvailableUpdatesInfo() = default;
 };
 #define AvailableUpdatesInfo_Fields (version)
 
