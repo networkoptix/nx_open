@@ -187,7 +187,7 @@ private:
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    nx::utils::log::Settings logSettings(
+    nx::utils::log::Settings makeLogSettings(
         const QString& argValue, const QString& settingsKey, const QString& defaultValue);
 
     void initializeLogging();
@@ -222,6 +222,6 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
-    bool m_serviceMode;
+    const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
 };

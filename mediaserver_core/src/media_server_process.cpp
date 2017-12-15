@@ -2365,7 +2365,7 @@ void MediaServerProcess::updateGuidIfNeeded()
         setObsoleteGuid(obsoleteGuid);
 }
 
-nx::utils::log::Settings MediaServerProcess::logSettings(
+nx::utils::log::Settings MediaServerProcess::makeLogSettings(
     const QString& argValue, const QString& settingsKey, const QString& defaultValue)
 {
     const auto settings = qnServerModule->roSettings();
@@ -2406,7 +2406,7 @@ void MediaServerProcess::initializeLogging()
 {
     const auto binaryPath = QFile::decodeName(m_argv[0]);
     nx::utils::log::initialize(
-        logSettings(cmdLineArguments().logLevel, "logLevel", ""),
+        makeLogSettings(cmdLineArguments().logLevel, "logLevel", ""),
         qApp->applicationName(), binaryPath);
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
@@ -2414,24 +2414,30 @@ void MediaServerProcess::initializeLogging()
     else
         qnServerModule->roSettings()->remove("logFile");
 
+    nx::utils::log::Settings logSettings;
+
+    logSettings = makeLogSettings(cmdLineArguments().httpLogLevel,
+        "http-log-level", toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
-        logSettings(cmdLineArguments().httpLogLevel, "http-log-level", "none"),
-        qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
+    logSettings = makeLogSettings(cmdLineArguments().hwLogLevel,
+        "hwLoglevel", toString(nx::utils::log::Level::info));
     nx::utils::log::initialize(
-        logSettings(cmdLineArguments().hwLogLevel, "hwLoglevel", "info"),
-        qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
 
+    logSettings = makeLogSettings(cmdLineArguments().ec2TranLogLevel,
+        "tranLogLevel", toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
-        logSettings(cmdLineArguments().ec2TranLogLevel, "tranLogLevel", "none"),
-        qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
+    logSettings = makeLogSettings(cmdLineArguments().permissionsLogLevel,
+        "permissionsLogLevel", toString(nx::utils::log::Level::none));
     nx::utils::log::initialize(
-        logSettings(cmdLineArguments().ec2TranLogLevel, "tranLogLevel", "none"),
-        qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -2440,9 +2446,10 @@ void MediaServerProcess::initializeLogging()
 void MediaServerProcess::initializeHardwareId()
 {
     const auto binaryPath = QFile::decodeName(m_argv[0]);
+
+    auto logSettings = makeLogSettings(cmdLineArguments().hwLogLevel, "hwLoglevel", "info");
     nx::utils::log::initialize(
-        logSettings(cmdLineArguments().hwLogLevel, "hwLoglevel", "info"),
-        qApp->applicationName(), binaryPath,
+        logSettings, qApp->applicationName(), binaryPath,
         QLatin1String("hw_log"), nx::utils::log::addLogger({QnLog::HWID_LOG}));
 
     LLUtil::initHardwareId(qnServerModule->roSettings());
