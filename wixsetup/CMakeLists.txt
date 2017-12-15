@@ -126,6 +126,25 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
     )
 endif()
 
+if(withMediaServer)
+    add_custom_target(generate_mediaserver_debug_package ALL
+        COMMENT "Preparing mediaserver debug package..."
+        DEPENDS
+            mediaserver
+            genericrtspplugin
+            generic_multicast_plugin
+            image_library_plugin
+            mjpg_link
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_mediaserver_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+    if(TARGET hanwha_metadata_plugin)
+        add_dependencies(generate_mediaserver_debug_package hanwha_metadata_plugin)
+    endif()
+endif()
+
 if(withClouds)
     add_custom_target(generate_cloud_debug_package ALL
         COMMENT "Preparing cloud debug package..."
