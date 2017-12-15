@@ -11,14 +11,14 @@ from environment import zip_files_to, find_all_files
 def generate_server_update_package(
     distribution_output_dir,
     server_distribution_name,
-    server_update_files_firectory,
+    server_update_files_directory,
     output_filename
 ):
     with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
         distribution_file = os.path.join(distribution_output_dir, server_distribution_name + '.exe')
         zip_files_to(zip, [distribution_file], distribution_output_dir)
-        zip_files_to(zip, find_all_files(server_update_files_firectory),
-                     server_update_files_firectory)
+        zip_files_to(zip, find_all_files(server_update_files_directory),
+                     server_update_files_directory)
 
 
 def main():
@@ -35,7 +35,7 @@ def main():
     generate_server_update_package(
         distribution_output_dir=config['distribution_output_dir'],
         server_distribution_name=config['server_distribution_name'],
-        server_update_files_firectory=config['server_update_files_firectory'],
+        server_update_files_directory=config['server_update_files_directory'],
         output_filename=output_filename)
 
 
