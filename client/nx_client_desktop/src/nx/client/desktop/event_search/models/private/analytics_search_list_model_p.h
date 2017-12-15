@@ -44,8 +44,9 @@ public:
     bool defaultAction(int index) const;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 latestTimeMs) override;
+    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
     virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
+    virtual void clipToSelectedTimePeriod() override;
     virtual bool hasAccessRights() const override;
 
 private:
@@ -55,6 +56,7 @@ private:
     int indexOf(const QnUuid& objectId, qint64 timeUs) const;
 
     void periodicUpdate();
+    void refreshUpdateTimer();
     void addNewlyReceivedObjects(analytics::storage::LookupResult&& data);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;

@@ -5,6 +5,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
+#include <recording/time_period.h>
 
 #include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
 
@@ -28,6 +29,9 @@ public:
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
+
+    QnTimePeriod selectedTimePeriod() const;
+    void setSelectedTimePeriod(const QnTimePeriod& value);
 
     void clear();
 

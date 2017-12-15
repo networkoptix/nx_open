@@ -140,6 +140,26 @@ void UnifiedSearchListModel::Private::setFilter(Types filter)
     updateModels();
 }
 
+QnTimePeriod UnifiedSearchListModel::Private::selectedTimePeriod() const
+{
+    return m_eventsModel->selectedTimePeriod();
+}
+
+void UnifiedSearchListModel::Private::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    if (selectedTimePeriod() == value)
+        return;
+
+    qDebug() << "Selected time period from"
+        << AbstractEventListModel::debugTimestampToString(value.startTimeMs) << "to"
+        << AbstractEventListModel::debugTimestampToString(value.endTimeMs());
+
+    m_eventsModel->setSelectedTimePeriod(value);
+    m_bookmarksModel->setSelectedTimePeriod(value);
+    m_analyticsModel->setSelectedTimePeriod(value);
+    ensureFetchMore();
+}
+
 vms::event::EventType UnifiedSearchListModel::Private::selectedEventType() const
 {
     return m_selectedEventType;
@@ -163,7 +183,7 @@ void UnifiedSearchListModel::Private::setAnalyticsSearchRect(const QRectF& relat
     m_analyticsModel->setFilterRect(relativeRect);
 
     if (m_filter.testFlag(Type::analytics))
-        updateModels();
+        ensureFetchMore();
 }
 
 void UnifiedSearchListModel::Private::clear()

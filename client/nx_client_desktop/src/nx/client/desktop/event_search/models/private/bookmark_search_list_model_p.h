@@ -33,8 +33,9 @@ public:
     virtual void clear() override;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 latestTimeMs) override;
+    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
     virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
+    virtual void clipToSelectedTimePeriod() override;
     virtual bool hasAccessRights() const override;
 
 private:

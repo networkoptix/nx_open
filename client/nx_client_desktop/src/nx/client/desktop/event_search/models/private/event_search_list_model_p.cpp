@@ -73,9 +73,7 @@ void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& 
         return;
 
     base_type::setCamera(camera);
-
-    if (camera)
-        m_updateTimer->start();
+    refreshUpdateTimer();
 }
 
 vms::event::EventType EventSearchListModel::Private::selectedEventType() const
@@ -143,17 +141,14 @@ void EventSearchListModel::Private::clear()
 {
     qDebug() << "Clear events model";
 
-    m_updateTimer->stop();
-
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
     m_currentUpdateId = rest::Handle();
-    m_latestTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
     base_type::clear();
 
-    if (camera())
-        m_updateTimer->start();
+    refreshUpdateTimer();
 }
 
 bool EventSearchListModel::Private::hasAccessRights() const
@@ -161,7 +156,7 @@ bool EventSearchListModel::Private::hasAccessRights() const
     return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
-rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 latestTimeMs)
+rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
 {
     const auto eventsReceived =
         [this](bool success, rest::Handle handle, vms::event::ActionDataList&& data)
@@ -188,8 +183,10 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 latestTimeMs)
                 : 0);
         };
 
-    qDebug() << "Requesting events from 0 to" << debugTimestampToString(latestTimeMs);
-    return getEvents(0, latestTimeMs, eventsReceived, kFetchBatchSize);
+    qDebug() << "Requesting events from" << debugTimestampToString(fromMs)
+        << "to" << debugTimestampToString(toMs);
+
+    return getEvents(fromMs, toMs, eventsReceived, kFetchBatchSize);
 }
 
 bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
@@ -228,6 +225,34 @@ bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs
     fetchedAll = count == m_prefetch.size() && m_prefetch.size() < kFetchBatchSize;
     m_prefetch.clear();
     return true;
+}
+
+void EventSearchListModel::Private::clipToSelectedTimePeriod()
+{
+    m_currentUpdateId = rest::Handle(); //< Cancel timed update.
+    m_latestTimeMs = qMin(m_latestTimeMs, selectedTimePeriod().endTimeMs());
+    refreshUpdateTimer();
+    clipToTimePeriod(m_data, upperBoundPredicate, selectedTimePeriod());
+}
+
+void EventSearchListModel::Private::refreshUpdateTimer()
+{
+    if (camera() && selectedTimePeriod().isInfinite())
+    {
+        if (!m_updateTimer->isActive())
+        {
+            qDebug() << "Event search update timer started";
+            m_updateTimer->start();
+        }
+    }
+    else
+    {
+        if (m_updateTimer->isActive())
+        {
+            qDebug() << "Event search update timer stopped";
+            m_updateTimer->stop();
+        }
+    }
 }
 
 void EventSearchListModel::Private::periodicUpdate()

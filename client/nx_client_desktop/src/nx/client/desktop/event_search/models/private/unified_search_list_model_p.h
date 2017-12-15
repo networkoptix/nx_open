@@ -36,6 +36,9 @@ public:
     Types filter() const;
     void setFilter(Types filter);
 
+    QnTimePeriod selectedTimePeriod() const;
+    void setSelectedTimePeriod(const QnTimePeriod& value);
+
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);
 

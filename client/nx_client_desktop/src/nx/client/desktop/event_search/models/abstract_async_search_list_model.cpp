@@ -32,6 +32,16 @@ void AbstractAsyncSearchListModel::setCamera(const QnVirtualCameraResourcePtr& c
     d->setCamera(camera);
 }
 
+QnTimePeriod AbstractAsyncSearchListModel::selectedTimePeriod() const
+{
+    return d->selectedTimePeriod();
+}
+
+void AbstractAsyncSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    d->setSelectedTimePeriod(value);
+}
+
 void AbstractAsyncSearchListModel::clear()
 {
     d->clear();

@@ -97,6 +97,7 @@ void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourceP
         return;
 
     base_type::setCamera(camera);
+    refreshUpdateTimer();
 
     if (m_display)
         m_display->removeMetadataConsumer(m_metadataSource);
@@ -182,15 +183,14 @@ void AnalyticsSearchListModel::Private::clear()
 {
     qDebug() << "Clear analytics model";
 
-    m_updateTimer->stop();
-
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
+    m_currentUpdateId = rest::Handle();
+    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
     base_type::clear();
 
-    if (camera())
-        m_updateTimer->start();
+    refreshUpdateTimer();
 }
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
@@ -198,7 +198,7 @@ bool AnalyticsSearchListModel::Private::hasAccessRights() const
     return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
 }
 
-rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 latestTimeMs)
+rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
 {
     const auto dataReceived =
         [this](bool success, rest::Handle handle, analytics::storage::LookupResult&& data)
@@ -226,8 +226,10 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 latestTim
                 : 0);
         };
 
-    qDebug() << "Requesting analytics from 0 to" << debugTimestampToString(latestTimeMs);
-    return getObjects(0, latestTimeMs, dataReceived, kFetchBatchSize);
+    qDebug() << "Requesting analytics from" << debugTimestampToString(fromMs)
+        << "to" << debugTimestampToString(toMs);
+
+    return getObjects(fromMs, toMs, dataReceived, kFetchBatchSize);
 }
 
 bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)
@@ -266,6 +268,34 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToComm
     fetchedAll = m_prefetch.empty();
     m_prefetch.clear();
     return true;
+}
+
+void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
+{
+    m_currentUpdateId = rest::Handle(); //< Cancel timed update.
+    m_latestTimeMs = qMin(m_latestTimeMs, selectedTimePeriod().endTimeMs());
+    refreshUpdateTimer();
+    clipToTimePeriod(m_data, upperBoundPredicate, selectedTimePeriod());
+}
+
+void AnalyticsSearchListModel::Private::refreshUpdateTimer()
+{
+    if (camera() && selectedTimePeriod().isInfinite())
+    {
+        if (!m_updateTimer->isActive())
+        {
+            qDebug() << "Event search update timer started";
+            m_updateTimer->start();
+        }
+    }
+    else
+    {
+        if (m_updateTimer->isActive())
+        {
+            qDebug() << "Event search update timer stopped";
+            m_updateTimer->stop();
+        }
+    }
 }
 
 void AnalyticsSearchListModel::Private::periodicUpdate()

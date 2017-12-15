@@ -91,16 +91,17 @@ void BookmarkSearchListModel::Private::clear()
     base_type::clear();
 }
 
-rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 latestTimeMs)
+rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
 {
     QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = 0;
-    filter.endTimeMs = latestTimeMs;
+    filter.startTimeMs = fromMs;
+    filter.endTimeMs = toMs;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = kFetchBatchSize;
 
-    qDebug() << "Requesting bookmarks from 0 to" << debugTimestampToString(latestTimeMs);
+    qDebug() << "Requesting bookmarks from" << debugTimestampToString(fromMs)
+        << "to" << debugTimestampToString(toMs);
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
         [this, guard = QPointer<QObject>(this)]
@@ -164,6 +165,14 @@ bool BookmarkSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommi
     return true;
 }
 
+void BookmarkSearchListModel::Private::clipToSelectedTimePeriod()
+{
+    const auto itemCleanup =
+        [this](const QnCameraBookmark& item) { m_guidToTimestampMs.remove(item.guid); };
+
+    clipToTimePeriod(m_data, upperBoundPredicate, selectedTimePeriod(), itemCleanup);
+}
+
 bool BookmarkSearchListModel::Private::hasAccessRights() const
 {
     return q->accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission);
@@ -186,7 +195,8 @@ void BookmarkSearchListModel::Private::watchBookmarkChanges()
 
 void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookmark)
 {
-    if (bookmark.startTimeMs < earliestTimeMs()) //< Skip bookmarks outside of time range.
+    // Skip bookmarks outside of time range.
+    if (!fetchedTimePeriod().contains(bookmark.startTimeMs))
         return;
 
     if (m_guidToTimestampMs.contains(bookmark.guid))

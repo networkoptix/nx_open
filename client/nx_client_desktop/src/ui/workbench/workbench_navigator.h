@@ -152,6 +152,7 @@ signals:
     void bookmarksModeEnabledChanged();
     void syncIsForcedChanged();
     void timelineRelevancyChanged(bool isRelevant);
+    void timeSelectionChanged(const QnTimePeriod& selection);
 
 protected:
     enum SliderLine

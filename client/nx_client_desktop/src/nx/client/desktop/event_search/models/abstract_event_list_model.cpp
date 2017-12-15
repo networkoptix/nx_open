@@ -5,6 +5,8 @@
 #include <utils/common/synctime.h>
 #include <utils/common/delayed.h>
 
+#include <nx/utils/datetime.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -76,7 +78,9 @@ QString AbstractEventListModel::timestampText(qint64 timestampMs) const
 
 QString AbstractEventListModel::debugTimestampToString(qint64 timestampMs)
 {
-    return QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
+    return timestampMs == DATETIME_NOW
+        ? lit("infinity")
+        : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
 }
 
 } // namespace

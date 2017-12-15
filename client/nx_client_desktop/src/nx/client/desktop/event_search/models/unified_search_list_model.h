@@ -3,6 +3,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
+#include <recording/time_period.h>
 
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/event/event_fwd.h>
@@ -34,6 +35,9 @@ public:
 
     Types filter() const;
     void setFilter(Types filter);
+
+    QnTimePeriod selectedTimePeriod() const;
+    void setSelectedTimePeriod(const QnTimePeriod& value);
 
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);

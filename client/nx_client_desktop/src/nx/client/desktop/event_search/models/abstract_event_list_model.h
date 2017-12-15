@@ -29,9 +29,10 @@ public:
 
 protected:
     bool isValid(const QModelIndex& index) const;
-    static QString debugTimestampToString(qint64 timestampMs);
-
     virtual QString timestampText(qint64 timestampMs) const;
+
+public:
+    static QString debugTimestampToString(qint64 timestampMs);
 };
 
 } // namespace
