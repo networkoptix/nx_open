@@ -16,6 +16,8 @@ option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
+option(codeSigning "Enable code signing." ON)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 

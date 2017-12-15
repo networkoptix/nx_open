@@ -80,15 +80,23 @@ if(ANDROID)
 
     set(apk_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.apk")
 
+    if(codeSigning)
+        set(code_signing_parameters
+            KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
+            KEYSTORE_ALIAS "${android.alias}"
+            KEYSTORE_PASSWORD "${android.storepass}"
+            KEYSTORE_KEY_PASSWORD "${android.keypass}"
+        )
+    else()
+        set(code_signing_parameters)
+    endif()
+
     add_android_apk(mobile_client_apk TARGET mobile_client
         FILE_NAME ${apk_file_name}
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
-        KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
-        KEYSTORE_ALIAS "${android.alias}"
-        KEYSTORE_PASSWORD "${android.storepass}"
-        KEYSTORE_KEY_PASSWORD "${android.keypass}"
+        ${code_signing_parameters}
     )
 endif()
 
