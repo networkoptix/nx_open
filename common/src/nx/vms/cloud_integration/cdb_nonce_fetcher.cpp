@@ -259,13 +259,13 @@ void CdbNonceFetcher::gotNonce(
     if (!m_cloudConnectionManager->boundToCloud())
         return;
 
-    QnMutexLocker lock(&m_mutex);
-
     if (resCode != nx::cdb::api::ResultCode::ok)
     {
         NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
         m_cloudConnectionManager->processCloudErrorCode(resCode);
+
+        QnMutexLocker lock(&m_mutex);
         m_timerID = nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(
@@ -273,6 +273,8 @@ void CdbNonceFetcher::gotNonce(
                 kGetNonceRetryTimeout));
         return;
     }
+
+    QnMutexLocker lock(&m_mutex);
 
     saveCloudNonce(std::move(nonce));
 
