@@ -242,33 +242,33 @@ private:
     void assertFileDataContent() const
     {
         FileData fileData;
-        ResultCode resultCode = m_updateRegistry->findUpdate(
-            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+        ResultCode resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
-        resultCode = m_updateRegistry->findUpdate(
-            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64()),
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData("nxvms.com", "default", QnSoftwareVersion(10, 0, 0, 0), ubuntuX64()),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
-        resultCode = m_updateRegistry->findUpdate(
-            UpdateRequestData("not-existing-host", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData("not-existing-host", "default", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
-        resultCode = m_updateRegistry->findUpdate(
-            UpdateRequestData("nxvms.com", "not-existing-customization", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData("nxvms.com", "not-existing-customization", QnSoftwareVersion(2, 0, 0, 0), ubuntuX64()),
             &fileData);
         assertFindResult(resultCode, fileData, true);
 
-        resultCode = m_updateRegistry->findUpdate(
-            UpdateRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(3, 0, 2, 9872), windowsX64()),
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(3, 0, 2, 9872), windowsX64()),
             &fileData);
         assertFindResult(resultCode, fileData, false);
 
-        resultCode = m_updateRegistry->findUpdate(
-            UpdateRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872), armRpi()),
+        resultCode = m_updateRegistry->findUpdateFile(
+            UpdateFileRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(3, 0, 0, 9872), armRpi()),
             &fileData);
         assertFindResult(resultCode, fileData, false);
     }

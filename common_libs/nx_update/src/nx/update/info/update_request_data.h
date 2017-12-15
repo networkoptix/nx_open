@@ -48,32 +48,48 @@ NX_UPDATE_API OsVersion armBpi();
 NX_UPDATE_API OsVersion armRpi();
 NX_UPDATE_API OsVersion armBananapi();
 
-struct NX_UPDATE_API UpdateRequestData
+struct UpdateRequestData
 {
     QString cloudHost;
     QString customization;
     QnSoftwareVersion currentNxVersion;
-    OsVersion osVersion;
 
     UpdateRequestData(
+        const QString& cloudHost,
+        const QString& customization,
+        const QnSoftwareVersion& currentNxVersion)
+        :
+        cloudHost(cloudHost),
+        customization(customization),
+        currentNxVersion(currentNxVersion)
+    {}
+
+    QString toString() const
+    {
+        return lit("cloud host=%1, customization=%2, current nx version=%3")
+            .arg(cloudHost)
+            .arg(customization)
+            .arg(currentNxVersion.toString());
+    }
+};
+
+struct UpdateFileRequestData: UpdateRequestData
+{
+    OsVersion osVersion;
+
+    UpdateFileRequestData(
         const QString& cloudHost,
         const QString& customization,
         const QnSoftwareVersion& currentNxVersion,
         const OsVersion& osVersion)
         :
-        cloudHost(cloudHost),
-        customization(customization),
-        currentNxVersion(currentNxVersion),
+        UpdateRequestData(cloudHost, customization, currentNxVersion),
         osVersion(osVersion)
     {}
 
     QString toString() const
     {
-        return lit("cloud host=%1, customization=%2, current nx version=%3, os=%4")
-            .arg(cloudHost)
-            .arg(customization)
-            .arg(currentNxVersion.toString())
-            .arg(osVersion.toString());
+        return UpdateRequestData::toString() + lit(", os=%1").arg(osVersion.toString());
     }
 };
 

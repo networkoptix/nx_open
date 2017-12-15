@@ -13,52 +13,54 @@ namespace {
 using namespace detail;
 using namespace detail::data_parser;
 
-class FileDataFinder
+class UpdateDataFinder
 {
 public:
-    FileDataFinder(
-        const QString& baseUrl,
+    UpdateDataFinder(
         const UpdateRequestData& updateRequestData,
         const detail::CustomizationVersionToUpdate& customizationVersionToUpdate,
         const CustomizationData& customizationData)
         :
-        m_baseUrl(baseUrl),
         m_updateRequestData(updateRequestData),
         m_customizationVersionToUpdate(customizationVersionToUpdate),
         m_customizationData(customizationData)
     {
-        if (!hasNewerVersions(updateRequestData.currentNxVersion))
+    }
+
+    void process()
+    {
+        if (!hasNewerVersions(m_updateRequestData.currentNxVersion))
         {
-            NX_WARNING(
+            NX_INFO(
                 this,
                 lm("No newer versions found. Current version is %1")
-                    .args(updateRequestData.currentNxVersion.toString()));
+                .args(m_updateRequestData.currentNxVersion.toString()));
             return;
         }
 
         if (!hasRequestedPackage())
         {
-            NX_WARNING(this, lm("No update package found for %1")
-                .args(updateRequestData.toString()));
+            NX_INFO(this, lm("No update package found for %1")
+                .args(m_updateRequestData.toString()));
         }
+
     }
+
+    virtual ~UpdateDataFinder() = default;
 
     bool ok() const
     {
         return m_found;
     }
 
-    FileData fileData() const
-    {
-        return m_fileData;
-    }
-private:
-    const QString& m_baseUrl;
+    QnSoftwareVersion version() const { return m_version; }
+
+protected:
     const UpdateRequestData& m_updateRequestData;
     const detail::CustomizationVersionToUpdate& m_customizationVersionToUpdate;
     const CustomizationData& m_customizationData;
-    mutable FileData m_fileData;
     mutable bool m_found = false;
+    mutable QnSoftwareVersion m_version;
 
     bool hasNewerVersions(const QnSoftwareVersion& currentNxVersion) const
     {
@@ -102,12 +104,53 @@ private:
             return;
         }
 
-        for (auto packageIt = updateIt->targetToPackage.cbegin();
-            packageIt != updateIt->targetToPackage.cend();
-            ++packageIt)
+        if (checkPackages(*updateIt, version))
+            m_version = version;
+    }
+
+    virtual bool checkPackages(
+        const UpdateData& /*updateData*/,
+        const QnSoftwareVersion& /*version*/) const
+    {
+        m_found = true;
+        return true;
+    }
+};
+
+class FileDataFinder: public UpdateDataFinder
+{
+public:
+    FileDataFinder(
+        const QString& baseUrl,
+        const UpdateFileRequestData& updateRequestData,
+        const detail::CustomizationVersionToUpdate& customizationVersionToUpdate,
+        const CustomizationData& customizationData)
+        :
+        UpdateDataFinder(updateRequestData, customizationVersionToUpdate, customizationData),
+        m_baseUrl(baseUrl)
+    {
+    }
+
+    FileData fileData() const
+    {
+        return m_fileData;
+    }
+private:
+    const QString& m_baseUrl;
+    mutable FileData m_fileData;
+
+    virtual bool checkPackages(
+        const UpdateData& updateData,
+        const QnSoftwareVersion& version) const override
+    {
+        for (auto it = updateData.targetToPackage.cbegin();
+            it != updateData.targetToPackage.cend();
+            ++it)
         {
-            checkPackage(packageIt.key(), packageIt.value(), version);
+            checkPackage(it.key(), it.value(), version);
         }
+
+        return m_found;
     }
 
     void checkPackage(
@@ -118,7 +161,7 @@ private:
         if (m_found)
             return;
 
-        if (!m_updateRequestData.osVersion.matches(target))
+        if (!static_cast<const UpdateFileRequestData&>(m_updateRequestData).osVersion.matches(target))
             return;
 
         m_fileData = fileData;
@@ -637,9 +680,9 @@ CommonUpdateRegistry::CommonUpdateRegistry(
     m_customizationVersionToUpdate(std::move(customizationVersionToUpdate))
 {}
 
-ResultCode CommonUpdateRegistry::findUpdate(
-    const UpdateRequestData& updateRequestData,
-    FileData* outFileData)
+ResultCode CommonUpdateRegistry::findUpdateFile(
+    const UpdateFileRequestData& updateRequestData,
+    FileData* outFileData) const
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
 
@@ -653,6 +696,7 @@ ResultCode CommonUpdateRegistry::findUpdate(
         m_customizationVersionToUpdate,
         customizationData);
 
+    fileDataFinder.process();
     if (!fileDataFinder.ok())
         return ResultCode::noData;
 
@@ -672,7 +716,7 @@ QList<QString> CommonUpdateRegistry::alternativeServers() const
 
 bool CommonUpdateRegistry::hasUpdateForCustomizationAndVersion(
     const UpdateRequestData& updateRequestData,
-    CustomizationData* customizationData)
+    CustomizationData* customizationData) const
 {
     using namespace detail::data_parser;
 
@@ -723,6 +767,30 @@ bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
     return otherCommonUpdateRegistry->m_baseUrl == m_baseUrl
         && otherCommonUpdateRegistry->m_metaData == m_metaData
         && otherCommonUpdateRegistry->m_customizationVersionToUpdate == m_customizationVersionToUpdate;
+}
+
+ResultCode CommonUpdateRegistry::latestUpdate(
+    const UpdateRequestData& updateRequestData,
+    QnSoftwareVersion* outSoftwareVersion) const
+{
+    CustomizationData customizationData;
+    if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
+        return ResultCode::noData;
+
+    UpdateDataFinder updateDataFinder(
+        updateRequestData,
+        m_customizationVersionToUpdate,
+        customizationData);
+
+    updateDataFinder.process();
+    if (!updateDataFinder.ok())
+    {
+        NX_VERBOSE(this, lm("No update found for %1").args(updateRequestData.toString()));
+        return ResultCode::noData;
+    }
+
+    *outSoftwareVersion = updateDataFinder.version();
+    return ResultCode::ok;
 }
 
 } // namespace impl

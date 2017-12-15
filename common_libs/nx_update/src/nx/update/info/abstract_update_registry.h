@@ -14,10 +14,15 @@ class NX_UPDATE_API AbstractUpdateRegistry
 public:
     // todo: implement findClientUpdate()
     virtual ~AbstractUpdateRegistry() {}
-    virtual ResultCode findUpdate(
+
+    virtual ResultCode findUpdateFile(
+        const UpdateFileRequestData& updateFileRequestData,
+        FileData* outFileData) const = 0;
+    virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
-        FileData* outFileData) = 0;
+        QnSoftwareVersion* outSoftwareVersion) const = 0;
     virtual QList<QString> alternativeServers() const = 0;
+
     virtual QByteArray toByteArray() const = 0;
     virtual bool fromByteArray(const QByteArray& rawData) = 0;
     virtual bool equals(AbstractUpdateRegistry* other) const = 0;
