@@ -1,5 +1,0 @@
-// Jenkinsfile for running pipeline project
-@Library('jenkins') _
-
-
-jenkins_project.run_project()
