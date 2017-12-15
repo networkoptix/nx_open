@@ -32,14 +32,12 @@ void MetadataHandler::handleMetadata(
         return;
 
     nxpt::ScopedRef<AbstractEventMetadataPacket> eventsPacket(
-        (AbstractEventMetadataPacket*)
-        metadata->queryInterface(IID_EventMetadataPacket), /*increaseRef*/ false);
+        metadata->queryInterface(IID_EventMetadataPacket));
     if (eventsPacket)
         handleEventsPacket(std::move(eventsPacket));
 
     nxpt::ScopedRef<AbstractObjectsMetadataPacket> objectsPacket(
-        (AbstractObjectsMetadataPacket*)
-        metadata->queryInterface(IID_DetectionMetadataPacket), /*increaseRef*/ false);
+        metadata->queryInterface(IID_DetectionMetadataPacket));
     if (objectsPacket)
         handleObjectsPacket(std::move(objectsPacket));
 }
@@ -48,13 +46,11 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<AbstractEventMetadataPa
 {
     while (true)
     {
-        nxpt::ScopedRef<AbstractMetadataItem> item(packet->nextItem(), false);
+        nxpt::ScopedRef<AbstractMetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
 
-        nxpt::ScopedRef<AbstractDetectedEvent> eventData =
-            (AbstractDetectedEvent*) item->queryInterface(IID_DetectedEvent);
-
+        nxpt::ScopedRef<AbstractDetectedEvent> eventData(item->queryInterface(IID_DetectedEvent));
         if (eventData)
         {
             auto timestampUsec = packet->timestampUsec();
@@ -72,7 +68,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<AbstractObjectsMetadat
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
-        nxpt::ScopedRef<AbstractDetectedObject> item(packet->nextItem(), false);
+        nxpt::ScopedRef<AbstractDetectedObject> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;

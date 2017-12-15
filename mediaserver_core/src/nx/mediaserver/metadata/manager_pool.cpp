@@ -181,9 +181,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
             createMetadataHandler(camera, pluginManifest->driverId));
 
         if (auto consumingMetadataManager = nxpt::ScopedRef<AbstractConsumingMetadataManager>(
-            static_cast<AbstractConsumingMetadataManager>(
-                manager->queryInterface(IID_ConsumingMetadataManager)),
-            /*increaseRef*/ false))
+            manager->queryInterface(IID_ConsumingMetadataManager)))
         {
             handler->registerDataReceptor(&context);
         }
@@ -505,9 +503,7 @@ void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* vi
     {
         using namespace nx::sdk::metadata;
         nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
-            static_cast<AbstractConsumingMetadataManager>(
-                data.manager->queryInterface(IID_ConsumingMetadataManager),
-            /*increaseRef*/ false);
+            data.manager->queryInterface(IID_ConsumingMetadataManager));
         if (!manager)
             return;
         bool needDeepCopy = data.manifest.capabilities.testFlag(

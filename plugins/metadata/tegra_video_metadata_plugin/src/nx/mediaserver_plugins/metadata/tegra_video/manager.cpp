@@ -290,8 +290,8 @@ bool Manager::pushFrameAndGetMetadataPackets(
     std::vector<nx::sdk::metadata::AbstractMetadataPacket*>* metadataPackets,
     AbstractDataPacket* mediaPacket) const
 {
-    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
-        (CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
+    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket(
+        mediaPacket->queryInterface(IID_CompressedVideoPacket));
     if (!videoPacket)
         return true; //< No error: no video frame.
 
