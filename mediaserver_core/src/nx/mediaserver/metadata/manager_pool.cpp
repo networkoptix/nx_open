@@ -505,7 +505,9 @@ void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* vi
     {
         using namespace nx::sdk::metadata;
         nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
-            data.manager->queryInterface(IID_ConsumingMetadataManager));
+            static_cast<AbstractConsumingMetadataManager>(
+                data.manager->queryInterface(IID_ConsumingMetadataManager),
+            /*increaseRef*/ false);
         if (!manager)
             return;
         bool needDeepCopy = data.manifest.capabilities.testFlag(
