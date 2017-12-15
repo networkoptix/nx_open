@@ -30,7 +30,7 @@ bool SystemMergeFixture::initializeSingleServerSystems(int count)
     for (int i = 0; i < count; ++i)
     {
         m_servers.emplace_back(
-            std::make_unique<PeerWrapper>(lm("%1/peer_%2").args(m_tmpDir, i)));
+            std::make_unique<PeerWrapper>(lm("%1/peer_%2").args(m_tmpDir, m_servers.size())));
         for (const auto& nameAndValue: m_settings)
             m_servers.back()->addSetting(nameAndValue.first, nameAndValue.second);
         if (!m_servers.back()->startAndWaitUntilStarted() ||
@@ -58,12 +58,12 @@ PeerWrapper& SystemMergeFixture::peer(int index)
     return *m_servers[index];
 }
 
-void SystemMergeFixture::whenMergeSystems()
+void SystemMergeFixture::mergeSystems()
 {
     m_prevResult = m_servers.back()->mergeTo(*m_servers.front());
 }
 
-void SystemMergeFixture::thenAllServersAreInterconnected()
+void SystemMergeFixture::waitUntilAllServersAreInterconnected()
 {
     for (;;)
     {
@@ -73,7 +73,7 @@ void SystemMergeFixture::thenAllServersAreInterconnected()
     }
 }
 
-void SystemMergeFixture::thenAllServersSynchronizedData()
+void SystemMergeFixture::waitUntilAllServersSynchronizedData()
 {
     for (;;)
     {

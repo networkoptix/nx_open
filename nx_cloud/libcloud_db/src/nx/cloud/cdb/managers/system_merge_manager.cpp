@@ -75,6 +75,13 @@ void SystemMergeManager::processMergeHistoryRecord(
         queryContext,
         mergeHistoryRecord.mergedSystemCloudId.toStdString(),
         &system);
+    if (resultCode == nx::utils::db::DBResult::notFound)
+    {
+        NX_INFO(this, lm("Ignoring merge history record for unknown system %1...")
+            .args(mergeHistoryRecord.mergedSystemCloudId));
+        return;
+    }
+
     if (resultCode != nx::utils::db::DBResult::ok)
         throw nx::utils::db::Exception(resultCode);
 

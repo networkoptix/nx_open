@@ -64,9 +64,9 @@ void ProxyWorker::closeConnection(
     SystemError::ErrorCode closeReason,
     nx_http::AsyncMessagePipeline* connection)
 {
-    NX_DEBUG(this, lm("Proxy %1. Connection to target peer %2 has been closed: %3")
-        .arg(m_proxyingId).arg(connection->socket()->getForeignAddress().toString())
-        .arg(SystemError::toString(closeReason)));
+    NX_DEBUG(this, lm("Proxy %1. Connection to target peer %2(%3) has been closed: %4")
+        .args(m_proxyingId, m_targetHost, connection->socket()->getForeignAddress().toString(),
+            SystemError::toString(closeReason)));
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
 
@@ -99,8 +99,8 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
     if (message.type != nx_http::MessageType::response)
     {
         NX_DEBUG(this,
-            lm("Proxy %1. Received unexpected request from target host %2. Closing connection...")
-            .arg(m_proxyingId).arg(m_targetHostPipeline->socket()->getForeignAddress()));
+            lm("Proxy %1. Received unexpected request from target host %2(%3). Closing connection...")
+            .args(m_proxyingId, m_targetHost, m_targetHostPipeline->socket()->getForeignAddress()));
 
         // TODO: #ak Use better status code.
         m_responseSender->sendResponse(
@@ -113,10 +113,13 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
     const auto contentType =
         nx_http::getHeaderValue(message.response->headers, "Content-Type");
 
-    NX_VERBOSE(this, lm("Proxy %1. Received response from target host %2. status %3, Content-Type %4")
-        .arg(m_proxyingId).arg(m_targetHostPipeline->socket()->getForeignAddress().toString())
-        .arg(nx_http::StatusCode::toString(statusCode))
-        .arg(contentType.isEmpty() ? nx::String("none") : contentType));
+    NX_VERBOSE(this, lm("Proxy %1. Received response from target host %2(%3). status %4, Content-Type %5")
+        .args(
+            m_proxyingId,
+            m_targetHost,
+            m_targetHostPipeline->socket()->getForeignAddress().toString(),
+            nx_http::StatusCode::toString(statusCode),
+            contentType.isEmpty() ? nx::String("none") : contentType));
 
     if (nx_http::isMessageBodyPresent(*message.response) &&
         !messageBodyNeedsConvertion(*message.response))
@@ -144,8 +147,8 @@ std::unique_ptr<nx_http::AbstractMsgBodySource>
     const auto contentType =
         nx_http::getHeaderValue(message.response->headers, "Content-Type");
 
-    NX_VERBOSE(this, lm("Proxy %1. Preparing streaming message body of type %2")
-        .arg(m_proxyingId).arg(contentType));
+    NX_VERBOSE(this, lm("Proxy %1 (target %2). Preparing streaming message body of type %3")
+        .args(m_proxyingId, m_targetHost, contentType));
 
     auto bodySource = nx_http::makeAsyncChannelMessageBodySource(
         contentType,
@@ -171,7 +174,8 @@ bool ProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& response)
         contentTypeIter->second);
     if (m_messageBodyConverter)
     {
-        NX_VERBOSE(this, lm("Proxy %1. Message body needs conversion").arg(m_proxyingId));
+        NX_VERBOSE(this, lm("Proxy %1 (target %2). Message body needs conversion")
+            .args(m_proxyingId, m_targetHost));
     }
     return m_messageBodyConverter != nullptr;
 }
@@ -200,7 +204,8 @@ void ProxyWorker::onMessageEnd()
 
 std::unique_ptr<nx_http::AbstractMsgBodySource> ProxyWorker::prepareFixedMessageBody()
 {
-    NX_VERBOSE(this, lm("Proxy %1. Preparing fixed message body").arg(m_proxyingId));
+    NX_VERBOSE(this, lm("Proxy %1 (target %2). Preparing fixed message body")
+        .args(m_proxyingId, m_targetHost));
 
     updateMessageHeaders(m_responseMessage.response);
 

@@ -77,6 +77,7 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
     to->realm = nx::network::AppInfo::realm();
     to->hash = "password_is_in_cloud";
     to->digest = "password_is_in_cloud";
+    to->isCloud = true;
     accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);
 }
 
