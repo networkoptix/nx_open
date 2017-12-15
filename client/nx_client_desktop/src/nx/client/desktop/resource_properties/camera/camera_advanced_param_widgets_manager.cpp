@@ -46,6 +46,8 @@ void CameraAdvancedParamWidgetsManager::clear()
 
     m_paramWidgetsById.clear();
     m_paramLabelsById.clear();
+    m_parametersById.clear();
+    m_handlerChains.clear();
     m_groupWidget->clear();
     while (m_contentsWidget->count() > 0)
         m_contentsWidget->removeWidget(m_contentsWidget->widget(0));
@@ -74,9 +76,17 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
     currentItemChanged(m_groupWidget->currentItem());
 }
 
-void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList &params)
+void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList& params)
 {
-    for (const QnCameraAdvancedParamValue &param : params)
+    for (const QnCameraAdvancedParamValue& param: params)
+    QMap<QString, QString> valuesToKeep;
+
+    // Disconnect all watches to not trigger handler chains.
+    for (auto& connection: m_handlerChainConnections)
+        disconnect(connection);
+
+    // Set widget values and store initial values that should be kept.
+    for (const QnCameraAdvancedParamValue &param: params)
     {
         if (!m_paramWidgetsById.contains(param.id))
             continue;
@@ -84,17 +94,72 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         auto widget = m_paramWidgetsById[param.id];
         widget->setValue(param.value);
         widget->setEnabled(true);
-        connect(widget, &AbstractCameraAdvancedParamWidget::valueChanged, this,
-            &CameraAdvancedParamWidgetsManager::paramValueChanged);
+
+        if (m_parametersById[param.id].shouldKeepInitialValue)
+            valuesToKeep[param.id] = param.value;
+    }
+
+    // Run handler chains.
+    for (const auto& watch: m_handlerChains.keys())
+    {
+        const auto& handlerChains = m_handlerChains.value(watch);
+        for (auto& func: handlerChains)
+            func();
+    }
+
+    // Connect handler chains to watched values.
+    m_handlerChainConnections.clear();
+    for (const auto& watch: m_handlerChains.keys())
+    {
+        const auto& handlerChains = m_handlerChains.value(watch);
+        for (auto& func: handlerChains)
+        {
+            auto watchWidget = m_paramWidgetsById[watch];
+            m_handlerChainConnections.push_back(
+                connect(
+                    watchWidget,
+                    &QnAbstractCameraAdvancedParamWidget::valueChanged,
+                    func));
+        }
+    }
+
+    // Restore initial values for some widgets.
+    for (const auto& paramId: valuesToKeep.keys())
+    {
+        auto widget = m_paramWidgetsById.value(paramId);
+        if (!widget)
+            continue;
+
+        widget->setValue(valuesToKeep[paramId]);
+    }
+
+    for (const QnCameraAdvancedParamValue &param: params)
+    {
+        auto widget = m_paramWidgetsById[param.id];
+        disconnect(
+            widget,
+            &QnAbstractCameraAdvancedParamWidget::valueChanged,
+            this,
+            &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
+
+        connect(
+            widget,
+            &QnAbstractCameraAdvancedParamWidget::valueChanged,
+            this,
+            &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
     }
 }
 
-bool CameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup &group) const
+bool CameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup& group) const
 {
-    bool hasValidParameter = boost::algorithm::any_of(group.params, [](const QnCameraAdvancedParameter &param) { return param.isValid(); });
+    bool hasValidParameter = boost::algorithm::any_of(
+        group.params,
+        [](const QnCameraAdvancedParameter &param) { return param.isValid(); });
     if (hasValidParameter)
         return true;
-    return boost::algorithm::any_of(group.groups, [this](const QnCameraAdvancedParamGroup &group) { return hasValidValues(group); });
+    return boost::algorithm::any_of(
+        group.groups,
+        [this](const QnCameraAdvancedParamGroup &group) { return hasValidValues(group); });
 }
 
 
@@ -170,8 +235,9 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    for (const auto& param : params)
+    for (const auto& param: params)
     {
+        m_parametersById[param.id] = param;
         auto widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
         if (!widget)
             continue;
@@ -249,71 +315,72 @@ void CameraAdvancedParamWidgetsManager::setUpDependenciesForPage(
         for (const auto& watch : watches)
         {
             if (auto widget = m_paramWidgetsById.value(watch))
-            {
-                connect(
-                    widget,
-                    &AbstractCameraAdvancedParamWidget::valueChanged,
-                    runHandlerChains);
-
-                runHandlerChains();
-            }
+                m_handlerChains[watch].push_back(runHandlerChains);
         }
-
-        if (!watches.empty())
-            runHandlerChains();
     }
 }
 
 CameraAdvancedParamWidgetsManager::DependencyHandler
-CameraAdvancedParamWidgetsManager::makeDependencyHandler(
-    const QnCameraAdvancedParameterDependency& dependency,
-    const QnCameraAdvancedParameter& parameter) const
+    CameraAdvancedParamWidgetsManager::makeDependencyHandler(
+        const QnCameraAdvancedParameterDependency& dependency,
+        const QnCameraAdvancedParameter& parameter) const
 {
     return
         [dependency, parameter, this]() -> bool
         {
             const auto paramId = parameter.id;
+            auto widget = m_paramWidgetsById.value(paramId);
+            if (!widget)
+                return false;
+
             bool allConditionsSatisfied = std::all_of(
                 dependency.conditions.cbegin(), dependency.conditions.cend(),
                 [this](const QnCameraAdvancedParameterCondition& condition)
-            {
-                using ConditionType =
-                    QnCameraAdvancedParameterCondition::ConditionType;
+                {
+                    using ConditionType =
+                        QnCameraAdvancedParameterCondition::ConditionType;
 
-                if (condition.type == ConditionType::present)
-                    return m_paramWidgetsById.contains(condition.paramId);
+                    if (condition.type == ConditionType::present)
+                        return m_paramWidgetsById.contains(condition.paramId);
 
-                if (condition.type == ConditionType::notPresent)
-                    return !m_paramWidgetsById.contains(condition.paramId);
+                    if (condition.type == ConditionType::notPresent)
+                        return !m_paramWidgetsById.contains(condition.paramId);
 
-                auto widget = m_paramWidgetsById.value(condition.paramId);
-                return widget && condition.checkValue(widget->value());
-            });
+                    auto widget = m_paramWidgetsById.value(condition.paramId);
+                    return widget && condition.checkValue(widget->value());
+                });
 
             // TODO: #dmishin move this somewhere.
             if (dependency.type == DependencyType::show)
             {
                 if (auto label = m_paramLabelsById.value(paramId))
                     label->setHidden(!allConditionsSatisfied);
-                if (auto widget = m_paramWidgetsById.value(paramId))
-                    widget->setHidden(!allConditionsSatisfied);
+
+                widget->setHidden(!allConditionsSatisfied);
             }
             else if (dependency.type == DependencyType::range)
             {
                 if (!allConditionsSatisfied)
                     return false;
 
-                auto widget = m_paramWidgetsById.value(paramId);
-                if (!widget)
-                    return false;
-
                 widget->setRange(dependency.range);
+                if (parameter.bindDefaultToMinimum)
+                {
+                    const auto minMax = dependency.range.split(L',');
+                    if (!minMax.isEmpty())
+                        widget->setValue(minMax.first().trimmed());
+                }
 
                 auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
                 if (!label)
                     return false;
 
                 setLabelText(label, parameter, dependency.range);
+            }
+            else if (dependency.type == DependencyType::trigger)
+            {
+                return false;
+                //< Do nothing. All work will be done by other handlers
             }
 
             return allConditionsSatisfied;

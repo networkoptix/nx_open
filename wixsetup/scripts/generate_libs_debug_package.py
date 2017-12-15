@@ -2,8 +2,9 @@
 
 import argparse
 import os
-import zipfile
 import yaml
+
+from environment import zip_files
 
 
 def create_libs_debug_file(binaries_dir, output_filename):
@@ -12,9 +13,7 @@ def create_libs_debug_file(binaries_dir, output_filename):
         'nx_utils.pdb',
         'nx_vms_utils.pdb',
         'udt.pdb']
-    with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
-        for pdb_filename in pdb_filenames:
-            zip.write(os.path.join(binaries_dir, pdb_filename), pdb_filename)
+    zip_files(pdb_filenames, binaries_dir, output_filename)
 
 
 def main():

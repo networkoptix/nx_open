@@ -2009,7 +2009,7 @@ bool HanwhaResource::addDependencies(
         ? lit("PRIMARY%")
         : lit("SECONDARY%");
 
-    for (const auto& codec : codecs)
+    for (const auto& codec: codecs)
     {
         const auto resolutions = m_codecInfo.resolutions(channel, codec, lit("General"));
         for (const auto& resolution : resolutions)

@@ -8,6 +8,10 @@ set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 set(VC14RedistPath "${vcredist_directory}")
 
+# These folders are filtered from filter-resources and required for update packages only
+set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
+set(server_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/server")
+
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
 file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
 file(TO_CMAKE_PATH ${certificates_path} certificates_path)
@@ -52,6 +56,16 @@ add_custom_target(wixsetup ALL
 
 if(withTestCamera)
     add_dependencies(wixsetup testcamera)
+
+    add_custom_target(generate_testcamera_package ALL
+        COMMENT "Preparing testcamera package..."
+        DEPENDS
+            testcamera
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_testcamera_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
 endif()
 
 if(withDesktopClient)
@@ -68,14 +82,14 @@ if(withDesktopClient)
         )
     add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
 
-    add_custom_target(generate_update_packages ALL
-    COMMENT "Preparing update and debug packages ..."
+    add_custom_target(generate_client_update_package ALL
+    COMMENT "Preparing client update package ..."
     DEPENDS
         collect_qml_dependencies
         applauncher
         minilauncher
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-    COMMAND ${PYTHON_EXECUTABLE} generate_update_packages.py
+    COMMAND ${PYTHON_EXECUTABLE} generate_client_update_package.py
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
     )
@@ -105,6 +119,16 @@ if(withMediaServer)
     if(withTrayTool)
         add_dependencies(wixsetup traytool)
     endif()
+
+    add_custom_target(generate_server_update_package ALL
+        COMMENT "Preparing mediaserver update package..."
+        DEPENDS
+            wixsetup
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_server_update_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
 endif()
 
 
@@ -121,17 +145,66 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+endif()
 
-    add_custom_target(generate_misc_debug_package ALL
-        COMMENT "Preparing misc debug package..."
+if(withMediaServer)
+    add_custom_target(generate_mediaserver_debug_package ALL
+        COMMENT "Preparing mediaserver debug package..."
         DEPENDS
-            applauncher
-            minilauncher
-            traytool
-            testcamera
+            mediaserver
+            genericrtspplugin
+            generic_multicast_plugin
+            image_library_plugin
+            mjpg_link
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-        COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
+        COMMAND ${PYTHON_EXECUTABLE} generate_mediaserver_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+    if(TARGET hanwha_metadata_plugin)
+        add_dependencies(generate_mediaserver_debug_package hanwha_metadata_plugin)
+    endif()
+endif()
+
+if(withClouds)
+    add_custom_target(generate_cloud_debug_package ALL
+        COMMENT "Preparing cloud debug package..."
+        DEPENDS
+            cloud_connect_test_util
+            cloud_db
+            connection_mediator
+            vms_gateway
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_cloud_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
+add_custom_target(generate_misc_debug_package ALL
+    COMMENT "Preparing misc debug package..."
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
+        "--config" ${config_file}
+        "--output" ${distribution_output_dir}
+)
+
+if(TARGET applauncher)
+    add_dependencies(generate_misc_debug_package applauncher)
+endif()
+
+if(TARGET minilauncher)
+    add_dependencies(generate_misc_debug_package minilauncher)
+endif()
+
+if(TARGET traytool)
+    add_dependencies(generate_misc_debug_package traytool)
+endif()
+
+if(TARGET testcamera)
+    add_dependencies(generate_misc_debug_package testcamera)
+endif()
+
+if(TARGET media_db_util)
+    add_dependencies(generate_misc_debug_package media_db_util)
 endif()

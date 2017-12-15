@@ -655,10 +655,14 @@ QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& licens
     return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
 }
 
-bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras)
+bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 {
+    QStringList extras;
+    for (const auto& license: licenses)
+        extras.push_back(getLicenseDescription(license));
+
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
-        tr("Deactivate licenses?", "", extras.size()),
+        tr("Deactivate licenses?", "", licenses.size()),
         QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
     confirmationDialog.setInformativeText(extras.join(kEmptyLine), false);
@@ -838,15 +842,15 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
     }
     else
     {
-        QStringList extras;
+        QnLicenseList deactivatableLicences;
         for (const auto& license: licenses)
         {
             if (canDeactivateLicense(license))
-                extras.append(getLicenseDescription(license));
+                deactivatableLicences.push_back(license);
         }
 
-        if (!extras.isEmpty() && confirmDeactivation(extras))
-            deactivateLicenses(licenses);
+        if (!deactivatableLicences.isEmpty() && confirmDeactivation(deactivatableLicences))
+            deactivateLicenses(deactivatableLicences);
     }
 }
 

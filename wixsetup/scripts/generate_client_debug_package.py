@@ -2,14 +2,14 @@
 
 import argparse
 import os
-import zipfile
 import yaml
+
+from environment import zip_files
 
 
 def create_client_debug_file(binaries_dir, output_filename):
     pdb_filename = 'desktop_client.pdb'
-    with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
-        zip.write(os.path.join(binaries_dir, pdb_filename), pdb_filename)
+    zip_files([pdb_filename], binaries_dir, output_filename)
 
 
 def main():
