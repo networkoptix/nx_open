@@ -86,7 +86,8 @@ int Service::exec()
         if (isStartInfoFilePresent())
         {
             NX_ERROR(this, lm("Start after crash detected"));
-            m_abnormalTerminationHandler(readStartInfoFile());
+            if (m_abnormalTerminationHandler)
+                m_abnormalTerminationHandler(readStartInfoFile());
         }
         writeStartInfo();
         auto startInfoFileGuard = makeScopeGuard([this]() { removeStartInfoFile(); });
