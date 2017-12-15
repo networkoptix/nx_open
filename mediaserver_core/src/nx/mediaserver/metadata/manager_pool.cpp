@@ -161,7 +161,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 {
     for (auto& plugin: availablePlugins())
     {
-        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*releaseRef*/ false);
+        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*increaseRef*/ false);
 
         nxpt::ScopedRef<AbstractMetadataManager> manager(
             createMetadataManager(camera, plugin), /*increaseRef*/ false);
@@ -178,8 +178,11 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
-        if (manager->queryInterface(IID_ConsumingMetadataManager))
+        if (auto consumingMetadataManager = nxpt::ScopedRef<AbstractConsumingMetadataManager>(
+            manager->queryInterface(IID_ConsumingMetadataManager)))
+        {
             handler->registerDataReceptor(&context);
+        }
 
         context.addManager(std::move(manager), std::move(handler), *pluginManifest);
     }
