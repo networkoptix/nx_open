@@ -8,6 +8,10 @@ set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 set(VC14RedistPath "${vcredist_directory}")
 
+# These folders are filtered from filter-resources and required for update packages only
+set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client")
+set(server_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/server")
+
 file(TO_CMAKE_PATH ${wix_directory} wix_directory)
 file(TO_CMAKE_PATH ${signtool_directory} signtool_directory)
 file(TO_CMAKE_PATH ${certificates_path} certificates_path)
@@ -108,6 +112,16 @@ if(withMediaServer)
     if(withTrayTool)
         add_dependencies(wixsetup traytool)
     endif()
+
+    add_custom_target(generate_server_update_package ALL
+        COMMENT "Preparing mediaserver update package..."
+        DEPENDS
+            wixsetup
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_server_update_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
 endif()
 
 

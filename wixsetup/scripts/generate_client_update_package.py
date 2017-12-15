@@ -1,10 +1,11 @@
 #!/bin/python2
 
 import argparse
-import fnmatch
 import os
 import zipfile
 import yaml
+
+from environment import zip_files_to, find_files_by_template, find_all_files
 
 common_qt_libraries = [
     'Core',
@@ -43,17 +44,6 @@ common_nx_libraries = ['nx_utils', 'nx_network', 'nx_kit', 'udt']
 client_nx_libraries = ['nx_vms_utils']
 
 
-def find_files_by_template(dir, template):
-    for file in fnmatch.filter(os.listdir(dir), template):
-        yield os.path.join(dir, file)
-
-
-def find_all_files(dir):
-    for root, dirs, files in os.walk(dir):
-        for file in files:
-            yield os.path.join(root, file)
-
-
 def ffmpeg_files(source_dir):
     templates = [
         'av*.dll',
@@ -76,7 +66,7 @@ def openal_files(source_dir):
     yield os.path.join(source_dir, 'OpenAL32.dll')
 
 
-def quazip_files(source_dir):
+def quazip_files_to(source_dir):
     yield os.path.join(source_dir, 'quazip.dll')
 
 
@@ -108,15 +98,9 @@ def nx_files(source_dir, libs):
         yield os.path.join(source_dir, '{}.dll'.format(lib))
 
 
-def zip_files(zip, files, rel_path, target_path='.'):
-    for file in files:
-        target_filename = os.path.join(target_path, os.path.relpath(file, rel_path))
-        zip.write(file, target_filename)
-
-
 def zip_package(zip, package_directory):
     bin_directory = os.path.join(package_directory, 'bin')
-    zip_files(zip, find_all_files(bin_directory), bin_directory)
+    zip_files_to(zip, find_all_files(bin_directory), bin_directory)
 
 
 def create_client_update_file(
@@ -130,26 +114,27 @@ def create_client_update_file(
     client_binary_name,
     launcher_version_name,
     minilauncher_binary_name,
-    client_update_files_firectory,
+    client_update_files_directory,
     client_update_file
 ):
     with zipfile.ZipFile(client_update_file, "w", zipfile.ZIP_DEFLATED) as zip:
-        zip_files(zip, ffmpeg_files(binaries_dir), binaries_dir)
-        zip_files(zip, openssl_files(binaries_dir), binaries_dir)
-        zip_files(zip, openal_files(binaries_dir), binaries_dir)
-        zip_files(zip, quazip_files(binaries_dir), binaries_dir)
-        zip_files(zip, nx_files(binaries_dir, common_nx_libraries), binaries_dir)
-        zip_files(zip, nx_files(binaries_dir, client_nx_libraries), binaries_dir)
-        zip_files(zip, find_all_files(client_update_files_firectory), client_update_files_firectory)
+        zip_files_to(zip, ffmpeg_files(binaries_dir), binaries_dir)
+        zip_files_to(zip, openssl_files(binaries_dir), binaries_dir)
+        zip_files_to(zip, openal_files(binaries_dir), binaries_dir)
+        zip_files_to(zip, quazip_files_to(binaries_dir), binaries_dir)
+        zip_files_to(zip, nx_files(binaries_dir, common_nx_libraries), binaries_dir)
+        zip_files_to(zip, nx_files(binaries_dir, client_nx_libraries), binaries_dir)
+        zip_files_to(zip, find_all_files(client_update_files_directory),
+                     client_update_files_directory)
 
         qt_bin_dir = os.path.join(qt_dir, 'bin')
-        zip_files(zip, icu_files(qt_bin_dir), qt_bin_dir)
-        zip_files(zip, qt_files(qt_bin_dir, common_qt_libraries), qt_bin_dir)
-        zip_files(zip, qt_files(qt_bin_dir, client_qt_libraries), qt_bin_dir)
-        zip_files(zip, find_all_files(client_qml_dir), client_qml_dir, 'qml')
+        zip_files_to(zip, icu_files(qt_bin_dir), qt_bin_dir)
+        zip_files_to(zip, qt_files(qt_bin_dir, common_qt_libraries), qt_bin_dir)
+        zip_files_to(zip, qt_files(qt_bin_dir, client_qt_libraries), qt_bin_dir)
+        zip_files_to(zip, find_all_files(client_qml_dir), client_qml_dir, 'qml')
 
         qt_plugins_dir = os.path.join(qt_dir, 'plugins')
-        zip_files(zip, qt_plugins_files(qt_plugins_dir), qt_plugins_dir)
+        zip_files_to(zip, qt_plugins_files(qt_plugins_dir), qt_plugins_dir)
 
         zip_package(zip, help_directory)
         zip_package(zip, vcredist_directory)
@@ -184,7 +169,7 @@ def main():
         client_binary_name=config['client_binary_name'],
         launcher_version_name=config['launcher_version_file'],
         minilauncher_binary_name=config['minilauncher_binary_name'],
-        client_update_files_firectory=config['client_update_files_firectory'],
+        client_update_files_directory=config['client_update_files_directory'],
         client_update_file=client_update_file)
 
 
