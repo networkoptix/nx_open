@@ -24,6 +24,9 @@ static const QString kHanwhaResourceTypeName = lit("Hanwha_Sunapi");
 static const QString kHanwhaDefaultUser = lit("admin");
 static const QString kHanwhaDefaultPassword = lit("4321");
 
+static const int kSunApiProbeSrcPort = 7711;
+static const int kSunApiProbeDstPort = 7701;
+
 } // namespace
 
 namespace nx {
@@ -47,6 +50,12 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     QnAbstractNetworkResourceSearcher(commonModule),
     nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType)
 {
+    m_sunapiProbePackets.resize(2);
+    m_sunapiProbePackets[0].resize(262);
+    m_sunapiProbePackets[0][0] = '\x1';
+
+    m_sunapiProbePackets[1].resize(334);
+    m_sunapiProbePackets[1][0] = '\x6';
 }
 
 QnResourcePtr HanwhaResourceSearcher::createResource(
@@ -124,8 +133,140 @@ QnResourceList HanwhaResourceSearcher::findResources(void)
 		m_foundUpnpResources.clear();
 		m_alreadFoundMacAddresses.clear();
 	}
-
+    addResourcesViaSunApi(upnpResults);
     return upnpResults;
+}
+
+void HanwhaResourceSearcher::addResourcesViaSunApi(QnResourceList& upnpResults)
+{
+    sendSunApiProbe();
+    readSunApiResponse(upnpResults);
+}
+
+void HanwhaResourceSearcher::updateSocketList()
+{
+    const auto interfaceList = getAllIPv4Interfaces();
+    if (m_lastInterfaceList == interfaceList)
+        return;
+    m_lastInterfaceList = interfaceList;
+
+    m_sunApiSocketList.clear();
+    for (const QnInterfaceAndAddr& iface: interfaceList)
+    {
+        auto socket(SocketFactory::createDatagramSocket());
+        if (!socket->setReuseAddrFlag(true) ||
+            !socket->bind(iface.address.toString(), kSunApiProbeSrcPort))
+        {
+            continue;
+        }
+        m_sunApiSocketList.push_back(std::move(socket));
+    }
+}
+
+bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData* outData)
+{
+    auto splitStringData = [](const QByteArray& data)
+    {
+        QList<QByteArray> result;
+        int prevPosition = -1;
+        for (int i = 0; i < data.size(); ++i)
+        {
+            if (data[i] < 32)
+            {
+                // Binary char
+                if (prevPosition >= 0)
+                    result << QByteArray::fromRawData(data.data() + prevPosition, i - prevPosition);
+                prevPosition = -1;
+            }
+            else
+            {
+                // Printable char
+                if (prevPosition == -1)
+                    prevPosition = i;
+            }
+        }
+        if (prevPosition >= 0)
+            result << QByteArray::fromRawData(data.data() + prevPosition, data.size() - prevPosition);
+
+        return result;
+    };
+
+    // Packet format is reverse engenered.
+    bool isPacketV1 = data.size() == 262 && data[0] == '\x0b';
+    bool isPacketV2 = data.size() == 334 && data[0] == '\x0c';
+    if (!isPacketV1 && !isPacketV2)
+        return false;
+    for (int i = 1; i < 16; ++i)
+    {
+        if (data[i] != 0)
+            return false;
+    }
+    if (!data.endsWith('\x00'))
+        return false;
+
+    const QByteArray stringData = data.mid(0x10);
+    QList<QByteArray> params = splitStringData(stringData);
+    params.erase(std::remove_if(
+        params.begin(), params.end(),
+        [](const QByteArray& value)
+        {
+            return value.size() <= 2; //< Remove unknown short params like 'P'
+        }), params.end());
+    if (params.size() != 6)
+        return false;
+    outData->macAddress = QnMacAddress(params[0]);
+    if (outData->macAddress.isNull())
+        return false;
+    outData->modelName = params[4];
+    outData->presentationUrl = QUrl(params[5]).toString(QUrl::RemovePath);
+    outData->manufacturer = kHanwhaManufacturerName;
+
+    return true;
+}
+
+void HanwhaResourceSearcher::sendSunApiProbe()
+{
+    updateSocketList();
+    for (const auto& socket: m_sunApiSocketList)
+    {
+        // Sending broadcast
+        for(const auto& packet: m_sunapiProbePackets)
+            socket->sendTo(packet.data(), packet.size(), BROADCAST_ADDRESS, kSunApiProbeDstPort);
+    }
+}
+
+void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceList)
+{
+    auto resourceAlreadyFound =
+        [](const QnResourceList& resultResourceList, const QnMacAddress& macAddress)
+        {
+            return std::any_of(
+                resultResourceList.begin(), resultResourceList.end(),
+                [&macAddress](const QnResourcePtr& resource)
+                {
+                    return QnMacAddress(resource->getUniqueId()) == macAddress;
+                });
+        };
+
+    QByteArray datagram;
+    datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+    for (const auto& socket: m_sunApiSocketList)
+    {
+        while (socket->hasData())
+        {
+            SocketAddress remoteEndpoint;
+            int bytesRead = socket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
+            if (bytesRead < 1)
+                continue;
+
+            SunApiData sunApiData;
+            if (parseSunApiData(datagram.left(bytesRead), &sunApiData))
+            {
+                if (!resourceAlreadyFound(resultResourceList, sunApiData.macAddress))
+                    createResource(sunApiData, sunApiData.macAddress, resultResourceList);
+            }
+        }
+    }
 }
 
 bool HanwhaResourceSearcher::isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const
