@@ -2136,7 +2136,7 @@ void MediaServerProcess::initializeLogging()
 
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
-    auto logSettings = makeLogSetting();
+    auto logSettings = makeLogSettings();
 
     logSettings.level.parse(cmdLineArguments().logLevel,
         settings->value("logLevel").toString(), toString(nx::utils::log::kDefaultLevel));
