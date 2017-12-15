@@ -7,9 +7,13 @@ import yaml
 from environment import zip_files
 
 
-def create_client_debug_file(binaries_dir, output_filename):
-    pdb_filename = 'desktop_client.pdb'
-    zip_files([pdb_filename], binaries_dir, output_filename)
+def create_cloud_debug_file(binaries_dir, output_filename):
+    pdb_filenames = [
+        'cloud_connect_test_util.pdb',
+        'cloud_db.pdb',
+        'connection_mediator.pdb',
+        'vms_gateway.pdb']
+    zip_files(pdb_filenames, binaries_dir, output_filename)
 
 
 def main():
@@ -22,8 +26,8 @@ def main():
         config = yaml.load(f)
 
     output_filename = os.path.join(
-        args.output, config['client_debug_distribution_name']) + '.zip'
-    create_client_debug_file(
+        args.output, config['cloud_debug_distribution_name']) + '.zip'
+    create_cloud_debug_file(
         binaries_dir=config['bin_source_dir'],
         output_filename=output_filename)
 

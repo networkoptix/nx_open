@@ -124,17 +124,47 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+endif()
 
-    add_custom_target(generate_misc_debug_package ALL
-        COMMENT "Preparing misc debug package..."
+if(withClouds)
+    add_custom_target(generate_cloud_debug_package ALL
+        COMMENT "Preparing cloud debug package..."
         DEPENDS
-            applauncher
-            minilauncher
-            traytool
-            testcamera
+            cloud_connect_test_util
+            cloud_db
+            connection_mediator
+            vms_gateway
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-        COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
+        COMMAND ${PYTHON_EXECUTABLE} generate_cloud_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
+endif()
+
+add_custom_target(generate_misc_debug_package ALL
+    COMMENT "Preparing misc debug package..."
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+    COMMAND ${PYTHON_EXECUTABLE} generate_misc_debug_package.py
+        "--config" ${config_file}
+        "--output" ${distribution_output_dir}
+)
+
+if(TARGET applauncher)
+    add_dependencies(generate_misc_debug_package applauncher)
+endif()
+
+if(TARGET minilauncher)
+    add_dependencies(generate_misc_debug_package minilauncher)
+endif()
+
+if(TARGET traytool)
+    add_dependencies(generate_misc_debug_package traytool)
+endif()
+
+if(TARGET testcamera)
+    add_dependencies(generate_misc_debug_package testcamera)
+endif()
+
+if(TARGET media_db_util)
+    add_dependencies(generate_misc_debug_package media_db_util)
 endif()
