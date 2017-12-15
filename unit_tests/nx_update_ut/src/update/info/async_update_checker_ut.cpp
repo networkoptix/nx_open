@@ -230,6 +230,7 @@ private:
     {
         assertAlternativeServer();
         assertFileDataContent();
+        assertUpdateDataContent();
         assertSerializability();
     }
 
@@ -237,6 +238,72 @@ private:
     {
         ASSERT_EQ(1, m_updateRegistry->alternativeServers().size());
         ASSERT_FALSE(m_updateRegistry->alternativeServers()[0].isEmpty());
+    }
+
+
+    void assertUpdateDataContent() const
+    {
+        QnSoftwareVersion softwareVersion;
+        ResultCode resultCode = m_updateRegistry->latestUpdate(
+            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(2, 0, 0, 0)),
+            &softwareVersion);
+        assertLatestUpdateResult(
+            resultCode,
+            QnSoftwareVersion("3.1.0.16975"),
+            softwareVersion,
+            false);
+
+        resultCode = m_updateRegistry->latestUpdate(
+            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(3, 2, 0, 0)),
+            &softwareVersion);
+        assertLatestUpdateResult(
+            resultCode,
+            QnSoftwareVersion("3.1.0.16975"),
+            softwareVersion,
+            true);
+
+        resultCode = m_updateRegistry->latestUpdate(
+            UpdateRequestData("invalid.host.com", "default", QnSoftwareVersion(2, 1, 0, 0)),
+            &softwareVersion);
+        assertLatestUpdateResult(
+            resultCode,
+            QnSoftwareVersion("3.1.0.16975"),
+            softwareVersion,
+            true);
+
+        resultCode = m_updateRegistry->latestUpdate(
+            UpdateRequestData("qcloud.vista-cctv.com", "vista", QnSoftwareVersion(2, 1, 0, 0)),
+            &softwareVersion);
+        assertLatestUpdateResult(
+            resultCode,
+            QnSoftwareVersion("3.1.0.16975"),
+            softwareVersion,
+            false);
+
+        resultCode = m_updateRegistry->latestUpdate(
+            UpdateRequestData("tricom.cloud-demo.hdw.mx", "tricom", QnSoftwareVersion(2, 1, 0, 0)),
+            &softwareVersion);
+        assertLatestUpdateResult(
+            resultCode,
+            QnSoftwareVersion("3.0.0.14532"),
+            softwareVersion,
+            false);
+    }
+
+    void assertLatestUpdateResult(
+        const ResultCode resultCode,
+        const QnSoftwareVersion& expectedVersion,
+        const QnSoftwareVersion& actualVersion,
+        const bool shouldFail) const
+    {
+        if (shouldFail)
+        {
+            ASSERT_NE(ResultCode::ok, resultCode);
+            return;
+        }
+
+        ASSERT_EQ(ResultCode::ok, resultCode);
+        ASSERT_EQ(expectedVersion, actualVersion);
     }
 
     void assertFileDataContent() const

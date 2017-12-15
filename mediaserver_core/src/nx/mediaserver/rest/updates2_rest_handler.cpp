@@ -24,7 +24,7 @@ public:
 
         if (findUpdateInfo())
         {
-            setResponseBody();
+            QJson::serialize(m_version, &m_responseBody);
             m_statusCode = nx_http::StatusCode::ok;
         }
     }
@@ -34,33 +34,24 @@ public:
 
 private:
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
-    update::info::FileData m_fileData;
     QByteArray m_responseBody;
+    QnSoftwareVersion m_version;
     nx_http::StatusCode::Value m_statusCode = nx_http::StatusCode::notFound;
 
     bool findUpdateInfo()
     {
-        const auto findResult = m_updateRegistry->findUpdateFile(
+        const auto findResult = m_updateRegistry->latestUpdate(
             createUpdateRequestData(),
-            &m_fileData);
+            &m_version);
         return findResult == update::info::ResultCode::ok;
     }
 
-    static update::info::UpdateFileRequestData createUpdateRequestData()
+    static update::info::UpdateRequestData createUpdateRequestData()
     {
-        return update::info::UpdateFileRequestData(
+        return update::info::UpdateRequestData(
             nx::network::AppInfo::defaultCloudHost(),
             QnAppInfo::customizationName(),
-            QnSoftwareVersion(QnAppInfo::applicationVersion()),
-            update::info::OsVersion(
-                QnAppInfo::applicationPlatform(),
-                QnAppInfo::applicationArch(),
-                QnAppInfo::applicationPlatformModification()));
-    }
-
-    void setResponseBody()
-    {
-        m_responseBody = QJson::serialize(m_fileData.);
+            QnSoftwareVersion(QnAppInfo::applicationVersion()));
     }
 };
 
@@ -74,12 +65,9 @@ int Updates2RestHandler::executeGet(
     const QnRestConnectionProcessor* processor)
 {
     NX_ASSERT(path == "/updates2");
-    auto updateRegistry = update::info::checkSync();
-    if (updateRegistry == nullptr)
-        return nx_http::StatusCode::notFound;
-    update::info::FileData fileData;
-    updateRegistry->findUpdateFile(createUpdateRequestData(), &fileData);
-    return nx_http::StatusCode::internalServerError;
+    GetUpdateInfoHelper getUpdateInfoHelper;
+    result = getUpdateInfoHelper.responseBody();
+    return getUpdateInfoHelper.statusCode();
 }
 
 int Updates2RestHandler::executePost(
