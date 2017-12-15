@@ -35,10 +35,7 @@ set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
 set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
-# This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
-set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
-
-
+set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/qml/")
 
 add_custom_target(wixsetup ALL
     DEPENDS
