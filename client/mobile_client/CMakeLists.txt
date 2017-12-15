@@ -131,7 +131,12 @@ if(IOS)
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
     )
 
-    if(developerBuild)
+    if(NOT codeSigning)
+        set_target_properties(mobile_client PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+            XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
+        )
+    elseif(developerBuild)
         set_target_properties(mobile_client PROPERTIES
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
             XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${apple_team_id}"
