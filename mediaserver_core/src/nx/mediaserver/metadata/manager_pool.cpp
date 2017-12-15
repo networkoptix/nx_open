@@ -149,7 +149,7 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins() const
 {
     auto pluginManager = qnServerModule->pluginManager();
-    NX_ASSERT(pluginManager, lit("Can not access PluginManager instance"));
+    NX_ASSERT(pluginManager, lit("Cannot access PluginManager instance"));
     if (!pluginManager)
         return PluginList();
 
@@ -161,21 +161,20 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 {
     for (auto& plugin: availablePlugins())
     {
-        auto managerObject = createMetadataManager(camera, plugin);
-        if (!managerObject)
+        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*releaseRef*/ false);
+
+        nxpt::ScopedRef<AbstractMetadataManager> manager(
+            createMetadataManager(camera, plugin), /*increaseRef*/ false);
+        if (!manager)
             continue;
-        nxpt::ScopedRef<AbstractMetadataManager> manager(managerObject, /*increaseRef*/ false);
 
         auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
-            continue;
+            continue; //< Error already logged.
 
         auto deviceManifest = addManifestToCamera(camera, manager.get());
         if (!deviceManifest)
-        {
-            // TODO: Investigate why manager is not destructed here by ScopedRef in case of "continue".
-            continue;
-        }
+            continue; //< Error already logged.
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
@@ -206,7 +205,7 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
     {
         NX_WARNING(
             this,
-            lm("Can not create resource info from resource %1 (%2)")
+            lm("Cannot create resource info from resource %1 (%2)")
                 .args(camera->getUserDefinedName(), camera->getId()));
         return nullptr;
     }
@@ -353,7 +352,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
         ->getResourceById<QnMediaServerResource>(
             m_serverModule->commonModule()->moduleGUID());
 
-    NX_ASSERT(server, lm("Can not obtain current server resource."));
+    NX_ASSERT(server, lm("Cannot obtain current server resource."));
     if (!server)
         return boost::none;
 
@@ -377,7 +376,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
     {
         NX_ERROR(
             this,
-            lm("Can not deserialize plugin manifest from plugin %1").arg(plugin->name()));
+            lm("Cannot deserialize plugin manifest from plugin %1").arg(plugin->name()));
         return boost::none; //< Error already logged.
     }
 
@@ -429,7 +428,7 @@ boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCame
     {
         NX_ERROR(
             this,
-            lm("Can not fetch or deserialize manifest for resource %1 (%2)")
+            lm("Cannot fetch or deserialize manifest for resource %1 (%2)")
                 .args(camera->getUserDefinedName(), camera->getId()));
         return boost::none; //< Error already logged.
     }

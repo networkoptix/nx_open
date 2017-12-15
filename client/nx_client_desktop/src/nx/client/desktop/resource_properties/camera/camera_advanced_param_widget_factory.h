@@ -18,10 +18,7 @@ public:
 
     virtual QString value() const = 0;
     virtual void setValue(const QString &newValue) = 0;
-    virtual void setRange(const QString& /*range*/)
-    {
-        NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
-    }
+    virtual void setRange(const QString& range);
 
 signals:
     void valueChanged(const QString &id, const QString &value);

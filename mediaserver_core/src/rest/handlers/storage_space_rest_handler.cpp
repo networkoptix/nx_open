@@ -85,9 +85,12 @@ QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
     NX_ASSERT(pluginManager, "There should be common module.");
     if (!pluginManager)
         return result;
-
-    for (const auto storagePlugin : pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    for (nx_spl::StorageFactory* const storagePlugin:
+        pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    {
         result.push_back(storagePlugin->storageType());
+        storagePlugin->releaseRef();
+    }
     result.push_back(lit("smb"));
     return result;
 }

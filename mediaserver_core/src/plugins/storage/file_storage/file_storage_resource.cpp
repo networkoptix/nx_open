@@ -14,6 +14,7 @@
 #include <utils/common/writer_pool.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -221,9 +222,16 @@ QIODevice* QnFileStorageResource::open(
                 ffmpegMaxBufferSize,
                 getId()));
     rez->setSystemFlags(systemFlags);
-    if (!rez->open(openMode))
-        return 0;
-    return rez.release();
+    if (rez->open(openMode))
+        return rez.release();
+
+    if (const auto rootTool = qnServerModule->rootTool())
+    {
+        if (rootTool->touchFile(fileName) && rez->open(openMode))
+            return rez.release();
+    }
+
+    return nullptr;
 }
 
 void QnFileStorageResource::setLocalPathSafe(const QString &path)
@@ -320,16 +328,31 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     }
 
     if (url.contains("://"))
+    {
         result = mountTmpDrive(url);
+    }
     else
     {
+        const auto rootTool = qnServerModule->rootTool();
         QDir storageDir(url);
         if (storageDir.exists() || storageDir.mkpath(url))
+        {
+            if (rootTool)
+                rootTool->changeOwner(url); //< Just in case it was not ours.
+
             result = Qn::StorageInit_Ok;
+        }
         else
         {
-            NX_LOG("[initOrUpdate] storage dir doesn't exist or mkdir failed", cl_logDEBUG2);
-            result = Qn::StorageInit_WrongPath;
+            if (rootTool && rootTool->makeDirectory(url))
+            {
+                result = Qn::StorageInit_Ok;
+            }
+            else
+            {
+                NX_LOG("[initOrUpdate] storage dir doesn't exist or mkdir failed", cl_logDEBUG2);
+                result = Qn::StorageInit_WrongPath;
+            }
         }
     }
 
@@ -466,6 +489,14 @@ void QnFileStorageResource::removeOldDirs()
 
 #if __linux__
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
+        if (ecode != 0)
+        {
+            if (const auto rootTool = qnServerModule->rootTool())
+            {
+                if (rootTool->unmount(entry.absoluteFilePath()))
+                    ecode = 0;
+            }
+        }
 #elif __APPLE__
         int ecode = unmount(entry.absoluteFilePath().toLatin1().constData(), 0);
 #endif
@@ -492,13 +523,22 @@ void QnFileStorageResource::removeOldDirs()
             }
         }
 
-        if (rmdir(entry.absoluteFilePath().toLatin1().constData()) != 0)
+        if (rmdir(entry.absoluteFilePath().toLatin1().constData()) == 0)
+            continue;
+
+        if (const auto rootTool = qnServerModule->rootTool())
         {
-            NX_LOG(
-                lit("QnFileStorageResource::removeOldDirs: remove %1 failed").arg(entry.absoluteFilePath()),
-                cl_logDEBUG1
-            );
+            if (rootTool->changeOwner(entry.absoluteFilePath())
+                && rmdir(entry.absoluteFilePath().toLatin1().constData()))
+            {
+                continue;
+            }
         }
+
+        NX_LOG(
+            lit("QnFileStorageResource::removeOldDirs: remove %1 failed").arg(entry.absoluteFilePath()),
+            cl_logDEBUG1
+        );
     }
 #endif
 }
@@ -559,6 +599,14 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlStr
 
     QString localPath = aux::genLocalPath(getUrl());
     setLocalPathSafe(localPath);
+    if (const auto rootTool = qnServerModule->rootTool())
+    {
+        if (rootTool->remount(url, localPath))
+            return Qn::StorageInit_Ok;
+
+        NX_WARNING(this, lm("Failed to mount '%1' to '%2' by root tool").args(url, localPath));
+    }
+
     umount(localPath.toLatin1().constData());
     rmdir(localPath.toLatin1().constData());
 
@@ -740,7 +788,18 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
     if (!m_valid)
         return false;
 
-    return QFile::rename(translateUrlToLocal(oldName), translateUrlToLocal(newName));
+    const auto oldPath = translateUrlToLocal(oldName);
+    const auto newPath = translateUrlToLocal(newName);
+    if (QFile::rename(oldPath, newPath))
+        return true;
+
+    if (const auto rootTool = qnServerModule->rootTool())
+    {
+        if (rootTool->changeOwner(oldPath) && rootTool->touchFile(newPath))
+            return QFile::rename(oldPath, newPath);
+    }
+
+    return false;
 }
 
 
@@ -749,8 +808,15 @@ bool QnFileStorageResource::removeDir(const QString& url)
     if (!m_valid)
         return false;
 
+    const auto path = removeProtocolPrefix(translateUrlToLocal(url));
     QDir dir;
-    return dir.rmdir(removeProtocolPrefix(translateUrlToLocal(url)));
+    if (dir.rmdir(path))
+        return true;
+
+    if (const auto rootTool = qnServerModule->rootTool())
+        return rootTool->changeOwner(path);
+
+    return dir.rmdir(path);
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)
@@ -839,8 +905,15 @@ bool QnFileStorageResource::testWriteCapInternal() const
     QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
     fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
+
     QFile file(fileName);
-    return file.open(QIODevice::WriteOnly);
+    if (file.open(QIODevice::WriteOnly))
+        return true;
+
+    if (const auto rootTool = qnServerModule->rootTool())
+        return rootTool->touchFile(fileName) && QFile::remove(fileName);
+
+    return false;
 }
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()

@@ -2,21 +2,19 @@
 
 import argparse
 import os
-import zipfile
 import yaml
+
+from environment import zip_files
 
 
 def create_misc_debug_file(binaries_dir, output_filename):
     pdb_filenames = [
         'applauncher.pdb',
+        'media_db_util.pdb',
         'minilauncher.pdb',
         'testcamera.pdb',
         'traytool.pdb']
-    with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
-        for pdb_filename in pdb_filenames:
-            source_file = os.path.join(binaries_dir, pdb_filename)
-            if os.path.isfile(source_file):
-                zip.write(source_file, pdb_filename)
+    zip_files(pdb_filenames, binaries_dir, output_filename, mandatory=False)
 
 
 def main():
