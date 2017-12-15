@@ -1682,9 +1682,15 @@ void QnRtspConnectionProcessor::run()
             }
             else {
                 // text request
-                int msgLen;
-                while ((msgLen = isFullMessage(d->receiveBuffer)))
+                while (true)
                 {
+                    const auto msgLen = isFullMessage(d->clientRequest);
+                    if (msgLen < 0)
+                        return;
+
+                    if (msgLen == 0)
+                        break;
+
                     d->clientRequest = d->receiveBuffer.left(msgLen);
                     d->receiveBuffer.remove(0, msgLen);
                     parseRequest();

@@ -42,6 +42,7 @@
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/mediaserver/root_tool.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
@@ -282,8 +283,17 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
     return m_archiveIntegrityWatcher;
 }
 
-nx::analytics::storage::AbstractEventsStorage*
-    QnMediaServerModule::analyticsEventsStorage() const
+nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
 {
     return m_analyticsEventsStorage.get();
+}
+
+void QnMediaServerModule::initializeRootTool()
+{
+    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+}
+
+nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
+{
+    return m_rootTool.get();
 }

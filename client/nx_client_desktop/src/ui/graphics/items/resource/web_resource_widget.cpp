@@ -74,14 +74,14 @@ void QnWebResourceWidget::setupOverlays()
         buttonsBar->addButton(Qn::BackButton, backButton);
         buttonsBar->setButtonsEnabled(Qn::BackButton, false);
 
-        connect(m_webView, &QnGraphicsWebView::canGoBackChanged, this, 
+        connect(m_webView, &QnGraphicsWebView::canGoBackChanged, this,
             [this, buttonsBar, backButton]()
             {
                 buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
             });
 
         // Should force HUD to update details text with new URL
-        connect(m_webView, &QnGraphicsWebView::loadStarted, this, 
+        connect(m_webView, &QnGraphicsWebView::loadStarted, this,
             [this]()
             {
                 this->updateDetailsText();
@@ -89,7 +89,7 @@ void QnWebResourceWidget::setupOverlays()
 
         auto reloadButton = createStatisticAwareButton(lit("web_widget_reload"));
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
-        connect(reloadButton, &QnImageButtonWidget::clicked, this, 
+        connect(reloadButton, &QnImageButtonWidget::clicked, this,
             [this]()
             {
                 // We can't use QnGraphicsWebView::reload because if it was an
@@ -105,7 +105,7 @@ void QnWebResourceWidget::setupOverlays()
         auto fullscreenButton= createStatisticAwareButton(lit("web_widget_fullscreen"));
         fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
         fullscreenButton->setToolTip(tr("Fullscreen mode"));
-        connect(fullscreenButton, &QnImageButtonWidget::clicked, this, 
+        connect(fullscreenButton, &QnImageButtonWidget::clicked, this,
             [this]()
             {
                 // Toggles fullscreen item mode

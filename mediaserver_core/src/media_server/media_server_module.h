@@ -25,6 +25,7 @@ namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
+class RootTool;
 
 namespace metadata {
 
@@ -79,6 +80,9 @@ public:
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
 
+    void initializeRootTool();
+    nx::mediaserver::RootTool* rootTool() const;
+
 private:
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
@@ -103,6 +107,7 @@ private:
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage>
         m_analyticsEventsStorage;
+    std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

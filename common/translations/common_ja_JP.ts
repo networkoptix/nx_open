@@ -775,7 +775,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>データはエクスポートされませんでした</translation>
     </message>
   </context>
   <context>

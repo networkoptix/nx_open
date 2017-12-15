@@ -63,6 +63,9 @@ private:
     QStackedWidget* m_contentsWidget;
     QHash<QString, AbstractCameraAdvancedParamWidget*> m_paramWidgetsById;
     QHash<QString, QWidget*> m_paramLabelsById;
+    QMap<QString, QVector<std::function<void()>>> m_handlerChains;
+    QHash<QString, QnCameraAdvancedParameter> m_parametersById;
+    QVector<QMetaObject::Connection> m_handlerChainConnections;
 };
 
 } // namespace desktop

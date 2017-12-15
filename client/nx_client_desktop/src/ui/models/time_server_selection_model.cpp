@@ -586,26 +586,21 @@ bool QnTimeServerSelectionModel::hasInternetAccess() const
 
 bool QnTimeServerSelectionModel::calculateSameTimezone() const
 {
-    qint64 localOffset = nx_tz::getLocalTimeZoneOffset(); /* In minutes. */
-    qint64 commonOffset = localOffset == -1
-        ? Qn::InvalidUtcOffset
-        : localOffset*60;
+    qint64 commonUtcOffset = Qn::InvalidUtcOffset;
 
-    for (const auto& item : m_items)
+    for (const auto& item: m_items)
     {
-        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
+        const auto server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
         if (!server || server->getStatus() != Qn::Online)
             continue;
 
-        auto offsetMs = server->utcOffset();
-        if (offsetMs == Qn::InvalidUtcOffset)
+        const auto utcOffset = server->utcOffset();
+        if (utcOffset == Qn::InvalidUtcOffset)
             continue;
 
-        auto offset = offsetMs / 1000;
-
-        if (commonOffset == Qn::InvalidUtcOffset)
-            commonOffset = offset;
-        else if (commonOffset != offset)
+        if (commonUtcOffset == Qn::InvalidUtcOffset)
+            commonUtcOffset = utcOffset;
+        else if (commonUtcOffset != utcOffset)
             return false;
     }
 

@@ -2,8 +2,9 @@
 
 function crash_gdb_bt() {
     BIN_PATH=$1
+    CRASH_DIR=${2:$HOME}
     if [ ! "$BIN_PATH" ]; then
-        echo "Usage: craqsh_gdb_bt BINARY_PATH" > 2
+        echo "Usage: crash_gdb_bt BINARY_PATH [CRASH_DIR]" > 2
         return 2
     fi
 
@@ -23,8 +24,9 @@ function crash_gdb_bt() {
 
         echo Generate crash report $REPORT...        BACKGROUND
         echo "t apply all bt 25" | gdb $BIN_PATH $CORE >/tmp/$REPORT 2>&1 && \
-            mv /tmp/$REPORT ~/$REPORT &
+            mkdir -p $CRASH_DIR && mv /tmp/$REPORT $CRASH_DIR/$REPORT &
 
+        chmod 666 $CRASH_DIR/$REPORT
         ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null
     fi
 }

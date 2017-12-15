@@ -46,6 +46,7 @@
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
+#include <ui/workbench/handlers/workbench_permissions_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <nx/client/desktop/export/workbench/workbench_export_handler.h>
 #include <nx/client/desktop/legacy/legacy_workbench_export_handler.h>
@@ -251,6 +252,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<WorkbenchExportHandler>();
     context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
+    context->instance<workbench::PermissionsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();

@@ -805,10 +805,23 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         {
             TRACE("Sharing layout " << layout->getName() << " with role "
                 << node->m_displayName);
+
             menu()->trigger(
                 action::ShareLayoutAction,
                 action::Parameters(layout)
                     .withArgument(Qn::UuidRole, roleId)
+            );
+        }
+        auto camerasToShare = data.resources().filtered<QnVirtualCameraResource>();
+        for (const auto& camera : camerasToShare)
+        {
+            TRACE("Sharing camera " << camera->getName() << " with role "
+                << node->m_displayName);
+
+            menu()->trigger(
+                action::ShareCameraAction,
+                action::Parameters(camera)
+                .withArgument(Qn::UuidRole, roleId)
             );
         }
     }
@@ -1025,6 +1038,14 @@ void QnResourceTreeModel::handleDrop(
 
             TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
             menu()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
+                .withArgument(Qn::UserResourceRole, targetUser));
+        }
+
+        for (const auto& sourceCamera : sourceResources.filtered<QnVirtualCameraResource>())
+        {
+            TRACE("Sharing camera " << sourceCamera->getName() << " with " << targetUser->getName());
+
+            menu()->trigger(action::ShareCameraAction, action::Parameters(sourceCamera)
                 .withArgument(Qn::UserResourceRole, targetUser));
         }
     }

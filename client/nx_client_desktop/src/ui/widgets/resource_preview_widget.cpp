@@ -216,43 +216,47 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
     }
     else
     {
-        painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+        const auto paintSize = Geometry::scaled(m_preview.size(), size(), Qt::KeepAspectRatio);
+        const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+            paintSize.toSize(), rect());
+
+        QRectF highlightSubRect;
+        painter.setRenderHints(QPainter::SmoothPixmapTransform);
 
         if (cropRequired())
         {
-            const auto sourceSize = Geometry::cwiseMul(m_highlightRect.size(),
-                m_preview.size() / m_preview.devicePixelRatio());
+            const auto croppedImageRect = Geometry::subRect(m_preview.rect(), m_highlightRect);
+            const auto boundingRect = Geometry::expanded(Geometry::aspectRatio(paintRect),
+                croppedImageRect, Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
 
-            const auto paintSize = Geometry::scaled(sourceSize, size(), Qt::KeepAspectRatio);
-            const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-                paintSize.toSize(), rect());
+            const auto sourceRect = Geometry::movedInto(boundingRect, m_preview.rect());
 
-            painter.drawPixmap(paintRect, m_preview,
-                Geometry::subRect(m_preview.rect(), m_highlightRect));
+            painter.drawPixmap(paintRect, m_preview, sourceRect);
+            highlightSubRect = Geometry::toSubRect(sourceRect, croppedImageRect);
         }
         else
         {
-            const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
-
-            const auto paintSize = Geometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
-            const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
-                paintSize.toSize(), rect());
-
             painter.drawPixmap(paintRect, m_preview);
+            highlightSubRect = m_highlightRect;
+        }
 
-            if (m_highlightRect.isEmpty())
-                return;
+        if (highlightSubRect.isEmpty())
+            return;
 
-            // Dim everything around highlighted area.
+        // Dim everything around highlighted area.
+        const auto highlightRect = Geometry::subRect(paintRect, highlightSubRect).toAlignedRect()
+            .intersected(paintRect);
+
+        if (highlightRect != paintRect)
+        {
             QPainterPath path;
-            const auto highlightRect = Geometry::subRect(paintRect, m_highlightRect).toAlignedRect();
             path.addRegion(QRegion(paintRect).subtracted(highlightRect));
             painter.fillPath(path, palette().alternateBase());
-
-            // Paint frame.
-            painter.setPen(palette().highlight().color());
-            painter.drawRect(highlightRect);
         }
+
+        // Paint frame.
+        painter.setPen(QPen(palette().highlight(), 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        painter.drawRect(Geometry::eroded(QRectF(highlightRect), 0.5));
     }
 }
 

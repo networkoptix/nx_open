@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include <map>
 #include <vector>
@@ -69,4 +69,4 @@ private:
 } // namespace mediaserver_plugins
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

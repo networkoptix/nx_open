@@ -179,6 +179,17 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
     eventPacket->addItem(detectedEvent);
+
+    NX_PRINT << "Firing event: "
+        << "type: " << (
+            (m_eventTypeId == kLineCrossingEventGuid)
+            ? "LineCrossing"
+            : (m_eventTypeId == kObjectInTheAreaEventGuid)
+                ? "ObjectInTheArea"
+                : "Unknown"
+        )
+        << ", isActive: " << ((m_counter == 1) ? "true" : "false");
+
     return eventPacket;
 }
 

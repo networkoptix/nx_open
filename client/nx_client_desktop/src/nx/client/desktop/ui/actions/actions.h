@@ -512,6 +512,14 @@ enum IDType
     SaveLayoutForCurrentUserAsAction,
 
     /**
+    * Shares selected camera with another user.
+    *
+    * Parameters:
+    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
+    */
+    ShareCameraAction,
+
+    /**
      * Performs a fit in view operation.
      */
     FitInViewAction,

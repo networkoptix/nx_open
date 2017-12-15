@@ -32,7 +32,8 @@ namespace {
 
 QnUuid getActionRunningKey(const nx::vms::event::AbstractActionPtr& action)
 {
-    const auto key = action->getExternalUniqKey();
+    const auto key = action->getExternalUniqKey()
+        + action->getParams().actionResourceId.toString();
     return guidFromArbitraryData(key);
 }
 

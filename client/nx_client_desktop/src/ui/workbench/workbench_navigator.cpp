@@ -455,6 +455,9 @@ void QnWorkbenchNavigator::initialize()
     connect(m_timeSlider, SIGNAL(thumbnailsVisibilityChanged()), this, SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider, SIGNAL(thumbnailClicked()), this, SLOT(at_timeSlider_thumbnailClicked()));
 
+    connect(m_timeSlider, &QnTimeSlider::selectionChanged,
+        this, &QnWorkbenchNavigator::timeSelectionChanged);
+
     m_timeSlider->setLiveSupported(isLiveSupported());
 
     m_timeSlider->setLineCount(SliderLineCount);

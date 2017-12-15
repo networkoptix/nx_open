@@ -976,38 +976,38 @@ több könyvjelző megjelenítéséhez</translation>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>A kiválasztott beállítások átkódolást igényelnek. Ez növeli a CPU használatát, a művelet hosszabb időt vehet igénybe.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>Az AVI formátum nem ajánlott nem folyamatos felvétel készítésére hangsávval.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>Ennek a kamerának a felvételeit &quot;Multi Video&quot; formátumban javasoljuk kimenteni a minőség megőrzése érdekében.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation>Hosszabb videó exportálására készül. Ez több gigabájtnyi merevlemez-területet igényelhet, és több percet vesz igénybe.</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>A beállítások nem állnak rendelkezésre az .EXE fájlokhoz.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>A helyi fájlok, a szervermonitor widgetek és a weboldalak nem lesznek exportálva.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Az exportált .EXE fájl mérete több mint 4 GB, és nem nyitható meg dupla kattintással a Windows rendszerben. Csak %1 kliensben játszható le.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio video interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1171,37 +1171,37 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>A jelszónak %n különböző karaktert, szimbólumot vagy számjegyet kell tartalmaznia</numerusform>
+        <numerusform>A jelszónak %n különböző karaktert, szimbólumot vagy számjegyet kell tartalmaznia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>A jelszónak legalább %n karakterből kell állnia.</numerusform>
+        <numerusform>A jelszónak legalább %n karakterből kell állnia.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>A jelszó nem lehet hosszabb %n karakternél.</numerusform>
+        <numerusform>A jelszó nem lehet hosszabb %n karakternél.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több egymást követő karaktert.</numerusform>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több egymást követő karaktert.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több ismétlődő karaktert.</numerusform>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több ismétlődő karaktert.</numerusform>
       </translation>
     </message>
   </context>
@@ -2323,7 +2323,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>Ne mentse</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2519,7 +2519,7 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>A jelszón nem egyezhet meg a kamerák felhasználó nevével</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2527,7 +2527,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Jelszó újra</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2535,7 +2535,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>A jelszónak legalább 8 szimbólumból kell állnia, és különböző karaktereket kell tartalmaznia.</translation>
     </message>
   </context>
   <context>
@@ -2621,11 +2621,11 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>Kevesebb beállítási lehetőség</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>Több beállítási lehetőség</translation>
     </message>
   </context>
   <context>
@@ -3168,22 +3168,22 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>Ennek a kamerának a beállításához jelszó szükséges.</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
+      <translation>A kiválasztott kamerák közül néhány beállításához jelszó szükséges.</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
-        <numerusform>Set Password</numerusform>
+      <translation>
+        <numerusform>Jelszó beállítása</numerusform>
+        <numerusform>Jelszó beállítása</numerusform>
       </translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Kérje a rendszergazda segítségét.</translation>
     </message>
   </context>
   <context>
@@ -3435,7 +3435,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Alap</translation>
     </message>
   </context>
   <context>
@@ -4228,9 +4228,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>Használjon licenceket a %n kamera megtekintéséhez</numerusform>
+        <numerusform>Használjon licenceket a %n kamera megtekintéséhez</numerusform>
       </translation>
     </message>
   </context>
@@ -4477,9 +4477,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Beállítás %n kamerához</numerusform>
+        <numerusform>Beállítás %n kamerához</numerusform>
       </translation>
     </message>
   </context>
@@ -4624,7 +4624,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>Az NVR kamerák nem támogatják a nem szinkronizált lejátszást</translation>
     </message>
   </context>
   <context>
@@ -4722,7 +4722,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>Jelszó beállítása</translation>
     </message>
   </context>
   <context>
@@ -6105,15 +6105,15 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>TÚL SOK KAPCSOLAT</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>JELSZÓ SZÜKSÉGES</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Beállítás ehhez kamerához</translation>
     </message>
   </context>
   <context>
@@ -6529,7 +6529,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Integritási hiba az archív állományban</translation>
     </message>
   </context>
   <context>
@@ -6597,11 +6597,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>A rendszeridő az Internettel szinkronizálva, és nem függ a helyi szerveridőtől.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>A rendszeridő a kiválasztott szerver idejével szinkronizálva, és nem függ a többi szerver idejétől.</translation>
     </message>
   </context>
   <context>
@@ -7736,38 +7736,38 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>Dinamikus</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>Nem támogatott média az adat exportáláshoz.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>A kiválasztott formátumot nem támogatja az FFMPEG könyvtár.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>FFMPEG könyvtár hiba.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Fájlírási hiba történt.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Belső hiba</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Nincs exportált adat.</translation>
     </message>
   </context>
   <context>
@@ -7790,11 +7790,11 @@ to %1</source>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>Időbélyeg hozzáadása</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>Időbélyeg törlése</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -7802,11 +7802,11 @@ to %1</source>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>Kép hozzáadása</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>Kép törlése</translation>
     </message>
     <message>
       <source>Image</source>
@@ -7814,27 +7814,27 @@ to %1</source>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>Szöveg hozzáadása</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>Szöveg törlése</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Szöveg</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Sebesség visszaállítása</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>Könyvjelző info hozzáadása</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>Könyvjelző info törlése</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
@@ -7868,7 +7868,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>(%1) kép</translation>
     </message>
     <message>
       <source>Error</source>
@@ -7876,7 +7876,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>Nem tölthető be a kép.</translation>
     </message>
   </context>
   <context>
@@ -7887,7 +7887,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>NEM KAMERA</translation>
     </message>
   </context>
   <context>
@@ -7913,16 +7913,16 @@ to %1</source>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>A teljesítmény javításához állítsa be az elrendezés felbontását &quot;Auto&quot; értékre.</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>Gyors áttekintés exportálásához a videó hossza legalább %n másodperc kell, hogy legyen.</numerusform>
+        <numerusform>Gyors áttekintés exportálásához a videó hossza legalább %n másodperc kell, hogy legyen.</numerusform>
       </translation>
     </message>
   </context>
@@ -7941,14 +7941,14 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 analitika</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>Export leállítása</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -8535,7 +8535,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>A jelszó megváltoztatása sikertelen %2/%1 kamerán</translation>
     </message>
   </context>
   <context>
@@ -8576,7 +8576,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Showreel %1 törlése?</translation>
     </message>
   </context>
   <context>

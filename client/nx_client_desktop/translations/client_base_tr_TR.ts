@@ -50,7 +50,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Yer imlerini dışa aktar</translation>
     </message>
   </context>
   <context>
@@ -854,7 +854,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>Analytics'i Başlat...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>

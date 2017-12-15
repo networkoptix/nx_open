@@ -172,6 +172,12 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+
+    if(targetDevice MATCHES "linux-*"
+        OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")
+    )
+        add_subdirectory(root_tool)
+    endif()
 endif()
 
 if(withTestCamera)

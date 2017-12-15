@@ -30,34 +30,44 @@ bool motionSelectionEnabled(QnMediaResourceWidget* widget)
     const auto options = widget->options();
     return options.testFlag(QnMediaResourceWidget::DisplayMotion)
         || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
-};
+}
 
 // This way we detect widget that can possibly have DisplayMotion enabled
 bool widgetWithMotion(QGraphicsItem* item)
 {
-    if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
+    if (const auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
     {
         return widget->resource()->toResource()->hasFlags(Qn::motion)
             && !widget->isZoomWindow();
     }
     return false;
-};
+}
 
 // Some widgets (e.g. timeline) must block motion selection
 bool blocksMotionSelection(QGraphicsItem* item)
 {
-    if (auto object = dynamic_cast<QGraphicsObject*>(item))
+    if (const auto object = dynamic_cast<QGraphicsObject*>(item))
         return object->property(Qn::BlockMotionSelection).isValid();
     return false;
 }
+
+// Auto-start drag by timer must be disabled.
+static constexpr int kStartDragTimeMs = -1;
+
+// Drag must be started as early as possible when we can distinguish move from click.
+static constexpr int kStartDragDistance = 5;
 
 } // namespace
 
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
-    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
-    m_isClick(false),
-    m_selectionModifiers(0),
+    base_type(Viewport,
+        makeSet(QEvent::MouseButtonPress,
+            QEvent::MouseMove,
+            QEvent::MouseButtonRelease,
+            QEvent::Paint),
+        parent),
+    m_selectionModifiers(Qt::NoModifier),
     m_multiSelectionModifiers(Qt::ControlModifier)
 {
     /* Default-initialize pen & brush from temporary selection item. */
@@ -65,75 +75,83 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     m_pen = item->pen();
     m_brush = item->brush();
 
-    dragProcessor()->setStartDragTime(0);
+    dragProcessor()->setStartDragTime(kStartDragTimeMs);
+    dragProcessor()->setStartDragDistance(kStartDragDistance);
 }
 
-MotionSelectionInstrument::~MotionSelectionInstrument() {
+MotionSelectionInstrument::~MotionSelectionInstrument()
+{
     ensureUninstalled();
 }
 
-void MotionSelectionInstrument::setPen(const QPen &pen) {
+void MotionSelectionInstrument::setPen(const QPen &pen)
+{
     m_pen = pen;
 
-    if(selectionItem())
+    if (selectionItem())
         selectionItem()->setPen(pen);
 }
 
-QPen MotionSelectionInstrument::pen() const {
+QPen MotionSelectionInstrument::pen() const
+{
     return m_pen;
 }
 
-void MotionSelectionInstrument::setBrush(const QBrush &brush) {
+void MotionSelectionInstrument::setBrush(const QBrush &brush)
+{
     m_brush = brush;
 
-    if(selectionItem())
+    if (selectionItem())
         selectionItem()->setBrush(brush);
 }
 
-QBrush MotionSelectionInstrument::brush() const {
+QBrush MotionSelectionInstrument::brush() const
+{
     return m_brush;
 }
 
-void MotionSelectionInstrument::setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers) {
-    m_selectionModifiers = selectionModifiers;
+void MotionSelectionInstrument::setSelectionModifiers(Qt::KeyboardModifiers modifiers)
+{
+    m_selectionModifiers = modifiers;
 }
 
-Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers() const {
+Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers() const
+{
     return m_selectionModifiers;
 }
 
-void MotionSelectionInstrument::setMultiSelectionModifiers(Qt::KeyboardModifiers multiSelectionModifiers) {
-    m_multiSelectionModifiers = multiSelectionModifiers;
+void MotionSelectionInstrument::setMultiSelectionModifiers(Qt::KeyboardModifiers modifiers)
+{
+    m_multiSelectionModifiers = modifiers;
 }
 
-Qt::KeyboardModifiers MotionSelectionInstrument::multiSelectionModifiers() const {
+Qt::KeyboardModifiers MotionSelectionInstrument::multiSelectionModifiers() const
+{
     return m_multiSelectionModifiers;
 }
 
-void MotionSelectionInstrument::installedNotify() {
-    NX_ASSERT(selectionItem() == NULL);
-
+void MotionSelectionInstrument::installedNotify()
+{
+    NX_ASSERT(selectionItem() == nullptr);
     ensureSelectionItem();
-
     base_type::installedNotify();
 }
 
-void MotionSelectionInstrument::aboutToBeDisabledNotify() {
-    m_isClick = false;
+void MotionSelectionInstrument::aboutToBeDisabledNotify()
+{
     setWidget(nullptr);
-
     base_type::aboutToBeDisabledNotify();
 }
 
-void MotionSelectionInstrument::aboutToBeUninstalledNotify() {
+void MotionSelectionInstrument::aboutToBeUninstalledNotify()
+{
     base_type::aboutToBeUninstalledNotify();
-
-    if(selectionItem() != NULL)
-        delete selectionItem();
+    delete selectionItem();
 }
 
-void MotionSelectionInstrument::ensureSelectionItem() {
-    if(selectionItem() != NULL)
+void MotionSelectionInstrument::ensureSelectionItem()
+{
+    if (selectionItem())
         return;
 
     m_selectionItem = new SelectionItem();
@@ -141,22 +159,22 @@ void MotionSelectionInstrument::ensureSelectionItem() {
     selectionItem()->setPen(m_pen);
     selectionItem()->setBrush(m_brush);
 
-    if(scene() != NULL)
+    if (scene())
         scene()->addItem(selectionItem());
 }
 
-void MotionSelectionInstrument::updateWidgetUnderCursor(QWidget *viewport, QMouseEvent* event)
+void MotionSelectionInstrument::updateWidgetUnderCursor(QWidget* viewport, QMouseEvent* event)
 {
-    auto view = this->view(viewport);
+    const auto view = this->view(viewport);
 
-    auto blocker = this->item(view, event->pos(), blocksMotionSelection);
+    const auto blocker = this->item(view, event->pos(), blocksMotionSelection);
     if (blocker)
     {
         setWidget(nullptr);
         return;
     }
 
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(
+    const auto widget = dynamic_cast<QnMediaResourceWidget*>(
         this->item(view, event->pos(), widgetWithMotion));
     setWidget(widget);
 }
@@ -188,8 +206,10 @@ void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
 
     if (m_widget)
     {
-        connect(m_widget, &QnResourceWidget::optionsChanged, this, &MotionSelectionInstrument::updateCursor);
-        connect(m_widget, &QObject::destroyed, this, &MotionSelectionInstrument::updateCursor);
+        connect(m_widget, &QnResourceWidget::optionsChanged, this,
+            &MotionSelectionInstrument::updateCursor);
+        connect(m_widget, &QObject::destroyed, this,
+            &MotionSelectionInstrument::updateCursor);
     }
 
     updateCursor();
@@ -208,12 +228,14 @@ void MotionSelectionInstrument::setItemUnderMouse(QGraphicsWidget* item)
     updateCursor();
 }
 
-Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnMediaResourceWidget *target) const
+Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(
+    QnMediaResourceWidget* target) const
 {
-    if(!target)
+    if (!target)
         return m_selectionModifiers;
 
-    return static_cast<Qt::KeyboardModifiers>(qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers));
+    return static_cast<Qt::KeyboardModifiers>(qvariant_cast<int>(
+        target->property(Qn::MotionSelectionModifiers), m_selectionModifiers));
 }
 
 bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event)
@@ -227,7 +249,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if (!m_widget)
         return false;
 
-    Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(m_widget);
+    const auto selectionModifiers = this->selectionModifiers(m_widget);
     if ((event->modifiers() & selectionModifiers) != selectionModifiers)
         return false;
 
@@ -261,10 +283,13 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
 
     // Really UiElementsWidget always getting here for main scene, resource widget for motion tab.
     auto item = dynamic_cast<QGraphicsWidget*>(
-        this->item(view, event->pos(), [](QGraphicsItem* item){ return item->isWidget(); }));
+        this->item(view, event->pos(), [](QGraphicsItem* item) { return item->isWidget(); }));
     setItemUnderMouse(item);
 
     updateButtonUnderCursor(viewport, event);
+
+    if (m_widget)
+        dragProcessor()->mouseMoveEvent(viewport, event);
 
     // Make sure selection will not stop while we are dragging over widget.
     const bool isDrag = dragProcessor()->isRunning() && event->buttons().testFlag(Qt::LeftButton);
@@ -283,9 +308,10 @@ bool MotionSelectionInstrument::mouseReleaseEvent(QWidget* viewport, QMouseEvent
     return result;
 }
 
-bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event)
+bool MotionSelectionInstrument::paintEvent(QWidget* viewport, QPaintEvent* event)
 {
-    if(target() == NULL) {
+    if (!target())
+    {
         dragProcessor()->reset();
         return false;
     }
@@ -293,24 +319,27 @@ bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event
     return base_type::paintEvent(viewport, event);
 }
 
-void MotionSelectionInstrument::startDragProcess(DragInfo *info) {
-    m_isClick = true;
+void MotionSelectionInstrument::startDragProcess(DragInfo* info)
+{
     emit selectionProcessStarted(info->view(), target());
 }
 
-void MotionSelectionInstrument::startDrag(DragInfo *info) {
-    m_isClick = false;
+void MotionSelectionInstrument::startDrag(DragInfo* info)
+{
     m_selectionStartedEmitted = false;
     m_gridRect = QRect();
 
-    if(target() == NULL) {
+    if (!target())
+    {
         /* Whoops, already destroyed. */
         dragProcessor()->reset();
         return;
     }
 
     if ((info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers)
+    {
         emit motionRegionCleared(info->view(), target());
+    }
 
     ensureSelectionItem();
     selectionItem()->setParentItem(target());
@@ -322,8 +351,10 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
     m_selectionStartedEmitted = true;
 }
 
-void MotionSelectionInstrument::dragMove(DragInfo *info) {
-    if(target() == NULL) {
+void MotionSelectionInstrument::dragMove(DragInfo* info)
+{
+    if (!target())
+    {
         dragProcessor()->reset();
         return;
     }
@@ -334,19 +365,24 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
 
     QPointF gridStep = target()->mapFromMotionGrid(QPoint(1, 1)) - target()->mapFromMotionGrid(QPoint(0, 0));
     QPointF mouseDelta = mouseOrigin - mouseCorner;
-    if(qAbs(mouseDelta.x()) < qAbs(gridStep.x()) / 2 && qAbs(mouseDelta.y()) < qAbs(gridStep.y()) / 2) {
+    if (qAbs(mouseDelta.x()) < qAbs(gridStep.x()) / 2 && qAbs(mouseDelta.y()) < qAbs(gridStep.y()) / 2)
+    {
         selectionItem()->setRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
         m_gridRect = QRect();
-    } else {
+    }
+    else
+    {
         QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
         QPoint gridCorner = target()->mapToMotionGrid(mouseCorner) + QPoint(1, 1);
 
-        if (gridCorner.x() <= gridOrigin.x()) {
+        if (gridCorner.x() <= gridOrigin.x())
+        {
             gridCorner -= QPoint(1, 0);
             gridOrigin += QPoint(1, 0);
         }
 
-        if (gridCorner.y() <= gridOrigin.y()) {
+        if (gridCorner.y() <= gridOrigin.y())
+        {
             gridCorner -= QPoint(0, 1);
             gridOrigin += QPoint(0, 1);
         }
@@ -359,9 +395,11 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void MotionSelectionInstrument::finishDrag(DragInfo *info) {
+void MotionSelectionInstrument::finishDrag(DragInfo* info)
+{
     ensureSelectionItem();
-    if(target() != NULL) {
+    if (target())
+    {
         emit motionRegionSelected(
             info->view(),
             target(),
@@ -372,29 +410,21 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     selectionItem()->setVisible(false);
     selectionItem()->setParentItem(NULL);
 
-    if(m_selectionStartedEmitted)
+    if (m_selectionStartedEmitted)
         emit selectionFinished(info->view(), target());
 }
 
-void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
-#if 0
-    if (m_isClick && !m_clearingBlocked && target()) {
-        Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target());
-        if((info->modifiers() & selectionModifiers) == selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers) {
-            emit motionRegionCleared(info->view(), target());
-            m_isClick = false;
-        }
-    }
-#endif
-
+void MotionSelectionInstrument::finishDragProcess(DragInfo* info)
+{
     emit selectionProcessFinished(info->view(), target());
 }
 
-SelectionItem *MotionSelectionInstrument::selectionItem() const {
+SelectionItem* MotionSelectionInstrument::selectionItem() const
+{
     return m_selectionItem.data();
 }
 
-QnMediaResourceWidget *MotionSelectionInstrument::target() const {
+QnMediaResourceWidget* MotionSelectionInstrument::target() const
+{
     return m_widget.data();
 }
-

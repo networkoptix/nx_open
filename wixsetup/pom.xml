@@ -22,7 +22,7 @@
         <bin_source_dir>${libdir}\bin\${build.configuration}</bin_source_dir>
         <NxtoolQuickControlsDir>${bin_source_dir}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
         <ClientFontsDir>${bin_source_dir}\fonts</ClientFontsDir>
-        <ClientQmlDir>${bin_source_dir}\qml</ClientQmlDir>
+        <client_qml_dir>${bin_source_dir}\qml</client_qml_dir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
         <certificates_path>${packages.dir}/any/certificates-${customization}</certificates_path>
         <installer.target.dir>bin</installer.target.dir>

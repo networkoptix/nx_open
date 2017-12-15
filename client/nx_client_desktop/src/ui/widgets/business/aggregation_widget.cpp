@@ -9,7 +9,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-constexpr int kDefaultOptimalWidth = 300;
+static constexpr int kDefaultOptimalWidth = 300;
 
 AggregationWidget::AggregationWidget(QWidget* parent):
     base_type(parent),
@@ -38,12 +38,14 @@ AggregationWidget::~AggregationWidget()
 {
 }
 
-void AggregationWidget::setValue(int secs) {
+void AggregationWidget::setValue(int secs)
+{
     ui->enabledCheckBox->setChecked(secs > 0);
     ui->periodWidget->setValue(secs);
 }
 
-int AggregationWidget::value() const {
+int AggregationWidget::value() const
+{
     if (!ui->enabledCheckBox->isChecked())
         return 0;
     return ui->periodWidget->value();
@@ -54,11 +56,13 @@ QWidget* AggregationWidget::lastTabItem() const
     return ui->periodWidget->lastTabItem();
 }
 
-void AggregationWidget::setShort(bool value) {
+void AggregationWidget::setShort(bool value)
+{
     ui->longLabel->setVisible(!value);
 }
 
-int AggregationWidget::optimalWidth() {
+int AggregationWidget::optimalWidth()
+{
     return kDefaultOptimalWidth;
 }
 
