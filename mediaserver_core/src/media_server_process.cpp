@@ -270,7 +270,7 @@
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
-#include <nx/utils/platform/current_process.cpp>
+#include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
 
 #if !defined(EDGE_SERVER)
