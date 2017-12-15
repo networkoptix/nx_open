@@ -20,10 +20,10 @@ public:
     const ConnectionOptions& connectionOptions() const;
 
     /**
-    * Establishes connection to DB.
-    * This method MUST be called after class instantiation
-    * NOTE: Method is needed because we do not use exceptions
-    */
+     * Establishes connection to DB.
+     * This method MUST be called after class instantiation
+     * NOTE: Method is needed because we do not use exceptions
+     */
     bool open();
 
     QSqlDatabase* dbConnection();
