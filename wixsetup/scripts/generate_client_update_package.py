@@ -110,7 +110,8 @@ def nx_files(source_dir, libs):
 
 def zip_files(zip, files, rel_path, target_path='.'):
     for file in files:
-        zip.write(file, os.path.join(target_path, os.path.relpath(file, rel_path)))
+        target_filename = os.path.join(target_path, os.path.relpath(file, rel_path))
+        zip.write(file, target_filename)
 
 
 def zip_package(zip, package_directory):
@@ -129,6 +130,7 @@ def create_client_update_file(
     client_binary_name,
     launcher_version_name,
     minilauncher_binary_name,
+    client_update_files_firectory,
     client_update_file
 ):
     with zipfile.ZipFile(client_update_file, "w", zipfile.ZIP_DEFLATED) as zip:
@@ -138,6 +140,7 @@ def create_client_update_file(
         zip_files(zip, quazip_files(binaries_dir), binaries_dir)
         zip_files(zip, nx_files(binaries_dir, common_nx_libraries), binaries_dir)
         zip_files(zip, nx_files(binaries_dir, client_nx_libraries), binaries_dir)
+        zip_files(zip, find_all_files(client_update_files_firectory), client_update_files_firectory)
 
         qt_bin_dir = os.path.join(qt_dir, 'bin')
         zip_files(zip, icu_files(qt_bin_dir), qt_bin_dir)
@@ -181,6 +184,7 @@ def main():
         client_binary_name=config['client_binary_name'],
         launcher_version_name=config['launcher_version_file'],
         minilauncher_binary_name=config['minilauncher_binary_name'],
+        client_update_files_firectory=config['client_update_files_firectory'],
         client_update_file=client_update_file)
 
 

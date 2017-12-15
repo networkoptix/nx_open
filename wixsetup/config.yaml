@@ -14,6 +14,8 @@ client_qml_dir: '${client_qml_dir}'
 help_directory: '${help_directory}'
 festival_vox_directory: '${festival_vox_directory}'
 fonts_directory: '${fonts_directory}'
+client_update_files_firectory: '${CMAKE_CURRENT_BINARY_DIR}/client'
+server_update_files_firectory: '${CMAKE_CURRENT_BINARY_DIR}/server'
 
 # Source binaries
 client_binary_name: '${product.name}'

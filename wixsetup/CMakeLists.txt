@@ -71,14 +71,14 @@ if(withDesktopClient)
         )
     add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
 
-    add_custom_target(generate_update_packages ALL
-    COMMENT "Preparing update and debug packages ..."
+    add_custom_target(generate_client_update_package ALL
+    COMMENT "Preparing client update package ..."
     DEPENDS
         collect_qml_dependencies
         applauncher
         minilauncher
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
-    COMMAND ${PYTHON_EXECUTABLE} generate_update_packages.py
+    COMMAND ${PYTHON_EXECUTABLE} generate_client_update_package.py
         "--config" ${config_file}
         "--output" ${distribution_output_dir}
     )
