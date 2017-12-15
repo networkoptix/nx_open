@@ -1,48 +1,47 @@
 #include "peer_wrapper.h"
 
 #include <api/auth_util.h>
+#include <rest/request_params.h>
 
 #include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 namespace test {
 
-//namespace {
-
-// TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient.
-// Though, it requires some refactoring: moving ec2::ApiTransactionDataList out of appserver2.
-class MediaServerClientEx:
-    public MediaServerClient
+MediaServerClientEx::MediaServerClientEx(const nx::utils::Url& baseRequestUrl):
+    base_type(baseRequestUrl)
 {
-    using base_type = MediaServerClient;
+}
 
-public:
-    MediaServerClientEx(const nx::utils::Url& baseRequestUrl):
-        base_type(baseRequestUrl)
-    {
-    }
+void MediaServerClientEx::ec2GetTransactionLog(
+    const ApiTranLogFilter& filter,
+    std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)> completionHandler)
+{
+    QString requestPath("ec2/getTransactionLog");
+    QUrlQuery urlQuery;
+    ::ec2::toUrlParams(filter, &urlQuery);
+    if (!urlQuery.isEmpty())
+        requestPath += lm("?%1").args(urlQuery.toString());
 
-    void ec2GetTransactionLog(
-        std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)> completionHandler)
-    {
-        performAsyncEc2Call("ec2/getTransactionLog", std::move(completionHandler));
-    }
+    performAsyncEc2Call(requestPath.toStdString(), std::move(completionHandler));
+}
 
-    ec2::ErrorCode ec2GetTransactionLog(ec2::ApiTransactionDataList* result)
-    {
-        using Ec2GetTransactionLogAsyncFuncPointer =
-            void(MediaServerClientEx::*)(
-                std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)>);
+ec2::ErrorCode MediaServerClientEx::ec2GetTransactionLog(
+    const ApiTranLogFilter& filter,
+    ec2::ApiTransactionDataList* result)
+{
+    using Ec2GetTransactionLogAsyncFuncPointer =
+        void(MediaServerClientEx::*)(
+            const ApiTranLogFilter&,
+            std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)>);
 
-        return syncCallWrapper(
-            this,
-            static_cast<Ec2GetTransactionLogAsyncFuncPointer>(
-                &MediaServerClientEx::ec2GetTransactionLog),
-            result);
-    }
-};
-
-//} // namespace
+    return syncCallWrapper(
+        this,
+        static_cast<Ec2GetTransactionLogAsyncFuncPointer>(
+            &MediaServerClientEx::ec2GetTransactionLog),
+        filter,
+        result);
+}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -142,8 +141,11 @@ QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
 
 ec2::ErrorCode PeerWrapper::getTransactionLog(ec2::ApiTransactionDataList* result) const
 {
+    ApiTranLogFilter filter;
+    filter.cloudOnly = false;
+
     auto mediaServerClient = prepareMediaServerClient();
-    return mediaServerClient->ec2GetTransactionLog(result);
+    return mediaServerClient->ec2GetTransactionLog(filter, result);
 }
 
 QnUuid PeerWrapper::id() const
@@ -166,7 +168,7 @@ nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
     return m_cloudCredentials;
 }
 
-std::unique_ptr<MediaServerClient> PeerWrapper::mediaServerClient() const
+std::unique_ptr<MediaServerClientEx> PeerWrapper::mediaServerClient() const
 {
     return prepareMediaServerClient();
 }

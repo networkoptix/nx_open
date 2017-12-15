@@ -25,10 +25,10 @@ public:
     const PeerWrapper& peer(int index) const;
     PeerWrapper& peer(int index);
 
-    void whenMergeSystems();
+    void mergeSystems();
 
-    void thenAllServersAreInterconnected();
-    void thenAllServersSynchronizedData();
+    void waitUntilAllServersAreInterconnected();
+    void waitUntilAllServersSynchronizedData();
 
     ApiSystemMergeHistoryRecordList waitUntilMergeHistoryIsAdded();
 
