@@ -735,7 +735,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             }
         }
 
-        var date = self.scaleManager.dragStartDate || self.scaleManager.screenCoordinateToDate(mouseX);
+        var date = self.scaleManager.dragDate || self.scaleManager.screenCoordinateToDate(mouseX);
 
         drawMarker( context,
                     date,
