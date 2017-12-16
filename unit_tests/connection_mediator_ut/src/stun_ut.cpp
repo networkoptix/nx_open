@@ -35,6 +35,7 @@ protected:
     StunCustomTest():
         mediaserverApi(&cloudData, &stunMessageDispatcher),
         relayClusterClient(settings),
+        listeningPeerPool(settings.listeningPeer()),
         listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool, &relayClusterClient),
         server(
             &stunMessageDispatcher,

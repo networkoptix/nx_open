@@ -55,7 +55,7 @@ const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
 const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
 const QLatin1String kStunConnectionInactivityTimeout("stun/connectionInactivityTimeout");
-const std::chrono::hours kDefaultStunInactivityTimeout(10);
+const std::chrono::minutes kDefaultStunInactivityTimeout(1);
 
 //HTTP
 const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
@@ -65,7 +65,7 @@ const QLatin1String kHttpKeepAliveOptions("http/keepAliveOptions");
 const QLatin1String kDefaultHttpKeepAliveOptions("");
 
 const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
-const std::chrono::hours kDefaultHttpInactivityTimeout(1);
+const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 
 const QString kModuleName = lit("connection_mediator");
 
@@ -136,6 +136,10 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 // Traffic Relay - related settings.
 
 const QLatin1String kTrafficRelayUrl("trafficRelay/url");
+
+const QLatin1String kListeningPeerConnectionInactivityTimeout(
+    "listeningPeer/connectionInactivityTimeout");
+const std::chrono::hours kDefaultListeningPeerConnectionInactivityTimeout(10);
 
 } // namespace
 
@@ -212,6 +216,11 @@ const TrafficRelay& Settings::trafficRelay() const
 const nx::cloud::discovery::conf::Discovery& Settings::discovery() const
 {
     return m_discovery;
+}
+
+const ListeningPeer& Settings::listeningPeer() const
+{
+    return m_listeningPeer;
 }
 
 void Settings::initializeWithDefaultValues()
@@ -301,6 +310,8 @@ void Settings::loadSettings()
     loadTrafficRelay();
 
     m_discovery.load(settings());
+
+    loadListeningPeer();
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -401,6 +412,14 @@ void Settings::loadConnectionParameters()
 void Settings::loadTrafficRelay()
 {
     m_trafficRelay.url = settings().value(kTrafficRelayUrl).toString();
+}
+
+void Settings::loadListeningPeer()
+{
+    m_listeningPeer.connectionInactivityTimeout =
+        nx::utils::parseOptionalTimerDuration(
+            settings().value(kListeningPeerConnectionInactivityTimeout).toString(),
+            kDefaultListeningPeerConnectionInactivityTimeout);
 }
 
 void Settings::readEndpointList(

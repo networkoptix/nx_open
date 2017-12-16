@@ -45,7 +45,8 @@ public:
         return SocketAddress();
     }
 
-    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> /*handler*/) override
+    virtual void addOnConnectionCloseHandler(
+        nx::utils::MoveOnlyFunc<void()> /*handler*/) override
     {
     }
 
@@ -58,8 +59,20 @@ public:
     {
     }
 
+    virtual void setInactivityTimeout(
+        boost::optional<std::chrono::milliseconds> value) override
+    {
+        m_inactivityTimeout = value;
+    }
+
+    boost::optional<std::chrono::milliseconds> inactivityTimeout() const
+    {
+        return m_inactivityTimeout;
+    }
+
 private:
     Socket m_socket;
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
 };
 
 } // namespace test
