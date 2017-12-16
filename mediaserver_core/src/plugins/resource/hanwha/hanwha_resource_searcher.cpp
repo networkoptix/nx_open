@@ -165,60 +165,27 @@ void HanwhaResourceSearcher::updateSocketList()
 
 bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData* outData)
 {
-    auto splitStringData = [](const QByteArray& data)
-    {
-        QList<QByteArray> result;
-        int prevPosition = -1;
-        for (int i = 0; i < data.size(); ++i)
-        {
-            if (data[i] < 32)
-            {
-                // Binary char
-                if (prevPosition >= 0)
-                    result << QByteArray::fromRawData(data.data() + prevPosition, i - prevPosition);
-                prevPosition = -1;
-            }
-            else
-            {
-                // Printable char
-                if (prevPosition == -1)
-                    prevPosition = i;
-            }
-        }
-        if (prevPosition >= 0)
-            result << QByteArray::fromRawData(data.data() + prevPosition, data.size() - prevPosition);
-
-        return result;
-    };
-
     // Packet format is reverse engenered.
     bool isPacketV1 = data.size() == 262 && data[0] == '\x0b';
     bool isPacketV2 = data.size() == 334 && data[0] == '\x0c';
     if (!isPacketV1 && !isPacketV2)
         return false;
-    for (int i = 1; i < 16; ++i)
-    {
-        if (data[i] != 0)
-            return false;
-    }
-    if (!data.endsWith('\x00'))
-        return false;
 
-    const QByteArray stringData = data.mid(0x10);
-    QList<QByteArray> params = splitStringData(stringData);
-    params.erase(std::remove_if(
-        params.begin(), params.end(),
-        [](const QByteArray& value)
-        {
-            return value.size() <= 2; //< Remove unknown short params like 'P'
-        }), params.end());
-    if (params.size() != 6)
-        return false;
-    outData->macAddress = QnMacAddress(params[0]);
+
+    static const int kMacAddressOffset = 19;
+    outData->macAddress = QnMacAddress(QLatin1String(data.data() + kMacAddressOffset));
     if (outData->macAddress.isNull())
         return false;
-    outData->modelName = params[4];
-    outData->presentationUrl = QUrl(params[5]).toString(QUrl::RemovePath);
+
+    static const int kModelOffset = 109;
+    outData->modelName = QLatin1String(data.data() + kModelOffset);
+
+    static const int kUrlOffset = 133;
+    const auto urlStr = QLatin1String(data.data() + kUrlOffset);
+    outData->presentationUrl = QUrl(urlStr).toString(QUrl::RemovePath);
+
+    if (outData->presentationUrl.isEmpty())
+        return false;
     outData->manufacturer = kHanwhaManufacturerName;
 
     return true;
@@ -249,13 +216,12 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
         };
 
     QByteArray datagram;
-    datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+    datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE + 1); //< Keep last byte zero.
     for (const auto& socket: m_sunApiSocketList)
     {
         while (socket->hasData())
         {
-            SocketAddress remoteEndpoint;
-            int bytesRead = socket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
+            int bytesRead = socket->recv(datagram.data(), datagram.size() - 1);
             if (bytesRead < 1)
                 continue;
 
