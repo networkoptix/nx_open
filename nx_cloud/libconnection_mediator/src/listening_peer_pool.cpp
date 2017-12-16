@@ -101,6 +101,11 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
+ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
+    m_settings(settings)
+{
+}
+
 ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const ConnectionStrongRef& connection,
     const MediaserverData& peerData)
@@ -119,10 +124,10 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const auto curConnectionStrongRef = peerIter->second.peerConnection.lock();
     if (curConnectionStrongRef != connection)
     {
-        //detaching from old connection
-
-        //binding to a new connection
+        // Binding to a new connection.
         peerIter->second.peerConnection = connection;
+        connection->setInactivityTimeout(
+            m_settings.connectionInactivityTimeout);
         connection->addOnConnectionCloseHandler([this, peerData, connection]()
         {
             QnMutexLocker lock(&m_mutex);

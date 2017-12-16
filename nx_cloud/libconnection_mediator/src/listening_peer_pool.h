@@ -11,6 +11,7 @@
 #include "data/listening_peer.h"
 #include "request_processor.h"
 #include "server/stun_request_processing_helper.h"
+#include "settings.h"
 
 namespace nx {
 namespace hpm {
@@ -87,6 +88,8 @@ public:
             PeerContainer::iterator peerIter);
     };
 
+    ListeningPeerPool(const conf::ListeningPeer& settings);
+
     /**
      * Inserts new or returns existing element with key peerData.
      * @note Another thread will block trying to lock peerData while
@@ -109,6 +112,7 @@ public:
 private:
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
+    const conf::ListeningPeer m_settings;
 };
 
 } // namespace hpm
