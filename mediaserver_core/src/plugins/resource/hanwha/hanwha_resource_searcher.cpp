@@ -333,7 +333,7 @@ void HanwhaResourceSearcher::createResource(
 template <typename T>
 void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
-    HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
+    HanwhaResourcePtr firstResource = result.last().template dynamicCast<HanwhaResource>();
 
     const auto info = cachedDeviceInfo(auth, firstResource->getUrl());
     if (!info)
