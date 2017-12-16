@@ -10,8 +10,8 @@ ServerConnection::ServerConnection(
     std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
-    BaseType(socketServer, std::move(sock)),
-    m_peerAddress(BaseType::getForeignAddress()),
+    base_type(socketServer, std::move(sock)),
+    m_peerAddress(base_type::getForeignAddress()),
     m_dispatcher(dispatcher)
 {
 }
@@ -29,7 +29,7 @@ void ServerConnection::sendMessage(
     nx::stun::Message message,
     std::function<void(SystemError::ErrorCode)> handler)
 {
-    BaseType::sendMessage(
+    base_type::sendMessage(
         std::move(message),
         std::move(handler));
 }
@@ -41,7 +41,7 @@ nx::network::TransportProtocol ServerConnection::transportProtocol() const
 
 SocketAddress ServerConnection::getSourceAddress() const
 {
-    return BaseType::socket()->getForeignAddress();
+    return base_type::socket()->getForeignAddress();
 }
 
 void ServerConnection::addOnConnectionCloseHandler(
@@ -52,13 +52,19 @@ void ServerConnection::addOnConnectionCloseHandler(
 
 AbstractCommunicatingSocket* ServerConnection::socket()
 {
-    return BaseType::socket().get();
+    return base_type::socket().get();
 }
 
 void ServerConnection::close()
 {
-    auto socket = BaseType::takeSocket();
+    auto socket = base_type::takeSocket();
     socket.reset();
+}
+
+void ServerConnection::setInactivityTimeout(
+    boost::optional<std::chrono::milliseconds> value)
+{
+    base_type::setInactivityTimeout(value);
 }
 
 void ServerConnection::setDestructHandler(std::function< void() > handler)

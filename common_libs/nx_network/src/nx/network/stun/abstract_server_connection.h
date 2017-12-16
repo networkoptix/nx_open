@@ -1,11 +1,13 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
+
+#include <boost/optional.hpp>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
-
 #include <nx/utils/system_error.h>
 
 #include "message.h"
@@ -16,7 +18,6 @@ namespace stun {
 class AbstractServerConnection
 {
 public:
-    AbstractServerConnection() = default;
     virtual ~AbstractServerConnection() = default;
 
     /**
@@ -33,10 +34,7 @@ public:
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     virtual AbstractCommunicatingSocket* socket() = 0;
     virtual void close() = 0;
-
-private:
-    AbstractServerConnection(const AbstractServerConnection&);
-    AbstractServerConnection& operator=(const AbstractServerConnection&);
+    virtual void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value) = 0;
 };
 
 } // namespace stun
