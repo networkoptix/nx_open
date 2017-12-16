@@ -2,7 +2,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import cache
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.helpers.exceptions import handle_exceptions, api_success, require_params, APIRequestException, ErrorCodes
+from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
+    APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
 import datetime, logging
 import json
 import requests
@@ -72,6 +73,9 @@ def language(request):
 def downloads_history(request):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
+    if not request.user.is_superuser and (request.user.customization != customization \
+                                     or not request.user.has_perm('api.can_view_release')):
+        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
     downloads_json = requests.get(downloads_url)
@@ -87,10 +91,17 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
+    if not request.user.is_superuser and (request.user.customization != customization \
+                                     or not request.user.has_perm('api.can_view_release')):
+        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+
     downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()
+
+    if 'releaseNotes' not in downloads_json:
+        raise APINotFoundException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
 
     updates_json = requests.get(settings.UPDATE_JSON)
     updates_json.raise_for_status()

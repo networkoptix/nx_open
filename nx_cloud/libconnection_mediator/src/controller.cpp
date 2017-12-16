@@ -21,6 +21,7 @@ Controller::Controller(
         : nullptr),
     m_mediaserverApi(m_cloudDataProvider.get(), stunMessageDispatcher),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
+    m_listeningPeerPool(settings.listeningPeer()),
     m_listeningPeerRegistrator(
         settings,
         m_cloudDataProvider.get(),

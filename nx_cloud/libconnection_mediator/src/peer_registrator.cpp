@@ -131,7 +131,7 @@ void PeerRegistrator::bind(
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
-    const api::ResultCode resultCode = 
+    const api::ResultCode resultCode =
         getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
