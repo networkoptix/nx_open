@@ -34,7 +34,8 @@ namespace test {
 class ConnectTest : public testing::Test
 {
 protected:
-    ConnectTest()
+    ConnectTest():
+        listeningPeerPool(settings.listeningPeer())
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 

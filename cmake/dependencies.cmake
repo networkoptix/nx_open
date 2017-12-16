@@ -121,6 +121,9 @@ function(get_dependencies)
         nx_rdep_add_package(any/qtsinglecoreapplication)
     endif()
 
+    if(WIN32)
+        set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
+    endif()
     nx_rdep_add_package(any/nx_kit)
 
     nx_rdep_add_package(openssl)
