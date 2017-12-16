@@ -16,6 +16,10 @@ name_css = "overflow: hidden;text-overflow: ellipsis;white-space: nowrap; width:
 
 
 class Account(PermissionsMixin):
+    class Meta:
+        permissions = (
+            ("can_view_release", "Can view releases and patches"),
+        )
 
     objects = AccountManager()
 
