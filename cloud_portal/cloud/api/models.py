@@ -14,7 +14,7 @@ from django.utils import timezone
 class Account(PermissionsMixin):
     class Meta:
         permissions = (
-            ("can_view_release", "Can view release notes"),
+            ("can_view_release", "Can view releases and patches"),
         )
 
     objects = AccountManager()

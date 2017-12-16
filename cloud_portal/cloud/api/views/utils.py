@@ -2,7 +2,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.core.cache import cache
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.helpers.exceptions import handle_exceptions, api_success, require_params, APIRequestException, ErrorCodes
+from api.helpers.exceptions import handle_exceptions, api_success, require_params, \
+    APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
 import datetime, logging
 import json
 import requests
@@ -107,7 +108,7 @@ def downloads_history(request):
     customization = settings.CUSTOMIZATION
     if not request.user.is_superuser and (request.user.customization != customization \
                                      or not request.user.has_perm('api.can_view_release')):
-        raise APIRequestException("Not authorized!!!", ErrorCodes.not_authorized)
+        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
     downloads_json = requests.get(downloads_url)
@@ -125,7 +126,7 @@ def download_build(request, build):
     customization = settings.CUSTOMIZATION
     if not request.user.is_superuser and (request.user.customization != customization \
                                      or not request.user.has_perm('api.can_view_release')):
-        raise APIRequestException("Not authorized!!!", ErrorCodes.not_authorized)
+        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_VERSION_JSON.replace('{{customization}}', customization).replace('{{build}}', build)
     downloads_json = requests.get(downloads_url)
@@ -133,7 +134,7 @@ def download_build(request, build):
     downloads_json = downloads_json.json()
 
     if 'releaseNotes' not in downloads_json:
-        raise APIRequestException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
+        raise APINotFoundException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
 
     updates_json = requests.get(settings.UPDATE_JSON)
     updates_json.raise_for_status()

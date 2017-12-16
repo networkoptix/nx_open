@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='account',
-            options={'permissions': (('can_view_release', 'Can view release notes'),)},
+            options={'permissions': (('can_view_release', 'Can view releases and patches'),)},
         ),
     ]
