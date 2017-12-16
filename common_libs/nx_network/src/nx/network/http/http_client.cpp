@@ -305,7 +305,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         // Have to re-establish connection if the previous message has not been read up to the end.
         if (m_asyncHttpClient)
         {
-            m_asyncHttpClient->pleaseStopSync();
+            m_asyncHttpClient->pleaseStopSync(false);
             m_asyncHttpClient.reset();
         }
         instantiateHttpClient();
@@ -363,7 +363,7 @@ void HttpClient::onResponseReceived()
             cl_logWARNING);
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync();
+        m_asyncHttpClient->pleaseStopSync(false);
     }
     m_cond.wakeAll();
 }
@@ -380,7 +380,7 @@ void HttpClient::onSomeMessageBodyAvailable()
             cl_logWARNING);
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync();
+        m_asyncHttpClient->pleaseStopSync(false);
     }
     m_cond.wakeAll();
 }

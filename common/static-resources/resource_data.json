@@ -2115,6 +2115,12 @@
                 "Surveillance Camera|DVB-4100-VS"
             ],
             "ignoreCameraTimeIfBigJitter": true
+        },
+        {
+            "keys": [
+                "DW|DWC-MTT4Wi36"
+            ],
+            "forceOnvifAdvancedParameters": true
         }
     ]
 }

@@ -38,6 +38,7 @@ extern "C"
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
 #include <nx/fusion/serialization/lexical_enum.h>
+#include <api/global_settings.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65536;
 static const int REOPEN_TIMEOUT = 1000;
@@ -79,7 +80,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_maxSessionDurartion(std::numeric_limits<qint64>::max())
 {
     m_footageUpToDate.test_and_set();
     m_currentServerUpToDate.test_and_set();
@@ -89,6 +91,11 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMotion;
     m_flags |= Flag_CanSeekImmediatly;
+
+    const auto settings = reader->getResource()->commonModule()->globalSettings();
+    auto maxSessionDurartion = settings->maxRtspConnectDuration();
+    if (maxSessionDurartion.count() > 0)
+        m_maxSessionDurartion = maxSessionDurartion;
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &camera)
@@ -278,11 +285,12 @@ bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
     return rez;
 }
 
-bool QnRtspClientArchiveDelegate::openInternal() {
+bool QnRtspClientArchiveDelegate::openInternal()
+{
     if (m_opened)
         return true;
     m_closing = false;
-
+    m_sessionTimeout.restart();
     m_customVideoLayout.reset();
     m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
 
@@ -426,8 +434,11 @@ void QnRtspClientArchiveDelegate::reopen()
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
-    if (!m_currentServerUpToDate.test_and_set())
+    if (!m_currentServerUpToDate.test_and_set() ||
+        (m_sessionTimeout.isValid() && m_sessionTimeout.hasExpired(m_maxSessionDurartion.count())))
+    {
         reopen();
+    }
 
     if (!m_footageUpToDate.test_and_set()) {
         if (m_isMultiserverAllowed)
