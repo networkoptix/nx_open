@@ -12,6 +12,10 @@ from django.utils import timezone
 
 
 class Account(PermissionsMixin):
+    class Meta:
+        permissions = (
+            ("can_view_release", "Can view release notes"),
+        )
 
     objects = AccountManager()
 
