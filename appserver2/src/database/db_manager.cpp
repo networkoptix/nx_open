@@ -1589,7 +1589,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         // Removing extra business rule, that was added through Rule::getRulesUpd43()
         // That fixes VMS-7696
         // id=900024 -> uuid = "{1d378edd-06ae-0df0-c85a-664c2f445ff5}"
-        QnUuid guid = "{1d378edd-06ae-0df0-c85a-664c2f445ff5}";
+        QnUuid guid("{1d378edd-06ae-0df0-c85a-664c2f445ff5}");
         return removeBusinessRule(guid) == ErrorCode::ok;
     }
 
