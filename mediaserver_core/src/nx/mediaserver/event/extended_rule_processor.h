@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <core/resource/resource_fwd.h>
