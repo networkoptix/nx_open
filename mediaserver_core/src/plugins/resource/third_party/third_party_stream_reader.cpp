@@ -4,6 +4,7 @@
 #ifdef ENABLE_THIRD_PARTY
 
 #include <algorithm>
+#include <nx/utils/std/cpp14.h>
 
 #include <QtCore/QTextStream>
 
@@ -23,6 +24,7 @@
 #include "third_party_video_data_packet.h"
 
 #include <motion/motion_detection.h>
+#include <utils/common/synctime.h>
 
 namespace
 {
@@ -260,7 +262,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             QString mediaUrlStr(mediaUrlBuf);
             m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        }   
+        }
 
         return CameraDiagnostics::NoErrorResult();
     }
@@ -300,7 +302,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 m_resource,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
         }
-        else 
+        else
         {
             return CameraDiagnostics::UnknownErrorResult();
         }
@@ -316,6 +318,8 @@ void ThirdPartyStreamReader::closeStream()
 
     if( m_builtinStreamReader.get() )
         m_builtinStreamReader->closeStream();
+    m_videoTimeHelpers.clear();
+    m_audioTimeHelpers.clear();
 }
 
 bool ThirdPartyStreamReader::isStreamOpened() const
@@ -491,7 +495,38 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         }
     }
 
+    if (m_needCorrectTime && rez)
+    {
+        if (auto helper = timeHelper(rez))
+            rez->timestamp = helper->getTimeUs(rez->timestamp);
+    }
+
     return rez;
+}
+
+void ThirdPartyStreamReader::setNeedCorrectTime(bool value)
+{
+    m_needCorrectTime = value;
+}
+
+nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaDataPtr& data)
+{
+    std::vector<TimeHelperPtr>* helperList = nullptr;
+    if (data->dataType == QnAbstractMediaData::VIDEO)
+        helperList = &m_videoTimeHelpers;
+    else if (data->dataType == QnAbstractMediaData::AUDIO)
+        helperList = &m_audioTimeHelpers;
+
+    if (helperList == nullptr || data->channelNumber >= CL_MAX_CHANNELS)
+        return nullptr;
+    while (helperList->size() <= data->channelNumber)
+    {
+        helperList->push_back(
+            std::make_unique<nx::utils::TimeHelper>(
+                m_resource->getUniqueId(),
+                []() { return qnSyncTime->currentTimePoint(); }));
+    }
+    return helperList->at(data->channelNumber).get();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

@@ -14,18 +14,9 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/url/url_builder.h>
+#include <plugins/utils/xml_request_helper.h>
 
 namespace {
-
-const std::chrono::milliseconds kRequestTimeout(4000);
-
-bool isResponseOK(const nx_http::HttpClient* client)
-{
-    if (!client->response())
-        return false;
-    return client->response()->statusLine.statusCode == nx_http::StatusCode::ok;
-}
 
 const std::array<Qn::ConnectionRole, 2> kRoles = {
     Qn::ConnectionRole::CR_LiveVideo,
@@ -38,6 +29,7 @@ namespace mediaserver_core {
 namespace plugins {
 
 using namespace nx::mediaserver_core::plugins::hikvision;
+using namespace nx::plugins::utils;
 
 HikvisionResource::HikvisionResource():
     QnPlOnvifResource()
@@ -111,17 +103,6 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
         return base_type::initializeMedia(onvifCapabilities);
 
     return fetchChannelCount();
-}
-
-static std::unique_ptr<nx_http::HttpClient> makeHttpClient(const QAuthenticator& authenticator)
-{
-    std::unique_ptr<nx_http::HttpClient> client(new nx_http::HttpClient);
-    client->setResponseReadTimeoutMs((unsigned int) kRequestTimeout.count());
-    client->setSendTimeoutMs((unsigned int) kRequestTimeout.count());
-    client->setMessageBodyReadTimeoutMs((unsigned int) kRequestTimeout.count());
-    client->setUserName(authenticator.user());
-    client->setUserPassword(authenticator.password());
-    return client;
 }
 
 std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
@@ -264,7 +245,7 @@ bool HikvisionResource::findDefaultPtzProfileToken()
     return false;
 }
 
-static const auto kIntegratePath = lit("/ISAPI/System/Network/Integrate");
+static const auto kIntegratePath = lit("ISAPI/System/Network/Integrate");
 static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <Integrate>
@@ -272,7 +253,7 @@ static const auto kEnableOnvifXml = QString::fromUtf8(R"xml(
 </Integrate>
 )xml").trimmed();
 
-static const auto kSetOnvifUserPath = lit("/ISAPI/Security/ONVIF/users/");
+static const auto kSetOnvifUserPath = lit("ISAPI/Security/ONVIF/users/");
 static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 <?xml version:"1.0" encoding="UTF-8"?>
 <User>
@@ -283,19 +264,14 @@ static const auto kSetOnvifUserXml = QString::fromUtf8(R"xml(
 </User>
 )xml").trimmed();
 
-// TODO: Move out into a separate file.
-class HikvisionRequestHelper
+class HikvisionRequestHelper: protected XmlRequestHelper
 {
 public:
-    HikvisionRequestHelper(const QUrl& url, const QAuthenticator& authenticator):
-        m_url(url),
-        m_client(makeHttpClient(authenticator))
-    {
-    }
+    using XmlRequestHelper::XmlRequestHelper;
 
     boost::optional<bool> isOnvifSupported()
     {
-        const auto document = getXml(kIntegratePath);
+        const auto document = get(kIntegratePath);
         if (!document)
             return boost::none;
 
@@ -308,24 +284,20 @@ public:
         if (value == lit("false"))
             return false;
 
-        NX_WARNING(this, lm("Unexpect ONVIF.enable value '%1' on %2").args(value, m_client->url()));
+        NX_WARNING(this, lm("Unexpected ONVIF.enable value '%1' on %2").args(value, m_client->url()));
         return boost::none;
     }
 
     bool enableOnvif()
     {
-        const auto result = m_client->doPut(
-            nx::network::url::Builder(m_url).setPath(kIntegratePath),
-            "application/xml", kEnableOnvifXml.toUtf8())
-                && isResponseOK(m_client.get());
-
+        const auto result = put(kIntegratePath, kEnableOnvifXml);
         NX_DEBUG(this, lm("Enable ONVIF result=%1 on %2").args(result, m_client->url()));
         return result;
     }
 
     boost::optional<std::map<int, QString>> getOnvifUsers()
     {
-        const auto document = getXml(kSetOnvifUserPath);
+        const auto document = get(kSetOnvifUserPath);
         if (!document)
             return boost::none;
 
@@ -353,48 +325,13 @@ public:
     bool setOnvifCredentials(int userId, const QString& login, const QString& password)
     {
         const auto userNumber = QString::number(userId);
-        const auto result = m_client->doPut(
-            nx::network::url::Builder(m_url).setPath(kSetOnvifUserPath + userNumber),
-            "application/xml", kSetOnvifUserXml.arg(userNumber, login, password).toUtf8())
-                && isResponseOK(m_client.get());
+        const auto result = put(
+            kSetOnvifUserPath + userNumber,
+            kSetOnvifUserXml.arg(userNumber, login, password));
 
         NX_DEBUG(this, lm("Set ONVIF credentials result=%1 on %2").args(result, m_client->url()));
         return result;
     }
-
-private:
-    boost::optional<QDomDocument> getXml(const QString& path)
-    {
-        if (!m_client->doGet(nx::network::url::Builder(m_url).setPath(path))
-            || !isResponseOK(m_client.get()))
-        {
-            NX_VERBOSE(this, lm("Unable to send request %2").arg(m_client->url()));
-            return boost::none;
-        }
-
-        const auto response = m_client->fetchEntireMessageBody();
-        if (!response)
-        {
-            NX_WARNING(this, lm("Unable to read response from %1: %2").args(
-                m_client->url(), SystemError::toString(m_client->lastSysErrorCode())));
-            return boost::none;
-        }
-
-        QDomDocument document;
-        QString parsingError;
-        if (!document.setContent(*response, &parsingError))
-        {
-            NX_WARNING(this, lm("Unable to parse response from %1: %2").args(
-                m_client->url(), parsingError));
-            return boost::none;
-        }
-
-        return document;
-    }
-
-private:
-    const QUrl& m_url;
-    const std::unique_ptr<nx_http::HttpClient> m_client;
 };
 
 bool HikvisionResource::tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator)

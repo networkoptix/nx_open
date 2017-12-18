@@ -490,7 +490,8 @@ namespace nxcip
             cameraParamsPersistentCapability    = 0x0800,     //!< camera parameters can be read/set even if camera is not accessible at the moment
             searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
-            needIFrameDetectionCapability       = 0x4000      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
+            needIFrameDetectionCapability       = 0x4000,      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
+            relativeTimestampCapability         = 0x8000       //!< camera provides relative timestamps. It need to align them to the current time.
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
