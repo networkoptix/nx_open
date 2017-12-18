@@ -37,6 +37,7 @@ def main():
 
     delete_path(os.path.join(args.build_dir, "distrib"))
 
+    delete_path(os.path.join(args.build_dir, "client", "mobile_client", "android"))
     delete_path(os.path.join(args.build_dir, "client", "mobile_client", "mobile_client_apk"))
 
     for configuration in CMAKE_CONFIGURATIONS:
