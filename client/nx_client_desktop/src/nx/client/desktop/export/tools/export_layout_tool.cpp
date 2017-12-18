@@ -196,31 +196,27 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     for (const auto& item: m_layout->getItems())
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
-        const bool skip = mode() == ExportLayoutSettings::Mode::Export
-            ? !resource.dynamicCast<QnVirtualCameraResource>()
-            : (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page));
+        const auto mediaResource = resource.dynamicCast<QnMediaResource>();
+        const bool skip = !mediaResource || resource->hasFlags(Qn::still_image);
 
         if (skip)
             continue;
 
-        QnLayoutItemData localItem = item;
-
-        ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
-
-        if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
+        const auto uniqueId = resource->getUniqueId();
+        if (!uniqIdList.contains(uniqueId))
         {
-            QString uniqueId = resource->getUniqueId();
-            localItem.resource.id = resource->getId();
-            localItem.resource.uniqueId = uniqueId;
-            if (!uniqIdList.contains(uniqueId))
-            {
-                d->resources << mediaRes;
-                uniqIdList << uniqueId;
-            }
-            info.timezone = QnWorkbenchServerTimeWatcher::utcOffset(mediaRes, Qn::InvalidUtcOffset);
+            d->resources << mediaResource;
+            uniqIdList << uniqueId;
         }
 
+        QnLayoutItemData localItem = item;
+        localItem.resource.id = resource->getId();
+        localItem.resource.uniqueId = uniqueId;
         items.insert(localItem.uuid, localItem);
+
+        ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
+        info.timezone = QnWorkbenchServerTimeWatcher::utcOffset(mediaResource,
+            Qn::InvalidUtcOffset);
         result.append(info);
     }
     m_layout->setItems(items);
