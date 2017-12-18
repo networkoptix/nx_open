@@ -445,9 +445,11 @@ struct RadassController::Private
             return;
         }
 
+        // If there are a lot of cameras on the layout, move all cameras to low quality if possible.
         if (consumers.size() >= kMaximumConsumersCount)
         {
-            gotoLowQuality(consumer, LqReason::Small);
+            trace("Setup new consumer: too many cameras on the scene, going to LQ", consumer);
+            gotoLowQuality(consumer, LqReason::Network); //< Netwok reason as 3.0-compat hack.
             return;
         }
 
@@ -787,19 +789,7 @@ void RadassController::registerConsumer(QnCamDisplay* display)
     auto consumer = d->consumers.end() - 1;
     NX_ASSERT(consumer->display == display);
 
-    // If there are a lot of cameras on the layout, move all cameras to low quality if possible.
-    if (consumerCount() >= kMaximumConsumersCount)
-    {
-        for (auto consumer = d->consumers.begin(); consumer != d->consumers.end(); ++consumer)
-        {
-            if (consumer->mode == RadassMode::Auto && !isForcedHqDisplay(consumer->display))
-                d->gotoLowQuality(consumer, LqReason::Small);
-        }
-    }
-    else
-    {
-        d->setupNewConsumer(consumer);
-    }
+    d->setupNewConsumer(consumer);
     d->lastModeChangeTimer.restart();
 
     // Listen to camera changes to make sure second stream will start working as soon as possible.
