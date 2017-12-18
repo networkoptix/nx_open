@@ -216,12 +216,12 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
         };
 
     QByteArray datagram;
-    datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE + 1); //< Keep last byte zero.
+    datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
     for (const auto& socket: m_sunApiSocketList)
     {
         while (socket->hasData())
         {
-            int bytesRead = socket->recv(datagram.data(), datagram.size() - 1);
+            int bytesRead = socket->recv(datagram.data(), datagram.size());
             if (bytesRead < 1)
                 continue;
 
