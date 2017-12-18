@@ -45,13 +45,14 @@ static QString normalizeUrl(const QString& url)
 }
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
-QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
+QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType, const QString& uniqueId)
 {
     QString urlStr = url.toString();
     this->url = url;
     this->auth = auth;
     this->resType = qnResTypePool->getResourceTypeByName(resType);
     this->searcher = 0;
+    this->uniqueId = uniqueId;
 }
 
 QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
@@ -389,7 +390,12 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
             .dynamicCast<QnSecurityCamResource>();
 
         if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
+        {
+            NX_VERBOSE(this, lm("Manual camera %1 check host address %2")
+                .args(manualCamera.uniqueId, manualCamera.url));
+
             searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
+        }
     }
 
     for (auto& future: searchFutures)
@@ -566,14 +572,18 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     const auto& resPool = netRes->commonModule()->resourcePool();
     auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
     if (existResource)
-        return existResource;
-
-    for (const auto& existRes: resPool->getResources<QnVirtualCameraResource>())
     {
-        bool sameChannels = netRes->getChannel() == existRes->getChannel();
-        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
-        if (sameChannels && sameMACs)
-            return existRes;
+        bool isSameIp = existResource->getHostAddress() == netRes->getHostAddress();
+        return isSameIp ? existResource : QnVirtualCameraResourcePtr();
+    }
+
+    for (const auto& existResource: resPool->getResources<QnVirtualCameraResource>())
+    {
+        bool isSameChannels = netRes->getChannel() == existResource->getChannel();
+        bool isSameMACs = !existResource->getMAC().isNull() && existResource->getMAC() == netRes->getMAC();
+        bool isSameIp = existResource->getHostAddress() == netRes->getHostAddress();
+        if (isSameChannels && isSameMACs)
+            return isSameIp ? existResource : QnVirtualCameraResourcePtr();
     }
 
     return QnNetworkResourcePtr();
@@ -615,7 +625,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(camera->getTypeId());
-    QnManualCameraInfo info(QUrl(camera->getUrl()), camera->getAuth(), resourceType->getName());
+    QnManualCameraInfo info(QUrl(camera->getUrl()), camera->getAuth(), resourceType->getName(), camera->getUniqueId());
     for (const auto& searcher: m_searchersList)
     {
         if (searcher->isResourceTypeSupported(resourceType->getId()))
@@ -631,7 +641,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
     int addedCount = 0;
     for (const auto& camera: cameras)
     {
-        // This is important to use reverse order of searchers as ONVIF resource type fits both 
+        // This is important to use reverse order of searchers as ONVIF resource type fits both
         // ONVIF and FLEX searchers, while ONVIF is always last one.
         for (auto searcherIterator = m_searchersList.rbegin();
             searcherIterator != m_searchersList.rend();
@@ -686,13 +696,8 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
         if (!camera || !camera->isManuallyAdded())
             return;
 
-        QString cameraNormalUrl = normalizeUrl(camera->getUrl());
         if (!m_manualCameraByUniqueId.contains(camera->getUniqueId()))
-        {
-            const auto resouceType = qnResTypePool->getResourceType(camera->getTypeId());
-            QnManualCameraInfo info(QUrl(camera->getUrl()), camera->getAuth(), resouceType->getName());
-            newCameras.push_back(info);
-        }
+            newCameras.push_back(manualCameraInfo(camera));
     }
 
     if (!newCameras.empty())

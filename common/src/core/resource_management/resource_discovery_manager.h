@@ -45,7 +45,7 @@ class QnAbstractDTSSearcher;
 
 struct QnManualCameraInfo
 {
-    QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType);
+    QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType, const QString& uniqueId);
     QList<QnResourcePtr> checkHostAddr() const;
 
     QUrl url;

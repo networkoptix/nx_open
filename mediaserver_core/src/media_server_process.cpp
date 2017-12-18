@@ -1434,7 +1434,7 @@ void MediaServerProcess::loadResourcesFromECS(
                     QnManualCameraInfo info(
                         QUrl(camera.url),
                         QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId),
-                        resourceType->getName());
+                        resourceType->getName(), camera.physicalId);
 
                     manualCameras.push_back(std::move(info));
                 }

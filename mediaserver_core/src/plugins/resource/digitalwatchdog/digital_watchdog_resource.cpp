@@ -11,8 +11,150 @@
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
 #include <common/static_common_module.h>
+#include <plugins/utils/xml_request_helper.h>
+#include <nx/utils/log/log.h>
 
 static const int HTTP_PORT = 80;
+
+// NOTE: This class using hardcoded XML reding/writeing intentionally, because CPro API may 
+// reject or crash on on requests, which are different from the original.
+// TODO: Move out to a separate file as soon as it makes sense.
+class QnDigitalWatchdogResource::CproApiClient
+{
+public:
+    CproApiClient(QnDigitalWatchdogResource* resource) :
+        m_resource(resource)
+    {
+        m_cacheExpiration = std::chrono::steady_clock::now();
+    }
+
+    bool updateVideoConfig()
+    {
+        if (m_cacheExpiration > std::chrono::steady_clock::now())
+            return (bool)m_videoConfig;
+
+        nx::plugins::utils::XmlRequestHelper requestHelper(
+            m_resource->getUrl(), m_resource->getAuth(), nx_http::AsyncHttpClient::authBasic);
+
+        if (requestHelper.post(lit("GetVideoStreamConfig")))
+            m_videoConfig = requestHelper.readRawBody();
+
+        m_cacheExpiration = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        return (bool)m_videoConfig;
+    }
+
+    boost::optional<QStringList> getSupportedVedioCodecs(bool isPrimary)
+    {
+        auto stream = indexOfStream(isPrimary);
+        if (stream == -1)
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return boost::none;
+        }
+
+        auto types = rangeOfTag("<encodeTypeCaps type=\"list\">", "</encodeTypeCaps>", stream);
+        if (!types)
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream capabilities on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return boost::none;
+        }
+
+        QStringList values;
+        while (auto tag = rangeOfTag("<item>", "</item>", types->first, types->second))
+        {
+            values << QString::fromUtf8(m_videoConfig->mid(tag->first, tag->second));
+            types->first = tag->first + tag->second;
+        }
+
+        if (values.isEmpty())
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream supported codecs on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return boost::none;
+        }
+
+        values.sort();
+        return values;
+    }
+
+    boost::optional<QString> getVedioCodec(bool isPrimary)
+    {
+        auto stream = indexOfStream(isPrimary);
+        if (stream == -1)
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return boost::none;
+        }
+
+        auto type = rangeOfTag("<encodeType>", "</encodeType>", stream);
+        if (!type)
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream codec on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return boost::none;
+        }
+
+        return QString::fromUtf8(m_videoConfig->mid(type->first, type->second));
+    }
+
+    bool setVedioCodec(bool isPrimary, const QString& value)
+    {
+        auto stream = indexOfStream(isPrimary);
+        if (stream == -1)
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return false;
+        }
+
+        auto type = rangeOfTag("<encodeType>", "</encodeType>", stream);
+        if (!type)
+        {
+            NX_DEBUG(this, lm("Unable to find %1 stream codec on %2")
+                .args(isPrimary, m_resource->getUrl()));
+            return false;
+        }
+
+        NX_DEBUG(this, lm("Set %1 stream codec to %2 on %3")
+            .args(isPrimary, value, m_resource->getUrl()));
+
+        nx::plugins::utils::XmlRequestHelper requestHelper(
+            m_resource->getUrl(), m_resource->getAuth(), nx_http::AsyncHttpClient::authBasic);
+
+        m_videoConfig->replace(type->first, type->second, value.toUtf8());
+        return requestHelper.post("SetVideoStreamConfig", *m_videoConfig);
+    }
+
+private:
+    int indexOfStream(bool isPrimary)
+    {
+        return m_videoConfig->indexOf(isPrimary ? "<item id=\"1\"" : "<item id=\"3\"");
+    }
+
+    boost::optional<std::pair<int, int>> rangeOfTag(
+        const QByteArray& openTag, const QByteArray& closeTag, 
+        int rangeBegin = 0, int rangeSize = 0)
+    {
+        auto start = m_videoConfig->indexOf(openTag, rangeBegin);
+        if (start == -1 || (rangeSize && start >= rangeBegin + rangeSize))
+            return boost::none;
+        start += openTag.size();
+
+        auto end = m_videoConfig->indexOf(closeTag, start);
+        if (end == -1 || (rangeSize && end >= rangeBegin + rangeSize))
+            return boost::none;
+
+        return std::pair<int, int>{start, end - start};
+    }
+
+private:
+    QnDigitalWatchdogResource* m_resource;
+    boost::optional<QByteArray> m_videoConfig;
+    std::chrono::steady_clock::time_point m_cacheExpiration;
+};
 
 bool modelHasZoom(const QString& cameraModel) {
     QString tmp = cameraModel.toLower();
@@ -25,7 +167,8 @@ bool modelHasZoom(const QString& cameraModel) {
 
 QnDigitalWatchdogResource::QnDigitalWatchdogResource():
     QnPlOnvifResource(),
-    m_hasZoom(false)
+    m_hasZoom(false),
+    m_cproApiClient(std::make_unique<CproApiClient>(this))
 {
     setVendor(lit("Digital Watchdog"));
 }
@@ -155,11 +298,69 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedP
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
-        return base_type::loadAdvancedParametersTemplate(params); //< dw-cpro chipset (or something else that has uncompatible cgi interface)
+    {
+        // DW CPro chipset (or something else that has uncompatible cgi interface).
+        if (!base_type::loadAdvancedParametersTemplate(params))
+            return false;
+    }
     else if (resourceData.value<bool>(lit("dw-pravis-chipset")))
-        return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml"));
+    {
+        if (!loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml")))
+            return false;
+    }
     else
-        return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw.xml"));
+    {
+        if (!loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw.xml")))
+            return false;
+    }
+
+    return loadCproAdvancedParameters(params);
+}
+
+static const QString kCproPrimaryVideoCodec = lit("cproPrimaryVideoCodec");
+static const QString kCproSecondaryVideoCodec = lit("cproSecondaryVideoCodec");
+static const QStringList kCproVideoCodecs{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
+
+bool QnDigitalWatchdogResource::loadCproAdvancedParameters(QnCameraAdvancedParams& params) const
+{
+    if (!m_cproApiClient->updateVideoConfig())
+        return true;
+    
+    // Those paramiters are hardcoded as they are supposed to be applied on top of templates.
+    // TODO: Makes sence to move into some template as soon as it supports paramiter merge.
+    QnCameraAdvancedParamGroup streams;
+    streams.name = lit("Video Streams");
+
+    if (const auto codecs = m_cproApiClient->getSupportedVedioCodecs(/*isPrimary*/ true))
+    {
+        QnCameraAdvancedParameter codec;
+        codec.id = kCproPrimaryVideoCodec;
+        codec.name = lit("Codec");
+        codec.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
+        codec.range = codecs->join(",");
+
+        QnCameraAdvancedParamGroup group;
+        group.name = lit("Primary");
+        group.params.push_back(codec);
+        streams.groups.push_back(group);
+    }
+
+    if (const auto codecs = m_cproApiClient->getSupportedVedioCodecs(/*isPrimary*/ false))
+    {
+        QnCameraAdvancedParameter codec;
+        codec.id = kCproSecondaryVideoCodec;
+        codec.name = lit("Codec");
+        codec.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
+        codec.range = codecs->join(",");
+
+        QnCameraAdvancedParamGroup group;
+        group.name = lit("Secondary");
+        group.params.push_back(codec);
+        streams.groups.push_back(group);
+    }
+
+    params.groups.insert(params.groups.begin(), streams);
+    return true;
 }
 
 void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
@@ -180,12 +381,20 @@ void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvanced
 
 QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const
 {
-    if (useOnvifAdvancedParameterProviders())
-        return base_type::calculateSupportedAdvancedParameters();
+    QSet<QString> result;
+    if (m_cproApiClient->updateVideoConfig())
+    {
+        result.insert(kCproPrimaryVideoCodec);
+        result.insert(kCproSecondaryVideoCodec);
+    }
 
-    QSet<QString> result = base_type::calculateSupportedAdvancedParameters();
+    result += base_type::calculateSupportedAdvancedParameters();
+    if (useOnvifAdvancedParameterProviders())
+        return result;
+
     for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())
         result.insert(value.id);
+
     return result;
 }
 
@@ -220,19 +429,39 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
 }
 
 
-bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {
+bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) 
+{
+    QSet<QString> result;
+    if (m_cproApiClient->updateVideoConfig())
+    {
+        if (const auto codec = m_cproApiClient->getVedioCodec(/*isPrimary*/ true))
+            values.insert(kCproPrimaryVideoCodec, *codec);
+
+        if (const auto codec = m_cproApiClient->getVedioCodec(/*isPrimary*/ false))
+            values.insert(kCproSecondaryVideoCodec, *codec);
+    }
+    
     bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
 
     if (!m_cameraProxy)
         return baseResult;
+
     values.appendValueList(m_cameraProxy->getParamsList());
     return true;
 }
 
-bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) {
-    bool baseResult = base_type::setAdvancedParameterUnderLock(parameter, value);
-    if (baseResult)
+bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(
+    const QnCameraAdvancedParameter &parameter, const QString &value)
+{
+    if (parameter.id == kCproPrimaryVideoCodec)
+        return m_cproApiClient->setVedioCodec(/*isPrimary*/ true, value);
+
+    if (parameter.id == kCproSecondaryVideoCodec)
+        return m_cproApiClient->setVedioCodec(/*isPrimary*/ false, value);
+
+    if (base_type::setAdvancedParameterUnderLock(parameter, value))
         return true;
+
     if (!m_cameraProxy)
         return false;
 
@@ -242,7 +471,8 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdva
     return m_cameraProxy->setParams(params);
 }
 
-bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
+    const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
 {
     if (useOnvifAdvancedParameterProviders())
         return base_type::setAdvancedParametersUnderLock(values, result);
@@ -252,19 +482,33 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdv
     for(const QnCameraAdvancedParamValue &value: values)
     {
         QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
-        if (parameter.isValid()) {
-            bool baseResult = base_type::setAdvancedParameterUnderLock(parameter, value.value);
-            if (baseResult)
+        if (parameter.isValid()) 
+        {
+            if (parameter.id == kCproPrimaryVideoCodec || parameter.id == kCproSecondaryVideoCodec)
+            {
+                if (setAdvancedParameterUnderLock(parameter, value.value))
+                    result << value;
+                else
+                    success = false;
+            }
+            else if (const auto baseResult
+                = base_type::setAdvancedParameterUnderLock(parameter, value.value))
+            {
                 result << value;
+            }
             else
-                moreParamsToProcess << QPair<QnCameraAdvancedParameter, QString>(parameter, value.value);
+            {
+                moreParamsToProcess << QPair<QnCameraAdvancedParameter, QString>(
+                    parameter, value.value);
+            }
         }
         else
+        {
             success = false;
+        }
     }
-    if (!success)
-        return false;
-    return m_cameraProxy->setParams(moreParamsToProcess, &result);
+
+    return success && m_cameraProxy->setParams(moreParamsToProcess, &result);
 }
 
 #endif //ENABLE_ONVIF

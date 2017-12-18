@@ -18,39 +18,19 @@ nx_configure_file(
     @ONLY)
 list(APPEND depends ${conf_file})
 
-function(configure_directory input output)
-    cmake_parse_arguments(ARG "" "OUTPUT_FILES_VARIABLE" "" ${ARGN})
-
-    set(output_files)
-
-    message(STATUS "Configuring directory (recursively) ${input}")
-    file(GLOB_RECURSE files RELATIVE ${input} ${input}/*)
-    foreach(file ${files})
-        set(src_template_path ${input}/${file})
-        if(NOT IS_DIRECTORY ${src_template_path})
-            nx_configure_file(${input}/${file} ${output}/${file} ${ARG_UNPARSED_ARGUMENTS})
-            list(APPEND output_files ${output}/${file})
-        endif()
-    endforeach()
-
-    if(ARG_OUTPUT_FILES_VARIABLE)
-        set(${ARG_OUTPUT_FILES_VARIABLE} ${output_files} PARENT_SCOPE)
-    endif()
-endfunction()
-
 if(targetDevice STREQUAL "edge1")
     set(box_dir "isd")
 else()
     set(box_dir "rpi")
 endif()
 
-configure_directory(
+nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/${box_dir}/maven/filter-resources
     ${CMAKE_CURRENT_BINARY_DIR}
     @ONLY
     OUTPUT_FILES_VARIABLE filtered1)
 
-configure_directory(
+nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/${box_dir}/maven/${targetDevice}
     ${CMAKE_CURRENT_BINARY_DIR}
     @ONLY

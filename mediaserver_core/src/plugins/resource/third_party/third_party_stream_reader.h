@@ -13,6 +13,7 @@
 #include <core/resource/resource_media_layout.h>
 
 #include "third_party_resource.h"
+#include <nx/utils/time_helper.h>
 
 //!Stream reader for resource, implemented in external plugin
 class ThirdPartyStreamReader
@@ -43,6 +44,7 @@ public:
     virtual void updateSoftwareMotion() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 
+    void setNeedCorrectTime(bool value);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
@@ -62,7 +64,7 @@ protected:
 private:
     //virtual bool needMetaData() const override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
-
+    nx::utils::TimeHelper* timeHelper(const QnAbstractMediaDataPtr& data);
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
@@ -76,6 +78,11 @@ private:
     std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
+
+    bool m_needCorrectTime = false;
+    using TimeHelperPtr = std::unique_ptr<nx::utils::TimeHelper>;
+    std::vector<TimeHelperPtr> m_videoTimeHelpers;
+    std::vector<TimeHelperPtr> m_audioTimeHelpers;
 
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras );
 };

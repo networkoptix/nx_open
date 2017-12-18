@@ -1584,6 +1584,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
         return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
 
+    if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
+        return resyncIfNeeded(ResyncRules);
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }
