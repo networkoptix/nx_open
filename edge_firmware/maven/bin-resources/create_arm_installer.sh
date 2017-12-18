@@ -28,7 +28,7 @@ SYMLINK_INSTALL_PATH=""
 # to these .so files will be created in the regular LIB_INSTALL_DIR.
 ALT_LIB_INSTALL_PATH=""
 
-OUTPUT_DIR=${DISTRIB_OUTPUT_DIR:-"$CURRENT_BUILD_DIR"}
+OUTPUT_DIR=${DISTRIBUTION_OUTPUT_DIR:-"$CURRENT_BUILD_DIR"}
 
 if [ "$BOX" = "edge1" ]; then
     INSTALL_PATH="usr/local/apps/$CUSTOMIZATION"
