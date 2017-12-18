@@ -2138,7 +2138,7 @@ void MediaServerProcess::initializeLogging()
 
     // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
 
-    auto logSettings = makeLogSetting();
+    auto logSettings = makeLogSettings();
 
     logSettings.level.parse(cmdLineArguments().logLevel,
         settings->value("logLevel").toString(), toString(nx::utils::log::kDefaultLevel));
@@ -2604,7 +2604,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
     auto pluginManager = qnServerModule->pluginManager();
-    for (const auto storagePlugin :
+    for (nx_spl::StorageFactory* const storagePlugin:
          pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         QnStoragePluginFactory::instance()->registerStoragePlugin(
@@ -2615,8 +2615,7 @@ void MediaServerProcess::run()
                 std::placeholders::_2,
                 storagePlugin
             ),
-            false
-        );
+            false);
     }
 
     QnStoragePluginFactory::instance()->registerStoragePlugin(

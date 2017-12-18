@@ -81,7 +81,7 @@ AbstractMetadataManager* Plugin::managerForResource(
     Error* outError)
 {
     *outError = Error::noError;
-    return new Manager();
+    return new Manager(this);
 }
 
 AbstractSerializer* Plugin::serializerForType(

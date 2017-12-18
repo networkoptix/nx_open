@@ -35,7 +35,6 @@ class ManagerPool final:
     public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
-    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
 
     Q_OBJECT
 public:
@@ -61,6 +60,8 @@ public slots:
     void initExistingResources();
 
 private:
+    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+
     PluginList availablePlugins() const;
 
     void createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);

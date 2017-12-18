@@ -26,6 +26,15 @@ CREATE VIRTUAL TABLE event_properties USING fts4(content);
 
 )sql";
 
+// VMS-7876
+static const char kAnalyticsDbMoreIndexes[] =
+R"sql(
+
+CREATE INDEX idx_event_object_id ON event(object_id);
+CREATE INDEX idx_event_device_guid ON event(device_guid);
+
+)sql";
+
 } // namespace storage
 } // namespace analytics
 } // namespace nx

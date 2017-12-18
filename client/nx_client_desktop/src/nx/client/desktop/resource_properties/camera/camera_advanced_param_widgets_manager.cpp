@@ -78,7 +78,6 @@ void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPara
 
 void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList& params)
 {
-    for (const QnCameraAdvancedParamValue& param: params)
     QMap<QString, QString> valuesToKeep;
 
     // Disconnect all watches to not trigger handler chains.
@@ -118,7 +117,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
             m_handlerChainConnections.push_back(
                 connect(
                     watchWidget,
-                    &QnAbstractCameraAdvancedParamWidget::valueChanged,
+                    &AbstractCameraAdvancedParamWidget::valueChanged,
                     func));
         }
     }
@@ -138,15 +137,15 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
         auto widget = m_paramWidgetsById[param.id];
         disconnect(
             widget,
-            &QnAbstractCameraAdvancedParamWidget::valueChanged,
+            &AbstractCameraAdvancedParamWidget::valueChanged,
             this,
-            &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
+            &CameraAdvancedParamWidgetsManager::paramValueChanged);
 
         connect(
             widget,
-            &QnAbstractCameraAdvancedParamWidget::valueChanged,
+            &AbstractCameraAdvancedParamWidget::valueChanged,
             this,
-            &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
+            &CameraAdvancedParamWidgetsManager::paramValueChanged);
     }
 }
 

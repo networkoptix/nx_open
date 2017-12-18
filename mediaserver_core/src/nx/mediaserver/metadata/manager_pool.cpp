@@ -159,27 +159,32 @@ nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins
 
 void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
 {
-    for (auto& plugin: availablePlugins())
+    for (AbstractMetadataPlugin* const plugin: availablePlugins())
     {
-        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*releaseRef*/ false);
+        nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*increaseRef*/ false);
 
         nxpt::ScopedRef<AbstractMetadataManager> manager(
             createMetadataManager(camera, plugin), /*increaseRef*/ false);
         if (!manager)
             continue;
 
-        auto pluginManifest = addManifestToServer(plugin);
+        const auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
             continue; //< Error already logged.
 
-        auto deviceManifest = addManifestToCamera(camera, manager.get());
+        const auto deviceManifest = addManifestToCamera(camera, manager.get());
         if (!deviceManifest)
             continue; //< Error already logged.
 
         auto& context = m_contexts[camera->getId()];
-        std::unique_ptr<MetadataHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
-        if (manager->queryInterface(IID_ConsumingMetadataManager))
+        std::unique_ptr<MetadataHandler> handler(
+            createMetadataHandler(camera, pluginManifest->driverId));
+
+        if (auto consumingMetadataManager = nxpt::ScopedRef<AbstractConsumingMetadataManager>(
+            manager->queryInterface(IID_ConsumingMetadataManager)))
+        {
             handler->registerDataReceptor(&context);
+        }
 
         context.addManager(std::move(manager), std::move(handler), *pluginManifest);
     }
@@ -498,8 +503,7 @@ void ManagerPool::putVideoData(const QnUuid& id, const QnCompressedVideoData* vi
     {
         using namespace nx::sdk::metadata;
         nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
-            (AbstractConsumingMetadataManager*)
-            data.manager->queryInterface(IID_ConsumingMetadataManager), false);
+            data.manager->queryInterface(IID_ConsumingMetadataManager));
         if (!manager)
             return;
         bool needDeepCopy = data.manifest.capabilities.testFlag(

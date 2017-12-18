@@ -196,8 +196,8 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
 AbstractMetadataPacket* Manager::cookSomeObjects(
     nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
-    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
-        (CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
+    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket(
+        mediaPacket->queryInterface(IID_CompressedVideoPacket));
     if (!videoPacket)
         return nullptr;
 

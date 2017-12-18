@@ -302,8 +302,9 @@ std::unique_ptr<AbstractStreamServerSocket> QnUniversalTcpListener::createAndPre
 {
     auto socket = SocketFactory::createStreamServerSocket(
         false,
-        nx::network::NatTraversalSupport::enabled,
-        ipVersion);
+        nx::network::NatTraversalSupport::enabled
+        // TODO: #muskov: Fix.
+        /*, ipVersion*/);
 
     if (!socket->setReuseAddrFlag(true) ||
         !socket->bind(localAddress) ||
