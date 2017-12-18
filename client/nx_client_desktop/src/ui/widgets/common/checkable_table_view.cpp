@@ -183,17 +183,11 @@ void QnCheckableTableView::selectionChanged(const QItemSelection& selected, cons
     {
         QSignalBlocker blocker(dataModel);
 
-        bool b = true;
-
         /* Uncheck deselected: */
-        if (!b)
+        for (auto range : deselected)
         {
-            for (auto range : deselected)
-            {
-                for (auto row = range.top(); row <= range.bottom(); ++row)
-                    dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
-            }
-
+            for (auto row = range.top(); row <= range.bottom(); ++row)
+                dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
         }
 
         /* Check selected: */

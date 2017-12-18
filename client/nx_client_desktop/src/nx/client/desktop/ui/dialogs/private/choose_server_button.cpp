@@ -107,7 +107,10 @@ void QnChooseServerButton::tryAddServer(const QnResourcePtr& resource)
         return;
 
     const auto serverSystemId = serverResource->getModuleInformation().localSystemId;
-    const auto currentSystemId = commonModule()->currentServer()->getModuleInformation().localSystemId;
+    const auto currentServer = commonModule()->currentServer();
+    const auto currentSystemId = currentServer
+        ? currentServer->getModuleInformation().localSystemId
+        : QnUuid(); //< We don't have connection.
     if (currentSystemId != serverSystemId)
         return;
 

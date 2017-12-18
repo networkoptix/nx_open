@@ -31,9 +31,9 @@ public:
 
     enum Columns
     {
-        manufacturerColumn,
-        nameColumn,
-        urlColumn,
+        brandColumn,
+        modelColumn,
+        addressColumn,
         presentedStateColumn,
         checkboxColumn,
 

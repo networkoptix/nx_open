@@ -22,14 +22,15 @@ void QnSimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHe
 
     if (!checkboxInHeader)
     {
-        m_checkableHeader = nullptr; // FIXME: delete current header if any??
+        m_checkableHeader = nullptr;
         setHorizontalHeader(new QHeaderView(Qt::Horizontal, this));
-        return;
     }
-
-    m_checkableHeader = new QnCheckBoxedHeaderView(column, this);
-    setHorizontalHeader(m_checkableHeader);
-    setupHeader();
+    else
+    {
+        m_checkableHeader = new QnCheckBoxedHeaderView(column, this);
+        setHorizontalHeader(m_checkableHeader);
+        setupHeader();
+    }
 }
 
 int QnSimpleSelectionTableView::getCheckedCount() const

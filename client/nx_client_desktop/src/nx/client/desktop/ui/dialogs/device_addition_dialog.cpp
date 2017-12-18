@@ -44,7 +44,6 @@ DeviceAdditionDialog::~DeviceAdditionDialog()
 void DeviceAdditionDialog::initializeControls()
 {
     //FIXME: remove default address
-
     ui->addressEdit->setText(lit("rtsp://media.smart-streaming.com/mytest/mp4:sample_phone_150k.mp4"));
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
@@ -73,13 +72,12 @@ void DeviceAdditionDialog::initializeControls()
             stopSearch();
         });
 
-
     connect(ui->selectServerMenuButton, &QnChooseServerButton::serversCountChanged, this,
         [this]()
         {
-            ui->serverChoosePanel->setVisible(
-                ui->selectServerMenuButton->serversCount() > 1);
+            ui->serverChoosePanel->setVisible(ui->selectServerMenuButton->serversCount() > 1);
         });
+
     ui->serverChoosePanel->setVisible(
         ui->selectServerMenuButton->serversCount() > 1);
 
@@ -98,7 +96,6 @@ void DeviceAdditionDialog::initializeControls()
 
 void DeviceAdditionDialog::setupTable()
 {
-
     const auto table = ui->foundDevicesTable;
 
     table->setCheckboxColumn(FoundDevicesModel::checkboxColumn, true);
@@ -111,7 +108,7 @@ void DeviceAdditionDialog::setupTableHeader()
     const auto header = ui->foundDevicesTable->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
     header->setSectionResizeMode(
-        FoundDevicesModel::urlColumn, QHeaderView::Stretch);
+        FoundDevicesModel::addressColumn, QHeaderView::Stretch);
     header->setSectionResizeMode(
         FoundDevicesModel::checkboxColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
@@ -156,7 +153,6 @@ QString DeviceAdditionDialog::password() const
         : ui->subnetScanPasswordEdit;
 
     return passwordEdit->text().trimmed();
-
 }
 
 QString DeviceAdditionDialog::login() const
@@ -215,20 +211,6 @@ void DeviceAdditionDialog::handleStartSearchClicked()
         m_model, &FoundDevicesModel::addDevices);
     connect(m_currentSearch, &ManualDeviceSearcher::devicesRemoved,
         m_model, &FoundDevicesModel::removeDevices);
-
-    const auto addDevicesCopy =
-        [this](QnManualResourceSearchList resources)
-        {
-            for (auto& resource: resources)
-            {
-                resource.uniqueId = QnUuid::createUuid().toString();
-                resource.existsInPool = false;
-            }
-
-            m_model->addDevices(resources);
-        };
-    connect(m_currentSearch, &ManualDeviceSearcher::devicesAdded, m_model, addDevicesCopy);
-    connect(m_currentSearch, &ManualDeviceSearcher::devicesAdded, m_model, addDevicesCopy);
 }
 
 void DeviceAdditionDialog::handleAddDevicesClicked()
@@ -286,7 +268,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     }
     else
     {
-
         qDebug() << "Failed!";
     }
 
@@ -298,7 +279,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
             id, FoundDevicesModel::presentedStateColumn);
         m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
     }
-
 }
 
 void DeviceAdditionDialog::stopSearch()
@@ -324,7 +304,6 @@ void DeviceAdditionDialog::stopSearch()
                     searcher->disconnect(this);
                     removeUnfinishedSearch(searcher);
                 }
-
             });
     }
     m_currentSearch.reset();
@@ -375,7 +354,6 @@ void DeviceAdditionDialog::handleModelDataChanged(
 
     if (checkedStateChanged)
         updateAddDevicesButtonText();
-
 }
 
 void DeviceAdditionDialog::updateAddDevicesButtonText()

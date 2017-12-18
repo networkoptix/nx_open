@@ -9,7 +9,7 @@ class QnCheckBoxedHeaderView: public QHeaderView
 
 public:
     explicit QnCheckBoxedHeaderView(int checkboxColumn, QWidget* parent = nullptr);
-    ~QnCheckBoxedHeaderView() { qDebug() << "-------------------- remove header";}
+
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state);
 

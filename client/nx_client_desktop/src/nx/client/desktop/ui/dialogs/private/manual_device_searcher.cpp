@@ -58,7 +58,6 @@ ManualDeviceSearcher::ManualDeviceSearcher(
 ManualDeviceSearcher::~ManualDeviceSearcher()
 {
     stop(); //< Last try to stop search.
-    qDebug() << "--- Removing searcher";
 }
 
 QnManualResourceSearchStatus::State ManualDeviceSearcher::progress() const
