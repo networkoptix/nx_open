@@ -53,8 +53,6 @@ QnChooseServerButton::QnChooseServerButton(QWidget* parent):
     connect(pool, &QnResourcePool::resourceAdded, this, &QnChooseServerButton::tryAddServer);
     connect(pool, &QnResourcePool::resourceRemoved, this, &QnChooseServerButton::tryRemoveServer);
 
-    setFlat(true);
-
     for (const auto server: pool->getAllServers(Qn::AnyStatus))
         tryAddServer(server);
 }

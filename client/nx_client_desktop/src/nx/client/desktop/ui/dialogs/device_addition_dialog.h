@@ -34,6 +34,7 @@ private:
 
     void initializeControls();
     void setupTable();
+    void setupTableHeader();
     void setupPortStuff(QCheckBox* autoCheckbox, QSpinBox* portSpinBox);
 
     void updateProgress();

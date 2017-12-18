@@ -7,7 +7,10 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
+#include <ui/common/palette.h>
+
 #include <core/resource/media_server_resource.h>
+#include <utils/common/event_processors.h>
 
 namespace {
 
@@ -52,6 +55,17 @@ void DeviceAdditionDialog::initializeControls()
     connect(ui->tabWidget, &QTabWidget::currentChanged,
         this, &DeviceAdditionDialog::handleSearchTypeChanged);
 
+    const auto tabWidgetSizePolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+    autoResizePagesToContents(ui->tabWidget, tabWidgetSizePolicy, true);
+    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
+
+    installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
+        [this]()
+        {
+            setPaletteColor(ui->serverChoosePanel, QPalette::Background,
+                palette().color(QPalette::Mid));
+        });
+
     connect(ui->selectServerMenuButton, &QnChooseServerButton::beforeServerChanged, this,
         [this]()
         {
@@ -60,16 +74,14 @@ void DeviceAdditionDialog::initializeControls()
         });
 
 
-//    connect(ui->selectServerMenuButton, &QnChooseServerButton::serversCountChanged, this,
-//        [this]()
-//        {
-//            ui->serverChoosePanel->setVisible(
-//                ui->selectServerMenuButton->serversCount() > 1);
-//        });
-//    ui->serverChoosePanel->setVisible(
-//        ui->selectServerMenuButton->serversCount() > 1);
-
-
+    connect(ui->selectServerMenuButton, &QnChooseServerButton::serversCountChanged, this,
+        [this]()
+        {
+            ui->serverChoosePanel->setVisible(
+                ui->selectServerMenuButton->serversCount() > 1);
+        });
+    ui->serverChoosePanel->setVisible(
+        ui->selectServerMenuButton->serversCount() > 1);
 
     connect(this, &DeviceAdditionDialog::rejected,
         this, &DeviceAdditionDialog::handleDialogClosed);
@@ -86,16 +98,24 @@ void DeviceAdditionDialog::initializeControls()
 
 void DeviceAdditionDialog::setupTable()
 {
-    static constexpr int kMinimumColumnWidth = 110;
 
     const auto table = ui->foundDevicesTable;
 
     table->setCheckboxColumn(FoundDevicesModel::checkboxColumn, true);
-
-    table->resizeColumnsToContents();
-
     table->setPersistentDelegateForColumn(FoundDevicesModel::presentedStateColumn,
         new PresentedStateDelegate(table));
+}
+
+void DeviceAdditionDialog::setupTableHeader()
+{
+    const auto header = ui->foundDevicesTable->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setSectionResizeMode(
+        FoundDevicesModel::urlColumn, QHeaderView::Stretch);
+    header->setSectionResizeMode(
+        FoundDevicesModel::checkboxColumn, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(
+        FoundDevicesModel::presentedStateColumn, QHeaderView::ResizeToContents);
 }
 
 void DeviceAdditionDialog::setupPortStuff(QCheckBox* autoCheckbox, QSpinBox* portSpinBox)
@@ -188,6 +208,7 @@ void DeviceAdditionDialog::handleStartSearchClicked()
         this, &DeviceAdditionDialog::handleModelDataChanged);
 
     ui->foundDevicesTable->setModel(m_model.data());
+    setupTableHeader();
     updateAddDevicesButtonText();
 
     connect(m_currentSearch, &ManualDeviceSearcher::devicesAdded,
