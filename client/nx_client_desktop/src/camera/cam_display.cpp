@@ -259,23 +259,15 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
 void QnCamDisplay::addMetadataConsumer(
     const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
 {
-    for (int i = 0; i < m_channelsCount; ++i)
-    {
-        NX_ASSERT(m_display[i]);
-        if (m_display[i])
-            m_display[i]->addMetadataConsumer(metadataConsumer);
-    }
+    QnMutexLocker lock(&m_metadataConsumersHashMutex);
+    m_metadataConsumerByType.insert(metadataConsumer->metadataType(), metadataConsumer);
 }
 
 void QnCamDisplay::removeMetadataConsumer(
     const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
 {
-    for (int i = 0; i < m_channelsCount; ++i)
-    {
-        NX_ASSERT(m_display[i]);
-        if (m_display[i])
-            m_display[i]->removeMetadataConsumer(metadataConsumer);
-    }
+    QnMutexLocker lock(&m_metadataConsumersHashMutex);
+    m_metadataConsumerByType.remove(metadataConsumer->metadataType(), metadataConsumer);
 }
 
 QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams,
@@ -1129,6 +1121,11 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
             m_delay.breakSleep();
         m_lastQueuedVideoTime = video->timestamp;
     }
+    else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
+    {
+        processMetadata(metadata);
+    }
+
     QnAbstractDataConsumer::putData(data);
     if (video && m_dataQueue.size() < 2)
         hurryUpCkeckForCamera2(video); // check if slow network
@@ -1261,6 +1258,27 @@ void QnCamDisplay::processFillerPacket(
         if (archive && archive->isSingleShotMode())
             archive->needMoreData();
     }
+}
+
+void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    QnMutexLocker lock(&m_metadataConsumersHashMutex);
+    const auto consumers = m_metadataConsumerByType;
+    lock.unlock();
+
+    int consumersCount = 0;
+    for (const auto& value: consumers.values(metadata->metadataType))
+    {
+        if (const auto& consumer = value.lock())
+        {
+            ++consumersCount;
+            consumer->processMetadata(metadata);
+        }
+    }
+
+    NX_VERBOSE(this)
+        << lm("Metadata [%2] processed by %3 consumers")
+            .arg(static_cast<int>(metadata->metadataType)).arg(consumersCount);
 }
 
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)

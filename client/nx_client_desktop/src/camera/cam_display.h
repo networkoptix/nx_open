@@ -197,6 +197,9 @@ private:
         qint64 timestampUs,
         QnAbstractStreamDataProvider* dataProvider,
         QnAbstractMediaData::MediaFlags flags);
+
+    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -281,6 +284,10 @@ protected:
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
     nx::utils::ElapsedTimer m_lastMediaEventTimeout;
+
+    mutable QnMutex m_metadataConsumersHashMutex;
+    QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
+        m_metadataConsumerByType;
 };
 
 #endif //QN_CAM_DISPLAY_H
