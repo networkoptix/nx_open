@@ -443,8 +443,8 @@ bool QnCamDisplay::fillDataQueue()
     if (!isForcedBufferingEnabled() || isDataQueueFilled())
         return false;
 
-    const auto requiredBufferLength =
-        nx::client::desktop::ini().forcedVideoBufferLengthUs * 110 / 100; //< Add 10%.
+    const auto requiredBufferLength = nx::client::desktop::ini().forcedVideoBufferLengthUs
+        + nx::client::desktop::ini().additionalVideoBufferLengthUs;
     while (!needToStop() && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLength)
     {
         if (m_dataQueue.size() == m_dataQueue.maxSize())
