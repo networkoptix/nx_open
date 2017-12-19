@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', 'update_user_customization'),
+        ('api', 'switch_to_utf8mb4_columns'),
     ]
 
     operations = [
