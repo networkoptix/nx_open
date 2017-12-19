@@ -658,7 +658,7 @@ gieThread(void *arg)
         {
 #if 1
             const bool needToDropFrame = !ctx->m_ptsQueue.empty()
-                ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp > microseconds(ctx->m_ptsQueue.front())
+                && ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp > microseconds(ctx->m_ptsQueue.front())
                 && ctx->m_lastInferenceDuration != microseconds::zero();
 
 
