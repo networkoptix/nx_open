@@ -32,8 +32,8 @@ private:
     void makeOfflineFlood();
     int sendAll(AbstractStreamSocket* socket, const void* data, int size);
 private:
-    const bool m_includePts;
     quint32 m_num;
+    const bool m_includePts;
     QByteArray m_mac;
     QStringList m_primaryFiles;
     QStringList m_secondaryFiles;
