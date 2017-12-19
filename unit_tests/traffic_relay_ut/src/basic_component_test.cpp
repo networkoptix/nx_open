@@ -8,6 +8,7 @@ namespace test {
 BasicComponentTest::BasicComponentTest(QString tmpDir):
     utils::test::TestWithTemporaryDirectory("traffic_relay", tmpDir)
 {
+    addArg("--http/listenOn=127.0.0.1:0");
 }
 
 BasicComponentTest::~BasicComponentTest()
