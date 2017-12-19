@@ -1859,6 +1859,7 @@ int UDPSocket::recvFrom(
 
 template class Socket<AbstractStreamServerSocket>;
 template class Socket<AbstractStreamSocket>;
+template class Socket<AbstractDatagramSocket>;
 template class CommunicatingSocket<AbstractStreamSocket>;
 template class CommunicatingSocket<AbstractDatagramSocket>;
 
