@@ -134,7 +134,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         connection->setInactivityTimeout(
             m_settings.connectionInactivityTimeout);
         connection->addOnConnectionCloseHandler(
-            [this, peerData, connection = connection.get(),
+            [this, peerData, curConnectionStrongRef,
                 guard = m_asyncOperationGuard.sharedGuard()]()
             {
                 // TODO: #ak Get rid of this guard after resolving
@@ -142,7 +142,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
                 auto lock = guard->lock();
                 if (!lock)
                     return; //< ListeningPeerPool has been destroyed.
-                onListeningPeerConnectionClosed(peerData, connection);
+                onListeningPeerConnectionClosed(peerData, curConnectionStrongRef.get());
             });
     }
 
