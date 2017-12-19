@@ -80,7 +80,6 @@ public:
     }
 
 private:
-public:
     QQueue<QnAbstractCompressedMetadataPtr> m_metadataCache;
     QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
     const int m_maxItemsCount;
