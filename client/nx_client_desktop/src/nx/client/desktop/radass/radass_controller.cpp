@@ -398,7 +398,7 @@ struct RadassController::Private
         if (isForcedLqDisplay(display))
         {
             if (reader->getQuality() != MEDIA_Quality_Low)
-                trace("Forced switch to HQ", consumer);
+                trace("Forced switch to LQ", consumer);
             gotoLowQuality(consumer, LqReason::fastForward);
             return;
         }
