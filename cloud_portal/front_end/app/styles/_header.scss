@@ -161,13 +161,10 @@ $header-collapsing-width-1: 1px;
             text-overflow: ellipsis;
             overflow: hidden;
             max-width: $max-dropdown-width;
+            margin: 0 -1px;
 
             &:hover{
                 background-color: $light2 !important;
-                border-right: 1px solid $light2;
-                border-left: 1px solid $light2;
-                margin-right: -1px;
-                margin-left: -1px;
             }
 
             .system-owner{
