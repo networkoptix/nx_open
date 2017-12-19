@@ -140,6 +140,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_liveMaxLenReached(false),
     m_hasVideo(true)
 {
+    nx::client::desktop::ini().reload();
+
     if (resource && resource->toResource()->hasFlags(Qn::live_cam))
         m_isRealTimeSource = true;
     else
@@ -209,6 +211,8 @@ void QnCamDisplay::pause()
 
 void QnCamDisplay::resume()
 {
+    nx::client::desktop::ini().reload();
+
     m_delay.afterdelay();
     m_singleShotMode = false;
     {
