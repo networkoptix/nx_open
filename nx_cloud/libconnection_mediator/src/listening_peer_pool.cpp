@@ -137,7 +137,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
             [this, peerData, connection = connection.get(),
                 guard = m_asyncOperationGuard.sharedGuard()]()
             {
-                // TODO: #ak Get rid of this guard aftre resolving
+                // TODO: #ak Get rid of this guard after resolving
                 // dependency issue between Controller and STUN server.
                 auto lock = guard->lock();
                 if (!lock)
