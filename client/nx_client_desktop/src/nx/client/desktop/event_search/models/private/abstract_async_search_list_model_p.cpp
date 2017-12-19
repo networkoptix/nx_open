@@ -10,7 +10,7 @@ namespace desktop {
 AbstractAsyncSearchListModel::Private::Private(AbstractAsyncSearchListModel* q):
     base_type(),
     q(q),
-    m_selectedTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::kMaxTimeValue)
+    m_selectedTimePeriod(QnTimePeriod::kMinTimeValue, QnTimePeriod::infiniteDuration())
 {
 }
 
