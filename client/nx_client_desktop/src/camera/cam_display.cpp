@@ -1156,7 +1156,8 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     {
         m_lastQueuedVideoTime = video->timestamp;
 
-        if (isForcedBufferingEnabled() && isDataQueueFilled())
+        if (isForcedBufferingEnabled()
+            && (isDataQueueFilled() || m_dataQueue.size() == m_dataQueue.maxSize()))
         {
             m_delay.breakSleep();
         }
