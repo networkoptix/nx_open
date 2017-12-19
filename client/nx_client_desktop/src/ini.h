@@ -20,11 +20,11 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(0, demoAnalyticsProviderTimestampPrecisionUs, "Timestamp precision of demo analytics provider.");
     NX_INI_FLAG(0, externalMetadata, "Use external metadata for local files.");
     NX_INI_FLAG(0, allowCustomArZoomWindows, "Allow zoom windows to have custom aspect ratio.");
-    NX_INI_INT(0, forcedVideoBufferLengthUs, "Don't start playing video until video buffer is filled by this length.");
+    NX_INI_INT(0, forcedVideoBufferLengthUs, "If non-zero, playing video will not start until video buffer is filled by this length.");
     NX_INI_INT(0, additionalVideoBufferLengthUs, "When video is buffering the buffer is filled for forcedVideoBufferLengthUs + this length.");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hide enhanced video from the scene.");
     NX_INI_FLAG(0, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
-    NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects areas.");
+    NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay lable to detected object description.");
 };
 
