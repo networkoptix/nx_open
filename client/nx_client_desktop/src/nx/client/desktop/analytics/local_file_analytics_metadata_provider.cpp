@@ -19,6 +19,61 @@ QString metadataFileName(QString fileName)
     return fileName.replace(QFileInfo(fileName).suffix(), lit("metadata"));
 }
 
+enum class SearchPolicy
+{
+    exact,
+    closestBefore,
+    closestAfter
+};
+
+std::vector<nx::common::metadata::DetectionMetadataPacket>::const_iterator
+    findMetadataIterator(
+        const std::vector<nx::common::metadata::DetectionMetadataPacket>& metadata,
+        qint64 timestamp,
+        SearchPolicy searchPolicy)
+{
+    if (metadata.empty())
+        return metadata.end();
+
+    switch (searchPolicy)
+    {
+        case SearchPolicy::exact:
+        {
+            auto containsTime =
+                [](const nx::common::metadata::DetectionMetadataPacket& metadata, qint64 timestamp)
+                {
+                    return metadata.timestampUsec >= timestamp
+                        && timestamp < metadata.timestampUsec + metadata.durationUsec;
+                };
+
+            auto it = std::lower_bound(
+                std::next(metadata.begin()),
+                metadata.end(),
+                std::chrono::microseconds(timestamp));
+
+            if (it != metadata.end() && containsTime(*it, timestamp))
+                return it;
+
+            --it;
+
+            if (containsTime(*it, timestamp))
+                return it;
+
+            return metadata.end();
+        }
+
+        case SearchPolicy::closestAfter:
+            return std::lower_bound(metadata.begin(), metadata.end(),
+                std::chrono::microseconds(timestamp));
+
+        case SearchPolicy::closestBefore:
+            return std::upper_bound(metadata.begin(), metadata.end(),
+                std::chrono::microseconds(timestamp));
+    }
+
+    return metadata.end();
+}
+
 } // namespace
 
 LocalFileAnalyticsMetadataProvider::LocalFileAnalyticsMetadataProvider(
@@ -36,26 +91,39 @@ LocalFileAnalyticsMetadataProvider::LocalFileAnalyticsMetadataProvider(
 common::metadata::DetectionMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
     qint64 timestamp, int channel) const
 {
-    if (m_metadata.empty())
-        return common::metadata::DetectionMetadataPacketPtr();
-
     if (channel != 0)
-        return common::metadata::DetectionMetadataPacketPtr();
+        return {};
 
-    auto currentFrame = std::lower_bound(
-        m_metadata.cbegin(), m_metadata.cend(), std::chrono::microseconds(timestamp));
-    if (currentFrame == m_metadata.cend())
-        --currentFrame;
+    const auto it = findMetadataIterator(m_metadata, timestamp, SearchPolicy::exact);
+    if (it == m_metadata.cend())
+        return {};
 
-    if (currentFrame == m_metadata.cbegin() && timestamp < currentFrame->timestampUsec)
-        return common::metadata::DetectionMetadataPacketPtr();
+    return std::make_shared<common::metadata::DetectionMetadataPacket>(*it);
+}
 
-    if (currentFrame != m_metadata.cbegin() && timestamp < currentFrame->timestampUsec)
-        --currentFrame;
+QList<common::metadata::DetectionMetadataPacketPtr>
+    LocalFileAnalyticsMetadataProvider::metadataRange(
+        qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+{
+    if (channel != 0)
+        return {};
 
-    NX_EXPECT(currentFrame->timestampUsec <= timestamp);
+    const auto startIt = findMetadataIterator(
+        m_metadata, startTimestamp, SearchPolicy::closestAfter);
+    if (startIt == m_metadata.cend())
+        return {};
 
-    return std::make_shared<common::metadata::DetectionMetadataPacket>(*currentFrame);
+    const auto endIt = findMetadataIterator(
+        m_metadata, endTimestamp, SearchPolicy::closestBefore);
+    if (startIt == m_metadata.cend())
+        return {};
+
+    QList<common::metadata::DetectionMetadataPacketPtr> result;
+    auto itemsLeft = maximumCount;
+    for (auto it = startIt; itemsLeft != 0 && it != endIt; ++it, --itemsLeft)
+        result.append(std::make_shared<common::metadata::DetectionMetadataPacket>(*it));
+
+    return result;
 }
 
 bool LocalFileAnalyticsMetadataProviderFactory::supportsAnalytics(

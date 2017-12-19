@@ -22,6 +22,12 @@ public:
         qint64 timestamp,
         int channel) const override;
 
+    virtual QList<common::metadata::DetectionMetadataPacketPtr> metadataRange(
+        qint64 startTimestamp,
+        qint64 endTimestamp,
+        int channel,
+        int maximumCount = -1) const override;
+
     virtual QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const override;
 
 private:

@@ -36,6 +36,23 @@ common::metadata::DetectionMetadataPacketPtr ConsumingAnalyticsMetadataProvider:
     return common::metadata::fromMetadataPacket(compressedMetadata);
 }
 
+QList<common::metadata::DetectionMetadataPacketPtr>
+    ConsumingAnalyticsMetadataProvider::metadataRange(
+        qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+{
+    const auto& metadataList = d->metadataConsumer->metadataRange(
+        startTimestamp, endTimestamp, channel, maximumCount);
+
+    QList<common::metadata::DetectionMetadataPacketPtr> result;
+    for (const auto& metadata: metadataList)
+    {
+        const auto compressedMetadata =
+            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+        result.append(common::metadata::fromMetadataPacket(compressedMetadata));
+    }
+    return result;
+}
+
 QSharedPointer<media::AbstractMetadataConsumer>
     ConsumingAnalyticsMetadataProvider::metadataConsumer() const
 {

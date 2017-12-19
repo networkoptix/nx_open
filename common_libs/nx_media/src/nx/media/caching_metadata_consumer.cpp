@@ -28,6 +28,13 @@ bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const
     return timestamp >= metadata->timestamp && timestamp < metadata->timestamp + duration;
 }
 
+enum class SearchPolicy
+{
+    exact,
+    closestBefore,
+    closestAfter
+};
+
 class MetadataCache
 {
 public:
@@ -55,31 +62,80 @@ public:
 
     QnAbstractCompressedMetadataPtr findMetadata(const qint64 timestamp) const
     {
-        if (m_metadataByTimestamp.isEmpty())
-            return QnAbstractCompressedMetadataPtr();
+        const auto it = findMetadataIterator(timestamp, SearchPolicy::exact);
+        if (it == m_metadataByTimestamp.end())
+            return {};
 
-        // Check metadata at lower_bound first (will match when only when timestamps are equal).
-        // Then if it fails check the previous item (may match by duration). Since we check the
-        // previous item anyway we can exclude the first item from lower_bound search. Thus
-        // explicit check for possibility to decrement the iterator can be omitted.
+        return *it;
+    }
 
-        auto it = std::lower_bound(
-            std::next(m_metadataByTimestamp.keyBegin()),
-            m_metadataByTimestamp.keyEnd(),
-            timestamp);
+    QList<QnAbstractCompressedMetadataPtr> findMetadataInRange(
+        const qint64 startTimestamp, const qint64 endTimestamp, int maxCount) const
+    {
+        const auto startIt = findMetadataIterator(startTimestamp, SearchPolicy::closestAfter);
+        if (startIt == m_metadataByTimestamp.end())
+            return {};
 
-        if (it != m_metadataByTimestamp.keyEnd() && metadataContainsTime(*it.base(), timestamp))
-            return *it.base();
+        const auto endIt = findMetadataIterator(endTimestamp, SearchPolicy::closestBefore);
+        if (endIt == m_metadataByTimestamp.end())
+            return {};
 
-        --it;
-
-        if (metadataContainsTime(*it.base(), timestamp))
-            return *it.base();
-
-        return QnAbstractCompressedMetadataPtr();
+        QList<QnAbstractCompressedMetadataPtr> result;
+        auto itemsLeft = maxCount;
+        for (auto it = startIt; itemsLeft != 0 && it != endIt; ++it, --itemsLeft)
+            result.append(*it);
+        return result;
     }
 
 private:
+    QMap<qint64, QnAbstractCompressedMetadataPtr>::const_iterator findMetadataIterator(
+        const qint64 timestamp, SearchPolicy searchPolicy) const
+    {
+        if (m_metadataByTimestamp.isEmpty())
+            return m_metadataByTimestamp.end();
+
+        switch (searchPolicy)
+        {
+            case SearchPolicy::exact:
+            {
+                // Check metadata at lower_bound first (will match when only when timestamps are
+                // equal). Then if it fails check the previous item (may match by duration). Since
+                // we check the previous item anyway we can exclude the first item from
+                // lower_bound. Thus explicit check for possibility to decrement the iterator
+                // can be omitted.
+
+                auto it = std::lower_bound(
+                    std::next(m_metadataByTimestamp.keyBegin()),
+                    m_metadataByTimestamp.keyEnd(),
+                    timestamp).base();
+
+                if (it != m_metadataByTimestamp.end() && metadataContainsTime(*it, timestamp))
+                    return it;
+
+                --it;
+
+                if (metadataContainsTime(*it, timestamp))
+                    return it;
+
+                return m_metadataByTimestamp.end();
+            }
+
+            case SearchPolicy::closestAfter:
+                return std::lower_bound(
+                    m_metadataByTimestamp.keyBegin(),
+                    m_metadataByTimestamp.keyEnd(),
+                    timestamp).base();
+
+            case SearchPolicy::closestBefore:
+                return std::upper_bound(
+                    m_metadataByTimestamp.keyBegin(),
+                    m_metadataByTimestamp.keyEnd(),
+                    timestamp).base();
+        }
+
+        return m_metadataByTimestamp.end();
+    }
+
     QQueue<QnAbstractCompressedMetadataPtr> m_metadataCache;
     QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
     const int m_maxItemsCount;
@@ -116,6 +172,19 @@ QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
         return QnAbstractCompressedMetadataPtr();
 
     return cache->findMetadata(timestamp);
+}
+
+QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
+    qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+{
+    if (channel >= d->cachePerChannel.size())
+        return QList<QnAbstractCompressedMetadataPtr>();
+
+    const auto& cache = d->cachePerChannel[channel];
+    if (!cache)
+        return QList<QnAbstractCompressedMetadataPtr>();
+
+    return cache->findMetadataInRange(startTimestamp, endTimestamp, maximumCount);
 }
 
 void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)

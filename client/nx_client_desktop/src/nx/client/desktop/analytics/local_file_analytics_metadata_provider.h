@@ -16,6 +16,12 @@ public:
         qint64 timestamp,
         int channel) const override;
 
+    virtual QList<common::metadata::DetectionMetadataPacketPtr> metadataRange(
+        qint64 startTimestamp,
+        qint64 endTimestamp,
+        int channel,
+        int maximumCount = -1) const override;
+
 private:
     std::vector<nx::common::metadata::DetectionMetadataPacket> m_metadata;
 };

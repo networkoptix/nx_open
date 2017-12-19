@@ -17,6 +17,10 @@
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 
+#include <utils/math/linear_combination.h>
+
+#include <ini.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -24,6 +28,8 @@ namespace desktop {
 namespace {
 
 static constexpr std::chrono::milliseconds kObjectTimeToLive = std::chrono::minutes(1);
+static constexpr std::chrono::microseconds kFutureMetadataLength = std::chrono::seconds(2);
+static constexpr int kMaxFutureMetadataPackets = 4;
 
 static const QVector<QColor> kFrameColors{
     Qt::red,
@@ -78,6 +84,29 @@ QnUuid findItemForObject(const QnLayoutResourcePtr& layout, const QnUuid& object
     return QnUuid();
 }
 
+QRectF interpolatedRectangle(
+    const QRectF& rectangle,
+    const qint64 rectangleTimestamp,
+    const QRectF& futureRectangle,
+    const qint64 futureRectangleTimestamp,
+    const qint64 timestamp)
+{
+    if (timestamp < 0
+        || rectangleTimestamp < 0
+        || futureRectangleTimestamp < 0
+        || timestamp < rectangleTimestamp
+        || timestamp > futureRectangleTimestamp)
+    {
+        return rectangle;
+    }
+
+    const auto factor =
+        static_cast<qreal>(timestamp - rectangleTimestamp)
+            / static_cast<qreal>(futureRectangleTimestamp - rectangleTimestamp);
+
+    return linearCombine(1 - factor, rectangle, factor, futureRectangle);
+}
+
 } // namespace
 
 class WidgetAnalyticsController::Private: public QObject
@@ -90,6 +119,11 @@ public:
         qint64 lastUsedTime = -1;
         QnUuid zoomWindowItemUuid;
         QRectF rectangle;
+        qint64 metadataTimestamp = -1;
+        QString description;
+
+        QRectF futureRectangle;
+        qint64 futureRectangleTimestamp = -1;
     };
 
     void at_areaClicked(const QnUuid& areaId);
@@ -101,6 +135,9 @@ public:
     void updateObjectInfoFromLayoutItem(const QnUuid& itemId);
     ObjectInfo& addOrUpdateObject(const nx::common::metadata::DetectedObject& object);
     void removeObject(const QnUuid& objectId);
+
+    void updateFutureRectangles(qint64 timestamp, int channel);
+    void updateObjectAreas(qint64 timestamp);
 
 public:
     QnMediaResourceWidget* mediaResourceWidget = nullptr;
@@ -206,23 +243,8 @@ WidgetAnalyticsController::Private::ObjectInfo&
         objectInfo.color = utils::random::choice(kFrameColors);
 
     objectInfo.rectangle = object.boundingBox;
+    objectInfo.description = objectDescription(object);
     objectInfo.active = true;
-
-    AreaHighlightOverlayWidget::AreaInformation areaInfo;
-    areaInfo.id = object.objectId;
-    areaInfo.rectangle = object.boundingBox;
-    areaInfo.color = objectInfo.color;
-    areaInfo.text = objectDescription(object);
-
-    areaHighlightWidget->addOrUpdateArea(areaInfo);
-
-    if (!objectInfo.zoomWindowItemUuid.isNull())
-    {
-        const auto& layout = layoutResource();
-        auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
-        item.zoomRect = areaInfo.rectangle;
-        layout->updateItem(item);
-    }
 
     return objectInfo;
 }
@@ -241,6 +263,81 @@ void WidgetAnalyticsController::Private::removeObject(const QnUuid& objectId)
     {
         layoutResource()->removeItem(it->zoomWindowItemUuid);
         it->zoomWindowItemUuid = QnUuid();
+    }
+}
+
+void WidgetAnalyticsController::Private::updateFutureRectangles(qint64 timestamp, int channel)
+{
+    const auto metadataList = metadataProvider->metadataRange(
+        timestamp, timestamp + kFutureMetadataLength.count(), channel, kMaxFutureMetadataPackets);
+
+    QSet<QnUuid> objectsToUpdate = objectInfoById.keys().toSet();
+
+    for (const auto& metadata: metadataList)
+    {
+        if (objectsToUpdate.isEmpty())
+            break;
+
+        for (const auto& object: metadata->objects)
+        {
+            auto it = objectsToUpdate.find(object.objectId);
+            if (it == objectsToUpdate.end())
+                continue;
+
+            auto& info = objectInfoById[object.objectId];
+            if (metadata->timestampUsec > info.metadataTimestamp)
+            {
+                info.futureRectangle = object.boundingBox;
+                info.futureRectangleTimestamp = metadata->timestampUsec;
+                objectsToUpdate.erase(it);
+            }
+        }
+    }
+}
+
+void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
+{
+    for (auto it = objectInfoById.begin(); it != objectInfoById.end(); ++it)
+    {
+        const auto& objectInfo = *it;
+
+        if (!objectInfo.active)
+            continue;
+
+        AreaHighlightOverlayWidget::AreaInformation areaInfo;
+        areaInfo.id = it.key();
+        areaInfo.color = objectInfo.color;
+        areaInfo.text = objectInfo.description;
+
+        if (ini().displayAnalyticsDelay && objectInfo.metadataTimestamp > 0)
+        {
+            areaInfo.text +=
+                lit("\nDelay\t%1").arg((timestamp - objectInfo.metadataTimestamp) / 1000);
+        }
+
+        if (ini().enableDetectedObjectsInterpolation)
+        {
+            areaInfo.rectangle = interpolatedRectangle(
+                objectInfo.rectangle,
+                objectInfo.metadataTimestamp,
+                objectInfo.futureRectangle,
+                objectInfo.futureRectangleTimestamp,
+                timestamp);
+        }
+        else
+        {
+            areaInfo.rectangle = objectInfo.rectangle;
+        }
+
+        areaHighlightWidget->addOrUpdateArea(areaInfo);
+
+        if (!objectInfo.zoomWindowItemUuid.isNull())
+        {
+            const auto& layout = layoutResource();
+            auto item = layout->getItem(objectInfo.zoomWindowItemUuid);
+            item.zoomRect = areaInfo.rectangle;
+            layout->updateItem(item);
+        }
     }
 }
 
@@ -276,6 +373,7 @@ void WidgetAnalyticsController::updateAreas(qint64 timestamp, int channel)
         for (const auto& object: metadata->objects)
         {
             auto& objectInfo = d->addOrUpdateObject(object);
+            objectInfo.metadataTimestamp = metadata->timestampUsec;
             objectInfo.lastUsedTime = elapsed;
             objectIds.insert(object.objectId);
         }
@@ -291,6 +389,9 @@ void WidgetAnalyticsController::updateAreas(qint64 timestamp, int channel)
         else
             it = d->objectInfoById.erase(it);
     }
+
+    d->updateFutureRectangles(timestamp, channel);
+    d->updateObjectAreas(timestamp);
 }
 
 void WidgetAnalyticsController::clearAreas()
