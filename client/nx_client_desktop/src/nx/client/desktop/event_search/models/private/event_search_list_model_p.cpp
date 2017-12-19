@@ -28,16 +28,24 @@ static constexpr int kFetchBatchSize = 25;
 // In "live mode", every kUpdateTimerInterval newly happened events are fetched.
 static constexpr auto kUpdateTimerInterval = std::chrono::seconds(15);
 
-static const auto upperBoundPredicate =
-    [](qint64 left, const vms::event::ActionData& right)
+static const auto lowerBoundPredicateUs =
+    [](const vms::event::ActionData& left, qint64 rightUs)
     {
-        return left > right.eventParams.eventTimestampUsec;
+        return left.eventParams.eventTimestampUsec > rightUs;
     };
 
-static const auto lowerBoundPredicate =
-    [](const vms::event::ActionData& left, qint64 right)
+static const auto upperBoundPredicateUs =
+    [](qint64 leftUs, const vms::event::ActionData& right)
     {
-        return left.eventParams.eventTimestampUsec > right;
+        return leftUs > right.eventParams.eventTimestampUsec;
+    };
+
+static const auto upperBoundPredicateMs =
+    [](qint64 leftMs, const vms::event::ActionData& right)
+    {
+        using namespace std::chrono;
+        const auto leftUs = duration_cast<microseconds>(milliseconds(leftMs)).count();
+        return leftUs > right.eventParams.eventTimestampUsec;
     };
 
 static qint64 timestampUs(const vms::event::ActionData& event)
@@ -201,7 +209,7 @@ bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs
         std::chrono::milliseconds(earliestTimeToCommitMs)).count();
 
     const auto end = std::upper_bound(m_prefetch.begin(), m_prefetch.end(),
-        earliestTimeToCommitUs, upperBoundPredicate);
+        earliestTimeToCommitUs, upperBoundPredicateUs);
 
     const auto first = this->count();
     const auto count = std::distance(m_prefetch.begin(), end);
@@ -232,7 +240,7 @@ void EventSearchListModel::Private::clipToSelectedTimePeriod()
     m_currentUpdateId = rest::Handle(); //< Cancel timed update.
     m_latestTimeMs = qMin(m_latestTimeMs, selectedTimePeriod().endTimeMs());
     refreshUpdateTimer();
-    clipToTimePeriod(m_data, upperBoundPredicate, selectedTimePeriod());
+    clipToTimePeriod(m_data, upperBoundPredicateMs, selectedTimePeriod());
 }
 
 void EventSearchListModel::Private::refreshUpdateTimer()
@@ -257,7 +265,7 @@ void EventSearchListModel::Private::refreshUpdateTimer()
 
 void EventSearchListModel::Private::periodicUpdate()
 {
-    if (!m_currentUpdateId)
+    if (m_currentUpdateId)
         return;
 
     const auto eventsReceived =
@@ -270,10 +278,12 @@ void EventSearchListModel::Private::periodicUpdate()
 
             if (success && !data.empty())
                 addNewlyReceivedEvents(std::move(data));
+            else
+                qDebug() << "Periodic update: no new events added";
         };
 
-    qDebug() << "Requesting new events from" << debugTimestampToString(m_latestTimeMs)
-        << "to infinity";
+    qDebug() << "Periodic update: requesting new events from"
+        << debugTimestampToString(m_latestTimeMs) << "to infinity";
 
     m_currentUpdateId = getEvents(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);
@@ -285,7 +295,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
         std::chrono::milliseconds(m_latestTimeMs)).count();
 
     const auto overlapBegin = std::lower_bound(m_data.cbegin(), m_data.cend(),
-        latestTimeUs, lowerBoundPredicate);
+        latestTimeUs, lowerBoundPredicateUs);
 
     const auto alreadyExists =
         [this, &overlapBegin, latestTimeUs](const vms::event::ActionData& event) -> bool
@@ -313,6 +323,8 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
         event.actionType = vms::event::undefinedAction; //< Use as flag.
         --count;
     }
+
+    qDebug() << "Periodic update:" << count << "new events added";
 
     if (count == 0)
         return;

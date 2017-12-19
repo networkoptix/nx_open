@@ -5,6 +5,7 @@
 #include <deque>
 #include <limits>
 
+#include <QtCore/QSet>
 #include <QtCore/QHash>
 
 #include <api/server_rest_connection_fwd.h>
@@ -53,11 +54,15 @@ private:
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
     media::SignalingMetadataConsumer* createMetadataSource();
 
-    int indexOf(const QnUuid& objectId, qint64 timeUs) const;
+    int indexOf(const QnUuid& objectId) const;
 
     void periodicUpdate();
     void refreshUpdateTimer();
     void addNewlyReceivedObjects(analytics::storage::LookupResult&& data);
+    void emitDataChangedIfNeeded();
+
+    void advanceObject(analytics::storage::DetectedObject& object,
+        analytics::storage::ObjectPosition&& position);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
     rest::Handle getObjects(qint64 startMs, qint64 endMs, GetCallback callback,
@@ -69,8 +74,9 @@ private:
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
-    QScopedPointer<QTimer> m_updateTimer;
-    QPointer<QTimer> m_dataChangedTimer;
+    const QScopedPointer<QTimer> m_updateTimer;
+    const QScopedPointer<QTimer> m_dataChangedTimer;
+    QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
     QnResourceDisplayPtr m_display;
     qint64 m_latestTimeMs = 0;
@@ -80,7 +86,7 @@ private:
     std::deque<analytics::storage::DetectedObject> m_data;
     bool m_success = true;
 
-    QHash<QnUuid, qint64> m_lastObjectTimesUs;
+    QHash<QnUuid, qint64> m_objectIdToTimestampUs;
 };
 
 } // namespace
