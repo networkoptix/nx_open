@@ -12,6 +12,7 @@
 
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <nx/utils/random.h>
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
