@@ -528,6 +528,7 @@ void rgbToRgba(unsigned char* rgb, int rgbSize, int* rgba)
 static void*
 gieThread(void *arg)
 {
+    using namespace std::chrono;
 
 #if defined(NX_TEST_MODE)
     context_t *ctx = (context_t *)arg;
@@ -561,9 +562,7 @@ gieThread(void *arg)
             std::cout << "Component " << i << " " << rgb2[i] << std::endl;
         }
 
-
-        ctx->gie_ctx->doInference(
-            rectList_queue);
+        ctx->gie_ctx->doInference(rectList_queue);
 
         auto vec = rectList_queue.front();
         rectList_queue.pop_front();
@@ -635,7 +634,7 @@ gieThread(void *arg)
                 timeout.tv_sec = time(0);
                 timeout.tv_nsec = time_in_ms * 1000000;
                 int ret =
-                    pthread_cond_timedwait(&ctx->gie_cond, &ctx->gie_lock, &timeout);
+                    pthread_cond_wait(&ctx->gie_cond, &ctx->gie_lock);
                 if (ret != 0)
                 {
                     pthread_mutex_unlock(&ctx->gie_lock);
@@ -654,26 +653,24 @@ gieThread(void *arg)
             process_last_batch = 1;
         }
 
-        if (inferenceFps > 0 && !process_last_batch)
-        {
-            auto now = std::chrono::high_resolution_clock::now();
-            auto timeElapsedSinceLastInference = std::chrono::duration_cast<std::chrono::milliseconds>(
-                (now - ctx->m_lastInferenceTime));
-            
-            if (ctx->m_lastInferenceTime.time_since_epoch() == std::chrono::milliseconds::zero())
-                ctx->m_lastInferenceTime = now;
 
-           
-            bool needToDropFrame = !ctx->m_ptsQueue.empty()
-                && (ctx->m_lastInferenceTime.time_since_epoch() + minTimeToNextInference
-                    > std::chrono::microseconds(ctx->m_ptsQueue.front()));
+        if (process_last_batch == 0)
+        {
+#if 1
+            const bool needToDropFrame = !ctx->m_ptsQueue.empty()
+                ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp > microseconds(ctx->m_ptsQueue.front())
+                && ctx->m_lastInferenceDuration != microseconds::zero();
+
 
             if (needToDropFrame)
             {
-                NX_OUTPUT << "Dropping frame without inference! "
-                    << timeElapsedSinceLastInference.count() << " "
-                    << minTimeToNextInference.count();
-
+                NX_OUTPUT << "@@@@@@@@@@@@@@@@@@@@@@@ DROPPING frame with timestamp: " << ctx->m_ptsQueue.front()
+                    << ", difference: "
+                    << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp - microseconds(ctx->m_ptsQueue.front())).count()
+                    << ", " << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp).count() 
+                    << ", " << microseconds(ctx->m_ptsQueue.front()).count()
+                    << std::endl;
+                
                 if (!ctx->m_ptsQueue.empty())
                     ctx->m_ptsQueue.pop();
                 else
@@ -688,11 +685,7 @@ gieThread(void *arg)
                     NX_OUTPUT << "conv queue buffer error";
                 continue;
             }
-
-            ctx->m_lastInferenceTime = now;
-            NX_OUTPUT << "Using this frame for inference! "
-                << timeElapsedSinceLastInference.count() << " "
-                << minTimeToNextInference.count();
+#endif
         }
 
         pthread_mutex_unlock(&ctx->gie_lock);
@@ -753,6 +746,7 @@ gieThread(void *arg)
         }
         else if(buf_num == 0) // framenum equal batch_size * n
         {
+            pthread_mutex_unlock(&ctx->gie_lock);
             break;
         }
 
@@ -761,8 +755,12 @@ gieThread(void *arg)
         queue<vector<cv::Rect>> rectList_queue;
 
         NX_TIME_BEGIN(Inference);
-        ctx->gie_ctx->doInference(
-            rectList_queue);
+
+        const auto before = high_resolution_clock::now();
+        ctx->gie_ctx->doInference(rectList_queue);
+        ctx->m_lastInferenceDuration = duration_cast<microseconds>(high_resolution_clock::now() - before);
+        ctx->m_lastProcessedFrameTimestamp = microseconds(ctx->m_ptsQueue.front());
+
         NX_TIME_END(Inference);
 
         {
@@ -772,11 +770,15 @@ gieThread(void *arg)
                 vector<cv::Rect> rectList = rectList_queue.front();
                 rectList_queue.pop();
 
+                const auto pts = ctx->m_ptsQueue.front();
+                ctx->m_ptsQueue.pop();             
+                ctx->m_outPtsQueue.push(pts);
+
                 ctx->rectQueuePtr->push(rectList);
                 for (int i = 0; i < rectList.size(); i++)
                 {
                     cv::Rect &r = rectList[i];
-                    cout <<"    x " << r.x << ", y " << r.y
+                    std::cout <<"    x " << r.x << ", y " << r.y
                          << ", width " << r.width << ", height " << r.height
                          << endl;
                 }
@@ -1261,6 +1263,7 @@ int Detector::startInference(
     setDefaultsNx(&m_ctx, modelFileName, deployFileName, cacheFileName);
 
     m_ctx.m_ptsQueue = std::queue<int64_t>();
+    m_ctx.m_outPtsQueue = std::queue<int64_t>();
 
     m_ctx.decoder_pixfmt = V4L2_PIX_FMT_H264;
 
@@ -1590,12 +1593,12 @@ std::vector<cv::Rect> Detector::getRectangles(int64_t* outPts)
         m_rects.pop();
     }
 
-    if (!m_ctx.m_ptsQueue.empty())
+    if (!m_ctx.m_outPtsQueue.empty())
     {
-        NX_PRINT << "POPPING FROM m_ptsQueue " << m_ctx.m_ptsQueue.size();
+        NX_OUTPUT << "POPPING FROM m_outPtsQueue " << m_ctx.m_outPtsQueue.size();
         if (outPts)
-            *outPts = m_ctx.m_ptsQueue.front();
-        m_ctx.m_ptsQueue.pop();
+            *outPts = m_ctx.m_outPtsQueue.front();
+        m_ctx.m_outPtsQueue.pop();
     }
 
     return rects;
