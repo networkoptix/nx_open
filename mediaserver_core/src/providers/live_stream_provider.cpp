@@ -354,10 +354,15 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     if (ini().enableMetadataProcessing)
     {
-        const bool needAnalyzeFrame = !ini().analyzeKeyFramesOnly
+        const bool needToAnalyzeFrame = !ini().analyzeKeyFramesOnly
             || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
 
-        if (needAnalyzeFrame)
+        const bool roleForAnalytics =
+            ini().analyzeSecondaryStream ? Qn::CR_SecondaryLiveVideo : Qn::CR_LiveVideo;
+
+        const bool needToAnalyzeStream = roleForAnalytics == getRole();
+
+        if (needToAnalyzeFrame && needToAnalyzeStream)
         {
             auto receptor = m_videoDataReceptor.toStrongRef();
             if (receptor && receptor->canAcceptData())
