@@ -65,4 +65,5 @@ private:
     std::string m_cloudSystemAuthKey;
 
     void init();
+    std::unique_ptr<MediaServerClient> allocateMediaServerClient();
 };

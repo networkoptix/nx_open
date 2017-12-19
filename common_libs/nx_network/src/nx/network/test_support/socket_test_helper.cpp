@@ -953,7 +953,7 @@ void AddressBinder::add(const SocketAddress& key, SocketAddress address)
     QnMutexLocker lock(&m_mutex);
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
-    NX_CRITICAL(it->second.insert(std::move(address)).second);
+    NX_CRITICAL(it->second.insert(address).second, address.toString());
     NX_LOGX(lm("New address %1 is bound to %2").args(address, key), cl_logDEBUG1);
 }
 

@@ -131,6 +131,14 @@ protected:
             deliverMergeHistoryRecord(nx::utils::random::generateName(7).toStdString()));
     }
 
+    void whenMergeHistoryRecordWithUnknownSystemIdIsDelivered()
+    {
+        auto mergeHistoryRecord = prepareMergeHistoryRecord(m_slaveSystem.authKey);
+        mergeHistoryRecord.mergedSystemCloudId =
+            nx::utils::random::generateName(nx::utils::random::number<int>(0, 7));
+        ASSERT_NO_THROW(deliverMergeHistoryRecord(mergeHistoryRecord));
+    }
+
     void thenMergeResultIsReported()
     {
         m_prevMergeResult = m_mergeResults.pop();
@@ -210,13 +218,13 @@ private:
 
     void deliverMergeHistoryRecord(const std::string& authKey)
     {
-        ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
-        mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
-        mergeHistoryRecord.mergedSystemLocalId = QnUuid::createUuid().toSimpleByteArray();
-        mergeHistoryRecord.username = m_ownerAccount.email.c_str();
-        mergeHistoryRecord.timestamp = nx::utils::random::number<qint64>();
-        mergeHistoryRecord.sign(authKey.c_str());
+        const auto mergeHistoryRecord = prepareMergeHistoryRecord(authKey);
+        deliverMergeHistoryRecord(mergeHistoryRecord);
+    }
 
+    void deliverMergeHistoryRecord(
+        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    {
         queryExecutor().executeUpdateQuerySync(
             [this, &mergeHistoryRecord](nx::utils::db::QueryContext* queryContext)
             {
@@ -224,6 +232,18 @@ private:
                     queryContext,
                     mergeHistoryRecord);
             });
+    }
+
+    ::ec2::ApiSystemMergeHistoryRecord prepareMergeHistoryRecord(
+        const std::string& authKey)
+    {
+        ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+        mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
+        mergeHistoryRecord.mergedSystemLocalId = QnUuid::createUuid().toSimpleByteArray();
+        mergeHistoryRecord.username = m_ownerAccount.email.c_str();
+        mergeHistoryRecord.timestamp = nx::utils::random::number<qint64>();
+        mergeHistoryRecord.sign(authKey.c_str());
+        return mergeHistoryRecord;
     }
 };
 
@@ -284,6 +304,13 @@ TEST_F(SystemMergeManager, merge_history_record_with_invalid_signature_ignored)
 {
     givenSystemsBeingMerged();
     whenBrokenMergeHistoryRecordIsDelivered();
+    thenSlaveSystemMovedToState(api::SystemStatus::beingMerged);
+}
+
+TEST_F(SystemMergeManager, merge_history_with_unknown_cloud_system_id_is_ignored)
+{
+    givenSystemsBeingMerged();
+    whenMergeHistoryRecordWithUnknownSystemIdIsDelivered();
     thenSlaveSystemMovedToState(api::SystemStatus::beingMerged);
 }
 

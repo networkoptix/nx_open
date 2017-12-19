@@ -51,5 +51,10 @@ void UDPMessageResponseSender::close()
     // Doing nothing, since it is UDP.
 }
 
+void UDPMessageResponseSender::setInactivityTimeout(
+    boost::optional<std::chrono::milliseconds> /*value*/)
+{
+}
+
 } // namespace stun
 } // namespace nx

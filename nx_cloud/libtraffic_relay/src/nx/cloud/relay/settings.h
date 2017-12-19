@@ -1,5 +1,9 @@
 #pragma once
 
+#include <chrono>
+
+#include <boost/optional.hpp>
+
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/settings.h>
@@ -19,6 +23,7 @@ struct Http
      * Backlog value to pass to tcpServerSocket->listen call.
      */
     int tcpBacklogSize;
+    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 
     Http();
 };

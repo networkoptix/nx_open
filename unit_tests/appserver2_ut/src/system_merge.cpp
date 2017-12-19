@@ -45,16 +45,16 @@ TEST_F(SystemMerge, two_systems_can_be_merged)
 {
     givenTwoSingleServerSystems();
 
-    whenMergeSystems();
+    mergeSystems();
 
     thenMergeSucceeded();
-    thenAllServersSynchronizedData();
+    waitUntilAllServersSynchronizedData();
 }
 
 TEST_F(SystemMerge, merge_history_record_is_added_during_merge)
 {
     givenTwoSingleServerSystems();
-    whenMergeSystems();
+    mergeSystems();
     thenMergeHistoryRecordIsAdded();
 }
 

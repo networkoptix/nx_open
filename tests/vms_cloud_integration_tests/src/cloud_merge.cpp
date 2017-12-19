@@ -10,6 +10,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
 
+#include <nx/cloud/cdb/ec2/data_conversion.h>
 #include <nx/cloud/cdb/test_support/cdb_launcher.h>
 
 #include <test_support/peer_wrapper.h>
@@ -37,6 +38,20 @@ public:
     }
 
 protected:
+    void givenCloudSystem()
+    {
+        ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(1));
+        ASSERT_TRUE(connectToCloud(
+            m_systemMergeFixture.peer(m_systemMergeFixture.peerCount()-1), m_cloudAccounts[0]));
+        m_systemCloudCredentials.push_back(
+            m_systemMergeFixture.peer(m_systemMergeFixture.peerCount()-1).getCloudCredentials());
+    }
+
+    void givenNonCloudSystem()
+    {
+        ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(1));
+    }
+
     void givenTwoCloudSystemsWithTheSameOwner()
     {
         ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(2));
@@ -111,7 +126,7 @@ protected:
 
     void whenMergeSystems()
     {
-        m_systemMergeFixture.whenMergeSystems();
+        m_systemMergeFixture.mergeSystems();
     }
 
     void whenMergeSystemsWithCloudDbRequest()
@@ -136,12 +151,12 @@ protected:
 
     void andAllServersAreInterconnected()
     {
-        m_systemMergeFixture.thenAllServersAreInterconnected();
+        m_systemMergeFixture.waitUntilAllServersAreInterconnected();
     }
 
     void andAllServersSynchronizedData()
     {
-        m_systemMergeFixture.thenAllServersSynchronizedData();
+        m_systemMergeFixture.waitUntilAllServersSynchronizedData();
     }
 
     void andMergeHistoryRecordIsAdded()
@@ -149,7 +164,8 @@ protected:
         const ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory =
             m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
         ASSERT_GE(systemMergeHistory.size(), 1U);
-        ASSERT_TRUE(systemMergeHistory[0].verify(m_systemCloudCredentials.back().key));
+        if (!systemMergeHistory.front().mergedSystemCloudId.isEmpty())
+            ASSERT_TRUE(systemMergeHistory.front().verify(m_systemCloudCredentials.back().key));
     }
 
     void thenMergedSystemDisappearedFromCloud()
@@ -225,10 +241,12 @@ protected:
                     &cloudUsers));
 
             int usersFound = 0;
+            int cloudUsersInVms = 0;
             for (const auto& vmsUser: vmsUsers)
             {
                 if (!vmsUser.isCloud)
                     continue;
+                ++cloudUsersInVms;
                 for (const auto& cloudUser: cloudUsers)
                 {
                     if (cloudUser.accountEmail == vmsUser.name.toStdString())
@@ -239,7 +257,7 @@ protected:
                 }
             }
 
-            if (usersFound == (int) cloudUsers.size())
+            if (usersFound == cloudUsersInVms)
                 break;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -257,6 +275,33 @@ protected:
         andAllServersAreInterconnected();
         andAllServersSynchronizedData();
         andMergeHistoryRecordIsAdded();
+    }
+
+    void andVmsTranscationLogMatchesCloudOne()
+    {
+        auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
+
+        for (;;)
+        {
+            ::ec2::ApiTranLogFilter filter;
+            filter.cloudOnly = true;
+            ::ec2::ApiTransactionDataList vmsTransactionLog;
+            ASSERT_EQ(
+                ::ec2::ErrorCode::ok,
+                mediaServerClient->ec2GetTransactionLog(filter, &vmsTransactionLog));
+
+            ::ec2::ApiTransactionDataList cloudTransactionLog;
+            m_cdb.getTransactionLog(
+                m_cloudAccounts[0].email,
+                m_cloudAccounts[0].password,
+                m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
+                &cloudTransactionLog);
+
+            if (vmsTransactionLog == cloudTransactionLog)
+                break;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
 
 private:
@@ -353,6 +398,17 @@ TEST_F(CloudMerge, merged_system_removed_in_cloud_after_merge)
     givenTwoCloudSystemsWithTheSameOwner();
     whenMergeSystems();
     thenMergedSystemDisappearedFromCloud();
+}
+
+TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_in_cloud)
+{
+    givenCloudSystem();
+    givenNonCloudSystem();
+
+    whenMergeSystems();
+
+    thenMergeFullyCompleted();
+    andVmsTranscationLogMatchesCloudOne();
 }
 
 } // namespace test

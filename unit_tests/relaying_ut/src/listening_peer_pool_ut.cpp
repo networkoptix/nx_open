@@ -603,10 +603,10 @@ protected:
     void assertStatisticsIsExpected()
     {
         const Statistics statistics = pool().statistics();
-        ASSERT_EQ(m_peerNames.size(), statistics.listeningServerCount);
+        ASSERT_EQ((int) m_peerNames.size(), statistics.listeningServerCount);
         ASSERT_EQ(connectionsEstablishedCount(), statistics.connectionCount);
         ASSERT_EQ(
-            connectionsEstablishedCount() / m_peerNames.size(),
+            connectionsEstablishedCount() / (int) m_peerNames.size(),
             statistics.connectionsAveragePerServerCount);
         ASSERT_GT(statistics.connectionsAcceptedPerMinute, 0);
     }
