@@ -182,13 +182,27 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
 {
     const auto streams = mediaStreams().streams;
-    auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
+    auto stream = std::find_if(streams.cbegin(), streams.cend(),
         [](const CameraMediaStreamInfo& stream)
         {
             return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primary;
         });
-    if (defaultStream != streams.cend())
-        return *defaultStream;
+    if (stream != streams.cend())
+        return *stream;
+
+    return CameraMediaStreamInfo();
+}
+
+CameraMediaStreamInfo QnVirtualCameraResource::secondaryStream() const
+{
+    const auto streams = mediaStreams().streams;
+    auto stream = std::find_if(streams.cbegin(), streams.cend(),
+        [](const CameraMediaStreamInfo& stream)
+        {
+            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::secondary;
+        });
+    if (stream != streams.cend())
+        return *stream;
 
     return CameraMediaStreamInfo();
 }
@@ -198,13 +212,30 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     using nx::vms::common::core::resource::SensorDescription;
 
     qreal customAr = customAspectRatio();
-    if (!qFuzzyIsNull(customAr))
+    const bool autoAr = qFuzzyIsNull(customAr);
+
+    if (!autoAr)
         return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
+
+    // The rest of code deals with auto aspect ratio
+    // Aspect ration should be forced to AS of the first stream.
+    // Note: primary stream AR could be changed on the fly and a camera
+    // may not have a primary stream. In this case natural secondary
+    // stream AS should be used.
 
     const auto stream = defaultStream();
     const QSize size = stream.getResolution();
     if (size.isEmpty())
-        return QnAspectRatio();
+    {
+        // Trying to use size from secondary stream
+        const auto secondary = secondaryStream();
+        const QSize secondarySize = secondary.getResolution();
+        if (secondarySize.isEmpty())
+        {
+            return QnAspectRatio();
+        }
+        return QnAspectRatio(size);
+    }
 
     const auto& sensor = combinedSensorsDescription().mainSensor();
     if (!sensor.isValid())

@@ -49,6 +49,7 @@ public:
 
     CameraMediaStreams mediaStreams() const;
     CameraMediaStreamInfo defaultStream() const;
+    CameraMediaStreamInfo secondaryStream() const;
 
     QnAspectRatio aspectRatio() const;
 

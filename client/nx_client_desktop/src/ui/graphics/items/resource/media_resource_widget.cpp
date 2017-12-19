@@ -930,27 +930,20 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (!qFuzzyIsNull(result))
         return result;
 
-    const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+    if (const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+    {
+        const auto cameraAr = camera->aspectRatio();
+        if (cameraAr.isValid())
+        {
+            return cameraAr.toFloat();
+        }
+    }
 
     if (m_renderer && !m_renderer->sourceSize().isEmpty())
     {
         auto sourceSize = m_renderer->sourceSize();
-        if (camera)
-        {
-            const auto& sensor = camera->combinedSensorsDescription().mainSensor();
-            if (sensor.isValid())
-                sourceSize = Geometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
-        }
         return Geometry::aspectRatio(sourceSize);
     }
-
-    if (camera)
-    {
-        const auto cameraAr = camera->aspectRatio();
-        if (cameraAr.isValid())
-            return cameraAr.toFloat();
-    }
-
     return defaultAspectRatio(); /*< Here we can get -1.0 if there are no predefined AR set */
 }
 
