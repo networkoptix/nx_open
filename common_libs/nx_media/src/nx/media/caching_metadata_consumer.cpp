@@ -106,7 +106,8 @@ CachingMetadataConsumer::~CachingMetadataConsumer()
 {
 }
 
-QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(qint64 timestamp, int channel)
+QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
+    qint64 timestamp, int channel) const
 {
     if (channel >= d->cachePerChannel.size())
         return QnAbstractCompressedMetadataPtr();

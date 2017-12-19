@@ -13,7 +13,7 @@ public:
     CachingMetadataConsumer(MetadataType metadataType);
     virtual ~CachingMetadataConsumer() override;
 
-    QnAbstractCompressedMetadataPtr metadata(qint64 timestamp, int channel);
+    QnAbstractCompressedMetadataPtr metadata(qint64 timestamp, int channel) const;
 
 protected:
     virtual void processMetadata(const QnAbstractCompressedMetadataPtr& metadata) override;
