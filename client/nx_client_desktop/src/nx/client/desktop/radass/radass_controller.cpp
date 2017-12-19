@@ -331,7 +331,10 @@ struct RadassController::Private
         if (isInHiQuality)
         {
             const auto oldReason = consumer->lqReason;
-            if (isPerformanceProblem(oldReason) && isPerformanceProblem(reason))
+            const auto wasPerformanceProblem = isPerformanceProblem(oldReason)
+                || oldReason == LqReason::tooManyItems;
+
+            if (wasPerformanceProblem && isPerformanceProblem(reason))
             {
                 // Item goes to LQ again because of performance issue.
                 autoHqTransitionAllowed = false;
