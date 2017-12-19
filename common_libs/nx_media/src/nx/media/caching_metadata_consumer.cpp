@@ -48,11 +48,12 @@ public:
     {
         if (m_metadataCache.size() == m_maxItemsCount)
         {
-            const auto metadata = m_metadataCache.dequeue();
-            const auto it = m_metadataByTimestamp.find(metadata->timestamp);
+            const auto oldestMetadata = m_metadataCache.dequeue();
+            const auto it = m_metadataByTimestamp.find(oldestMetadata->timestamp);
             // Check the value equality is necessary because the stored value can be replaced by
             // other metadata with the same timestamp.
-            if (it != m_metadataByTimestamp.end() && *it == metadata)
+            NX_ASSERT(it != m_metadataByTimestamp.end());
+            if (it != m_metadataByTimestamp.end() && *it == oldestMetadata)
                 m_metadataByTimestamp.erase(it);
         }
 
