@@ -188,8 +188,6 @@ private:
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
     bool needBuffering(qint64 vTime) const;
     void processSkippingFramesTime();
-    void clearMetaDataInfo();
-    void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
     bool fillDataQueue();
     bool isDataQueueFilled() const;
@@ -253,7 +251,6 @@ protected:
     int m_executingJump;
     int m_skipPrevJumpSignal;
     int m_processedPackets;
-    std::map<qint64, FrameMetadata> m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
     bool m_isStillImage;

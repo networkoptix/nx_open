@@ -184,17 +184,6 @@ qint64 QnResourceWidgetRenderer::lastDisplayedTimestampUsec(int channel) const
     return ctx.renderer ? ctx.renderer->lastDisplayedTime() : -1;
 }
 
-FrameMetadata QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
-{
-    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
-        return FrameMetadata();
-
-    const RenderingTools& ctx = m_channelRenderers[channel];
-    return ctx.renderer
-        ? ctx.renderer->lastFrameMetadata()
-        : FrameMetadata();
-}
-
 void QnResourceWidgetRenderer::setBlurFactor(qreal value)
 {
     m_blurFactor = value;

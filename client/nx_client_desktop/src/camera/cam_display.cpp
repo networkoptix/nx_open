@@ -12,7 +12,6 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
-#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 
 #include "core/resource/camera_resource.h"
@@ -36,7 +35,6 @@ Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000 * 1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer
-static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
 static const std::chrono::milliseconds kMediaMessageDelay(1500);
 
 static void updateActivity()
@@ -1002,7 +1000,6 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     }
     m_firstAfterJumpTime = qint64(AV_NOPTS_VALUE);
     m_prevLQ = -1;
-    clearMetaDataInfo();
 }
 
 void QnCamDisplay::onReaderPaused()
@@ -1169,6 +1166,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
     {
         processMetadata(metadata);
+        return;
     }
 
     QnAbstractDataConsumer::putData(data);
@@ -1206,42 +1204,6 @@ void QnCamDisplay::processSkippingFramesTime()
             markIgnoreBefore(m_videoQueue[i], m_skippingFramesTime);
         m_skippingFramesTime = qint64(AV_NOPTS_VALUE);
     }
-}
-
-void QnCamDisplay::clearMetaDataInfo()
-{
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_lastMetadata->clear();
-}
-
-void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
-{
-    const auto& ini = nx::client::desktop::ini();
-    if (ini.enableAnalytics && ini.externalMetadata)
-        qnMetadataAnalyticsController->gotFrame(m_resource->toResourcePtr(), video->timestamp);
-
-    auto& queue = m_lastMetadata[video->channelNumber];
-    if (queue.empty())
-        return;
-    auto itr = queue.upper_bound(video->timestamp);
-    if (itr != queue.begin())
-        --itr;
-
-    auto& metadataList = itr->second;
-    for (auto itrMetadata = metadataList.begin(); itrMetadata != metadataList.end();)
-    {
-        auto& metadata = *itrMetadata;
-        if (metadata->containTime(video->timestamp))
-        {
-            video->metadata << metadata;
-            itrMetadata = metadataList.erase(itrMetadata);
-        }
-        else
-        {
-            ++itrMetadata;
-        }
-    }
-    queue.erase(queue.begin(), itr);
 }
 
 void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
@@ -1333,8 +1295,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (!media)
         return true;
 
-    QnAbstractCompressedMetadataPtr metadata =
-        std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
     QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
@@ -1382,10 +1342,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     processSkippingFramesTime();
 
     if (vd)
-    {
         m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        mapMetadataFrame(vd);
-    }
 
     bool oldIsStillImage = m_isStillImage;
     m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
@@ -1429,32 +1386,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_extTimeSrc->reinitTime(AV_NOPTS_VALUE);
     }
 
-    if (metadata)
-    {
-        if (metadata->metadataType == MetadataType::MediaStreamEvent)
-        {
-            QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
-            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
-                QString::fromLatin1(data));
-
-            m_lastMediaEvent = mediaEvent;
-            if (!m_lastMediaEventTimeout.isValid())
-                m_lastMediaEventTimeout.restart();
-
-            processFillerPacket(
-                m_speed >= 0 ? DATETIME_NOW : 0,
-                metadata->dataProvider,
-                QnAbstractMediaData::MediaFlags_None);
-        }
-        else
-        {
-            int ch = metadata->channelNumber;
-            m_lastMetadata[ch][metadata->timestamp] << metadata;
-            if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
-                m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
-        }
-        return true;
-    }
     if (ad)
     {
         if (speed < 0)
