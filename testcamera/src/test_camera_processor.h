@@ -10,11 +10,15 @@ class QnTestCameraProcessor: public QnTCPConnectionProcessor
 public:
     QnTestCameraProcessor(
         const QSharedPointer<AbstractStreamSocket>& socket,
-        QnTcpListener* owner);
+        QnTcpListener* owner,
+        bool noSecondaryStream);
+
     virtual ~QnTestCameraProcessor();
     virtual void run() override;
+
 private:
     Q_DECLARE_PRIVATE(QnTestCameraProcessor);
+    bool m_noSecondaryStream;
 };
 
 #endif // __TEST_CAMERA_CONNECTION_PROCESSOR_H__

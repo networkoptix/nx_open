@@ -15,7 +15,7 @@ class QnTestCamera
 {
 public:
 
-    QnTestCamera(quint32 num);
+    QnTestCamera(quint32 num, bool includePts);
 
     QByteArray getMac() const;
 
@@ -32,6 +32,7 @@ private:
     void makeOfflineFlood();
     int sendAll(AbstractStreamSocket* socket, const void* data, int size);
 private:
+    const bool m_includePts;
     quint32 m_num;
     QByteArray m_mac;
     QStringList m_primaryFiles;
