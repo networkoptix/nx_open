@@ -28,7 +28,7 @@ ConsumingAnalyticsMetadataProvider::ConsumingAnalyticsMetadataProvider():
 }
 
 common::metadata::DetectionMetadataPacketPtr ConsumingAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int channel)
+    qint64 timestamp, int channel) const
 {
     const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(
         d->metadataConsumer->metadata(timestamp, channel));

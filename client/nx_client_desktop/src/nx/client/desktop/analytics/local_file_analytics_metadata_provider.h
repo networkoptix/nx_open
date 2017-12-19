@@ -14,7 +14,7 @@ public:
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
         qint64 timestamp,
-        int channel) override;
+        int channel) const override;
 
 private:
     std::vector<nx::common::metadata::DetectionMetadataPacket> m_metadata;

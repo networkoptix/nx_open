@@ -34,7 +34,7 @@ LocalFileAnalyticsMetadataProvider::LocalFileAnalyticsMetadataProvider(
 }
 
 common::metadata::DetectionMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int channel)
+    qint64 timestamp, int channel) const
 {
     if (m_metadata.empty())
         return common::metadata::DetectionMetadataPacketPtr();

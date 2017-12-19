@@ -15,7 +15,7 @@ public:
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
         qint64 timestamp,
-        int channel) = 0;
+        int channel) const = 0;
 };
 
 } // namespace core

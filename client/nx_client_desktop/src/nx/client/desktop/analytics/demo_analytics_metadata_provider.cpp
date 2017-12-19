@@ -64,7 +64,7 @@ DemoAnalyticsMetadataProvider::DemoAnalyticsMetadataProvider():
 }
 
 common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int /*channel*/)
+    qint64 timestamp, int /*channel*/) const
 {
     if (d->objectsNumber <= 0)
         return common::metadata::DetectionMetadataPacketPtr();

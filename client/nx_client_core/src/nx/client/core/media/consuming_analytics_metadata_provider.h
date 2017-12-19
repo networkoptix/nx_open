@@ -20,7 +20,7 @@ public:
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
         qint64 timestamp,
-        int channel) override;
+        int channel) const override;
 
     virtual QSharedPointer<media::AbstractMetadataConsumer> metadataConsumer() const override;
 
