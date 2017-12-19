@@ -121,9 +121,9 @@ public:
             function(listener.get());
     }
 
-    template<typename ... Args>
+    template<typename SocketServerRelatedType, typename ... Args>
     void forEachListener(
-        void(SocketServerType::*function)(Args...),
+        void(SocketServerRelatedType::*function)(Args...),
         const Args& ... args)
     {
         for (auto& listener: m_listeners)
