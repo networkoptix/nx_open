@@ -2490,7 +2490,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ספק:</translation>
+      <translation>ספק</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2498,7 +2498,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>קושחה:</translation>
+      <translation>קושחה</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -3953,7 +3953,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון:</translation>
+      <translation>מפתח רשיון</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3972,7 +3972,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון:</translation>
+      <translation>מפתח רשיון</translation>
     </message>
     <message>
       <source>Status</source>
@@ -4322,10 +4322,10 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
-        <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
-        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
-        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">

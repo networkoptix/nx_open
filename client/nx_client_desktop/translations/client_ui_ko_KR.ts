@@ -361,7 +361,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>책갈피 정보</translation>
     </message>
     <message>
       <location/>
@@ -371,12 +371,12 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>영역 넓이</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>글꼴 크기</translation>
     </message>
     <message>
       <location/>
@@ -700,7 +700,7 @@
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>카메라 스트림 및 프로필 설정 유지</translation>
     </message>
     <message>
       <location/>
@@ -725,7 +725,7 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>보조 스트림 활성화</translation>
     </message>
     <message>
       <location/>
@@ -740,7 +740,7 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>보관하기</translation>
     </message>
     <message>
       <location/>
@@ -1077,7 +1077,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>설정 내보내기</translation>
     </message>
     <message>
       <location/>
@@ -1090,7 +1090,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>설정 내보내기</translation>
     </message>
     <message>
       <location/>
@@ -1141,7 +1141,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>영상 백업</translation>
     </message>
     <message>
       <location/>
@@ -1151,12 +1151,12 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>설정 내보내기</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>멀티 비디오</translation>
     </message>
   </context>
   <context>
@@ -1339,7 +1339,7 @@
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>기본</translation>
     </message>
     <message>
       <location/>
@@ -2280,12 +2280,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>초기 영상길이</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>추출된 영상 길이</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>프레임 간격</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>속도 초기화</translation>
     </message>
   </context>
   <context>
@@ -2961,7 +2961,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>문자</translation>
     </message>
     <message>
       <location/>
@@ -2971,7 +2971,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>글꼴 크기</translation>
     </message>
     <message>
       <location/>
@@ -2981,7 +2981,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>영역 넓이</translation>
     </message>
   </context>
   <context>
@@ -3007,7 +3007,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>글꼴 크기</translation>
     </message>
     <message>
       <location/>

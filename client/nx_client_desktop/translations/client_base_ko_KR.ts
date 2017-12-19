@@ -1022,11 +1022,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>실행가능한 %1 미디어 파일 (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>실행가능한 %1 미디어 파일 (x86)</translation>
     </message>
   </context>
   <context>
@@ -1161,40 +1161,40 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>긴</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>라틴 문자, 숫자 및 키보드 기호 %1 만 허용됩니다.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>패스워드는 %n 개의 다른 문자, 기호 또는 숫자 조합이 있어야합니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>비밀번호는 %n 자 이상이어야 합니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>비밀번호는 %n 글자보다 길어야 합니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>패스워드에는 %n개 이상의 같은문자가 연속으로 함께 포함되어서는 안됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>패스워드에는 %n 개 이상의 반복 문자가 포함되어서는 안됩니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -2299,7 +2299,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>변경 하지 마십시오</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2490,7 +2490,7 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>패스워드는 카메라의 사용자 이름과 같으면 안됩니다.</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2498,7 +2498,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>반복 비밀번호</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -3142,8 +3142,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
+      <translation>
+        <numerusform>비밀번호 설정</numerusform>
       </translation>
     </message>
     <message>
@@ -5015,7 +5015,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -6226,7 +6226,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -7632,7 +7632,7 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>동적펼침</translation>
     </message>
   </context>
   <context>
@@ -7651,7 +7651,7 @@ to %1</source>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>비디오 또는 오디오 코덱은 선택된 포맷과 호환되지 않습니다.</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -7659,7 +7659,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>내부 오류</translation>
     </message>
     <message>
       <source>No data exported.</source>
@@ -7816,8 +7816,8 @@ to %1</source>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>빠른 검토 기능으로 내보내기를 사용하려면 최소 %n 초 이상의 비디오가 있어야 합니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -7825,7 +7825,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>긴</translation>
     </message>
     <message>
       <source>Short</source>
@@ -7836,7 +7836,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 분석</translation>
     </message>
   </context>
   <context>
@@ -7851,7 +7851,7 @@ to %1</source>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>내보내기 실패</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -8070,14 +8070,14 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>지원 되는 이벤트 형식</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>애널리틱스 이벤트가 위의 모든 조건을 충족하는 경우에만 이벤트가 실행됩니다. 키워드 필드가 비어 있으면 조건이 항상 충족됩니다. 일치하지 않으면 웹 로그 분석 이벤트의 해당 필드에 키워드가 포함되어 있으면 조건이 충족됩니다.</translation>
     </message>
   </context>
   <context>
@@ -8419,7 +8419,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>비밀번호 변경에 실패했습니다.</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
