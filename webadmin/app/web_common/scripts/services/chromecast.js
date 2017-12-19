@@ -3,6 +3,9 @@
 angular.module('nxCommon')
     .service('chromeCast', function () {
         var self = this;
+        if(!window.chrome){
+            return;
+        }
         if(chrome.cast){
             this.castPlayer = new CastPlayer();
             this.castPlayer.initializeCastPlayer();
