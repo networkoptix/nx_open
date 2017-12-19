@@ -438,7 +438,40 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
         return m_delay.terminatedSleep(needToSleep, maxSleepTime);
     else
         return m_delay.sleep(needToSleep, maxSleepTime);
+}
 
+bool QnCamDisplay::fillDataQueue()
+{
+    if (!isForcedBufferingEnabled() || isDataQueueFilled())
+        return false;
+
+    const auto requiredBufferLength =
+        nx::client::desktop::ini().forcedVideoBufferLengthUs * 110 / 100; //< Add 10%.
+    while (!needToStop() && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLength)
+    {
+        if (m_dataQueue.size() == m_dataQueue.maxSize())
+            m_dataQueue.setMaxSize(m_dataQueue.maxSize() * 2);
+
+        constexpr qint64 kMinSleepTimeUs = 30000;
+        constexpr qint64 kMaxSleepTimeUs = 1000000;
+
+        const auto sleepTime = std::max(kMinSleepTimeUs,
+            requiredBufferLength - (m_lastQueuedVideoTime - m_lastVideoPacketTime));
+        const auto maxSleepTime = std::min(kMaxSleepTimeUs, sleepTime + kMinSleepTimeUs);
+
+        if (m_isRealTimeSource)
+            m_delay.terminatedSleep(sleepTime, maxSleepTime);
+        else
+            m_delay.sleep(sleepTime, maxSleepTime);
+    }
+
+    return true;
+}
+
+bool QnCamDisplay::isDataQueueFilled() const
+{
+    const auto forcedVideoBufferLengthUs = nx::client::desktop::ini().forcedVideoBufferLengthUs;
+    return m_lastQueuedVideoTime - m_lastVideoPacketTime > forcedVideoBufferLengthUs;
 }
 
 bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
@@ -612,7 +645,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
         else if (!m_display[0]->selfSyncUsed())
         {
-            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
+            if (fillDataQueue())
+                realSleepTime = AV_NOPTS_VALUE;
+            else if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
                 realSleepTime = doSmartSleep(needToSleep, speed);
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
@@ -1088,7 +1123,8 @@ void QnCamDisplay::processNewSpeed(float speed)
     }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
-        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+        if (!isForcedBufferingEnabled())
+            m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
         m_delay.setMaxOverdraft(-1);
     }
     else
@@ -1117,9 +1153,18 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (video)
     {
-        if ((video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
-            m_delay.breakSleep();
         m_lastQueuedVideoTime = video->timestamp;
+
+        if (isForcedBufferingEnabled() && isDataQueueFilled())
+        {
+            m_delay.breakSleep();
+        }
+        else if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
+            && m_dataQueue.size() > 0
+            && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
+        {
+            m_delay.breakSleep();
+        }
     }
     else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
     {
@@ -1886,7 +1931,8 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
 
 void QnCamDisplay::onSlowSourceHint()
 {
-    m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+    if (!isForcedBufferingEnabled())
+        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
 
 qint64 QnCamDisplay::getDisplayedMax() const
@@ -2104,6 +2150,11 @@ qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
 {
     return m_lastMediaEvent;
+}
+
+bool QnCamDisplay::isForcedBufferingEnabled() const
+{
+    return nx::client::desktop::ini().forcedVideoBufferLengthUs > 0;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

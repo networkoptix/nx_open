@@ -127,6 +127,9 @@ public:
     QnMediaResourcePtr resource() const;
 
     Qn::MediaStreamEvent lastMediaEvent() const;
+
+    bool isForcedBufferingEnabled() const;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -188,6 +191,8 @@ private:
     void clearMetaDataInfo();
     void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
+    bool fillDataQueue();
+    bool isDataQueueFilled() const;
 
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
