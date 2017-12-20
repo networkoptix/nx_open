@@ -14,8 +14,6 @@ namespace media {
 
 namespace {
 
-static constexpr int kDefaultMaxCacheItemsCount = 60;
-
 bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const qint64 timestamp)
 {
     const auto allowedDelay = (metadata->metadataType == MetadataType::ObjectDetection)
@@ -40,8 +38,8 @@ enum class SearchPolicy
 class MetadataCache
 {
 public:
-    MetadataCache(int cacheSize = kDefaultMaxCacheItemsCount):
-        m_maxItemsCount(std::max(cacheSize, 1))
+    MetadataCache(int cacheSize = -1):
+        m_maxItemsCount(std::max(1, cacheSize >= 0 ? cacheSize : ini().metadataCacheSize))
     {
         m_metadataCache.reserve(m_maxItemsCount);
     }
