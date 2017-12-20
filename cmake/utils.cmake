@@ -17,6 +17,12 @@ macro(nx_expose_variables_to_parent_scope _variables_list)
     endforeach()
 endmacro()
 
+function(nx_set_variable_if_empty variable value)
+    if("${${variable}}" STREQUAL "")
+        set(${variable} ${value} PARENT_SCOPE)
+    endif()
+endfunction()
+
 function(nx_copy)
     cmake_parse_arguments(COPY "IF_NEWER;IF_DIFFERENT;IF_MISSING" "DESTINATION" "" ${ARGN})
 
