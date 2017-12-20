@@ -565,6 +565,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
         Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
         Auth_DisabledUser,    // disabled user
+        Auth_InvalidCsrfToken, // for cookie login
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);

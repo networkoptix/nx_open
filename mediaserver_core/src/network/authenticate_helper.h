@@ -70,7 +70,9 @@ public:
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
-    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, Qn::UserAccessData* accessRights);
+    Qn::AuthResult doCookieAuthorization(
+        const QByteArray& method, const QByteArray& authData, const QByteArray& csrfToken,
+        nx_http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
     /*!
     \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
