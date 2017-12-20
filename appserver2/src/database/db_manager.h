@@ -723,6 +723,7 @@ namespace detail
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_dbReadOnly;
+        bool m_needReparentLayouts;
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
