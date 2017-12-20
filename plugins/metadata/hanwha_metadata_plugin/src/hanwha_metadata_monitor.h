@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
+#include <QtCore/QElapsedTimer>
 
 #include <map>
 #include <vector>
@@ -55,6 +56,7 @@ private:
     const QUrl m_url;
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
+    QElapsedTimer m_timeSinceLastOpen;
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
 
