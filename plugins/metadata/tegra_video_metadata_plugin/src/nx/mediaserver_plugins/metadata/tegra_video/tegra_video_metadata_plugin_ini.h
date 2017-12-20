@@ -39,7 +39,7 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_INT(0, postprocMinObjectHeight,
         "Rectangle height in 0..1 coordinates. Should be divided by 100.");
 
-    NX_INI_INT(35, postprocMaxObjectWidth,
+    NX_INI_INT(25, postprocMaxObjectWidth,
         "Rectangle width in 0..1 coordinates. Should be divided by 100.");
 
     NX_INI_INT(25, postprocMaxObjectHeight,
