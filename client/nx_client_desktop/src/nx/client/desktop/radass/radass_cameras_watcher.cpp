@@ -15,30 +15,27 @@ RadassCamerasWatcher::RadassCamerasWatcher(RadassController* controller,
     QnResourcePool* resourcePool,
     QObject* parent)
     :
-    base_type(parent)
+    base_type(parent),
+    m_radassController(controller)
 {
-    QPointer<RadassController> controllerGuard(controller);
+    auto handleDataDropped =
+        [this](QnArchiveStreamReader* reader)
+        {
+            if (m_radassController)
+                m_radassController->onSlowStream(reader);
+        };
 
     auto handleResourceAdded =
-        [controllerGuard](const QnResourcePtr& resource)
+        [this, handleDataDropped](const QnResourcePtr& resource)
         {
-            if (!controllerGuard)
-                return;
-
             if (auto camera = resource.dynamicCast<QnClientCameraResource>())
-            {
-                connect(camera, &QnClientCameraResource::dataDropped, controllerGuard,
-                    &RadassController::onSlowStream);
-            }
+                connect(camera, &QnClientCameraResource::dataDropped, this, handleDataDropped);
         };
 
     auto handleResourceRemoved =
-        [controllerGuard](const QnResourcePtr& resource)
+        [this](const QnResourcePtr& resource)
         {
-            if (!controllerGuard)
-                return;
-
-            resource->disconnect(controllerGuard);
+            resource->disconnect(this);
         };
 
     connect(resourcePool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
