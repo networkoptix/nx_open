@@ -8,6 +8,7 @@
 #include <cstring>
 #include <fstream>
 #include <algorithm>
+#include <ctime>
 
 using Rect = TegraVideo::Rect;
 
@@ -53,7 +54,7 @@ private:
     static std::string getTempDir()
     {
         char tempDir[L_tmpnam] = "";
-        ASSERT_TRUE(std::tmpnam(tempDir));
+        ASSERT_TRUE(std::tmpnam(tempDir) != nullptr);
 
         // Extract dir name from the file path - truncate after the last path separator.
         for (int i = (int) strlen(tempDir) - 1; i >= 0; --i)
@@ -80,9 +81,11 @@ static void testRects(const Rect rects[], int rectCount)
     ASSERT_TRUE(writeRectsToFile(file.filename(), rects, rectCount));
 
     const int maxRectCount = rectCount + 100;
-    Rect newRects[maxRectCount];
+    std::vector<Rect> newRects(maxRectCount);
+
     int newRectCount = -1;
-    ASSERT_TRUE(readRectsFromFile(file.filename(), newRects, maxRectCount, &newRectCount));
+    ASSERT_TRUE(readRectsFromFile(
+        file.filename(), &newRects.front(), maxRectCount, &newRectCount));
 
     ASSERT_EQ(rectCount, newRectCount);
     for (int i = 0; i < rectCount; ++i)
