@@ -26,6 +26,7 @@ struct NX_NETWORK_API QnInterfaceAndAddr
 
     QHostAddress subNetworkAddress() const;
     QHostAddress broadcastAddress() const;
+    bool isHostBelongToIpv4Network(const QHostAddress& address) const;
 
     QString name;
     QHostAddress address;
@@ -57,7 +58,9 @@ NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pb
 // returns list of interfaces.rkjybhjdfybtr
 // Set allowItfWithoutAddress to <true> to get list with interfaces without any ip
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
-QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(bool allowItfWithoutAddress = false);
+QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
+    bool allowItfWithoutAddress = false,
+    bool keepAllAddressesPerInterface = false);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
 QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
