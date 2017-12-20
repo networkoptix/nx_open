@@ -48,7 +48,7 @@ protected:
 
     void whenRemovingAnyAcceptorByIndex()
     {
-        const std::size_t index = 
+        const std::size_t index =
             nx::utils::random::number<std::size_t>(
                 0, m_acceptorStubs.size()-1);
         m_acceptorToRemove = m_acceptorStubs[index];

@@ -64,7 +64,7 @@ protected:
             });
         ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
-    
+
     void whenConnectToRegularStunServer()
     {
         nx::utils::promise<SystemError::ErrorCode> done;

@@ -16,7 +16,7 @@ namespace nx {
 namespace network {
 namespace test {
 
-class MultipleServerSocketTester: 
+class MultipleServerSocketTester:
     public network::MultipleServerSocket
 {
 public:
@@ -373,7 +373,7 @@ protected:
     {
         using namespace std::chrono;
         using namespace std::placeholders;
-        
+
         m_startTime = steady_clock::now();
         m_isCancelled = isCancelled;
         m_testDurationLimit = testDurationLimit;

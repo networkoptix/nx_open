@@ -62,7 +62,7 @@ struct HttpMessageWithIncompleteInfiniteBody: HttpMessageTestData
 {
     HttpMessageWithIncompleteInfiniteBody()
     {
-        fullMessage = 
+        fullMessage =
             "HTTP/1.1 200 OK\r\n"
             "Server: Network Optix\r\n"
             "Connection: close\r\n"
@@ -80,7 +80,7 @@ struct HttpMessageWithFiniteBody: HttpMessageTestData
 {
     HttpMessageWithFiniteBody()
     {
-        fullMessage = 
+        fullMessage =
             "HTTP/1.1 200 OK\r\n"
             "Server: Network Optix\r\n"
             "Connection: close\r\n"
@@ -100,7 +100,7 @@ struct HttpMessageWithoutBody: HttpMessageTestData
 {
     HttpMessageWithoutBody()
     {
-        fullMessage = 
+        fullMessage =
             "HTTP/1.1 204 No Content\r\n"
             "Server: Network Optix\r\n"
             "Connection: close\r\n"
@@ -117,7 +117,7 @@ using TestHttpConnection = nx_http::AsyncMessagePipeline;
 } // namespace
 
 /**
- * Testing BaseStreamProtocolConnection using AsyncMessagePipeline since 
+ * Testing BaseStreamProtocolConnection using AsyncMessagePipeline since
  *   Http already has convenient infrastructure around it.
  */
 class BaseStreamProtocolConnection:
@@ -190,7 +190,7 @@ protected:
         //m_receivedMessageQueue.pop();
         thenEveryMessageIsReceived();
     }
-    
+
     void thenMessageBodyIsReported()
     {
         m_receivedMsgBody.waitForReceivedDataToMatch(m_expectedBody);

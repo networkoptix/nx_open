@@ -91,7 +91,7 @@ TEST(WebsocketHandshake, validateRequest_response)
     ASSERT_EQ(validateRequest(request, &response), Error::noError);
 
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Protocol")->second, "test");
-    ASSERT_EQ(response.headers.find("Sec-WebSocket-Accept")->second, 
+    ASSERT_EQ(response.headers.find("Sec-WebSocket-Accept")->second,
         detail::makeAcceptKey(request.headers.find("Sec-WebSocket-Key")->second));
 }
 

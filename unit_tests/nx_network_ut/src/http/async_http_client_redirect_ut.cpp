@@ -148,7 +148,7 @@ protected:
 
     void andDigestUrlIsCorrectAndFullyEncoded()
     {
-        const auto authHeader = 
+        const auto authHeader =
             m_prevReceivedPostRequest->headers.find(nx_http::header::Authorization::NAME);
         ASSERT_NE(authHeader, m_prevReceivedPostRequest->headers.end());
         nx_http::header::Authorization auth(nx_http::header::AuthScheme::digest);

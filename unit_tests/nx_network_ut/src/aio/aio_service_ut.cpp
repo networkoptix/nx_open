@@ -37,10 +37,6 @@ class AIOService:
     public AIOEventHandler
 {
 public:
-    AIOService()
-    {
-    }
-
     ~AIOService()
     {
         m_service.stopMonitoring(m_socket.get(), aio::EventType::etRead, true);

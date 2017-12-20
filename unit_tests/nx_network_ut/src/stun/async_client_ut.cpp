@@ -108,7 +108,7 @@ protected:
         m_tcpConnectionToTheServer = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(m_tcpConnectionToTheServer->connect(m_server->address()));
     }
-    
+
     void givenStunClientWithPredefinedConnection()
     {
         m_stunClient = std::make_shared<nx::stun::AsyncClient>(

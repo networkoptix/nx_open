@@ -36,7 +36,7 @@ void BasicStunAsyncClientAcceptanceTest::setSingleShotUnconnectableSocketFactory
         std::bind(&BasicStunAsyncClientAcceptanceTest::createUnconnectableStreamSocket, this, _1, _2));
 }
 
-std::unique_ptr<AbstractStreamSocket> 
+std::unique_ptr<AbstractStreamSocket>
 BasicStunAsyncClientAcceptanceTest::createUnconnectableStreamSocket(
     bool /*sslRequired*/,
     nx::network::NatTraversalSupport /*natTraversalRequired*/)

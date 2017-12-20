@@ -295,7 +295,7 @@ protected:
                 m_serverSocketConnected.set_value(code);
             });
     }
-    
+
     void assertClientSocketHasConnected()
     {
         const auto connectResultCode = m_serverSocketConnected.get_future().get();
@@ -344,7 +344,7 @@ protected:
             {
                 break;
             }
-            
+
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
@@ -766,6 +766,19 @@ struct UdtSocketTypeSet
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
+
+//-------------------------------------------------------------------------------------------------
+
+struct UdtStreamSocketFactory
+{
+    std::unique_ptr<nx::network::UdtStreamSocket> operator()() const
+    {
+        return std::make_unique<nx::network::UdtStreamSocket>(AF_INET);
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamSocket, SocketOptions, UdtStreamSocketFactory);
+INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamSocket, SocketOptionsDefaultValue, UdtStreamSocketFactory);
 
 } // namespace test
 } // namespace network

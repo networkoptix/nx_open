@@ -177,7 +177,7 @@ protected:
     void givenScheduledWrite()
     {
         using namespace std::placeholders;
-    
+
         if (!m_channel)
             createTransformingChannel();
 

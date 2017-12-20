@@ -132,7 +132,7 @@ TEST_F(AIOThread, socket_polled_notification)
 
     started.get_future().wait();
     ASSERT_FALSE(handlerCalledFlag);
-    
+
     m_aioThread.stopMonitoring(&socket, aio::etRead, true, nullptr);
 }
 

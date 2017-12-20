@@ -159,7 +159,7 @@ TYPED_TEST_P(HttpServerBasicMessageDispatcher, handler_not_found)
 {
     this->registerHandler("/accounts/");
     this->registerHandler("/systems/");
-    
+
     this->assertHandlerNotFound("/accounts/accountId/systems");
     this->assertHandlerNotFound("/users/");
     this->assertHandlerNotFound("/accounts");
@@ -190,14 +190,14 @@ TYPED_TEST_P(HttpServerBasicMessageDispatcher, default_handler_has_lowest_priori
 TYPED_TEST_P(HttpServerBasicMessageDispatcher, register_handler_for_specific_method)
 {
     this->registerHandler("/accounts/", nx_http::Method::get);
-    
+
     this->assertHandlerIsFound("/accounts/", nx_http::Method::get);
     this->assertHandlerNotFound("/accounts/", nx_http::Method::post);
 }
 
 REGISTER_TYPED_TEST_CASE_P(
     HttpServerBasicMessageDispatcher,
-    handler_found_by_exatch_match, handler_not_found, default_handler_is_used, 
+    handler_found_by_exatch_match, handler_not_found, default_handler_is_used,
     default_handler_has_lowest_priority, register_handler_for_specific_method);
 
 } // namespace test
