@@ -66,6 +66,7 @@ private:
         QnMacAddress macAddress;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
+    bool isHostBelongToValidSubnet(const QHostAddress& address) const;
 private:
     QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData

@@ -163,6 +163,19 @@ void HanwhaResourceSearcher::updateSocketList()
     }
 }
 
+bool HanwhaResourceSearcher::isHostBelongToValidSubnet(const QHostAddress& address) const
+{
+    const auto interfaceList = getAllIPv4Interfaces(
+        false, /*interfaces without ipv4*/
+        true /*keep all ipv4 list per interface*/);
+    return std::any_of(
+        interfaceList.begin(), interfaceList.end(),
+        [&address](const QnInterfaceAndAddr& netInterface)
+        {
+            return netInterface.isHostBelongToIpv4Network(address);
+        });
+}
+
 bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData* outData)
 {
     // Packet format is reverse engenered.
@@ -182,10 +195,11 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
 
     static const int kUrlOffset = 133;
     const auto urlStr = QLatin1String(data.data() + kUrlOffset);
-    outData->presentationUrl = QUrl(urlStr).toString(QUrl::RemovePath);
-
-    if (outData->presentationUrl.isEmpty())
+    QUrl url(urlStr);
+    if (!url.isValid() || !isHostBelongToValidSubnet(QHostAddress(url.host())))
         return false;
+    outData->presentationUrl = url.toString(QUrl::RemovePath);
+
     outData->manufacturer = kHanwhaManufacturerName;
 
     return true;
