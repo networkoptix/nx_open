@@ -45,16 +45,16 @@ set(deb.customization.company.name "hanwha")
 
 set(ios.skip.sign "false")
 set(ios.bundle_identifier "com.hanwhasecurity.wave")
-set(ios.new_bundle_identifier "com.hanwhasecurity.wavemobile")
-set(ios.group_identifier "group.com.hanwhasecurity.wave")
-set(ios.sign.identity "iPhone Distribution: Ethan Kim (Q5VL4R39XK)")
+set(ios.new_bundle_identifier "com.hanwhasecurity.wisenetwave")
+set(ios.group_identifier "group.com.hanwhasecurity.wisenetwave")
+set(ios.sign.identity "iPhone Distribution: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
 set(ios.old_app_appstore_id "")
 
 set(mac.skip.sign "false")
-#set(mac.sign.identity "Developer ID Application: RAS Bvba (CJ7G58V6NE)")
-#set(mac.app.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
-#set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: RAS Bvba (CJ7G58V6NE)")
-set(mac.bundle.identifier "com.hanwhasecurity.wave2")
+set(mac.sign.identity "Developer ID Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
+set(mac.app.sign.identity "3rd Party Mac Developer Application: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
+set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Samsung Opto-Electronics America, Inc. (TPM6NB485L)")
+set(mac.bundle.identifier "com.hanwhasecurity.wisenetwave2")
 set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler")
 
 # Other customizations.
