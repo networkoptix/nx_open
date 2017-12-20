@@ -35,6 +35,14 @@ CREATE INDEX idx_event_device_guid ON event(device_guid);
 
 )sql";
 
+// VMS-7876
+static const char kAnalyticsDbEvenMoreIndexes[] =
+R"sql(
+
+CREATE INDEX idx_event_for_streaming_cursor ON event(device_guid, timestamp_usec_utc);
+
+)sql";
+
 } // namespace storage
 } // namespace analytics
 } // namespace nx
