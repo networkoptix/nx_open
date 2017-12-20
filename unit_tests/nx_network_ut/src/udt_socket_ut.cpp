@@ -769,6 +769,7 @@ INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
 
 //-------------------------------------------------------------------------------------------------
 
+#if 0
 struct UdtStreamSocketFactory
 {
     std::unique_ptr<nx::network::UdtStreamSocket> operator()() const
@@ -779,6 +780,7 @@ struct UdtStreamSocketFactory
 
 INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamSocket, SocketOptions, UdtStreamSocketFactory);
 INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamSocket, SocketOptionsDefaultValue, UdtStreamSocketFactory);
+#endif
 
 } // namespace test
 } // namespace network
