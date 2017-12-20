@@ -5,7 +5,6 @@ set(windows.skip.sign "false")
 set(help.language "english")
 set(quicksync "false")
 set(dynamic.customization "false")
-set(display.mobile.name "${display.product.name} Mobile")
 
 set(uri.protocol "nx-vms")
 
