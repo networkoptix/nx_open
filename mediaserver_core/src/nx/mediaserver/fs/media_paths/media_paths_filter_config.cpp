@@ -9,16 +9,15 @@ namespace mediaserver {
 namespace fs {
 namespace media_paths {
 
-FilterConfig FilterConfig::createDefault(
-    NetworkDrives isNetworkDrivesAllowed,
-    RemovableDrives isRemovableDrivesAllowed)
+FilterConfig FilterConfig::createDefault(NetworkDrives isNetworkDrivesAllowed)
 {
     FilterConfig result;
 
     const auto settings = qnServerModule->roSettings();
     result.isMultipleInstancesAllowed =
         static_cast<bool>(settings->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt());
-    result.isRemovableDrivesAllowed = isRemovableDrivesAllowed;
+    result.isRemovableDrivesAllowed =
+        static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt());
     result.isNetworkDrivesAllowed = isNetworkDrivesAllowed;
 
     result.partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();

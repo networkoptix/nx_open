@@ -14,12 +14,6 @@ enum class NetworkDrives
     notAllowed
 };
 
-enum class RemovableDrives
-{
-    allowed,
-    notAllowed
-};
-
 struct FilterConfig
 {
     FilterConfig(FilterConfig&&) = default;
@@ -29,15 +23,13 @@ struct FilterConfig
     QList<QnPlatformMonitor::PartitionSpace> partitions;
     bool isMultipleInstancesAllowed = false;
     NetworkDrives isNetworkDrivesAllowed = NetworkDrives::notAllowed;
-    RemovableDrives isRemovableDrivesAllowed = RemovableDrives::notAllowed;
+    bool isRemovableDrivesAllowed = false;
     QString dataDirectory;
     QString mediaFolderName;
     QnUuid serverUuid;
     bool isWindows = false;
 
-    static FilterConfig createDefault(
-        NetworkDrives isNetworkDrivesAllowed,
-        RemovableDrives isRemovableDrivesAllowed);
+    static FilterConfig createDefault(NetworkDrives isNetworkDrivesAllowed);
 };
 
 } // namespace media_paths

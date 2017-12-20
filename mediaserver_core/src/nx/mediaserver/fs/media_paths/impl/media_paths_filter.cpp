@@ -90,7 +90,7 @@ QStringList Filter::get() const
 QList<QnPlatformMonitor::PartitionSpace> Filter::filteredPartitions() const
 {
     auto partitions = m_filterConfig.partitions;
-    if (m_filterConfig.isRemovableDrivesAllowed == RemovableDrives::notAllowed)
+    if (!m_filterConfig.isRemovableDrivesAllowed)
         filterOut(&partitions, QnPlatformMonitor::RemovableDiskPartition);
 
     if (m_filterConfig.isNetworkDrivesAllowed == NetworkDrives::notAllowed)

@@ -922,7 +922,7 @@ qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType pt
     const bool isLocal = QnPlatformMonitor::LocalDiskPartition
         || ptype == QnPlatformMonitor::RemovableDiskPartition;
 
-    return ptype == isLocal ? defaultStorageSpaceLimit : kNasStorageLimit;
+    return isLocal ? defaultStorageSpaceLimit : kNasStorageLimit;
 }
 
 bool QnFileStorageResource::isLocal()

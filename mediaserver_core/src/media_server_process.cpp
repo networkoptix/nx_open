@@ -543,17 +543,11 @@ static QStringList listRecordFolders(bool includeNetwork = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    NetworkDrives networkDrivesFlag = includeNetwork
+    const NetworkDrives networkDrivesFlag = includeNetwork
         ? NetworkDrives::allowed
         : NetworkDrives::notAllowed;
 
-    const auto settings = qnServerModule->roSettings();
-    RemovableDrives removableDrivesFlag =
-        static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt())
-            ? RemovableDrives::allowed
-            : RemovableDrives::notAllowed;
-
-    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag, removableDrivesFlag));
+    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }

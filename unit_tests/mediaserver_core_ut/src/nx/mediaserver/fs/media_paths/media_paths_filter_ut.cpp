@@ -51,7 +51,7 @@ protected:
     void whenTypesNotAllowed(int typeMask)
     {
         m_filterConfig.isNetworkDrivesAllowed = NetworkDrives::allowed;
-        m_filterConfig.isRemovableDrivesAllowed = RemovableDrives::allowed;
+        m_filterConfig.isRemovableDrivesAllowed = true;
 
         if (typeMask == TypesNotAllowed::none)
             return;
@@ -60,7 +60,7 @@ protected:
             m_filterConfig.isNetworkDrivesAllowed = NetworkDrives::notAllowed;
 
         if (typeMask & TypesNotAllowed::removable)
-            m_filterConfig.isRemovableDrivesAllowed = RemovableDrives::notAllowed;
+            m_filterConfig.isRemovableDrivesAllowed = false;
     }
 
     void givenOsIs(Os os)
