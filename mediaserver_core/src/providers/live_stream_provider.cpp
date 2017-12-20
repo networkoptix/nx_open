@@ -91,9 +91,6 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     });
 
     m_dataReceptorMultiplexer.reset(new DataCopier());
-
-    auto pool = qnServerModule->metadataManagerPool();
-    m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
@@ -102,6 +99,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
             qnServerModule->analyticsEventsStorage()));
     m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
 
+	auto pool = qnServerModule->metadataManagerPool();
     pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
 }
 
@@ -141,6 +139,16 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     {
         mtx.unlock();
         pleaseReopenStream();
+    }
+
+    const auto roleForAnalytics = ini().analyzeSecondaryStream
+        ? Qn::ConnectionRole::CR_SecondaryLiveVideo
+        : Qn::ConnectionRole::CR_LiveVideo;
+
+    if (role == roleForAnalytics)
+    {
+        auto pool = qnServerModule->metadataManagerPool();
+        m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
     }
 }
 
@@ -357,8 +365,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
         const bool needToAnalyzeFrame = !ini().analyzeKeyFramesOnly
             || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
 
-        const bool roleForAnalytics =
-            ini().analyzeSecondaryStream ? Qn::CR_SecondaryLiveVideo : Qn::CR_LiveVideo;
+        const auto roleForAnalytics = ini().analyzeSecondaryStream
+            ? Qn::ConnectionRole::CR_SecondaryLiveVideo
+            : Qn::ConnectionRole::CR_LiveVideo;
 
         const bool needToAnalyzeStream = roleForAnalytics == getRole();
 
