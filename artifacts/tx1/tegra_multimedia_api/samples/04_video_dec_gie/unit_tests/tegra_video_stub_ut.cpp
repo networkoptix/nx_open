@@ -24,7 +24,7 @@ TEST(tegra_video_stub, start)
     ASSERT_TRUE(tegraVideo->start(params));
 }
 
-testRect(const TegraVideo::Rect& rect)
+void testRect(const TegraVideo::Rect& rect)
 {
     ASSERT_TRUE(rect.x >= 0);
     ASSERT_TRUE(rect.x <= 1);
