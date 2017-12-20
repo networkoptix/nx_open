@@ -188,7 +188,6 @@ bool QnTestCamera::doStreamingFile(
 
         if (m_includePts)
         {
-qDebug() << "Included PTS:" << video->timestamp;
             qint64 ptsBigEndian = (qint64) htonll((quint64) video->timestamp);
             if (!sendAll(socket, &ptsBigEndian, sizeof(ptsBigEndian)))
                 return false;
