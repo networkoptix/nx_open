@@ -1358,7 +1358,7 @@ class SocketOptionsDefaultValue:
 public:
     SocketOptionsDefaultValue()
     {
-        addSocket();
+        this->addSocket();
     }
 
 protected:
@@ -1367,7 +1367,7 @@ protected:
         bool (SocketInterface::*getSocketOption)(SocketOption*) const)
     {
         auto value = SocketOption();
-        NX_GTEST_ASSERT_TRUE((m_sockets.front().get()->*getSocketOption)(&value));
+        NX_GTEST_ASSERT_TRUE((this->m_sockets.front().get()->*getSocketOption)(&value));
         return value;
     }
 };
