@@ -22,6 +22,8 @@
 #include "media_data_receptor.h"
 #include <nx/utils/log/log_main.h>
 
+#include <ini.h>
+
 namespace nx {
 namespace mediaserver {
 namespace metadata {
@@ -159,6 +161,16 @@ nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins
 
 void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
 {
+    if (ini().enablePersistentMetadataManager)
+    {
+        const auto itr = m_contexts.find(camera->getId());
+        if (itr != m_contexts.cend())
+        {
+            if (!itr->second.managers().empty())
+                return;
+        }
+    }
+
     for (AbstractMetadataPlugin* const plugin: availablePlugins())
     {
         nxpt::ScopedRef<AbstractMetadataPlugin> pluginGuard(plugin, /*increaseRef*/ false);
@@ -225,6 +237,9 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
 
 void ManagerPool::releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& camera)
 {
+    if (ini().enablePersistentMetadataManager)
+        return;
+
     auto& context = m_contexts[camera->getId()];
     context.clearManagers();
     context.setManagersInitialized(false);
