@@ -55,8 +55,12 @@ NX_NETWORK_API QString MACToString(const unsigned char *mac);
 NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
-// returns list of interfaces.rkjybhjdfybtr
-// Set allowItfWithoutAddress to <true> to get list with interfaces without any ip
+/**
+ * Returns list of network interfaces.
+ * @param allowItfWithoutAddress get interfaces without ipv4.
+ * @param keepAllAddressesPerInterface return several records for interfaces with multiple addresses.
+ */
+
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
 QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
     bool allowItfWithoutAddress = false,
