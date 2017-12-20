@@ -657,7 +657,8 @@ gieThread(void *arg)
         if (process_last_batch == 0)
         {
 #if 1
-            const bool needToDropFrame = !ctx->m_ptsQueue.empty()
+            const bool needToDropFrame = ini().dropFrames
+                && !ctx->m_ptsQueue.empty()
                 && ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp > microseconds(ctx->m_ptsQueue.front())
                 && ctx->m_lastInferenceDuration != microseconds::zero();
 
@@ -778,7 +779,7 @@ gieThread(void *arg)
                 for (int i = 0; i < rectList.size(); i++)
                 {
                     cv::Rect &r = rectList[i];
-                    std::cout <<"    x " << r.x << ", y " << r.y
+                    NX_OUTPUT <<"    x " << r.x << ", y " << r.y
                          << ", width " << r.width << ", height " << r.height
                          << endl;
                 }
