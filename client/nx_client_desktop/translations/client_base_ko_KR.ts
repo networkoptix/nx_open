@@ -2506,7 +2506,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>패스워드는 8 자 이상이어야하며 다른 유형의 문자를 포함해야합니다.</translation>
     </message>
   </context>
   <context>
@@ -2592,11 +2592,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>적은 설정</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>더 많은 설정</translation>
     </message>
   </context>
   <context>
@@ -3134,11 +3134,11 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>이 카메라는 패스워드를 설정해야합니다.</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
+      <translation>일부 카메라들은 암호 설정이 필요합니다.</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
@@ -4173,8 +4173,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>라이센스를 사용하여 %n 카메라 보기</numerusform>
       </translation>
     </message>
   </context>
@@ -4567,7 +4567,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>NVR 카메라는 동기화되지 않은 재생을 지원하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -4664,7 +4664,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>패스워드 설정</translation>
     </message>
   </context>
   <context>
@@ -6033,11 +6033,11 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>너무 많은 연결</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>패스워드 필요</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -6456,7 +6456,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>아카이브 무결성 문제가 감지되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -6524,11 +6524,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>시스템 시간은 인터넷과 동기화되었으며 서버의 현지 시간에 의존하지 않습니다.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>시스템 시간은 선택한 서버의 로컬 시간과 동기화되었으며 다른 서버의 로컬 시간에 의존하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -7639,15 +7639,15 @@ to %1</source>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>데이터 내보내기에 지원되지 않는 미디어.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>선택한 형식은 FFMPEG 라이브러리에서 지원되지 않습니다.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>FFMPEG 라이브러리 오류.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
@@ -7655,7 +7655,7 @@ to %1</source>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>파일 쓰기 오류.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -7843,7 +7843,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>내보내기 중지</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -7855,12 +7855,12 @@ to %1</source>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>파일을 쓸 수 없습니다.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1이 다른 내보내기에서 사용 중입니다.</translation>
     </message>
   </context>
   <context>

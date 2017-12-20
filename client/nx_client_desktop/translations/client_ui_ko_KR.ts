@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>이벤트 유형:</translation>
     </message>
   </context>
   <context>
@@ -381,7 +381,7 @@
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>설명 포함</translation>
     </message>
   </context>
   <context>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>시스템 성능에 잠재적으로 영향을 미칠 수 있다는 확신이 들지 않으면이 설정을 변경하지 마십시오.</translation>
     </message>
     <message>
       <location/>
@@ -705,17 +705,17 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>녹화 일정의 화질 및 프레임 속도 (FPS) 설정은 관련성이 없어집니다.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>초당 비트 레이트 대신 GOP 당 비트 레이트를 계산</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>카메라의 비트율을 증가합니다.</translation>
     </message>
     <message>
       <location/>
@@ -745,7 +745,7 @@
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>미디어 스트리밍</translation>
     </message>
     <message>
       <location/>
@@ -1082,7 +1082,7 @@
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>읽기 전용으로 설정</translation>
     </message>
   </context>
   <context>
@@ -1095,17 +1095,17 @@
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>필터 적용</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>회전, Dewarping, 이미지 향상 등</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>필터를 적용하고 오버레이를 추가하면 트랜스 코딩이 필요하므로 CPU 사용량이 늘어나고 상당한 시간이 걸릴 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1146,7 +1146,7 @@
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>단일 카메라</translation>
     </message>
     <message>
       <location/>
@@ -2976,7 +2976,7 @@
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>일반 텍스트 또는 HTML을 입력</translation>
     </message>
     <message>
       <location/>
