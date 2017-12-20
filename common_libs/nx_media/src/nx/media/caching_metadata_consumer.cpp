@@ -86,8 +86,6 @@ public:
             return {};
 
         const auto endIt = findMetadataIterator(endTimestamp, SearchPolicy::closestBefore);
-        if (endIt == m_metadataByTimestamp.end())
-            return {};
 
         QList<QnAbstractCompressedMetadataPtr> result;
         auto itemsLeft = maxCount;
