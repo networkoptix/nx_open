@@ -127,7 +127,10 @@ void NaiveObjectTracker::addObjectToCache(const QnUuid& id, const TegraVideo::Re
     CachedObject object;
     object.id = id;
     object.rect = boundingBox;
-    object.lifetime = ini().postprocObjectLifetime;
+    object.lifetime = isRectangleInNoCorrectionZone(boundingBox)
+        ? 1
+        : ini().postprocObjectLifetime;
+
     object.found = true;
 
     assignRandomAttributes(&object);
@@ -152,6 +155,8 @@ void NaiveObjectTracker::updateObjectInCache(const QnUuid& id, const TegraVideo:
 
     if (isNearBorder)
         cached.lifetime = ini().postprocBottomBorderLifetime;
+    else if (isRectangleInNoCorrectionZone(boundingBox))
+        cached.lifetime = 1;
     else
         cached.lifetime = ini().postprocObjectLifetime;
 }
@@ -285,7 +290,7 @@ double NaiveObjectTracker::distance(const TegraVideo::Rect& first, const TegraVi
     return rectCenterDistance - dotProduct;
 }
 
-QPointF NaiveObjectTracker::rectangleCenter(const TegraVideo::Rect& rect)
+QPointF NaiveObjectTracker::rectangleCenter(const TegraVideo::Rect& rect) const
 {
     QPointF center;
     center.setX((rect.x + bottomRightX(rect)) / 2);
@@ -379,6 +384,19 @@ QString NaiveObjectTracker::randomAttributeValue(const QString& attributeName) c
         return QString();
 
     return options[index];
+}
+
+bool NaiveObjectTracker::isRectangleInNoCorrectionZone(const TegraVideo::Rect& rect) const
+{
+    auto center = rectangleCenter(rect);
+
+    const auto alpha = (double) ini().postProcNoCorrectionAlpha / 100;
+    const auto beta = (double) ini().postProcNoCorrectionBeta / 100;
+
+    const auto x = center.x();
+    const auto y  = center.y();
+
+    return y < x * alpha + beta;
 }
 
 bool NaiveObjectTracker::isTooBig(const TegraVideo::Rect& rectangle)
