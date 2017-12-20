@@ -327,6 +327,40 @@ QString QnDbManager::getDatabaseName(const QString& baseName)
     return baseName + commonModule()->moduleGUID().toString();
 }
 
+bool QnDbManager::setMediaServersStatus(Qn::ResourceStatus status)
+{
+    QSqlQuery queryServers(m_sdb);
+    if (!prepareSQLQuery(
+        &queryServers,
+        "SELECT guid FROM vms_resource WHERE xtype_guid = ?",
+        Q_FUNC_INFO))
+    {
+        return false;
+    }
+
+    QSqlQuery updateStatusQuery(m_sdb);
+    if (!prepareSQLQuery(
+        &updateStatusQuery,
+        "INSERT OR REPLACE INTO vms_resource_status(guid, status) values (?, ?)",
+        Q_FUNC_INFO))
+    {
+        return false;
+    }
+
+    queryServers.addBindValue(m_serverTypeId.toRfc4122());
+    if (!execSQLQuery(&queryServers, Q_FUNC_INFO))
+        return false;
+    while (queryServers.next())
+    {
+        QnUuid id = QnSql::deserialized_field<QnUuid>(queryServers.value(0));
+        updateStatusQuery.addBindValue( id.toRfc4122());
+        updateStatusQuery.addBindValue((int) status);
+        if (!execSQLQuery(&updateStatusQuery, Q_FUNC_INFO))
+            return false;
+    }
+    return true;
+}
+
 bool QnDbManager::init(const QUrl& dbUrl)
 {
     NX_ASSERT(m_tranLog != nullptr);
@@ -481,16 +515,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         NX_CRITICAL(!m_adminUserID.isNull());
 
 
-        QSqlQuery queryServers(m_sdb);
-        queryServers.prepare("UPDATE vms_resource_status set status = ? WHERE guid in (select guid from vms_resource where xtype_guid = ?)"); // todo: only mserver without DB?
-        queryServers.bindValue(0, Qn::Offline);
-        queryServers.bindValue(1, m_serverTypeId.toRfc4122());
-        if (!queryServers.exec())
-        {
-            qWarning() << Q_FUNC_INFO << __LINE__ << queryServers.lastError();
-            NX_ASSERT(false);
+        if (!setMediaServersStatus(Qn::Offline))
             return false;
-        }
 
         // read license overflow time
         QSqlQuery query(m_sdb);
