@@ -257,6 +257,7 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_dbReadOnly(false),
+    m_needReparentLayouts(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
     m_timeSyncManager(nullptr),
@@ -861,6 +862,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<QnUuid, ApiDiscoveryData, ApiDiscoveryDataList>(ApiCommand::addDiscoveryInformation))
+        return false;
+
+    if (!fillTransactionLogInternal<nullptr_t, ApiServerFootageData, ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
         return false;
 
     return true;
@@ -1558,8 +1562,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/87_migrate_videowall_layouts.sql")))
     {
-        return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceQueries)
-            && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
+        m_needReparentLayouts = true;
+        return resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
     }
     if (updateName.endsWith(lit("/92_rename_recording_param_name.sql")))
         return updateBusinessActionParameters();
@@ -1572,6 +1576,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
         return ec2::db::migrateEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+    if (updateName.endsWith(lit("/96_add_layout_item_path.sql")))
+    {
+        if (m_needReparentLayouts)
+            return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceQueries);
+    }
 
     if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
         return ec2::db::cleanupClientInfoList(m_sdb);
