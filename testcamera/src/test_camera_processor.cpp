@@ -12,10 +12,12 @@ public:
 QnTestCameraProcessor::QnTestCameraProcessor(
     const QSharedPointer<AbstractStreamSocket>& socket,
     QnTcpListener* owner,
-    bool noSecondaryStream)
+    bool noSecondaryStream,
+    int fps)
     :
     QnTCPConnectionProcessor(socket, owner),
-    m_noSecondaryStream(noSecondaryStream)
+    m_noSecondaryStream(noSecondaryStream),
+    m_fps(fps)
 {
 }
 
@@ -55,13 +57,20 @@ void QnTestCameraProcessor::run()
         for (int i = 0; i < params.size(); ++ i)
         {
             QList<QByteArray> paramVal = params[i].split('=');
-            if (paramVal[0] == "primary" && paramVal.size() == 2) {
+            if (paramVal[0] == "primary" && paramVal.size() == 2)
+            {
                 if (paramVal[1] != "1")
                     isSecondary = true;
             }
             else if (paramVal[0] == "fps" && paramVal.size() == 2)
+            {
                 fps = paramVal[1].toInt();
+            }
         }
+
+        if (m_fps != -1)
+            fps = m_fps;
+
         if (!isSecondary || !m_noSecondaryStream)
             camera->startStreaming(d->socket.data(), isSecondary, fps);
     }

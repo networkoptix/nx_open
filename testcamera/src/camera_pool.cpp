@@ -128,14 +128,16 @@ QnCameraPool* QnCameraPool::instance()
 QnCameraPool::QnCameraPool(
     const QStringList& localInterfacesToListen,
     QnCommonModule* commonModule,
-    bool noSecondaryStream)
+    bool noSecondaryStream,
+    int fps)
     :
     QnTcpListener(commonModule,
         localInterfacesToListen.isEmpty()
         ? QHostAddress::Any
         : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT),
     m_cameraNum(0),
-    m_noSecondaryStream(noSecondaryStream)
+    m_noSecondaryStream(noSecondaryStream),
+    m_fps(fps)
 
 {
     m_discoveryListener = new QnCameraDiscoveryListener(localInterfacesToListen);
@@ -197,7 +199,7 @@ void QnCameraPool::addCameras(
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, this, m_noSecondaryStream);
+    return new QnTestCameraProcessor(clientSocket, this, m_noSecondaryStream, m_fps);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()
