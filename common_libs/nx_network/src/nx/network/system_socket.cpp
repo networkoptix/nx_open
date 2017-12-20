@@ -190,10 +190,15 @@ bool Socket<SocketInterfaceToImplement>::isClosed() const
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::setReuseAddrFlag(bool reuseAddr)
 {
-    int reuseAddrVal = reuseAddr;
-
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal)))
+    const int on = reuseAddr ? 1 : 0;
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
         return false;
+
+    #if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
+        if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
+            return false;
+    #endif
+
     return true;
 }
 
@@ -201,7 +206,7 @@ template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 {
     int reuseAddrVal = 0;
-    socklen_t optLen = 0;
+    socklen_t optLen = sizeof(reuseAddrVal);
 
     if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (char*)&reuseAddrVal, &optLen))
         return false;
@@ -409,15 +414,6 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     }
 
     int on = 1;
-
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
-        return false;
-
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
-        return false;
-#endif
-
     if (m_ipVersion == AF_INET6
         && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)))
     {
@@ -1859,6 +1855,7 @@ int UDPSocket::recvFrom(
 
 template class Socket<AbstractStreamServerSocket>;
 template class Socket<AbstractStreamSocket>;
+template class Socket<AbstractDatagramSocket>;
 template class CommunicatingSocket<AbstractStreamSocket>;
 template class CommunicatingSocket<AbstractDatagramSocket>;
 

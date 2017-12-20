@@ -97,8 +97,6 @@ private:
         m_server->bindToAioThread(aioThread);
         ASSERT_TRUE(m_server->setNonBlockingMode(true))
             << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(m_server->setReuseAddrFlag(true))
-            << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress))
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(m_server->listen())
@@ -375,7 +373,7 @@ protected:
                     hpm::api::ConnectionRequestedEvent event)
                 {
                     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
-            
+
                     SocketAddress address(QLatin1String(event.originatingPeerID));
                     auto acceptor = std::make_unique<FakeTcpTunnelAcceptor>(
                         network::test::AddressBinder::Manager(
@@ -782,7 +780,7 @@ protected:
         cloudServerSocket().acceptAsync(
             std::bind(&CloudServerSocketMultipleAcceptors::onAcceptCompletion, this, _1, _2));
     }
-    
+
     void whenOneAcceptorReturnsSocket()
     {
         auto acceptor = nx::utils::random::choice(m_acceptorsCreated);

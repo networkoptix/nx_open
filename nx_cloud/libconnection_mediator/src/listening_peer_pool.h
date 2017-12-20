@@ -6,6 +6,7 @@
 
 #include <nx/network/cloud/data/connection_method.h>
 #include <nx/network/stun/abstract_server_connection.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "data/listening_peer.h"
@@ -89,6 +90,7 @@ public:
     };
 
     ListeningPeerPool(const conf::ListeningPeer& settings);
+    virtual ~ListeningPeerPool();
 
     /**
      * Inserts new or returns existing element with key peerData.
@@ -113,6 +115,11 @@ private:
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
     const conf::ListeningPeer m_settings;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
+
+    void onListeningPeerConnectionClosed(
+        const MediaserverData& peerData,
+        nx::stun::AbstractServerConnection* connection);
 };
 
 } // namespace hpm

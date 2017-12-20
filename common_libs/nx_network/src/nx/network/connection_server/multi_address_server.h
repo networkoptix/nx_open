@@ -121,11 +121,13 @@ public:
             function(listener.get());
     }
 
-    template<typename ... Args>
-    void forEachListener(void(SocketServerType::*function)(Args...), Args&& ... args)
+    template<typename SocketServerRelatedType, typename ... Args>
+    void forEachListener(
+        void(SocketServerRelatedType::*function)(Args...),
+        const Args& ... args)
     {
         for (auto& listener: m_listeners)
-            (listener.get()->*function)(std::forward<Args>(args)...);
+            (listener.get()->*function)(args...);
     }
 
     virtual Statistics statistics() const override
