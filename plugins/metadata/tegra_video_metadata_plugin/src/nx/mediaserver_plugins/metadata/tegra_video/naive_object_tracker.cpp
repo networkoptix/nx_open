@@ -182,7 +182,8 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         auto& cached = item.second;
 
         bool needToApplySpeed = ini().postprocApplySpeedToCachedRectangles
-            && (cached.speed.x() < cached.speed.y() || cached.speed.isNull());
+            && (cached.speed.x() < cached.speed.y() || cached.speed.isNull())
+            && !cached.found;
 
         if (needToApplySpeed)
         {
