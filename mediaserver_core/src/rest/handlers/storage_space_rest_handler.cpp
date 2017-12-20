@@ -113,8 +113,9 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
     QnPlatformMonitor* monitor = qnPlatform->monitor();
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         monitor->totalPartitionSpaceInfo(
-        QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
-        );
+            QnPlatformMonitor::LocalDiskPartition
+            | QnPlatformMonitor::NetworkPartition
+            | QnPlatformMonitor::RemovableDiskPartition);
 
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);

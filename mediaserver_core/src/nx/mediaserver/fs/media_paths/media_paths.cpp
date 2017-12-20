@@ -7,7 +7,7 @@ namespace fs {
 namespace media_paths {
 
 struct FilterConfig;
-QStringList mediaPaths(FilterConfig filterConfig)
+QStringList get(FilterConfig filterConfig)
 {
     return impl::Filter(std::move(filterConfig)).get();
 }

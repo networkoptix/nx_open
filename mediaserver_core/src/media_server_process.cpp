@@ -542,7 +542,18 @@ static int freeGB(QString drive)
 static QStringList listRecordFolders(bool includeNetwork = false)
 {
     using namespace nx::mediaserver::fs::media_paths;
-    auto mediaPathList = mediaPaths(FilterConfig::createDefault(includeNetwork));
+
+    NetworkDrives networkDrivesFlag = includeNetwork
+        ? NetworkDrives::allowed
+        : NetworkDrives::notAllowed;
+
+    const auto settings = qnServerModule->roSettings();
+    RemovableDrives removableDrivesFlag =
+        static_cast<bool>(settings->value(nx_ms_conf::ALLOW_REMOVABLE_STORAGES).toInt())
+            ? RemovableDrives::allowed
+            : RemovableDrives::notAllowed;
+
+    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag, removableDrivesFlag));
     NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }

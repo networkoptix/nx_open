@@ -8,6 +8,18 @@ namespace mediaserver {
 namespace fs {
 namespace media_paths {
 
+enum class NetworkDrives
+{
+    allowed,
+    notAllowed
+};
+
+enum class RemovableDrives
+{
+    allowed,
+    notAllowed
+};
+
 struct FilterConfig
 {
     FilterConfig(FilterConfig&&) = default;
@@ -16,14 +28,16 @@ struct FilterConfig
 
     QList<QnPlatformMonitor::PartitionSpace> partitions;
     bool isMultipleInstancesAllowed = false;
-    bool isNetworkDrivesAllowed = false;
-    bool isRemovableDrivesAllowed = false;
+    NetworkDrives isNetworkDrivesAllowed = NetworkDrives::notAllowed;
+    RemovableDrives isRemovableDrivesAllowed = RemovableDrives::notAllowed;
     QString dataDirectory;
     QString mediaFolderName;
     QnUuid serverUuid;
     bool isWindows = false;
 
-    static FilterConfig createDefault(bool isNetworkDrivesAllowed);
+    static FilterConfig createDefault(
+        NetworkDrives isNetworkDrivesAllowed,
+        RemovableDrives isRemovableDrivesAllowed);
 };
 
 } // namespace media_paths
