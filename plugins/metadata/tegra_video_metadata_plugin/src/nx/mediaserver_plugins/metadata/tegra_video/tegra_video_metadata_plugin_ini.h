@@ -82,8 +82,8 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_INT(1, postprocDeactivationSequenceLength,
         "Frame sequence length to decide if there are no humans on the scene.");
 
-    NX_INI_INT(50, postProcNoCorrectionAlpha, "aX + b alpha coefficient.");
-    NX_INI_INT(50, postProcNoCorrectionBeta, "aX + b beta coefficient.");
+    NX_INI_INT(100, postProcNoCorrectionAlpha, "aX + b alpha coefficient.");
+    NX_INI_INT(-50, postProcNoCorrectionBeta, "aX + b beta coefficient.");
 };
 
 inline IniConfig& ini()
