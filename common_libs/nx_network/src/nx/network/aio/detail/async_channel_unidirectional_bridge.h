@@ -138,6 +138,8 @@ private:
     {
         using namespace std::placeholders;
 
+        NX_ASSERT(m_isSourceOpened);
+
         m_source->readSomeAsync(
             &m_readBuffer,
             [this](
