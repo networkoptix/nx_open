@@ -7,7 +7,7 @@ namespace nx {
 namespace mediaserver {
 namespace fs {
 namespace media_paths {
-namespace impl {
+namespace detail {
 
 namespace {
 
@@ -110,7 +110,7 @@ void Filter::appendServerGuidPostFix(QStringList* paths) const
         path = closeDirPath(path) + m_filterConfig.serverUuid.toString();
 }
 
-} // namespace impl
+} // namespace detail
 } // namespace media_paths
 } // namespace fs
 } // namespace mediaserver

@@ -7,7 +7,7 @@ namespace nx {
 namespace mediaserver {
 namespace fs {
 namespace media_paths {
-namespace impl {
+namespace detail {
 namespace test {
 
 class Filter: public ::testing::Test
@@ -240,7 +240,7 @@ TEST_F(Filter, Linux_allAllowed_noMultipleInstances)
 }
 
 } // namespace test
-} // namespace impl
+} // namespace detail
 } // namespace media_paths
 } // namespace fs
 } // namespace mediaserver

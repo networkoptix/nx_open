@@ -6,7 +6,7 @@ namespace nx {
 namespace mediaserver {
 namespace fs {
 namespace media_paths {
-namespace impl {
+namespace detail {
 
 class Filter
 {
@@ -21,7 +21,7 @@ private:
     QString amendPath(const QString& path) const;
 };
 
-} // namespace impl
+} // namespace detail
 } // namespace media_paths
 } // namespace fs
 } // namespace mediaserver

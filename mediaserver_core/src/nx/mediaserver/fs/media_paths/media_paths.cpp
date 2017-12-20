@@ -1,5 +1,5 @@
 #include "media_paths.h"
-#include "impl/media_paths_filter.h"
+#include "detail/media_paths_filter.h"
 
 namespace nx {
 namespace mediaserver {
@@ -9,7 +9,7 @@ namespace media_paths {
 struct FilterConfig;
 QStringList get(FilterConfig filterConfig)
 {
-    return impl::Filter(std::move(filterConfig)).get();
+    return detail::Filter(std::move(filterConfig)).get();
 }
 
 } // namespace media_paths
