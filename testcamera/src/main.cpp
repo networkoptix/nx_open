@@ -54,11 +54,13 @@ void showUsage(char* exeName)
 {
     qDebug() << "usage:";
     qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
-    qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
+    qDebug() << "where <cameraSetN> is semicolon-separated camera param(s):";
     qDebug() << "count=N";
     qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
     qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-    qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
+    qDebug() << "[offline=0..100] (optional, default is 0 - no offline)";
+    qDebug() << "[fps=<value>] (optional, default is 10; ATTENTION: Video file FPS is ignored)";
+    qDebug() << "[primary=0|1] (optional, default is 0)";
     qDebug() << "";
     qDebug() << "example:";
     QString str = QFileInfo(exeName).baseName() + QString(" files=\"c:/test.264\";count=20");
