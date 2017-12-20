@@ -215,8 +215,9 @@ private:
 };
 
 /**
- * LeftChannel and RightChannel types must be at least movable.
- * That allows them to be std::unique_ptr<Something>.
+ * LeftChannel and RightChannel types must meet the requirements of MoveConstructible
+ * and support AbstractAsyncChannel API.
+ * NOTE: LeftChannel and RightChannel are allowed to be std::unique_ptr<...>.
  */
 template<typename LeftChannel, typename RightChannel>
 std::unique_ptr<AsyncChannelBridgeImpl<LeftChannel, RightChannel>>
