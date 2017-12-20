@@ -299,7 +299,19 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     }
 
     if (result)
-        qnServerDb->saveActionToDB(action);
+    {
+        // Check whether we need to save this action to DB
+        //const vms::event::EventParameters& eventParameters = action->getRuntimeParams();
+        //bool omitLogging = eventParameters.omitDbLogging && eventParameters.eventType == vms::event::EventType::softwareTriggerEvent;
+        if (!shouldOmitActionLogging(action))
+        {
+            qnServerDb->saveActionToDB(action);
+        }
+        else
+        {
+            NX_DEBUG(this, "Omitted event logging at executeActionInternal");
+        }
+    }
 
     return result;
 }

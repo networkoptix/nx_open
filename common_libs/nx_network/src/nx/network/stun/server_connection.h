@@ -27,12 +27,11 @@ class NX_NETWORK_API ServerConnection:
     public std::enable_shared_from_this<ServerConnection>
 {
 public:
-    typedef nx::network::server::BaseStreamProtocolConnection<
+    using base_type = nx::network::server::BaseStreamProtocolConnection<
         ServerConnection,
         Message,
         MessageParser,
-        MessageSerializer
-    > BaseType;
+        MessageSerializer>;
 
     ServerConnection(
         nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
@@ -48,6 +47,7 @@ public:
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
+    virtual void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value) override;
 
     void setDestructHandler(std::function< void() > handler = nullptr);
 

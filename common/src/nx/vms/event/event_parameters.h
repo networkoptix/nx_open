@@ -85,6 +85,12 @@ struct EventParameters
      */
     EventMetaData metadata;
 
+    /**
+     * Flag allows to omit event logging to DB on the server.
+     * This event still triggers user notifications
+     */
+    bool omitDbLogging;
+
     // TODO: #GDM #vkutin #rvasilenko think about implementing something like std::variant here.
     QnUuid analyticsEventId() const;
     void setAnalyticsEventId(const QnUuid& id);
@@ -97,7 +103,7 @@ struct EventParameters
 
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 bool checkForKeywords(const QString& value, const QString& keywords);

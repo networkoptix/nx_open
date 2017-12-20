@@ -186,6 +186,7 @@ function(nx_get_dependencies)
         nx_rdep_add_package(festival)
         nx_rdep_add_package(any/festival-vox-${festival_version}
             PATH_VARIABLE festival_vox_directory)
+        nx_expose_to_parent_scope(festival_vox_directory)
     endif()
 
     if(ANDROID OR IOS)

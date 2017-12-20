@@ -66,6 +66,8 @@ void showUsage(char* exeName)
     qDebug() << "\n[options]: ";
     qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
     qDebug() << "-S, --camera-for-file      Run separate camera for each primary file, count parameter must be empty or 0";
+    qDebug() << "--pts                      Include original PTS into the stream";
+    qDebug() << "--no-secondary             Do not stream the secondary stream";
 }
 
 
@@ -100,6 +102,8 @@ int main(int argc, char *argv[])
 
 
     bool cameraForEachFile = false;
+    bool includePts = false;
+    bool noSecondaryStream = false;
     QStringList localInterfacesToListen;
     for( int i = 1; i < argc; ++i )
     {
@@ -115,15 +119,25 @@ int main(int argc, char *argv[])
             if( i >= argc )
                 continue;
             localInterfacesToListen.push_back( QString(argv[i]) );
-        }else if( param =="--camera-for-file" || param == "-S" )
+        }
+        else if( param == "--camera-for-file" || param == "-S" )
         {
             cameraForEachFile = true;
+        }
+        else if( param == "--no-secondary" )
+        {
+            noSecondaryStream = true;
+        }
+        else if( param == "--pts" )
+        {
+            includePts = true;
         }
     }
 
     std::unique_ptr<QnCommonModule> commonModule(
         new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
-    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, commonModule.get()));
+    QnCameraPool::initGlobalInstance(new QnCameraPool(
+        localInterfacesToListen, commonModule.get(), noSecondaryStream));
     QnCameraPool::instance()->start();
     for (int i = 1; i < argc; ++i)
     {
@@ -190,7 +204,8 @@ int main(int argc, char *argv[])
         if (secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
-        QnCameraPool::instance()->addCameras(cameraForEachFile, count, primaryFiles, secondaryFiles, offlineFreq);
+        QnCameraPool::instance()->addCameras(
+            cameraForEachFile, includePts, count, primaryFiles, secondaryFiles, offlineFreq);
     }
 
     int appResult = app.exec();

@@ -42,6 +42,7 @@ private:
     int m_index = 0;
 };
 
+// TODO: #mike: Rename to Generic*.
 class CommonEventsMetadataPacket:
     public CommonMetadataPacketBase<AbstractEventMetadataPacket, AbstractDetectedEvent>
 {
@@ -49,6 +50,7 @@ class CommonEventsMetadataPacket:
 
 };
 
+// TODO: #mike: Rename to Generic*.
 class CommonObjectsMetadataPacket:
     public CommonMetadataPacketBase<AbstractObjectsMetadataPacket, AbstractDetectedObject>
 {

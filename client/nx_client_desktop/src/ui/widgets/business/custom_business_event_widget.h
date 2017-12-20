@@ -21,6 +21,7 @@ public:
 
 protected slots:
     virtual void at_model_dataChanged(Fields fields) override;
+    void setOmitLogging(bool state);
 private slots:
     void paramsChanged();
 

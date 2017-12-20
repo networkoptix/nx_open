@@ -170,7 +170,8 @@ void BookmarkSearchListModel::Private::clipToSelectedTimePeriod()
     const auto itemCleanup =
         [this](const QnCameraBookmark& item) { m_guidToTimestampMs.remove(item.guid); };
 
-    clipToTimePeriod(m_data, upperBoundPredicate, selectedTimePeriod(), itemCleanup);
+    clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicate)>(
+        m_data, upperBoundPredicate, selectedTimePeriod(), itemCleanup);
 }
 
 bool BookmarkSearchListModel::Private::hasAccessRights() const

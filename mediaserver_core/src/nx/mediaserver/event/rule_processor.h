@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <QtCore/QTimer>
@@ -106,6 +107,10 @@ public:
 
     bool broadcastAction(const vms::event::AbstractActionPtr& action);
 
+    /*
+     * Get pointer to rule, that catched provided action
+     */
+    vms::event::RulePtr getRuleForAction(const vms::event::AbstractActionPtr& action) const;
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it.
@@ -143,7 +148,9 @@ private slots:
 
 protected:
     bool containsResource(const QnResourceList& resList, const QnUuid& resId) const;
-    vms::event::AbstractActionList matchActions(const vms::event::AbstractEventPtr& event);
+
+    typedef std::list<std::pair<vms::event::RulePtr, vms::event::AbstractActionPtr> > EventActions;
+    EventActions matchActions(const vms::event::AbstractEventPtr& event);
 
     /*
     * Some actions can be executed on server only.
@@ -155,6 +162,11 @@ protected:
     void terminateRunningRule(const vms::event::RulePtr& rule);
 
     bool fixActionTimeFields(const vms::event::AbstractActionPtr& action);
+
+    // Check if we should omit this action from mentioning in DB
+    // @param action - action to check
+    // @param rule - rule that triggered this action
+    bool shouldOmitActionLogging(const vms::event::AbstractActionPtr& action) const;
 
 private:
     void at_ruleAddedOrUpdated_impl(const vms::event::RulePtr& rule);
@@ -202,7 +214,7 @@ private:
      * @brief match resources between event and rule.
      * @return false if business rule isn't match to a source event
      */
-    bool checkEventCondition(const vms::event::AbstractEventPtr& event, const vms::event::RulePtr& rule);
+    bool checkEventCondition(const vms::event::AbstractEventPtr& event, const vms::event::RulePtr& rule) const;
 
     QMap<QString, ProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, QSet<QnUuid>> m_actionInProgress;               // remove duplicates for long actions

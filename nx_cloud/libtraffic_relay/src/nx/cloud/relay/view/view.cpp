@@ -83,6 +83,21 @@ void View::registerStatisticsApiHandlers(
 
 void View::start()
 {
+    using namespace std::chrono;
+
+    const auto httpConnectionInactivityTimeout =
+        m_settings.http().connectionInactivityTimeout;
+    if (httpConnectionInactivityTimeout)
+    {
+        m_multiAddressHttpServer->forEachListener(
+            [&httpConnectionInactivityTimeout](
+                nx_http::HttpStreamSocketServer* listener)
+            {
+                listener->setConnectionInactivityTimeout(
+                    duration_cast<milliseconds>(*httpConnectionInactivityTimeout));
+            });
+    }
+
     if (!m_multiAddressHttpServer->listen(m_settings.http().tcpBacklogSize))
     {
         throw std::runtime_error(

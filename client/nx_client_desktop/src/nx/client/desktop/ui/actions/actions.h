@@ -653,6 +653,11 @@ enum IDType
     ServerAddCameraManuallyAction,
 
     /**
+     * Opens manual device addition dialog.
+     */
+    AddDeviceManuallyAction,
+
+    /**
      * Opens camera list by server
      */
     CameraListByServerAction,

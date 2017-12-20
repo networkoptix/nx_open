@@ -26,6 +26,7 @@ struct TegraVideoIniConfig: public nx::kit::IniConfig
     NX_INI_INT(2, stubNumberOfRectangles, "Number of test rectangles.");
     NX_INI_INT(20, stubRectangleWidth, "Width of test rectangles (should be divided by 100).");
     NX_INI_INT(20, stubRectangleHeight, "Height of test rectangles (should be divided by 100).");
+    NX_INI_INT(1, stubMetadataFrequency, "Output metadata for each nth frame.");
 };
 
 inline TegraVideoIniConfig& ini()

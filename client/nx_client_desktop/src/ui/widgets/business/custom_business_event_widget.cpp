@@ -33,6 +33,8 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
     const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
     const QString documentationHint = tr("To generate Generic Event, please refer to %1.").arg(link);
 
+    connect(ui->omitLogging, SIGNAL(toggled(bool)), this, SLOT(setOmitLogging(bool)));
+
     ui->hintLabel->setTextFormat(Qt::RichText);
     ui->hintLabel->setText(lit("%1<hr/>%2").arg(description, documentationHint));
     connect(ui->hintLabel,  &QnWordWrappedLabel::linkActivated, this,
@@ -58,7 +60,8 @@ void QnCustomBusinessEventWidget::updateTabOrder(QWidget* before, QWidget* after
     setTabOrder(before, ui->deviceNameEdit);
     setTabOrder(ui->deviceNameEdit, ui->captionEdit);
     setTabOrder(ui->captionEdit, ui->descriptionEdit);
-    setTabOrder(ui->descriptionEdit, after);
+    setTabOrder(ui->descriptionEdit, ui->omitLogging);
+    setTabOrder(ui->omitLogging, after);
 }
 
 void QnCustomBusinessEventWidget::at_model_dataChanged(Fields fields)
@@ -75,18 +78,28 @@ void QnCustomBusinessEventWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventParams))
     {
-        QString resName = model()->eventParams().resourceName;
+        const nx::vms::event::EventParameters & params = model()->eventParams();
+        QString resName = params.resourceName;
         if (ui->deviceNameEdit->text() != resName)
             ui->deviceNameEdit->setText(resName);
 
-        QString caption = model()->eventParams().caption;
+        QString caption = params.caption;
         if (ui->captionEdit->text() != caption)
             ui->captionEdit->setText(caption);
 
-        QString description = model()->eventParams().description;
+        QString description = params.description;
         if (ui->descriptionEdit->text() != description)
             ui->descriptionEdit->setText(description);
+
+        bool omitLogging = params.omitDbLogging;
+        if (ui->omitLogging->isChecked() != omitLogging)
+            ui->omitLogging->setChecked(omitLogging);
     }
+}
+
+void QnCustomBusinessEventWidget::setOmitLogging(bool state)
+{
+    emit paramsChanged();
 }
 
 void QnCustomBusinessEventWidget::paramsChanged()
@@ -98,5 +111,6 @@ void QnCustomBusinessEventWidget::paramsChanged()
     eventParams.resourceName = ui->deviceNameEdit->text();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
+    eventParams.omitDbLogging = ui->omitLogging->isChecked();
     model()->setEventParams(eventParams);
 }

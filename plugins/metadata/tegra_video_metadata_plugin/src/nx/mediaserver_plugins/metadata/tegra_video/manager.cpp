@@ -256,32 +256,11 @@ bool Manager::makeMetadataPacketsFromRectsPostprocCar(
     const std::vector<TegraVideo::Rect>& rects,
     int64_t ptsUs) const
 {
-    // TODO: #dmishin: STUB
-
-    // Create metadata Objects directly from the rects; create no events.
-
     auto objectPacket = new CommonObjectsMetadataPacket();
     objectPacket->setTimestampUsec(ptsUs);
     objectPacket->setDurationUsec(1000000LL * 10); //< TODO: #mike: Ask #rvasilenko.
 
     m_tracker.filterAndTrack(metadataPackets, rects, ptsUs);
-
-#if 0 //< Stub implementation.
-    for (const auto& rect: rects)
-    {
-        auto detectedObject = new CommonDetectedObject();
-        // TODO: #mike: Make new GUID for every object.
-        static const nxpl::NX_GUID objectId =
-            {{0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1}};
-
-        detectedObject->setId(objectId);
-        detectedObject->setTypeId(m_objectTypeId);
-
-        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
-        objectPacket->addItem(detectedObject);
-    }
-    metadataPackets->push_back(objectPacket);
-#endif // 0
 
     return true;
 }

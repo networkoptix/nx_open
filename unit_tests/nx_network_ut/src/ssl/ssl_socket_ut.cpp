@@ -341,7 +341,7 @@ public:
     }
 };
 
-TEST_F(SslSocketVerifySslIsActuallyUsedByAsyncIo, read_write)
+TEST_F(SslSocketVerifySslIsActuallyUsedByAsyncIo, DISABLED_read_write)
 {
     givenEstablishedConnection();
     whenSentRandomData();
@@ -361,7 +361,7 @@ public:
     }
 };
 
-TEST_F(SslSocketVerifySslIsActuallyUsedBySyncIo, read_write)
+TEST_F(SslSocketVerifySslIsActuallyUsedBySyncIo, DISABLED_read_write)
 {
     givenEstablishedConnection();
     whenSentRandomData();
@@ -397,7 +397,7 @@ protected:
     }
 };
 
-TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
+TEST_F(SslSocketSwitchIoMode, DISABLED_from_async_to_sync)
 {
     givenEstablishedConnection();
 
@@ -406,10 +406,10 @@ TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
     exchangeDataInSyncMode();
 }
 
-TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
+TEST_F(SslSocketSwitchIoMode, DISABLED_from_sync_to_async)
 {
     givenEstablishedConnection();
-    
+
     exchangeDataInSyncMode();
     changeSocketIoMode();
     exchangeDataInAsyncMode();

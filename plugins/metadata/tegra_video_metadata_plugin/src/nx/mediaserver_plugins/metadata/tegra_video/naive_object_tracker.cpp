@@ -192,7 +192,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
 
             cached.rect = applySpeedToRectangle(cached.rect, speed);
 
-            NX_PRINT << "(addNonExpiredObjects) "
+            NX_OUTPUT << "(addNonExpiredObjects) "
                 << cached.id.toString().toStdString() << " ("
                 << cached.rect.x << " "
                 << cached.rect.y << ") ("

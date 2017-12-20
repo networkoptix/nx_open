@@ -6,20 +6,16 @@
 class QnTestCameraProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
-
-    QnTestCameraProcessorPrivate():
-      QnTCPConnectionProcessorPrivate()
-      {
-
-      }
+    using QnTCPConnectionProcessorPrivate::QnTCPConnectionProcessorPrivate;
 };
 
 QnTestCameraProcessor::QnTestCameraProcessor(
     const QSharedPointer<AbstractStreamSocket>& socket,
-    QnTcpListener* owner)
-:
-    QnTCPConnectionProcessor(socket, owner)
+    QnTcpListener* owner,
+    bool noSecondaryStream)
+    :
+    QnTCPConnectionProcessor(socket, owner),
+    m_noSecondaryStream(noSecondaryStream)
 {
 }
 
@@ -66,6 +62,7 @@ void QnTestCameraProcessor::run()
             else if (paramVal[0] == "fps" && paramVal.size() == 2)
                 fps = paramVal[1].toInt();
         }
-        camera->startStreaming(d->socket.data(), isSecondary, fps);
+        if (!isSecondary || !m_noSecondaryStream)
+            camera->startStreaming(d->socket.data(), isSecondary, fps);
     }
 }

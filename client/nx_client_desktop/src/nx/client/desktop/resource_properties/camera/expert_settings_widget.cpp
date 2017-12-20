@@ -98,7 +98,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
     ui->iconLabel->setScaledContents(true);
 
-    static const auto styleTemplateRaw = lit(R"(.QWidget {
+    static const auto styleTemplateRaw = QString::fromLatin1(R"(.QWidget {
         border-style: solid;
         border-color: %1;
         border-width: 1px;

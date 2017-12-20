@@ -1334,6 +1334,17 @@ void initialize(Manager* manager, Action* root)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
+    factory(AddDeviceManuallyAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Add Device (new)..."))   //intentionally hardcode devices here
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+            && ConditionWrapper(new EdgeServerCondition(false))
+            && !ConditionWrapper(new FakeServerCondition(true))
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(QnDeviceDependentStrings::getDefaultNameFromSet(

@@ -30,17 +30,12 @@ struct General
 
 struct CloudDb
 {
-    bool runWithCloud;
+    bool runWithCloud = true;
     boost::optional<nx::utils::Url> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval{0};
     std::chrono::seconds startTimeout{0};
-
-    CloudDb():
-        runWithCloud(true)
-    {
-    }
 };
 
 struct Stun
@@ -59,17 +54,17 @@ struct Http
 
 struct Statistics
 {
-    bool enabled;
-
-    Statistics():
-        enabled(true)
-    {
-    }
+    bool enabled = true;
 };
 
 struct TrafficRelay
 {
     QString url;
+};
+
+struct ListeningPeer
+{
+    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 /**
@@ -108,6 +103,7 @@ public:
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
     const nx::cloud::discovery::conf::Discovery& discovery() const;
+    const ListeningPeer& listeningPeer() const;
 
 private:
     General m_general;
@@ -120,6 +116,7 @@ private:
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
     nx::cloud::discovery::conf::Discovery m_discovery;
+    ListeningPeer m_listeningPeer;
 
     virtual void loadSettings() override;
 
@@ -129,6 +126,7 @@ private:
         std::list<SocketAddress>* const addrToListenList);
     void loadConnectionParameters();
     void loadTrafficRelay();
+    void loadListeningPeer();
 };
 
 } // namespace conf

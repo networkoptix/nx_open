@@ -91,9 +91,6 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     });
 
     m_dataReceptorMultiplexer.reset(new DataCopier());
-
-    auto pool = qnServerModule->metadataManagerPool();
-    m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
@@ -102,6 +99,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
             qnServerModule->analyticsEventsStorage()));
     m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
 
+    auto pool = qnServerModule->metadataManagerPool();
     pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
 }
 
@@ -141,6 +139,16 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     {
         mtx.unlock();
         pleaseReopenStream();
+    }
+
+    const auto roleForAnalytics = ini().analyzeSecondaryStream
+        ? Qn::ConnectionRole::CR_SecondaryLiveVideo
+        : Qn::ConnectionRole::CR_LiveVideo;
+
+    if (role == roleForAnalytics)
+    {
+        auto pool = qnServerModule->metadataManagerPool();
+        m_videoDataReceptor = pool->mediaDataReceptor(m_cameraRes->getId());
     }
 }
 
@@ -354,10 +362,16 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     if (ini().enableMetadataProcessing)
     {
-        const bool needAnalyzeFrame = !ini().analyzeKeyFramesOnly
+        const bool needToAnalyzeFrame = !ini().analyzeKeyFramesOnly
             || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
 
-        if (needAnalyzeFrame)
+        const auto roleForAnalytics = ini().analyzeSecondaryStream
+            ? Qn::ConnectionRole::CR_SecondaryLiveVideo
+            : Qn::ConnectionRole::CR_LiveVideo;
+
+        const bool needToAnalyzeStream = roleForAnalytics == getRole();
+
+        if (needToAnalyzeFrame && needToAnalyzeStream)
         {
             auto receptor = m_videoDataReceptor.toStrongRef();
             if (receptor && receptor->canAcceptData())

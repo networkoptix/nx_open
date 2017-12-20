@@ -184,6 +184,7 @@
 #include <core/resource/fake_media_server.h>
 
 #include <nx/client/desktop/ui/main_window.h>
+#include <nx/client/desktop/ui/dialogs/device_addition_dialog.h>
 
 using nx::client::core::Geometry;
 
@@ -312,6 +313,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::ExitAction), &QAction::triggered, this, &ActionHandler::closeApplication);
     connect(action(action::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(action::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
+
+    connect(action(action::AddDeviceManuallyAction), &QAction::triggered,
+        this, &ActionHandler::at_addDeviceManually_triggered);
 
     connect(action(action::ConvertCameraToEntropix), &QAction::triggered,
         this, &ActionHandler::at_convertCameraToEntropix_triggered);
@@ -1893,6 +1897,20 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
         }
         dialog->setServer(server);
     }
+}
+
+
+void ActionHandler::at_addDeviceManually_triggered()
+{
+    const auto params = menu()->currentParameters(sender());
+    const auto server = params.resource().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    QnNonModalDialogConstructor<DeviceAdditionDialog> dialogContructor(
+        m_deviceAdditionDialog, mainWindowWidget());
+
+    m_deviceAdditionDialog->setServer(server);
 }
 
 void ActionHandler::at_serverLogsAction_triggered()

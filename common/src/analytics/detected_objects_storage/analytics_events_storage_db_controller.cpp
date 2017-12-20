@@ -13,6 +13,7 @@ DbController::DbController(
 {
     dbStructureUpdater().addUpdateScript(kCreateAnalyticsEventsSchema);
     dbStructureUpdater().addUpdateScript(kAnalyticsDbMoreIndexes);
+    dbStructureUpdater().addUpdateScript(kAnalyticsDbEvenMoreIndexes);
 }
 
 } // namespace storage

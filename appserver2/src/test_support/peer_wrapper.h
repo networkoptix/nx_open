@@ -16,7 +16,24 @@
 namespace ec2 {
 namespace test {
 
-class MediaServerClientEx;
+// TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient.
+// Though, it requires some refactoring: moving ec2::ApiTransactionDataList out of appserver2.
+class MediaServerClientEx:
+    public MediaServerClient
+{
+    using base_type = MediaServerClient;
+
+public:
+    MediaServerClientEx(const nx::utils::Url& baseRequestUrl);
+
+    void ec2GetTransactionLog(
+        const ApiTranLogFilter& filter,
+        std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)> completionHandler);
+
+    ec2::ErrorCode ec2GetTransactionLog(
+        const ApiTranLogFilter& filter,
+        ec2::ApiTransactionDataList* result);
+};
 
 class PeerWrapper
 {
@@ -49,7 +66,7 @@ public:
 
     nx::hpm::api::SystemCredentials getCloudCredentials() const;
 
-    std::unique_ptr<MediaServerClient> mediaServerClient() const;
+    std::unique_ptr<MediaServerClientEx> mediaServerClient() const;
 
     nx::utils::test::ModuleLauncher<Appserver2ProcessPublic>& process();
 

@@ -70,8 +70,21 @@ public:
         NX_OUTPUT << __func__ << "(data, dataSize: " << compressedFrame->dataSize
             << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
 
-        m_hasMetadata = true;
-        m_ptsUs = compressedFrame->ptsUs;
+        ++m_currentFrameIndex;
+        if (ini().stubMetadataFrequency)
+        {
+            if (m_currentFrameIndex % ini().stubMetadataFrequency == 0)
+            {
+                m_hasMetadata = true;
+                m_ptsUs = compressedFrame->ptsUs;
+            }
+        }   
+        else
+        {
+            m_hasMetadata = true;
+            m_ptsUs = compressedFrame->ptsUs;
+        }
+
         return true;
     }
 
@@ -83,7 +96,7 @@ public:
         *outPtsUs = m_ptsUs;
         makeRectangles(outRects, maxRectsCount, outRectsCount);
         m_hasMetadata = false;
-
+        
         return true;
     }
 
@@ -113,11 +126,13 @@ private:
         const auto width = (float)ini().stubRectangleWidth / 100;
         const auto height = (float)ini().stubRectangleWidth / 100;
         const auto rectangleCount = std::min(ini().stubNumberOfRectangles, maxRectsCount);
+        const int frequencyCoefficient = ini().stubMetadataFrequency ? ini().stubMetadataFrequency : 1;
+
 
         for (int i = 0; i < rectangleCount; ++i)
         {
             auto& center = m_currentRectangleCenters[i];
-            center.y += 0.02;
+            center.y += 0.02 * frequencyCoefficient;
             if (center.y > 1)
                 center.y = 0;
 
@@ -151,6 +166,7 @@ private:
     int m_netHeight = 0;
 
     bool m_hasMetadata = false;
+    int m_currentFrameIndex = 0;
 
     std::vector<PointF> m_currentRectangleCenters;
 };

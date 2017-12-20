@@ -14,7 +14,13 @@ public:
 
     virtual common::metadata::DetectionMetadataPacketPtr metadata(
         qint64 timestamp,
-        int channel) override;
+        int channel) const override;
+
+    virtual QList<common::metadata::DetectionMetadataPacketPtr> metadataRange(
+        qint64 startTimestamp,
+        qint64 endTimestamp,
+        int channel,
+        int maximumCount = -1) const override;
 
 private:
     class Private;
