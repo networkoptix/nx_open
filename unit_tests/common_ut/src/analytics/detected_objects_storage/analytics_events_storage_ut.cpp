@@ -106,10 +106,7 @@ protected:
             objects.begin(), objects.end(),
             [&filter](const DetectedObject& left, const DetectedObject& right)
             {
-                if (filter.sortOrder == Qt::SortOrder::AscendingOrder)
-                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
-                else
-                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
+                return left.track.front().timestampUsec > right.track.front().timestampUsec;
             });
 
         andLookupResultEquals(filterObjects(objects, filter));
