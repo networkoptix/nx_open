@@ -41,14 +41,12 @@ public:
     const MultiHttpServer& httpServer() const;
 
 private:
-    using MultiHttpServerPtr = std::unique_ptr<MultiHttpServer>;
-
     const conf::Settings& m_settings;
     Controller* m_controller;
     nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx_http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
-    MultiHttpServerPtr m_multiAddressHttpServer;
+    std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();

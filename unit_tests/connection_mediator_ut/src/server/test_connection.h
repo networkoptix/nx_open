@@ -26,7 +26,8 @@ template<> struct SocketTypeToProtocolType<nx::network::UDPSocket>
 
 template<typename Socket>
 class TestConnection:
-    public stun::AbstractServerConnection
+    public stun::AbstractServerConnection,
+    public nx::network::aio::BasicPollable
 {
 public:
     virtual void sendMessage(
@@ -46,8 +47,9 @@ public:
     }
 
     virtual void addOnConnectionCloseHandler(
-        nx::utils::MoveOnlyFunc<void()> /*handler*/) override
+        nx::utils::MoveOnlyFunc<void()> handler) override
     {
+        m_connectionCloseHandler.swap(handler);
     }
 
     virtual AbstractCommunicatingSocket* socket() override
@@ -70,9 +72,20 @@ public:
         return m_inactivityTimeout;
     }
 
+    void reportConnectionClosure()
+    {
+        post(
+            [this]()
+            {
+                if (m_connectionCloseHandler)
+                    nx::utils::swapAndCall(m_connectionCloseHandler);
+            });
+    }
+
 private:
     Socket m_socket;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    nx::utils::MoveOnlyFunc<void()> m_connectionCloseHandler;
 };
 
 } // namespace test
