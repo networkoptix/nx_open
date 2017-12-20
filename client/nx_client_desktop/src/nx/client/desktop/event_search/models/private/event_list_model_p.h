@@ -61,6 +61,6 @@ private:
     qint64 m_nextBackNumber = -1;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

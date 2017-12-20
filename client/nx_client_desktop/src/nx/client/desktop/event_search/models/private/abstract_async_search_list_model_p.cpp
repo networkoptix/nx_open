@@ -128,6 +128,6 @@ QnTimePeriod AbstractAsyncSearchListModel::Private::fetchedTimePeriod() const
         : QnTimePeriod::fromInterval(m_earliestTimeMs, m_selectedTimePeriod.endTimeMs());
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

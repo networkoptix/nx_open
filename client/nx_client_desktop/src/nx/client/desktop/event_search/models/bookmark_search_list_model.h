@@ -19,6 +19,6 @@ private:
     class Private;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

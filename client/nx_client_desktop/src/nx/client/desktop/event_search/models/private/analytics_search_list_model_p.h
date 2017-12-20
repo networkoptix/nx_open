@@ -89,6 +89,6 @@ private:
     QHash<QnUuid, qint64> m_objectIdToTimestampUs;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

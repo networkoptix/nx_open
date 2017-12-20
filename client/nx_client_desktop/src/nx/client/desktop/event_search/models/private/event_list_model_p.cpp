@@ -167,6 +167,6 @@ QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const Eve
         });
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

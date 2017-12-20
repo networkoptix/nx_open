@@ -10,6 +10,6 @@ BookmarkSearchListModel::BookmarkSearchListModel(QObject* parent):
 {
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

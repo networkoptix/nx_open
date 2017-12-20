@@ -58,6 +58,6 @@ private:
     bool m_success = true;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

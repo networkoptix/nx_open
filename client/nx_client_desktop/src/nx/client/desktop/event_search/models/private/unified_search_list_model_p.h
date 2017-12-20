@@ -73,6 +73,6 @@ private:
     bool m_queuedFetchMore = false;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

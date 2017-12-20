@@ -92,6 +92,6 @@ void MotionSearchListModel::fetchMore(const QModelIndex& /*parent*/)
     d->fetchMore();
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

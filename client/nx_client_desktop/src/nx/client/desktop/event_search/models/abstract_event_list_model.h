@@ -35,6 +35,6 @@ public:
     static QString debugTimestampToString(qint64 timestampMs);
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

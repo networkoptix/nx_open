@@ -27,6 +27,6 @@ private:
     Private* const d = nullptr;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

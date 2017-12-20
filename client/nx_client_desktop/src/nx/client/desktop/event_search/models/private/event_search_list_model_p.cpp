@@ -464,6 +464,6 @@ bool EventSearchListModel::Private::hasPreview(vms::event::EventType eventType)
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

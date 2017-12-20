@@ -287,6 +287,6 @@ QColor BookmarkSearchListModel::Private::color()
     return QPalette().color(QPalette::LinkVisited);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

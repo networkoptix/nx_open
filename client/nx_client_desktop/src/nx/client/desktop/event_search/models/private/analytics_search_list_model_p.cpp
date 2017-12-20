@@ -591,6 +591,6 @@ qint64 AnalyticsSearchListModel::Private::startTimeMs(
         std::chrono::microseconds(object.firstAppearanceTimeUsec)).count();
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

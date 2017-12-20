@@ -83,6 +83,6 @@ QString AbstractEventListModel::debugTimestampToString(qint64 timestampMs)
         : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

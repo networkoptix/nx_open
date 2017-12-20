@@ -114,6 +114,6 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
     return true;
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

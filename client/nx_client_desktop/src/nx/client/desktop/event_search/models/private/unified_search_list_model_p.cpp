@@ -228,6 +228,6 @@ void UnifiedSearchListModel::Private::ensureFetchMore()
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx
