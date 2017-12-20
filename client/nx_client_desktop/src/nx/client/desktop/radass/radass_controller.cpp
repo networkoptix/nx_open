@@ -534,8 +534,7 @@ struct RadassController::Private
         if (!lastAutoSwitchTimer.hasExpired(kQualitySwitchIntervalMs))
         {
             trace("Quality switch was less than 5 seconds ago, leaving as is.", consumer);
-            if (!consumer->awaitingLqTime.isValid())
-                consumer->awaitingLqTime.restart();
+            consumer->awaitingLqTime.restart();
             return;
         }
 
