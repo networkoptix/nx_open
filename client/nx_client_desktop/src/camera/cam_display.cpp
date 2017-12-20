@@ -449,7 +449,9 @@ bool QnCamDisplay::fillDataQueue()
 
     const auto requiredBufferLength = nx::client::desktop::ini().forcedVideoBufferLengthUs
         + nx::client::desktop::ini().additionalVideoBufferLengthUs;
-    while (!needToStop() && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLength)
+    while (!needToStop()
+        && m_lastQueuedVideoTime >= m_lastVideoPacketTime
+        && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLength)
     {
         if (m_dataQueue.size() == m_dataQueue.maxSize())
             m_dataQueue.setMaxSize(m_dataQueue.maxSize() * 2);
@@ -464,7 +466,7 @@ bool QnCamDisplay::fillDataQueue()
         m_delay.terminatedSleep(sleepTime, maxSleepTime);
     }
 
-    return true;
+    return m_lastQueuedVideoTime >= m_lastVideoPacketTime;
 }
 
 bool QnCamDisplay::isDataQueueFilled() const
