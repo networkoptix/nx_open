@@ -701,6 +701,7 @@ namespace detail
 
         QString getDatabaseName(const QString& baseName);
         bool rebuildUserAccessRightsTransactions();
+        bool setMediaServersStatus(Qn::ResourceStatus status);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
