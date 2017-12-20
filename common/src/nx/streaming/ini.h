@@ -9,6 +9,8 @@ struct NxStreamingIniConfig: public nx::kit::IniConfig
 
     NX_INI_STRING("", analyticsMetadataLogFilePrefix,
         "If not empty, metadata will be logged to this file.");
+
+    NX_INI_FLAG(0, disableTimeCorrection, "Disable correcting bad-looking frame timestamps.");
 };
 
 inline NxStreamingIniConfig& nxStreamingIni()
