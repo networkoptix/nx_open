@@ -19,6 +19,7 @@ public:
     Qn::StreamQuality getStreamQuality() const;
     int getDurationSec() const;
     int getRecordAfterSec() const;
+    int getRecordBeforeSec() const;
 };
 
 } // namespace event
