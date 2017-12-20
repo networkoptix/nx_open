@@ -236,8 +236,8 @@ TegraVideo::Rect NaiveObjectTracker::applySpeedToRectangle(
     result.x = std::max(std::min(result.x + xOffset, 1.0f), 0.0f);
     result.y = std::max(std::min(result.y + yOffset, 1.0f), 0.0f);
 
-    result.width = std::min(result.width, 1.0f - result.x);
-    result.height = std::min(result.height, 1.0f - result.y);
+    result.w = std::min(result.w, 1.0f - result.x);
+    result.h = std::min(result.h, 1.0f - result.y);
 
     return result;
 }
@@ -385,10 +385,10 @@ bool NaiveObjectTracker::isTooBig(const TegraVideo::Rect& rectangle)
 {
     return
         (ini().postprocMaxObjectWidth != 0
-            && rectangle.width > (float) ini().postprocMaxObjectWidth / 100
+            && rectangle.w > (float) ini().postprocMaxObjectWidth / 100
         ) ||
         (ini().postprocMaxObjectHeight != 0
-            && rectangle.height > (float) ini().postprocMaxObjectHeight / 100
+            && rectangle.h > (float) ini().postprocMaxObjectHeight / 100
         );
 }
 
@@ -396,26 +396,26 @@ bool NaiveObjectTracker::isTooSmall(const TegraVideo::Rect& rectangle)
 {
     return
         (ini().postprocMinObjectWidth != 0
-            && rectangle.width < (float) ini().postprocMinObjectWidth / 100
+            && rectangle.w < (float) ini().postprocMinObjectWidth / 100
         ) ||
         (ini().postprocMinObjectHeight != 0
-            && rectangle.height < (float) ini().postprocMinObjectHeight / 100
+            && rectangle.h < (float) ini().postprocMinObjectHeight / 100
         );
 }
 
 float NaiveObjectTracker::bottomRightX(const TegraVideo::Rect& rectangle)
 {
-    return rectangle.x + rectangle.width;
+    return rectangle.x + rectangle.w;
 }
 
 float NaiveObjectTracker::bottomRightY(const TegraVideo::Rect& rectangle)
 {
-    return rectangle.y + rectangle.height;
+    return rectangle.y + rectangle.h;
 }
 
 sdk::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
 {
-    return sdk::Rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    return sdk::Rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
 }
 
 nxpl::NX_GUID NaiveObjectTracker::toSdkGuid(const QnUuid& id)

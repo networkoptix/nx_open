@@ -668,10 +668,10 @@ gieThread(void *arg)
                 NX_OUTPUT << "@@@@@@@@@@@@@@@@@@@@@@@ DROPPING frame with timestamp: " << ctx->m_ptsQueue.front()
                     << ", difference: "
                     << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp - microseconds(ctx->m_ptsQueue.front())).count()
-                    << ", " << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp).count() 
+                    << ", " << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp).count()
                     << ", " << microseconds(ctx->m_ptsQueue.front()).count()
                     << std::endl;
-                
+
                 if (!ctx->m_ptsQueue.empty())
                     ctx->m_ptsQueue.pop();
                 else
@@ -772,7 +772,7 @@ gieThread(void *arg)
                 rectList_queue.pop();
 
                 const auto pts = ctx->m_ptsQueue.front();
-                ctx->m_ptsQueue.pop();             
+                ctx->m_ptsQueue.pop();
                 ctx->m_outPtsQueue.push(pts);
 
                 ctx->rectQueuePtr->push(rectList);
@@ -780,7 +780,7 @@ gieThread(void *arg)
                 {
                     cv::Rect &r = rectList[i];
                     NX_OUTPUT <<"    x " << r.x << ", y " << r.y
-                         << ", width " << r.width << ", height " << r.height
+                         << ", w " << r.width << ", h " << r.height
                          << endl;
                 }
             }

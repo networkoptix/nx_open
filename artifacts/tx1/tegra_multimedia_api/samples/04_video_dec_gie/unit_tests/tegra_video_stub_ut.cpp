@@ -24,6 +24,18 @@ TEST(tegra_video_stub, start)
     ASSERT_TRUE(tegraVideo->start(params));
 }
 
+testRect(const TegraVideo::Rect& rect)
+{
+    ASSERT_TRUE(rect.x >= 0);
+    ASSERT_TRUE(rect.x <= 1);
+    ASSERT_TRUE(rect.y >= 0);
+    ASSERT_TRUE(rect.y <= 1);
+    ASSERT_TRUE(rect.w > 0);
+    ASSERT_TRUE(rect.h > 0);
+    ASSERT_TRUE(rect.x + rect.w <= 1);
+    ASSERT_TRUE(rect.y + rect.h <= 1);
+}
+
 TEST(tegra_video_stub, frames)
 {
     ASSERT_FALSE(tegraVideo->hasMetadata());
@@ -39,12 +51,12 @@ TEST(tegra_video_stub, frames)
     TegraVideo::Rect rects[kMaxRectsCount];
     rects[0].x = kUntouchedValue;
     rects[0].y = kUntouchedValue;
-    rects[0].width = kUntouchedValue;
-    rects[0].height = kUntouchedValue;
+    rects[0].w = kUntouchedValue;
+    rects[0].h = kUntouchedValue;
     rects[1].x = kUntouchedValue;
     rects[1].y = kUntouchedValue;
-    rects[1].width = kUntouchedValue;
-    rects[1].height = kUntouchedValue;
+    rects[1].w = kUntouchedValue;
+    rects[1].h = kUntouchedValue;
 
     int rectsCount = kUntouchedValue;
     int64_t ptsUs = kUntouchedValue;
@@ -53,14 +65,9 @@ TEST(tegra_video_stub, frames)
 
     ASSERT_EQ(rectsCount, 2); //< Stub is expected to produce a two rects.
     ASSERT_EQ(ptsUs, 0);
-    ASSERT_TRUE(rects[0].x >= 0);
-    ASSERT_TRUE(rects[0].y >= 0);
-    ASSERT_TRUE(rects[0].width > 0);
-    ASSERT_TRUE(rects[0].height > 0);
-    ASSERT_TRUE(rects[1].x >= 0);
-    ASSERT_TRUE(rects[1].y >= 0);
-    ASSERT_TRUE(rects[1].width > 0);
-    ASSERT_TRUE(rects[1].height > 0);
+
+    for (int i = 0; i < rectsCount; ++i)
+        testRect(rects[i]);
 }
 
 TEST(tegra_video_stub, stop)
