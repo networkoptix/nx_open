@@ -461,10 +461,7 @@ bool QnCamDisplay::fillDataQueue()
             requiredBufferLength - (m_lastQueuedVideoTime - m_lastVideoPacketTime));
         const auto maxSleepTime = std::min(kMaxSleepTimeUs, sleepTime + kMinSleepTimeUs);
 
-        if (m_isRealTimeSource)
-            m_delay.terminatedSleep(sleepTime, maxSleepTime);
-        else
-            m_delay.sleep(sleepTime, maxSleepTime);
+        m_delay.terminatedSleep(sleepTime, maxSleepTime);
     }
 
     return true;
