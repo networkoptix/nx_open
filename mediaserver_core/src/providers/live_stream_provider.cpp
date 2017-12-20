@@ -99,7 +99,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
             qnServerModule->analyticsEventsStorage()));
     m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
 
-	auto pool = qnServerModule->metadataManagerPool();
+    auto pool = qnServerModule->metadataManagerPool();
     pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
 }
 
