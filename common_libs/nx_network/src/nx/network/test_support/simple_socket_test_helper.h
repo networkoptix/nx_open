@@ -768,34 +768,6 @@ void socketMultiConnect(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketErrorHandling(
-    const ServerSocketMaker& serverMaker,
-    const ClientSocketMaker& clientMaker)
-{
-    auto client = clientMaker();
-    auto server = serverMaker();
-
-    SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_TRUE(server->bind(SocketAddress::anyAddress))
-        << SystemError::getLastOSErrorText().toStdString();
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
-
-    ASSERT_EQ(true, server->listen());
-    ASSERT_EQ(SystemError::noError, SystemError::getLastOSErrorCode());
-
-    SystemError::setLastErrorCode(SystemError::noError);
-
-    ASSERT_TRUE(client->bind(server->getLocalAddress()));
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
-
-    // Sounds wierd but linux ::listen sometimes returns true...
-    //
-    // SystemError::setLastErrorCode(SystemError::noError);
-    // ASSERT_FALSE(server->listen(10));
-    // ASSERT_NE(SystemError::getLastOSErrorCode(), SystemError::noError);
-}
-
-template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketShutdown(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
@@ -1308,6 +1280,113 @@ void serverSocketPleaseStopCancelsPostedCall(
     socketStopped.get_future().wait();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename CreateSocketFunc>
+class SocketOptions:
+    public ::testing::Test
+{
+public:
+    using SocketPointer = typename std::result_of<CreateSocketFunc()>::type;
+
+protected:
+    std::vector<SocketPointer> m_sockets;
+
+    void givenSocketBoundToLocalAddress()
+    {
+        addSocket();
+        ASSERT_TRUE(m_sockets.back()->bind(SocketAddress::anyPrivateAddress));
+    }
+
+    void assertAnotherSocketCanBeBoundToTheSameAddress()
+    {
+        addSocket();
+        ASSERT_TRUE(m_sockets.back()->bind(m_sockets.front()->getLocalAddress()));
+    }
+
+    void assertAnotherSocketCannotBeBoundToTheSameAddress()
+    {
+        addSocket();
+        ASSERT_FALSE(m_sockets.back()->bind(m_sockets.front()->getLocalAddress()));
+    }
+
+    void addSocket()
+    {
+        m_sockets.push_back(CreateSocketFunc()());
+        if (m_reuseAddr)
+        {
+            ASSERT_TRUE(m_sockets.back()->setReuseAddrFlag(true));
+        }
+    }
+
+    void enableReuseAddr()
+    {
+        m_reuseAddr = true;
+    }
+
+private:
+    bool m_reuseAddr = false;
+};
+
+TYPED_TEST_CASE_P(SocketOptions);
+
+TYPED_TEST_P(SocketOptions, same_address_can_be_used_if_reuse_addr_enabled)
+{
+    this->enableReuseAddr();
+
+    this->givenSocketBoundToLocalAddress();
+    this->assertAnotherSocketCanBeBoundToTheSameAddress();
+}
+
+TYPED_TEST_P(SocketOptions, same_address_cannot_be_used_by_default)
+{
+    this->givenSocketBoundToLocalAddress();
+    this->assertAnotherSocketCannotBeBoundToTheSameAddress();
+}
+
+REGISTER_TYPED_TEST_CASE_P(SocketOptions,
+    same_address_can_be_used_if_reuse_addr_enabled,
+    same_address_cannot_be_used_by_default);
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename CreateSocketFunc>
+class SocketOptionsDefaultValue:
+    public SocketOptions<CreateSocketFunc>
+{
+public:
+    SocketOptionsDefaultValue()
+    {
+        addSocket();
+    }
+
+protected:
+    template<typename SocketInterface, typename SocketOption>
+    SocketOption getOptionValue(
+        bool (SocketInterface::*getSocketOption)(SocketOption*) const)
+    {
+        auto value = SocketOption();
+        NX_GTEST_ASSERT_TRUE((m_sockets.front().get()->*getSocketOption)(&value));
+        return value;
+    }
+};
+
+TYPED_TEST_CASE_P(SocketOptionsDefaultValue);
+
+TYPED_TEST_P(SocketOptionsDefaultValue, reuse_addr)
+{
+    ASSERT_EQ(false, this->getOptionValue(&AbstractSocket::getReuseAddrFlag));
+}
+
+TYPED_TEST_P(SocketOptionsDefaultValue, non_blocking_mode)
+{
+    ASSERT_EQ(false, this->getOptionValue(&AbstractSocket::getNonBlockingMode));
+}
+
+REGISTER_TYPED_TEST_CASE_P(SocketOptionsDefaultValue,
+    reuse_addr,
+    non_blocking_mode);
 
 } // namespace test
 } // namespace network

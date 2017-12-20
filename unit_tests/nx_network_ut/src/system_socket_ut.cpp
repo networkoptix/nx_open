@@ -179,12 +179,27 @@ TEST_F(TcpSocket, DISABLED_KeepAliveOptionsClient)
     waitForKeepAliveDisconnect(client.get());
 }
 
-TEST_F(TcpSocket, ErrorHandling)
+struct TcpSocketIpv4Factory
 {
-    nx::network::test::socketErrorHandling(
-        []() { return std::make_unique<TCPServerSocket>(AF_INET); },
-        []() { return std::make_unique<TCPSocket>(AF_INET); });
-}
+    std::unique_ptr<nx::network::TCPSocket> operator()() const
+    {
+        return std::make_unique<nx::network::TCPSocket>(AF_INET);
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket, SocketOptions, TcpSocketIpv4Factory);
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket, SocketOptionsDefaultValue, TcpSocketIpv4Factory);
+
+struct TcpSocketIpv6Factory
+{
+    std::unique_ptr<nx::network::TCPSocket> operator()() const
+    {
+        return std::make_unique<nx::network::TCPSocket>(AF_INET6);
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket6, SocketOptions, TcpSocketIpv6Factory);
+INSTANTIATE_TYPED_TEST_CASE_P(TcpSocket6, SocketOptionsDefaultValue, TcpSocketIpv6Factory);
 
 TEST_F(TcpSocket, socket_timer_is_single_shot)
 {
@@ -252,6 +267,6 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
 
 INSTANTIATE_TYPED_TEST_CASE_P(TCPServerSocket, ServerSocketTest, TCPServerSocket);
 
-}   //test
-}   //network
-}   //nx
+} // test
+} // network
+} // nx
