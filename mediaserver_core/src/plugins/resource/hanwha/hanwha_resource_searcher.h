@@ -66,7 +66,8 @@ private:
         QnMacAddress macAddress;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
-    bool isHostBelongToValidSubnet(const QHostAddress& address) const;
+    bool isHostBelongsToValidSubnet(const QHostAddress& address) const;
+    static std::vector<std::vector<quint8>> createProbePackets();
 private:
     QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData
@@ -86,7 +87,7 @@ private:
 
     mutable QMap<QString, SessionKeyPtr> m_sessionKeys;
 
-    std::vector<std::vector<quint8>> m_sunapiProbePackets;
+    const std::vector<std::vector<quint8>> m_sunapiProbePackets;
     std::vector<std::unique_ptr<AbstractDatagramSocket>> m_sunApiSocketList;
     QList<QnInterfaceAndAddr> m_lastInterfaceList;
 };
