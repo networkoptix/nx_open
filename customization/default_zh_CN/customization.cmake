@@ -7,7 +7,6 @@ set(product.name.short "hdwitness_cn")
 set(company.name "Network Optix")
 
 set(product.appName "hdwitness")
-set(display.mobile.name "Nx Mobile")
 set(short.company.name "Nx")
 set(uri.protocol "nx-vms")
 set(liteDeviceName "nx1")

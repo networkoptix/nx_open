@@ -15,7 +15,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>${ios.new_bundle_identifier}</string>
 	<key>CFBundleDisplayName</key>
-	<string>${display_mobile_bundle_name}</string>
+	<string>${display_mobile_name}</string>
 	<key>CFBundleName</key>
 	<string>${mobile_bundle_name}</string>
 	<key>CFBundleShortVersionString</key>

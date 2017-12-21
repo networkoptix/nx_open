@@ -101,8 +101,8 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    if(mobile_bundle_name STREQUAL display_mobile_bundle_name)
-        message(FATAL_ERROR "mobile_bundle_name cannot be equal to display_mobile_bundle_name.")
+    if(mobile_bundle_name STREQUAL display_mobile_name)
+        message(FATAL_ERROR "mobile_bundle_name cannot be equal to display_mobile_name.")
     endif()
 
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")

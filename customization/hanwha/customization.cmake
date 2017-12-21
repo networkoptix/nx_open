@@ -3,7 +3,7 @@ set(parent.customization "digitalwatchdog")
 
 # Components Namings
 set(display.product.name "Wisenet WAVE")
-set(display_mobile_bundle_name "Wisenet WAVE")
+set(display_mobile_name "Wisenet WAVE")
 set(mobile_bundle_name "WisenetWAVE")
 set(product.name "Wisenet WAVE")
 set(product.name.short "hanwha")

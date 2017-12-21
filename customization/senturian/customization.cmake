@@ -2,7 +2,7 @@
 set(defaultSkin "dark_blue")
 set(parent.customization "default")
 set(display.product.name "Sentry Matrix")
-set(display_mobile_bundle_name "Sentry Mobile")
+set(display_mobile_name "Sentry Mobile")
 set(mobile_bundle_name "Sentry")
 set(product.name "Sentry Matrix")
 set(product.name.short "senturian")
