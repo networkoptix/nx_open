@@ -49,12 +49,37 @@ QnChooseServerButton::QnChooseServerButton(QWidget* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
 {
+    connect(this, &QnChooseServerButton::serverChanged,
+        this, &QnChooseServerButton::serverOnlineStatusChanged);
+
     const auto pool = commonModule()->resourcePool();
     connect(pool, &QnResourcePool::resourceAdded, this, &QnChooseServerButton::tryAddServer);
     connect(pool, &QnResourcePool::resourceRemoved, this, &QnChooseServerButton::tryRemoveServer);
 
     for (const auto server: pool->getAllServers(Qn::AnyStatus))
         tryAddServer(server);
+
+    connect(this, &QnChooseServerButton::serverChanged,
+        this, &QnChooseServerButton::tryUpdateCurrentAction);
+}
+
+void QnChooseServerButton::tryUpdateCurrentAction()
+{
+    if (!m_server)
+    {
+        setCurrentAction(nullptr, false);
+        return;
+    }
+
+    auto action = actionForServer(m_server);
+    if (!action)
+        action = addMenuItemForServer(m_server);
+
+    if (action != currentAction())
+    {
+        setCurrentAction(action, false);
+        emit serverOnlineStatusChanged();
+    }
 }
 
 bool QnChooseServerButton::setServer(const QnMediaServerResourcePtr& server)
@@ -68,9 +93,10 @@ bool QnChooseServerButton::setServer(const QnMediaServerResourcePtr& server)
         return false;
     }
 
-    emit beforeServerChanged();
-
+    const auto previousServer = m_server;
     m_server = server;
+
+    emit serverChanged(previousServer);
 
     updatebuttonData();
     return true;
@@ -84,6 +110,16 @@ QnMediaServerResourcePtr QnChooseServerButton::server() const
 int QnChooseServerButton::serversCount() const
 {
     return m_servers.size();
+}
+
+bool QnChooseServerButton::serverIsOnline()
+{
+    const auto action = currentAction();
+    if (!action)
+        return false;
+
+    const auto server = action->data().value<QnMediaServerResourcePtr>();
+    return server && server->getStatus() == Qn::Online;
 }
 
 void QnChooseServerButton::updatebuttonData()
@@ -138,7 +174,9 @@ void QnChooseServerButton::tryRemoveServer(const QnResourcePtr& resource)
     if (it == m_servers.end())
         return;
 
-    removeMenuItemForServer(serverResource->getId());
+    if (const auto action = actionForServer(serverResource))
+        removeAction(action);
+
     m_servers.erase(it);
 
     if (sameServer(m_server, serverResource))
@@ -151,7 +189,7 @@ void QnChooseServerButton::tryRemoveServer(const QnResourcePtr& resource)
     emit serversCountChanged();
 }
 
-void QnChooseServerButton::addMenuItemForServer(const QnMediaServerResourcePtr& server)
+QAction* QnChooseServerButton::addMenuItemForServer(const QnMediaServerResourcePtr& server)
 {
     const auto currentMenu = menu();
     const auto action = new QAction(currentMenu);
@@ -159,28 +197,40 @@ void QnChooseServerButton::addMenuItemForServer(const QnMediaServerResourcePtr& 
     action->setText(getText(server));
     action->setIcon(getIcon(server));
     action->setIconVisibleInMenu(true);
+
     connect(server, &QnMediaServerResource::statusChanged, this,
-        [action, server]() { action->setIcon(getIcon(server)); });
+        [this, action, server]()
+        {
+            const auto icon = getIcon(server);
+            action->setIcon(icon);
+            if (currentAction() != action)
+                return;
+
+            setIcon(icon);
+            emit serverOnlineStatusChanged();
+        });
+
     connect(server, &QnMediaServerResource::nameChanged, this,
         [action, server]() { action->setText(getText(server)); });
     connect(action, &QAction::triggered, this,
         [this, server]() { setServer(server); });
+
     currentMenu->addAction(action);
+    return action;
 }
 
-void QnChooseServerButton::removeMenuItemForServer(const QnUuid& serverId)
+QAction* QnChooseServerButton::actionForServer(const QnMediaServerResourcePtr& server)
 {
+    if (!server)
+        return nullptr;
+
     const auto currentMenu = menu();
     const auto actions = currentMenu->actions();
     const auto it = std::find_if(actions.begin(), actions.end(),
-        [serverId](QAction* action)
+        [server](QAction* action)
         {
-            const auto server = action->data().value<QnMediaServerResourcePtr>();
-            return server && server->getId() == serverId;
+            return sameServer(server, action->data().value<QnMediaServerResourcePtr>());
         });
 
-    if (it == actions.end())
-        NX_EXPECT(false, "No menu item for the specified server");
-    else
-        currentMenu->removeAction(*it);
+    return it == actions.end() ? nullptr : *it;
 }

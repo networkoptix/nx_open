@@ -21,19 +21,25 @@ public:
 
     int serversCount() const;
 
+    bool serverIsOnline();
+
 signals:
-    void beforeServerChanged();
+    void serverChanged(const QnMediaServerResourcePtr& previousServer);
 
     void serversCountChanged();
 
+    void serverOnlineStatusChanged();
+
 private:
+    void tryUpdateCurrentAction();
     void updatebuttonData();
 
     void tryAddServer(const QnResourcePtr& resource);
     void tryRemoveServer(const QnResourcePtr& resource);
 
-    void addMenuItemForServer(const QnMediaServerResourcePtr& server);
-    void removeMenuItemForServer(const QnUuid& serverId);
+    QAction* addMenuItemForServer(const QnMediaServerResourcePtr& server);
+
+    QAction* actionForServer(const QnMediaServerResourcePtr& server);
 
 private:
     QnMediaServerResourcePtr m_server;

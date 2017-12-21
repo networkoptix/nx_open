@@ -65,21 +65,33 @@ void DeviceAdditionDialog::initializeControls()
                 palette().color(QPalette::Mid));
         });
 
-    connect(ui->selectServerMenuButton, &QnChooseServerButton::beforeServerChanged, this,
-        [this]()
+    connect(ui->selectServerMenuButton, &QnChooseServerButton::serverChanged, this,
+        [this](const QnMediaServerResourcePtr& previousServer)
         {
-            cleanUnfinishedSearches(ui->selectServerMenuButton->server());
+            if (!previousServer)
+                return;
+
+            cleanUnfinishedSearches(previousServer);
             stopSearch();
         });
 
+    ui->serverOfflineAlertBar->setText(tr("Server offline"));
     connect(ui->selectServerMenuButton, &QnChooseServerButton::serversCountChanged, this,
         [this]()
         {
             ui->serverChoosePanel->setVisible(ui->selectServerMenuButton->serversCount() > 1);
         });
 
+    connect(ui->selectServerMenuButton, &QnChooseServerButton::serverOnlineStatusChanged, this,
+        [this]()
+        {
+            ui->serverOfflineAlertBar->setVisible(!ui->selectServerMenuButton->serverIsOnline());
+        });
+
     ui->serverChoosePanel->setVisible(
         ui->selectServerMenuButton->serversCount() > 1);
+
+    ui->serverOfflineAlertBar->setVisible(false);
 
     connect(this, &DeviceAdditionDialog::rejected,
         this, &DeviceAdditionDialog::handleDialogClosed);
