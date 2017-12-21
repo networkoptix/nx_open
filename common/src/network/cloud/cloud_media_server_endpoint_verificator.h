@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_abstract_endpoint_verificator.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class CloudMediaServerEndpointVerificator:
     public nx::network::cloud::tcp::AbstractEndpointVerificator

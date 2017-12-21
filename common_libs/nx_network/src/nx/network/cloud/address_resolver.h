@@ -3,11 +3,10 @@
 #include <set>
 #include <deque>
 
+#include <nx/network/async_stoppable.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/scope_guard.h>
-
-#include "mediator_client_connections.h"
 
 namespace nx {
 namespace network {

@@ -1,5 +1,7 @@
 #include "cloud_media_server_endpoint_verificator.h"
 
+#include <nx/utils/log/log.h>
+
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
 

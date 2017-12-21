@@ -260,7 +260,6 @@ class AddressResolverTrivialNameResolve:
 {
 public:
     AddressResolverTrivialNameResolve():
-        m_resolver(nullptr),
         m_hostNameToResolve("127.0.0.1")
     {
         using namespace std::placeholders;

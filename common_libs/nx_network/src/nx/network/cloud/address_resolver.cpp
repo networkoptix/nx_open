@@ -1,11 +1,11 @@
 #include "address_resolver.h"
 
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/stun/extension/stun_extension_types.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include "mediator_connector.h"
 
