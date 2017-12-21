@@ -5,7 +5,7 @@ function(set_distribution_names)
         set(suffix "${platform}${beta_suffix}-${cloudGroup}")
     else()
         set(beta_suffix)
-        set(suffix)
+        set(suffix "${platform}-${cloudGroup}")
     endif()
 
     set(client_distribution_name "${prefix}-client-${releaseVersion.full}-${suffix}"
