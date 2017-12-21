@@ -12,7 +12,6 @@ static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
 namespace nx {
 namespace network {
-namespace cloud {
 
 QString toString(const AddressType& type)
 {
@@ -618,6 +617,5 @@ bool AddressResolver::isCloudHostName(
     return m_cloudAddressRegExp.exactMatch(hostName);
 }
 
-} // namespace cloud
 } // namespace network
 } // namespace nx

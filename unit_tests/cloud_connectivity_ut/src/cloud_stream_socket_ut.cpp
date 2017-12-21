@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/ssl_socket.h>

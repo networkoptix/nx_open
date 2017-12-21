@@ -17,10 +17,10 @@ namespace hpm { namespace api { class MediatorConnector; } }
 namespace network {
 
 namespace aio { class AIOService; }
+class AddressResolver;
 
 namespace cloud {
 
-class AddressResolver;
 class MediatorAddressPublisher;
 class OutgoingTunnelPool;
 class CloudConnectSettings;
@@ -62,7 +62,7 @@ public:
     static Ini& ini();
     static DebugIni& debugIni();
     static aio::AIOService& aioService();
-    static cloud::AddressResolver& addressResolver();
+    static AddressResolver& addressResolver();
     static cloud::MediatorAddressPublisher& addressPublisher();
     static hpm::api::MediatorConnector& mediatorConnector();
     static cloud::OutgoingTunnelPool& outgoingTunnelPool();

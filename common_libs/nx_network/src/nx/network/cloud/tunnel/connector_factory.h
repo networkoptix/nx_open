@@ -4,12 +4,12 @@
 #include <list>
 #include <map>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/basic_factory.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_tunnel_connector.h"
-#include "../address_resolver.h"
 #include "../cloud_connect_type.h"
 #include "../data/connect_data.h"
 

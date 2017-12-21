@@ -11,7 +11,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <common/common_module.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 

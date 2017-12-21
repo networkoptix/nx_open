@@ -1,7 +1,7 @@
 #include <boost/optional.hpp>
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/cross_nat_connector.h>
 #include <nx/network/cloud/tunnel/udp/connector.h>

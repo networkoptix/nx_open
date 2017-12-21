@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/async_stoppable.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 

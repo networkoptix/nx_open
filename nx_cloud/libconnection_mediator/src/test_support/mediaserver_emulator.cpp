@@ -1,7 +1,7 @@
 #include "mediaserver_emulator.h"
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>

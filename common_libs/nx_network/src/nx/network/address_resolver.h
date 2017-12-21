@@ -10,7 +10,6 @@
 
 namespace nx {
 namespace network {
-namespace cloud {
 
 enum class AddressType
 {
@@ -244,6 +243,5 @@ protected:
         const QString& hostName) const;
 };
 
-} // namespace cloud
 } // namespace network
 } // namespace nx

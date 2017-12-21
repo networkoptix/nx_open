@@ -5,7 +5,7 @@
 
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/stun/async_client.h>

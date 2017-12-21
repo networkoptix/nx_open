@@ -9,7 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/string.h>

@@ -6,7 +6,7 @@
 
 #include "aio/pollset_factory.h"
 #include "aio/aio_service.h"
-#include "cloud/address_resolver.h"
+#include "address_resolver.h"
 #include "cloud/tunnel/connector_factory.h"
 #include "cloud/cloud_connect_settings.h"
 #include "cloud/mediator_address_publisher.h"
@@ -68,7 +68,7 @@ public:
 
     CloudConnectManagers(
         aio::AIOService* aioService,
-        cloud::AddressResolver* addressResolver)
+        AddressResolver* addressResolver)
         :
         addressPublisher(mediatorConnector.systemConnection()),
         tcpReversePool(
@@ -101,7 +101,7 @@ public:
     }
 
 private:
-    cloud::AddressResolver* m_addressResolver;
+    AddressResolver* m_addressResolver;
 };
 
 struct SocketGlobalsImpl
@@ -116,7 +116,7 @@ struct SocketGlobalsImpl
 
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
-    std::unique_ptr<cloud::AddressResolver> m_addressResolver;
+    std::unique_ptr<AddressResolver> m_addressResolver;
     std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
 
     std::unique_ptr<CloudConnectManagers> cloudConnectManagers;
@@ -195,7 +195,7 @@ aio::AIOService& SocketGlobals::aioService()
     return s_instance->m_impl->m_aioServiceGuard.aioService();
 }
 
-cloud::AddressResolver& SocketGlobals::addressResolver()
+AddressResolver& SocketGlobals::addressResolver()
 {
     return *s_instance->m_impl->m_addressResolver;
 }
@@ -342,7 +342,7 @@ void SocketGlobals::initializeNetworking()
     ssl::initOpenSSLGlobalLock();
 #endif
 
-    m_impl->m_addressResolver = std::make_unique<cloud::AddressResolver>();
+    m_impl->m_addressResolver = std::make_unique<AddressResolver>();
     m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 

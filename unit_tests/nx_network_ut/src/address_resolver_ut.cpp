@@ -5,7 +5,7 @@
 
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/resolve/custom_resolver.h>
 #include <nx/network/socket_global.h>
@@ -289,7 +289,7 @@ protected:
     }
 
 private:
-    cloud::AddressResolver m_resolver;
+    network::AddressResolver m_resolver;
     const QString m_hostNameToResolve;
     std::list<QString> m_resolvedHostNames;
 
@@ -336,7 +336,7 @@ TEST_F(AddressResolverNat64, IPv4) // NAT64 not in use, IP v4 is just converted 
         kV4, NatTraversalSupport::disabled, AF_INET);
     ASSERT_EQ(1U, entries.size());
 
-    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_EQ(AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());
     ASSERT_EQ(kV4.ipV4()->s_addr, entries.front().host.ipV4()->s_addr);
 }
@@ -347,11 +347,11 @@ TEST_F(AddressResolverNat64, IPv6) // NAT64 returns 2 addresses: mapped IP v6 an
         kV4, NatTraversalSupport::disabled, AF_INET6);
     ASSERT_EQ(2U, entries.size());
 
-    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_EQ(AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());
     ASSERT_EQ(0, memcmp(&kV6.ipV6().first.get(), &entries.front().host.ipV6().first.get(), sizeof(in6_addr)));
 
-    ASSERT_EQ(cloud::AddressType::direct, entries.back().type);
+    ASSERT_EQ(AddressType::direct, entries.back().type);
     ASSERT_TRUE(entries.back().host.isIpAddress());
     ASSERT_EQ(0, memcmp(&kV4.ipV6().first.get(), &entries.back().host.ipV6().first.get(), sizeof(in6_addr)));
 }

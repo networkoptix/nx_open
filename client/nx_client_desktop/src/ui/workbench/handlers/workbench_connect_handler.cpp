@@ -40,7 +40,7 @@
 
 #include <finders/systems_finder.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 
 #include <helpers/system_weight_helper.h>

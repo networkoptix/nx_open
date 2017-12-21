@@ -30,7 +30,7 @@ void CloudMediaServerEndpointVerificator::setTimeout(
 
 void CloudMediaServerEndpointVerificator::verifyHost(
     const SocketAddress& endpointToVerify,
-    const nx::network::cloud::AddressEntry& targetHostAddress,
+    const nx::network::AddressEntry& targetHostAddress,
     nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler)
 {
     m_endpointToVerify = endpointToVerify;
