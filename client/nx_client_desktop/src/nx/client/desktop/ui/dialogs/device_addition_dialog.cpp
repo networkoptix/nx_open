@@ -82,11 +82,8 @@ void DeviceAdditionDialog::initializeControls()
             ui->serverChoosePanel->setVisible(ui->selectServerMenuButton->serversCount() > 1);
         });
 
-    connect(ui->selectServerMenuButton, &QnChooseServerButton::serverOnlineStatusChanged, this,
-        [this]()
-        {
-            ui->serverOfflineAlertBar->setVisible(!ui->selectServerMenuButton->serverIsOnline());
-        });
+    connect(ui->selectServerMenuButton, &QnChooseServerButton::serverOnlineStatusChanged,
+            this, &DeviceAdditionDialog::handleServerOnlineStateChanged);
 
     ui->serverChoosePanel->setVisible(
         ui->selectServerMenuButton->serversCount() > 1);
@@ -104,6 +101,18 @@ void DeviceAdditionDialog::initializeControls()
     setAccentStyle(ui->addDevicesButton);
 
     updateResultsWidgetState();
+}
+
+void DeviceAdditionDialog::handleServerOnlineStateChanged()
+{
+    const bool online = ui->selectServerMenuButton->serverIsOnline();
+
+    ui->serverOfflineAlertBar->setVisible(!ui->selectServerMenuButton->serverIsOnline());
+    ui->searchResultsStackedWidget->setEnabled(online);
+    ui->searchPanel->setEnabled(online);
+
+    if (!online && m_currentSearch)
+        stopSearch();
 }
 
 void DeviceAdditionDialog::setupTable()
@@ -267,10 +276,17 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     QEventLoop loop;
     connect(&result, &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
     connect(this, &DeviceAdditionDialog::rejected, &loop, &QEventLoop::quit);
-    loop.exec();
 
-    if (!result.isFinished())
-        return;
+    const auto connection =
+        connect(ui->selectServerMenuButton, &QnChooseServerButton::serverOnlineStatusChanged, this,
+            [this, &loop]()
+            {
+                if (!ui->selectServerMenuButton->serverIsOnline())
+                    loop.quit();
+            });
+
+    loop.exec();
+    disconnect(connection);
 
     if (result.status() == 0)
     {

@@ -47,6 +47,7 @@ private:
     void handleSearchTypeChanged();
     void handleDialogClosed();
     void updateAddDevicesButtonText();
+    void handleServerOnlineStateChanged();
     void handleModelDataChanged(
         const QModelIndex& topLeft,
         const QModelIndex& bottomRight,
