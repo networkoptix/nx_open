@@ -124,6 +124,8 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         std::chrono::milliseconds(kTimeSelectionDelay).count(),
         this);
 
+    applyTimePeriod->setFlags(utils::PendingOperation::NoFlags);
+
     connect(navigator(), &QnWorkbenchNavigator::timeSelectionChanged, this,
         [this, applyTimePeriod](const QnTimePeriod& selection)
         {
