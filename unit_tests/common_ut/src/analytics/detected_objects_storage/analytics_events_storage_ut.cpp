@@ -102,6 +102,8 @@ protected:
     {
         auto objects = toDetectedObjects(expected);
 
+        // First, sorting objects in descending order, because we always filtering the most recent objects
+        // and filter.sortOrder is applied AFTER fitering.
         std::sort(
             objects.begin(), objects.end(),
             [&filter](const DetectedObject& left, const DetectedObject& right)
@@ -109,7 +111,19 @@ protected:
                 return left.track.front().timestampUsec > right.track.front().timestampUsec;
             });
 
-        andLookupResultEquals(filterObjects(objects, filter));
+        auto filteredObjects = filterObjects(objects, filter);
+
+        std::sort(
+            filteredObjects.begin(), filteredObjects.end(),
+            [&filter](const DetectedObject& left, const DetectedObject& right)
+            {
+                if (filter.sortOrder == Qt::AscendingOrder)
+                    return left.track.front().timestampUsec < right.track.front().timestampUsec;
+                else
+                    return left.track.front().timestampUsec > right.track.front().timestampUsec;
+            });
+
+        andLookupResultEquals(filteredObjects);
     }
 
     void thenLookupSucceded()
