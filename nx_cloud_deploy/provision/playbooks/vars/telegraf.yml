@@ -5,6 +5,10 @@ telegraf_agent_output:
       - secret_key = "ftny74/WLECuN4ASIh80bG0KJMkZZ/6hx4U7/zeR"
       - region = "us-east-1"
       - namespace = "CustomSystem"
+  - type: influxdb
+    config:
+      - urls = ["http://localhost:8086"]
+      - database = "telegraf"
 telegraf_plugins_default:
   - plugin: cpu
     config:

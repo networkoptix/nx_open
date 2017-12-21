@@ -1,5 +1,12 @@
 - hosts: all
   vars_files:
     - vars/telegraf.yml
+    - vars/grafana.yml
   roles:
     - role: dj-wasabi.telegraf
+    - role: rossmcdonald.influxdb
+    - role: ansiblebit.grafana
+  pre_tasks:
+    - name: fix buggy ansiblebit.grafana role
+      set_fact:
+        grafana_default: '{{grafana_default|combine({"pid_file_dir": "/var/lib/grafana"})}}'
