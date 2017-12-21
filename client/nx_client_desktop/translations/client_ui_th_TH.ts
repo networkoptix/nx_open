@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>ประเภทเหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>ข้อมูลบุ๊กมาร์ก</translation>
     </message>
     <message>
       <location/>
@@ -371,17 +371,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>ความกว้างของพื้นที่</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>ขนาดตัวอักษร</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>รวมคำอธิบาย</translation>
     </message>
   </context>
   <context>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>คำเตือน! อย่าเปลี่ยนการตั้งค่าเหล่านี้นอกจากคุณจะแน่ใจจริงๆ กับของผลกระทบที่อาจเกิดกับประสิทธิภาพของระบบ</translation>
     </message>
     <message>
       <location/>
@@ -700,22 +700,22 @@
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>เก็บการตั้งค่าโปรไฟล์ของกล้องและโปรไฟล์ไว้</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>คุณภาพและกรอบอัตรา (FPS) ค่าในตารางการบันทึกจะไม่เกี่ยวข้อง</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>คำนวณบิตเรตต่อ GOP แทนบิตเรตต่อวินาที</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>จะเพิ่มอัตราบิตสำหรับกล้อง</translation>
     </message>
     <message>
       <location/>
@@ -725,7 +725,7 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>ปิดใช้สตรีมรอง</translation>
     </message>
     <message>
       <location/>
@@ -740,12 +740,12 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>เก็บถาวร</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>สตรีมมิ่งสื่อ</translation>
     </message>
     <message>
       <location/>
@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>ประเภทการตรวจสอบสิทธิ์</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>ประเภทคำขอ</translation>
     </message>
   </context>
   <context>
@@ -1077,12 +1077,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>ตั้งค่าส่งออก</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>ทำให้ไฟล์อ่านอย่างเดียว</translation>
     </message>
   </context>
   <context>
@@ -1090,22 +1090,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>ตั้งค่าส่งออก</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>ใช้ตัวกรอง</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>หมุน Dewarping ฯลฯ การเพิ่มประสิทธิภาพของภาพ</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>การตั้งค่าที่เลือกจะต้องมีการแปลงรหัส จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
     </message>
   </context>
   <context>
@@ -1141,22 +1141,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>ส่งออกวิดีโอ</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>กล้องเดียว</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>ตั้งค่าส่งออก</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>วิดีโอหลายรายการ</translation>
     </message>
   </context>
   <context>
@@ -1334,12 +1334,12 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>ความทึบ</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>ค่าเริ่มต้น</translation>
     </message>
     <message>
       <location/>
@@ -2280,12 +2280,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>ความยาวเริ่มต้นของวิดีโอ</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>ส่งออกความยาววิดีโอ</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>ช่วงเฟรม</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>รีเซ็ตความเร็ว</translation>
     </message>
   </context>
   <context>
@@ -2961,7 +2961,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>ข้อความ</translation>
     </message>
     <message>
       <location/>
@@ -2971,17 +2971,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>ขนาดตัวอักษร</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>ป้อนข้อความล้วนหรือ HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>ความกว้างของพื้นที่</translation>
     </message>
   </context>
   <context>
@@ -3007,7 +3007,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>ขนาดตัวอักษร</translation>
     </message>
     <message>
       <location/>

@@ -1940,7 +1940,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>刪除(&amp;D)</translation>
+      <translation>刪除 (D)</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
