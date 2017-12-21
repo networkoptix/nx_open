@@ -179,14 +179,25 @@ AbstractMetadataPacket* Manager::cookSomeEvents()
     auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
     eventPacket->addItem(detectedEvent);
+
+    NX_PRINT << "Firing event: "
+        << "type: " << (
+            (m_eventTypeId == kLineCrossingEventGuid)
+            ? "LineCrossing"
+            : (m_eventTypeId == kObjectInTheAreaEventGuid)
+                ? "ObjectInTheArea"
+                : "Unknown"
+        )
+        << ", isActive: " << ((m_counter == 1) ? "true" : "false");
+
     return eventPacket;
 }
 
 AbstractMetadataPacket* Manager::cookSomeObjects(
     nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
-    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
-        (CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
+    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket(
+        mediaPacket->queryInterface(IID_CompressedVideoPacket));
     if (!videoPacket)
         return nullptr;
 

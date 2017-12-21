@@ -141,8 +141,6 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(action(action::CloseLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(action::CloseAllButThisLayoutAction),         &QAction::triggered, this, &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
     connect(action(action::RemoveFromServerAction),              &QAction::triggered, this, &LayoutsHandler::at_removeFromServerAction_triggered);
-    connect(action(action::ShareLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_shareLayoutAction_triggered);
-    connect(action(action::StopSharingLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_stopSharingLayoutAction_triggered);
     connect(action(action::OpenNewTabAction),                    &QAction::triggered, this, &LayoutsHandler::at_openNewTabAction_triggered);
 
     connect(action(action::RemoveLayoutItemAction), &QAction::triggered, this,
@@ -477,39 +475,6 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
     }
 }
 
-void LayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
-    const QnResourceAccessSubject &subject)
-{
-    NX_ASSERT(layout && subject.isValid());
-    if (!layout || !subject.isValid())
-        return;
-
-    NX_ASSERT(!layout->isFile());
-    if (layout->isFile())
-        return;
-
-    if (!layout->isShared())
-        layout->setParentId(QnUuid());
-    NX_ASSERT(layout->isShared());
-
-    /* If layout is changed, it will automatically be saved here (and become shared if needed).
-    * Also we do not grant direct access to cameras anyway as layout will become shared
-    * and do not ask confirmation, so we do not use common saveLayout() method anyway. */
-    if (!snapshotManager()->save(layout))
-        return;
-
-    /* Admins anyway have all shared layouts. */
-    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
-        return;
-
-    auto accessible = sharedResourcesManager()->sharedResources(subject);
-    if (accessible.contains(layout->getId()))
-        return;
-
-    accessible << layout->getId();
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
-}
-
 LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
     const QnLayoutResourcePtr& layout)
 {
@@ -651,47 +616,6 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     }
 
     return ui::messages::Resources::deleteLocalLayouts(mainWindowWidget(), stillAccessible);
-}
-
-bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
-    const QnLayoutResourceList& layouts)
-{
-    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
-        return true;
-
-    /* Calculate all resources that were available through these layouts. */
-    QSet<QnUuid> layoutsIds;
-    QSet<QnResourcePtr> resourcesOnLayouts;
-    for (const auto& layout: layouts)
-    {
-        layoutsIds << layout->getId();
-        resourcesOnLayouts += layout->layoutResources();
-    }
-
-    QnResourceList resourcesBecomeUnaccessible;
-    for (const auto& resource : resourcesOnLayouts)
-    {
-        if (!QnResourceAccessFilter::isShareableMedia(resource))
-            continue;
-
-        QnResourceList providers;
-        auto accessSource = resourceAccessProvider()->accessibleVia(subject, resource, &providers);
-        if (accessSource != nx::core::access::Source::layout)
-            continue;
-
-        QSet<QnUuid> providerIds;
-        for (const auto& provider: providers)
-            providerIds << provider->getId();
-
-        providerIds -= layoutsIds;
-
-        /* This resource was available only via these layouts. */
-        if (providerIds.isEmpty())
-            resourcesBecomeUnaccessible << resource;
-    }
-
-    return ui::messages::Resources::stopSharingLayouts(mainWindowWidget(),
-        resourcesBecomeUnaccessible, subject);
 }
 
 bool LayoutsHandler::confirmChangeVideoWallLayout(const LayoutChange& change)
@@ -972,64 +896,6 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
         if (confirmDeleteLocalLayouts(user, userLayouts))
             removeLayouts(userLayouts);
     }
-}
-
-void LayoutsHandler::at_shareLayoutAction_triggered()
-{
-    auto params = menu()->currentParameters(sender());
-    auto layout = params.resource().dynamicCast<QnLayoutResource>();
-    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
-
-    QnResourceAccessSubject subject = user
-        ? QnResourceAccessSubject(user)
-        : QnResourceAccessSubject(userRolesManager()->userRole(roleId));
-
-    QnUserResourcePtr owner = layout->getParentResource().dynamicCast<QnUserResource>();
-    if (owner && owner == user)
-        return; /* Sharing layout with its owner does nothing. */
-
-    /* Here layout will become shared, and owner will keep access rights. */
-    if (owner && !layout->isShared())
-        shareLayoutWith(layout, owner);
-
-    shareLayoutWith(layout, subject);
-}
-
-void LayoutsHandler::at_stopSharingLayoutAction_triggered()
-{
-    auto params = menu()->currentParameters(sender());
-    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
-    NX_ASSERT(user || !roleId.isNull());
-    if (!user && roleId.isNull())
-        return;
-
-    QnResourceAccessSubject subject = user
-        ? QnResourceAccessSubject(user)
-        : QnResourceAccessSubject(userRolesManager()->userRole(roleId));
-    if (!subject.isValid())
-        return;
-
-    QnLayoutResourceList sharedLayouts;
-    for (auto resource: params.resources().filtered<QnLayoutResource>())
-    {
-        if (resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
-            sharedLayouts << resource;
-    }
-    if (sharedLayouts.isEmpty())
-        return;
-
-    if (!confirmStopSharingLayouts(subject, sharedLayouts))
-        return;
-
-    auto accessible = sharedResourcesManager()->sharedResources(subject);
-    for (const auto& layout : sharedLayouts)
-    {
-        NX_ASSERT(!layout->isFile());
-        accessible.remove(layout->getId());
-    }
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
 }
 
 void LayoutsHandler::at_openNewTabAction_triggered()

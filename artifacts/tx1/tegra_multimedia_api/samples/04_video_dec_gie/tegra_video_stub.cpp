@@ -10,8 +10,10 @@
 
 #define NX_PRINT_PREFIX "[tegra_video_stub" << (m_id.empty() ? "" : " #" + m_id) << "] "
 #include <nx/kit/debug.h>
+#include <queue>
 
 #include "tegra_video_ini.h"
+#include "rects_serialization.h"
 
 namespace {
 
@@ -70,18 +72,38 @@ public:
         NX_OUTPUT << __func__ << "(data, dataSize: " << compressedFrame->dataSize
             << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
 
+        ++m_currentFrameIndex;
+        if (ini().stubMetadataFrequency != 0)
+        {
+            if (m_currentFrameIndex % ini().stubMetadataFrequency != 0)
+                return true;
+        }
+
         m_hasMetadata = true;
-        m_ptsUs = compressedFrame->ptsUs;
+        m_ptsUsQueue.push(compressedFrame->ptsUs);
+
         return true;
     }
 
     virtual bool pullRectsForFrame(
-        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override
+        Rect outRects[], int maxRectCount, int* outRectCount, int64_t* outPtsUs) override
     {
         NX_OUTPUT << __func__ << "() -> true";
 
-        *outPtsUs = m_ptsUs;
-        makeRectangles(outRects, maxRectsCount, outRectsCount);
+        *outPtsUs = m_ptsUsQueue.front();
+        m_ptsUsQueue.pop();
+
+        if (ini().rectanglesFilePrefix[0])
+        {
+            const std::string filename =
+                ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", *outPtsUs);
+            if (!readRectsFromFile(filename, outRects, maxRectCount, outRectCount))
+                return false; //< Error already logged.
+        }
+        else
+        {
+            makeRectangles(outRects, maxRectCount, outRectCount);
+        }
         m_hasMetadata = false;
 
         return true;
@@ -107,22 +129,25 @@ private:
         }
     }
 
-    void makeRectangles(Rect outRects[], int maxRectsCount, int* outRectsCount)
+    void makeRectangles(Rect outRects[], int maxRectCount, int* outRectCount)
     {
-        *outRectsCount = 0;
-        const auto width = (float)ini().stubRectangleWidth / 100;
-        const auto height = (float)ini().stubRectangleWidth / 100;
-        const auto rectangleCount = std::min(ini().stubNumberOfRectangles, maxRectsCount);
+        *outRectCount = 0;
+        const auto width = (float) ini().stubRectangleWidth / 100;
+        const auto height = (float) ini().stubRectangleWidth / 100;
+        const auto rectangleCount = std::min(ini().stubNumberOfRectangles, maxRectCount);
+        const int frequencyCoefficient =
+            ini().stubMetadataFrequency ? ini().stubMetadataFrequency : 1;
+
 
         for (int i = 0; i < rectangleCount; ++i)
         {
             auto& center = m_currentRectangleCenters[i];
-            center.y += 0.02;
+            center.y += 0.02 * frequencyCoefficient;
             if (center.y > 1)
                 center.y = 0;
 
             outRects[i] = makeRectangleFromCenter(center);
-            ++(*outRectsCount);
+            ++(*outRectCount);
         }
     }
 
@@ -135,14 +160,14 @@ private:
         rectangle.x = std::max(0.0f, std::min(1.0f, center.x - width / 2));
         rectangle.y = std::max(0.0f, std::min(1.0f, center.y - height / 2));
 
-        rectangle.width = std::min(1.0f - rectangle.x, width);
-        rectangle.height = std::min(1.0f - rectangle.y, height);
+        rectangle.w = std::min(1.0f - rectangle.x, width);
+        rectangle.h = std::min(1.0f - rectangle.y, height);
 
         return rectangle;
     }
 
 private:
-    int64_t m_ptsUs;
+    std::queue<int64_t> m_ptsUsQueue;
     std::string m_id;
     std::string m_modelFile;
     std::string m_deployFile;
@@ -151,6 +176,7 @@ private:
     int m_netHeight = 0;
 
     bool m_hasMetadata = false;
+    int m_currentFrameIndex = 0;
 
     std::vector<PointF> m_currentRectangleCenters;
 };

@@ -32,7 +32,8 @@ namespace {
 
 QnUuid getActionRunningKey(const nx::vms::event::AbstractActionPtr& action)
 {
-    const auto key = action->getExternalUniqKey();
+    const auto key = action->getExternalUniqKey()
+        + action->getParams().actionResourceId.toString();
     return guidFromArbitraryData(key);
 }
 
@@ -165,7 +166,14 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
         // We need to save action to the log before proxy.
         // It is needed for event log for 'view video' operation.
         // Foreign server won't be able to perform this.
-        qnServerDb->saveActionToDB(action);
+        if (!shouldOmitActionLogging(action))
+        {
+            qnServerDb->saveActionToDB(action);
+        }
+        else
+        {
+            NX_DEBUG(this, "Event logging was omitted from doProxyAction");
+        }
     }
 }
 
@@ -217,8 +225,16 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
                 broadcastAction(action);
                 // These actions are marked as requiring camera resource,
                 // but in "play to client" mode they don't require it.
-                if (resources.isEmpty())
+                // And we should skip logging for generic user events
+                if (!shouldOmitActionLogging(action))
+                {
                     qnServerDb->saveActionToDB(action);
+                }
+                else
+                {
+                    NX_DEBUG(this, "Event logging was omitted from executeAction");
+                }
+
             }
             break;
         }
@@ -376,10 +392,11 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
 {
     QnMutexLocker lock(&m_mutex);
 
+    // Get pairs of {rule, action} for event
     const auto actions = matchActions(event);
 
     for (const auto& action: actions)
-        executeAction(action);
+        executeAction(action.second);
 }
 
 bool RuleProcessor::containsResource(const QnResourceList& resList, const QnUuid& resId) const
@@ -506,6 +523,20 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     return vms::event::AbstractActionPtr();
 }
 
+bool RuleProcessor::shouldOmitActionLogging(const vms::event::AbstractActionPtr& action) const
+{
+    nx::vms::event::RuleManager* manager = commonModule()->eventRuleManager();
+    const vms::event::RulePtr& rule = manager->rule(action->getRuleId());
+    if (rule.isNull())
+        return false;
+    const vms::event::EventParameters& eventParameters = rule->eventParams();
+    if (!eventParameters.omitDbLogging)
+        return false;
+    const auto eventType = action->getRuntimeParams().eventType;
+    return eventType == vms::event::EventType::softwareTriggerEvent
+        || eventType == vms::event::EventType::userDefinedEvent;
+}
+
 void RuleProcessor::at_timer()
 {
     QnMutexLocker lock(&m_mutex);
@@ -527,8 +558,11 @@ void RuleProcessor::at_timer()
 }
 
 bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& event,
-    const vms::event::RulePtr& rule)
+    const vms::event::RulePtr& rule) const
 {
+    if (rule->isDisabled() || rule->eventType() != event->getEventType())
+        return false;
+
     const bool resOK = !event->getResource()
         || rule->eventResources().isEmpty()
         || rule->eventResources().contains(event->getResource()->getId());
@@ -542,44 +576,46 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (!vms::event::hasToggleState(event->getEventType()))
         return true;
 
-    // For continuing event put information to m_eventsInProgress.
-    QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
-    RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
-    if (event->getToggleState() == vms::event::EventState::active)
-        runtimeRule.resources[resId] = event;
-    else
-        runtimeRule.resources.remove(resId);
-
     return true;
 }
 
-vms::event::AbstractActionList RuleProcessor::matchActions(
+RuleProcessor::EventActions RuleProcessor::matchActions(
     const vms::event::AbstractEventPtr& event)
 {
-    vms::event::AbstractActionList result;
+    RuleProcessor::EventActions result;
     for (const vms::event::RulePtr& rule: m_rules)
     {
-        if (rule->isDisabled() || rule->eventType() != event->getEventType())
-            continue;
         bool condOK = checkEventCondition(event, rule);
-        if (condOK)
-        {
-            vms::event::AbstractActionPtr action;
+        if (!condOK)
+            continue;
 
-            if (rule->isActionProlonged())
-                action = processToggleableAction(event, rule);
-            else
-                action = processInstantAction(event, rule);
+        // This was taken from checkEventConditioning
+        // TODO: think a bit more about reasoning in this piece of code
+        // Add to rulesInProgress
+        // For continuing event put information to m_eventsInProgress.
+        QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
+        RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
+        if (event->getToggleState() == vms::event::EventState::active)
+            runtimeRule.resources[resId] = event;
+        else
+            runtimeRule.resources.remove(resId);
 
-            if (action)
-                result << action;
+        vms::event::AbstractActionPtr action;
 
-            RunningRuleMap::Iterator itr = m_rulesInProgress.find(rule->getUniqueId());
-            if (itr != m_rulesInProgress.end() && itr->resources.isEmpty())
-                m_rulesInProgress.erase(itr); // clear running info if event is finished (all running event resources actually finished)
-        }
+        if (rule->isActionProlonged())
+            action = processToggleableAction(event, rule);
+        else
+            action = processInstantAction(event, rule);
+
+        if (action)
+            result.push_back(std::make_pair(rule, action));
+
+        // Remove from rulesInProgress
+        RunningRuleMap::Iterator itr = m_rulesInProgress.find(rule->getUniqueId());
+        if (itr != m_rulesInProgress.end() && itr->resources.isEmpty())
+            m_rulesInProgress.erase(itr); // clear running info if event is finished (all running event resources actually finished)
     }
-    return result;
+    return std::move(result);
 }
 
 void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& action)

@@ -299,7 +299,19 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     }
 
     if (result)
-        qnServerDb->saveActionToDB(action);
+    {
+        // Check whether we need to save this action to DB
+        //const vms::event::EventParameters& eventParameters = action->getRuntimeParams();
+        //bool omitLogging = eventParameters.omitDbLogging && eventParameters.eventType == vms::event::EventType::softwareTriggerEvent;
+        if (!shouldOmitActionLogging(action))
+        {
+            qnServerDb->saveActionToDB(action);
+        }
+        else
+        {
+            NX_DEBUG(this, "Omitted event logging at executeActionInternal");
+        }
+    }
 
     return result;
 }
@@ -491,7 +503,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                0, /* Record-before setup is forbidden */
+                action->getRecordBeforeSec(), /* Record-before setup is not forbidden after VMS-7148 */
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }

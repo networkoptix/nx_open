@@ -19,6 +19,7 @@ namespace desktop {
 class EventSearchListModel;
 class BookmarkSearchListModel;
 class AnalyticsSearchListModel;
+class BusyIndicatorModel;
 
 class UnifiedSearchListModel::Private: public QObject
 {
@@ -35,6 +36,9 @@ public:
     Types filter() const;
     void setFilter(Types filter);
 
+    QnTimePeriod selectedTimePeriod() const;
+    void setSelectedTimePeriod(const QnTimePeriod& value);
+
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);
 
@@ -47,6 +51,8 @@ public:
 
 private:
     void updateModels();
+    void ensureFetchMore();
+    bool fetchInProgress() const;
 
 private:
     UnifiedSearchListModel* const q = nullptr;
@@ -54,21 +60,19 @@ private:
     Types m_filter = Type::all;
     vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
 
-    EventSearchListModel* const m_eventsModel;
-    BookmarkSearchListModel* const m_bookmarksModel;
-    AnalyticsSearchListModel* const m_analyticsModel;
+    EventSearchListModel* const m_eventsModel = nullptr;
+    BookmarkSearchListModel* const m_bookmarksModel = nullptr;
+    AnalyticsSearchListModel* const m_analyticsModel = nullptr;
+    BusyIndicatorModel* const m_busyIndicatorModel = nullptr;
 
     qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
     qint64 m_latestTimeMs = -1;
 
     QWeakPointer<QnRaiiGuard> m_currentFetchGuard;
-    Types m_fetchingTypes;
     qint64 m_latestStartTimeMs = -1; //< Synchronization point used during fetch.
-
-    // A flag to request updateModels() call after current fetch finishes:
-    bool m_needToUpdateModels = false;
+    bool m_queuedFetchMore = false;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

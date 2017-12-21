@@ -468,6 +468,6 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

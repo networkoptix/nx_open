@@ -648,9 +648,15 @@ void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
-        setMotionSearchModeEnabled(false);
+    {
+        titleBar()->rightButtonsBar()->setButtonsChecked(
+            Qn::MotionSearchButton | Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton,
+            false);
+    }
     else
+    {
         m_areaSelectOverlayWidget->clearSelectedArea();
+    }
 }
 
 QString QnMediaResourceWidget::overlayCustomButtonText(
@@ -1607,11 +1613,11 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (isAnalyticsEnabled())
         d->analyticsController->updateAreas(timestamp, channel);
 
-    if (const auto provider = d->analyticsMetadataProvider)
+    if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
     {
         // TODO: Rewrite old-style analytics visualization (via zoom windows) with metadata
         // providers.
-        if (const auto metadata = provider->metadata(timestamp, channel))
+        if (const auto metadata = d->analyticsMetadataProvider->metadata(timestamp, channel))
             qnMetadataAnalyticsController->gotMetadata(d->resource, metadata);
     }
 

@@ -5,6 +5,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/globals.h>
 
 #include <common/common_module.h>
 
@@ -94,8 +95,20 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(QWidget* parent):
     ui->secondStreamQualityComboBox->addItem(tr("Medium"), Qn::SSQualityMedium);
     ui->secondStreamQualityComboBox->addItem(tr("High"), Qn::SSQualityHigh);
 
-    ui->iconLabel->setPixmap(qnSkin->pixmap("legacy/warning.png"));
+    ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
     ui->iconLabel->setScaledContents(true);
+
+    static const auto styleTemplateRaw = QString::fromLatin1(R"(.QWidget {
+        border-style: solid;
+        border-color: %1;
+        border-width: 1px;
+        border-radius: 2;
+    })");
+
+    const auto color = qnGlobals->errorTextColor();
+
+    static const auto styleTemplate = styleTemplateRaw.arg(color.name(QColor::HexArgb));
+    ui->warningContainer->setStyleSheet(styleTemplate);
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled,
         ui->secondStreamGroupBox, &QGroupBox::setDisabled);

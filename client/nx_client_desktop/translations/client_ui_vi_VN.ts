@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Loại sự kiện:</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Đánh dấu thông tin</translation>
     </message>
     <message>
       <location/>
@@ -371,17 +371,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Kích thước hình ảnh</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Cỡ chữ</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Bao gồm mô tả</translation>
     </message>
   </context>
   <context>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
     </message>
     <message>
       <location/>
@@ -700,22 +700,22 @@
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Giữ các luồng camera và cài đặt cấu hình</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Cài đặt chất lượng và tốc độ khung hình (FPS) trong Lịch ghi âm sẽ trở nên không có liên quan.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Tính tỷ lệ bit trên mỗi GOP thay vì tốc độ bit trên giây</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Nó sẽ tăng bitrate cho camera</translation>
     </message>
     <message>
       <location/>
@@ -725,7 +725,7 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Vô hiệu hóa luồng thứ cấp</translation>
     </message>
     <message>
       <location/>
@@ -740,12 +740,12 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>Lưu trữ</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Luồng truyền thông</translation>
     </message>
     <message>
       <location/>
@@ -1056,12 +1056,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Xác thực...</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Loại yêu cầu</translation>
     </message>
   </context>
   <context>
@@ -1077,12 +1077,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Xuất cài đặt</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Đặt chỉ đọc</translation>
     </message>
   </context>
   <context>
@@ -1090,22 +1090,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Xuất cài đặt</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Áp dụng các bộ lọc</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotation, Dewarping, Image Enhancement vv</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>Nếu đang áp dụng bộ lọc và thêm lớp phủ đòi hỏi chuyển mã sẽ làm tăng việc sử dụng CPU và có thể mất nhiều thời gian.</translation>
     </message>
   </context>
   <context>
@@ -1141,22 +1141,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Xuất video</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Camera đơn</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Xuất cài đặt</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Nhiều Video</translation>
     </message>
   </context>
   <context>
@@ -1334,12 +1334,12 @@
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Độ mờ</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Mặc định</translation>
     </message>
     <message>
       <location/>
@@ -2280,12 +2280,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Chiều dài video ban đầu</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Độ dài video đã xuất</translation>
     </message>
     <message>
       <location/>
@@ -2295,12 +2295,12 @@
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Khoảng thời gian khung hình</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Đặt lại Tốc độ</translation>
     </message>
   </context>
   <context>
@@ -2961,7 +2961,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Văn bản</translation>
     </message>
     <message>
       <location/>
@@ -2971,17 +2971,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Cỡ chữ</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Nhập văn bản dạng text hoặc HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Kích thước hình ảnh</translation>
     </message>
   </context>
   <context>
@@ -3007,7 +3007,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Cỡ chữ</translation>
     </message>
     <message>
       <location/>

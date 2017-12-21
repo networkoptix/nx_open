@@ -1,0 +1,5 @@
+platforms:
+  linux-x64:
+    c_compiler: gcc-7
+    cxx_compiler: g++-7
+

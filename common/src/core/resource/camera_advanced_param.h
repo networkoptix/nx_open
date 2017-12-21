@@ -46,6 +46,7 @@ struct QnCameraAdvancedParameterCondition
         notInRange,
         present, //< Watched parameter is present in parameter list
         notPresent,
+        valueChanged,
         unknown
     };
 
@@ -66,6 +67,7 @@ struct QnCameraAdvancedParameterDependency
     {
         show,
         range,
+        trigger,
         unknown
     };
 
@@ -74,9 +76,6 @@ struct QnCameraAdvancedParameterDependency
     QString range;
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;
-
-    static DependencyType fromStringToDependencyType(const QString& dependencyType);
-    static QString fromDependencyTypeToString(const DependencyType& dependencyType);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType, (lexical))
@@ -113,6 +112,8 @@ struct QnCameraAdvancedParameter
     QString unit;
     QString notes;
     bool resync = false;
+    bool shouldKeepInitialValue = false;
+    bool bindDefaultToMinimum = false;
 
     bool isValid() const;
     QStringList getRange() const;
@@ -146,7 +147,9 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (dependencies)\
     (showRange)\
     (unit)\
-    (notes)
+    (notes)\
+    (shouldKeepInitialValue)\
+    (bindDefaultToMinimum)
 
 struct QnCameraAdvancedParamGroup
 {

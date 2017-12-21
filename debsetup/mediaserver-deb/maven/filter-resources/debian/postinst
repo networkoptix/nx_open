@@ -39,6 +39,7 @@ TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
 CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
+SYSTEM_USER=$COMPANY_NAME
 
 function is_local_addr {
     local hostname=$1;
@@ -250,6 +251,18 @@ case "$1" in
         if [ '${arch}' != 'arm' ]
         then
             [ -n "$UPGRADING" ] && $DBSYNC
+        fi
+
+        if [ ! -z "$SYSTEM_USER" ]; then
+            $CFG_HELPER systemUser "$SYSTEM_USER"
+            useradd "$SYSTEM_USER" || true
+
+            # Allow core dumps creation.
+            chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
+
+            # Helper tool to get root permissions.
+            chown "root:$SYSTEM_USER" "$BIN_DIR/root_tool"
+            chmod 4750 "$BIN_DIR/root_tool"
         fi
   ;;
 

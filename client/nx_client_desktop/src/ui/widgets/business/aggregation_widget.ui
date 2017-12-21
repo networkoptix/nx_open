@@ -51,7 +51,7 @@
      </widget>
    </item>
    <item>
-     <widget class="QnTimeDurationWidget" name="periodWidget" native="true">
+     <widget class="nx::client::desktop::TimeDurationWidget" name="periodWidget" native="true">
      </widget>
    </item>
    <item>
@@ -78,7 +78,7 @@
  </widget>
   <customwidgets>
     <customwidget>
-      <class>QnTimeDurationWidget</class>
+      <class>nx::client::desktop::TimeDurationWidget</class>
       <extends>QWidget</extends>
       <header location="global">ui/widgets/business/time_duration_widget.h</header>
       <container>1</container>

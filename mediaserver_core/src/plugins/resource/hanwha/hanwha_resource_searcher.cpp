@@ -44,9 +44,9 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+    QnAbstractNetworkResourceSearcher(commonModule),
+    nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType)
 {
-	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
 

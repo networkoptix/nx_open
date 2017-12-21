@@ -1,4 +1,5 @@
 #include "spush_media_stream_provider.h"
+#include "nx/streaming/ini.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -199,7 +200,8 @@ void CLServerPushStreamReader::run()
         if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
-        checkTime(data);
+        if (!nxStreamingIni().disableTimeCorrection)
+            checkTime(data);
 
         if (canChangeStatus())
         {

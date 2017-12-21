@@ -32,7 +32,13 @@ AbstractCameraAdvancedParamWidget::AbstractCameraAdvancedParamWidget(const QnCam
     setLayout(m_layout);
 }
 
-class BoolCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget {
+void AbstractCameraAdvancedParamWidget::setRange(const QString& /*range*/)
+{
+    NX_ASSERT(false, lit("setRange allowed to be called only for Enumeration widget."));
+}
+
+class BoolCameraAdvancedParamWidget: public AbstractCameraAdvancedParamWidget
+{
 public:
     BoolCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
         AbstractCameraAdvancedParamWidget(parameter, parent),

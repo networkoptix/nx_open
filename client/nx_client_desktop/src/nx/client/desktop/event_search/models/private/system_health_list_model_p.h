@@ -72,6 +72,6 @@ private:
     std::deque<Item> m_items; //< Kept sorted.
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

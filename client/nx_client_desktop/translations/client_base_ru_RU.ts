@@ -4532,10 +4532,10 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Установить для всех %n камер</numerusform>
+        <numerusform>Установить для всех %n камер</numerusform>
+        <numerusform>Установить для всех %n камер</numerusform>
       </translation>
     </message>
   </context>
@@ -6184,7 +6184,7 @@ to %1</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Установить для этой камеры</translation>
     </message>
   </context>
   <context>
@@ -7870,7 +7870,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Нет данных для экспорта.</translation>
     </message>
   </context>
   <context>
@@ -8286,7 +8286,7 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>Произвольное событие наступит если cобытие аналитики удовлетворяет всем условиям, указанным выше. Если подстрока пустая, то проверка будет пройдена при любом значении в соответствующем поле события.</translation>
     </message>
   </context>
   <context>
@@ -8646,7 +8646,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>Не удалось сменить пароль на %1 из %2 камер</translation>
     </message>
   </context>
   <context>

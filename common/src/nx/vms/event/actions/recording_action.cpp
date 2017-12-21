@@ -31,6 +31,11 @@ int RecordingAction::getRecordAfterSec() const
     return m_params.recordAfter;
 }
 
+int RecordingAction::getRecordBeforeSec() const
+{
+    return m_params.recordBeforeMs / 1000;
+}
+
 } // namespace event
 } // namespace vms
 } // namespace nx

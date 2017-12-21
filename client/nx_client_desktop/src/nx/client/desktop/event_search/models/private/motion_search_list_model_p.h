@@ -39,6 +39,6 @@ private:
     std::deque<QnTimePeriod> m_data; //< Reversed list.
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

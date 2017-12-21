@@ -20,8 +20,12 @@ public:
     virtual ~QnTableView();
 
     virtual QSize viewportSizeHint() const override;
+    virtual void setModel(QAbstractItemModel* newModel) override;
 
     QnItemViewHoverTracker* hoverTracker() const;
+
+    // Takes ownership of delegate
+    void setPersistentDelegateForColumn(int column, QAbstractItemDelegate* delegate);
 
 protected:
     virtual bool edit(const QModelIndex& index, EditTrigger trigger, QEvent* event) override;
@@ -31,6 +35,11 @@ protected:
 private:
     QRect rowRect(int row) const;
 
+    void openEditorsForColumn(int column, int firstRow, int lastRow);
+
 private:
     QnItemViewHoverTracker* m_tracker;
+
+    using ColumnDelegateHash = QHash<int, QPointer<QAbstractItemDelegate>>;
+    ColumnDelegateHash m_delegates;
 };

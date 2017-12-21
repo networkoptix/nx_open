@@ -49,12 +49,12 @@ public:
     {
         float x = 0;
         float y = 0;
-        float width = 0;
-        float height = 0;
+        float w = 0;
+        float h = 0;
     };
 
     virtual bool pullRectsForFrame(
-        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) = 0;
+        Rect outRects[], int maxRectCount, int* outRectCount, int64_t* outPtsUs) = 0;
 
     virtual bool hasMetadata() const = 0;
 };

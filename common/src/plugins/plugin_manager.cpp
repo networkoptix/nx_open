@@ -13,6 +13,7 @@
 #include <decoders/abstractvideodecoderplugin.h>
 #include <plugins/camera_plugin.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <plugins/plugin_tools.h>
 
 #include "plugins_ini.h"
 
@@ -199,31 +200,22 @@ bool PluginManager::loadNxPlugin(
     NX_WARNING(this) << lit("Successfully loaded NX plugin %1").arg(filePath);
     m_nxPlugins.push_back(obj);
 
-    // Check whether the plugin supports nxpl::Plugin interface.
-    auto pluginObj = static_cast<nxpl::Plugin*>(obj->queryInterface(nxpl::IID_Plugin));
-    if (pluginObj)
+    if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
         // Report settings to the plugin.
         if (!settingsForPlugin.empty())
             pluginObj->setSettings(&settingsForPlugin[0], settingsForPlugin.size());
-
-        pluginObj->releaseRef();
     }
 
-    auto plugin2Obj = static_cast<nxpl::Plugin2*>(obj->queryInterface(nxpl::IID_Plugin2));
-    if (plugin2Obj)
+    if (auto plugin2Obj = nxpt::ScopedRef<nxpl::Plugin2>(obj->queryInterface(nxpl::IID_Plugin2)))
     {
         if (m_pluginContainer)
             plugin2Obj->setPluginContainer(m_pluginContainer);
-
-        plugin2Obj->releaseRef();
     }
 
-    auto plugin3Obj = static_cast<nxpl::Plugin3*>(obj->queryInterface(nxpl::IID_Plugin3));
-    if (plugin3Obj)
+    if (auto plugin3Obj = nxpt::ScopedRef<nxpl::Plugin3>(obj->queryInterface(nxpl::IID_Plugin3)))
     {
         plugin3Obj->setLocale("en_US"); //< TODO: Change to the real locale.
-        plugin3Obj->releaseRef();
     }
 
     emit pluginLoaded();

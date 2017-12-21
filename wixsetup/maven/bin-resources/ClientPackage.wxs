@@ -7,7 +7,7 @@
             <MsiPackage
                 Id="ClientPackage"
                 Name="$(var.ClientMsiName)"
-                SourceFile="$(var.InstallerTargetDir)/$(var.ClientMsiName)"
+                SourceFile="$(var.ClientStrippedMsiFile)"
                 InstallCondition="InstallClientOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"
                 Compressed="yes">

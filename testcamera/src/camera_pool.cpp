@@ -125,14 +125,20 @@ QnCameraPool* QnCameraPool::instance()
     return inst;
 }
 
-QnCameraPool::QnCameraPool(const QStringList& localInterfacesToListen,
-    QnCommonModule* commonModule)
+QnCameraPool::QnCameraPool(
+    const QStringList& localInterfacesToListen,
+    QnCommonModule* commonModule,
+    bool noSecondaryStream,
+    int fps)
     :
     QnTcpListener(commonModule,
         localInterfacesToListen.isEmpty()
         ? QHostAddress::Any
         : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT),
-    m_cameraNum(0)
+    m_cameraNum(0),
+    m_noSecondaryStream(noSecondaryStream),
+    m_fps(fps)
+
 {
     m_discoveryListener = new QnCameraDiscoveryListener(localInterfacesToListen);
     m_discoveryListener->start();
@@ -143,7 +149,13 @@ QnCameraPool::~QnCameraPool()
     delete m_discoveryListener;
 }
 
-void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq)
+void QnCameraPool::addCameras(
+    bool cameraForEachFile,
+    bool includePts,
+    int count,
+    QStringList primaryFileList,
+    QStringList secondaryFileList,
+    int offlineFreq)
 {
     qDebug() << "Add" << count << "cameras from primary file(s)" << primaryFileList << " secondary file(s)" << secondaryFileList << "offlineFreq=" << offlineFreq;
     QMutexLocker lock(&m_mutex);
@@ -151,7 +163,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
     {
         for (int i = 0; i < count; ++i)
         {
-            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(primaryFileList);
             camera->setSecondaryFileList(secondaryFileList);
             camera->setOfflineFreq(offlineFreq);
@@ -169,7 +181,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
             QString primaryFile = primaryFileList[i];
             QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
 
-            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(QStringList() << primaryFile);
             camera->setSecondaryFileList(QStringList() << secondaryFile);
             camera->setOfflineFreq(offlineFreq);
@@ -187,7 +199,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, this);
+    return new QnTestCameraProcessor(clientSocket, this, m_noSecondaryStream, m_fps);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

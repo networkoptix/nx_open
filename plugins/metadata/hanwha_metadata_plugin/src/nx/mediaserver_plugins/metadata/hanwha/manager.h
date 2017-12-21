@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -67,4 +67,4 @@ private:
 } // namespace mediaserver_plugins
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <QtWidgets/QLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QCheckBox>
@@ -14,10 +15,12 @@
 #include <ui/widgets/common/search_line_edit.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -28,7 +31,11 @@ namespace desktop {
 namespace {
 
 static const auto kFilterDelay = std::chrono::milliseconds(250);
-static const auto kTextButtonHeight = 24;
+static const auto kTimeSelectionDelay = std::chrono::milliseconds(250);
+static constexpr int kTextButtonHeight = 24;
+
+static const QnTimePeriod kEntiretyTimePeriod(QnTimePeriod::kMinTimeValue,
+    QnTimePeriod::kMaxTimeValue);
 
 class EventSortFilterModel: public QnSortFilterListModel
 {
@@ -53,6 +60,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     m_superTypeButton(new QPushButton(m_headerWidget)),
     m_eventTypeButton(new QPushButton(m_headerWidget)),
     m_selectAreaCheckBox(new QCheckBox(m_headerWidget)),
+    m_timeSelectionLabel(new QLabel(m_headerWidget)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
     m_searchLineEdit->setTextChangedSignalFilterMs(std::chrono::milliseconds(kFilterDelay).count());
@@ -72,8 +80,12 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     buttonsLayout->addWidget(m_selectAreaCheckBox);
     buttonsLayout->setAlignment(m_selectAreaCheckBox, Qt::AlignLeft);
 
+    m_timeSelectionLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    m_timeSelectionLabel->setHidden(true);
+
     auto layout = m_headerWidget->layout();
     layout->addWidget(m_searchLineEdit);
+    layout->addWidget(m_timeSelectionLabel);
     layout->addWidget(buttonsHolder);
 
     m_sortFilterModel->setSourceModel(m_model);
@@ -105,6 +117,20 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
             // Queue more fetch after a short delay.
             static const int kReFetchDelayMs = 50;
             queueFetchMoreIfNeeded(kReFetchDelayMs);
+        });
+
+    auto applyTimePeriod = new utils::PendingOperation(
+        [this]() { updateEffectiveTimePeriod(); },
+        std::chrono::milliseconds(kTimeSelectionDelay).count(),
+        this);
+
+    applyTimePeriod->setFlags(utils::PendingOperation::NoFlags);
+
+    connect(navigator(), &QnWorkbenchNavigator::timeSelectionChanged, this,
+        [this, applyTimePeriod](const QnTimePeriod& selection)
+        {
+            m_desiredTimePeriod = selection.isEmpty() ? kEntiretyTimePeriod : selection;
+            applyTimePeriod->requestOperation();
         });
 }
 
@@ -225,10 +251,40 @@ void EventSearchWidget::Private::updateButtonVisibility()
     if (!updated)
         return;
 
-    for (auto w = m_eventTypeButton->parentWidget(); w != nullptr; w = w->parentWidget())
+    activateLayouts(m_eventTypeButton->parentWidget());
+}
+
+void EventSearchWidget::Private::updateEffectiveTimePeriod()
+{
+    m_model->setSelectedTimePeriod(m_desiredTimePeriod);
+
+    const bool entirety = m_desiredTimePeriod == kEntiretyTimePeriod;
+    m_timeSelectionLabel->setHidden(entirety);
+    if (!entirety)
     {
-        if (w->layout())
-            w->layout()->activate();
+        const auto toString =
+            [](qint64 fromEpochMs)
+            {
+                return QDateTime::fromMSecsSinceEpoch(fromEpochMs).toString(Qt::RFC2822Date);
+            };
+
+        const auto text = lit("<b>%1</b> %3<br><b>%2</b> %4")
+            .arg(tr("From:")).arg(tr("To:"))
+            .arg(toString(m_desiredTimePeriod.startTimeMs))
+            .arg(toString(m_desiredTimePeriod.endTimeMs()));
+
+        m_timeSelectionLabel->setText(text);
+    }
+
+    activateLayouts(m_timeSelectionLabel->parentWidget());
+}
+
+void EventSearchWidget::Private::activateLayouts(QWidget* from)
+{
+    for (auto widget = from; widget != nullptr; widget = widget->parentWidget())
+    {
+        if (widget->layout())
+            widget->layout()->activate();
     }
 }
 

@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "metadata_monitor.h"
 
@@ -62,6 +62,7 @@ void MetadataMonitor::stopMonitoring()
             if (m_httpClient)
                 m_httpClient->pleaseStopSync();
 
+            m_timer.pleaseStopSync();
             promise.set_value();
         });
 
@@ -163,4 +164,4 @@ void MetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr /*httpClie
 } // namespace mediaserver_plugins
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

@@ -6,4 +6,3 @@
 #define QnSpinboxDoubleValueChanged     static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged)
 #define QnButtonGroupIdToggled          static_cast<void (QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled)
 #define QnDoubleSpinBoxValueChanged     static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged)
-#define QnTimeDurationWidgetValueChanged        static_cast<void (QnTimeDurationWidget::*)(int)>(&QnTimeDurationWidget::valueChanged)

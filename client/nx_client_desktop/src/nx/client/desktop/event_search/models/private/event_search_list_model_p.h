@@ -3,7 +3,6 @@
 #include "../event_search_list_model.h"
 
 #include <deque>
-#include <limits>
 
 #include <QtCore/QHash>
 #include <QtCore/QScopedPointer>
@@ -11,6 +10,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/actions/abstract_action.h>
 
@@ -24,29 +24,39 @@ namespace vms { namespace event { class StringsHelper; }}
 namespace client {
 namespace desktop {
 
-class EventSearchListModel::Private: public QObject
+class EventSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = AbstractAsyncSearchListModel::Private;
 
 public:
     explicit Private(EventSearchListModel* q);
     virtual ~Private() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    virtual void setCamera(const QnVirtualCameraResourcePtr& camera) override;
 
     vms::event::EventType selectedEventType() const;
     void setSelectedEventType(vms::event::EventType value);
 
-    int count() const;
-    const vms::event::ActionData& getEvent(int index) const;
+    virtual int count() const override;
+    virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
-    void clear();
+    virtual void clear() override;
 
-    bool canFetchMore() const;
-    bool prefetch(PrefetchCompletionHandler completionHandler);
-    void commitPrefetch(qint64 latestStartTimeMs);
+protected:
+    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
+    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
+    virtual void clipToSelectedTimePeriod() override;
+    virtual bool hasAccessRights() const override;
+
+private:
+    void periodicUpdate();
+    void refreshUpdateTimer();
+    void addNewlyReceivedEvents(vms::event::ActionDataList&& data);
+
+    using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
+    rest::Handle getEvents(qint64 startMs, qint64 endMs, GetCallback callback,
+        int limit = std::numeric_limits<int>::max());
 
     QString title(vms::event::EventType eventType) const;
     QString description(const vms::event::EventParameters& parameters) const;
@@ -55,30 +65,18 @@ public:
     static bool hasPreview(vms::event::EventType eventType);
 
 private:
-    void periodicUpdate();
-    void addNewlyReceivedEvents(vms::event::ActionDataList&& data);
-
-    using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
-    rest::Handle getEvents(qint64 startMs, qint64 endMs, GetCallback callback,
-        int limit = std::numeric_limits<int>::max());
-
-private:
     EventSearchListModel* const q = nullptr;
-    QnVirtualCameraResourcePtr m_camera;
     vms::event::EventType m_selectedEventType = vms::event::undefinedEvent;
     QScopedPointer<QTimer> m_updateTimer;
-    QScopedPointer<vms::event::StringsHelper> m_helper;
+    mutable QScopedPointer<vms::event::StringsHelper> m_helper;
     qint64 m_latestTimeMs = 0;
-    qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    rest::Handle m_currentFetchId = rest::Handle();
     rest::Handle m_currentUpdateId = rest::Handle();
-    bool m_fetchedAll = false;
-    bool m_success = true;
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;
+    bool m_success = false;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -329,7 +329,9 @@
             "default": {
                 "shadow":        "dark7",
                 "window":        "dark9",
-                "windowText":    "light16"
+                "windowText":    "light16",
+                "highlight":     "brand_core",
+                "alternateBase": "dark1.setAlpha(110)"
             }
         }
     },

@@ -35,7 +35,6 @@ class ManagerPool final:
     public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
-    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
 
     Q_OBJECT
 public:
@@ -61,6 +60,8 @@ public slots:
     void initExistingResources();
 
 private:
+    using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
+
     PluginList availablePlugins() const;
 
     void createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
@@ -79,7 +80,10 @@ private:
 
     bool isCameraAlive(const QnSecurityCamResourcePtr& camera) const;
 
-    void fetchMetadataForResourceUnsafe(ResourceMetadataContext& context, QSet<QnUuid>& eventTypeIds);
+    void fetchMetadataForResourceUnsafe(
+        const QnUuid& resourceId,
+        ResourceMetadataContext& context, 
+        QSet<QnUuid>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const

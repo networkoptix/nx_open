@@ -1,7 +1,9 @@
 #pragma once
 
 #include <nx/client/core/media/analytics_fwd.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <client_core/connection_context_aware.h>
+
+class QnMediaResourceWidget;
 
 namespace nx {
 namespace client {

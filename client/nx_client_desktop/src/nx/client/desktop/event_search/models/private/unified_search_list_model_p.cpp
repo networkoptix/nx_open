@@ -6,6 +6,8 @@
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
+#include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -17,9 +19,10 @@ UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
     q(q),
     m_eventsModel(new EventSearchListModel(q)),
     m_bookmarksModel(new BookmarkSearchListModel(q)),
-    m_analyticsModel(new AnalyticsSearchListModel(q))
+    m_analyticsModel(new AnalyticsSearchListModel(q)),
+    m_busyIndicatorModel(new BusyIndicatorModel(q))
 {
-    q->setModels({m_eventsModel, m_bookmarksModel, m_analyticsModel});
+    q->setModels({m_eventsModel, m_bookmarksModel, m_analyticsModel, m_busyIndicatorModel});
 }
 
 UnifiedSearchListModel::Private::~Private()
@@ -38,7 +41,7 @@ void UnifiedSearchListModel::Private::fetchMore()
     if (!canFetchMore())
         return;
 
-    NX_ASSERT(m_fetchingTypes == Types());
+    NX_ASSERT(!fetchInProgress());
 
     // Will be called after all prefetches are complete.
     auto totalCompletionHandler =
@@ -47,30 +50,36 @@ void UnifiedSearchListModel::Private::fetchMore()
             if (!guard)
                 return;
 
-            const bool emitSignals = !m_needToUpdateModels;
+            m_busyIndicatorModel->setActive(false);
 
-            if (emitSignals)
-                emit q->fetchAboutToBeCommitted(UnifiedSearchListModel::QPrivateSignal());
+            if (m_queuedFetchMore)
+            {
+                executeDelayedParented([this]() { ensureFetchMore(); }, 0, this);
+                m_queuedFetchMore = false;
+            }
 
-            if (m_fetchingTypes.testFlag(Type::events))
+            if (!fetchInProgress()) //< If previous fetch was completely cancelled.
+                return;
+
+            const auto oldRowCount = q->rowCount();
+
+            QnRaiiGuard fetchCommittedSignalGuard(
+                [this, oldRowCount]()
+                {
+                    emit q->fetchCommitted(q->rowCount() - oldRowCount,
+                        UnifiedSearchListModel::QPrivateSignal());
+                });
+
+            emit q->fetchAboutToBeCommitted(UnifiedSearchListModel::QPrivateSignal());
+
+            if (m_eventsModel->fetchInProgress())
                 m_eventsModel->commitPrefetch(m_latestStartTimeMs);
 
-            if (m_fetchingTypes.testFlag(Type::bookmarks))
+            if (m_bookmarksModel->fetchInProgress())
                 m_bookmarksModel->commitPrefetch(m_latestStartTimeMs);
 
-            if (m_fetchingTypes.testFlag(Type::analytics))
+            if (m_analyticsModel->fetchInProgress())
                 m_analyticsModel->commitPrefetch(m_latestStartTimeMs);
-
-            m_fetchingTypes = Types();
-
-            if (emitSignals)
-                emit q->fetchCommitted(UnifiedSearchListModel::QPrivateSignal());
-
-            if (m_needToUpdateModels)
-            {
-                executeDelayedParented([this]() { updateModels(); }, 0, this);
-                m_needToUpdateModels = false;
-            }
         };
 
     auto completionGuard = QnRaiiGuard::createDestructible(totalCompletionHandler);
@@ -84,16 +93,20 @@ void UnifiedSearchListModel::Private::fetchMore()
 
     m_latestStartTimeMs = 0;
     m_currentFetchGuard = completionGuard;
-    m_fetchingTypes = Types();
 
-    if (m_eventsModel->prefetchAsync(prefetchCompletionHandler))
-        m_fetchingTypes |= Type::events;
+    m_eventsModel->prefetchAsync(prefetchCompletionHandler);
+    m_bookmarksModel->prefetchAsync(prefetchCompletionHandler);
+    m_analyticsModel->prefetchAsync(prefetchCompletionHandler);
 
-    if (m_bookmarksModel->prefetchAsync(prefetchCompletionHandler))
-        m_fetchingTypes |= Type::bookmarks;
+    if (fetchInProgress())
+        m_busyIndicatorModel->setActive(true);
+}
 
-    if (m_analyticsModel->prefetchAsync(prefetchCompletionHandler))
-        m_fetchingTypes |= Type::analytics;
+bool UnifiedSearchListModel::Private::fetchInProgress() const
+{
+    return m_eventsModel->fetchInProgress()
+        || m_bookmarksModel->fetchInProgress()
+        || m_analyticsModel->fetchInProgress();
 }
 
 QnVirtualCameraResourcePtr UnifiedSearchListModel::Private::camera() const
@@ -120,8 +133,32 @@ void UnifiedSearchListModel::Private::setFilter(Types filter)
     if (filter == m_filter)
         return;
 
+    const bool somethingAdded = (filter & ~m_filter) != 0;
+    if (somethingAdded) //< We should not add new types to existing search.
+        clear();
+
     m_filter = filter;
     updateModels();
+}
+
+QnTimePeriod UnifiedSearchListModel::Private::selectedTimePeriod() const
+{
+    return m_eventsModel->selectedTimePeriod();
+}
+
+void UnifiedSearchListModel::Private::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    if (selectedTimePeriod() == value)
+        return;
+
+    qDebug() << "Selected time period from"
+        << utils::timestampToRfc2822(value.startTimeMs) << "to"
+        << utils::timestampToRfc2822(value.endTimeMs());
+
+    m_eventsModel->setSelectedTimePeriod(value);
+    m_bookmarksModel->setSelectedTimePeriod(value);
+    m_analyticsModel->setSelectedTimePeriod(value);
+    ensureFetchMore();
 }
 
 vms::event::EventType UnifiedSearchListModel::Private::selectedEventType() const
@@ -147,20 +184,18 @@ void UnifiedSearchListModel::Private::setAnalyticsSearchRect(const QRectF& relat
     m_analyticsModel->setFilterRect(relativeRect);
 
     if (m_filter.testFlag(Type::analytics))
-        updateModels();
+        ensureFetchMore();
+}
+
+void UnifiedSearchListModel::Private::clear()
+{
+    m_eventsModel->clear();
+    m_bookmarksModel->clear();
+    m_analyticsModel->clear();
 }
 
 void UnifiedSearchListModel::Private::updateModels()
 {
-    if (m_currentFetchGuard)
-    {
-        // We cannot update models during fetch, so queue it for later:
-        m_needToUpdateModels = true;
-        return;
-    }
-
-    m_needToUpdateModels = false;
-
     m_eventsModel->setCamera(m_filter.testFlag(Type::events)
         ? m_camera
         : QnVirtualCameraResourcePtr());
@@ -177,9 +212,23 @@ void UnifiedSearchListModel::Private::updateModels()
         ? m_camera
         : QnVirtualCameraResourcePtr());
 
-    fetchMore();
+    ensureFetchMore();
 }
 
-} // namespace
+void UnifiedSearchListModel::Private::ensureFetchMore()
+{
+    if (m_currentFetchGuard)
+    {
+        m_queuedFetchMore = true;
+    }
+    else
+    {
+        NX_ASSERT(!m_queuedFetchMore);
+        m_queuedFetchMore = false;
+        fetchMore();
+    }
+}
+
+} // namespace desktop
 } // namespace client
 } // namespace nx

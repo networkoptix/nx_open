@@ -1,4 +1,4 @@
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include "common.h"
 
@@ -68,4 +68,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanw
 } // namespace mediaserver_plugins
 } // namespace nx
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

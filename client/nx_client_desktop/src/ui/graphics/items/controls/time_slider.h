@@ -238,7 +238,7 @@ public:
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
-    void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
+    void selectionChanged(const QnTimePeriod& selection);
     void customContextMenuRequested(const QPointF& pos, const QPoint& screenPos);
     void selectionPressed();
     void selectionReleased();
