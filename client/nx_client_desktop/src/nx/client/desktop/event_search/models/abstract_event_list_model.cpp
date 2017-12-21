@@ -76,13 +76,6 @@ QString AbstractEventListModel::timestampText(qint64 timestampMs) const
     return dateTime.time().toString(Qt::DefaultLocaleShortDate);
 }
 
-QString AbstractEventListModel::debugTimestampToString(qint64 timestampMs)
-{
-    return timestampMs == DATETIME_NOW
-        ? lit("infinity")
-        : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
-}
-
 } // namespace desktop
 } // namespace client
 } // namespace nx

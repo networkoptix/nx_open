@@ -24,6 +24,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/utils/datetime.h>
 #include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
@@ -214,8 +215,8 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, q
             else
             {
                 qDebug() << "Pre-fetched" << m_prefetch.size() << "analytics from"
-                    << debugTimestampToString(startTimeMs(m_prefetch.back())) << "to"
-                    << debugTimestampToString(startTimeMs(m_prefetch.front()));
+                    << utils::timestampToRfc2822(startTimeMs(m_prefetch.back())) << "to"
+                    << utils::timestampToRfc2822(startTimeMs(m_prefetch.front()));
             }
 
             NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
@@ -224,8 +225,8 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(qint64 fromMs, q
                 : 0);
         };
 
-    qDebug() << "Requesting analytics from" << debugTimestampToString(fromMs)
-        << "to" << debugTimestampToString(toMs);
+    qDebug() << "Requesting analytics from" << utils::timestampToRfc2822(fromMs)
+        << "to" << utils::timestampToRfc2822(toMs);
 
     return getObjects(fromMs, toMs, dataReceived, kFetchBatchSize);
 }
@@ -250,8 +251,8 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToComm
     if (count > 0)
     {
         qDebug() << "Committing" << count << "analytics from"
-            << debugTimestampToString(startTimeMs(m_prefetch[count - 1])) << "to"
-            << debugTimestampToString(startTimeMs(m_prefetch.front()));
+            << utils::timestampToRfc2822(startTimeMs(m_prefetch[count - 1])) << "to"
+            << utils::timestampToRfc2822(startTimeMs(m_prefetch.front()));
 
         ScopedInsertRows insertRows(q,  first, first + count - 1);
 
@@ -329,7 +330,7 @@ void AnalyticsSearchListModel::Private::periodicUpdate()
         };
 
     qDebug() << "Periodic update: requesting new analytics from"
-        << debugTimestampToString(m_latestTimeMs) << "to infinity";
+        << utils::timestampToRfc2822(m_latestTimeMs) << "to infinity";
 
     m_currentUpdateId = getObjects(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);

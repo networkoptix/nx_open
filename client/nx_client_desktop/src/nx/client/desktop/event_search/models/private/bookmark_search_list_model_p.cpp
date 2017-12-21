@@ -9,6 +9,8 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/utils/datetime.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -100,8 +102,8 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
     filter.orderBy.order = Qt::DescendingOrder;
     filter.limit = kFetchBatchSize;
 
-    qDebug() << "Requesting bookmarks from" << debugTimestampToString(fromMs)
-        << "to" << debugTimestampToString(toMs);
+    qDebug() << "Requesting bookmarks from" << utils::timestampToRfc2822(fromMs)
+        << "to" << utils::timestampToRfc2822(toMs);
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
         [this, guard = QPointer<QObject>(this)]
@@ -120,8 +122,8 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(qint64 fromMs, qi
             else
             {
                 qDebug() << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
-                    << debugTimestampToString(m_prefetch.back().startTimeMs) << "to"
-                    << debugTimestampToString(m_prefetch.front().startTimeMs);
+                    << utils::timestampToRfc2822(m_prefetch.back().startTimeMs) << "to"
+                    << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
             }
 
             complete(m_prefetch.size() < kFetchBatchSize
@@ -147,8 +149,8 @@ bool BookmarkSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommi
     if (count > 0)
     {
         qDebug() << "Committing" << count << "bookmarks from"
-            << debugTimestampToString(m_prefetch[count - 1].startTimeMs) << "to"
-            << debugTimestampToString(m_prefetch.front().startTimeMs);
+            << utils::timestampToRfc2822(m_prefetch[count - 1].startTimeMs) << "to"
+            << utils::timestampToRfc2822(m_prefetch.front().startTimeMs);
 
         ScopedInsertRows insertRows(q, first, first + count - 1);
         m_data.insert(m_data.end(), m_prefetch.cbegin(), end);
