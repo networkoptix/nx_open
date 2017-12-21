@@ -204,10 +204,10 @@ def log_diffs(x, y):
         log.warning('Strange, no diffs are found...')
 
 def save_json_artifact(artifact_factory, api_method, side_name, server, value):
-    file_path = artifact_factory(['result', api_method, side_name], name='%s-%s' % (api_method, side_name),
-                                 ext='.json', type_name='json', content_type='application/json').produce_file_path()
-    with open(file_path, 'w') as f:
-        json.dump(value, f, indent=4, cls=transaction_log.TransactionJsonEncoder)
+    file_path = artifact_factory(
+        ['result', api_method, side_name],
+        name='%s-%s' % (api_method, side_name)).save_json(
+            value, encoder=transaction_log.TransactionJsonEncoder)
     log.debug('results from %s from server %s %s is stored to %s', api_method, server.title, server, file_path)
 
 
