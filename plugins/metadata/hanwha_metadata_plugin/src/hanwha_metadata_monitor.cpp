@@ -25,7 +25,7 @@ static const QString kMonitorUrlTemplate(
 
 static const int kDefaultHttpPort = 80;
 static const std::chrono::minutes kKeepAliveTimeout(2);
-static const std::chrono::seconds kminReopenInterval(10);
+static const std::chrono::seconds kMinReopenInterval(10);
 
 HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     const Hanwha::DriverManifest& manifest,
@@ -154,7 +154,7 @@ void HanwhaMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr http
 {
     const auto elapsed = m_timeSinceLastOpen.elapsed();
     std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
-        <std::chrono::milliseconds>(kminReopenInterval).count() - elapsed));
+        <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
     m_timer.start(reopenDelay, [this]() { initMonitorUnsafe(); });
 }
 
