@@ -3,6 +3,7 @@
 namespace {
 
 static const int kDefaultChunkContainerSize = 1024;
+static const int kDefaultChannelCount = 1;
 
 } // namespace
 
@@ -101,7 +102,7 @@ QnAbstractMediaDataPtr QnRtpAudioStreamParser::nextData()
 
 int QnRtspAudioLayout::channelCount() const
 {
-    return 1;
+    return kDefaultChannelCount;
 }
 
 QnResourceAudioLayout::AudioTrack QnRtspAudioLayout::getAudioTrackInfo(int /*index*/) const
