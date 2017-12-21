@@ -12,7 +12,7 @@ class QnMjpegRtpParser: public QnRtpVideoStreamParser
 public:
     QnMjpegRtpParser();
     virtual ~QnMjpegRtpParser();
-    virtual void setSDPInfo(QList<QByteArray> lines) override;
+    virtual void setSdpInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(
         quint8* rtpBufferBase, int bufferOffset, int bytesRead, const QnRtspStatistic& statistics,

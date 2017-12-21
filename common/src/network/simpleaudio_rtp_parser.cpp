@@ -30,7 +30,7 @@ void QnSimpleAudioRtpParser::setCodecId(AVCodecID codecId)
     m_codecId = codecId;
 }
 
-void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
+void QnSimpleAudioRtpParser::setSdpInfo(QList<QByteArray> lines)
 {
     // determine here:
     // 1. sizeLength(au size in bits)  or constantSize

@@ -64,7 +64,7 @@ bool HevcParser::processData(
     return true;
 }
 
-void HevcParser::setSDPInfo(QByteArrayList lines)
+void HevcParser::setSdpInfo(QByteArrayList lines)
 {
     for (const auto& line: lines)
     {
@@ -147,7 +147,7 @@ void HevcParser::parseFmtp(const nx::Buffer& fmtpLine)
             (char*)hevc::kShortNalUnitPrefix,
             sizeof(hevc::kShortNalUnitPrefix));
 
-        // Some cameras (e.g. DigitalWatchdog) 
+        // Some cameras (e.g. DigitalWatchdog)
         // may send extra start code in parameter set SDP string.
         if (parameterSet.endsWith(startCode))
         {
@@ -430,7 +430,6 @@ bool HevcParser::handleFragmentationPacket(
 
     if (fuHeader.startFlag)
     {
-
         insertPayloadHeader(
             const_cast<uint8_t**>(&payload),  //< Dirty dirty hack.
             &payloadLength,
@@ -560,6 +559,7 @@ void HevcParser::createVideoDataIfNeeded(bool* outGotData, const QnRtspStatistic
 {
     if (m_hasEnoughRawData)
     {
+        qDebug() << "CREATING DATA";
         m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTime, statistic);
         *outGotData = !!m_mediaData;
         reset(/*softReset*/ true);
