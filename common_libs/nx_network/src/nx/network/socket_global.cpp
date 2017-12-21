@@ -70,11 +70,11 @@ public:
         aio::AIOService* aioService,
         cloud::AddressResolver* addressResolver)
         :
-        m_addressResolver(addressResolver),
         addressPublisher(mediatorConnector.systemConnection()),
         tcpReversePool(
             aioService,
-            mediatorConnector.clientConnection())
+            mediatorConnector.clientConnection()),
+        m_addressResolver(addressResolver)
     {
         mediatorConnector.setOnMediatorAvailabilityChanged(
             [this](bool isMediatorAvailable)

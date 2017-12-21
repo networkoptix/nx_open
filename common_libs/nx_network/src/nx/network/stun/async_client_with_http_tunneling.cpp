@@ -9,8 +9,6 @@
 namespace nx {
 namespace stun {
 
-static bool m_xxx = false;
-
 AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     m_settings(settings),
     m_reconnectTimer(m_settings.reconnectPolicy)
@@ -20,8 +18,6 @@ AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
 
 AsyncClientWithHttpTunneling::~AsyncClientWithHttpTunneling()
 {
-    if (m_xxx)
-        int x = 0;
 }
 
 void AsyncClientWithHttpTunneling::bindToAioThread(
@@ -167,11 +163,9 @@ void AsyncClientWithHttpTunneling::cancelHandlers(
     void* client,
     utils::MoveOnlyFunc<void()> handler)
 {
-    m_xxx = true;
     post(
         [this, client, handler = std::move(handler)]() mutable
         {
-            m_xxx = false;
             QnMutexLocker lock(&m_mutex);
 
             for (auto it = m_indicationHandlers.begin(); it != m_indicationHandlers.end(); )
