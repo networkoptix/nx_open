@@ -26,6 +26,7 @@
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
+#include <QtGui/QScreen>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
@@ -168,9 +169,11 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     #endif
 
     QDesktopWidget *desktop = qApp->desktop();
-    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
+    bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
+        && startupParams.screen < desktop->screenCount();
     if (customScreen)
     {
+        NX_INFO("MainWindow") "Running application on a custom screen" << startupParams.screen;
         const auto windowHandle = mainWindow->windowHandle();
         if (windowHandle && (desktop->screenCount() > 0))
         {
@@ -178,14 +181,37 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
             qApp->processEvents();
 
             /* Set target screen for fullscreen mode. */
-            windowHandle->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
+            const auto screen = QGuiApplication::screens().value(startupParams.screen, 0);
+            NX_INFO("MainWindow") "Target screen geometry is" << screen->geometry();
+            windowHandle->setScreen(screen);
 
-            /* Set target position for the window when we set fullscreen off. */
-            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
+            // Set target position for the window when we set fullscreen off.
+            QPoint screenDelta = mainWindow->pos()
+                - desktop->screenGeometry(mainWindow.data()).topLeft();
+            NX_INFO("MainWindow") "Current display offset is" << screenDelta;
+
+            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft()
+                + screenDelta;
+            NX_INFO("MainWindow") "Target top-left corner position is" << targetPosition;
+
             mainWindow->move(targetPosition);
         }
     }
+    bool debugScreensGeometry = startupParams.screen != QnStartupParameters::kInvalidScreen
+        && startupParams.screen >= desktop->screenCount();
+    if (debugScreensGeometry)
+    {
+        NX_INFO("MainWindow") "System screen configuration:";
+        for (int i = 0; i < desktop->screenCount(); ++i)
+        {
+            const auto screen = QGuiApplication::screens().value(i);
+            NX_INFO("MainWindow") "Screen" << i << "geometry is" << screen->geometry();
+            if (desktop->screenGeometry(i) != screen->geometry())
+                NX_INFO("MainWindow") "Alternative screen" << i << "geometry is" << desktop->screenGeometry(i);
+        }
+    }
+
+
     mainWindow->show();
     joystickManager->start();
     if (customScreen)
