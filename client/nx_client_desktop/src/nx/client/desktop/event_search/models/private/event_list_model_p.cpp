@@ -71,6 +71,11 @@ void EventListModel::Private::removeEvents(int first, int count)
         m_events.removeAt(first);
 }
 
+int EventListModel::Private::indexOf(const QnUuid& id) const
+{
+    return m_events.index_of(id);
+}
+
 void EventListModel::Private::clear()
 {
     ScopedReset reset(q, !m_events.empty());

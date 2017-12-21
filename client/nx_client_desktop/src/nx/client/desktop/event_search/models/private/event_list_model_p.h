@@ -31,6 +31,9 @@ public:
     bool removeEvent(const QnUuid& id);
     void removeEvents(int first, int count);
 
+    // Event index lookup by id. Logarithmic complexity.
+    int indexOf(const QnUuid& id) const;
+
     bool updateEvent(const EventData& data);
 
     const EventData& getEvent(int index) const;
