@@ -5,14 +5,14 @@
 #include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
+#include <nx/utils/thread/mutex.h>
+
 #include <nx/media/ini.h>
 
 namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr int kDefaultMaxCacheItemsCount = 60;
 
 bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const qint64 timestamp)
 {
@@ -38,14 +38,16 @@ enum class SearchPolicy
 class MetadataCache
 {
 public:
-    MetadataCache(int cacheSize = kDefaultMaxCacheItemsCount):
-        m_maxItemsCount(std::max(cacheSize, 1))
+    MetadataCache(int cacheSize = -1):
+        m_maxItemsCount(std::max(1, cacheSize >= 0 ? cacheSize : ini().metadataCacheSize))
     {
         m_metadataCache.reserve(m_maxItemsCount);
     }
 
     void insertMetadata(const QnAbstractCompressedMetadataPtr& metadata)
     {
+        QnMutexLocker lock(&m_mutex);
+
         if (m_metadataCache.size() == m_maxItemsCount)
         {
             const auto oldestMetadata = m_metadataCache.dequeue();
@@ -63,9 +65,13 @@ public:
 
     QnAbstractCompressedMetadataPtr findMetadata(const qint64 timestamp) const
     {
+        QnMutexLocker lock(&m_mutex);
+
         const auto it = findMetadataIterator(timestamp, SearchPolicy::exact);
         if (it == m_metadataByTimestamp.end())
             return {};
+
+        NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
 
         return *it;
     }
@@ -73,18 +79,22 @@ public:
     QList<QnAbstractCompressedMetadataPtr> findMetadataInRange(
         const qint64 startTimestamp, const qint64 endTimestamp, int maxCount) const
     {
+        QnMutexLocker lock(&m_mutex);
+
         const auto startIt = findMetadataIterator(startTimestamp, SearchPolicy::closestAfter);
         if (startIt == m_metadataByTimestamp.end())
             return {};
 
         const auto endIt = findMetadataIterator(endTimestamp, SearchPolicy::closestBefore);
-        if (endIt == m_metadataByTimestamp.end())
-            return {};
 
         QList<QnAbstractCompressedMetadataPtr> result;
         auto itemsLeft = maxCount;
         for (auto it = startIt; itemsLeft != 0 && it != endIt; ++it, --itemsLeft)
-            result.append(*it);
+        {
+            NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
+            if (*it)
+                result.append(*it);
+        }
         return result;
     }
 
@@ -137,6 +147,7 @@ private:
         return m_metadataByTimestamp.end();
     }
 
+    mutable QnMutex m_mutex;
     QQueue<QnAbstractCompressedMetadataPtr> m_metadataCache;
     QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
     const int m_maxItemsCount;

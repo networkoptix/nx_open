@@ -36,6 +36,6 @@ bool AnalyticsSearchListModel::setData(const QModelIndex& index, const QVariant&
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

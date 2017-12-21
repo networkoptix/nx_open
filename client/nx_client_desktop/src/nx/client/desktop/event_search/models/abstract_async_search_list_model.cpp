@@ -83,6 +83,6 @@ bool AbstractAsyncSearchListModel::fetchInProgress() const
     return d->fetchInProgress();
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -70,6 +70,6 @@ void UnifiedSearchListModel::setAnalyticsSearchRect(const QRectF& relativeRect)
     d->setAnalyticsSearchRect(relativeRect);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

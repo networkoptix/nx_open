@@ -20,6 +20,7 @@
 
 #include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -60,8 +61,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     m_eventTypeButton(new QPushButton(m_headerWidget)),
     m_selectAreaCheckBox(new QCheckBox(m_headerWidget)),
     m_timeSelectionLabel(new QLabel(m_headerWidget)),
-    m_helper(new vms::event::StringsHelper(commonModule())),
-    m_applyTimePeriodTimer(new QTimer(this))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     m_searchLineEdit->setTextChangedSignalFilterMs(std::chrono::milliseconds(kFilterDelay).count());
 
@@ -119,16 +119,18 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
             queueFetchMoreIfNeeded(kReFetchDelayMs);
         });
 
-    m_applyTimePeriodTimer->setSingleShot(true);
-    m_applyTimePeriodTimer->setInterval(std::chrono::milliseconds(kTimeSelectionDelay).count());
+    auto applyTimePeriod = new utils::PendingOperation(
+        [this]() { updateEffectiveTimePeriod(); },
+        std::chrono::milliseconds(kTimeSelectionDelay).count(),
+        this);
 
-    connect(m_applyTimePeriodTimer, &QTimer::timeout, this, &Private::updateEffectiveTimePeriod);
+    applyTimePeriod->setFlags(utils::PendingOperation::NoFlags);
 
     connect(navigator(), &QnWorkbenchNavigator::timeSelectionChanged, this,
-        [this](const QnTimePeriod& selection)
+        [this, applyTimePeriod](const QnTimePeriod& selection)
         {
             m_desiredTimePeriod = selection.isEmpty() ? kEntiretyTimePeriod : selection;
-            m_applyTimePeriodTimer->start(); //< Start or restart.
+            applyTimePeriod->requestOperation();
         });
 }
 

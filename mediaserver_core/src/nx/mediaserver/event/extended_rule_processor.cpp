@@ -503,7 +503,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                0, /* Record-before setup is forbidden */
+                action->getRecordBeforeSec(), /* Record-before setup is not forbidden after VMS-7148 */
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }

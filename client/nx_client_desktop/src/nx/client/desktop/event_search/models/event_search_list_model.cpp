@@ -21,6 +21,6 @@ void EventSearchListModel::setSelectedEventType(vms::event::EventType value)
     d->setSelectedEventType(value);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

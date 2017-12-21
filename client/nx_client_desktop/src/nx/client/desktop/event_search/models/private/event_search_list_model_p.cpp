@@ -15,6 +15,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/synctime.h>
 
+#include <nx/utils/datetime.h>
 #include <nx/vms/event/strings_helper.h>
 
 namespace nx {
@@ -182,8 +183,8 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint6
             else
             {
                 qDebug() << "Pre-fetched" << m_prefetch.size() << "events from"
-                    << debugTimestampToString(timestampMs(m_prefetch.back())) << "to"
-                    << debugTimestampToString(timestampMs(m_prefetch.front()));
+                    << utils::timestampToRfc2822(timestampMs(m_prefetch.back())) << "to"
+                    << utils::timestampToRfc2822(timestampMs(m_prefetch.front()));
             }
 
             complete(m_prefetch.size() >= kFetchBatchSize
@@ -191,8 +192,8 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint6
                 : 0);
         };
 
-    qDebug() << "Requesting events from" << debugTimestampToString(fromMs)
-        << "to" << debugTimestampToString(toMs);
+    qDebug() << "Requesting events from" << utils::timestampToRfc2822(fromMs)
+        << "to" << utils::timestampToRfc2822(toMs);
 
     return getEvents(fromMs, toMs, eventsReceived, kFetchBatchSize);
 }
@@ -217,8 +218,8 @@ bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs
     if (count > 0)
     {
         qDebug() << "Committing" << count << "events from"
-            << debugTimestampToString(timestampMs(m_prefetch[count-1])) << "to"
-            << debugTimestampToString(timestampMs(m_prefetch.front()));
+            << utils::timestampToRfc2822(timestampMs(m_prefetch[count-1])) << "to"
+            << utils::timestampToRfc2822(timestampMs(m_prefetch.front()));
 
         ScopedInsertRows insertRows(q,  first, first + count - 1);
         m_data.insert(m_data.end(),
@@ -283,7 +284,7 @@ void EventSearchListModel::Private::periodicUpdate()
         };
 
     qDebug() << "Periodic update: requesting new events from"
-        << debugTimestampToString(m_latestTimeMs) << "to infinity";
+        << utils::timestampToRfc2822(m_latestTimeMs) << "to infinity";
 
     m_currentUpdateId = getEvents(m_latestTimeMs,
         std::numeric_limits<qint64>::max(), eventsReceived);
@@ -464,6 +465,6 @@ bool EventSearchListModel::Private::hasPreview(vms::event::EventType eventType)
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

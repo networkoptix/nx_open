@@ -20,13 +20,17 @@ struct TegraVideoIniConfig: public nx::kit::IniConfig
     NX_INI_INT(-1, cropRectY, "-1 means 0.");
     NX_INI_INT(-1, cropRectW, "-1 means taking frame width.");
     NX_INI_INT(-1, cropRectH, "-1 means taking frame height.");
-    NX_INI_INT(70, maxInferenceFps, "-1 means unlimited. This value will be divided by 10.");
+    NX_INI_INT(70, maxInferenceFps, "-1 means unlimited. Will be divided by 10.");
 
+    NX_INI_STRING("", rectanglesFilePrefix,
+        "If not empty, frame rects will be saved (loaded if stub) to file with PTS as suffix.");
 
-    NX_INI_INT(2, stubNumberOfRectangles, "Number of test rectangles.");
-    NX_INI_INT(20, stubRectangleWidth, "Width of test rectangles (should be divided by 100).");
-    NX_INI_INT(20, stubRectangleHeight, "Height of test rectangles (should be divided by 100).");
+    NX_INI_INT(2, stubNumberOfRectangles, "Number of stub rectangles.");
+    NX_INI_INT(20, stubRectangleWidth, "Width of stub rectangles. Will be divided by 100.");
+    NX_INI_INT(20, stubRectangleHeight, "Height of stub rectangles. Will be divided by 100.");
     NX_INI_INT(1, stubMetadataFrequency, "Output metadata for each nth frame.");
+
+    NX_INI_FLAG(1, dropFrames, "Enables frame dropping depending on inference performance.");    
 };
 
 inline TegraVideoIniConfig& ini()

@@ -61,6 +61,6 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(UnifiedSearchListModel::Types);
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

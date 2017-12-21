@@ -47,7 +47,6 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
             m_checked.insert(newDevice.uniqueId, false);
             m_presentedState.insert(newDevice.uniqueId,
                 newDevice.existsInPool ? alreadyAddedState : notPresentedState);
-
         }
     }
 
@@ -136,11 +135,11 @@ QVariant FoundDevicesModel::displayData(const QModelIndex& index) const
     const auto& currentDeivce = device(index);
     switch(index.column())
     {
-        case Columns::nameColumn:
+        case Columns::modelColumn:
             return currentDeivce.name;
-        case Columns::urlColumn:
+        case Columns::addressColumn:
             return currentDeivce.url;
-        case Columns::manufacturerColumn:
+        case Columns::brandColumn:
             return currentDeivce.vendor;
         default:
             return QVariant();
@@ -221,11 +220,11 @@ QVariant FoundDevicesModel::headerData(
 
     switch(section)
     {
-        case Columns::manufacturerColumn:
+        case Columns::brandColumn:
             return tr("Brand");
-        case Columns::nameColumn:
+        case Columns::modelColumn:
             return tr("Model");
-        case Columns::urlColumn:
+        case Columns::addressColumn:
             return tr("Address");
         case Columns::presentedStateColumn:
             return tr("%1 devices total, %2 new ").arg(rowCount()).arg(newDevicesCount());
@@ -255,4 +254,3 @@ int FoundDevicesModel::newDevicesCount() const
 } // namespace desktop
 } // namespace client
 } // namespace nx
-

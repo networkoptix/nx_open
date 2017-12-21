@@ -116,13 +116,13 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QString& cloudHost)
 {
     bool isMobile = ec2::ApiPeerData::isMobileClient(qnStaticCommon->localPeerType());
-/*
+
     if (!compatibleCustomization(brand, qnStaticCommon->brand(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
     if (!compatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
-*/
+
     if (!compatibleCloudHost(cloudHost, isMobile))
         return Qn::IncompatibleCloudHostConnectionResult;
 

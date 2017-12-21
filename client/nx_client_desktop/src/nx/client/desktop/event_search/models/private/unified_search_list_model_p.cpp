@@ -7,6 +7,7 @@
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -151,8 +152,8 @@ void UnifiedSearchListModel::Private::setSelectedTimePeriod(const QnTimePeriod& 
         return;
 
     qDebug() << "Selected time period from"
-        << AbstractEventListModel::debugTimestampToString(value.startTimeMs) << "to"
-        << AbstractEventListModel::debugTimestampToString(value.endTimeMs());
+        << utils::timestampToRfc2822(value.startTimeMs) << "to"
+        << utils::timestampToRfc2822(value.endTimeMs());
 
     m_eventsModel->setSelectedTimePeriod(value);
     m_bookmarksModel->setSelectedTimePeriod(value);
@@ -228,6 +229,6 @@ void UnifiedSearchListModel::Private::ensureFetchMore()
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

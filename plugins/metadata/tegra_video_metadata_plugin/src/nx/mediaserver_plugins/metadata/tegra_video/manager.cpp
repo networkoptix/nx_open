@@ -213,7 +213,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocNone(
         detectedObject->setId(objectId);
         detectedObject->setTypeId(m_objectTypeId);
 
-        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
+        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
         objectPacket->addItem(detectedObject);
     }
     metadataPackets->push_back(objectPacket);
@@ -243,7 +243,7 @@ bool Manager::makeMetadataPacketsFromRectsPostprocPed(
         detectedObject->setId(objectId);
         detectedObject->setTypeId(m_objectTypeId);
 
-        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.width, rect.height));
+        detectedObject->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
         objectPacket->addItem(detectedObject);
     }
 
@@ -316,7 +316,7 @@ bool Manager::pushFrameAndGetMetadataPackets(
             for (const auto rect: rects)
             {
                 NX_OUTPUT << "    x " << rect.x << ", y " << rect.y
-                    << ", width " << rect.width << ", height " << rect.height;
+                    << ", w " << rect.w << ", h " << rect.h;
             }
         }
 

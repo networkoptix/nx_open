@@ -57,7 +57,6 @@ private:
     QLabel* const m_timeSelectionLabel = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     QnTimePeriod m_desiredTimePeriod;
-    QTimer* const m_applyTimePeriodTimer = nullptr;
     int m_previousRowCount = 0;
 };
 

@@ -105,6 +105,6 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

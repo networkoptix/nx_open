@@ -657,7 +657,8 @@ gieThread(void *arg)
         if (process_last_batch == 0)
         {
 #if 1
-            const bool needToDropFrame = !ctx->m_ptsQueue.empty()
+            const bool needToDropFrame = ini().dropFrames
+                && !ctx->m_ptsQueue.empty()
                 && ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp > microseconds(ctx->m_ptsQueue.front())
                 && ctx->m_lastInferenceDuration != microseconds::zero();
 
@@ -667,10 +668,10 @@ gieThread(void *arg)
                 NX_OUTPUT << "@@@@@@@@@@@@@@@@@@@@@@@ DROPPING frame with timestamp: " << ctx->m_ptsQueue.front()
                     << ", difference: "
                     << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp - microseconds(ctx->m_ptsQueue.front())).count()
-                    << ", " << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp).count() 
+                    << ", " << (ctx->m_lastInferenceDuration + ctx->m_lastProcessedFrameTimestamp).count()
                     << ", " << microseconds(ctx->m_ptsQueue.front()).count()
                     << std::endl;
-                
+
                 if (!ctx->m_ptsQueue.empty())
                     ctx->m_ptsQueue.pop();
                 else
@@ -771,15 +772,15 @@ gieThread(void *arg)
                 rectList_queue.pop();
 
                 const auto pts = ctx->m_ptsQueue.front();
-                ctx->m_ptsQueue.pop();             
+                ctx->m_ptsQueue.pop();
                 ctx->m_outPtsQueue.push(pts);
 
                 ctx->rectQueuePtr->push(rectList);
                 for (int i = 0; i < rectList.size(); i++)
                 {
                     cv::Rect &r = rectList[i];
-                    std::cout <<"    x " << r.x << ", y " << r.y
-                         << ", width " << r.width << ", height " << r.height
+                    NX_OUTPUT <<"    x " << r.x << ", y " << r.y
+                         << ", w " << r.width << ", h " << r.height
                          << endl;
                 }
             }

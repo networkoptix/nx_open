@@ -47,6 +47,6 @@ private:
     QHash<QnUuid, QSharedPointer<AudioPlayer>> m_players;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -375,7 +375,10 @@ void QnLiveStreamProvider::onGotVideoFrame(
         {
             auto receptor = m_videoDataReceptor.toStrongRef();
             if (receptor && receptor->canAcceptData())
+            {
+                NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << videoData->timestamp;
                 receptor->putData(videoData);
+            }
         }
     }
 #endif // ENABLE_SOFTWARE_MOTION_DETECTION

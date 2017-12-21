@@ -30,11 +30,8 @@ public:
 protected:
     bool isValid(const QModelIndex& index) const;
     virtual QString timestampText(qint64 timestampMs) const;
-
-public:
-    static QString debugTimestampToString(qint64 timestampMs);
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

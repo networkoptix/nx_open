@@ -32,7 +32,7 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
             if (value == 0)
             {
                 int index = ui->periodComboBox->currentIndex();
-                NX_ASSERT(index > 0, "Invalid minimum value for the minimal period.");
+                NX_ASSERT(index >= 0, "Invalid minimum value for the minimal period.");
                 if (index == 0)
                 {
                     ui->valueSpinBox->setValue(1);
@@ -42,8 +42,8 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
                     {
                         QSignalBlocker blocker(ui->periodComboBox);
                         ui->periodComboBox->setCurrentIndex(index - 1);
+                        updateMinimumValue();
                     }
-                    updateMinimumValue();
 
                     int intervalSec = ui->periodComboBox->itemData(index).toInt();
                     int value = intervalSec / ui->periodComboBox->itemData(index - 1).toInt();

@@ -77,6 +77,6 @@ private:
     bool m_success = false;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx
