@@ -3,7 +3,8 @@ set(parent.customization "default")
 
 # Components Namings
 set(display.product.name "Sefica ProBox")
-set(display.mobile.name "Sefica ProBox Mobile")
+set(display_mobile_bundle_name "Sefica ProBox Mobile")
+set(mobile_bundle_name "ProBox")
 set(product.name "Sefica ProBox")
 set(product.name.short "ras")
 set(product.appName "probox")
