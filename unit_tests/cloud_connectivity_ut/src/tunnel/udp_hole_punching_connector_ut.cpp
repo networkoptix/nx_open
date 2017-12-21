@@ -29,8 +29,7 @@ public:
     UdpTunnelConnector():
         m_cloudConnectMaskBak(ConnectorFactory::getEnabledCloudConnectMask())
     {
-        ConnectorFactory::setEnabledCloudConnectMask(
-            (int)CloudConnectType::udpHp);
+        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::udpHp);
     }
 
     ~UdpTunnelConnector()

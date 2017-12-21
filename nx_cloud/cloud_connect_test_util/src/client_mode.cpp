@@ -120,7 +120,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     {
         network::cloud::tcp::DirectEndpointConnector::setVerificationRequirement(false);
         network::cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            (int) network::cloud::CloudConnectType::forwardedTcpPort);
+            (int) network::cloud::ConnectType::forwardedTcpPort);
     }
 
     if (args.get("udt"))

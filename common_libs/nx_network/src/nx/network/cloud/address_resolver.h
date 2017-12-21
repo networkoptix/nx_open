@@ -34,17 +34,8 @@ struct TypedAddress
 enum class AddressAttributeType
 {
     unknown,
-    port, //!< NX peer port
-};
-
-enum class CloudConnectType
-{
-    unknown = 0,
-    forwardedTcpPort = 0x01,   /**< E.g., Upnp */
-    udpHp = 0x02,      /**< UDP hole punching */
-    tcpHp = 0x04,      /**< TCP hole punching */
-    proxy = 0x08,      /**< Proxy server address */
-    all = forwardedTcpPort | udpHp | tcpHp | proxy,
+    /** NX peer port. */
+    port,
 };
 
 struct NX_NETWORK_API AddressAttribute

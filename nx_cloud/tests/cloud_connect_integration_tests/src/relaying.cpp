@@ -63,7 +63,7 @@ private:
         base_type::SetUp();
 
         // Disabling every method except relaying.
-        ConnectorFactory::setEnabledCloudConnectMask((int)CloudConnectType::proxy);
+        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
 
         startServer();
     }

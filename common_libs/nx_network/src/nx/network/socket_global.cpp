@@ -276,13 +276,13 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
     {
         cloud::ConnectorFactory::setEnabledCloudConnectMask(
             cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-            ~((int)cloud::CloudConnectType::udpHp));
+            ~((int)cloud::ConnectType::udpHp));
     }
 
     if (arguments.get("cloud-connect-enable-proxy-only"))
     {
         cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            (int)cloud::CloudConnectType::proxy);
+            (int)cloud::ConnectType::proxy);
     }
 }
 

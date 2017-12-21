@@ -8,8 +8,9 @@
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_tunnel_connector.h"
-#include "nx/network/cloud/address_resolver.h"
-#include "nx/network/cloud/data/connect_data.h"
+#include "../address_resolver.h"
+#include "../cloud_connect_type.h"
+#include "../data/connect_data.h"
 
 namespace nx {
 namespace network {
@@ -41,7 +42,7 @@ public:
 
     /**
      * Enable/disable cloud connectors. Debug only!
-     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::CloudConnectType enum.
+     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::ConnectType enum.
      * By default, everything is enabled.
      */
     static void setEnabledCloudConnectMask(int cloudConnectTypeMask);
