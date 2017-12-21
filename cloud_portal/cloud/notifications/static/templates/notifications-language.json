@@ -13,5 +13,8 @@
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} is ready to be reviewed"
+  },
+  "cloud_notification": {
+    "emailSubject": "{{message.subject}}"
   }
 }

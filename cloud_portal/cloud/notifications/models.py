@@ -83,4 +83,13 @@ class Message(models.Model):
 class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when checking on message status
     class Meta:
         model = Message
-        fields = ('external_id', 'task_id', 'type', 'customization', 'created_date', 'send_date')
+        fields = ('external_id', 'task_id', 'type', 'customization', 'created_date', 'send')
+
+
+class CloudNotification(models.Model):
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    sent_date = models.DateTimeField(null=True, blank=True)
+    sent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        related_name='accepted_%(class)s')
