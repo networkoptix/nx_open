@@ -559,7 +559,6 @@ void HevcParser::createVideoDataIfNeeded(bool* outGotData, const QnRtspStatistic
 {
     if (m_hasEnoughRawData)
     {
-        qDebug() << "CREATING DATA";
         m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTime, statistic);
         *outGotData = !!m_mediaData;
         reset(/*softReset*/ true);
