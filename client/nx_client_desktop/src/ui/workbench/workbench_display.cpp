@@ -1238,8 +1238,13 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-        qnClientModule->radassController()->unregisterConsumer(mediaWidget->display()->camDisplay());
+
+    const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+    if (mediaWidget && mediaWidget->isZoomWindow())
+    {
+        qnClientModule->radassController()->unregisterConsumer(
+            mediaWidget->display()->camDisplay());
+    }
 
     if (destroyWidget)
     {
