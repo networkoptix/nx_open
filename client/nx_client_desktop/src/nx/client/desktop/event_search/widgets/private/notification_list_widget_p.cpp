@@ -24,6 +24,7 @@
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/event_search/models/system_health_list_model.h>
 #include <nx/client/desktop/event_search/models/notification_list_model.h>
+#include <nx/client/desktop/event_search/models/progress_list_model.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/fusion/model_functions.h>
@@ -82,8 +83,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     sortModel->setFilterRole(Qn::ResourceSearchStringRole);
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
+    auto progressModel = new ProgressListModel(this);
+
     m_eventRibbon->setModel(new ConcatenationListModel(
-        {systemHealthListModel, m_notificationsModel}, this));
+        {systemHealthListModel, progressModel, m_notificationsModel}, this));
 }
 
 NotificationListWidget::Private::~Private()

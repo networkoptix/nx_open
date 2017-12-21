@@ -12,6 +12,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/elided_label.h>
 #include <utils/common/delayed.h>
 
 namespace nx {
@@ -30,12 +31,15 @@ static constexpr int kTitleFontWeight = QFont::Medium;
 static constexpr int kTimestampFontWeight = QFont::Normal;
 static constexpr int kDescriptionFontWeight = QFont::Normal;
 
+static constexpr int kProgressBarResolution = 1000;
+
 } // namespace
 
 EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this))
+    m_closeButton(new QPushButton(this)),
+    m_progressLabel(new QnElidedLabel(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
@@ -87,7 +91,21 @@ EventTile::EventTile(QWidget* parent):
         style::Metrics::kStandardPadding);
 
     ui->busyIndicator->setHidden(true);
+    ui->progressHolder->setHidden(true);
     ui->mainWidget->setHidden(true);
+
+    QFont progressLabelFont;
+    progressLabelFont.setWeight(QFont::DemiBold);
+
+    ui->progressBar->setRange(0, kProgressBarResolution);
+    m_progressLabel->setParent(ui->progressBar);
+    m_progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    m_progressLabel->setFont(progressLabelFont);
+    m_progressLabel->setForegroundRole(QPalette::Highlight);
+
+    static constexpr int kProgressLabelShift = 8;
+    auto progressLabelAnchor = new QnWidgetAnchor(m_progressLabel);
+    progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);
 
     connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
@@ -234,7 +252,7 @@ void EventTile::setAction(const CommandActionPtr& value)
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
 {
-    if (ui->mainWidget->isHidden())
+    if (ui->mainWidget->isHidden() && ui->progressHolder->isHidden())
         return;
 
     QPainter painter(this);
@@ -348,6 +366,37 @@ bool EventTile::busyIndicatorVisible() const
 void EventTile::setBusyIndicatorVisible(bool value)
 {
     ui->busyIndicator->setVisible(value);
+}
+
+bool EventTile::progressBarVisible() const
+{
+    return !ui->progressHolder->isHidden();
+}
+
+void EventTile::setProgressBarVisible(bool value)
+{
+    ui->progressHolder->setVisible(value);
+}
+
+qreal EventTile::progressValue() const
+{
+    return m_progressValue;
+}
+
+void EventTile::setProgressValue(qreal value)
+{
+    m_progressValue = value;
+    ui->progressBar->setValue(int(value * kProgressBarResolution));
+}
+
+QString EventTile::progressTitle() const
+{
+    return m_progressLabel->text();
+}
+
+void EventTile::setProgressTitle(const QString& value)
+{
+    m_progressLabel->setText(value);
 }
 
 } // namespace

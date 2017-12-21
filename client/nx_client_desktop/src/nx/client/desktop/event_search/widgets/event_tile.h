@@ -12,6 +12,7 @@
 
 class QModelIndex;
 class QPushButton;
+class QnElidedLabel;
 class QnImageProvider;
 
 namespace Ui { class EventTile; }
@@ -29,6 +30,8 @@ class EventTile: public Customized<QWidget>
     Q_PROPERTY(QString description READ description WRITE setDescription)
     Q_PROPERTY(QString timestamp READ timestamp WRITE setTimestamp)
     Q_PROPERTY(QPixmap icon READ icon WRITE setIcon)
+    Q_PROPERTY(bool busyIndicatorVisible READ busyIndicatorVisible WRITE setBusyIndicatorVisible)
+    Q_PROPERTY(bool progressBarVisible READ progressBarVisible WRITE setProgressBarVisible)
 
     using base_type = Customized<QWidget>;
 
@@ -79,6 +82,15 @@ public:
     bool busyIndicatorVisible() const;
     void setBusyIndicatorVisible(bool value);
 
+    bool progressBarVisible() const;
+    void setProgressBarVisible(bool value);
+
+    qreal progressValue() const;
+    void setProgressValue(qreal value);
+
+    QString progressTitle() const;
+    void setProgressTitle(const QString& value);
+
 signals:
     void clicked();
 
@@ -100,7 +112,9 @@ private:
     QPushButton* const m_closeButton = nullptr;
     bool m_closeable = false;
     CommandActionPtr m_action; //< Button action.
+    QnElidedLabel* const m_progressLabel = nullptr;
     QTimer* m_autoCloseTimer = nullptr;
+    qreal m_progressValue = 0.0;
 };
 
 } // namespace

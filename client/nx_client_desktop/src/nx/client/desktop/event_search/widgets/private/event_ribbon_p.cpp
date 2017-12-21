@@ -203,6 +203,17 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         return;
     }
 
+    // Check whether the tile is a special progress bar tile.
+    const auto progress = index.data(Qn::ProgressValueRole);
+    if (progress.canConvert<qreal>())
+    {
+        tile->setProgressBarVisible(true);
+        tile->setProgressValue(progress.value<qreal>());
+        tile->setProgressTitle(index.data(Qt::DisplayRole).toString());
+        tile->setToolTip(index.data(Qn::DescriptionTextRole).toString());
+        return;
+    }
+
     // Check whether the tile is a special separator tile.
     const auto title = index.data(Qt::DisplayRole).toString();
     if (title.isEmpty())
