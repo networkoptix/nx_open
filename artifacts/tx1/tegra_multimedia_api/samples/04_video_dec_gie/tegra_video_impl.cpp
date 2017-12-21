@@ -12,6 +12,7 @@
 
 #include "tegra_video_ini.h"
 #include "net_dimensions.h"
+#include "rects_serialization.h"
 
 #define NX_PRINT_PREFIX "[tegra_video_impl" << (m_id.empty() ? "" : " #" + m_id) << "] "
 #include <nx/kit/debug.h>
@@ -32,7 +33,7 @@ public:
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override;
 
     virtual bool pullRectsForFrame(
-        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override;
+        Rect outRects[], int maxRectCount, int* outRectCount, int64_t* outPtsUs) override;
 
     virtual bool hasMetadata() const override;
 
@@ -179,7 +180,7 @@ bool Impl::processRectsFromAdditionalDetectors()
             for (const auto& rect: m_detectors[i]->getRectangles(&ptsUs))
             {
                 NX_OUTPUT << "{ x " << rect.x << ", y " << rect.y
-                    << ", width " << rect.width << ", height " << rect.height << " }, pts "
+                    << ", w " << rect.width << ", h " << rect.height << " }, pts "
                     << ptsUs;
             }
         }
@@ -189,7 +190,7 @@ bool Impl::processRectsFromAdditionalDetectors()
 }
 
 bool Impl::pullRectsForFrame(
-    Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs)
+    Rect outRects[], int maxRectCount, int* outRectCount, int64_t* outPtsUs)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     if (!outRects || !outPtsUs)
@@ -209,14 +210,14 @@ bool Impl::pullRectsForFrame(
 
     const auto rectsFromGie = m_detectors.front()->getRectangles(outPtsUs);
 
-    if (rectsFromGie.size() > maxRectsCount)
+    if (rectsFromGie.size() > maxRectCount)
     {
         NX_PRINT << "INTERNAL ERROR: "
             << __func__ << "(): Too many rects: " << rectsFromGie.size();
         return false;
     }
 
-    *outRectsCount = (int) rectsFromGie.size();
+    *outRectCount = (int) rectsFromGie.size();
 
     for (int i = 0; i < rectsFromGie.size(); ++i)
     {
@@ -224,8 +225,16 @@ bool Impl::pullRectsForFrame(
         TegraVideo::Rect& r = outRects[i];
         r.x = (float) rect.x / m_netWidth;
         r.y = (float) rect.y / m_netHeight;
-        r.width = (float) rect.width / m_netWidth;
-        r.height = (float) rect.height / m_netHeight;
+        r.w = (float) rect.width / m_netWidth;
+        r.h = (float) rect.height / m_netHeight;
+    }
+
+    if (ini().rectanglesFilePrefix[0])
+    {
+        writeRectsToFile(
+            ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", *outPtsUs),
+            outRects,
+            *outRectCount);
     }
 
     NX_OUTPUT << __func__ << "() END -> true";

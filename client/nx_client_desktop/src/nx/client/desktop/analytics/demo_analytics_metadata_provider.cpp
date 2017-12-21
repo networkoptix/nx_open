@@ -64,7 +64,7 @@ DemoAnalyticsMetadataProvider::DemoAnalyticsMetadataProvider():
 }
 
 common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
-    qint64 timestamp, int /*channel*/)
+    qint64 timestamp, int /*channel*/) const
 {
     if (d->objectsNumber <= 0)
         return common::metadata::DetectionMetadataPacketPtr();
@@ -75,7 +75,11 @@ common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::meta
     const common::metadata::DetectionMetadataPacketPtr metadata(
         new common::metadata::DetectionMetadataPacket());
 
-    metadata->timestampUsec = timestamp * 1000;
+    const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
+    if (precision > 0)
+        timestamp -= timestamp % precision;
+
+    metadata->timestampUsec = timestamp;
     metadata->durationUsec = d->duration * 1000;
 
     for (int i = 0; i < d->objectsNumber; ++i)
@@ -90,6 +94,24 @@ common::metadata::DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::meta
     }
 
     return metadata;
+}
+
+QList<common::metadata::DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
+    qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount) const
+{
+    const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
+    if (precision > 0)
+    {
+        startTimestamp = startTimestamp - startTimestamp % precision + precision;
+        endTimestamp -= endTimestamp % precision;
+    }
+
+    QList<common::metadata::DetectionMetadataPacketPtr> result;
+    if (maximumCount > 0)
+        result.append(metadata(startTimestamp, channel));
+    if (maximumCount > 1)
+        result.append(metadata(endTimestamp, channel));
+    return result;
 }
 
 bool DemoAnalyticsMetadataProviderFactory::supportsAnalytics(

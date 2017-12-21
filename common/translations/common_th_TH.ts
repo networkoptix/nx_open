@@ -775,7 +775,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>ไม่มีข้อมูลที่ส่งออก</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>วิเคราะห์เหตุการณ์</translation>
     </message>
     <message>
       <source>%1 at %2</source>

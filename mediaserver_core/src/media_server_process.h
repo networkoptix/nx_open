@@ -27,6 +27,7 @@
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
 
 class QnAppserverResourceProcessor;
@@ -67,6 +68,7 @@ public:
     QString enforcedMediatorEndpoint;
     QString ipVersion;
     QString createFakeData;
+    QString crashDirectory;
 
     CmdLineArguments():
         logLevel(
@@ -163,6 +165,7 @@ private:
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
+    void changeSystemUser(const QString& userName);
 
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
@@ -179,7 +182,10 @@ private:
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    void serviceModeInit();
+    nx::utils::log::Settings makeLogSettings();
+
+    void initializeLogging();
+    void initializeHardwareId();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
     void connectArchiveIntegrityWatcher();
@@ -190,6 +196,7 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
+    std::unique_ptr<AbstractStreamServerSocket> m_preparedTcpServerSocket;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
@@ -209,6 +216,6 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
-    bool m_serviceMode;
+    const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
 };

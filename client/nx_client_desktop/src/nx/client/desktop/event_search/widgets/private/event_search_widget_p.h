@@ -3,11 +3,14 @@
 #include "../event_search_widget.h"
 #include "search_widget_base_p.h"
 
+#include <recording/time_period.h>
+
 class QnMediaResourceWidget;
 class QnSortFilterListModel;
 class QnSearchLineEdit;
 class QPushButton;
 class QCheckBox;
+class QLabel;
 
 namespace nx {
 
@@ -40,6 +43,8 @@ private:
     void setupEventTypeButton();
     void setupSelectAreaCheckBox();
     void updateButtonVisibility();
+    void updateEffectiveTimePeriod();
+    static void activateLayouts(QWidget* from);
 
 private:
     EventSearchWidget* q = nullptr;
@@ -49,7 +54,9 @@ private:
     QPushButton* const m_superTypeButton = nullptr;
     QPushButton* const m_eventTypeButton = nullptr;
     QCheckBox* const m_selectAreaCheckBox = nullptr;
+    QLabel* const m_timeSelectionLabel = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    QnTimePeriod m_desiredTimePeriod;
     int m_previousRowCount = 0;
 };
 

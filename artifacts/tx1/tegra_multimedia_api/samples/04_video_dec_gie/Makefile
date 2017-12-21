@@ -77,6 +77,7 @@ SRCS := \
     tegra_video_impl.cpp \
     tegra_video_stub.cpp \
     net_dimensions.cpp \
+    rects_serialization.cpp \
     $(wildcard $(CLASS_DIR)/*.cpp) \
 
 OBJS := $(SRCS:.cpp=.o)

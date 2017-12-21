@@ -12,7 +12,8 @@ namespace event {
 EventParameters::EventParameters():
     eventType(undefinedEvent),
     eventTimestampUsec(0),
-    reasonCode(EventReason::none)
+    reasonCode(EventReason::none),
+    omitDbLogging(false)
 {
 }
 

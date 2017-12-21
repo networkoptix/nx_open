@@ -46,6 +46,6 @@ bool NotificationListModel::setData(const QModelIndex& index, const QVariant& va
     return result;
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

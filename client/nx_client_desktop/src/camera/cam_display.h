@@ -127,6 +127,9 @@ public:
     QnMediaResourcePtr resource() const;
 
     Qn::MediaStreamEvent lastMediaEvent() const;
+
+    bool isForcedBufferingEnabled() const;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -185,14 +188,21 @@ private:
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
     bool needBuffering(qint64 vTime) const;
     void processSkippingFramesTime();
-    void clearMetaDataInfo();
-    void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
+    bool fillDataQueue();
+    bool isDataQueueFilled() const;
 
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
 
     void moveTimestampTo(qint64 timestampUs);
+    void processFillerPacket(
+        qint64 timestampUs,
+        QnAbstractStreamDataProvider* dataProvider,
+        QnAbstractMediaData::MediaFlags flags);
+
+    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -241,7 +251,6 @@ protected:
     int m_executingJump;
     int m_skipPrevJumpSignal;
     int m_processedPackets;
-    std::map<qint64, FrameMetadata> m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
     bool m_isStillImage;
@@ -277,6 +286,10 @@ protected:
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
     nx::utils::ElapsedTimer m_lastMediaEventTimeout;
+
+    mutable QnMutex m_metadataConsumersHashMutex;
+    QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
+        m_metadataConsumerByType;
 };
 
 #endif //QN_CAM_DISPLAY_H

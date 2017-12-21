@@ -1197,7 +1197,8 @@ void QnTimeSlider::setSelection(qint64 start, qint64 end)
         m_selectionStart = start;
         m_selectionEnd = end;
 
-        emit selectionChanged(m_selectionStart, m_selectionEnd);
+        if (isSelectionValid())
+            emit selectionChanged(QnTimePeriod::fromInterval(m_selectionStart, m_selectionEnd));
     }
 }
 
@@ -1208,10 +1209,17 @@ bool QnTimeSlider::isSelectionValid() const
 
 void QnTimeSlider::setSelectionValid(bool valid)
 {
-    m_selectionValid = valid;
-
     if (!m_selectionValid)
         m_selectionInitiated = false;
+
+    if (m_selectionValid == valid)
+        return;
+
+    m_selectionValid = valid;
+
+    emit selectionChanged(m_selectionValid
+        ? QnTimePeriod::fromInterval(m_selectionStart, m_selectionEnd)
+        : QnTimePeriod());
 }
 
 QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const

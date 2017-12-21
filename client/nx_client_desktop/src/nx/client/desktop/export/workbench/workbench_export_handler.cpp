@@ -1,7 +1,9 @@
 #include "workbench_export_handler.h"
 
 #include <QtWidgets/QAction>
+#include <QtWidgets/QPushButton>
 
+#include <ini.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -24,6 +26,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/workbench/extensions/activity_manager.h>
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_layout_tool.h>
@@ -36,6 +39,7 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -67,6 +71,11 @@ QnLayoutResourcePtr constructLayoutForWidget(QnMediaResourceWidget* widget)
     return layout;
 }
 
+static bool informersEnabled()
+{
+    return ini().enableProgressInformers && ini().unifiedEventPanel;
+}
+
 } // namespace
 
 struct WorkbenchExportHandler::Private
@@ -85,6 +94,18 @@ struct WorkbenchExportHandler::Private
         q(owner),
         exportManager(new ExportManager())
     {
+        if (informersEnabled())
+        {
+            const auto& manager = q->context()->instance<ui::workbench::ActivityManager>();
+            NX_ASSERT(manager);
+
+            connect(manager, &ui::workbench::ActivityManager::interactionRequested, q,
+                [this](const QnUuid& exportProcessId)
+                {
+                    if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
+                        dialog->show();
+                });
+        }
     }
 
     bool isInRunningExports(const Filename& filename) const
@@ -99,7 +120,10 @@ struct WorkbenchExportHandler::Private
 
     QnUuid initExport(const Filename& fileName)
     {
-        const auto exportProcessId = QnUuid::createUuid();
+        const auto& manager = q->context()->instance<ui::workbench::ActivityManager>();
+        const auto exportProcessId = informersEnabled()
+            ? manager->add(tr("Export video"), fileName.completeFileName())
+            : QnUuid::createUuid();
 
         const auto progressDialog = new QnProgressDialog(
             fileName.completeFileName(),
@@ -108,9 +132,18 @@ struct WorkbenchExportHandler::Private
             100,
             q->mainWindowWidget());
 
+        if (informersEnabled())
+        {
+            auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
+            progressDialog->addButton(minimizeButton, QDialogButtonBox::ActionRole);
+            connect(minimizeButton, &QPushButton::clicked, progressDialog, &QWidget::hide);
+        }
+
         connect(progressDialog, &QnProgressDialog::canceled, exportManager.data(),
             [this, exportProcessId, progressDialog]
             {
+                if (informersEnabled())
+                    q->context()->instance<ui::workbench::ActivityManager>()->remove(exportProcessId);
                 exportManager->stopExport(exportProcessId);
                 progressDialog->hide();
             });
@@ -187,6 +220,12 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
         dialog->setMaximum(info.rangeEnd);
         dialog->setValue(info.progressValue);
     }
+
+    if (informersEnabled())
+    {
+        context()->instance<ui::workbench::ActivityManager>()->setProgress(info.id,
+            qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
+    }
 }
 
 void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info)
@@ -195,6 +234,8 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
         return;
 
     const auto exportProcess = d->runningExports.take(info.id);
+    if (informersEnabled())
+        context()->instance<ui::workbench::ActivityManager>()->remove(info.id);
 
     if (auto dialog = exportProcess.progressDialog)
     {

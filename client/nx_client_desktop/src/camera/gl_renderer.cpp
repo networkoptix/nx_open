@@ -370,7 +370,6 @@ Qn::RenderStatus QnGLRenderer::discardFrame()
         : Qn::OldFrameRendered;
 
     m_prevFrameSequence = picLock->sequence();
-    m_lastDisplayedMetadata = picLock->metadata();
 
     return result;
 }
@@ -471,7 +470,6 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(
             }
         }
         m_prevFrameSequence = picLock->sequence();
-        m_lastDisplayedMetadata = picLock->metadata();
     }
     else
     {
@@ -839,12 +837,6 @@ qint64 QnGLRenderer::lastDisplayedTime() const
 bool QnGLRenderer::isLowQualityImage() const
 {
     return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;
-}
-
-FrameMetadata QnGLRenderer::lastFrameMetadata() const
-{
-    QnMutexLocker locker( &m_mutex );
-    return m_lastDisplayedMetadata;
 }
 
 bool QnGLRenderer::isHardwareDecoderUsed() const

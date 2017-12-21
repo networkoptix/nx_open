@@ -122,7 +122,7 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         NX_VERBOSE(this) << lm("Forwarding request [%1] to server %4 (camera %2, timestamp %3)").args(
             request->requestLine,
             camera->getId().toString(),
-            timestampMs == -1
+            (timestampMs == -1)
                 ? QString::fromLatin1("live")
                 : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate),
             server->getId().toString());

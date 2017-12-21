@@ -66,7 +66,7 @@ private:
 
     double distance(const TegraVideo::Rect& first, const TegraVideo::Rect& second);
 
-    QPointF rectangleCenter(const TegraVideo::Rect& rect);
+    QPointF rectangleCenter(const TegraVideo::Rect& rect) const;
 
     TegraVideo::Rect correctRectangle(const TegraVideo::Rect& rect);
 
@@ -75,6 +75,8 @@ private:
     void assignRandomAttributes(CachedObject* outCachedObject);
 
     QString randomAttributeValue(const QString& attributeName) const;
+
+    bool isRectangleInNoCorrectionZone(const TegraVideo::Rect& rect) const;
 
     static bool isTooBig(const TegraVideo::Rect& rectangle);
     static bool isTooSmall(const TegraVideo::Rect& rectangle);

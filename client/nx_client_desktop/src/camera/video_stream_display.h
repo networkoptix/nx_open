@@ -45,9 +45,6 @@ public:
     int addRenderer(QnAbstractRenderer* draw);
     int removeRenderer(QnAbstractRenderer* draw);
 
-    void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
-    void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
-
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,
         bool draw,
@@ -150,10 +147,6 @@ private:
     bool m_isPaused;
     qreal m_overridenAspectRatio;
 
-    mutable QnMutex m_metadataConsumersHashMutex;
-    QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
-        m_metadataConsumerByType;
-
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
@@ -167,7 +160,6 @@ private:
         int srcHeight,
         QnFrameScaler::DownscaleFactor force_factor);
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
-    void processMetadata(const FrameMetadata& metadataList, int channel);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
     /*!

@@ -1,4 +1,4 @@
-﻿#if defined(ENABLED_HANWHA)
+﻿#if defined(ENABLE_HANWHA)
 
 #include "plugin.h"
 
@@ -321,5 +321,5 @@ NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 
 } // extern "C"
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)
 

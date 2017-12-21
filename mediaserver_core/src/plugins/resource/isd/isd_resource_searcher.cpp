@@ -43,10 +43,10 @@ static QByteArray extractWord(int index, const QByteArray& rawData)
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+    QnAbstractNetworkResourceSearcher(commonModule),
+    SearchAutoHandler(kUpnpBasicDeviceType)
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
-	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
 QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)

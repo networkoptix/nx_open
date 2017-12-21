@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(ENABLED_HANWHA)
+#if defined(ENABLE_HANWHA)
 
 #include <QtCore/QString>
 #include <QtCore/QFlag>
@@ -109,4 +109,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (metatype)(numeric)(lexical)
 )
 
-#endif // defined(ENABLED_HANWHA)
+#endif // defined(ENABLE_HANWHA)

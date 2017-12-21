@@ -106,20 +106,6 @@ int QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
     return m_newList.size();
 }
 
-void QnVideoStreamDisplay::addMetadataConsumer(
-    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
-{
-    QnMutexLocker lock(&m_metadataConsumersHashMutex);
-    m_metadataConsumerByType.insert(metadataConsumer->metadataType(), metadataConsumer);
-}
-
-void QnVideoStreamDisplay::removeMetadataConsumer(
-    const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
-{
-    QnMutexLocker lock(&m_metadataConsumersHashMutex);
-    m_metadataConsumerByType.remove(metadataConsumer->metadataType(), metadataConsumer);
-}
-
 QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::getCurrentDownscaleFactor() const
 {
     return m_scaleFactor;
@@ -808,8 +794,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(
             }
             for (const auto render: m_renderList)
                 render->draw(outFrame); //< Send the new one.
-
-            processMetadata(outFrame->metadata, outFrame->channel);
         }
         // Allow frame queue for selected video.
         m_frameQueueIndex = (m_frameQueueIndex + 1) % kMaxFrameQueueSize;
@@ -820,48 +804,12 @@ bool QnVideoStreamDisplay::processDecodedFrame(
         for (const auto render: m_renderList)
             render->draw(outFrame);
 
-        processMetadata(outFrame->metadata, outFrame->channel);
-
         for (const auto render: m_renderList)
             render->waitForFrameDisplayed(outFrame->channel);
     }
     m_lastDisplayedFrame = outFrame;
 
     return true;
-}
-
-void QnVideoStreamDisplay::processMetadata(const FrameMetadata& metadataList, int /*channel*/)
-{
-    QnMutexLocker lock(&m_metadataConsumersHashMutex);
-    const auto consumers = m_metadataConsumerByType;
-    lock.unlock();
-
-    int metadataCount = 0;
-    for (const auto& metadata: metadataList)
-    {
-        for (const auto& value: consumers.values(metadata->metadataType))
-        {
-            if (const auto& consumer = value.lock())
-            {
-                ++metadataCount;
-                consumer->processMetadata(metadata);
-            }
-            else
-            {
-                NX_VERBOSE(this) << "WARNING: Null metadata";
-            }
-        }
-    }
-
-    if (metadataCount == 0)
-    {
-        NX_VERBOSE(this) << lm("%1(): No metadata processed").arg(__func__);
-    }
-    else
-    {
-        NX_VERBOSE(this) << lm("%1(): Processed %2 metadata object(s) of %3 type(s)")
-            .args(__func__, metadataCount, metadataList.size());
-    }
 }
 
 bool QnVideoStreamDisplay::selfSyncUsed() const

@@ -58,7 +58,7 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
             }
             else
             {
-                NX_DEBUG(this, lm("Detection metadata packet has been saved successfully"));
+                NX_VERBOSE(this, lm("Detection metadata packet has been saved successfully"));
             }
         });
 }

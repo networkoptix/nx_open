@@ -144,6 +144,6 @@ bool EventListModel::setData(const QModelIndex& index, const QVariant& /*value*/
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

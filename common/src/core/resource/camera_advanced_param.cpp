@@ -20,9 +20,11 @@ const QString kInRangeConditionType = lit("valueIn");
 const QString kNotInRangeConditionType = lit("valueNotIn");
 const QString kPresenceConditionType = lit("present");
 const QString kLackOfPresenceConditionType = lit("notPresent");
+const QString kValueChangedConditionType = lit("valueChanged");
 
 const QString kShowDependencyType = lit("Show");
 const QString kRangeDependencyType = lit("Range");
+const QString kValueDependencyType = lit("DefaultValue");
 
 const QString kBoolDataType = lit("Bool");
 const QString kNumberDataType = lit("Number");
@@ -369,35 +371,15 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
             auto valuesList = value.split(L',');
             return !valuesList.contains(valueToCheck);
         }
+        case ConditionType::valueChanged:
+        {
+            return true;
+        }
         default:
         {
             NX_ASSERT(false, "We should never get here.");
             return false;
         }
-    }
-}
-
-DependencyType QnCameraAdvancedParameterDependency::fromStringToDependencyType(const QString& dependencyTypeString)
-{
-    DependencyType dependencyType = DependencyType::unknown;
-    if (dependencyTypeString == kShowDependencyType)
-        dependencyType = DependencyType::show;
-    else if(dependencyTypeString == kRangeDependencyType)
-        dependencyType = DependencyType::range;
-
-    return dependencyType;
-}
-
-QString QnCameraAdvancedParameterDependency::fromDependencyTypeToString(const DependencyType& dependencyType)
-{
-    switch (dependencyType)
-    {
-        case DependencyType::show:
-            return kShowDependencyType;
-        case DependencyType::range:
-            return kRangeDependencyType;
-        default:
-            return QString();
     }
 }
 
@@ -416,11 +398,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, Co
     (QnCameraAdvancedParameterCondition::ConditionType::notInRange, kNotInRangeConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::present, kPresenceConditionType)
     (QnCameraAdvancedParameterCondition::ConditionType::notPresent, kLackOfPresenceConditionType)
+    (QnCameraAdvancedParameterCondition::ConditionType::valueChanged, kValueChangedConditionType)
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, DependencyType,
     (QnCameraAdvancedParameterDependency::DependencyType::show, "Show")
     (QnCameraAdvancedParameterDependency::DependencyType::range, "Range")
+    (QnCameraAdvancedParameterDependency::DependencyType::trigger, "Trigger")
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)

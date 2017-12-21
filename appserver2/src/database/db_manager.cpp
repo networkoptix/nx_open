@@ -1584,6 +1584,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
         return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
 
+    if (updateName.endsWith(lit("/99_20171218_remove_extra_buisiness_rules.sql")))
+    {
+        // Removing extra business rule, that was added through Rule::getRulesUpd43()
+        // That fixes VMS-7696
+        // id=900024 -> uuid = "{1d378edd-06ae-0df0-c85a-664c2f445ff5}"
+        QnUuid guid("{1d378edd-06ae-0df0-c85a-664c2f445ff5}");
+        return removeBusinessRule(guid) == ErrorCode::ok;
+    }
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }
@@ -3144,7 +3153,7 @@ ErrorCode QnDbManager::doQueryNoLock(
 {
     QSqlQuery fetchMergeHistoryQuery(m_sdb);
     fetchMergeHistoryQuery.prepare(R"sql(
-        SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId, 
+        SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId,
             merged_system_cloud_id AS mergedSystemCloudId, username, signature
         FROM system_merge_history
         )sql");
@@ -4248,10 +4257,10 @@ ErrorCode QnDbManager::executeTransactionInternal(
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare(R"sql(
         INSERT INTO system_merge_history(
-            id, timestamp, merged_system_local_id, 
+            id, timestamp, merged_system_local_id,
             merged_system_cloud_id, username, signature)
         VALUES (
-            :id, :timestamp, :mergedSystemLocalId, 
+            :id, :timestamp, :mergedSystemLocalId,
             :mergedSystemCloudId, :username, :signature)
         )sql");
     QnSql::bind(tran.params, &insQuery);
@@ -4261,7 +4270,7 @@ ErrorCode QnDbManager::executeTransactionInternal(
             .args(insQuery.lastError().text()));
         return ErrorCode::dbError;
     }
-    
+
     return ErrorCode::ok;
 }
 

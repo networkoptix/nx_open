@@ -18,7 +18,7 @@ public:
     AbstractMotionMetadataProvider();
     virtual ~AbstractMotionMetadataProvider();
 
-    virtual MetaDataV1Ptr metadata(const qint64 timestamp, int channel) = 0;
+    virtual MetaDataV1Ptr metadata(const qint64 timestamp, int channel) const = 0;
 };
 
 } // namespace core

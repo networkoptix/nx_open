@@ -191,10 +191,23 @@ void QnCheckableTableView::selectionChanged(const QItemSelection& selected, cons
         }
 
         /* Check selected: */
-        for (auto range : selected)
+        if (!selected.isEmpty())
         {
-            for (auto row = range.top(); row <= range.bottom(); ++row)
-                dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Checked, Qt::CheckStateRole);
+            const auto range = selected.first();
+            const auto row = range.top();
+            const auto index = dataModel->index(row, m_checkboxColumn);
+            const auto newValue = index.data(Qt::CheckStateRole) == Qt::Unchecked
+                ? Qt::Checked
+                : Qt::Unchecked;
+
+            for (auto range: selected)
+            {
+                for (auto row = range.top(); row <= range.bottom(); ++row)
+                {
+                    const auto index = dataModel->index(row, m_checkboxColumn);
+                    dataModel->setData(index, newValue, Qt::CheckStateRole);
+                }
+            }
         }
 
         blocker.unblock();

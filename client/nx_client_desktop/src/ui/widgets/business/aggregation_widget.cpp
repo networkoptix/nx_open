@@ -5,18 +5,20 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
-namespace {
-    const int defaultOptimalWidth = 300;
-}
+namespace nx {
+namespace client {
+namespace desktop {
 
-QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
-    QWidget(parent),
+static constexpr int kDefaultOptimalWidth = 300;
+
+AggregationWidget::AggregationWidget(QWidget* parent):
+    base_type(parent),
     ui(new Ui::AggregationWidget)
 {
     ui->setupUi(this);
 
     QSize minSize(this->minimumSize());
-    minSize.setWidth(defaultOptimalWidth);
+    minSize.setWidth(kDefaultOptimalWidth);
     setMinimumSize(minSize);
 
     // initial state: checkbox is cleared
@@ -27,35 +29,43 @@ QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
 
     connect(ui->enabledCheckBox,    &QCheckBox::toggled,    ui->periodWidget,   &QWidget::setVisible);
     connect(ui->enabledCheckBox,    &QCheckBox::toggled,    ui->instantLabel,   &QLabel::setHidden);
-    connect(ui->enabledCheckBox,    &QCheckBox::toggled,    this,               &QnAggregationWidget::valueChanged);
+    connect(ui->enabledCheckBox,    &QCheckBox::toggled,    this,               &AggregationWidget::valueChanged);
 
     connect(ui->periodWidget, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
 }
 
-QnAggregationWidget::~QnAggregationWidget()
+AggregationWidget::~AggregationWidget()
 {
 }
 
-void QnAggregationWidget::setValue(int secs) {
+void AggregationWidget::setValue(int secs)
+{
     ui->enabledCheckBox->setChecked(secs > 0);
     ui->periodWidget->setValue(secs);
 }
 
-int QnAggregationWidget::value() const {
+int AggregationWidget::value() const
+{
     if (!ui->enabledCheckBox->isChecked())
         return 0;
     return ui->periodWidget->value();
 }
 
-QWidget *QnAggregationWidget::lastTabItem()
+QWidget* AggregationWidget::lastTabItem() const
 {
     return ui->periodWidget->lastTabItem();
 }
 
-void QnAggregationWidget::setShort(bool value) {
+void AggregationWidget::setShort(bool value)
+{
     ui->longLabel->setVisible(!value);
 }
 
-int QnAggregationWidget::optimalWidth() {
-    return defaultOptimalWidth;
+int AggregationWidget::optimalWidth()
+{
+    return kDefaultOptimalWidth;
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

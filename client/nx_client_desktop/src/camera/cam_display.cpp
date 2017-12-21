@@ -12,7 +12,6 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
-#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 
 #include "core/resource/camera_resource.h"
@@ -36,7 +35,6 @@ Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000 * 1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer
-static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
 static const std::chrono::milliseconds kMediaMessageDelay(1500);
 
 static void updateActivity()
@@ -142,6 +140,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_liveMaxLenReached(false),
     m_hasVideo(true)
 {
+    nx::client::desktop::ini().reload();
+
     if (resource && resource->toResource()->hasFlags(Qn::live_cam))
         m_isRealTimeSource = true;
     else
@@ -211,6 +211,8 @@ void QnCamDisplay::pause()
 
 void QnCamDisplay::resume()
 {
+    nx::client::desktop::ini().reload();
+
     m_delay.afterdelay();
     m_singleShotMode = false;
     {
@@ -259,23 +261,15 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
 void QnCamDisplay::addMetadataConsumer(
     const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
 {
-    for (int i = 0; i < m_channelsCount; ++i)
-    {
-        NX_ASSERT(m_display[i]);
-        if (m_display[i])
-            m_display[i]->addMetadataConsumer(metadataConsumer);
-    }
+    QnMutexLocker lock(&m_metadataConsumersHashMutex);
+    m_metadataConsumerByType.insert(metadataConsumer->metadataType(), metadataConsumer);
 }
 
 void QnCamDisplay::removeMetadataConsumer(
     const nx::media::AbstractMetadataConsumerPtr& metadataConsumer)
 {
-    for (int i = 0; i < m_channelsCount; ++i)
-    {
-        NX_ASSERT(m_display[i]);
-        if (m_display[i])
-            m_display[i]->removeMetadataConsumer(metadataConsumer);
-    }
+    QnMutexLocker lock(&m_metadataConsumersHashMutex);
+    m_metadataConsumerByType.remove(metadataConsumer->metadataType(), metadataConsumer);
 }
 
 QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams,
@@ -446,7 +440,39 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
         return m_delay.terminatedSleep(needToSleep, maxSleepTime);
     else
         return m_delay.sleep(needToSleep, maxSleepTime);
+}
 
+bool QnCamDisplay::fillDataQueue()
+{
+    if (!isForcedBufferingEnabled() || isDataQueueFilled())
+        return false;
+
+    const auto requiredBufferLength = nx::client::desktop::ini().forcedVideoBufferLengthUs
+        + nx::client::desktop::ini().additionalVideoBufferLengthUs;
+    while (!needToStop()
+        && m_lastQueuedVideoTime >= m_lastVideoPacketTime
+        && m_lastQueuedVideoTime - m_lastVideoPacketTime <= requiredBufferLength)
+    {
+        if (m_dataQueue.size() == m_dataQueue.maxSize())
+            m_dataQueue.setMaxSize(m_dataQueue.maxSize() * 2);
+
+        constexpr qint64 kMinSleepTimeUs = 30000;
+        constexpr qint64 kMaxSleepTimeUs = 1000000;
+
+        const auto sleepTime = std::max(kMinSleepTimeUs,
+            requiredBufferLength - (m_lastQueuedVideoTime - m_lastVideoPacketTime));
+        const auto maxSleepTime = std::min(kMaxSleepTimeUs, sleepTime + kMinSleepTimeUs);
+
+        m_delay.terminatedSleep(sleepTime, maxSleepTime);
+    }
+
+    return m_lastQueuedVideoTime >= m_lastVideoPacketTime;
+}
+
+bool QnCamDisplay::isDataQueueFilled() const
+{
+    const auto forcedVideoBufferLengthUs = nx::client::desktop::ini().forcedVideoBufferLengthUs;
+    return m_lastQueuedVideoTime - m_lastVideoPacketTime > forcedVideoBufferLengthUs;
 }
 
 bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
@@ -620,7 +646,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
         else if (!m_display[0]->selfSyncUsed())
         {
-            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
+            if (fillDataQueue())
+                realSleepTime = AV_NOPTS_VALUE;
+            else if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
                 realSleepTime = doSmartSleep(needToSleep, speed);
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
@@ -975,7 +1003,6 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     }
     m_firstAfterJumpTime = qint64(AV_NOPTS_VALUE);
     m_prevLQ = -1;
-    clearMetaDataInfo();
 }
 
 void QnCamDisplay::onReaderPaused()
@@ -1096,7 +1123,8 @@ void QnCamDisplay::processNewSpeed(float speed)
     }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
-        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+        if (!isForcedBufferingEnabled())
+            m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
         m_delay.setMaxOverdraft(-1);
     }
     else
@@ -1125,10 +1153,26 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (video)
     {
-        if ((video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
-            m_delay.breakSleep();
         m_lastQueuedVideoTime = video->timestamp;
+
+        if (isForcedBufferingEnabled()
+            && (isDataQueueFilled() || m_dataQueue.size() == m_dataQueue.maxSize()))
+        {
+            m_delay.breakSleep();
+        }
+        else if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
+            && m_dataQueue.size() > 0
+            && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
+        {
+            m_delay.breakSleep();
+        }
     }
+    else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
+    {
+        processMetadata(metadata);
+        return;
+    }
+
     QnAbstractDataConsumer::putData(data);
     if (video && m_dataQueue.size() < 2)
         hurryUpCkeckForCamera2(video); // check if slow network
@@ -1166,42 +1210,6 @@ void QnCamDisplay::processSkippingFramesTime()
     }
 }
 
-void QnCamDisplay::clearMetaDataInfo()
-{
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_lastMetadata->clear();
-}
-
-void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
-{
-    const auto& ini = nx::client::desktop::ini();
-    if (ini.enableAnalytics && ini.externalMetadata)
-        qnMetadataAnalyticsController->gotFrame(m_resource->toResourcePtr(), video->timestamp);
-
-    auto& queue = m_lastMetadata[video->channelNumber];
-    if (queue.empty())
-        return;
-    auto itr = queue.upper_bound(video->timestamp);
-    if (itr != queue.begin())
-        --itr;
-
-    auto& metadataList = itr->second;
-    for (auto itrMetadata = metadataList.begin(); itrMetadata != metadataList.end();)
-    {
-        auto& metadata = *itrMetadata;
-        if (metadata->containTime(video->timestamp))
-        {
-            video->metadata << metadata;
-            itrMetadata = metadataList.erase(itrMetadata);
-        }
-        else
-        {
-            ++itrMetadata;
-        }
-    }
-    queue.erase(queue.begin(), itr);
-}
-
 void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
 {
     //performing before locking m_timeMutex. Otherwise we could get dead-lock between this thread and a setSpeed, called from main thread.
@@ -1229,6 +1237,61 @@ void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
         m_timeMutex.unlock();
 }
 
+void QnCamDisplay::processFillerPacket(
+    qint64 timestampUs,
+    QnAbstractStreamDataProvider* dataProvider,
+    QnAbstractMediaData::MediaFlags flags)
+{
+    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+    m_emptyPacketCounter++;
+    // empty data signal about EOF, or read/network error. So, check counter before EOF signaling
+    //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
+    bool isFillerPacket = timestampUs > 0 && timestampUs < DATETIME_NOW;
+    if (m_emptyPacketCounter >= 3 || isFillerPacket)
+    {
+        bool isLive = flags & QnAbstractMediaData::MediaFlags_LIVE;
+        if (m_extTimeSrc &&
+            !isLive &&
+            isVideoCamera &&
+            !m_eofSignalSended &&
+            !isFillerPacket &&
+            (!m_lastMediaEventTimeout.isValid() ||
+                m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay)))
+        {
+            m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+            m_eofSignalSended = true;
+        }
+
+        moveTimestampTo(timestampUs);
+    }
+    else {
+        QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(dataProvider);
+        if (archive && archive->isSingleShotMode())
+            archive->needMoreData();
+    }
+}
+
+void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    QnMutexLocker lock(&m_metadataConsumersHashMutex);
+    const auto consumers = m_metadataConsumerByType;
+    lock.unlock();
+
+    int consumersCount = 0;
+    for (const auto& value: consumers.values(metadata->metadataType))
+    {
+        if (const auto& consumer = value.lock())
+        {
+            ++consumersCount;
+            consumer->processMetadata(metadata);
+        }
+    }
+
+    NX_VERBOSE(this)
+        << lm("Metadata [%2] processed by %3 consumers")
+            .arg(static_cast<int>(metadata->metadataType)).arg(consumersCount);
+}
+
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
@@ -1236,8 +1299,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (!media)
         return true;
 
-    QnAbstractCompressedMetadataPtr metadata =
-        std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
     QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
@@ -1268,10 +1329,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
 
     float speed = m_speed;
-    bool speedIsNegative = speed < 0;
-    bool dataIsNegative = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
-    if (speedIsNegative != dataIsNegative)
-        return true; // skip data
+    if (media->dataType != QnAbstractMediaData::GENERIC_METADATA)
+    {
+        bool speedIsNegative = speed < 0;
+        bool dataIsNegative = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
+        if (speedIsNegative != dataIsNegative)
+            return true; // skip data
+    }
 
     if (m_prevSpeed != speed || m_executingChangeSpeed)
     {
@@ -1282,10 +1346,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     processSkippingFramesTime();
 
     if (vd)
-    {
         m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        mapMetadataFrame(vd);
-    }
 
     bool oldIsStillImage = m_isStillImage;
     m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
@@ -1329,27 +1390,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_extTimeSrc->reinitTime(AV_NOPTS_VALUE);
     }
 
-    if (metadata)
-    {
-        if (metadata->metadataType == MetadataType::MediaStreamEvent)
-        {
-            QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
-            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
-                QString::fromLatin1(data));
-
-            m_lastMediaEvent = mediaEvent;
-            m_lastMediaEventTimeout.restart();
-            moveTimestampTo(m_speed >= 0 ? DATETIME_NOW : 0);
-        }
-        else
-        {
-            int ch = metadata->channelNumber;
-            m_lastMetadata[ch][metadata->timestamp] << metadata;
-            if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
-                m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
-        }
-        return true;
-    }
     if (ad)
     {
         if (speed < 0)
@@ -1416,41 +1456,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             // in that case MediaFlags_AfterEOF is set and we should process the packet normally.
             return true;
         }
-
-        m_emptyPacketCounter++;
-        // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
-        bool isFillerPacket =  emptyData->timestamp > 0 && emptyData->timestamp < DATETIME_NOW;
-        if (m_emptyPacketCounter >= 3 || isFillerPacket)
-        {
-            bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            if (m_extTimeSrc &&
-                !isLive &&
-                isVideoCamera &&
-                !m_eofSignalSended &&
-                !isFillerPacket &&
-                (!m_lastMediaEventTimeout.isValid() ||
-                  m_lastMediaEventTimeout.hasExpired(kMediaMessageDelay)))
-            {
-                m_extTimeSrc->onEofReached(this, true); // jump to live if needed
-                m_eofSignalSended = true;
-            }
-
-            /*
-            // One camera from several sync cameras may reach BOF/EOF
-            // move current time position to the edge to prevent other cameras blocking
-            m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
-            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                m_display[i]->overrideTimestampOfNextFrameToRender(m_lastDecodedTime);
-            }
-            */
-            moveTimestampTo(emptyData->timestamp);
-        }
-        else {
-            QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(emptyData->dataProvider);
-            if (archive && archive->isSingleShotMode())
-                archive->needMoreData();
-        }
+        processFillerPacket(emptyData->timestamp, emptyData->dataProvider, emptyData->flags);
         return true;
     }
     else
@@ -1860,7 +1866,8 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
 
 void QnCamDisplay::onSlowSourceHint()
 {
-    m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+    if (!isForcedBufferingEnabled())
+        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
 
 qint64 QnCamDisplay::getDisplayedMax() const
@@ -2078,6 +2085,11 @@ qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
 {
     return m_lastMediaEvent;
+}
+
+bool QnCamDisplay::isForcedBufferingEnabled() const
+{
+    return nx::client::desktop::ini().forcedVideoBufferLengthUs > 0;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

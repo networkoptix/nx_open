@@ -512,6 +512,14 @@ enum IDType
     SaveLayoutForCurrentUserAsAction,
 
     /**
+    * Shares selected camera with another user.
+    *
+    * Parameters:
+    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
+    */
+    ShareCameraAction,
+
+    /**
      * Performs a fit in view operation.
      */
     FitInViewAction,
@@ -643,6 +651,11 @@ enum IDType
      * Opens manual camera addition dialog.
      */
     ServerAddCameraManuallyAction,
+
+    /**
+     * Opens manual device addition dialog.
+     */
+    AddDeviceManuallyAction,
 
     /**
      * Opens camera list by server

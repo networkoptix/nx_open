@@ -191,13 +191,15 @@ void EventsStorage::prepareCursorQuery(
             nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
     }
 
+    // TODO: #ak Think over limit in the following query.
     query->prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec, device_guid,
             object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
         FROM %1
         %2
-        ORDER BY timestamp_usec_utc %3, object_id %3;
+        ORDER BY timestamp_usec_utc %3, object_id %3
+        LIMIT 30000;
     )sql").args(
         eventsFilteredByFreeTextSubQuery,
         sqlQueryFilterStr,

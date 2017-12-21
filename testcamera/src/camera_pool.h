@@ -16,13 +16,25 @@ public:
     /*!
         \param localInterfacesToListen If empty, all local interfaces are listened
     */
-    QnCameraPool(const QStringList& localInterfacesToListen, QnCommonModule* commonModule);
+    QnCameraPool(
+        const QStringList& localInterfacesToListen,
+        QnCommonModule* commonModule,
+        bool noSecondaryStream,
+        int fps);
+
     virtual ~QnCameraPool();
 
     static void initGlobalInstance(QnCameraPool* _inst);
     static QnCameraPool* instance();
 
-    void addCameras(bool cameraForEachFile, int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);
+    void addCameras(
+        bool cameraForEachFile,
+        bool includePts,
+        int count,
+        QStringList primaryFileList,
+        QStringList secondaryFileList,
+        int offlineFreq);
+
     QnTestCamera* findCamera(const QString& mac) const;
     QByteArray getDiscoveryResponse();
 protected:
@@ -32,6 +44,8 @@ private:
     int m_cameraNum;
     mutable QMutex m_mutex;
     QnCameraDiscoveryListener* m_discoveryListener;
+    bool m_noSecondaryStream;
+    int m_fps;
 };
 
 #endif // __CAMERA_POOL_H__

@@ -35,6 +35,16 @@ void UnifiedSearchListModel::setFilter(Types filter)
     d->setFilter(filter);
 }
 
+QnTimePeriod UnifiedSearchListModel::selectedTimePeriod() const
+{
+    return d->selectedTimePeriod();
+}
+
+void UnifiedSearchListModel::setSelectedTimePeriod(const QnTimePeriod& value)
+{
+    d->setSelectedTimePeriod(value);
+}
+
 vms::event::EventType UnifiedSearchListModel::selectedEventType() const
 {
     return d->selectedEventType();
@@ -60,6 +70,6 @@ void UnifiedSearchListModel::setAnalyticsSearchRect(const QRectF& relativeRect)
     d->setAnalyticsSearchRect(relativeRect);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

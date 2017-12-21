@@ -319,6 +319,6 @@ QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType messa
     }
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -6,14 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>815</width>
-    <height>89</height>
+    <width>439</width>
+    <height>117</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QLabel" name="afterLabel">
+     <property name="text">
+      <string>Post-Recording:</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -21,10 +28,94 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="fixedDurationCheckBox">
+     <property name="text">
+      <string>Fixed duration:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="beforeLabel">
+     <property name="text">
+      <string>Pre-Recording:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="5">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QSpinBox" name="beforeSpinBox">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="suffix">
+        <string>s</string>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="1" colspan="5">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QSpinBox" name="afterSpinBox">
+       <property name="suffix">
+        <string>s</string>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
    <item row="0" column="1">
     <widget class="QComboBox" name="qualityComboBox"/>
    </item>
-   <item row="0" column="2" colspan="2">
+   <item row="3" column="1">
+    <widget class="nx::client::desktop::TimeDurationWidget" name="fixedDuration" native="true">
+     <property name="maximum" stdset="0">
+      <number>9999</number>
+     </property>
+     <property name="value" stdset="0">
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
     <widget class="QSpinBox" name="fpsSpinBox">
      <property name="maximum">
       <number>30</number>
@@ -34,15 +125,21 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4">
+   <item row="0" column="3">
     <widget class="QLabel" name="fpsLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>FPS</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="5">
-    <spacer name="horizontalSpacer">
+   <item row="0" column="4" colspan="2">
+    <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -54,82 +151,11 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="6">
-    <widget class="QLabel" name="beforeLabel">
-     <property name="text">
-      <string>Pre-Recording:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="7">
-    <widget class="QSpinBox" name="beforeSpinBox">
-     <property name="suffix">
-      <string>s</string>
-     </property>
-     <property name="value">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="8">
-    <widget class="QLabel" name="afterLabel">
-     <property name="text">
-      <string>Post-Recording:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="9">
-    <widget class="QSpinBox" name="afterSpinBox">
-     <property name="suffix">
-      <string>s</string>
-     </property>
-     <property name="value">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="10">
-    <widget class="QSpinBox" name="durationSpinBox">
-     <property name="suffix">
-      <string>s</string>
-     </property>
-     <property name="maximum">
-      <number>86400</number>
-     </property>
-     <property name="value">
-      <number>60</number>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="11">
-    <widget class="QLabel" name="durationLabel">
-     <property name="text">
-      <string>max</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QCheckBox" name="fixedDurationCheckBox">
-     <property name="text">
-      <string>Fixed duration:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" colspan="2">
-    <widget class="QnTimeDurationWidget" name="fixedDuration">
-     <property name="maximum">
-      <number>9999</number>
-     </property>
-     <property name="value">
-      <number>5</number>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTimeDurationWidget</class>
+   <class>nx::client::desktop::TimeDurationWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/time_duration_widget.h</header>
    <container>1</container>

@@ -441,6 +441,13 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(!condition::isSafeMode());
 
+    factory(ShareCameraAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .autoRepeat(false)
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(!condition::isSafeMode());
+
     factory(SaveCurrentVideoWallReviewAction)
         .flags(Main | Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
         .mode(DesktopMode)
@@ -1319,6 +1326,17 @@ void initialize(Manager* manager, Action* root)
     factory(ServerAddCameraManuallyAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+            && ConditionWrapper(new EdgeServerCondition(false))
+            && !ConditionWrapper(new FakeServerCondition(true))
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+
+    factory(AddDeviceManuallyAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Add Device (new)..."))   //intentionally hardcode devices here
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))

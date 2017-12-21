@@ -160,6 +160,6 @@ void MotionSearchListModel::Private::fetchMore()
         m_data.push_front(*chunk);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

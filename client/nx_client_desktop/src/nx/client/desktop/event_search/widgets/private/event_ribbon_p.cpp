@@ -34,7 +34,8 @@ static constexpr int kScrollBarStep = 16;
 // When tile becomes visible its true height can be computed and used.
 static constexpr int kApproximateTileHeight = 40;
 
-static constexpr int kDefaultThumbnailSize = 224;
+static constexpr int kDefaultThumbnailWidth = 224;
+static constexpr int kMaximumThumbnailWidth = 1024;
 static constexpr int kMultiThumbnailSpacing = 1;
 
 QSize minimumWidgetSize(QWidget* widget)
@@ -194,7 +195,31 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 {
     NX_EXPECT(tile && index.isValid());
 
-    tile->setTitle(index.data(Qt::DisplayRole).toString());
+    // Check whether the tile is a special busy indicator tile.
+    const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
+    if (busyIndicatorVisibility.isValid())
+    {
+        tile->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
+        return;
+    }
+
+    // Check whether the tile is a special progress bar tile.
+    const auto progress = index.data(Qn::ProgressValueRole);
+    if (progress.canConvert<qreal>())
+    {
+        tile->setProgressBarVisible(true);
+        tile->setProgressValue(progress.value<qreal>());
+        tile->setProgressTitle(index.data(Qt::DisplayRole).toString());
+        tile->setToolTip(index.data(Qn::DescriptionTextRole).toString());
+        return;
+    }
+
+    // Check whether the tile is a special separator tile.
+    const auto title = index.data(Qt::DisplayRole).toString();
+    if (title.isEmpty())
+        return;
+
+    tile->setTitle(title);
     tile->setIcon(index.data(Qt::DecorationRole).value<QPixmap>());
     tile->setTimestamp(index.data(Qn::TimestampTextRole).toString());
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
@@ -219,18 +244,23 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         return;
 
     const auto previewTimeMs = index.data(Qn::PreviewTimeRole).value<qint64>();
+    const auto previewCropRect = index.data(Qn::ItemZoomRectRole).value<QRectF>();
+    const auto thumbnailWidth = previewCropRect.isEmpty()
+        ? kDefaultThumbnailWidth
+        : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+
     tile->setPreview(new QnSingleThumbnailLoader(
         camera,
         previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
         QnThumbnailRequestData::kDefaultRotation,
-        QSize(kDefaultThumbnailSize, 0),
+        QSize(thumbnailWidth, 0),
         QnThumbnailRequestData::JpgFormat,
         QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
         QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
         tile));
 
     tile->preview()->loadAsync();
-    tile->setPreviewHighlight(index.data(Qn::ItemZoomRectRole).value<QRectF>());
+    tile->setPreviewCropRect(previewCropRect);
 }
 
 void EventRibbon::Private::debugCheckGeometries()

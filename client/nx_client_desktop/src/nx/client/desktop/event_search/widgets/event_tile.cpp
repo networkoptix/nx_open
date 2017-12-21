@@ -12,6 +12,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/elided_label.h>
 #include <utils/common/delayed.h>
 
 namespace nx {
@@ -30,12 +31,15 @@ static constexpr int kTitleFontWeight = QFont::Medium;
 static constexpr int kTimestampFontWeight = QFont::Normal;
 static constexpr int kDescriptionFontWeight = QFont::Normal;
 
+static constexpr int kProgressBarResolution = 1000;
+
 } // namespace
 
 EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this))
+    m_closeButton(new QPushButton(this)),
+    m_progressLabel(new QnElidedLabel(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
@@ -55,6 +59,8 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
     ui->previewWidget->setHidden(true);
+
+    ui->previewWidget->setCropMode(QnResourcePreviewWidget::CropMode::notHovered);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -77,6 +83,29 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
+
+    ui->busyIndicator->setContentsMargins(
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding);
+
+    ui->busyIndicator->setHidden(true);
+    ui->progressHolder->setHidden(true);
+    ui->mainWidget->setHidden(true);
+
+    QFont progressLabelFont;
+    progressLabelFont.setWeight(QFont::DemiBold);
+
+    ui->progressBar->setRange(0, kProgressBarResolution);
+    m_progressLabel->setParent(ui->progressBar);
+    m_progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    m_progressLabel->setFont(progressLabelFont);
+    m_progressLabel->setForegroundRole(QPalette::Highlight);
+
+    static constexpr int kProgressLabelShift = 8;
+    auto progressLabelAnchor = new QnWidgetAnchor(m_progressLabel);
+    progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);
 
     connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
@@ -134,7 +163,7 @@ QString EventTile::title() const
 void EventTile::setTitle(const QString& value)
 {
     ui->nameLabel->setText(value);
-    ui->nameLabel->setHidden(value.isEmpty());
+    ui->mainWidget->setHidden(value.isEmpty());
 }
 
 QColor EventTile::titleColor() const
@@ -168,7 +197,7 @@ QString EventTile::timestamp() const
 void EventTile::setTimestamp(const QString& value)
 {
     ui->timestampLabel->setText(value);
-    ui->timestampLabel->setHidden(value.isEmpty());
+    ui->timestampLabel->setHidden(value.isEmpty() || !m_closeButton->isHidden());
 }
 
 QPixmap EventTile::icon() const
@@ -200,14 +229,14 @@ void EventTile::setPreview(QnImageProvider* value)
     ui->previewWidget->setHidden(!value);
 }
 
-QRectF EventTile::previewHighlight() const
+QRectF EventTile::previewCropRect() const
 {
-    return ui->previewWidget->highlight();
+    return ui->previewWidget->highlightRect();
 }
 
-void EventTile::setPreviewHighlight(const QRectF& relativeRect)
+void EventTile::setPreviewCropRect(const QRectF& relativeRect)
 {
-    ui->previewWidget->setHighlight(relativeRect);
+    ui->previewWidget->setHighlightRect(relativeRect);
 }
 
 CommandActionPtr EventTile::action() const
@@ -223,6 +252,9 @@ void EventTile::setAction(const CommandActionPtr& value)
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
 {
+    if (ui->mainWidget->isHidden() && ui->progressHolder->isHidden())
+        return;
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::NoPen);
@@ -268,7 +300,7 @@ bool EventTile::event(QEvent* event)
 void EventTile::handleHoverChanged(bool hovered)
 {
     const auto showCloseButton = hovered & m_closeable;
-    ui->timestampLabel->setHidden(showCloseButton);
+    ui->timestampLabel->setHidden(showCloseButton || ui->timestampLabel->text().isEmpty());
     m_closeButton->setVisible(showCloseButton);
     updateBackgroundRole(hovered && !m_closeButton->underMouse());
 
@@ -324,6 +356,47 @@ void EventTile::setAutoCloseTimeMs(int value)
         m_autoCloseTimer->setInterval(value);
     else
         m_autoCloseTimer = executeDelayedParented(autoClose, value, this);
+}
+
+bool EventTile::busyIndicatorVisible() const
+{
+    return !ui->busyIndicator->isHidden();
+}
+
+void EventTile::setBusyIndicatorVisible(bool value)
+{
+    ui->busyIndicator->setVisible(value);
+}
+
+bool EventTile::progressBarVisible() const
+{
+    return !ui->progressHolder->isHidden();
+}
+
+void EventTile::setProgressBarVisible(bool value)
+{
+    ui->progressHolder->setVisible(value);
+}
+
+qreal EventTile::progressValue() const
+{
+    return m_progressValue;
+}
+
+void EventTile::setProgressValue(qreal value)
+{
+    m_progressValue = value;
+    ui->progressBar->setValue(int(value * kProgressBarResolution));
+}
+
+QString EventTile::progressTitle() const
+{
+    return m_progressLabel->text();
+}
+
+void EventTile::setProgressTitle(const QString& value)
+{
+    m_progressLabel->setText(value);
 }
 
 } // namespace

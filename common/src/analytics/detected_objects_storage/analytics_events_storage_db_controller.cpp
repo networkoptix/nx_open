@@ -12,6 +12,8 @@ DbController::DbController(
     base_type(connectionOptions)
 {
     dbStructureUpdater().addUpdateScript(kCreateAnalyticsEventsSchema);
+    dbStructureUpdater().addUpdateScript(kAnalyticsDbMoreIndexes);
+    dbStructureUpdater().addUpdateScript(kAnalyticsDbEvenMoreIndexes);
 }
 
 } // namespace storage

@@ -67,7 +67,7 @@ QnFileCache* QnFileCache::instance()
 
 // -------------- QnTestCamera ------------
 
-QnTestCamera::QnTestCamera(quint32 num): m_num(num)
+QnTestCamera::QnTestCamera(quint32 num, bool includePts): m_num(num), m_includePts(includePts)
 {
     //bool ok;
     m_mac = "92-61";
@@ -125,7 +125,8 @@ int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int si
     return sentTotal == size;
 }
 
-bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps)
+bool QnTestCamera::doStreamingFile(
+    const QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps)
 {
     double streamingTime = 0;
     QTime timer;
@@ -133,9 +134,9 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
 
     for (int i = 0; i < data.size(); ++i)
     {
-
         makeOfflineFlood();
-        if (!m_isEnabled) {
+        if (!m_isEnabled)
+        {
             QnSleep::msleep(100);
             return false;
         }
@@ -143,49 +144,62 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
         QnCompressedVideoDataPtr video = data[i];
         if (i == 0)
         {
-            QByteArray byteArray = video->context->serialize();
+            QByteArray mediaContext = video->context->serialize();
 
-            quint32 packetLen = htonl(byteArray.size());
-            quint16 codec = video->compressionType;
-            codec |= 0xc000;
-            codec = htons(codec);
+            quint32 mediaContextSizeBigEndian = htonl(mediaContext.size());
+            quint16 codecAndFlags = video->compressionType;
+            codecAndFlags |= (/*isKeyFrame*/ 1 << 7) << 8;
+            codecAndFlags |= (/*isCodecContext*/ 1 << 6) << 8;
+            const quint16 codecAndFlagsBigEndian = htons(codecAndFlags);
 
-            if (!sendAll(socket, &codec, 2)) {
+            if (!sendAll(socket, &codecAndFlagsBigEndian, 2))
                 return false;
-            }
 
-            if (!sendAll(socket, &packetLen, 4)) {
+            if (!sendAll(socket, &mediaContextSizeBigEndian, 4))
                 return false;
-            }
 
-            if (!sendAll(socket, byteArray.data(), byteArray.size())) {
+            if (!sendAll(socket, mediaContext.data(), mediaContext.size()))
                 return false;
-            }
         }
 
-        quint32 packetLen = htonl(video->dataSize());
-        quint16 codec = video->compressionType;
+        quint16 codecAndFlags = video->compressionType;
+        if (codecAndFlags == 0)
+        {
+            qDebug() << "ERROR: Codec is 0";
+        }
+        else if (codecAndFlags >= (1 << 5))
+        {
+            qDebug() << "ERROR: Codec" << codecAndFlags << "exceeds" << (1 << 5)
+                << " which is not supported by testcamera; setting to 0";
+            codecAndFlags = 0;
+        }
         if (video->flags & AV_PKT_FLAG_KEY)
-            codec |= 0x8000;
-        codec = htons(codec);
+            codecAndFlags |= (/*isKeyFrame*/ 1 << 7) << 8;
+        if (m_includePts)
+            codecAndFlags |= (/*isPtsIncluded*/ 1 << 5) << 8;
 
-        if (!sendAll(socket, &codec, 2)) {
+        const quint16 codecAndFlagsBigEndian = htons(codecAndFlags);
+        if (!sendAll(socket, &codecAndFlagsBigEndian, 2))
             return false;
+
+        quint32 videoPacketSizeBigEndian = (quint32) htonl((int) video->dataSize());
+        if (!sendAll(socket, &videoPacketSizeBigEndian, 4))
+            return false;
+
+        if (m_includePts)
+        {
+            qint64 ptsBigEndian = (qint64) htonll((quint64) video->timestamp);
+            if (!sendAll(socket, &ptsBigEndian, sizeof(ptsBigEndian)))
+                return false;
         }
 
-        if (!sendAll(socket, &packetLen, 4)) {
+        if (!sendAll(socket, video->data(), (int) video->dataSize()))
             return false;
-        }
-
-        if (!sendAll(socket, video->data(), video->dataSize())) {
-            return false;
-        }
 
         streamingTime += 1000.0 / fps;
         int waitingTime = streamingTime - timer.elapsed();
         if (waitingTime > 0)
             QnSleep::msleep(waitingTime);
-
     }
     return true;
 }

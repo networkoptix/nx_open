@@ -95,7 +95,11 @@ typedef struct
     std::chrono::high_resolution_clock::time_point m_lastInferenceTime
         = std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(0));
 
+    std::chrono::microseconds m_lastProcessedFrameTimestamp;
+    std::chrono::microseconds m_lastInferenceDuration;
+
     std::queue<int64_t> m_ptsQueue;
+    std::queue<int64_t> m_outPtsQueue;
 
 } context_t;
 
