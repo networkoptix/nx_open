@@ -108,7 +108,9 @@ private:
     void setDebugIniReloadTimer();
 
     void initializeNetworking();
+
     void initializeCloudConnectivity();
+    void deinitializeCloudConnectivity();
 
     // TODO: Initialization and deinitialization of this class is brocken by design (because of
     //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:

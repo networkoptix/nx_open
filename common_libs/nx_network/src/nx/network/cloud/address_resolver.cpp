@@ -7,8 +7,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-#include "mediator_connector.h"
-
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
 static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
@@ -250,7 +248,7 @@ void AddressResolver::resolveAsync(
         auto entries = info->second.getAll();
 
         // TODO: #mux This is ugly fix for VMS-5777, should be properly fixed in 3.1.
-        if (info->second.isLikelyCloudAddress && isMediatorAvailable())
+        if (info->second.isLikelyCloudAddress && isCloudResolveEnabled())
         {
             const bool cloudAddressEntryPresent =
                 std::count_if(
@@ -353,6 +351,16 @@ bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
     return (endpoint.port != 0) || isCloudHostName(endpoint.address.toString());
 }
 
+void AddressResolver::setCloudResolveEnabled(bool isEnabled)
+{
+    m_isCloudResolveEnabled = isEnabled;
+}
+
+bool AddressResolver::isCloudResolveEnabled() const
+{
+    return m_isCloudResolveEnabled;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress):
@@ -447,11 +455,6 @@ AddressResolver::RequestInfo::RequestInfo(
 
 //-------------------------------------------------------------------------------------------------
 
-bool AddressResolver::isMediatorAvailable() const
-{
-    return SocketGlobals::mediatorConnector().isConnected();
-}
-
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 {
     const auto domain = info->first.toString();
@@ -531,7 +534,7 @@ void AddressResolver::mediatorResolve(
     }
 
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress && isMediatorAvailable())
+    if (info->second.isLikelyCloudAddress && isCloudResolveEnabled())
     {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
         resolveResult = SystemError::noError;

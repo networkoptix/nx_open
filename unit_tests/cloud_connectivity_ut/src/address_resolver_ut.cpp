@@ -9,8 +9,7 @@ namespace network {
 namespace cloud {
 namespace test {
 
-class AddressResolverTest
-:
+class AddressResolverTest:
     public ::testing::Test,
     protected AddressResolver
 {
@@ -73,7 +72,12 @@ public:
         s_endpoints.clear();
     }
 
-    ~AddressResolverTest() override
+    AddressResolverTest()
+    {
+        setCloudResolveEnabled(true);
+    }
+
+    virtual ~AddressResolverTest() override
     {
         pleaseStopSync();
     }
@@ -116,11 +120,6 @@ public:
     }
 
 private:
-    virtual bool isMediatorAvailable() const override
-    {
-        return true;
-    }
-
     static std::map<QString, std::list<SocketAddress>> s_endpoints;
     static std::shared_ptr<stun::test::AsyncClientMock> s_stunClient;
 };
