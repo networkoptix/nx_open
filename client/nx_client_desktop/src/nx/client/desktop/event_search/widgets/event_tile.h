@@ -32,6 +32,8 @@ class EventTile: public Customized<QWidget>
     Q_PROPERTY(QPixmap icon READ icon WRITE setIcon)
     Q_PROPERTY(bool busyIndicatorVisible READ busyIndicatorVisible WRITE setBusyIndicatorVisible)
     Q_PROPERTY(bool progressBarVisible READ progressBarVisible WRITE setProgressBarVisible)
+    Q_PROPERTY(QString progressTitle READ progressTitle WRITE setProgressTitle)
+    Q_PROPERTY(qreal progressValue READ progressValue WRITE setProgressValue)
 
     using base_type = Customized<QWidget>;
 
