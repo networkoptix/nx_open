@@ -57,13 +57,13 @@ NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pb
 
 /**
  * Returns list of network interfaces.
- * @param allowItfWithoutAddress get interfaces without ipv4.
+ * @param allowInterfacesWithoutAddress get interfaces without ipv4.
  * @param keepAllAddressesPerInterface return several records for interfaces with multiple addresses.
  */
 
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
 QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
-    bool allowItfWithoutAddress = false,
+    bool allowInterfacesWithoutAddress = false,
     bool keepAllAddressesPerInterface = false);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.

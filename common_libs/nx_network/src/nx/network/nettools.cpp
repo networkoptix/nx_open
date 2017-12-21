@@ -68,8 +68,8 @@ QHostAddress QnInterfaceAndAddr::broadcastAddress() const
 
 QHostAddress QnInterfaceAndAddr::subNetworkAddress() const
 {
-    quint32 subnetworkIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
-    return QHostAddress(subnetworkIpv4);
+    quint32 subnetworkIpV4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(subnetworkIpV4);
 }
 
 bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) const
@@ -84,7 +84,7 @@ bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) 
 }
 
 QnInterfaceAndAddrList getAllIPv4Interfaces(
-    bool allowItfWithoutAddress,
+    bool allowInterfacesWithoutAddress,
     bool keepAllAddressesPerInterface)
 {
     struct LocalCache
@@ -97,7 +97,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(
     enum { kCacheLinesCount = 2};
     static LocalCache caches[kCacheLinesCount];
 
-    LocalCache &cache = caches[allowItfWithoutAddress ? 1 : 0];
+    LocalCache &cache = caches[allowInterfacesWithoutAddress ? 1 : 0];
     {
         // speed optimization
         QnMutexLocker lock(&cache.guard);
@@ -119,7 +119,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(
             continue;
 #endif
 
-        bool addInterfaceAnyway = allowItfWithoutAddress;
+        bool addInterfaceAnyway = allowInterfacesWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
