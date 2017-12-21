@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/utils/data_structures/keyed_list.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -29,9 +31,6 @@ public:
     bool removeEvent(const QnUuid& id);
     void removeEvents(int first, int count);
 
-    // Event index lookup by id. Logarithmic complexity.
-    int indexOf(const QnUuid& id) const;
-
     bool updateEvent(const EventData& data);
 
     const EventData& getEvent(int index) const;
@@ -40,25 +39,8 @@ public:
     QnVirtualCameraResourceList accessibleCameras(const EventData& event) const;
 
 private:
-    struct EventDescriptor
-    {
-        EventData data;
-        qint64 sequentialNumber = -1;
-
-        EventDescriptor() = default;
-        EventDescriptor(const EventData& data, qint64 sequentialNumber):
-            data(data),
-            sequentialNumber(sequentialNumber)
-        {
-        }
-    };
-
-private:
     EventListModel* const q = nullptr;
-    QList<EventDescriptor> m_events;
-    QHash<QnUuid, qint64> m_sequentialNumberById;
-    qint64 m_nextFrontNumber = 0;
-    qint64 m_nextBackNumber = -1;
+    utils::KeyedList<QnUuid, EventData> m_events;
 };
 
 } // namespace desktop
