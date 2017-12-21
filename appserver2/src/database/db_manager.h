@@ -23,6 +23,7 @@
 
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
+#include <nx/vms/event/event_fwd.h>
 
 struct BeforeRestoreDbData;
 
@@ -702,6 +703,7 @@ namespace detail
         QString getDatabaseName(const QString& baseName);
         bool rebuildUserAccessRightsTransactions();
         bool setMediaServersStatus(Qn::ResourceStatus status);
+        bool updateDefaultRules(const nx::vms::event::RuleList& rules);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

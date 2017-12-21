@@ -1411,6 +1411,19 @@ bool QnDbManager::encryptKvPairs()
     return true;
 }
 
+bool QnDbManager::updateDefaultRules(const nx::vms::event::RuleList& rules)
+{
+    // TODO: #GDM move to migration
+    for (const auto& rule: rules)
+    {
+        ApiBusinessRuleData ruleData;
+        fromResourceToApi(rule, ruleData);
+        if (updateBusinessRule(ruleData) != ErrorCode::ok)
+            return false;
+    }
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName.endsWith(lit("/07_videowall.sql")))
@@ -1474,28 +1487,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/43_add_business_rules.sql")))
     {
-        // TODO: #GDM move to migration
-        for (const auto& rule: vms::event::Rule::getRulesUpd43())
-        {
-            ApiBusinessRuleData ruleData;
-            fromResourceToApi(rule, ruleData);
-            if (updateBusinessRule(ruleData) != ErrorCode::ok)
-                return false;
-        }
-        return resyncIfNeeded(ResyncRules);
+        updateDefaultRules(vms::event::Rule::getRulesUpd43()) && resyncIfNeeded(ResyncRules);
     }
 
     if (updateName.endsWith(lit("/48_add_business_rules.sql")))
     {
-        // TODO: #GDM move to migration
-        for (const auto& rule: vms::event::Rule::getRulesUpd48())
-        {
-            ApiBusinessRuleData ruleData;
-            fromResourceToApi(rule, ruleData);
-            if (updateBusinessRule(ruleData) != ErrorCode::ok)
-                return false;
-        }
-        return resyncIfNeeded(ResyncRules);
+        return updateDefaultRules(vms::event::Rule::getRulesUpd48()) && resyncIfNeeded(ResyncRules);
     }
 
     if (updateName.endsWith(lit("/43_resync_client_info_data.sql")))
@@ -1620,7 +1617,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
 
     if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
-        return resyncIfNeeded(ResyncRules);
+        return updateDefaultRules(vms::event::Rule::getDefaultRules()) && resyncIfNeeded(ResyncRules);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -2097,7 +2094,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
-    }   
+    }
 
     return ErrorCode::ok;
 }
