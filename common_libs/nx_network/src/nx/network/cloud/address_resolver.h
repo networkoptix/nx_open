@@ -75,42 +75,49 @@ struct NX_NETWORK_API AddressEntry
     QString toString() const;
 };
 
-//!Contains peer names, their known addresses and some attributes
-class NX_NETWORK_API AddressResolver
-        : public QnStoppableAsync
+/**
+ * Resolves hostname to IP address or cloud host id which
+ * is enough to establish connection to the host.
+ */
+class NX_NETWORK_API AddressResolver:
+    public QnStoppableAsync
 {
 public:
-    typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
+    using MediatorConnection = hpm::api::MediatorClientTcpConnection;
+
     AddressResolver(std::unique_ptr<MediatorConnection> mediatorConnection);
     virtual ~AddressResolver() = default;
 
-    //!Add new peer address
-    /*!
-        Peer addresses are resolved from time to time in the following way:\n
-        - custom NX resolve request is sent if nxApiPort attribute is provided.
-            If peer responds and reports same name as peerName than address
-            considered "resolved"
-        - if host does not respond to custom NX resolve request or no
-            nxApiPort attribute, than ping is used from time to time
-        - resolved address is "resolved" for only some period of time
-
-        \param attributes Attributes refer to hostAddress not peerName
-
-        NOTE: Peer can have multiple addresses
-    */
+    /**
+     * Add new peer address.
+     * Peer addresses are resolved from time to time in the following way:\n
+     * - Custom NX resolve request is sent if nxApiPort attribute is provided.
+     *   If peer responds and reports same name as peerName than address
+     *   considered "resolved".
+     * - If host does not respond to custom NX resolve request or no
+     *   nxApiPort attribute, than ping is used from time to time.
+     * - Resolved address is "resolved" for only some period of time.
+     *
+     * @param attributes Attributes refer to hostAddress not peerName.
+     *
+     * NOTE: Peer can have multiple addresses.
+     */
     void addFixedAddress(
         const HostAddress& hostName, const SocketAddress& endpoint);
 
-    //!Removes added address, if endpoint is boost::none, removes all addresses.
+    /**
+     * Removes added address, if endpoint is boost::none, removes all addresses.
+     */
     void removeFixedAddress(
-        const HostAddress& hostName, boost::optional<SocketAddress> endpoint = boost::none);
+        const HostAddress& hostName,
+        boost::optional<SocketAddress> endpoint = boost::none);
 
-    //!Resolves domain address to the list of subdomains
-    /*!
-        \example resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
-
-        NOTE: handler might be called within this function in case if
-            values are avaliable from cache
+    /**
+     * Resolves domain address to the list of subdomains.
+     * Example: resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
+     *
+     * NOTE: handler might be called within this function in case if
+     *   values are avaliable from cache.
      */
     void resolveDomain(
         const HostAddress& domain,
@@ -119,18 +126,18 @@ public:
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::deque<AddressEntry>)> ResolveHandler;
 
-    //!Resolves hostName like DNS server does
-    /*!
-        handler is called with complete address list includung:
-            - addresses reported by \fn addPeerAddress
-            - resolve result from \class DnsResolver
-            - resolve result from \class MediatorAddressResolver (TODO :)
-
-        NOTE: handler might be called within this function in case if
-            values are avaliable from cache
-
-        natTraversal defines if mediator should be used for address resolution
-    */
+    /**
+     * Resolves hostName like DNS server does.
+     * handler is called with complete address list includung:
+     * - Addresses reported by AddressResolver::addFixedAddress.
+     * - Resolve result from DnsResolver.
+     * - Resolve result from MediatorAddressResolver (TODO :).
+     *
+     * @param natTraversalSupport defines if mediator should be used for address resolution.
+     *
+     * NOTE: Handler might be called within this function in case if
+     *   values are avaliable from cache.
+     */
     void resolveAsync(
         const HostAddress& hostName,
         ResolveHandler handler,
@@ -143,11 +150,11 @@ public:
         NatTraversalSupport natTraversalSupport,
         int ipVersion);
 
-    //!Cancels request
-    /*!
-        if handler not provided the method will block until actual
-        cancelation is done
-    */
+    /**
+     * Cancels request.
+     * If handler not provided the method will block until actual
+     *   cancelation is done.
+     */
     void cancel(
         void* requestId,
         nx::utils::MoveOnlyFunc<void()> handler = nullptr);
