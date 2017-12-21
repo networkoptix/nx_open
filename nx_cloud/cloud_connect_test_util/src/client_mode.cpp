@@ -37,6 +37,10 @@ void printConnectOptions(std::ostream* const outStream)
         "  --ssl                Use SSL on top of client sockets\n";
 }
 
+static bool resolveDomainName(
+    const SocketAddress& targetAddress,
+    std::vector<SocketAddress>* instanceEndpoints);
+
 static std::vector<SocketAddress> resolveTargets(
     SocketAddress targetAddress,
     const nx::utils::ArgumentParser& args)
@@ -61,21 +65,45 @@ static std::vector<SocketAddress> resolveTargets(
         return targets;
     }
 
-    // Or resolve it.
-    nx::utils::promise<void> promise;
-    const auto port = targetAddress.port;
-    nx::network::SocketGlobals::addressResolver().resolveDomain(
-        std::move(targetAddress.address),
-        [port, &targets, &promise](std::vector<nx::network::cloud::TypedAddress> addresses)
-        {
-            for (auto& address: addresses)
-                targets.push_back(SocketAddress(std::move(address.address), port));
+    resolveDomainName(targetAddress, &targets);
+    return targets;
+}
 
-            promise.set_value();
+static bool resolveDomainName(
+    const SocketAddress& targetAddress,
+    std::vector<SocketAddress>* instanceEndpoints)
+{
+    auto mediatorConnection = nx::network::SocketGlobals::mediatorConnector().clientConnection();
+    auto mediatorConnectionGuard =
+        makeScopeGuard([&mediatorConnection]() { mediatorConnection->pleaseStopSync(); });
+
+    nx::utils::promise<
+        std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ResolveDomainResponse>
+    > resolveDomainDone;
+    mediatorConnection->resolveDomain(
+        nx::hpm::api::ResolveDomainRequest(targetAddress.address.toString().toUtf8()),
+        [&resolveDomainDone](
+            nx::hpm::api::ResultCode resultCode,
+            nx::hpm::api::ResolveDomainResponse response)
+        {
+            resolveDomainDone.set_value(std::make_tuple(resultCode, std::move(response)));
         });
 
-    promise.get_future().wait();
-    return targets;
+    const auto result = resolveDomainDone.get_future().get();
+    if (std::get<0>(result) != nx::hpm::api::ResultCode::ok)
+        return false;
+
+    for (const auto& hostName: std::get<1>(result).hostNames)
+    {
+        const auto entries = nx::network::SocketGlobals::addressResolver().resolveSync(
+            hostName.toStdString(),
+            nx::network::NatTraversalSupport::enabled,
+            AF_INET);
+        for (const auto& entry: entries)
+            instanceEndpoints->push_back(SocketAddress(entry.host, targetAddress.port));
+    }
+
+    return true;
 }
 
 int runInConnectMode(const nx::utils::ArgumentParser& args)
@@ -108,7 +136,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
     if (args.read("bytes-to-send", &trafficLimit))
-        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
+        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing;
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
     if (args.get("ping"))
@@ -263,7 +291,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
             std::ios_base::binary | std::ios_base::out);
         if (!outputFile->is_open())
         {
-            std::cerr << "Failed to open output file " << 
+            std::cerr << "Failed to open output file " <<
                 messageBodyFilePath.toStdString() << std::endl;
             return 1;
         }

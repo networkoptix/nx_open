@@ -124,16 +124,7 @@ TEST_F( ConnectTest, BindConnect )
         .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID));
 
     nx_http::HttpClient client;
-    if( nx::network::cloud::AddressResolver::kResolveOnMediator )
-    {
-        ASSERT_TRUE( client.doGet(address) );
-        ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
-        ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
-    }
-    else
-    {
-        ASSERT_FALSE( client.doGet(address) );
-    }
+    ASSERT_FALSE( client.doGet(address) );
 }
 
 } // namespace test

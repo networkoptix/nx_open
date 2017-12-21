@@ -74,9 +74,7 @@ class NX_NETWORK_API AddressResolver:
     public QnStoppableAsync
 {
 public:
-    using MediatorConnection = hpm::api::MediatorClientTcpConnection;
-
-    AddressResolver(std::unique_ptr<MediatorConnection> mediatorConnection);
+    AddressResolver();
     virtual ~AddressResolver() = default;
 
     /**
@@ -102,17 +100,6 @@ public:
     void removeFixedAddress(
         const HostAddress& hostName,
         boost::optional<SocketAddress> endpoint = boost::none);
-
-    /**
-     * Resolves domain address to the list of subdomains.
-     * Example: resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
-     *
-     * NOTE: handler might be called within this function in case if
-     *   values are avaliable from cache.
-     */
-    void resolveDomain(
-        const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler);
 
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::deque<AddressEntry>)> ResolveHandler;
@@ -155,14 +142,6 @@ public:
     bool isCloudHostName(const QString& hostName) const;
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    /**
-     * true: resolve on mediator to have a chanse to get direct IPs, DNS is used in case if
-     *      mediator returned nothing.
-     * false: do not resolve on mediator, set cloud address in case of patter match pattern match,
-     *      DNS is involved only if pattern does not match.
-     */
-    static const bool kResolveOnMediator = false;
 
     DnsResolver& dnsResolver() { return m_dnsResolver; }
 
@@ -229,9 +208,6 @@ protected:
     void mediatorResolve(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
 
-    void mediatorResolveImpl(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
-
     std::vector<Guard> grabHandlers(
         SystemError::ErrorCode lastErrorCode, HaInfoIterator info);
 
@@ -260,7 +236,6 @@ protected:
     std::multimap<void*, RequestInfo> m_requests;
 
     DnsResolver m_dnsResolver;
-    std::unique_ptr<MediatorConnection> m_mediatorConnection;
     const QRegExp m_cloudAddressRegExp;
 
     bool isCloudHostName(

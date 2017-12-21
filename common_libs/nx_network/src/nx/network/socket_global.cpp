@@ -322,8 +322,7 @@ void SocketGlobals::initializeCloudConnectivity()
     m_impl->m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
         &m_impl->m_aioServiceGuard.aioService(),
         m_impl->m_mediatorConnector->clientConnection());
-    m_impl->m_addressResolver = std::make_unique<cloud::AddressResolver>(
-        m_impl->m_mediatorConnector->clientConnection());
+    m_impl->m_addressResolver = std::make_unique<cloud::AddressResolver>();
     m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 

@@ -107,10 +107,7 @@ QString AddressEntry::toString() const
 
 //-------------------------------------------------------------------------------------------------
 
-AddressResolver::AddressResolver(
-    std::unique_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection)
-:
-    m_mediatorConnection(std::move(mediatorConnection)),
+AddressResolver::AddressResolver():
     m_cloudAddressRegExp(QLatin1String(
         "(.+\\.)?[0-9a-f]{8}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{4}\\-[0-9a-f]{12}"))
 {
@@ -168,39 +165,6 @@ void AddressResolver::removeFixedAddress(
         NX_LOGX(lm("Removed all fixed address for %1").args(hostName), cl_logDEBUG1);
         entries.clear();
     }
-}
-
-void AddressResolver::resolveDomain(
-    const HostAddress& domain,
-    utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler)
-{
-    m_mediatorConnection->resolveDomain(
-        nx::hpm::api::ResolveDomainRequest(domain.toString().toUtf8()),
-        [this, domain, handler = std::move(handler)](
-            nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::ResolveDomainResponse response)
-        {
-            NX_VERBOSE(this, lm("Domain %1 resolution on mediator result: %2").args(domain, resultCode));
-            std::vector<TypedAddress> result;
-            {
-                QnMutexLocker lk(&m_mutex);
-                iterateSubdomains(
-                    domain.toString(), [&](HaInfoIterator info)
-                    {
-                        result.emplace_back(info->first, AddressType::direct);
-                        return false; // continue
-                    });
-            }
-
-            for (const auto& host : response.hostNames)
-            {
-                HostAddress address(QString::fromUtf8(host));
-                result.emplace_back(std::move(address), AddressType::cloud);
-            }
-
-            NX_VERBOSE(this, lm("Domain %1 is resolved to: %2").arg(domain).container(result));
-            handler(std::move(result));
-        });
 }
 
 namespace {
@@ -381,12 +345,7 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     // TODO: make DnsResolver QnStoppableAsync
     m_dnsResolver.stop();
-    m_mediatorConnection->pleaseStop(
-        [this, handler = std::move(handler)]()
-        {
-            m_mediatorConnection.reset();
-            handler();
-        });
+    handler();
 }
 
 bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
@@ -394,8 +353,9 @@ bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
     return (endpoint.port != 0) || isCloudHostName(endpoint.address.toString());
 }
 
-AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress)
-:
+//-------------------------------------------------------------------------------------------------
+
+AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress):
     isLikelyCloudAddress(_isLikelyCloudAddress),
     m_dnsState(State::unresolved),
     m_mediatorState(State::unresolved)
@@ -471,6 +431,8 @@ std::deque<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
     return entries;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 AddressResolver::RequestInfo::RequestInfo(
     HostAddress address,
     NatTraversalSupport natTraversalSupport,
@@ -482,6 +444,8 @@ AddressResolver::RequestInfo::RequestInfo(
     handler(std::move(handler))
 {
 }
+
+//-------------------------------------------------------------------------------------------------
 
 bool AddressResolver::isMediatorAvailable() const
 {
@@ -566,9 +530,6 @@ void AddressResolver::mediatorResolve(
             break; // continue
     }
 
-    if (kResolveOnMediator)
-        return mediatorResolveImpl(info, lk, needDns, ipVersion);
-
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
     if (info->second.isLikelyCloudAddress && isMediatorAvailable())
     {
@@ -592,53 +553,9 @@ void AddressResolver::mediatorResolve(
         return dnsResolve(info, lk, false, ipVersion);
 }
 
-void AddressResolver::mediatorResolveImpl(
-    HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion)
-{
-    info->second.mediatorProgress();
-    QnMutexUnlocker ulk(lk);
-    m_mediatorConnection->resolvePeer(
-        nx::hpm::api::ResolvePeerRequest(info->first.toString().toUtf8()),
-        [this, info, needDns, ipVersion](
-            nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::ResolvePeerResponse response)
-        {
-            std::vector<Guard> guards;
-
-            QnMutexLocker lk(&m_mutex);
-            std::vector<AddressEntry> entries;
-            if (resultCode == nx::hpm::api::ResultCode::ok)
-            {
-                for (const auto& it : response.endpoints)
-                {
-                    AddressEntry entry(AddressType::direct, it.address);
-                    entry.attributes.push_back(AddressAttribute(
-                        AddressAttributeType::port, it.port));
-                    entries.push_back(std::move(entry));
-                }
-
-                // if target host supports cloud connect, adding corresponding
-                // address entry
-                if (response.connectionMethods != 0)
-                    entries.emplace_back(AddressType::cloud, info->first);
-            }
-
-            NX_VERBOSE(this, lm("Address %1 is resolved by mediator to %2")
-                .arg(info->first).container(entries));
-
-            const auto code = (resultCode == nx::hpm::api::ResultCode::ok)
-                ? SystemError::noError
-                : SystemError::hostUnreach; //TODO #ak correct error translation
-
-            info->second.setMediatorEntries(std::move(entries));
-            guards = grabHandlers(code, info);
-            if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
-                dnsResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
-        });
-}
-
 std::vector<Guard> AddressResolver::grabHandlers(
-        SystemError::ErrorCode lastErrorCode, HaInfoIterator info)
+    SystemError::ErrorCode lastErrorCode,
+    HaInfoIterator info)
 {
     std::vector<Guard> guards;
 
