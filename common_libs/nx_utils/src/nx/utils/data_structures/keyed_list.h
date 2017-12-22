@@ -336,7 +336,7 @@ int KeyList<Key>::index_of(const Key& key) const
 
     const auto pos = std::lower_bound(m_items.cbegin(), m_items.cend(), iter.value(),
         [](const Item& left, qint64 rightNumber) { return left.number < rightNumber; });
-    NX_EXPECT(pos != m_items.cend() && pos.value() == iter.value());
+    NX_EXPECT(pos != m_items.cend() && pos->number == iter.value());
     return std::distance(m_items.cbegin(), pos);
 }
 
