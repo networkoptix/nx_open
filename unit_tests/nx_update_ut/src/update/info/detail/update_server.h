@@ -4,7 +4,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 #include <rest/server/json_rest_handler.h>
-#include <update/info/detail/json_data.h>
+#include <nx/update/info/detail/data_provider/test_support/json_data.h>
 
 namespace nx {
 namespace update {
@@ -35,9 +35,13 @@ private:
 
     void registerHandlers()
     {
-        m_httpServer.registerStaticProcessor(m_updatesPath, metaDataJson, m_jsonMimeType);
+        using namespace info::detail::data_provider;
+        m_httpServer.registerStaticProcessor(
+            m_updatesPath,
+            test_support::metaDataJson(),
+            m_jsonMimeType);
 
-        for (const auto& updateTestData : updateTestDataList)
+        for (const auto& updateTestData : test_support::updateTestDataList())
         {
             QString updatePath = lit("/%1/%2%3")
                 .arg(updateTestData.customization)

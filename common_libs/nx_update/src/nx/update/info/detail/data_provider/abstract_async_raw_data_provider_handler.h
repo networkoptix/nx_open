@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtCore>
 #include <nx/update/info/result_code.h>
 
 namespace nx {
@@ -9,12 +8,10 @@ namespace info {
 namespace detail {
 namespace data_provider {
 
-class AbstractCustomizationInfoList;
-
 class AbstractAsyncRawDataProviderHandler
 {
 public:
-    virtual ~AbstractAsyncRawDataProviderHandler() {}
+    virtual ~AbstractAsyncRawDataProviderHandler() = default;
     virtual void onGetUpdatesMetaInformationDone(ResultCode resultCode, QByteArray rawData) = 0;
     virtual void onGetSpecificUpdateInformationDone(ResultCode resultCode, QByteArray rawData) = 0;
 };

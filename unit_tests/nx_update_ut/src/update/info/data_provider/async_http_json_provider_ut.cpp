@@ -4,6 +4,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/abstract_async_raw_data_provider_handler.h>
+#include <nx/update/info/detail/data_provider/test_support/json_data.h>
 #include "../detail/update_server.h"
 
 namespace nx {
@@ -92,7 +93,7 @@ protected:
 
     void thenCorrectMetaDataIsProvided()
     {
-        ASSERT_EQ(QByteArray(metaDataJson), m_providerHandler.metaData());
+        ASSERT_EQ(QByteArray(test_support::metaDataJson()), m_providerHandler.metaData());
         ASSERT_EQ(ResultCode::ok, m_providerHandler.lastResultCode());
     }
 
@@ -133,11 +134,12 @@ private:
 
     void issueNextRequest()
     {
-        if (m_updateRequestCount >= updateTestDataList.size())
+        if (m_updateRequestCount >= test_support::updateTestDataList().size())
             return;
 
         m_providerHandler.reset();
-        const UpdateTestData& updateTestData = updateTestDataList[m_updateRequestCount];
+        const test_support::UpdateTestData& updateTestData =
+            test_support::updateTestDataList()[m_updateRequestCount];
         m_rawDataProvider->getSpecificUpdateData(
             updateTestData.customization,
             updateTestData.version);
@@ -169,14 +171,16 @@ private:
 
     void assertResponses()
     {
-        ASSERT_EQ(static_cast<int>(updateTestDataList.size()), m_updateResponses.size());
-        for (size_t i = 0; i < updateTestDataList.size(); ++i)
+        ASSERT_EQ(
+            static_cast<int>(test_support::updateTestDataList().size()),
+            m_updateResponses.size());
+        for (size_t i = 0; i < test_support::updateTestDataList().size(); ++i)
             assertResponse(i);
     }
 
     void assertResponse(size_t i)
     {
-        const auto& updateTestData = updateTestDataList[i];
+        const auto& updateTestData = test_support::updateTestDataList()[i];
         const auto updateResponse = m_updateResponses[static_cast<int>(i)];
         ASSERT_EQ(updateTestData.json, updateResponse.responseData);
     }

@@ -4,8 +4,7 @@
 #include <nx/update/info/detail/data_parser/impl/json_data_parser.h>
 #include <nx/update/info/detail/data_parser/updates_meta_data.h>
 #include <nx/update/info/detail/fwd.h>
-
-#include "../detail/json_data.h"
+#include <nx/update/info/detail/data_provider/test_support/json_data.h>
 
 namespace nx {
 namespace update {
@@ -20,13 +19,15 @@ protected:
     virtual void SetUp() override
     {
         m_parser = RawDataParserFactory::create();
-        ASSERT_TRUE((bool) m_parser.get());
+        ASSERT_TRUE(static_cast<bool>(m_parser.get()));
         ASSERT_NE(nullptr, dynamic_cast<impl::JsonDataParser*>(m_parser.get()));
     }
 
     void whenTestMetaDataParsed()
     {
-        ASSERT_EQ(ResultCode::ok, m_parser->parseMetaData(metaDataJson, &m_updatesMetaData));
+        ASSERT_EQ(ResultCode::ok, m_parser->parseMetaData(
+            data_provider::test_support::metaDataJson(),
+            &m_updatesMetaData));
     }
 
     void thenUpdatesMetaDataShouldBeCorrect()
@@ -42,12 +43,15 @@ private:
     void thenAlternativesServersShouldBeCorrect()
     {
         ASSERT_EQ(1, m_updatesMetaData.alternativeServersDataList.size());
-        AlternativeServerData alternativeServerData = m_updatesMetaData.alternativeServersDataList[0];
+        const AlternativeServerData alternativeServerData =
+            m_updatesMetaData.alternativeServersDataList[0];
         ASSERT_EQ("mono-us", alternativeServerData.name);
-        ASSERT_EQ("http://beta.networkoptix.com/beta-builds/daily/updates.json", alternativeServerData.url);
+        ASSERT_EQ(
+            "http://beta.networkoptix.com/beta-builds/daily/updates.json",
+            alternativeServerData.url);
     }
 
-    void thenCustomizationDataShouldBeCorrect()
+    void thenCustomizationDataShouldBeCorrect() const
     {
         ASSERT_EQ(29, m_updatesMetaData.customizationDataList.size());
         checkCustomizationContent("digitalwatchdog", 8, "17.2.3.15624");
@@ -58,9 +62,9 @@ private:
     void checkCustomizationContent(
         const QString& customizationName,
         int versionsCount,
-        const QString& lastVersion)
+        const QString& lastVersion) const
     {
-        auto customizationIt = std::find_if(
+        const auto customizationIt = std::find_if(
             m_updatesMetaData.customizationDataList.cbegin(),
             m_updatesMetaData.customizationDataList.cend(),
             [&customizationName](const CustomizationData& data)
@@ -79,23 +83,24 @@ private:
 class UpdateDataParser: public ::testing::Test
 {
 protected:
-    UpdateDataParser(): m_parser(m_parserFactory.create()) {}
+    UpdateDataParser(): m_parser(RawDataParserFactory::create()) {}
 
     void whenUpdateDataParsed()
     {
-        auto defaultUpdateIt = std::find_if(
-            updateTestDataList.cbegin(),
-            updateTestDataList.cend(),
-            [](const UpdateTestData& updateTestData)
+        using namespace data_provider;
+        const auto defaultUpdateIt = std::find_if(
+            test_support::updateTestDataList().cbegin(),
+            test_support::updateTestDataList().cend(),
+            [](const test_support::UpdateTestData& updateTestData)
             {
                 return updateTestData.customization == "default"
                     && updateTestData.version == "16975";
             });
-        ASSERT_NE(updateTestDataList.cend(), defaultUpdateIt);
+        ASSERT_NE(test_support::updateTestDataList().cend(), defaultUpdateIt);
         ASSERT_EQ(ResultCode::ok, m_parser->parseUpdateData(defaultUpdateIt->json, &m_updateData));
     }
 
-    void thenUpdateDataShouldBeCorrect()
+    void thenUpdateDataShouldBeCorrect() const
     {
         thenCloudHostShoudBeCorrect();
         thenServerPackagesShouldBeCorrect();
@@ -103,32 +108,34 @@ protected:
     }
 
 private:
-    RawDataParserFactory m_parserFactory;
     AbstractRawDataParserPtr m_parser;
     UpdateData m_updateData;
 
-    void thenCloudHostShoudBeCorrect()
+    void thenCloudHostShoudBeCorrect() const
     {
         ASSERT_EQ("nxvms.com", m_updateData.cloudHost);
     }
 
-    void thenServerPackagesShouldBeCorrect()
+    void thenServerPackagesShouldBeCorrect() const
     {
         ASSERT_EQ(7, m_updateData.targetToPackage.size());
         checkFileData(m_updateData.targetToPackage, "linux.arm_rpi", 80605107);
         checkFileData(m_updateData.targetToPackage, "windows.x86_winxp", 65677361);
     }
 
-    void checkFileData(const QHash<QString, FileData>& targetToFileData, const QString& target, qint64 size)
+    void checkFileData(
+        const QHash<QString, FileData>& targetToFileData,
+        const QString& target,
+        qint64 size) const
     {
-        auto fileDataIt = targetToFileData.find(target);
+        const auto fileDataIt = targetToFileData.find(target);
         ASSERT_NE(targetToFileData.constEnd(), fileDataIt);
         ASSERT_EQ(size, fileDataIt->size);
         ASSERT_FALSE(fileDataIt->file.isEmpty());
         ASSERT_FALSE(fileDataIt->md5.isEmpty());
     }
 
-    void thenClientPackagesShouldBeCorrect()
+    void thenClientPackagesShouldBeCorrect() const
     {
         ASSERT_EQ(5, m_updateData.targetToClientPackage.size());
         checkFileData(m_updateData.targetToClientPackage, "linux.x64_ubuntu", 103335409);

@@ -1,6 +1,15 @@
 #include "json_data.h"
 
-extern const char* const metaDataJson = R"JSON(
+namespace nx {
+namespace update {
+namespace info {
+namespace detail {
+namespace data_provider {
+namespace test_support {
+
+const QByteArray& metaDataJson()
+{
+    static const QByteArray result = R"JSON(
 {
     "__info": [
         {
@@ -401,9 +410,12 @@ extern const char* const metaDataJson = R"JSON(
     }
 }
 )JSON";
+    return result;
+}
 
-
-extern const std::vector<UpdateTestData> updateTestDataList = {
+const std::vector<UpdateTestData>& updateTestDataList()
+{
+    static const std::vector<UpdateTestData> result = {
 {
     "default",
     "16975",
@@ -658,5 +670,13 @@ extern const std::vector<UpdateTestData> updateTestDataList = {
     }
     )JSON"
 }
-
 };
+    return result;
+};
+
+} // namespace test_support
+} // namespace data_parser
+} // namespace detail
+} // namespace info
+} // namespace update
+} // namespace nx
