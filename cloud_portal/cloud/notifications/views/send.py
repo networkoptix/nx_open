@@ -9,6 +9,7 @@ from api.models import Account
 from notifications.models import *
 from datetime import datetime
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import permission_required
 import re
 
 #Replace </p> and <br> with \n and then remove all html tags
@@ -96,9 +97,8 @@ def send_notification(request):
 
 # TODO: Comeback and fix this permissions check
 @api_view(['GET','POST'])
-@permission_classes((AllowAny, ))
+@permission_required('notifications.send_cloud_notification')
 def cloud_notification_action(request):
-    print request.data
     notification_id = str(request.data['id'])
     if 'Save' in request.data:
         notification_id = str(update_or_create_notification(request.data))
@@ -111,7 +111,7 @@ def cloud_notification_action(request):
         notification = CloudNotification.objects.get(id=notification_id)
         send_to_all_users(reqeust.user, notification)
     else:
-        raise 'Error'
+        return Response("Invalid")
 
     return redirect('/admin/notifications/cloudnotification/' + notification_id + '/change/')
 
