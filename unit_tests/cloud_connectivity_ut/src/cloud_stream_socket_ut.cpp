@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/ssl_socket.h>
@@ -525,7 +526,7 @@ protected:
 
         base_type::SetUp();
 
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(serverAddress()));
     }
 

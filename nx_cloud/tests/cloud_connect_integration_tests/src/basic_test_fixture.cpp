@@ -1,5 +1,6 @@
 #include "basic_test_fixture.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_global.h>
@@ -8,11 +9,9 @@
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
-//#include <nx/cloud/relay/controller/connect_session_manager.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
 #include <nx/cloud/relaying/listening_peer_pool.h>
-//#include <nx/cloud/relay/model/model.h>
 
 namespace nx {
 namespace network {
@@ -172,11 +171,11 @@ void BasicTestFixture::SetUp()
 
     if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
     {
-        SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupCloudModulesXmlUrl(
             nx::network::url::Builder().setScheme("http")
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
                 .setPath(kCloudModulesXmlPath));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 }
 
@@ -188,7 +187,7 @@ void BasicTestFixture::startServer()
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
     m_cloudSystemCredentials.key = cloudSystemCredentials.authKey;
 
-    SocketGlobals::mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
+    SocketGlobals::cloud().mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
 
     startHttpServer();
 }
@@ -375,7 +374,7 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
 void BasicTestFixture::startHttpServer()
 {
     auto cloudServerSocket = std::make_unique<CloudServerSocket>(
-        &SocketGlobals::mediatorConnector());
+        &SocketGlobals::cloud().mediatorConnector());
 
     m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");

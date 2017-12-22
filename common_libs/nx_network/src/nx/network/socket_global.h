@@ -11,22 +11,12 @@
 #include "socket_common.h"
 
 namespace nx {
-
-namespace hpm { namespace api { class MediatorConnector; } }
-
 namespace network {
 
 namespace aio { class AIOService; }
 class AddressResolver;
 
-namespace cloud {
-
-class MediatorAddressPublisher;
-class OutgoingTunnelPool;
-class CloudConnectSettings;
-namespace tcp { class ReverseConnectionPool; }
-
-} // namespace cloud
+namespace cloud { class CloudConnectController; }
 
 struct SocketGlobalsImpl;
 
@@ -63,11 +53,7 @@ public:
     static DebugIni& debugIni();
     static aio::AIOService& aioService();
     static AddressResolver& addressResolver();
-    static cloud::MediatorAddressPublisher& addressPublisher();
-    static hpm::api::MediatorConnector& mediatorConnector();
-    static cloud::OutgoingTunnelPool& outgoingTunnelPool();
-    static cloud::CloudConnectSettings& cloudConnectSettings();
-    static cloud::tcp::ReverseConnectionPool& tcpReversePool();
+    static cloud::CloudConnectController& cloud();
     static int initializationFlags();
 
     static void init(int initializationFlags = 0); /**< Should be called before any socket use. */

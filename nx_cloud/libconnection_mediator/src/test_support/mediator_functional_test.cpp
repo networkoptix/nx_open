@@ -9,6 +9,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
@@ -108,10 +109,10 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
-        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder()
                 .setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
-        network::SocketGlobals::mediatorConnector().enable(true);
+        network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     return true;
@@ -130,13 +131,13 @@ SocketAddress MediatorFunctionalTest::httpEndpoint() const
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
-    return network::SocketGlobals::mediatorConnector().clientConnection();
+    return network::SocketGlobals::cloud().mediatorConnector().clientConnection();
 }
 
 std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
-    return network::SocketGlobals::mediatorConnector().systemConnection();
+    return network::SocketGlobals::cloud().mediatorConnector().systemConnection();
 }
 
 void MediatorFunctionalTest::registerCloudDataProvider(

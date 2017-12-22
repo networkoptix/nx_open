@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
@@ -185,7 +186,7 @@ class CloudServerSocketTcpTester:
 {
 public:
     CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder):
-        CloudServerSocket(&nx::network::SocketGlobals::mediatorConnector()),
+        CloudServerSocket(&nx::network::SocketGlobals::cloud().mediatorConnector()),
         m_addressManager(addressBinder)
     {
     }
@@ -295,7 +296,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         stunAsyncClient->remoteAddress(),
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
-            &nx::network::SocketGlobals::mediatorConnector()));
+            &nx::network::SocketGlobals::cloud().mediatorConnector()));
 
     auto server = std::make_unique<CloudServerSocket>(
         &mediatorConnector,
@@ -354,7 +355,7 @@ protected:
         nx::hpm::api::SystemCredentials systemCredentials;
         systemCredentials.systemId = "system";
         systemCredentials.key = "key";
-        SocketGlobals::mediatorConnector().setSystemCredentials(
+        SocketGlobals::cloud().mediatorConnector().setSystemCredentials(
             std::move(systemCredentials));
 
         for (size_t i = 0; i < kPeerCount; i++)
@@ -386,7 +387,7 @@ protected:
             m_stunClient->remoteAddress(),
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
-                &SocketGlobals::mediatorConnector()));
+                &SocketGlobals::cloud().mediatorConnector()));
 
         auto cloudServerSocket = std::make_unique<CloudServerSocket>(
             m_mediatorConnector.get(),
@@ -630,22 +631,22 @@ protected:
             system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
         ASSERT_NE(nullptr, server);
-        SocketGlobals::mediatorConnector().setSystemCredentials(
+        SocketGlobals::cloud().mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 system.id,
                 server->serverId(),
                 system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(m_mediator.stunEndpoint()));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     void givenInitializedServerSocket()
     {
         m_cloudServerSocket = std::make_unique<cloud::CloudServerSocket>(
-            &nx::network::SocketGlobals::mediatorConnector());
+            &nx::network::SocketGlobals::cloud().mediatorConnector());
         ASSERT_EQ(
             hpm::api::ResultCode::ok,
             m_cloudServerSocket->registerOnMediatorSync());
@@ -679,7 +680,7 @@ TEST_F(CloudServerSocket, reconnect)
 {
     startMediatorAndRegister();
     hpm::api::SystemCredentials currentCredentials =
-        *nx::network::SocketGlobals::mediatorConnector().getSystemCredentials();
+        *nx::network::SocketGlobals::cloud().mediatorConnector().getSystemCredentials();
 
     auto system2 = m_mediator.addRandomSystem();
     auto server2 = m_mediator.addRandomServer(
@@ -697,10 +698,10 @@ TEST_F(CloudServerSocket, reconnect)
 
         // Breaking connection to mediator.
         nx::utils::promise<void> cloudCredentialsModified;
-        nx::network::SocketGlobals::mediatorConnector().post(
+        nx::network::SocketGlobals::cloud().mediatorConnector().post(
             [&cloudCredentialsModified, &otherCredentials]()
             {
-                nx::network::SocketGlobals::mediatorConnector()
+                nx::network::SocketGlobals::cloud().mediatorConnector()
                     .setSystemCredentials(otherCredentials);
                 cloudCredentialsModified.set_value();
             });
@@ -822,7 +823,7 @@ protected:
     {
         ASSERT_TRUE(static_cast<bool>(m_providedCloudCredentials));
         ASSERT_EQ(
-            SocketGlobals::mediatorConnector().getSystemCredentials(),
+            SocketGlobals::cloud().mediatorConnector().getSystemCredentials(),
             *m_providedCloudCredentials);
     }
 

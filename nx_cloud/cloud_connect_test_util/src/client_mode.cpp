@@ -2,6 +2,7 @@
 
 #include <fstream>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/cross_nat_connector.h>
@@ -73,7 +74,7 @@ static bool resolveDomainName(
     const SocketAddress& targetAddress,
     std::vector<SocketAddress>* instanceEndpoints)
 {
-    auto mediatorConnection = nx::network::SocketGlobals::mediatorConnector().clientConnection();
+    auto mediatorConnection = nx::network::SocketGlobals::cloud().mediatorConnector().clientConnection();
     auto mediatorConnectionGuard =
         makeScopeGuard([&mediatorConnection]() { mediatorConnection->pleaseStopSync(); });
 
@@ -118,8 +119,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         return 1;
     }
 
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cc-tu-connect", QnUuid::createUuid());
 
     int totalConnections = kDefaultTotalConnections;
@@ -263,8 +264,8 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     args.read("o", &messageBodyFilePath);
     args.read("output-document", &messageBodyFilePath);
 
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cc-tu-http", QnUuid::createUuid());
 
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
