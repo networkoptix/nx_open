@@ -48,12 +48,16 @@ protected:
         m_requestResult = m_httpClient.doGet(getUrl);
     }
 
-    void thenItShouldBeSuccessfull() const
+    void thenItShouldBeSuccessfull()
     {
         ASSERT_TRUE(m_requestResult);
         const nx_http::Response* response = m_httpClient.response();
+        ASSERT_TRUE(response);
         ASSERT_EQ(nx_http::StatusCode::ok ,response->statusLine.statusCode);
-        ASSERT_FALSE(response->messageBody.isEmpty());
+
+        ASSERT_TRUE(static_cast<bool>(m_httpClient.fetchEntireMessageBody()));
+        const auto body = *m_httpClient.fetchEntireMessageBody();
+        qWarning() << body;
     }
 private:
     std::unique_ptr<MediaServerLauncher> m_mediaServerLauncher = nullptr;
