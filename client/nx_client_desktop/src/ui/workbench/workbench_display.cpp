@@ -1240,7 +1240,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
 
     const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-    if (mediaWidget && mediaWidget->isZoomWindow())
+    if (mediaWidget && !mediaWidget->isZoomWindow())
     {
         qnClientModule->radassController()->unregisterConsumer(
             mediaWidget->display()->camDisplay());
