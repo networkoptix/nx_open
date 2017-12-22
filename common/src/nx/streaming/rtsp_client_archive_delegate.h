@@ -135,7 +135,7 @@ private:
     std::atomic_flag m_currentServerUpToDate;
     QElapsedTimer m_reopenTimer;
     QElapsedTimer m_sessionTimeout;
-    std::chrono::milliseconds m_maxSessionDurartion;
+    std::chrono::milliseconds m_maxSessionDurartionMs;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

@@ -81,7 +81,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_playNowModeAllowed(true),
     m_reader(reader),
     m_frameCnt(0),
-    m_maxSessionDurartion(std::numeric_limits<qint64>::max())
+    m_maxSessionDurartionMs(std::numeric_limits<qint64>::max())
 {
     m_footageUpToDate.test_and_set();
     m_currentServerUpToDate.test_and_set();
@@ -91,11 +91,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMotion;
     m_flags |= Flag_CanSeekImmediatly;
-
-    const auto settings = reader->getResource()->commonModule()->globalSettings();
-    auto maxSessionDurartion = settings->maxRtspConnectDuration();
-    if (maxSessionDurartion.count() > 0)
-        m_maxSessionDurartion = maxSessionDurartion;
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &camera)
@@ -115,6 +110,9 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
     m_server = camera->getParentServer();
 
     auto commonModule = camera->commonModule();
+    auto maxSessionDurartion = commonModule->globalSettings()->maxRtspConnectDuration();
+    if (maxSessionDurartion.count() > 0)
+        m_maxSessionDurartionMs = maxSessionDurartion;
 
     m_auth.username = commonModule->currentUrl().userName();
     m_auth.password = commonModule->currentUrl().password();
@@ -437,7 +435,7 @@ void QnRtspClientArchiveDelegate::reopen()
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     if (!m_currentServerUpToDate.test_and_set() ||
-        (m_sessionTimeout.isValid() && m_sessionTimeout.hasExpired(m_maxSessionDurartion.count())))
+        (m_sessionTimeout.isValid() && m_sessionTimeout.hasExpired(m_maxSessionDurartionMs.count())))
     {
         reopen();
     }
