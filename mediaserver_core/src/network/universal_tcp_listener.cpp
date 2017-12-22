@@ -1,5 +1,6 @@
 #include "universal_tcp_listener.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/retry_timer.h>
@@ -248,7 +249,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(
-                &nx::network::SocketGlobals::mediatorConnector(),
+                &nx::network::SocketGlobals::cloud().mediatorConnector(),
                 std::move(registrationOnMediatorRetryPolicy));
         cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));

@@ -70,7 +70,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 

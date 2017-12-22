@@ -20,6 +20,9 @@ namespace network { namespace cloud { class ConnectionMediatorUrlFetcher; } }
 namespace hpm {
 namespace api {
 
+using MediatorAvailabilityChangedHandler =
+    nx::utils::MoveOnlyFunc<void(bool /*isMediatorAvailable*/)>;
+
 class NX_NETWORK_API AbstractMediatorConnector
 {
 public:
@@ -30,7 +33,9 @@ public:
     /** Provides server-related functionality. */
     virtual std::unique_ptr<MediatorServerTcpConnection> systemConnection() = 0;
     virtual boost::optional<SocketAddress> udpEndpoint() const = 0;
-    virtual bool isConnected() const = 0;
+    //virtual bool isConnected() const = 0;
+    virtual void setOnMediatorAvailabilityChanged(
+        MediatorAvailabilityChangedHandler handler) = 0;
 };
 
 class NX_NETWORK_API MediatorConnector:
@@ -73,7 +78,9 @@ public:
     virtual boost::optional<SystemCredentials> getSystemCredentials() const override;
 
     virtual boost::optional<SocketAddress> udpEndpoint() const override;
-    virtual bool isConnected() const override;
+    //virtual bool isConnected() const override;
+    virtual void setOnMediatorAvailabilityChanged(
+        MediatorAvailabilityChangedHandler handler) override;
 
     static void setStunClientSettings(stun::AbstractAsyncClient::Settings stunClientSettings);
 
@@ -89,6 +96,7 @@ private:
     boost::optional<nx::utils::Url> m_mediatorUrl;
     boost::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
+    MediatorAvailabilityChangedHandler m_mediatorAvailabilityChangedHandler;
 
     virtual void stopWhileInAioThread() override;
 

@@ -1,8 +1,3 @@
-/**********************************************************
-* 26 dec 2014
-* a.kolesnikov
-***********************************************************/
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -23,18 +18,12 @@
 
 namespace nx_http {
 
-class HttpClientServerTest
-:
+class HttpClientServerTest:
     public ::testing::Test
 {
 protected:
-    HttpClientServerTest()
-    :
+    HttpClientServerTest():
         m_testHttpServer(new TestHttpServer())
-    {
-    }
-
-    ~HttpClientServerTest()
     {
     }
 
@@ -47,28 +36,28 @@ private:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
 };
 
-TEST_F( HttpClientServerTest, SimpleTest )
+TEST_F(HttpClientServerTest, SimpleTest)
 {
-    ASSERT_TRUE( testHttpServer()->registerStaticProcessor(
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
         "/test",
         "SimpleTest",
-        "application/text") );
-    ASSERT_TRUE( testHttpServer()->bindAndListen() );
+        "application/text"));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
 
     nx_http::HttpClient client;
-    const nx::utils::Url url( lit("http://127.0.0.1:%1/test")
-                    .arg( testHttpServer()->serverAddress().port) );
+    const nx::utils::Url url(lit("http://127.0.0.1:%1/test")
+        .arg(testHttpServer()->serverAddress().port));
 
-    ASSERT_TRUE( client.doGet( url ) );
-    ASSERT_TRUE( client.response() );
-    ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
-    ASSERT_EQ( client.fetchMessageBodyBuffer(), "SimpleTest" );
+    ASSERT_TRUE(client.doGet(url));
+    ASSERT_TRUE(client.response());
+    ASSERT_EQ(client.response()->statusLine.statusCode, nx_http::StatusCode::ok);
+    ASSERT_EQ(client.fetchMessageBodyBuffer(), "SimpleTest");
 }
 
 /*!
-    This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
+This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
 */
-TEST_F( HttpClientServerTest, KeepAliveConnection )
+TEST_F(HttpClientServerTest, KeepAliveConnection)
 {
 }
 
@@ -109,7 +98,7 @@ TEST_F(HttpClientServerTest, FileDownload)
         "27xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         "28xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         "29xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        );
+    );
 #endif
 
     ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
@@ -123,7 +112,7 @@ TEST_F(HttpClientServerTest, FileDownload)
     nx_http::HttpClient client;
     client.setMessageBodyReadTimeoutMs(3000);
 
-    for (int i=0; i<77; ++i)
+    for (int i = 0; i<77; ++i)
     {
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
@@ -168,69 +157,69 @@ TEST_F(HttpClientServerTest, KeepAlive)
     nx_http::HttpClient client;
 
     nx::Buffer msgBody;
-    for( int i = 0; i < TEST_RUNS; ++i )
+    for (int i = 0; i < TEST_RUNS; ++i)
     {
-        ASSERT_TRUE( client.doGet( url ) );
-        ASSERT_TRUE( client.response() );
-        ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response());
+        ASSERT_EQ(client.response()->statusLine.statusCode, nx_http::StatusCode::ok);
         nx::Buffer newMsgBody;
-        while( !client.eof() )
+        while (!client.eof())
             newMsgBody += client.fetchMessageBodyBuffer();
-        if( i == 0 )
+        if (i == 0)
             msgBody = newMsgBody;
         else
-            ASSERT_EQ( msgBody, newMsgBody );
+            ASSERT_EQ(msgBody, newMsgBody);
     }
 }
 
 //TODO #ak refactor these tests using HttpClientServerTest
 
-TEST( HttpClientTest, DISABLED_KeepAlive2 )
+TEST(HttpClientTest, DISABLED_KeepAlive2)
 {
-    nx::utils::Url url( "http://192.168.0.1:7001/ec2/testConnection" );
-    url.setUserName( "admin" );
-    url.setPassword( "123" );
+    nx::utils::Url url("http://192.168.0.1:7001/ec2/testConnection");
+    url.setUserName("admin");
+    url.setPassword("123");
     static const int TEST_RUNS = 2;
 
     nx::Buffer msgBody;
-    for( int i = 0; i < TEST_RUNS; ++i )
+    for (int i = 0; i < TEST_RUNS; ++i)
     {
         nx_http::HttpClient client;
-        ASSERT_TRUE( client.doGet( url ) );
-        ASSERT_TRUE( client.response() );
-        ASSERT_EQ( nx_http::StatusCode::ok, client.response()->statusLine.statusCode );
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response());
+        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
         nx::Buffer newMsgBody;
-        while( !client.eof() )
+        while (!client.eof())
             newMsgBody += client.fetchMessageBodyBuffer();
-        if( i == 0 )
+        if (i == 0)
             msgBody = newMsgBody;
         else
-            ASSERT_EQ( msgBody, newMsgBody );
+            ASSERT_EQ(msgBody, newMsgBody);
     }
 }
 
-TEST( HttpClientTest, DISABLED_KeepAlive3 )
+TEST(HttpClientTest, DISABLED_KeepAlive3)
 {
-    nx::utils::Url url( "http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0" );
-    url.setUserName( "admin" );
-    url.setPassword( "123" );
+    nx::utils::Url url("http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0");
+    url.setUserName("admin");
+    url.setPassword("123");
     static const int TEST_RUNS = 2;
 
     nx::Buffer msgBody;
-    for( int i = 0; i < TEST_RUNS; ++i )
+    for (int i = 0; i < TEST_RUNS; ++i)
     {
         nx_http::HttpClient client;
-        client.addAdditionalHeader( "NX-EC-SYSTEM-NAME", "ak_ec_2.3" );
-        ASSERT_TRUE( client.doGet( url ) );
-        ASSERT_TRUE( client.response() );
-        ASSERT_EQ( nx_http::StatusCode::ok, client.response()->statusLine.statusCode );
+        client.addAdditionalHeader("NX-EC-SYSTEM-NAME", "ak_ec_2.3");
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response());
+        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
         nx::Buffer newMsgBody;
-        while( !client.eof() )
+        while (!client.eof())
             newMsgBody += client.fetchMessageBodyBuffer();
-        if( i == 0 )
+        if (i == 0)
             msgBody = newMsgBody;
         else
-            ASSERT_EQ( msgBody, newMsgBody );
+            ASSERT_EQ(msgBody, newMsgBody);
     }
 }
 
@@ -276,7 +265,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
             std::unique_lock<std::mutex> lk(mtx);
             int pos = nx::utils::random::number<int>(0, (int)clients.size() - 1);
             while (clients[pos].first)
-                pos = (pos+1) % clients.size();
+                pos = (pos + 1) % clients.size();
             auto client = clients[pos].second;
             clients[pos].first = true;
             lk.unlock();

@@ -56,6 +56,13 @@ private:
     std::size_t m_sizeBytes;
 };
 
+/**
+ * Reads from source and writes to destination.
+ * Always seeks to load source and destination as much as possible.
+ * NOTE: SourcePtr and DestinationPtr must follow AbstractAsyncChannel API.
+ * NOTE: Intermediate buffer that allows concurrent read/writes can be adjusted
+ *   with AsyncChannelUnidirectionalBridge::setMaxSendQueueSizeBytes.
+ */
 class AsyncChannelUnidirectionalBridge
 {
 public:
@@ -137,6 +144,8 @@ private:
     void scheduleRead()
     {
         using namespace std::placeholders;
+
+        NX_ASSERT(m_isSourceOpened);
 
         m_source->readSomeAsync(
             &m_readBuffer,

@@ -13,7 +13,7 @@ class HttpHeaderStrictTransportSecurity:
 protected:
     void givenHeaderWithRandomValues()
     {
-        m_originalHeader.maxAge = 
+        m_originalHeader.maxAge =
             std::chrono::seconds(nx::utils::random::number<int>(1, 100000));
         m_originalHeader.includeSubDomains = nx::utils::random::number<bool>();
         m_originalHeader.preload = nx::utils::random::number<bool>();

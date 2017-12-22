@@ -3,7 +3,7 @@
 #include <fstream>
 #include <list>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/network/cloud/connection_mediator_url_fetcher.h>
 #include <nx/network/http/http_client.h>

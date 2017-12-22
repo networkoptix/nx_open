@@ -1,13 +1,7 @@
-/**********************************************************
-* Mar 24, 2016
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/network/retry_timer.h>
 #include <nx/utils/std/future.h>
-
 
 namespace nx {
 namespace network {
@@ -48,7 +42,7 @@ TEST(RetryTimer, tryCount)
 TEST(RetryTimer, delayCalculation)
 {
     const unsigned int delayMultiplierValues[] = { 0, 1, 2 };
-    const std::chrono::milliseconds maxDelayValues[] = 
+    const std::chrono::milliseconds maxDelayValues[] =
         { std::chrono::milliseconds::zero(), std::chrono::milliseconds(350), std::chrono::seconds(10) };
     const std::chrono::milliseconds initialDelay(1);
     const int testLoopSize = 10;
@@ -92,5 +86,5 @@ TEST(RetryTimer, delayCalculation)
     }
 }
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx

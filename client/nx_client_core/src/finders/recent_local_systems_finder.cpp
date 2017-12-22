@@ -1,6 +1,6 @@
 #include "recent_local_systems_finder.h"
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 

@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>

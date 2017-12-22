@@ -18,7 +18,7 @@
 
 #include "aio_event_handler.h"
 #include "../abstract_socket.h"
-#include "../cloud/address_resolver.h"
+#include "../address_resolver.h"
 #include "../socket_global.h"
 
 namespace nx {
@@ -363,7 +363,7 @@ public:
     }
 
 private:
-    cloud::AddressResolver* m_addressResolver;
+    AddressResolver* m_addressResolver;
 
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     size_t m_connectSendAsyncCallCounter;

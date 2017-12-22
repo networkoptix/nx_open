@@ -1,10 +1,9 @@
 #include "reverse_connection_pool.h"
 
-#include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
-#include "../outgoing_tunnel_pool.h"
 #include "reverse_connection_holder.h"
+#include "../outgoing_tunnel_pool.h"
 
 namespace nx {
 namespace network {
@@ -22,9 +21,11 @@ static String getHostSuffix(const String& hostName)
 
 ReverseConnectionPool::ReverseConnectionPool(
     aio::AIOService* aioService,
+    const OutgoingTunnelPool& outgoingTunnelPool,
     std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> mediatorConnection)
 :
     base_type(aioService, nullptr),
+    m_outgoingTunnelPool(outgoingTunnelPool),
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
@@ -56,7 +57,7 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     m_publicIp = std::move(publicIp);
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
-            SocketGlobals::outgoingTunnelPool().ownPeerId(),
+            m_outgoingTunnelPool.ownPeerId(),
             serverAddress, m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")

@@ -110,6 +110,9 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
     m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
     m_stunClient->connect(mediatorUrl, [](SystemError::ErrorCode) {});
     m_promise->set_value(true);
+
+    if (m_mediatorAvailabilityChangedHandler)
+        m_mediatorAvailabilityChangedHandler(true);
 }
 
 void MediatorConnector::setSystemCredentials(boost::optional<SystemCredentials> value)
@@ -140,10 +143,10 @@ boost::optional<SocketAddress> MediatorConnector::udpEndpoint() const
     return m_mediatorUdpEndpoint;
 }
 
-bool MediatorConnector::isConnected() const
+void MediatorConnector::setOnMediatorAvailabilityChanged(
+    MediatorAvailabilityChangedHandler handler)
 {
-    QnMutexLocker lock(&m_mutex);
-    return static_cast<bool>(m_mediatorUrl);
+    m_mediatorAvailabilityChangedHandler.swap(handler);
 }
 
 void MediatorConnector::setStunClientSettings(
@@ -187,6 +190,8 @@ void MediatorConnector::fetchEndpoint()
                 m_mediatorUdpEndpoint = nx::network::url::getEndpoint(udpUrl);
                 m_mediatorUrl = tcpUrl;
                 connectToMediatorAsync();
+                if (m_mediatorAvailabilityChangedHandler)
+                    m_mediatorAvailabilityChangedHandler(true);
             }
         });
 }

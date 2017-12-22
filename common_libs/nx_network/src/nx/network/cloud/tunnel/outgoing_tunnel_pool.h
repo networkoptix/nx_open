@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/async_stoppable.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -51,8 +51,14 @@ public:
      * Should be called somewhere in every module exactly once, so this id is useful for debug.
      * @param name Short module name, useful for debug.
      * @param uuid Unique instance id, e.g. Hardware id.
+     * NOTE: This method generates peer id in internal format using supplied information (name & uuid).
      */
     void assignOwnPeerId(const String& name, const QnUuid& uuid);
+    /**
+     * NOTE: This method just sets already prepared peerId.
+     *   E.g., received from OutgoingTunnelPool::ownPeerId().
+     */
+    void setOwnPeerId(const String& peerId);
     void clearOwnPeerIdIfEqual(const String& name, const QnUuid& uuid);
 
     OnTunnelClosedSubscription& onTunnelClosedSubscription();

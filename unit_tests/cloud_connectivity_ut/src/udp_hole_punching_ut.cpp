@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
@@ -44,16 +45,16 @@ public:
             m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().setSystemCredentials(
+        SocketGlobals::cloud().mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 m_system.id,
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(mediator().stunEndpoint()));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     const hpm::MediatorFunctionalTest& mediator() const
@@ -69,7 +70,7 @@ public:
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket()
     {
         auto serverSocket = std::make_unique<CloudServerSocket>(
-            &SocketGlobals::mediatorConnector());
+            &SocketGlobals::cloud().mediatorConnector());
 
         serverSocket->setSupportedConnectionMethods(m_methods);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
@@ -163,7 +164,7 @@ public:
 
         using namespace std::placeholders;
 
-        SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
+        SocketGlobals::cloud().outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
             std::bind(&CloudConnectTunnel::onTunnelClosed, this, _1),
             &m_onTunnelClosedSubscriptionId);
     }
@@ -172,7 +173,7 @@ public:
     {
         base_type::TearDown();
 
-        SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().removeSubscription(
+        SocketGlobals::cloud().outgoingTunnelPool().onTunnelClosedSubscription().removeSubscription(
             m_onTunnelClosedSubscriptionId);
         m_onTunnelClosedSubscriptionId = nx::utils::kInvalidSubscriptionId;
 

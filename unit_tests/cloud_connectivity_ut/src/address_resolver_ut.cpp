@@ -1,7 +1,9 @@
+#include <thread>
+
 #include <gtest/gtest.h>
-#include <nx/network/cloud/address_resolver.h>
+
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/test_support/stun_async_client_mock.h>
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
@@ -9,54 +11,11 @@ namespace network {
 namespace cloud {
 namespace test {
 
-class AddressResolverTest
-:
+class AddressResolverCloudResolving:
     public ::testing::Test,
     protected AddressResolver
 {
 public:
-    static void SetUpTestCase()
-    {
-        // TODO: Test 2 cases: with and without mediator address
-
-        s_stunClient = std::make_shared<stun::test::AsyncClientMock>();
-        s_stunClient->emulateRequestHandler(
-            stun::extension::methods::resolvePeer,
-            [](
-                stun::Message request,
-                stun::AbstractAsyncClient::RequestHandler handler )
-            {
-                const auto attr = request.getAttribute<stun::extension::attrs::HostName>();
-                ASSERT_TRUE(attr);
-
-                stun::Message response(stun::Header(
-                    stun::MessageClass::successResponse,
-                    stun::extension::methods::resolvePeer,
-                    std::move(request.header.transactionId)));
-
-                const auto host = QString::fromUtf8(attr->getString());
-                const auto it = std::find_if(
-                    s_endpoints.begin(), s_endpoints.end(),
-                    [&host](const decltype(s_endpoints)::value_type& endpoint)
-                    {
-                        return endpoint.first.endsWith(host);
-                    });
-
-                if (it == s_endpoints.end())
-                {
-                    response.header.messageClass = stun::MessageClass::errorResponse;
-                    response.newAttribute<stun::attrs::ErrorCode>(404);
-                }
-                else
-                {
-                    response.newAttribute<stun::extension::attrs::PublicEndpointList>(it->second);
-                    response.newAttribute<stun::extension::attrs::ConnectionMethods>("1");
-                }
-
-                handler(SystemError::noError, std::move(response));
-            });
-    }
-
     static void emulateAddress(
         const HostAddress& address,
         std::list<SocketAddress> endpoints = {})
@@ -69,16 +28,15 @@ public:
 
     static void TearDownTestCase()
     {
-        s_stunClient.reset();
         s_endpoints.clear();
     }
 
-    AddressResolverTest():
-        AddressResolver(std::make_unique<hpm::api::MediatorClientTcpConnection>(s_stunClient))
+    AddressResolverCloudResolving()
     {
+        setCloudResolveEnabled(true);
     }
 
-    ~AddressResolverTest() override
+    virtual ~AddressResolverCloudResolving() override
     {
         pleaseStopSync();
     }
@@ -121,17 +79,10 @@ public:
     }
 
 private:
-    virtual bool isMediatorAvailable() const override
-    {
-        return true;
-    }
-
     static std::map<QString, std::list<SocketAddress>> s_endpoints;
-    static std::shared_ptr<stun::test::AsyncClientMock> s_stunClient;
 };
 
-std::map<QString, std::list<SocketAddress>> AddressResolverTest::s_endpoints;
-std::shared_ptr<stun::test::AsyncClientMock> AddressResolverTest::s_stunClient;
+std::map<QString, std::list<SocketAddress>> AddressResolverCloudResolving::s_endpoints;
 
 static const HostAddress kAddress("ya.ru");
 static const SocketAddress kResult(*HostAddress::ipV4from(lit("10.11.12.13")), 12345);
@@ -140,7 +91,7 @@ static const SocketAddress kResult(*HostAddress::ipV4from(lit("10.11.12.13")), 1
  * Usual DNS addresses like "ya.ru" shell be resolved in order:
  *  fixed -> dns -> mediator (never touches mediator because of valid DNS)
  */
-TEST_F(AddressResolverTest, FixedVsDns)
+TEST_F(AddressResolverCloudResolving, FixedVsDns)
 {
     addFixedAddress(kAddress, kResult);
     resolveAndCheckState(
@@ -206,7 +157,7 @@ static QString testUuid()
  * Cloud-like adresses shell be resolved in next order:
  *  fixed -> mediator -> dns
  */
-TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
+TEST_F(AddressResolverCloudResolving, FixedVsMediatorVsDns)
 {
     const std::vector<HostAddress> kGoodCloudAddresses =
     {
@@ -229,17 +180,7 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
                 const auto entries = info.getAll();
-                ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2U : 1U);
-
-                if (kResolveOnMediator)
-                {
-                    const AddressEntry entry1 = entries.front();
-                    EXPECT_EQ(entry1.type, AddressType::direct);
-                    EXPECT_EQ(entry1.host, kResult.address);
-                    EXPECT_EQ(entry1.attributes.size(), 1U);
-                    EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
-                    EXPECT_EQ(entry1.attributes.front().value, kResult.port);
-                }
+                ASSERT_EQ(1U, info.getAll().size());
 
                 const AddressEntry entry2 = entries.back();
                 EXPECT_EQ(entry2.type, AddressType::cloud);
@@ -260,7 +201,7 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(entry.attributes.front().type, AddressAttributeType::port);
                 EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
-                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 3U : 2U);
+                EXPECT_EQ(2U, info.getAll().size());
                 if (!isSub)
                 {
                     EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
@@ -283,8 +224,8 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 typedef HostAddressInfo::State st;
                 const HostAddressInfo& info = it->second;
                 EXPECT_EQ(info.fixedEntries.size(), 0U);
-                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 0U : 1U);
-                EXPECT_EQ(info.dnsState(), kResolveOnMediator ? st::resolved : st::unresolved);
+                EXPECT_EQ(1U, info.getAll().size());
+                EXPECT_EQ(st::unresolved, info.dnsState());
                 EXPECT_EQ(info.mediatorState(), st::resolved);
             });
     }
@@ -294,7 +235,7 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
  * Usual DNS addresses like "ya.ru" shell be resolved in order:
  *  fixed -> dns -> mediator (always uses mediator because of not valid DNS)
  */
-TEST_F(AddressResolverTest, DnsVsMediator)
+TEST_F(AddressResolverCloudResolving, DnsVsMediator)
 {
     static const HostAddress kAddressGood("hren-resolve-me-1.com");
     static const HostAddress kAddressBad("hren-resolve-me-2.com");
@@ -309,21 +250,7 @@ TEST_F(AddressResolverTest, DnsVsMediator)
             EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
             const auto entries = info.getAll();
-            ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2U : 0U);
-
-            if (kResolveOnMediator)
-            {
-                const AddressEntry entry1 = entries.front();
-                EXPECT_EQ(entry1.type, AddressType::direct);
-                EXPECT_EQ(entry1.host, kResult.address);
-                EXPECT_EQ(entry1.attributes.size(), 1U);
-                EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
-                EXPECT_EQ(entry1.attributes.front().value, kResult.port);
-
-                const AddressEntry entry2 = entries.back();
-                EXPECT_EQ(entry2.type, AddressType::cloud);
-                EXPECT_EQ(entry2.host, kAddressGood);
-            }
+            ASSERT_EQ(0U, info.getAll().size());
         });
 
     resolveAndCheckState(

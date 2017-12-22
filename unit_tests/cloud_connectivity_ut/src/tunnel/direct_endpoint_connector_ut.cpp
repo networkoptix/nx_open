@@ -29,7 +29,7 @@ public:
 
         // Disabling udp hole punching and enabling tcp port forwarding.
         ConnectorFactory::setEnabledCloudConnectMask(
-            (int)CloudConnectType::forwardedTcpPort);
+            (int)ConnectType::forwardedTcpPort);
     }
 
     ~TcpTunnelConnector()

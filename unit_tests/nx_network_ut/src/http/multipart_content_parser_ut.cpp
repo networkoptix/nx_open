@@ -1,8 +1,3 @@
-/**********************************************************
-* 8 sep 2014
-* a.kolesnikov
-***********************************************************/
-
 #include <deque>
 
 #include <gtest/gtest.h>
@@ -14,7 +9,7 @@
 
 TEST( HttpMultipartContentParser, genericTest )
 {
-    //const nx::Buffer frame1 = 
+    //const nx::Buffer frame1 =
     //    "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
     //    "xxxxxxxxxxxxxxxxxxxxxxxxxxx\r\nxxxxxx2";
     const nx::Buffer frame1 =
@@ -25,7 +20,7 @@ TEST( HttpMultipartContentParser, genericTest )
         "xxxxxxxxxxxxxxx\r\r\rx\rxxxxxxxxxxxxxxxxxx"
         "xxxxxxxxxxxxxxxxxxxxx\n\n\n\nxxx\r\n\r\nxxxxxxxxx4";
     const nx::Buffer frame3 = "";
-    //const nx::Buffer frame4 = 
+    //const nx::Buffer frame4 =
     //    "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\n6";
     const nx::Buffer frame4 =
         "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\nyyyyyyyyyyyyyy6";
@@ -34,7 +29,7 @@ TEST( HttpMultipartContentParser, genericTest )
     {
         const bool closeContent = i > 0;
 
-        nx::Buffer testData = 
+        nx::Buffer testData =
             "\r\n--fbdr"
             "\r\n"
             "Content-Type: image/jpeg\r\n"
@@ -105,27 +100,27 @@ TEST( HttpMultipartContentParser, genericTest )
 
 TEST( HttpMultipartContentParser, onlySizedData )
 {
-    //const nx::Buffer frame1 = 
+    //const nx::Buffer frame1 =
     //    "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
     //    "xxxxxxxxxxxxxxxxxxxxxxxxxxx\r\nxxxxxx2";
-    const nx::Buffer frame1 = 
+    const nx::Buffer frame1 =
         "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
         "xxxxxxxxxxxxxxxxx\r\nxxxxxxxxxxxxxxxx2";
-    const nx::Buffer frame2 = 
+    const nx::Buffer frame2 =
         "3xxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx"
         "xxxxxxxxxxxxxxx\r\r\rx\rxxxxxxxxxxxxxxxxxx"
         "xxxxxxxxxxxxxxxxxxxxx\n\n\n\nxxx\r\n\r\nxxxxxxxxx4";
     const nx::Buffer frame3 = "";
-    //const nx::Buffer frame4 = 
+    //const nx::Buffer frame4 =
     //    "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\n6";
-    const nx::Buffer frame4 = 
+    const nx::Buffer frame4 =
         "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\nyyyyyyyyyyyyyy6";
 
     for (int i = 0; i < 2; ++i)
     {
         const bool closeContent = i > 0;
 
-        nx::Buffer testData = 
+        nx::Buffer testData =
             "\r\n--fbdr"
             "\r\n"
             "Content-Length: "+nx::Buffer::number(frame1.size())+"\r\n"
@@ -196,7 +191,7 @@ TEST( HttpMultipartContentParser, onlySizedData )
 
 TEST( HttpMultipartContentParser, unSizedDataSimple )
 {
-    const nx::Buffer frame1 = 
+    const nx::Buffer frame1 =
         "a\rb";
     const nx::Buffer frame2 =
         "c\rd";
@@ -274,7 +269,7 @@ TEST( HttpMultipartContentParser, unSizedData )
         nx::Buffer testData;
         for( const nx::Buffer& testFrame: testFrames )
         {
-            testData += 
+            testData +=
                 "\r\n--fbdr"    //delimiter
                 "\r\n"
                 "Content-Type: image/jpeg\r\n"

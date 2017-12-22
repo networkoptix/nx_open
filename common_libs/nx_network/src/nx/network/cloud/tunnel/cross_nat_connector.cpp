@@ -1,6 +1,7 @@
 #include "cross_nat_connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -48,9 +49,9 @@ CrossNatConnector::CrossNatConnector(
     m_mediatorUdpEndpoint(
         mediatorUdpEndpoint
         ? mediatorUdpEndpoint.get()
-        : *nx::network::SocketGlobals::mediatorConnector().udpEndpoint()),
+        : *nx::network::SocketGlobals::cloud().mediatorConnector().udpEndpoint()),
     m_originatingHostAddressReplacement(
-        SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
+        SocketGlobals::cloud().settings().originatingHostAddressReplacement()),
     m_done(false)
 {
     m_mediatorUdpClient =
@@ -79,7 +80,7 @@ void CrossNatConnector::connect(
         [this, timeout, handler = std::move(handler)]() mutable
         {
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
-            if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
+            if (auto holder = SocketGlobals::cloud().tcpReversePool().getConnectionSource(hostName))
             {
                 s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
                 NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
@@ -373,7 +374,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
 {
     api::ConnectRequest connectRequest;
 
-    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().ownPeerId();
+    connectRequest.originatingPeerId = SocketGlobals::cloud().outgoingTunnelPool().ownPeerId();
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();

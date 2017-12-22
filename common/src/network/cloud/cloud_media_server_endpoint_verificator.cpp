@@ -1,5 +1,7 @@
 #include "cloud_media_server_endpoint_verificator.h"
 
+#include <nx/utils/log/log.h>
+
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
 
@@ -28,7 +30,7 @@ void CloudMediaServerEndpointVerificator::setTimeout(
 
 void CloudMediaServerEndpointVerificator::verifyHost(
     const SocketAddress& endpointToVerify,
-    const nx::network::cloud::AddressEntry& targetHostAddress,
+    const nx::network::AddressEntry& targetHostAddress,
     nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler)
 {
     m_endpointToVerify = endpointToVerify;
