@@ -78,82 +78,31 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
 
-AbstractStreamServerSocket* QnUniversalTcpListener::addServerSocketToMultipleSocket(
-    const SocketAddress& localAddress,
-    nx::network::MultipleServerSocket* multipleServerSocket,
-    int ipVersion)
-{
-    std::unique_ptr<AbstractStreamServerSocket> tcpServerSocket;
-    if (m_preparedTcpSocket
-        && m_preparedTcpSocket->getLocalAddress().toString() == localAddress.toString())
-    {
-        tcpServerSocket = std::move(m_preparedTcpSocket);
-    }
-
-    if (!tcpServerSocket)
-        tcpServerSocket = createAndPrepareTcpSocket(localAddress);
-
-    if (!tcpServerSocket)
-    {
-        setLastError(SystemError::getLastOSErrorCode());
-        return nullptr;
-    }
-
-    auto result = tcpServerSocket.get();
-    if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
-    {
-        setLastError(SystemError::getLastOSErrorCode());
-        return nullptr;
-    }
-
-    return result;
-}
-
 AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     bool sslNeeded,
     const SocketAddress& localAddress)
 {
     QnMutexLocker lk(&m_mutex);
+    if (m_preparedTcpSockets.empty())
+        m_preparedTcpSockets = createAndPrepareTcpSockets(localAddress);
+
+    if (m_preparedTcpSockets.empty())
+        return nullptr;
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
-    bool needToAddIpV4Socket =
-        localAddress.address.toString() == HostAddress::anyHost.toString()
-        || (bool) localAddress.address.ipV4();
-
-    bool needToAddIpV6Socket =
-        localAddress.address.toString() == HostAddress::anyHost.toString()
-        || (bool)localAddress.address.isPureIpV6();
-
-    AbstractStreamServerSocket* ipV4ServerSocket = nullptr;
-    if (needToAddIpV4Socket)
+    for (auto& socket: m_preparedTcpSockets)
     {
-        ipV4ServerSocket = addServerSocketToMultipleSocket(
-            localAddress,
-            multipleServerSocket.get(),
-            AF_INET);
-
-        if (ipV4ServerSocket == nullptr)
-            return nullptr;
-        ++m_totalListeningSockets;
-        ++m_cloudSocketIndex;
-    }
-
-    if (needToAddIpV6Socket)
-    {
-        SocketAddress ipV6SocketAddress = localAddress;
-        if (ipV4ServerSocket != nullptr)
-            ipV6SocketAddress.port = ipV4ServerSocket->getLocalAddress().port;
-
-        if (!addServerSocketToMultipleSocket(
-                ipV6SocketAddress,
-                multipleServerSocket.get(),
-                AF_INET6))
+        if (!multipleServerSocket->addSocket(std::move(socket)))
         {
+            setLastError(SystemError::getLastOSErrorCode());
             return nullptr;
         }
+
         ++m_totalListeningSockets;
         ++m_cloudSocketIndex;
     }
+
+    m_preparedTcpSockets.clear();
 
     #ifdef LISTEN_ON_UDT_SOCKET
         auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
@@ -292,28 +241,55 @@ void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
     m_unauthorizedForwardingPaths.insert(lit("/") + path + lit("/"));
 }
 
-void QnUniversalTcpListener::setPreparedTcpSocket(std::unique_ptr<AbstractStreamServerSocket> socket)
+void QnUniversalTcpListener::setPreparedTcpSockets(
+    std::vector<std::unique_ptr<AbstractStreamServerSocket>> sockets)
 {
-    m_preparedTcpSocket = std::move(socket);
+    m_preparedTcpSockets = std::move(sockets);
 }
 
-std::unique_ptr<AbstractStreamServerSocket> QnUniversalTcpListener::createAndPrepareTcpSocket(
-    const SocketAddress& localAddress)
+std::vector<std::unique_ptr<AbstractStreamServerSocket>> 
+    QnUniversalTcpListener::createAndPrepareTcpSockets(const SocketAddress& localAddress)
 {
-    auto socket = SocketFactory::createStreamServerSocket(
-        false,
-        nx::network::NatTraversalSupport::enabled
-        // TODO: #muskov: Fix.
-        /*, ipVersion*/);
+    uint16_t assignedPort = 0;
+    std::vector<std::unique_ptr<AbstractStreamServerSocket>> sockets;
+    const auto addSocket =
+        [&](SocketAddress localAddress, int ipVersion)
+        {
+            if (assignedPort)
+                localAddress.port = assignedPort;
 
-    if (!socket->setReuseAddrFlag(true) ||
-        !socket->bind(localAddress) ||
-        !socket->listen())
+            auto socket = SocketFactory::createStreamServerSocket(
+                false,
+                nx::network::NatTraversalSupport::enabled,
+                ipVersion);
+
+            if (!socket->setReuseAddrFlag(true) ||
+                !socket->bind(localAddress) ||
+                !socket->listen())
+            {
+                return false;
+            }
+
+            assignedPort = socket->getLocalAddress().port;
+            sockets.push_back(std::move(socket));
+            return true;
+        };
+
+    if (localAddress.address.toString() == HostAddress::anyHost.toString()
+        || (bool) localAddress.address.ipV4())
     {
-        return nullptr;
+        if (!addSocket(localAddress, AF_INET))
+            return {};
     }
 
-    return socket;
+    if (localAddress.address.toString() == HostAddress::anyHost.toString()
+        || (bool) localAddress.address.isPureIpV6())
+    {
+        if (!addSocket(localAddress, AF_INET6))
+            return {};
+    }
+
+    return sockets;
 }
 
 nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const
