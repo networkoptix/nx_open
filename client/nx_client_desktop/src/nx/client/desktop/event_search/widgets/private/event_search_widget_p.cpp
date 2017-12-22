@@ -313,6 +313,6 @@ void EventSearchWidget::Private::setAnalyticsSearchByAreaEnabled(bool value)
     m_selectAreaCheckBox->setChecked(value);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

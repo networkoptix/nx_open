@@ -495,6 +495,6 @@ void EventRibbon::Private::updateView()
     debugCheckVisibility();
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

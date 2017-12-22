@@ -27,6 +27,6 @@ private:
     MotionSearchListModel* const m_model = nullptr;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -70,6 +70,6 @@ private:
     QSet<EventTile*> m_visible;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx
