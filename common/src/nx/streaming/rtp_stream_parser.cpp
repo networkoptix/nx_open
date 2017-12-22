@@ -1,18 +1,15 @@
 #include "rtp_stream_parser.h"
 
+namespace {
+
+static const int kDefaultChunkContainerSize = 1024;
+static const int kDefaultChannelCount = 1;
+
+} // namespace
+
 QnRtpVideoStreamParser::QnRtpVideoStreamParser()
 {
-    m_chunks.reserve(1024);
-}
-
-QnRtpStreamParser::QnRtpStreamParser():
-    m_timeHelper(0),
-    m_logicalChannelNum(0)
-{
-}
-
-QnRtpStreamParser::~QnRtpStreamParser()
-{
+    m_chunks.reserve(kDefaultChunkContainerSize);
 }
 
 void QnRtpStreamParser::setTimeHelper(QnRtspTimeHelper* timeHelper)
@@ -20,47 +17,71 @@ void QnRtpStreamParser::setTimeHelper(QnRtspTimeHelper* timeHelper)
     m_timeHelper = timeHelper;
 }
 
-void QnRtpAudioStreamParser::processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param)
+int QnRtpStreamParser::logicalChannelNum() const
+{
+    return m_logicalChannelNum;
+}
+
+void QnRtpStreamParser::setLogicalChannelNum(int value)
+{
+    m_logicalChannelNum = value;
+}
+
+void QnRtpAudioStreamParser::processIntParam(
+    const QByteArray& checkName,
+    int& setValue,
+    const QByteArray& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
         return;
-    QByteArray paramName = param.left(valuePos);
-    QByteArray paramValue = param.mid(valuePos+1);
+
+    const auto paramName = param.left(valuePos);
+    const auto paramValue = param.mid(valuePos+1);
     if (paramName.toLower() == checkName.toLower())
         setValue = paramValue.toInt();
 }
 
-void QnRtpAudioStreamParser::processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param)
+void QnRtpAudioStreamParser::processHexParam(
+    const QByteArray& checkName,
+    QByteArray& setValue,
+    const QByteArray& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
         return;
-    QByteArray paramName = param.left(valuePos);
-    QByteArray paramValue = param.mid(valuePos+1);
+
+    const auto paramName = param.left(valuePos);
+    const auto paramValue = param.mid(valuePos+1);
     if (paramName.toLower() == checkName.toLower())
         setValue = QByteArray::fromHex(paramValue);
 }
 
-void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param)
+void QnRtpAudioStreamParser::processStringParam(
+    const QByteArray& checkName,
+    QByteArray& setValue,
+    const QByteArray& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
         return;
-    QByteArray paramName = param.left(valuePos);
-    QByteArray paramValue = param.mid(valuePos+1);
+
+    const auto paramName = param.left(valuePos);
+    const auto paramValue = param.mid(valuePos+1);
     if (paramName.toLower() == checkName.toLower())
         setValue = paramValue;
 }
 
 QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
 {
-    if (m_mediaData) {
+    if (m_mediaData)
+    {
         QnAbstractMediaDataPtr result;
         result.swap( m_mediaData );
         return result;
     }
-    else {
+    else
+    {
         return QnAbstractMediaDataPtr();
     }
 }
@@ -68,10 +89,28 @@ QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
 QnAbstractMediaDataPtr QnRtpAudioStreamParser::nextData()
 {
     if (m_audioData.empty())
+    {
         return QnAbstractMediaDataPtr();
-    else {
-        QnAbstractMediaDataPtr result = m_audioData.front();
+    }
+    else
+    {
+        auto result = m_audioData.front();
         m_audioData.pop_front();
         return result;
     }
+}
+
+int QnRtspAudioLayout::channelCount() const
+{
+    return kDefaultChannelCount;
+}
+
+QnResourceAudioLayout::AudioTrack QnRtspAudioLayout::getAudioTrackInfo(int /*index*/) const
+{
+    return m_audioTrack;
+}
+
+void QnRtspAudioLayout::setAudioTrackInfo(const AudioTrack& info)
+{
+    m_audioTrack = info;
 }
