@@ -53,7 +53,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/cmake)
+    ${PROJECT_SOURCE_DIR}/cmake
+)
 
 include(CMakeParseArguments)
 include(ExternalProject)
@@ -191,7 +192,9 @@ if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     add_subdirectory(edge_firmware)
 endif()
 
-if(LINUX AND NOT ANDROID)
+if(targetDevice MATCHES "linux-*"
+    OR (targetDevice STREQUAL "" AND platform STREQUAL "linux" AND NOT ANDROID)
+)
     add_subdirectory(debsetup)
 endif()
 
