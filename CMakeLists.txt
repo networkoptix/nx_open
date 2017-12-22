@@ -191,6 +191,10 @@ if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     add_subdirectory(edge_firmware)
 endif()
 
+if(LINUX AND NOT ANDROID)
+    add_subdirectory(debsetup)
+endif()
+
 include(fix_qt_vars)
 
 nx_configure_file(

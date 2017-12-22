@@ -2,10 +2,10 @@
 
 set -e
 
-COMPANY_NAME=${deb.customization.company.name}
+COMPANY_NAME=@deb.customization.company.name@
 
-VERSION=${release.version}
-ARCHITECTURE=${os.arch}
+VERSION=@release.version@
+ARCHITECTURE=@os.arch@
 
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
@@ -17,8 +17,8 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
 
-FINALNAME=${artifact.name.server}
-UPDATE_NAME=${artifact.name.server_update}.zip
+FINALNAME=@artifact.name.server@
+UPDATE_NAME=@artifact.name.server_update@.zip
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -31,15 +31,15 @@ INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 SYSTEMDSTAGE=$STAGE$SYSTEMDTARGET
 
-SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
-SERVER_SHARE_PATH=${libdir}/share
+SERVER_BIN_PATH=@libdir@/bin/@build.configuration@
+SERVER_SHARE_PATH=@libdir@/share
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
-SERVER_DEB_PATH=${libdir}/deb
+SERVER_DEB_PATH=@libdir@/deb
 SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
-SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
+SERVER_LIB_PATH=@libdir@/lib/@build.configuration@
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
-SCRIPTS_PATH=${basedir}/../scripts
-BUILD_INFO_TXT=${libdir}/build_info.txt
+SCRIPTS_PATH=@basedir@/../scripts
+BUILD_INFO_TXT=@libdir@/build_info.txt
 
 # Prepare stage dir
 rm -rf $STAGE
@@ -56,22 +56,22 @@ mkdir -p $SYSTEMDSTAGE
 cp -r $BUILD_INFO_TXT $BINSTAGE/../
 
 # Copy dbsync 2.2
-if [ '${arch}' != 'arm' ]
+if [ '@arch@' != 'arm' ]
 then
-    cp -r ${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
-    cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
+    cp -r @packages.dir@/@rdep.target@/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
+    cp @libdir@/version.py $SHARESTAGE/dbsync-2.2/bin
 fi
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
-[ $COMPANY_NAME != "hanwha" ] && rm $LIBPLUGINSTAGE\hanwha* || true
+[ $COMPANY_NAME != "hanwha" ] && rm -rf $LIBPLUGINSTAGE/hanwha*
 cp -r $SERVER_VOX_PATH $BINSTAGE
 #'libstdc++.so.6 is needed on some machines
-if [ '${arch}' != 'arm' ]
+if [ '@arch@' != 'arm' ]
 then
-    cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
-    cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
+    cp -r /usr/lib/@arch.dir@/libstdc++.so.6* $LIBSTAGE
+    cp -P @qt.dir@/lib/libicu*.so* $LIBSTAGE
 fi
 
 #copying qt libs
@@ -80,14 +80,15 @@ for var in $QTLIBS
 do
     qtlib=libQt5$var.so
     echo "Adding Qt lib" $qtlib
-    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
+    cp -P @qt.dir@/lib/$qtlib* $LIBSTAGE
 done
 
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
 
-if [ '${build.configuration}' == 'release' ] && [ '${arch}' != 'arm' ]
+if [[ ('@build.configuration@' == 'release' || '@CMAKE_BUILD_TYPE@' == 'Release') \
+    && '@arch@' != 'arm' ]]
 then
   for f in `find $LIBPLUGINSTAGE -type f`
   do
@@ -103,7 +104,7 @@ fi
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod -R 755 $BINSTAGE
-if [ '${arch}' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}; fi
+if [ '@arch@' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}; fi
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
@@ -123,7 +124,7 @@ install -m 644 systemd/networkoptix-mediaserver.service $SYSTEMDSTAGE/$COMPANY_N
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
-chmod go+rx $STAGE/DEBIAN
+chmod 00775 $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
@@ -139,5 +140,5 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 cp -Rf $SERVER_DEB_PATH/* $STAGEBASE
 (cd $STAGEBASE; zip -r ./$UPDATE_NAME ./ -x ./$FINALNAME/**\* $FINALNAME/)
-mv $STAGEBASE/$UPDATE_NAME ${project.build.directory}
+mv $STAGEBASE/$UPDATE_NAME @project.build.directory@/
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

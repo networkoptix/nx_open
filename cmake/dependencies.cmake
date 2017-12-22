@@ -162,6 +162,10 @@ function(nx_get_dependencies)
         nx_rdep_add_package(quazip)
     endif()
 
+    if(LINUX AND box STREQUAL "none")
+        nx_rdep_add_package(cifs-utils)
+    endif()
+
     if(WINDOWS)
         nx_rdep_add_package(directx)
         nx_rdep_add_package("vcredist-2015" PATH_VARIABLE vcredist_directory)
