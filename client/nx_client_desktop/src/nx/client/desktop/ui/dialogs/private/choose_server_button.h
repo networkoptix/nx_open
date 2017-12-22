@@ -4,6 +4,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
+#include <nx/client/desktop/watchers/server_online_status_watcher.h>
 
 class QMenu;
 class QnUuid;
@@ -16,32 +17,25 @@ class QnChooseServerButton: public Connective<QnDropdownButton>, public QnCommon
 public:
     QnChooseServerButton(QWidget* parent = nullptr);
 
-    bool setServer(const QnMediaServerResourcePtr& server);
-    QnMediaServerResourcePtr server() const;
+    bool setCurrentServer(const QnMediaServerResourcePtr& currentServer);
+    QnMediaServerResourcePtr currentServer() const;
 
-    int serversCount() const;
-
-    bool serverIsOnline();
+    void addServer(const QnMediaServerResourcePtr& currentServer);
+    void removeServer(const QnUuid& id);
 
 signals:
-    void serverChanged(const QnMediaServerResourcePtr& previousServer);
-
-    void serversCountChanged();
-
-    void serverOnlineStatusChanged();
+    void currentServerChanged(const QnMediaServerResourcePtr& previousServer);
 
 private:
     void tryUpdateCurrentAction();
-    void updatebuttonData();
-
-    void tryAddServer(const QnResourcePtr& resource);
-    void tryRemoveServer(const QnResourcePtr& resource);
 
     QAction* addMenuItemForServer(const QnMediaServerResourcePtr& server);
 
-    QAction* actionForServer(const QnMediaServerResourcePtr& server);
+    QAction* actionForServer(const QnUuid& id);
+
+    void handleSelectedServerOnlineStatusChanged();
 
 private:
+    nx::client::desktop::ServerOnlineStatusWatcher m_serverStatus;
     QnMediaServerResourcePtr m_server;
-    QnMediaServerResourceList m_servers;
 };
