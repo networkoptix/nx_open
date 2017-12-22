@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import permission_required
 import re
 
-#Replace </p> and <br> with \n and then remove all html tags
+#Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
     new_line = re.compile(r'<(\/p|br)>')
     tags = re.compile(r'<[\/\w]+>')
@@ -95,7 +95,6 @@ def send_notification(request):
     return api_success()
 
 
-# TODO: Comeback and fix this permissions check
 @api_view(['GET','POST'])
 @permission_required('notifications.send_cloud_notification')
 def cloud_notification_action(request):

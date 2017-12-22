@@ -87,6 +87,11 @@ class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when
 
 
 class CloudNotification(models.Model):
+    class Meta:
+        permissions = (
+            ("send_cloud_notification", "Can send cloud notifications"),
+        )
+
     subject = models.CharField(max_length=255)
     body = models.TextField()
     sent_date = models.DateTimeField(null=True, blank=True)
