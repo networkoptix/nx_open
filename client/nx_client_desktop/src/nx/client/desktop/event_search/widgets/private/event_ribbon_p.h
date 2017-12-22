@@ -5,7 +5,6 @@
 #include <QtCore/QModelIndex>
 #include <QtCore/QScopedPointer>
 
-#include <nx/utils/integer_range.h>
 #include <nx/utils/disconnect_helper.h>
 
 class QScrollBar;
@@ -54,6 +53,7 @@ private:
     static void updateTile(EventTile* tile, const QModelIndex& index);
 
     void debugCheckGeometries();
+    void debugCheckVisibility();
 
 private:
     EventRibbon* const q = nullptr;
@@ -67,7 +67,7 @@ private:
     QHash<EventTile*, int> m_positions;
     int m_totalHeight = 0;
 
-    nx::utils::IntegerRange m_visible;
+    QSet<EventTile*> m_visible;
 };
 
 } // namespace
