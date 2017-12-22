@@ -34,7 +34,7 @@ def send_to_all_users(sent_by, notification):
     notification.save()
     for user in users:
         message['full_name'] = user.get_full_name()
-        api.send(user.email, 'system_shared', message, 'default')
+        api.send(user.email, 'cloud_notification', message, 'default')
 
 
 def update_or_create_notification(data):
@@ -106,7 +106,7 @@ def cloud_notification_action(request):
         notification = CloudNotification.objects.get(id=notification_id)
         message = format_message(notification)
         message['full_name'] = request.user.get_full_name()
-        api.send(request.user.email, 'system_shared', message, 'default')
+        api.send(request.user.email, 'cloud_notification', message, 'default')
     elif 'Send' in request.data:
         notification = CloudNotification.objects.get(id=notification_id)
         send_to_all_users(reqeust.user, notification)
