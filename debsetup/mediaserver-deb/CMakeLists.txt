@@ -1,8 +1,8 @@
 set(depends mediaserver)
 
-set(zip_filename ${artifact.name.server_update}.zip)
-set(deb_filename ${artifact.name.server}.deb)
-set(installer_output_list ${zip_filename} ${deb_filename})
+set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
+set(deb_file ${distribution_output_dir}/${artifact.name.server}.deb)
+set(installer_output_list ${zip_file} ${deb_file})
 
 # Variables which may depend on current project and are used by build-dist.sh.
 set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})

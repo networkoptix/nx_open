@@ -140,5 +140,11 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 cp -Rf $SERVER_DEB_PATH/* $STAGEBASE
 (cd $STAGEBASE; zip -r ./$UPDATE_NAME ./ -x ./$FINALNAME/**\* $FINALNAME/)
-mv $STAGEBASE/$UPDATE_NAME @project.build.directory@/
 echo "server.finalName=$FINALNAME" >> finalname-server.properties
+
+if [ '@distribution_output_dir@' != '' ]; then
+    mv $STAGEBASE/$UPDATE_NAME @distribution_output_dir@/
+    mv $STAGEBASE/$FINALNAME.deb @distribution_output_dir@/
+else
+    mv $STAGEBASE/$UPDATE_NAME @project.build.directory@/
+fi
