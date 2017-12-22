@@ -49,10 +49,10 @@ public:
         bool& gotData) override;
 
     // Implementation of QnRtpStreamParser::setSDPInfo
-    virtual void setSDPInfo(QByteArrayList lines) override;
+    virtual void setSdpInfo(QByteArrayList lines) override;
 
 private:
-    
+
     // Returns true if RTP header is correct. In this case value of outIsFatalError
     // is undefined and we can ignore it. If this method has returned false and
     // value of outIsFatalError is false we can just skip the data,
@@ -141,6 +141,8 @@ private:
     int m_videoFrameSize = 0;
     uint32_t m_lastRtpTime = 0;
     const uint8_t* m_rtpBufferBase;
+
+/**/bool m_hasPrevSlice = false;
 };
 
 } // namespace rtp

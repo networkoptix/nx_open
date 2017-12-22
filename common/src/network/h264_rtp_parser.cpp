@@ -35,7 +35,7 @@ CLH264RtpParser::~CLH264RtpParser()
 {
 }
 
-void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
+void CLH264RtpParser::setSdpInfo(QList<QByteArray> lines)
 {
     for (int i = 0; i < lines.size(); ++ i)
     {

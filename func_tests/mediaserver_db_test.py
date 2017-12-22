@@ -120,7 +120,7 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
-def test_backup_restore(one, two, camera):
+def test_backup_restore(artifact_factory, one, two, camera):
     two.merge_systems(one)
     full_info_initial = wait_until_servers_have_same_full_info(one, two)
     backup = one.rest_api.ec2.dumpDatabase.GET()
@@ -131,7 +131,14 @@ def test_backup_restore(one, two, camera):
     one.rest_api.ec2.restoreDatabase.POST(data=backup['data'])
     wait_for_camera_disappearance_after_backup(one, camera_guid)
     full_info_after_backup_restore = wait_until_servers_have_same_full_info(one, two)
-    assert full_info_after_backup_restore == full_info_initial
+    try:
+        assert full_info_after_backup_restore == full_info_initial
+    except AssertionError:
+        artifact_factory(['full_info_initial'],
+                             name='full_info_initial').save_json(full_info_initial)
+        artifact_factory(['full_info_after_backup_restore'],
+                             name='full_info_after_backup_restore').save_json(full_info_after_backup_restore)
+        raise
 
 
 # To detect VMS-5969

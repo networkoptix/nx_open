@@ -14,7 +14,7 @@ public:
     QnNxRtpParser();
     virtual ~QnNxRtpParser();
 
-    virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
+    virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
 
     qint64 position() const { return m_position; }
