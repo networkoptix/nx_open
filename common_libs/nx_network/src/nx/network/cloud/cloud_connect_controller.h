@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace nx {
 
@@ -48,7 +49,7 @@ public:
 private:
     struct Settings
     {
-        QString forcedMediatorUrl;
+        std::string forcedMediatorUrl;
         bool isUdpHpDisabled = false;
         bool isOnlyCloudProxyEnabled = false;
     };

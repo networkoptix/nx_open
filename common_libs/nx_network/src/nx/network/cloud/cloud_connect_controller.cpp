@@ -131,7 +131,7 @@ void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
 void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments)
 {
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        m_settings.forcedMediatorUrl = *value;
+        m_settings.forcedMediatorUrl = value->toStdString();
 
     // TODO: #ak Following parameters are redundant and contradicting.
 
@@ -144,8 +144,8 @@ void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments
 
 void CloudConnectController::applySettings()
 {
-    if (!m_settings.forcedMediatorUrl.isEmpty())
-        mediatorConnector().mockupMediatorUrl(m_settings.forcedMediatorUrl);
+    if (!m_settings.forcedMediatorUrl.empty())
+        mediatorConnector().mockupMediatorUrl(QString::fromStdString(m_settings.forcedMediatorUrl));
 
     if (m_settings.isUdpHpDisabled)
     {
