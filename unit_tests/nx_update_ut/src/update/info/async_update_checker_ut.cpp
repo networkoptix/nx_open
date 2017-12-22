@@ -103,6 +103,15 @@ private:
             false);
 
         resultCode = m_updateRegistry->latestUpdate(
+            UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(4, 0, 0, 0)),
+            &softwareVersion);
+        assertLatestUpdateResult(
+            resultCode,
+            QnSoftwareVersion("3.1.0.16975"),
+            softwareVersion,
+            true);
+
+        resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData("nxvms.com", "default", QnSoftwareVersion(3, 2, 0, 0)),
             &softwareVersion);
         assertLatestUpdateResult(

@@ -9,6 +9,24 @@ namespace nx {
 namespace mediaserver {
 namespace rest {
 
+UpdateRequestDataFactory::FactoryFunc UpdateRequestDataFactory::s_factoryFunc = nullptr;
+
+update::info::UpdateRequestData UpdateRequestDataFactory::create()
+{
+    if (s_factoryFunc)
+        return s_factoryFunc();
+
+    return update::info::UpdateRequestData(
+        nx::network::AppInfo::defaultCloudHost(),
+        QnAppInfo::customizationName(),
+        QnSoftwareVersion(QnAppInfo::applicationVersion()));
+}
+
+void UpdateRequestDataFactory::setFactoryFunc(UpdateRequestDataFactory::FactoryFunc factoryFunc)
+{
+    s_factoryFunc = std::move(factoryFunc);
+}
+
 namespace {
 
 class GetUpdateInfoHelper
@@ -16,99 +34,69 @@ class GetUpdateInfoHelper
 public:
     GetUpdateInfoHelper()
     {
-        setNegativeResponseBody();
-        m_updateRegistry = update::info::checkSync();
-        if (m_updateRegistry == nullptr)
+        fillNegativeRestResponse();
+        if (!findUpdateInfo())
             return;
 
-        if (findUpdateInfo())
-            QJson::serialize(api::AvailableUpdatesInfo(m_version.toString()), &m_responseBody);
+        fillPositiveRestResponse();
     }
 
-    QByteArray responseBody() const { return m_responseBody; }
-
+    JsonRestResponse response() const { return m_jsonRestResponse; }
 private:
-    update::info::AbstractUpdateRegistryPtr m_updateRegistry;
-    QByteArray m_responseBody;
+    JsonRestResponse m_jsonRestResponse;
     QnSoftwareVersion m_version;
 
     bool findUpdateInfo()
     {
-        const auto findResult = m_updateRegistry->latestUpdate(
-            createUpdateRequestData(),
+        const update::info::AbstractUpdateRegistryPtr updateRegistry = update::info::checkSync();
+        if (updateRegistry == nullptr)
+            return false;
+
+        const auto findResult = updateRegistry->latestUpdate(
+            UpdateRequestDataFactory::create(),
             &m_version);
         return findResult == update::info::ResultCode::ok;
     }
 
-    static update::info::UpdateRequestData createUpdateRequestData()
-    {
-        return update::info::UpdateRequestData(
-            nx::network::AppInfo::defaultCloudHost(),
-            QnAppInfo::customizationName(),
-            QnSoftwareVersion(QnAppInfo::applicationVersion()));
-    }
+    void fillNegativeRestResponse() { fillRestResponse(); }
+    void fillPositiveRestResponse() { fillRestResponse(m_version.toString()); }
 
-    void setNegativeResponseBody()
+    void fillRestResponse(const QString& version = QString())
     {
-        QJson::serialize(api::AvailableUpdatesInfo(), &m_responseBody);
+        m_jsonRestResponse.statusCode = nx_http::StatusCode::ok;
+        m_jsonRestResponse.json.setReply(api::AvailableUpdatesInfo(version));
     }
 };
 
-static const QString kUpdates2Path = "/updates2";
+static const QString kUpdates2Path = "/api/updates2";
 } // namespace
 
-int Updates2RestHandler::executeGet(
-    const QString& path,
-    const QnRequestParamList& /*params*/,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* processor)
+JsonRestResponse Updates2RestHandler::executeGet(const JsonRestRequest& request)
 {
-    NX_ASSERT(path == kUpdates2Path);
-    if (path != kUpdates2Path)
+    NX_ASSERT(request.path == kUpdates2Path);
+    if (request.path != kUpdates2Path)
         return nx_http::StatusCode::notFound;
 
-    GetUpdateInfoHelper getUpdateInfoHelper;
-    result = getUpdateInfoHelper.responseBody();
-
-    return nx_http::StatusCode::ok;
+    return GetUpdateInfoHelper().response();
 }
 
-int Updates2RestHandler::executePost(
-    const QString& path,
-    const QnRequestParamList& params,
-    const QByteArray& body,
-    const QByteArray& bodyContentType,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* processor)
+JsonRestResponse Updates2RestHandler::executeDelete(const JsonRestRequest& request)
 {
-    NX_ASSERT(false);
-    return nx_http::StatusCode::internalServerError;
+    return JsonRestResponse();
 }
 
-int Updates2RestHandler::executePut(
-    const QString& path,
-    const QnRequestParamList& params,
-    const QByteArray& body,
-    const QByteArray& bodyContentType,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* processor)
+JsonRestResponse Updates2RestHandler::executePost(
+    const JsonRestRequest& request,
+    const QByteArray& body)
 {
-    NX_ASSERT(false);
-    return nx_http::StatusCode::internalServerError;
+    return JsonRestResponse();
 }
 
-int Updates2RestHandler::executeDelete(
-    const QString& path,
-    const QnRequestParamList& params,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* processor)
+JsonRestResponse Updates2RestHandler::executePut(
+    const JsonRestRequest& request,
+    const QByteArray& body)
 {
-    NX_ASSERT(false);
-    return nx_http::StatusCode::internalServerError;
+    return JsonRestResponse();
 }
 
 } // namespace rest
