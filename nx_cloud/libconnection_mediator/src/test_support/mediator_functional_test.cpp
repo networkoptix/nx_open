@@ -59,7 +59,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     m_httpPort(0)
 {
     if (m_testFlags & initializeSocketGlobals)
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobals::cloud().reinitialize();
 
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();

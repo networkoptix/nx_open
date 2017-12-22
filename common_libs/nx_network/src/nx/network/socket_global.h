@@ -97,11 +97,6 @@ private:
 
     void initializeCloudConnectivity();
     void deinitializeCloudConnectivity();
-
-    // TODO: Initialization and deinitialization of this class is brocken by design (because of
-    //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
-    // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
-    // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
 };
 
 //-------------------------------------------------------------------------------------------------

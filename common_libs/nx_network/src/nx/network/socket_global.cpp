@@ -211,10 +211,8 @@ void SocketGlobals::printArgumentsHelp(std::ostream* outputStream)
     (*outputStream) <<
         "  --ip-version=, -ip               Ip version to use. 4 or 6" << std::endl <<
         "  --enforce-socket={socket type}   tcp, udt, cloud" << std::endl <<
-        "  --enforce-ssl                    Use ssl for every connection" << std::endl <<
-        "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
-        "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
-        "  --cloud-connect-enable-proxy-only" << std::endl;
+        "  --enforce-ssl                    Use ssl for every connection" << std::endl;
+    cloud::CloudConnectController::printArgumentsHelp(outputStream);
 }
 
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)

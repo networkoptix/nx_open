@@ -19,28 +19,30 @@ namespace cloud {
 
 struct CloudConnectControllerImpl
 {
+    aio::AIOService* aioService;
+    AddressResolver* addressResolver;
     hpm::api::MediatorConnector mediatorConnector;
     MediatorAddressPublisher addressPublisher;
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
     tcp::ReverseConnectionPool tcpReversePool;
-    AddressResolver* m_addressResolver;
 
     CloudConnectControllerImpl(
         aio::AIOService* aioService,
         AddressResolver* addressResolver)
         :
+        aioService(aioService),
+        addressResolver(addressResolver),
         addressPublisher(mediatorConnector.systemConnection()),
         tcpReversePool(
             aioService,
             outgoingTunnelPool,
-            mediatorConnector.clientConnection()),
-        m_addressResolver(addressResolver)
+            mediatorConnector.clientConnection())
     {
         mediatorConnector.setOnMediatorAvailabilityChanged(
             [this](bool isMediatorAvailable)
             {
-                m_addressResolver->setCloudResolveEnabled(isMediatorAvailable);
+                this->addressResolver->setCloudResolveEnabled(isMediatorAvailable);
             });
     }
 
@@ -56,7 +58,7 @@ struct CloudConnectControllerImpl
 
         cloudServicesStoppedPromise.get_future().wait();
 
-        m_addressResolver->setCloudResolveEnabled(false);
+        addressResolver->setCloudResolveEnabled(false);
     }
 };
 
@@ -76,21 +78,8 @@ CloudConnectController::~CloudConnectController()
 
 void CloudConnectController::applyArguments(const utils::ArgumentParser& arguments)
 {
-    if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        mediatorConnector().mockupMediatorUrl(*value);
-
-    if (arguments.get("cloud-connect-disable-udp"))
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-            ~((int)cloud::ConnectType::udpHp));
-    }
-
-    if (arguments.get("cloud-connect-enable-proxy-only"))
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            (int)cloud::ConnectType::proxy);
-    }
+    loadSettings(arguments);
+    applySettings();
 }
 
 hpm::api::MediatorConnector& CloudConnectController::mediatorConnector()
@@ -116,6 +105,60 @@ CloudConnectSettings& CloudConnectController::settings()
 tcp::ReverseConnectionPool& CloudConnectController::tcpReversePool()
 {
     return m_impl->tcpReversePool;
+}
+
+void CloudConnectController::reinitialize()
+{
+    auto aioService = m_impl->aioService;
+    auto addressResolver = m_impl->addressResolver;
+    const auto ownPeerId = outgoingTunnelPool().ownPeerId();
+
+    m_impl.reset();
+
+    m_impl = std::make_unique<CloudConnectControllerImpl>(aioService, addressResolver);
+    applySettings();
+    outgoingTunnelPool().setOwnPeerId(ownPeerId);
+}
+
+void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
+{
+    (*outputStream) <<
+        "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
+        "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
+        "  --cloud-connect-enable-proxy-only" << std::endl;
+}
+
+void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments)
+{
+    if (const auto value = arguments.get("enforce-mediator", "mediator"))
+        m_settings.forcedMediatorUrl = *value;
+
+    // TODO: #ak Following parameters are redundant and contradicting.
+
+    if (arguments.get("cloud-connect-disable-udp"))
+        m_settings.isUdpHpDisabled = true;
+
+    if (arguments.get("cloud-connect-enable-proxy-only"))
+        m_settings.isOnlyCloudProxyEnabled = true;
+}
+
+void CloudConnectController::applySettings()
+{
+    if (!m_settings.forcedMediatorUrl.isEmpty())
+        mediatorConnector().mockupMediatorUrl(m_settings.forcedMediatorUrl);
+
+    if (m_settings.isUdpHpDisabled)
+    {
+        cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+            ~((int)cloud::ConnectType::udpHp));
+    }
+
+    if (m_settings.isOnlyCloudProxyEnabled)
+    {
+        cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            (int)cloud::ConnectType::proxy);
+    }
 }
 
 } // namespace cloud
