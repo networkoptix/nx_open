@@ -405,7 +405,13 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
             lm("Starting metadata fetching for resource %1. Event list is %2")
                 .args(resourceId, eventTypeIds));
 
-        result = manager->startFetchingMetadata(handler.get()); //< TODO: #dmishin pass event types.
+        std::vector<nxpl::NX_GUID> eventTypeList;
+        for (const auto& eventTypeId: eventTypeIds)
+            eventTypeList.push_back(nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122()));
+        result = manager->startFetchingMetadata(
+            handler.get(),
+            !eventTypeList.empty() ? &eventTypeList[0] : nullptr,
+            eventTypeList.size());
     }
 
     return result == Error::noError;
