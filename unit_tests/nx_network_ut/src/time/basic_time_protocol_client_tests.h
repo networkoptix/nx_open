@@ -104,7 +104,7 @@ private:
         ASSERT_TRUE(m_timeServer->bind(
             m_serverAddress ? (*m_serverAddress) : SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_timeServer->listen());
-    
+
         m_serverAddress = m_timeServer->address();
     }
 };

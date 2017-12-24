@@ -18,7 +18,8 @@ public:
     virtual std::unique_ptr<hpm::api::MediatorClientTcpConnection> clientConnection() override;
     virtual std::unique_ptr<hpm::api::MediatorServerTcpConnection> systemConnection() override;
     virtual boost::optional<SocketAddress> udpEndpoint() const override;
-    virtual bool isConnected() const override;
+    virtual void setOnMediatorAvailabilityChanged(
+        hpm::api::MediatorAvailabilityChangedHandler handler) override;
 
 private:
     SocketAddress m_udpEndpoint;

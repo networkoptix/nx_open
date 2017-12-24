@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_holder.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
@@ -101,11 +102,12 @@ public:
         m_acceptingHostName(lm("%1.%1").args(QnUuid::createUuid().toSimpleByteArray()).toUtf8()),
         m_reverseConnectionPool(
             &nx::network::SocketGlobals::aioService(),
+            nx::network::SocketGlobals::cloud().outgoingTunnelPool(),
             std::make_unique<MediatorClientTcpConnectionStub>(
                 std::make_shared<stun::test::AsyncClientMock>())),
         m_reverseConnector(
             m_acceptingHostName,
-            nx::network::SocketGlobals::outgoingTunnelPool().ownPeerId())
+            nx::network::SocketGlobals::cloud().outgoingTunnelPool().ownPeerId())
     {
         ReverseConnectionHolder::setConnectionlessHolderExpirationTimeout(
             std::chrono::seconds(31));
@@ -159,7 +161,7 @@ protected:
 
     void thenConnectionSourceIsAvailable()
     {
-        m_reverseConnectionSource = 
+        m_reverseConnectionSource =
             m_reverseConnectionPool.getConnectionSource(m_acceptingHostName);
         ASSERT_NE(nullptr, m_reverseConnectionSource);
     }

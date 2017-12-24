@@ -126,7 +126,7 @@ private:
 
 TYPED_TEST_CASE_P(StreamSocket);
 
-// Windows 8/10 doesn't support client->server send timeout. 
+// Windows 8/10 doesn't support client->server send timeout.
 // It close connection automatically with error 10053 after client send timeout.
 TYPED_TEST_P(StreamSocket, DISABLED_receiveDelay)
 {

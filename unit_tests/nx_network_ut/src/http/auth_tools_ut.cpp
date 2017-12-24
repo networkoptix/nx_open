@@ -3,7 +3,6 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 
-
 namespace nx_http {
 namespace test {
 

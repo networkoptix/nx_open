@@ -22,7 +22,7 @@
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
-#include "cloud/address_resolver.h"
+#include "address_resolver.h"
 
 #ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */

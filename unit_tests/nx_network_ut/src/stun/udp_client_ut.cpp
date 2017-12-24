@@ -328,7 +328,7 @@ TEST_F(UdpClient, client_cancellation)
     ignoreNextMessage(REQUESTS_TO_SEND);
 
     int errorsReported = 0;
-    auto completionHandler = 
+    auto completionHandler =
         [&errorsReported](
             SystemError::ErrorCode errorCode,
             nx::stun::Message /*response*/)
@@ -410,7 +410,7 @@ TEST_F(UdpClient, client_response_injection)
                     requestMessage.header.transactionId));
             injectedResponseMessage.newAttribute<stun::attrs::Nonce>("bad");
             const auto serializedMessage = MessageSerializer::serialized(injectedResponseMessage);
-            ASSERT_EQ(serializedMessage.size(), udpSocket->send(serializedMessage)) 
+            ASSERT_EQ(serializedMessage.size(), udpSocket->send(serializedMessage))
                 << SystemError::getLastOSErrorText().toStdString();
         }
         else

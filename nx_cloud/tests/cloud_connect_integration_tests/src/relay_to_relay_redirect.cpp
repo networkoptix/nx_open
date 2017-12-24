@@ -30,7 +30,7 @@ public:
     virtual void SetUp() override
     {
         BasicTestFixture::SetUp();
-        ConnectorFactory::setEnabledCloudConnectMask((int)CloudConnectType::proxy);
+        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
         startServer();
     }
 

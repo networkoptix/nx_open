@@ -15,6 +15,7 @@
 #include "server/server_globals.h"
 #include <plugins/resource/onvif/onvif_helper.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 
@@ -121,8 +122,8 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));

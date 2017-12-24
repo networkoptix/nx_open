@@ -2,7 +2,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 

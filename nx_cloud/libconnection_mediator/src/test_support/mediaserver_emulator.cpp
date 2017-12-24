@@ -1,7 +1,8 @@
 #include "mediaserver_emulator.h"
 
 #include <nx/fusion/serialization/json.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
@@ -89,7 +90,7 @@ MediaServerEmulator::MediaServerEmulator(
             mediatorEndpoint,
             m_mediatorConnector.get())),
     m_action(ActionToTake::proceedWithConnection),
-    m_cloudConnectionMethodMask((int)network::cloud::CloudConnectType::all),
+    m_cloudConnectionMethodMask((int)network::cloud::ConnectType::all),
     m_cloudSystemIdForModuleInformation(m_systemData.id),
     m_serverIdForModuleInformation(m_serverId)
 {
@@ -279,7 +280,7 @@ void MediaServerEmulator::onConnectionRequested(
 
     nx::hpm::api::ConnectionAckRequest connectionAckData;
     connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
-    if ((m_cloudConnectionMethodMask & (int)network::cloud::CloudConnectType::udpHp) > 0)
+    if ((m_cloudConnectionMethodMask & (int)network::cloud::ConnectType::udpHp) > 0)
         connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
 
     if (m_onConnectionRequestedHandler)

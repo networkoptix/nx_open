@@ -1,6 +1,7 @@
 #include "cloud_connection_manager.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/utils/vms_utils.h>
@@ -182,12 +183,12 @@ void CloudConnectionManager::setCloudCredentials(
             commonModule()->moduleGUID().toSimpleString().toUtf8(),
             cloudAuthKey.toUtf8());
 
-        nx::network::SocketGlobals::mediatorConnector()
+        nx::network::SocketGlobals::cloud().mediatorConnector()
             .setSystemCredentials(std::move(credentials));
     }
     else
     {
-        nx::network::SocketGlobals::mediatorConnector()
+        nx::network::SocketGlobals::cloud().mediatorConnector()
             .setSystemCredentials(boost::none);
         makeSystemLocal();
     }

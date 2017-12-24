@@ -65,7 +65,7 @@ protected:
             header::StrictTransportSecurity::NAME);
         ASSERT_TRUE(m_prevStrictTransportSecurity.parse(strictTransportSecurityStr));
     }
-    
+
     void andStrictTransportSecurityMaxAgeIsNotLessThan(
         std::chrono::seconds desiredMinimalAge)
     {

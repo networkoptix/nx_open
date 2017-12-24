@@ -55,6 +55,7 @@
 #include <finders/systems_finder.h>
 #include <nx/vms/discovery/manager.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
@@ -331,7 +332,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnClientAutoRunWatcher());
 
     commonModule->setModuleGUID(clientInstanceManager->instanceGuid());
-    nx::network::SocketGlobals::outgoingTunnelPool()
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool()
         .assignOwnPeerId("dc", commonModule->moduleGUID());
 
     commonModule->store(new QnGlobals());
@@ -531,12 +532,12 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
     }
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     if (!startupParams.videoWallGuid.isNull())
     {

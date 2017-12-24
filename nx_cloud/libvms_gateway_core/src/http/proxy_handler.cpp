@@ -2,7 +2,7 @@
 
 #include <typeinfo>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>

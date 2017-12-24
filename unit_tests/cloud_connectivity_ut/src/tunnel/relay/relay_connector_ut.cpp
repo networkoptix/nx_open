@@ -159,7 +159,7 @@ protected:
     {
         m_connector = std::make_unique<relay::Connector>(
             relayUrl,
-            nx::network::cloud::AddressEntry(
+            nx::network::AddressEntry(
                 AddressType::cloud, targetHostAddress.constData()),
             connectSessionId);
     }

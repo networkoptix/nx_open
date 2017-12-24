@@ -11,6 +11,7 @@
 #include <QtCore/QFile>
 
 #include <nx/network/http/http_client.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
@@ -45,8 +46,8 @@ int main(int /*argc*/, char* /*argv*/[])
     QnLog::instance()->setLogLevel(cl_logDEBUG2);
 
     nx::network::SocketGlobals::InitGuard socketInitializationGuard;
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cloud_connect_auto_test", QnUuid::createUuid());
 
     bool succeeded = true;

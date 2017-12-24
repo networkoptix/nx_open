@@ -11,22 +11,12 @@
 #include "socket_common.h"
 
 namespace nx {
-
-namespace hpm { namespace api { class MediatorConnector; } }
-
 namespace network {
 
 namespace aio { class AIOService; }
-
-namespace cloud {
-
 class AddressResolver;
-class MediatorAddressPublisher;
-class OutgoingTunnelPool;
-class CloudConnectSettings;
-namespace tcp { class ReverseConnectionPool; }
 
-} // namespace cloud
+namespace cloud { class CloudConnectController; }
 
 struct SocketGlobalsImpl;
 
@@ -62,12 +52,8 @@ public:
     static Ini& ini();
     static DebugIni& debugIni();
     static aio::AIOService& aioService();
-    static cloud::AddressResolver& addressResolver();
-    static cloud::MediatorAddressPublisher& addressPublisher();
-    static hpm::api::MediatorConnector& mediatorConnector();
-    static cloud::OutgoingTunnelPool& outgoingTunnelPool();
-    static cloud::CloudConnectSettings& cloudConnectSettings();
-    static cloud::tcp::ReverseConnectionPool& tcpReversePool();
+    static AddressResolver& addressResolver();
+    static cloud::CloudConnectController& cloud();
     static int initializationFlags();
 
     static void init(int initializationFlags = 0); /**< Should be called before any socket use. */
@@ -108,12 +94,9 @@ private:
     void setDebugIniReloadTimer();
 
     void initializeNetworking();
-    void initializeCloudConnectivity();
 
-    // TODO: Initialization and deinitialization of this class is brocken by design (because of
-    //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
-    // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
-    // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
+    void initializeCloudConnectivity();
+    void deinitializeCloudConnectivity();
 };
 
 //-------------------------------------------------------------------------------------------------

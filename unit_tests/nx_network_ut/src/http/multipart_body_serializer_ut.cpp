@@ -1,13 +1,7 @@
-/**********************************************************
-* May 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/utils/byte_stream/buffer_output_stream.h>
 #include <nx/network/http/multipart_body_serializer.h>
-
 
 namespace nx_http {
 
@@ -71,4 +65,4 @@ TEST(HttpMultipartBodySerializer, onlyEpilogue)
     ASSERT_EQ(testData, bufferOutputStream->buffer());
 }
 
-}   //namespace nx_http
+} // namespace nx_http

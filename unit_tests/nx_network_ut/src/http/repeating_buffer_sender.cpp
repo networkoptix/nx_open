@@ -1,19 +1,13 @@
-/**********************************************************
-* Aug 24, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "repeating_buffer_sender.h"
 
 #include <nx/utils/std/cpp14.h>
 
 #include "repeating_buffer_msg_body_source.h"
 
-
 RepeatingBufferSender::RepeatingBufferSender(
     const nx_http::StringType& mimeType,
     nx::Buffer buffer)
-:
+    :
     m_mimeType(mimeType),
     m_buffer(std::move(buffer))
 {

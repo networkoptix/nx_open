@@ -1,6 +1,6 @@
 #include "test_setup.h"
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/hls/hls_types.h>
 #include <nx/network/http/http_client.h>

@@ -1,13 +1,16 @@
 #pragma once
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/cloud/mediator_client_connections.h>
 
 #include "reverse_acceptor.h"
+#include "../../mediator_client_connections.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
+
+class OutgoingTunnelPool;
+
 namespace tcp {
 
 class ReverseConnectionSource;
@@ -27,6 +30,7 @@ class NX_NETWORK_API ReverseConnectionPool:
 public:
     ReverseConnectionPool(
         aio::AIOService* aioService,
+        const OutgoingTunnelPool& outgoingTunnelPool,
         std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> mediatorConnection);
     virtual ~ReverseConnectionPool() override;
 
@@ -54,6 +58,7 @@ private:
     bool registerOnMediator(bool waitForRegistration = false);
     std::shared_ptr<ReverseConnectionHolder> getOrCreateHolder(const String& hostName);
 
+    const OutgoingTunnelPool& m_outgoingTunnelPool;
     std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;

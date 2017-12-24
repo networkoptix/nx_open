@@ -84,7 +84,7 @@ protected:
         bool val = false;
         ASSERT_FALSE(m_sslSocket->getNonBlockingMode(&val));
     }
-    
+
     void thenSetNonBlockingModeFails()
     {
         ASSERT_FALSE(m_sslSocket->setNonBlockingMode(true));
@@ -105,7 +105,7 @@ private:
 TEST_F(DeprecatedSslSocket, error_on_changing_underlying_socket_mode_is_properly_handled)
 {
     givenSslSocketWithBrokenUnderlyingSocket();
-    
+
     thenGetNonBlockingModeFails();
     thenSetNonBlockingModeFails();
     thenReadAsyncFails();

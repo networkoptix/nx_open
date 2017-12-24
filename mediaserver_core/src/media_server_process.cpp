@@ -218,6 +218,7 @@
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
@@ -1319,7 +1320,7 @@ void MediaServerProcess::updateAddressesList()
         mediaServerManager->save(server, this, &MediaServerProcess::at_serverSaved);
     }
 
-    nx::network::SocketGlobals::addressPublisher().updateAddresses(
+    nx::network::SocketGlobals::cloud().addressPublisher().updateAddresses(
         std::list<SocketAddress>(
             serverAddresses.begin(),
             serverAddresses.end()));
@@ -1784,10 +1785,10 @@ bool MediaServerProcess::initTcpListener(
 
 void MediaServerProcess::initializeCloudConnect()
 {
-    nx::network::SocketGlobals::outgoingTunnelPool()
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool()
         .assignOwnPeerId("ms", commonModule()->moduleGUID());
 
-    nx::network::SocketGlobals::addressPublisher().setRetryInterval(
+    nx::network::SocketGlobals::cloud().addressPublisher().setRetryInterval(
         nx::utils::parseTimerDuration(
             qnServerModule->roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
             nx::network::cloud::MediatorAddressPublisher::kDefaultRetryInterval));
@@ -3129,7 +3130,7 @@ void MediaServerProcess::run()
 
     performActionsOnExit();
 
-    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerIdIfEqual(
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().clearOwnPeerIdIfEqual(
         "ms", commonModule()->moduleGUID());
 
     m_autoRequestForwarder.reset();
