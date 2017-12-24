@@ -22,6 +22,7 @@ if("${platform}" STREQUAL "linux")
         endif()
     elseif("${arch}" STREQUAL "x86")
         set(_withTests OFF)
+        set(_withClouds OFF)
     endif()
 endif()
 

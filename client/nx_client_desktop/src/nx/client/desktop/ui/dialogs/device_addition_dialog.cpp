@@ -8,6 +8,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/common/palette.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
@@ -29,6 +30,8 @@ namespace ui {
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
+    m_serversWatcher(parent),
+    m_serverStatusWatcher(this),
     ui(new Ui::DeviceAdditionDialog())
 {
     ui->setupUi(this);
@@ -58,6 +61,13 @@ void DeviceAdditionDialog::initializeControls()
     autoResizePagesToContents(ui->tabWidget, tabWidgetSizePolicy, true);
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
+    connect(&m_serversWatcher, &SystemServersWatcher::serverAdded,
+        ui->selectServerMenuButton, &QnChooseServerButton::addServer);
+    connect(&m_serversWatcher, &SystemServersWatcher::serverRemoved,
+        ui->selectServerMenuButton, &QnChooseServerButton::removeServer);
+    for (const auto server: m_serversWatcher.servers())
+        ui->selectServerMenuButton->addServer(server);
+
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
         [this]()
         {
@@ -65,21 +75,17 @@ void DeviceAdditionDialog::initializeControls()
                 palette().color(QPalette::Mid));
         });
 
-    connect(ui->selectServerMenuButton, &QnChooseServerButton::beforeServerChanged, this,
-        [this]()
-        {
-            cleanUnfinishedSearches(ui->selectServerMenuButton->server());
-            stopSearch();
-        });
+    connect(ui->selectServerMenuButton, &QnChooseServerButton::currentServerChanged,
+        this, &DeviceAdditionDialog::handleSelectedServerChanged);
 
-    connect(ui->selectServerMenuButton, &QnChooseServerButton::serversCountChanged, this,
-        [this]()
-        {
-            ui->serverChoosePanel->setVisible(ui->selectServerMenuButton->serversCount() > 1);
-        });
+    ui->serverOfflineAlertBar->setText(tr("Server offline"));
 
-    ui->serverChoosePanel->setVisible(
-        ui->selectServerMenuButton->serversCount() > 1);
+    updateSelectedServerButtonVisibility();
+    connect(&m_serversWatcher, &SystemServersWatcher::serversCountChanged,
+        this, &DeviceAdditionDialog::updateSelectedServerButtonVisibility);
+    connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged,
+        this, &DeviceAdditionDialog::handleServerOnlineStateChanged);
+    ui->serverOfflineAlertBar->setVisible(false);
 
     connect(this, &DeviceAdditionDialog::rejected,
         this, &DeviceAdditionDialog::handleDialogClosed);
@@ -92,6 +98,34 @@ void DeviceAdditionDialog::initializeControls()
     setAccentStyle(ui->addDevicesButton);
 
     updateResultsWidgetState();
+}
+
+void DeviceAdditionDialog::updateSelectedServerButtonVisibility()
+{
+    const bool visible = m_serversWatcher.serversCount() > 1;
+    ui->serverChoosePanel->setVisible(visible);
+}
+
+void DeviceAdditionDialog::handleSelectedServerChanged(const QnMediaServerResourcePtr& previous)
+{
+    m_serverStatusWatcher.setServer(ui->selectServerMenuButton->currentServer());
+    if (!previous)
+        return;
+
+    cleanUnfinishedSearches(previous);
+    stopSearch();
+}
+
+void DeviceAdditionDialog::handleServerOnlineStateChanged()
+{
+    const bool online = m_serverStatusWatcher.isOnline();
+
+    ui->serverOfflineAlertBar->setVisible(!online);
+    ui->searchResultsStackedWidget->setEnabled(online);
+    ui->searchPanel->setEnabled(online);
+
+    if (!online && m_currentSearch)
+        stopSearch();
 }
 
 void DeviceAdditionDialog::setupTable()
@@ -126,7 +160,7 @@ void DeviceAdditionDialog::setupPortStuff(QCheckBox* autoCheckbox, QSpinBox* por
 
 void DeviceAdditionDialog::setServer(const QnMediaServerResourcePtr& value)
 {
-    if (ui->selectServerMenuButton->setServer(value))
+    if (!ui->selectServerMenuButton->setCurrentServer(value))
         stopSearch();
 }
 
@@ -172,12 +206,12 @@ void DeviceAdditionDialog::handleStartSearchClicked()
     const bool isKnownAddressTabPage = isKnownAddressPage(ui->tabWidget);
     if (isKnownAddressTabPage)
     {
-        m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->server(),
+        m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
             ui->addressEdit->text().simplified(), login(), password(), port()));
     }
     else
     {
-        m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->server(),
+        m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
             ui->startAddressEdit->text().trimmed(), ui->endAddressEdit->text().trimmed(),
             login(), password(), port()));
     }
@@ -215,7 +249,7 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
 void DeviceAdditionDialog::handleAddDevicesClicked()
 {
-    const auto server = ui->selectServerMenuButton->server();
+    const auto server = ui->selectServerMenuButton->currentServer();
     if (!server || server->getStatus() != Qn::Online || !m_currentSearch || !m_model)
         return;
 
@@ -255,10 +289,18 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     QEventLoop loop;
     connect(&result, &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
     connect(this, &DeviceAdditionDialog::rejected, &loop, &QEventLoop::quit);
-    loop.exec();
 
-    if (!result.isFinished())
-        return;
+
+    const auto connection =
+        connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged, this,
+            [this, &loop]()
+            {
+                if (!m_serverStatusWatcher.isOnline())
+                    loop.quit();
+            });
+
+    loop.exec();
+    disconnect(connection);
 
     if (result.status() == 0)
     {
@@ -364,6 +406,28 @@ void DeviceAdditionDialog::updateAddDevicesButtonText()
         : tr("Add all devices"));
 }
 
+QString DeviceAdditionDialog::progressMessage() const
+{
+    if (!m_currentSearch)
+        return QString();
+
+    switch(m_currentSearch->progress())
+    {
+        case QnManualResourceSearchStatus::Init:
+            return lit("%1\t").arg(tr("Initializing scan"));
+        case QnManualResourceSearchStatus::CheckingOnline:
+            return lit("%1\t").arg(tr("Scanning online hosts"));
+        case QnManualResourceSearchStatus::CheckingHost:
+            return lit("%1\t").arg(tr("Checking host"));
+        case QnManualResourceSearchStatus::Finished:
+            return lit("%1\t").arg(tr("Finished"));
+        case QnManualResourceSearchStatus::Aborted:
+            return lit("%1\t").arg(tr("Aborted"));
+        default:
+            return QString();
+    }
+}
+
 void DeviceAdditionDialog::updateResultsWidgetState()
 {
     static constexpr int kResultsPageIndex = 0;
@@ -403,27 +467,13 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     if (!m_currentSearch)
         return;
 
-    const auto progressMessage =
-        [this]() -> QString
-        {
-            switch(m_currentSearch->progress())
-            {
-                case QnManualResourceSearchStatus::Init:
-                    return lit("%1\t").arg(tr("Initializing scan"));
-                case QnManualResourceSearchStatus::CheckingOnline:
-                    return lit("%1\t").arg(tr("Scanning online hosts"));
-                case QnManualResourceSearchStatus::CheckingHost:
-                    return lit("%1\t").arg(tr("Checking host"));
-                case QnManualResourceSearchStatus::Finished:
-                    return lit("%1\t").arg(tr("Finished"));
-                case QnManualResourceSearchStatus::Aborted:
-                    return lit("%1\t").arg(tr("Aborted"));
-                default:
-                    return QString();
-            }
-        }();
+    ui->searchProgressBar->setFormat(progressMessage());
 
-    ui->searchProgressBar->setFormat(progressMessage);
+    if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted
+        && !m_currentSearch->lastErrorText().isEmpty())
+    {
+        QnMessageBox::critical(this, tr("Device search failed"));
+    }
 }
 } // namespace ui
 } // namespace desktop

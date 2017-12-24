@@ -53,6 +53,6 @@ bool EventRibbon::event(QEvent* event)
     return true;
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

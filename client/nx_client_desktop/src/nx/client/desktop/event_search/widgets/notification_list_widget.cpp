@@ -15,6 +15,6 @@ NotificationListWidget::~NotificationListWidget()
 {
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

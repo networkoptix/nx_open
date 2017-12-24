@@ -1729,8 +1729,8 @@ bool MediaServerProcess::initTcpListener(
 
     registerRestHandlers(cloudManagerGroup, m_universalTcpListener, messageBus);
 
-    if (m_preparedTcpServerSocket)
-        m_universalTcpListener->setPreparedTcpSocket(std::move(m_preparedTcpServerSocket));
+    if (!m_preparedTcpServerSockets.empty())
+        m_universalTcpListener->setPreparedTcpSockets(std::move(m_preparedTcpServerSockets));
 
     if (!m_universalTcpListener->bindToLocalAddress())
         return false;
@@ -1832,11 +1832,11 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     // Preallocate TCP socket in case if some system port is required, e.g. 80.
     const int port = qnServerModule->roSettings()->value(
         nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
-    m_preparedTcpServerSocket = QnUniversalTcpListener::createAndPrepareTcpSocket(
+    m_preparedTcpServerSockets = QnUniversalTcpListener::createAndPrepareTcpSockets(
         SocketAddress(HostAddress::anyHost, port));
-    if (!m_preparedTcpServerSocket)
+    if (m_preparedTcpServerSockets.empty())
     {
-        qWarning().noquote() << "WARNING: Unable to prealocate socket on port" << port << ":"
+        qWarning().noquote() << "WARNING: Unable to prealocate TCP sockets on port" << port << ":"
             << SystemError::getLastOSErrorText();
     }
 

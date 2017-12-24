@@ -136,6 +136,6 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         });
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx
