@@ -196,7 +196,7 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    std::unique_ptr<AbstractStreamServerSocket> m_preparedTcpServerSocket;
+    std::vector<std::unique_ptr<AbstractStreamServerSocket>> m_preparedTcpServerSockets;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;

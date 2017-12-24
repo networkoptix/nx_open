@@ -60,6 +60,6 @@ private:
     int m_previousRowCount = 0;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

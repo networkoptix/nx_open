@@ -138,6 +138,6 @@ QToolButton* NotificationListWidget::Private::newActionButton(
     return button;
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

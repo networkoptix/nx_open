@@ -2,6 +2,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/client/desktop/watchers/system_servers_watcher.h>
+#include <nx/client/desktop/watchers/server_online_status_watcher.h>
 
 namespace Ui {
 class DeviceAdditionDialog;
@@ -47,6 +49,9 @@ private:
     void handleSearchTypeChanged();
     void handleDialogClosed();
     void updateAddDevicesButtonText();
+    void handleServerOnlineStateChanged();
+    void updateSelectedServerButtonVisibility();
+    void handleSelectedServerChanged(const QnMediaServerResourcePtr& previous);
     void handleModelDataChanged(
         const QModelIndex& topLeft,
         const QModelIndex& bottomRight,
@@ -55,8 +60,12 @@ private:
     int port() const;
     QString password() const;
     QString login() const;
+    QString progressMessage() const;
 
 private:
+    SystemServersWatcher m_serversWatcher;
+    ServerOnlineStatusWatcher m_serverStatusWatcher;
+
     QScopedPointer<Ui::DeviceAdditionDialog> ui;
 
     using SearchersList = QList<SearcherPtr>;

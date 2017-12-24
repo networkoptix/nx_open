@@ -40,6 +40,6 @@ void EventSearchWidget::setAnalyticsSearchByAreaEnabled(bool value)
     d->setAnalyticsSearchByAreaEnabled(value);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

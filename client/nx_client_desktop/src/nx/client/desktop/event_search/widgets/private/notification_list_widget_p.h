@@ -39,6 +39,6 @@ private:
     AbstractEventListModel* m_notificationsModel = nullptr;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

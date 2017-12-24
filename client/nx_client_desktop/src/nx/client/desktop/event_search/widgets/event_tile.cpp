@@ -399,6 +399,6 @@ void EventTile::setProgressTitle(const QString& value)
     m_progressLabel->setText(value);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

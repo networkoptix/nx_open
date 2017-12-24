@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>655</width>
-    <height>582</height>
+    <height>602</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -79,6 +79,9 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <widget class="QnAlertBar" name="serverOfflineAlertBar" native="true"/>
    </item>
    <item>
     <widget class="QnPanel" name="searchPanel" native="true">
@@ -552,6 +555,12 @@
    <class>QnChooseServerButton</class>
    <extends>QPushButton</extends>
    <header location="global">nx/client/desktop/ui/dialogs/private/choose_server_button.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnAlertBar</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/alert_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

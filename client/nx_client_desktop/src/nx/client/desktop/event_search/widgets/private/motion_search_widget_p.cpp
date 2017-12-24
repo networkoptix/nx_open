@@ -30,6 +30,6 @@ void MotionSearchWidget::Private::setCamera(const QnVirtualCameraResourcePtr& ca
     m_model->setCamera(camera);
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx
