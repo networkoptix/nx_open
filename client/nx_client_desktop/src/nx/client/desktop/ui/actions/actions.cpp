@@ -1336,14 +1336,15 @@ void initialize(Manager* manager, Action* root)
 
     factory(AddDeviceManuallyAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Add Device (new)..."))   //intentionally hardcode devices here
+        .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::isSafeMode()
             && !condition::tourIsRunning()
-            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
+            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
