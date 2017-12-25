@@ -22,10 +22,7 @@ namespace {
 
 const char* kPluginName = "Hikvision metadata plugin";
 const QString kHikvisionTechwinVendor = lit("hikvision");
-
-const std::chrono::milliseconds kAttributesTimeout(4000);
-
-static const std::chrono::seconds kCacheTimeout{ 60 };
+static const std::chrono::seconds kCacheTimeout{60};
 
 } // namespace
 
@@ -40,9 +37,9 @@ using namespace nx::sdk::metadata;
 
 MetadataPlugin::MetadataPlugin()
 {
-    QFile f(":manifest.json");
-    if (f.open(QFile::ReadOnly))
-        m_manifest = f.readAll();
+    QFile file(":manifest.json");
+    if (file.open(QFile::ReadOnly))
+        m_manifest = file.readAll();
     m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(m_manifest);
 }
 

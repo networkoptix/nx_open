@@ -36,7 +36,7 @@ std::vector<QString> AttributesParser::parseSupportedEventsXml(
         *outSuccess = false;
 
     if (!reader.readNextStartElement())
-        return result; //< Read root element
+        return result; //< Read root element.
     while (reader.readNextStartElement())
     {
         auto eventTypeName = normalizeInternalName(reader.name().toString());
@@ -46,7 +46,7 @@ std::vector<QString> AttributesParser::parseSupportedEventsXml(
     }
 
     if (outSuccess)
-        *outSuccess = true;
+        *outSuccess = (reader.error() == QXmlStreamReader::NoError);
     return result;
 }
 
@@ -62,7 +62,7 @@ HikvisionEvent AttributesParser::parseEventXml(
         *outSuccess = false;
 
     if (!reader.readNextStartElement())
-        return result; //< Read root element
+        return result; //< Read root element.
     while (reader.readNextStartElement())
     {
         auto name = reader.name().toString().toLower().trimmed();
@@ -104,7 +104,7 @@ HikvisionEvent AttributesParser::parseEventXml(
     result.description = HikvisionStringHelper::buildDescription(manifest, result);
 
     if (outSuccess)
-        *outSuccess = true;
+        *outSuccess = (reader.error() == QXmlStreamReader::NoError);
     return result;
 }
 

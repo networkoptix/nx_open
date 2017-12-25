@@ -14,7 +14,6 @@ namespace {
 
 static const std::chrono::seconds kExpiredEventTimeout(5);
 
-
 } // namespace
 
 BytestreamFilter::BytestreamFilter(
