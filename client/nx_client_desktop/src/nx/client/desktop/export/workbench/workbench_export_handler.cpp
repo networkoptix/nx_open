@@ -26,7 +26,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
-#include <nx/client/desktop/ui/workbench/extensions/activity_manager.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_layout_tool.h>
@@ -96,10 +96,10 @@ struct WorkbenchExportHandler::Private
     {
         if (informersEnabled())
         {
-            const auto& manager = q->context()->instance<ui::workbench::ActivityManager>();
+            const auto& manager = q->context()->instance<WorkbenchProgressManager>();
             NX_ASSERT(manager);
 
-            connect(manager, &ui::workbench::ActivityManager::interactionRequested, q,
+            connect(manager, &WorkbenchProgressManager::interactionRequested, q,
                 [this](const QnUuid& exportProcessId)
                 {
                     if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
@@ -120,7 +120,7 @@ struct WorkbenchExportHandler::Private
 
     QnUuid initExport(const Filename& fileName)
     {
-        const auto& manager = q->context()->instance<ui::workbench::ActivityManager>();
+        const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         const auto exportProcessId = informersEnabled()
             ? manager->add(tr("Export video"), fileName.completeFileName())
             : QnUuid::createUuid();
@@ -143,7 +143,7 @@ struct WorkbenchExportHandler::Private
             [this, exportProcessId, progressDialog]
             {
                 if (informersEnabled())
-                    q->context()->instance<ui::workbench::ActivityManager>()->remove(exportProcessId);
+                    q->context()->instance<WorkbenchProgressManager>()->remove(exportProcessId);
                 exportManager->stopExport(exportProcessId);
                 progressDialog->hide();
             });
@@ -223,7 +223,7 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
 
     if (informersEnabled())
     {
-        context()->instance<ui::workbench::ActivityManager>()->setProgress(info.id,
+        context()->instance<WorkbenchProgressManager>()->setProgress(info.id,
             qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
     }
 }
@@ -235,7 +235,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
 
     const auto exportProcess = d->runningExports.take(info.id);
     if (informersEnabled())
-        context()->instance<ui::workbench::ActivityManager>()->remove(info.id);
+        context()->instance<WorkbenchProgressManager>()->remove(info.id);
 
     if (auto dialog = exportProcess.progressDialog)
     {

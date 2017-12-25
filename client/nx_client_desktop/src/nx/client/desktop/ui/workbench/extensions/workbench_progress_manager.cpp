@@ -1,23 +1,21 @@
-#include "activity_manager.h"
+#include "workbench_progress_manager.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace workbench {
 
-ActivityManager::ActivityManager(QObject* parent):
+WorkbenchProgressManager::WorkbenchProgressManager(QObject* parent):
     base_type(parent)
 {
 }
 
-QList<QnUuid> ActivityManager::activities() const
+QList<QnUuid> WorkbenchProgressManager::activities() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_ids;
 }
 
-QnUuid ActivityManager::add(const QString& title, const QString& description, bool cancellable)
+QnUuid WorkbenchProgressManager::add(const QString& title, const QString& description, bool cancellable)
 {
     QnMutexLocker lock(&m_mutex);
     const auto activityId = QnUuid::createUuid();
@@ -30,7 +28,7 @@ QnUuid ActivityManager::add(const QString& title, const QString& description, bo
     return activityId;
 }
 
-void ActivityManager::remove(const QnUuid& activityId)
+void WorkbenchProgressManager::remove(const QnUuid& activityId)
 {
     QnMutexLocker lock(&m_mutex);
     auto iter = m_lookup.find(activityId);
@@ -44,19 +42,19 @@ void ActivityManager::remove(const QnUuid& activityId)
     emit removed(activityId);
 }
 
-QString ActivityManager::title(const QnUuid& activityId) const
+QString WorkbenchProgressManager::title(const QnUuid& activityId) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lookup.value(activityId).title;
 }
 
-QString ActivityManager::description(const QnUuid& activityId) const
+QString WorkbenchProgressManager::description(const QnUuid& activityId) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lookup.value(activityId).description;
 }
 
-void ActivityManager::setDescription(const QnUuid& activityId, const QString& value)
+void WorkbenchProgressManager::setDescription(const QnUuid& activityId, const QString& value)
 {
     QnMutexLocker lock(&m_mutex);
     auto iter = m_lookup.find(activityId);
@@ -69,13 +67,13 @@ void ActivityManager::setDescription(const QnUuid& activityId, const QString& va
     emit descriptionChanged(activityId, value);
 }
 
-qreal ActivityManager::progress(const QnUuid& activityId) const
+qreal WorkbenchProgressManager::progress(const QnUuid& activityId) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lookup.value(activityId).progress;
 }
 
-void ActivityManager::setProgress(const QnUuid& activityId, qreal value)
+void WorkbenchProgressManager::setProgress(const QnUuid& activityId, qreal value)
 {
     QnMutexLocker lock(&m_mutex);
     auto iter = m_lookup.find(activityId);
@@ -88,13 +86,13 @@ void ActivityManager::setProgress(const QnUuid& activityId, qreal value)
     emit progressChanged(activityId, value);
 }
 
-bool ActivityManager::isCancellable(const QnUuid& activityId) const
+bool WorkbenchProgressManager::isCancellable(const QnUuid& activityId) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lookup.value(activityId).cancellable;
 }
 
-void ActivityManager::setCancellable(const QnUuid& activityId, bool value)
+void WorkbenchProgressManager::setCancellable(const QnUuid& activityId, bool value)
 {
     QnMutexLocker lock(&m_mutex);
     auto iter = m_lookup.find(activityId);
@@ -107,7 +105,7 @@ void ActivityManager::setCancellable(const QnUuid& activityId, bool value)
     emit cancellableChanged(activityId, value);
 }
 
-void ActivityManager::cancel(const QnUuid& activityId)
+void WorkbenchProgressManager::cancel(const QnUuid& activityId)
 {
     QnMutexLocker lock(&m_mutex);
     const auto iter = m_lookup.find(activityId);
@@ -118,7 +116,7 @@ void ActivityManager::cancel(const QnUuid& activityId)
     emit cancelRequested(activityId);
 }
 
-void ActivityManager::interact(const QnUuid& activityId)
+void WorkbenchProgressManager::interact(const QnUuid& activityId)
 {
     QnMutexLocker lock(&m_mutex);
     if (!m_lookup.contains(activityId))
@@ -128,8 +126,6 @@ void ActivityManager::interact(const QnUuid& activityId)
     emit interactionRequested(activityId);
 }
 
-} // namespace workbench
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
