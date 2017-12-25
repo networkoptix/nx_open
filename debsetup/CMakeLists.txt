@@ -1,4 +1,5 @@
-# Variables used for .deb building.
+# Variables used by build-dist.sh and/or .deb contents.
+set(build.configuration "") #< Used by build-dist.sh as suffix to lib and bin dirs.
 if(arch STREQUAL "x64")
     set(os.arch "amd64")
     set(arch.dir "x86_64-linux-gnu/")
@@ -24,9 +25,9 @@ set(common_depends
     "libfontconfig1"
     "libgl1-mesa-glx"
     "cifs-utils"
-    "syslinux"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
+set(arch.depends ", syslinux")
 set(license.text "TODO license.text") #< TODO: #dklychkov: Include license text to cmake build.
 
 nx_configure_file(
