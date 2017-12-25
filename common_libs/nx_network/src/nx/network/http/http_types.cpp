@@ -885,16 +885,13 @@ bool DigestCredentials::parse(const BufferType& str, char separator)
 
 void DigestCredentials::serialize(BufferType* const dstBuffer) const
 {
-    const static std::array<const char*, 8> predefinedOrder =
+    const static std::array<const char*, 5> predefinedOrder =
     {
         "username",
         "realm",
         "nonce",
         "uri",
-        "response",
-        "qop",
-        "nc",
-        "cnonce"
+        "response"
     };
 
     bool isFirst = true;
@@ -903,12 +900,9 @@ void DigestCredentials::serialize(BufferType* const dstBuffer) const
          if (!isFirst)
             dstBuffer->append(", ");
         dstBuffer->append(name);
-        dstBuffer->append("=");
-        if (name != "qop" && name != "nc")
-            dstBuffer->append("\"");
+        dstBuffer->append("=\"");
         dstBuffer->append(value);
-        if (name != "qop" && name != "nc")
-            dstBuffer->append("\"");
+        dstBuffer->append("\"");
         isFirst = false;
     };
 
