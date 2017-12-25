@@ -198,6 +198,7 @@ protected slots:
 
     void at_openNewScene_triggered();
     void at_addDeviceManually_triggered();
+    void at_mainMenuAddDeviceManually_triggered();
 
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
