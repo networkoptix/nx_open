@@ -74,7 +74,7 @@
         "emailFrom": "电子邮件发件人",
         "emailSignature": "电子邮件签名",
         "emailSupportEmail": "支持电子邮件",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP 管理员 DN",
         "ldapSearchBase": "LDAP 搜索库",
         "ldapSearchFilter": "LDAP 搜索过滤器",

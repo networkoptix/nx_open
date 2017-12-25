@@ -74,7 +74,7 @@
         "emailFrom": "אי מייל מ",
         "emailSignature": "חתימת דוא\"ל",
         "emailSupportEmail": "דוא\"ל תמיכה",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "מנהל LDAP DN",
         "ldapSearchBase": "בסיס חיפוש LDAP",
         "ldapSearchFilter": "מסנן חיפוש LDAP",

@@ -74,7 +74,7 @@
         "emailFrom": "전자 우편에서",
         "emailSignature": "이메일 서명",
         "emailSupportEmail": "지원 이메일",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",
         "ldapSearchFilter": "LDAP 검색 필터",

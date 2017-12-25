@@ -74,7 +74,7 @@
         "emailFrom": "Nadawca e-mail",
         "emailSignature": "Podpis e-mail",
         "emailSupportEmail": "E-mail do supportu",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",

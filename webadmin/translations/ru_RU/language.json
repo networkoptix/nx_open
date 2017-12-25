@@ -74,7 +74,7 @@
         "emailFrom": "Email от",
         "emailSignature": "Подпись к письму",
         "emailSupportEmail": "Электронная почта поддержки",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP Администратор DN",
         "ldapSearchBase": "База поиска LDAP",
         "ldapSearchFilter": "Фильтр поиска LDAP",

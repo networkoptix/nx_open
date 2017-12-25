@@ -74,7 +74,7 @@
         "emailFrom": "E-mail van",
         "emailSignature": "Email handtekening",
         "emailSupportEmail": "Ondersteuning e-mail",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP zoekbasis",
         "ldapSearchFilter": "LDAP zoekfilter",

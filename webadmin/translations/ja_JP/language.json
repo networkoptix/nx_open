@@ -74,7 +74,7 @@
         "emailFrom": "メール送信元",
         "emailSignature": "メールの署名",
         "emailSupportEmail": "サポート Eメール",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP管理DN",
         "ldapSearchBase": "LDAP検索ベース",
         "ldapSearchFilter": "LDAP検索フィルター",

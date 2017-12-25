@@ -74,7 +74,7 @@
         "emailFrom": "E-Mail von",
         "emailSignature": "E-Mail-Signatur",
         "emailSupportEmail": "E-Mail-Adresse Support",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP Admin-DN",
         "ldapSearchBase": "LDAP-Suchbasis",
         "ldapSearchFilter": "LDAP-Suchfilter",

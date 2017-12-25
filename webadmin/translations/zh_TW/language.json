@@ -74,7 +74,7 @@
         "emailFrom": "電子郵件來自",
         "emailSignature": "電子郵件簽章",
         "emailSupportEmail": "支援電子郵件",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP 管理者 DN",
         "ldapSearchBase": "LDAP 搜尋庫",
         "ldapSearchFilter": "LDAP 搜尋篩選",

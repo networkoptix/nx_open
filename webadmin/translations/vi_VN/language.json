@@ -74,7 +74,7 @@
         "emailFrom": "Thư gửi từ",
         "emailSignature": "Chữ ký email",
         "emailSupportEmail": "Hỗ trợ Email",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP quản trị DN",
         "ldapSearchBase": "Cơ sở tìm kiếm LDAP",
         "ldapSearchFilter": "Bộ lọc tìm kiếm LDAP",

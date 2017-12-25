@@ -74,7 +74,7 @@
         "emailFrom": "Kimden",
         "emailSignature": "E-posta imzası",
         "emailSupportEmail": "Destek maili",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "LDAP yönetici DN",
         "ldapSearchBase": "LDAP veritabanı",
         "ldapSearchFilter": "LDAP arama filtresi",

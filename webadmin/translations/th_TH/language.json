@@ -74,7 +74,7 @@
         "emailFrom": "จากอีเมล",
         "emailSignature": "ลายเซ็นอีเมล",
         "emailSupportEmail": "สนับสนุนอีเมล",
-        "eventLogPeriodDays": "Event log period",
+        "eventLogPeriodDays": "Event log period (days)",
         "ldapAdminDn": "ผู้ดูแล LDAP DN",
         "ldapSearchBase": "ฐานการค้นหา LDAP",
         "ldapSearchFilter": "ตัวกรองการค้นหา LDAP",
