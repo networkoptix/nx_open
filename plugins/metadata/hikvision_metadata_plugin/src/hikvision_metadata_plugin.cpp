@@ -15,6 +15,7 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 namespace {
 
@@ -28,7 +29,7 @@ static const std::chrono::seconds kCacheTimeout{ 60 };
 } // namespace
 
 
-bool HikvisionMetadataPlugin::DeviceData::hasExpired() const
+bool MetadataPlugin::DeviceData::hasExpired() const
 {
     return !timeout.isValid() || timeout.hasExpired(kCacheTimeout);
 }
@@ -36,7 +37,7 @@ bool HikvisionMetadataPlugin::DeviceData::hasExpired() const
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-HikvisionMetadataPlugin::HikvisionMetadataPlugin()
+MetadataPlugin::MetadataPlugin()
 {
     QFile f(":manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -44,7 +45,7 @@ HikvisionMetadataPlugin::HikvisionMetadataPlugin()
     m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(m_manifest);
 }
 
-void* HikvisionMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* MetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataPlugin)
     {
@@ -78,27 +79,27 @@ void* HikvisionMetadataPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* HikvisionMetadataPlugin::name() const
+const char* MetadataPlugin::name() const
 {
     return kPluginName;
 }
 
-void HikvisionMetadataPlugin::setSettings(const nxpl::Setting* settings, int count)
+void MetadataPlugin::setSettings(const nxpl::Setting* settings, int count)
 {
     // Do nothing.
 }
 
-void HikvisionMetadataPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+void MetadataPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
     // Do nothing.
 }
 
-void HikvisionMetadataPlugin::setLocale(const char* locale)
+void MetadataPlugin::setLocale(const char* locale)
 {
     // Do nothing.
 }
 
-AbstractMetadataManager* HikvisionMetadataPlugin::managerForResource(
+AbstractMetadataManager* MetadataPlugin::managerForResource(
     const ResourceInfo& resourceInfo,
     Error* outError)
 {
@@ -116,7 +117,7 @@ AbstractMetadataManager* HikvisionMetadataPlugin::managerForResource(
     nx::api::AnalyticsDeviceManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
-    auto manager = new HikvisionMetadataManager(this);
+    auto manager = new MetadataManager(this);
     manager->setResourceInfo(resourceInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
@@ -124,7 +125,7 @@ AbstractMetadataManager* HikvisionMetadataPlugin::managerForResource(
     return manager;
 }
 
-AbstractSerializer* HikvisionMetadataPlugin::serializerForType(
+AbstractSerializer* MetadataPlugin::serializerForType(
     const nxpl::NX_GUID& typeGuid,
     Error* outError)
 {
@@ -132,13 +133,13 @@ AbstractSerializer* HikvisionMetadataPlugin::serializerForType(
     return nullptr;
 }
 
-const char* HikvisionMetadataPlugin::capabilitiesManifest(Error* error) const
+const char* MetadataPlugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
     return m_manifest.constData();
 }
 
-QList<QnUuid> HikvisionMetadataPlugin::parseSupportedEvents(const QByteArray& data)
+QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 {
     bool success = false;
     QList<QnUuid> result;
@@ -154,7 +155,7 @@ QList<QnUuid> HikvisionMetadataPlugin::parseSupportedEvents(const QByteArray& da
     return result;
 }
 
-boost::optional<QList<QnUuid>> HikvisionMetadataPlugin::fetchSupportedEvents(
+boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
     const ResourceInfo& resourceInfo)
 {
     auto& data = m_cachedDeviceData[resourceInfo.sharedId];
@@ -178,11 +179,12 @@ boost::optional<QList<QnUuid>> HikvisionMetadataPlugin::fetchSupportedEvents(
     return data.supportedEventTypes;
 }
 
-const Hikvision::DriverManifest& HikvisionMetadataPlugin::driverManifest() const
+const Hikvision::DriverManifest& MetadataPlugin::driverManifest() const
 {
     return m_driverManifest;
 }
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
@@ -191,7 +193,7 @@ extern "C" {
 
     NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
     {
-        return new nx::mediaserver::plugins::HikvisionMetadataPlugin();
+        return new nx::mediaserver::plugins::hikvision::MetadataPlugin();
     }
 
 } // extern "C"

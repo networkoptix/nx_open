@@ -13,6 +13,7 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 class HikvisionStringHelper
 {
@@ -39,7 +40,7 @@ private:
     }
 };
 
+} // namespace hikvision
 } // namespace nx
 } // namespace mediaserver
 } // namespace plugins
-

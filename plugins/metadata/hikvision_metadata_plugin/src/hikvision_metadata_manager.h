@@ -16,17 +16,18 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
-class HikvisionMetadataManager:
+class MetadataManager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 
 {
     Q_OBJECT;
 public:
-    HikvisionMetadataManager(HikvisionMetadataPlugin* plugin);
+    MetadataManager(MetadataPlugin* plugin);
 
-    virtual ~HikvisionMetadataManager();
+    virtual ~MetadataManager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -54,12 +55,12 @@ private:
     QString m_sharedId;
     int m_channel;
 
-    HikvisionMetadataPlugin* m_plugin = nullptr;
+    MetadataPlugin* m_plugin = nullptr;
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-

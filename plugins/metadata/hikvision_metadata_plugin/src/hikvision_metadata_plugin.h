@@ -22,12 +22,13 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
-class HikvisionMetadataPlugin:
+class MetadataPlugin:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
-    HikvisionMetadataPlugin();
+    MetadataPlugin();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -72,6 +73,7 @@ private:
     QMap<QString, DeviceData> m_cachedDeviceData;
 };
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

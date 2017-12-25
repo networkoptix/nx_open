@@ -10,6 +10,7 @@
 #include <plugins/plugin_tools.h>
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace mediaserver {
@@ -55,8 +56,9 @@ public:
         QnUuid eventTypeByInternalName(const QString& internalEventName) const;
         const Hikvision::EventDescriptor& eventDescriptorById(const QnUuid& id) const;
     private:
-        mutable QMap<QString, QnUuid> m_idByInternalName;
-        mutable QMap<QnUuid, EventDescriptor> m_recordById;
+        static QnMutex m_cachedIdMutex;
+        static QMap<QString, QnUuid> m_idByInternalName;
+        static QMap<QnUuid, EventDescriptor> m_recordById;
 
     };
     #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)

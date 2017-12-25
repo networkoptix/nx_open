@@ -19,8 +19,8 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
-//static const QString kMonitorUrlTemplate("http://%1:%2/ISAPI/Event/triggers%3");
 static const QString kMonitorUrlTemplate("http://%1:%2/ISAPI/Event/notification/alertStream");
 
 static const int kDefaultHttpPort = 80;
@@ -139,7 +139,7 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
 
     m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
     m_contentParser->setForceParseAsBinary(true);
-    m_contentParser->setNextFilter(std::make_shared<HikvisionBytestreamFilter>(m_manifest, handler));
+    m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, handler));
 
     httpClient->doGet(m_url);
     m_httpClient = httpClient;
@@ -165,6 +165,7 @@ void HikvisionMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr h
     m_timer.start(kUpdateInterval, [this]() { initMonitorUnsafe(); });
 }
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

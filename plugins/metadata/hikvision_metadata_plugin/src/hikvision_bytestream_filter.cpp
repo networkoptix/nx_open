@@ -8,6 +8,7 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 namespace {
 
@@ -16,21 +17,21 @@ static const std::chrono::seconds kExpiredEventTimeout(5);
 
 } // namespace
 
-HikvisionBytestreamFilter::HikvisionBytestreamFilter(
+BytestreamFilter::BytestreamFilter(
     const Hikvision::DriverManifest& manifest,
-    HikvisionBytestreamFilter::Handler handler)
+    BytestreamFilter::Handler handler)
     :
     m_manifest(manifest),
     m_handler(handler)
 {
 }
 
-HikvisionBytestreamFilter::~HikvisionBytestreamFilter()
+BytestreamFilter::~BytestreamFilter()
 {
 
 }
 
-bool HikvisionBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
+bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
     NX_ASSERT(m_handler, lit("No handler is set."));
     if (!m_handler)
@@ -71,7 +72,7 @@ bool HikvisionBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     return true;
 }
 
-void HikvisionBytestreamFilter::addExpiredEvents(std::vector<HikvisionEvent>& result)
+void BytestreamFilter::addExpiredEvents(std::vector<HikvisionEvent>& result)
 {
     for (auto itr = m_startedEvents.begin(); itr != m_startedEvents.end();)
     {
@@ -91,6 +92,7 @@ void HikvisionBytestreamFilter::addExpiredEvents(std::vector<HikvisionEvent>& re
     }
 }
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

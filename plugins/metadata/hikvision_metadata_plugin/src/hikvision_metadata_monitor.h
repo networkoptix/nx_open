@@ -15,6 +15,7 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 class HikvisionMetadataMonitor: public QObject
 {
@@ -63,6 +64,7 @@ private:
     QMap<QString, Handler> m_handlers;
 };
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

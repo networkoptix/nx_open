@@ -10,6 +10,7 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 QString HikvisionStringHelper::buildCaption(
     const Hikvision::DriverManifest& manifest,
@@ -44,6 +45,7 @@ QString HikvisionStringHelper::buildDescription(
     return description;
 }
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

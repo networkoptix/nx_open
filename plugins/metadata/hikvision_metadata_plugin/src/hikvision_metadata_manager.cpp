@@ -12,21 +12,22 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-HikvisionMetadataManager::HikvisionMetadataManager(HikvisionMetadataPlugin* plugin):
+MetadataManager::MetadataManager(MetadataPlugin* plugin):
     m_plugin(plugin)
 {
 }
 
-HikvisionMetadataManager::~HikvisionMetadataManager()
+MetadataManager::~MetadataManager()
 {
     stopFetchingMetadata();
 }
 
-void* HikvisionMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataManager)
     {
@@ -42,7 +43,7 @@ void* HikvisionMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error HikvisionMetadataManager::startFetchingMetadata(
+Error MetadataManager::startFetchingMetadata(
     AbstractMetadataHandler* handler,
     nxpl::NX_GUID* eventTypeList,
     int eventTypeListSize)
@@ -99,7 +100,7 @@ Error HikvisionMetadataManager::startFetchingMetadata(
     return Error::noError;
 }
 
-Error HikvisionMetadataManager::stopFetchingMetadata()
+Error MetadataManager::stopFetchingMetadata()
 {
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
@@ -112,7 +113,7 @@ Error HikvisionMetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* HikvisionMetadataManager::capabilitiesManifest(Error* error) const
+const char* MetadataManager::capabilitiesManifest(Error* error) const
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -124,7 +125,7 @@ const char* HikvisionMetadataManager::capabilitiesManifest(Error* error) const
     return m_deviceManifest.constData();
 }
 
-void HikvisionMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void MetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
 {
     m_url = resourceInfo.url;
     m_model = resourceInfo.model;
@@ -136,16 +137,17 @@ void HikvisionMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& reso
     m_channel = resourceInfo.channel;
 }
 
-void HikvisionMetadataManager::setDeviceManifest(const QByteArray& manifest)
+void MetadataManager::setDeviceManifest(const QByteArray& manifest)
 {
     m_deviceManifest = manifest;
 }
 
-void HikvisionMetadataManager::setDriverManifest(const Hikvision::DriverManifest& manifest)
+void MetadataManager::setDriverManifest(const Hikvision::DriverManifest& manifest)
 {
     m_driverManifest = manifest;
 }
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

@@ -11,11 +11,6 @@ namespace hikvision {
 
 namespace {
 
-static const QString kChannelParameter = lit("Channel.#.EventType");
-static const QString kAlarmInputParameter = lit("AlarmInput");
-static const QString kAlarmOutputParameter = lit("AlarmOutput");
-static const QString kSystemEventParameter = lit("SystemEvent");
-
 QString normalizeInternalName(const QString& rawInternalName)
 {
 
@@ -72,7 +67,7 @@ HikvisionEvent AttributesParser::parseEventXml(
         auto name = reader.name().toString().toLower().trimmed();
         if (name == "channelid")
         {
-            result.channel = reader.readElementText().toInt() -1; //< Convert to range [0..x].
+            result.channel = reader.readElementText().toInt() - 1; //< Convert to range [0..x].
         }
         else if (name == "datetime")
         {
@@ -90,6 +85,11 @@ HikvisionEvent AttributesParser::parseEventXml(
         else if (name == "eventdescription")
         {
             description = reader.readElementText();
+        }
+        else if (name == "detectionregionlist")
+        {
+            const auto regionList = reader.readElementText().trimmed();
+            // TODO: Region number is empty. I haven't seen cameras with non empty region list so far.
         }
         else
         {

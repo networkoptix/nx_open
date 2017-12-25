@@ -12,16 +12,17 @@
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
-class HikvisionMetadataMonitor;
+class MetadataMonitor;
 
-class HikvisionBytestreamFilter: public nx::utils::bstream::AbstractByteStreamFilter
+class BytestreamFilter: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     using Handler = std::function<void(const HikvisionEventList&)>;
 
-    HikvisionBytestreamFilter(const Hikvision::DriverManifest& manifest, Handler handler);
-    virtual ~HikvisionBytestreamFilter();
+    BytestreamFilter(const Hikvision::DriverManifest& manifest, Handler handler);
+    virtual ~BytestreamFilter();
     virtual bool processData(const QnByteArrayConstRef& notification) override;
 private:
     void addExpiredEvents(std::vector<HikvisionEvent>& result);
@@ -44,6 +45,7 @@ private:
     QMap<QString, StartedEvent> m_startedEvents;
 };
 
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx

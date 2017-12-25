@@ -9,8 +9,13 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
+QnMutex Hikvision::DriverManifest::m_cachedIdMutex;
+QMap<QString, QnUuid> Hikvision::DriverManifest::m_idByInternalName;
+QMap<QnUuid, Hikvision::EventDescriptor> Hikvision::DriverManifest::m_recordById;
+
 QnUuid Hikvision::DriverManifest::eventTypeByInternalName(const QString& internalEventName) const
 {
+    QnMutexLocker lock(&m_cachedIdMutex);
     QnUuid result = m_idByInternalName.value(internalEventName);
     if (!result.isNull())
         return result;
@@ -33,6 +38,7 @@ QnUuid Hikvision::DriverManifest::eventTypeByInternalName(const QString& interna
 
 const Hikvision::EventDescriptor& Hikvision::DriverManifest::eventDescriptorById(const QnUuid& id) const
 {
+    QnMutexLocker lock(&m_cachedIdMutex);
     auto itr = m_recordById.find(id);
     if (itr != m_recordById.end())
         return itr.value();
