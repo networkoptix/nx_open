@@ -1,5 +1,5 @@
-#include "hikvision_common.h"
-#include "hikvision_metadata_manager.h"
+#include "common.h"
+#include "metadata_manager.h"
 
 #include <QtCore/QUrl>
 

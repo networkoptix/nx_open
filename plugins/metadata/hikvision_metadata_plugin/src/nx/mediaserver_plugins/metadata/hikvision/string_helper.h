@@ -7,7 +7,7 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <hikvision_common.h>
+#include "common.h"
 #include <plugins/plugin_api.h>
 
 namespace nx {

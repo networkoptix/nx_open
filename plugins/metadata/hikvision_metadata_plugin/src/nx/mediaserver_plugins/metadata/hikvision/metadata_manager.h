@@ -7,8 +7,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <hikvision_metadata_monitor.h>
-#include <hikvision_metadata_plugin.h>
+#include "metadata_monitor.h"
+#include "metadata_plugin.h"
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>

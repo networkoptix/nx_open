@@ -1,7 +1,7 @@
 #pragma once
 
-#include "hikvision_common.h"
-#include "hikvision_metadata_monitor.h"
+#include "common.h"
+#include "metadata_monitor.h"
 
 #include <QtCore/QByteArray>
 #include <QtCore/QUrl>

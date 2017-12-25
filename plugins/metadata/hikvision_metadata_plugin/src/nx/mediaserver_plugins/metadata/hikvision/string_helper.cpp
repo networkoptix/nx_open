@@ -1,4 +1,4 @@
-#include "hikvision_string_helper.h"
+#include "string_helper.h"
 
 #include <nx/utils/literal.h>
 #include <nx/utils/std/hashes.h>

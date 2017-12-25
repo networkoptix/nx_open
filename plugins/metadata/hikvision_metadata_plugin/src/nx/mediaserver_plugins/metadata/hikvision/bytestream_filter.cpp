@@ -1,9 +1,9 @@
-#include "hikvision_bytestream_filter.h"
-#include "hikvision_common.h"
-#include "hikvision_string_helper.h"
+#include "bytestream_filter.h"
+#include "common.h"
+#include "string_helper.h"
 
 #include <iostream>
-#include "hikvision_attributes_parser.h"
+#include "attributes_parser.h"
 
 namespace nx {
 namespace mediaserver {

@@ -1,5 +1,5 @@
-#include "hikvision_metadata_monitor.h"
-#include "hikvision_bytestream_filter.h"
+#include "metadata_monitor.h"
+#include "bytestream_filter.h"
 
 #include <QtCore/QUrlQuery>
 

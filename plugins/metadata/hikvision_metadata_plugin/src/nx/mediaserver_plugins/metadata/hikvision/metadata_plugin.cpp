@@ -1,8 +1,8 @@
-﻿#include "hikvision_metadata_plugin.h"
-#include "hikvision_metadata_manager.h"
-#include "hikvision_common.h"
-#include "hikvision_string_helper.h"
-#include "hikvision_attributes_parser.h"
+﻿#include "metadata_plugin.h"
+#include "metadata_manager.h"
+#include "common.h"
+#include "string_helper.h"
+#include "attributes_parser.h"
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>

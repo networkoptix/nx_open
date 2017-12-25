@@ -2,8 +2,8 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <hikvision_metadata_monitor.h>
-#include <hikvision_common.h>
+#include "metadata_monitor.h"
+#include "common.h"
 
 #include <plugins/plugin_api.h>
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>

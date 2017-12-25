@@ -1,8 +1,8 @@
-#include "hikvision_attributes_parser.h"
+#include "attributes_parser.h"
 
 #include <nx/utils/literal.h>
 #include <array>
-#include "hikvision_string_helper.h"
+#include "string_helper.h"
 
 namespace nx {
 namespace mediaserver {

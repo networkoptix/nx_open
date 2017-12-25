@@ -1,4 +1,4 @@
-#include "hikvision_common.h"
+#include "common.h"
 
 #include <nx/fusion/model_functions.h>
 

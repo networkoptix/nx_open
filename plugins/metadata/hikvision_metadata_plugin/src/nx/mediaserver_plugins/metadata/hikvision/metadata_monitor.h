@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 
-#include <hikvision_common.h>
+#include "common.h"
 
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>

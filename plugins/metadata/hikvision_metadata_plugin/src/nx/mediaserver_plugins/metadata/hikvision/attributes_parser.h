@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "hikvision_common.h"
+#include "common.h"
 
 namespace nx {
 namespace mediaserver {
