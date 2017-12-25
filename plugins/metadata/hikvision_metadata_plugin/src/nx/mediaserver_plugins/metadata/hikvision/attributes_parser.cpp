@@ -3,6 +3,7 @@
 #include <nx/utils/literal.h>
 #include <array>
 #include "string_helper.h"
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
@@ -81,6 +82,8 @@ HikvisionEvent AttributesParser::parseEventXml(
         {
             auto internalName = normalizeInternalName(reader.readElementText());
             result.typeId = manifest.eventTypeByInternalName(internalName);
+            if (result.typeId.isNull())
+                NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
         }
         else if (name == "eventdescription")
         {

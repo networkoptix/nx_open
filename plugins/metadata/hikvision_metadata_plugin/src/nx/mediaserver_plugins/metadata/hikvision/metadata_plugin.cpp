@@ -11,6 +11,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
@@ -171,9 +172,13 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
     if (nx_http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
         statusCode != nx_http::StatusCode::ok)
     {
-        // TODO: add log message here
+        NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
+            arg(resourceInfo.url).arg(statusCode));
         return boost::optional<QList<QnUuid>>();
     }
+    NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
+        arg(resourceInfo.url).arg(buffer));
+
     data.supportedEventTypes = parseSupportedEvents(buffer);
 
     return data.supportedEventTypes;

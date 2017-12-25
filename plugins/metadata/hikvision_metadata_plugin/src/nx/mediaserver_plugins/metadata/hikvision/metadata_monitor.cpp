@@ -7,14 +7,7 @@
 #include <iostream>
 
 #include <nx/utils/std/cpp14.h>
-
-#if defined(__GNUC__) || defined(__clang__)
-    #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#elif defined(_MSC_VER)
-    #define NX_PRETTY_FUNCTION __FUNCSIG__
-#else
-    #define NX_PRETTY_FUNCTION __func__
-#endif
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
@@ -46,6 +39,7 @@ HikvisionMetadataMonitor::~HikvisionMetadataMonitor()
 
 void HikvisionMetadataMonitor::startMonitoring()
 {
+    NX_VERBOSE(this, "Monitor started");
     m_timer.post([this](){ initMonitorUnsafe(); });
 }
 
@@ -63,7 +57,7 @@ void HikvisionMetadataMonitor::stopMonitoring()
         });
 
     promise.get_future().wait();
-    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
+    NX_VERBOSE(this, "Monitor stopped");
 }
 
 void HikvisionMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -103,7 +97,6 @@ QUrl HikvisionMetadataMonitor::buildMonitoringUrl(
 
 void HikvisionMetadataMonitor::initMonitorUnsafe()
 {
-    std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
     auto httpClient = nx_http::AsyncHttpClient::create();
     m_timer.pleaseStopSync();
     httpClient->bindToAioThread(m_timer.getAioThread());

@@ -8,6 +8,7 @@
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <plugins/plugin_internal_tools.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
@@ -60,11 +61,8 @@ Error MetadataManager::startFetchingMetadata(
                     return;
 
                 auto event = new CommonDetectedEvent();
-                std::cout
-                    << "---------------- (Metadata manager handler) Got event: "
-                    << hikvisionEvent.caption.toStdString() << " "
-                    << hikvisionEvent.description.toStdString() << " "
-                    << "Channel " << m_channel << std::endl;
+                NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
+                    .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
                 event->setEventTypeId(
                     nxpt::NxGuidHelper::fromRawData(hikvisionEvent.typeId.toRfc4122()));
@@ -81,7 +79,6 @@ Error MetadataManager::startFetchingMetadata(
                 packet->addEvent(event);
             }
 
-            std::cout << std::endl << std::endl;
             m_handler->handleMetadata(Error::noError, packet);
         };
 
