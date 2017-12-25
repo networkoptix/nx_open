@@ -55,12 +55,37 @@ bool HevcParser::processData(
         return !isFatalError;
     }
 
+    if (rtpTimestamp == m_lastCreatedPacketTimestamp)
+    {
+        // Skip data if it belongs to the previously created frame.
+        // Don't trust RTP marker bit anymore, since the stream is considered buggy in this case.
+        m_trustMarkerBit = false;
+        return true;
+    }
+
+    if (rtpTimestamp != m_lastRtpTimestamp && m_lastRtpTimestamp != m_lastCreatedPacketTimestamp)
+    {
+        // We got new frame, but there wasn't marker bit in the end of previous.
+        m_trustMarkerBit = false;
+    }
+
+    if (!m_trustMarkerBit)
+    {
+        createVideoDataIfNeeded(&gotData, statistics, rtpTimestamp);
+        // Restore pointer to the buffer after data creation. It will be needed for payload processing.
+        m_rtpBufferBase = rtpBufferBase;
+    }
+
     if (!handlePayload(payload, payloadLength))
         return reset();
 
-    createVideoDataIfNeeded(&gotData, statistics);
+    if (!m_trustMarkerBit && rtpTimestamp != m_lastRtpTimestamp)
+        backupCurrentData(rtpBufferBase);
 
-    m_lastRtpTime = rtpTimestamp;
+    if (m_trustMarkerBit)
+        createVideoDataIfNeeded(&gotData, statistics, rtpTimestamp);
+
+    m_lastRtpTimestamp = rtpTimestamp;
     return true;
 }
 
@@ -241,7 +266,7 @@ bool HevcParser::processRtpHeader(
         return false;
 
     if (rtpHeader->marker)
-        m_hasEnoughRawData = true; //< It is time to create some video data.
+        m_gotMarkerBit = true;
 
     *outRtpTimestamp = ntohl(rtpHeader->timestamp);
 
@@ -322,6 +347,7 @@ bool HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
     skipPayloadHeader(&payload, &payloadLength);
 
     auto packetType = hevc::fromNalUnitTypeToPacketType(packetHeader.unitType);
+
     switch (packetType)
     {
         case hevc::PacketType::singleNalUnitPacket:
@@ -436,11 +462,12 @@ bool HevcParser::handleFragmentationPacket(
             fuHeader.unitType,
             header->tid);
         updateNalFlags(fuHeader.unitType, payload, payloadLength);
+        ++m_numberOfNalUnits;
     }
 
     m_chunks.emplace_back(payload - m_rtpBufferBase, payloadLength, fuHeader.startFlag);
     m_videoFrameSize += payloadLength;
-    ++m_numberOfNalUnits;
+
     return true;
 }
 
@@ -493,15 +520,18 @@ void HevcParser::updateNalFlags(
 {
     if (unitType == hevc::NalUnitType::vpsNut)
     {
+
         m_context.inStreamVpsFound = true;
     }
     else if (unitType == hevc::NalUnitType::spsNut)
     {
+
         m_context.inStreamSpsFound = true;
         extractPictureDimensionsFromSps(payload, payloadLength);
     }
     else if (unitType == hevc::NalUnitType::ppsNut)
     {
+
         m_context.inStreamPpsFound = true;
     }
     else if(hevc::isRandomAccessPoint(unitType))
@@ -542,8 +572,12 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(
                 sizeof(hevc::kNalUnitPrefix));
         }
 
+        const auto chunkBufferStart = m_chunks[i].bufferStart
+            ? (const char*) m_chunks[i].bufferStart
+            : (const char*) rtpBuffer;
+
         result->m_data.uncheckedWrite(
-            (const char*)rtpBuffer + m_chunks[i].bufferOffset,
+            chunkBufferStart + m_chunks[i].bufferOffset,
             m_chunks[i].len);
     }
 
@@ -555,11 +589,18 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(
     return result;
 }
 
-void HevcParser::createVideoDataIfNeeded(bool* outGotData, const QnRtspStatistic& statistic)
+void HevcParser::createVideoDataIfNeeded(
+    bool* outGotData,
+    const QnRtspStatistic& statistic,
+    uint32_t rtpTimestamp)
 {
-    if (m_hasEnoughRawData)
+    bool needToCreateVideoData = (m_trustMarkerBit && m_gotMarkerBit)
+        || (!m_trustMarkerBit && !m_chunks.empty() && rtpTimestamp != m_lastRtpTimestamp);
+
+    if (needToCreateVideoData)
     {
-        m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTime, statistic);
+        m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTimestamp, statistic);
+        m_lastCreatedPacketTimestamp = m_lastRtpTimestamp;
         *outGotData = !!m_mediaData;
         reset(/*softReset*/ true);
     }
@@ -577,7 +618,7 @@ bool HevcParser::reset(bool softReset)
 
     m_context.keyDataFound = false;
 
-    m_hasEnoughRawData = false;
+    m_gotMarkerBit = false;
     m_numberOfNalUnits = 0;
     m_rtpBufferBase = nullptr;
     m_chunks.clear();

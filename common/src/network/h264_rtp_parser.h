@@ -1,11 +1,6 @@
-#ifndef __H264_RTP_PARSER_H
-#define __H264_RTP_PARSER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
-
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
 
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
@@ -52,14 +47,14 @@ private:
     bool isPacketStartsNewFrame(
         const quint8* curPtr,
         const quint8* bufferEnd) const;
-    void backupCurrentData(quint8* rtpBufferBase);
+
     bool isIFrame(const quint8* data, int dataLen) const;
 
     QnCompressedVideoDataPtr createVideoData(
-        const quint8            *rtpBuffer,
-        quint32                 rtpTime,
-        const QnRtspStatistic     &statistics
-        );
+        const quint8* rtpBuffer,
+        quint32 rtpTime,
+        const QnRtspStatistic& statistics);
+
     bool isBufferOverflow() const;
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
@@ -68,5 +63,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif

@@ -86,6 +86,25 @@ QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
     }
 }
 
+void QnRtpVideoStreamParser::backupCurrentData(const quint8* currentBufferBase)
+{
+    size_t chunksLength = 0;
+    for (const auto& chunk: m_chunks)
+        chunksLength += chunk.len;
+
+    m_nextFrameChunksBuffer.resize(chunksLength);
+
+    size_t offset = 0;
+    quint8* nextFrameBufRaw = m_nextFrameChunksBuffer.data();
+    for (auto& chunk: m_chunks)
+    {
+        memcpy(nextFrameBufRaw + offset, currentBufferBase + chunk.bufferOffset, chunk.len);
+        chunk.bufferStart = nextFrameBufRaw;
+        chunk.bufferOffset = (int)offset;
+        offset += chunk.len;
+    }
+}
+
 QnAbstractMediaDataPtr QnRtpAudioStreamParser::nextData()
 {
     if (m_audioData.empty())
