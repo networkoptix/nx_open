@@ -321,7 +321,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     connect(&result, &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
     connect(this, &DeviceAdditionDialog::rejected, &loop, &QEventLoop::quit);
 
-
     const auto connection =
         connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged, this,
             [this, &loop]()
@@ -496,7 +495,6 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         setAccentStyle(ui->searchButton);
     else
         resetButtonStyle(ui->searchButton);
-
 
     const bool showSearchProgressControls = m_currentSearch && m_currentSearch->searching();
     ui->searchControls->setCurrentIndex(showSearchProgressControls ? 1 : 0);
