@@ -57,7 +57,7 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent):
         this, &QnResourceDirectoryBrowser::at_filesystemFileChanged);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId,
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid& resourceTypeId,
     const QnResourceParams& params)
 {
     QnResourcePtr result;
@@ -127,7 +127,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     };
 
     // Search through directory list
-    foreach (const QString &dir, dirs)
+    for (const QString& dir: dirs)
     {
         int limit = std::max(kMaxResourceCount - found, 0);
         if (kMaxResourceCount < 0)
@@ -153,14 +153,14 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     return result;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
+QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename) const
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     return resourceFromFile(filename, resourcePool); // TODO: #GDM #3.1 refactor all the scheme. Adding must not be here
 }
 
 // =============================================================================================
-int QnResourceDirectoryBrowser::findResources(const QString& directory, const ResourceCache & cache, BrowseHandler & handler, int maxResources)
+int QnResourceDirectoryBrowser::findResources(const QString& directory, const ResourceCache& cache, BrowseHandler& handler, int maxResources)
 {
     // Note: This method can be called from a separate thread. Beware!
     NX_LOG(lit("Checking %1").arg(directory), cl_logDEBUG1);
@@ -176,7 +176,7 @@ int QnResourceDirectoryBrowser::findResources(const QString& directory, const Re
     handler(directory, true);
 
     const QList<QFileInfo> files = QDir(directory).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files | QDir::NoSymLinks);
-    for(const QFileInfo &file: files)
+    for(const QFileInfo& file: files)
     {
         if (shouldStop())
             break;
@@ -385,7 +385,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     return layout;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename,
+QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
     const QString path = fixSeparators(filename);
@@ -433,7 +433,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
     return QnResourcePtr();
 }
 
-void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString  &path)
+void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString& path)
 {
     // We get here if:
     // - file has been added. Should iterate over all resources from this path
@@ -474,7 +474,7 @@ void QnResourceDirectoryBrowser::at_filesystemDirectoryChanged(const QString  &p
     }
 }
 
-void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString  &path)
+void QnResourceDirectoryBrowser::at_filesystemFileChanged(const QString& path)
 {
     // We get here if:
     // - file has been removed
@@ -532,7 +532,7 @@ void QnResourceDirectoryBrowser::setPathCheckList(const QStringList& paths)
     m_pathListToCheck = paths;
 }
 
-void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString &directory)
+void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& directory)
 {
     QnResourceList resources;
 

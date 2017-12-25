@@ -12,16 +12,16 @@ class QnResourceDirectoryBrowser:
 public:
     QnResourceDirectoryBrowser(QObject* parent = nullptr);
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid& resourceTypeId, const QnResourceParams& params) override;
 
     virtual QString manufacture() const override;
     virtual QnResourceList findResources() override;
 
     virtual void setPathCheckList(const QStringList& paths) override;
 
-    virtual QnResourcePtr checkFile(const QString &filename) const override;
+    virtual QnResourcePtr checkFile(const QString& filename) const override;
 
-    void dropResourcesFromFolder(const QString &path);
+    void dropResourcesFromFolder(const QString& path);
 
     // Local files search only once. Use cleanup before search to re-search files again
     void cleanup();
@@ -51,7 +51,7 @@ protected:
      * @param maxResources - limit to number of resources to discover. Set to -1 to get all the resources
      * @return number of resources discovered
      */
-    int findResources(const QString &directory, const ResourceCache & cache, BrowseHandler & handler, int maxResources);
+    int findResources(const QString& directory, const ResourceCache& cache, BrowseHandler& handler, int maxResources);
 protected slots:
     void at_filesystemDirectoryChanged(const QString& path);
     void at_filesystemFileChanged(const QString& path);
