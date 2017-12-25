@@ -213,7 +213,7 @@ TEST_F(Filter, Windows_removableNotAllowed_noMultipleInstances)
     whenPathsRequested();
 
     thenNumberOfStoragesReturnedShouldBeEqualTo(3);
-    thenThereShouldBeNoThisPath("\\\\external");
+    thenThereShouldBeNoThisPath("E:\\");
     thenPathsShouldBeAmendedCorrectly();
 }
 
