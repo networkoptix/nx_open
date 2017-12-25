@@ -20,7 +20,7 @@ class CLH264RtpParser: public QnRtpVideoStreamParser
 public:
     CLH264RtpParser();
     virtual ~CLH264RtpParser();
-    virtual void setSDPInfo(QList<QByteArray> lines) override;
+    virtual void setSdpInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
 
@@ -42,7 +42,6 @@ private:
 
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
-    std::vector<quint8> m_nextFrameChunksBuffer;
     quint32 m_lastRtpTime;
 private:
     void serializeSpsPps(QnByteArray& dst);

@@ -64,7 +64,7 @@ bool HevcParser::processData(
     return true;
 }
 
-void HevcParser::setSDPInfo(QByteArrayList lines)
+void HevcParser::setSdpInfo(QByteArrayList lines)
 {
     for (const auto& line: lines)
     {
@@ -430,7 +430,6 @@ bool HevcParser::handleFragmentationPacket(
 
     if (fuHeader.startFlag)
     {
-
         insertPayloadHeader(
             const_cast<uint8_t**>(&payload),  //< Dirty dirty hack.
             &payloadLength,

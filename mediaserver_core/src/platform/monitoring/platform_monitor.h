@@ -67,7 +67,7 @@ public:
         SwapPartition           = 0x08,
         NetworkPartition        = 0x10,
         UnknownPartition        = 0x20,
-        UsbDiskPartition        = 0x40
+        RemovableDiskPartition  = 0x40
     };
     Q_DECLARE_FLAGS(PartitionTypes, PartitionType)
 
@@ -134,7 +134,7 @@ public:
     // TODO: #Elric remove 'total' from names.
 
     /**
-     * \returns                         Percent of CPU time (both user and kernel) consumed 
+     * \returns                         Percent of CPU time (both user and kernel) consumed
      *                                  by all running processes since the last call to this function,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.
      */

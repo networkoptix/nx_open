@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Köprü</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>Köprü Lisansları</translation>
     </message>
   </context>
   <context>
@@ -785,7 +785,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Dışa aktarılan veri yok.</translation>
     </message>
   </context>
   <context>
@@ -1519,7 +1519,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analiz Etkinliği</translation>
     </message>
     <message>
       <source>%1 at %2</source>

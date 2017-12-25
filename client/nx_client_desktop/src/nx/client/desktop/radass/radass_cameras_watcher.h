@@ -26,6 +26,9 @@ public:
         QObject* parent = nullptr);
 
     virtual ~RadassCamerasWatcher() override;
+
+private:
+    QPointer<RadassController> m_radassController;
 };
 
 } // namespace desktop

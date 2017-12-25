@@ -345,7 +345,7 @@ QnMjpegRtpParser::~QnMjpegRtpParser()
 {
 }
 
-void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
+void QnMjpegRtpParser::setSdpInfo(QList<QByteArray> lines)
 {
     for (int i = 0; i < lines.size(); ++i)
     {
