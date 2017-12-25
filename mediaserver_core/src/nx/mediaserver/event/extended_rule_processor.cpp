@@ -300,10 +300,7 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
 
     if (result)
     {
-        // Check whether we need to save this action to DB
-        //const vms::event::EventParameters& eventParameters = action->getRuntimeParams();
-        //bool omitLogging = eventParameters.omitDbLogging && eventParameters.eventType == vms::event::EventType::softwareTriggerEvent;
-        if (!shouldOmitActionLogging(action))
+        if (actionRequiresLogging(action))
         {
             qnServerDb->saveActionToDB(action);
         }

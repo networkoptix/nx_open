@@ -89,7 +89,7 @@ struct EventParameters
      * Flag allows to omit event logging to DB on the server.
      * This event still triggers user notifications
      */
-    bool omitDbLogging;
+    bool omitDbLogging = false;
 
     // TODO: #GDM #vkutin #rvasilenko think about implementing something like std::variant here.
     QnUuid analyticsEventId() const;

@@ -148,8 +148,7 @@ private slots:
 protected:
     bool containsResource(const QnResourceList& resList, const QnUuid& resId) const;
 
-    typedef std::list<std::pair<vms::event::RulePtr, vms::event::AbstractActionPtr> > EventActions;
-    EventActions matchActions(const vms::event::AbstractEventPtr& event);
+    vms::event::AbstractActionList matchActions(const vms::event::AbstractEventPtr& event);
 
     /*
     * Some actions can be executed on server only.
@@ -162,10 +161,12 @@ protected:
 
     bool fixActionTimeFields(const vms::event::AbstractActionPtr& action);
 
-    // Check if we should omit this action from mentioning in DB
-    // @param action - action to check
-    // @param rule - rule that triggered this action
-    bool shouldOmitActionLogging(const vms::event::AbstractActionPtr& action) const;
+    /**
+     * Check if we should log this action to DB
+     * @param action - action to check
+     * @param rule - rule that triggered this action
+     */
+    bool actionRequiresLogging(const vms::event::AbstractActionPtr& action) const;
 
 private:
     void at_ruleAddedOrUpdated_impl(const vms::event::RulePtr& rule);
