@@ -109,6 +109,7 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <ini.h>
 
 using namespace nx;
 using namespace client::desktop::ui;
@@ -1460,6 +1461,18 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
+
+    if (client::desktop::ini().showVideoQualityOverlay
+        && hasVideo()
+        && !resource()->toResourcePtr()->hasFlags(Qn::local))
+    {
+        QColor overlayColor = m_renderer->isLowQualityImage(0)
+            ? Qt::red
+            : Qt::green;
+        overlayColor = toTransparent(overlayColor, 0.5);
+        const PainterTransformScaleStripper scaleStripper(painter);
+        painter->fillRect(scaleStripper.mapRect(rect), overlayColor);
+    }
 }
 
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion)
