@@ -1,6 +1,6 @@
 #include "cloud_url_validator.h"
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 
 #include <api/network_proxy_factory.h>

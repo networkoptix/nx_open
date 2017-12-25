@@ -277,6 +277,19 @@ void EventRibbon::Private::debugCheckGeometries()
 #endif
 }
 
+void EventRibbon::Private::debugCheckVisibility()
+{
+#if defined(_DEBUG)
+    if (!q->isVisible())
+        return;
+
+    for (int i = 0; i < m_tiles.size(); ++i)
+    {
+        NX_ASSERT(m_tiles[i]->isHidden() == !m_visible.contains(m_tiles[i]));
+    }
+#endif
+}
+
 void EventRibbon::Private::insertNewTiles(int index, int count)
 {
     if (!m_model || count == 0)
@@ -350,13 +363,9 @@ void EventRibbon::Private::removeTiles(int first, int count)
         delta += m_tiles[first]->height() + kDefaultTileSpacing;
         m_tiles[first]->deleteLater();
         m_positions.remove(m_tiles[first]);
+        m_visible.remove(m_tiles[first]);
         m_tiles.removeAt(first);
     }
-
-    auto newVisible = m_visible - nx::utils::IntegerRange(first, count);
-    newVisible = newVisible.left | (newVisible.right - count);
-    NX_EXPECT(!newVisible.right);
-    m_visible = newVisible.left;
 
     for (int i = first; i < m_tiles.count(); ++i)
         m_positions[m_tiles[i]] -= delta;
@@ -378,8 +387,8 @@ void EventRibbon::Private::clear()
 
     m_tiles.clear();
     m_positions.clear();
+    m_visible.clear();
     m_totalHeight = 0;
-    m_visible = nx::utils::IntegerRange();
 
     m_scrollBar->setVisible(false);
     m_scrollBar->setValue(0);
@@ -445,6 +454,8 @@ void EventRibbon::Private::updateView()
     int currentPosition = m_positions.value(*first);
     const auto positionLimit = base + height;
 
+    QSet<EventTile*> newVisible;
+
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
         m_positions[*iter] = currentPosition;
@@ -452,10 +463,9 @@ void EventRibbon::Private::updateView()
         (*iter)->setGeometry(0, currentPosition - base,
             m_viewport->width(), calculateHeight(*iter));
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
+        newVisible.insert(*iter);
         ++iter;
     }
-
-    const auto visibleCount = std::distance(first, iter);
 
     while (iter != m_tiles.end())
     {
@@ -472,20 +482,19 @@ void EventRibbon::Private::updateView()
 
     debugCheckGeometries();
 
-    nx::utils::IntegerRange newVisible(std::distance(m_tiles.cbegin(), first), visibleCount);
-
-    for (int i = m_visible.first(); i <= m_visible.last(); ++i)
+    for (auto& oldVisibleTile: m_visible)
     {
-        if (!newVisible.contains(i))
-            m_tiles[i]->setVisible(false);
+        if (!newVisible.contains(oldVisibleTile))
+            oldVisibleTile->setVisible(false);
     }
 
     m_visible = newVisible;
     m_viewport->update();
 
     updateScrollRange();
+    debugCheckVisibility();
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

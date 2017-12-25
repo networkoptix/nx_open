@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_abstract_endpoint_verificator.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class CloudMediaServerEndpointVerificator:
     public nx::network::cloud::tcp::AbstractEndpointVerificator
@@ -16,7 +17,7 @@ public:
 
     virtual void verifyHost(
         const SocketAddress& endpointToVerify,
-        const nx::network::cloud::AddressEntry& targetHostAddress,
+        const nx::network::AddressEntry& targetHostAddress,
         nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
 
     virtual SystemError::ErrorCode lastSystemErrorCode() const override;
@@ -32,7 +33,7 @@ private:
     boost::optional<std::chrono::milliseconds> m_timeout;
     nx_http::AsyncHttpClientPtr m_httpClient;
     SocketAddress m_endpointToVerify;
-    nx::network::cloud::AddressEntry m_targetHostAddress;
+    nx::network::AddressEntry m_targetHostAddress;
     nx::utils::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
 
     void onHttpRequestDone();

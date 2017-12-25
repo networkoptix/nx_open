@@ -188,7 +188,7 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
 
 TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
 {
-    static const char testData[] = 
+    static const char testData[] =
         "GET /cdb/event/subscribe HTTP/1.1\r\n"
         "Date: Fri, 20 May 2016 05:43:16 -0700\r\n"
         "Host: cloud-demo.hdw.mx\r\n"

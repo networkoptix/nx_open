@@ -23,7 +23,7 @@
 #include "udt_common.h"
 #include "udt_socket_impl.h"
 #include "../aio/async_socket_helper.h"
-#include "../cloud/address_resolver.h"
+#include "../address_resolver.h"
 #ifdef _WIN32
 #include "../win32_socket_tools.h"
 #endif

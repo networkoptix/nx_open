@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 
 #include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
@@ -26,7 +27,7 @@ class VmsGatewayMediatorIntegration:
 public:
     VmsGatewayMediatorIntegration():
         m_vmsGateway(nx::cloud::gateway::VmsGatewayFunctionalTest::doNotReinitialiseSocketGlobals),
-        m_vmsGatewayPeerId(SocketGlobals::outgoingTunnelPool().ownPeerId().toStdString())
+        m_vmsGatewayPeerId(SocketGlobals::cloud().outgoingTunnelPool().ownPeerId().toStdString())
     {
         setInitFlags(BasicTestFixture::doNotInitializeMediatorConnection);
     }

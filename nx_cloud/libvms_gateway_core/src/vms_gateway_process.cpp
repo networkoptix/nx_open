@@ -1,5 +1,6 @@
 #include "vms_gateway_process.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_connect_settings.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
@@ -176,10 +177,10 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 {
     if (!settings.general().mediatorEndpoint.isEmpty())
     {
-        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
-        nx::network::SocketGlobals::mediatorConnector().enable(true);
+        nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     m_endpointVerificatorFactoryBak =
@@ -225,13 +226,13 @@ void VmsGatewayProcess::publicAddressFetched(
     NX_LOGX(lm("Retrieved public address %1. This address will be used for cloud connect")
         .arg(publicAddress), cl_logINFO);
 
-    nx::network::SocketGlobals::cloudConnectSettings()
+    nx::network::SocketGlobals::cloud().settings()
         .replaceOriginatingHostAddress(publicAddress);
 
     const auto& rcSettings = settings.cloudConnect().tcpReverse;
     if (rcSettings.poolSize != 0)
     {
-        auto& pool = nx::network::SocketGlobals::tcpReversePool();
+        auto& pool = nx::network::SocketGlobals::cloud().tcpReversePool();
         pool.setPoolSize(rcSettings.poolSize);
         pool.setKeepAliveOptions(rcSettings.keepAlive);
         pool.setStartTimeout(rcSettings.startTimeout);

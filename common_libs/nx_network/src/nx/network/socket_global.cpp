@@ -1,18 +1,14 @@
 #include "socket_global.h"
 
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/std/future.h>
 
-#include "aio/pollset_factory.h"
 #include "aio/aio_service.h"
-#include "cloud/address_resolver.h"
-#include "cloud/tunnel/connector_factory.h"
-#include "cloud/cloud_connect_settings.h"
-#include "cloud/mediator_address_publisher.h"
-#include "cloud/mediator_connector.h"
-#include "cloud/tunnel/outgoing_tunnel_pool.h"
-#include "cloud/tunnel/tcp/reverse_connection_pool.h"
+#include "aio/pollset_factory.h"
+#include "aio/timer.h"
+#include "address_resolver.h"
+#include "cloud/cloud_connect_controller.h"
+#include "cloud/tunnel/outgoing_tunnel_pool.h" //< TODO: #ak Get rid of this dependency.
+#include "socket_factory.h"
 #include "ssl/ssl_static_data.h"
 
 const std::chrono::seconds kDebugIniReloadInterval(10);
@@ -67,20 +63,12 @@ struct SocketGlobalsImpl
      * Regular networking services. (AddressResolver should be split to cloud and non-cloud).
      */
 
-    std::unique_ptr<cloud::AddressResolver> m_addressResolver;
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
+    std::unique_ptr<AddressResolver> m_addressResolver;
     std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
 
-    /**
-     * Cloud networking services.
-     */
-
-    std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
-    std::unique_ptr<cloud::MediatorAddressPublisher> m_addressPublisher;
-    std::unique_ptr<cloud::OutgoingTunnelPool> m_outgoingTunnelPool;
-    cloud::CloudConnectSettings m_cloudConnectSettings;
-    std::unique_ptr<cloud::tcp::ReverseConnectionPool> m_tcpReversePool;
+    std::unique_ptr<cloud::CloudConnectController> cloudConnectController;
 
     QnMutex m_mutex;
     std::map<SocketGlobals::CustomInit, SocketGlobals::CustomDeinit> m_customInits;
@@ -129,19 +117,10 @@ SocketGlobals::SocketGlobals(int initializationFlags):
 
 SocketGlobals::~SocketGlobals()
 {
-    // NOTE: should be moved to QnStoppableAsync::pleaseStop
+    deinitializeCloudConnectivity();
 
-    nx::utils::promise<void> cloudServicesStoppedPromise;
-    {
-        utils::BarrierHandler barrier([&](){ cloudServicesStoppedPromise.set_value(); });
-        m_impl->m_debugIniReloadTimer->pleaseStop(barrier.fork());
-        m_impl->m_addressResolver->pleaseStop(barrier.fork());
-        m_impl->m_addressPublisher->pleaseStop(barrier.fork());
-        m_impl->m_outgoingTunnelPool->pleaseStop(barrier.fork());
-        m_impl->m_tcpReversePool->pleaseStop(barrier.fork());
-    }
-
-    cloudServicesStoppedPromise.get_future().wait();
+    m_impl->m_debugIniReloadTimer->pleaseStopSync();
+    m_impl->m_addressResolver->pleaseStopSync();
 
     for (const auto& init: m_impl->m_customInits)
     {
@@ -165,34 +144,14 @@ aio::AIOService& SocketGlobals::aioService()
     return s_instance->m_impl->m_aioServiceGuard.aioService();
 }
 
-cloud::AddressResolver& SocketGlobals::addressResolver()
+AddressResolver& SocketGlobals::addressResolver()
 {
     return *s_instance->m_impl->m_addressResolver;
 }
 
-cloud::MediatorAddressPublisher& SocketGlobals::addressPublisher()
+cloud::CloudConnectController& SocketGlobals::cloud()
 {
-    return *s_instance->m_impl->m_addressPublisher;
-}
-
-hpm::api::MediatorConnector& SocketGlobals::mediatorConnector()
-{
-    return *s_instance->m_impl->m_mediatorConnector;
-}
-
-cloud::OutgoingTunnelPool& SocketGlobals::outgoingTunnelPool()
-{
-    return *s_instance->m_impl->m_outgoingTunnelPool;
-}
-
-cloud::CloudConnectSettings& SocketGlobals::cloudConnectSettings()
-{
-    return s_instance->m_impl->m_cloudConnectSettings;
-}
-
-cloud::tcp::ReverseConnectionPool& SocketGlobals::tcpReversePool()
-{
-    return *s_instance->m_impl->m_tcpReversePool;
+    return *s_instance->m_impl->cloudConnectController;
 }
 
 int SocketGlobals::initializationFlags()
@@ -252,10 +211,8 @@ void SocketGlobals::printArgumentsHelp(std::ostream* outputStream)
     (*outputStream) <<
         "  --ip-version=, -ip               Ip version to use. 4 or 6" << std::endl <<
         "  --enforce-socket={socket type}   tcp, udt, cloud" << std::endl <<
-        "  --enforce-ssl                    Use ssl for every connection" << std::endl <<
-        "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
-        "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
-        "  --cloud-connect-enable-proxy-only" << std::endl;
+        "  --enforce-ssl                    Use ssl for every connection" << std::endl;
+    cloud::CloudConnectController::printArgumentsHelp(outputStream);
 }
 
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
@@ -269,21 +226,7 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
     if (arguments.get("enforce-ssl", "ssl"))
         SocketFactory::enforceSsl();
 
-    if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        mediatorConnector().mockupMediatorUrl(*value);
-
-    if (arguments.get("cloud-connect-disable-udp"))
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-            ~((int)cloud::CloudConnectType::udpHp));
-    }
-
-    if (arguments.get("cloud-connect-enable-proxy-only"))
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            (int)cloud::CloudConnectType::proxy);
-    }
+    cloud().applyArguments(arguments);
 }
 
 void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
@@ -299,7 +242,7 @@ void SocketGlobals::setDebugIniReloadTimer()
         kDebugIniReloadInterval,
         [this]()
         {
-        m_impl->m_debugIni.reload();
+            m_impl->m_debugIni.reload();
             setDebugIniReloadTimer();
         });
 }
@@ -311,20 +254,21 @@ void SocketGlobals::initializeNetworking()
 #ifdef ENABLE_SSL
     ssl::initOpenSSLGlobalLock();
 #endif
+
+    m_impl->m_addressResolver = std::make_unique<AddressResolver>();
+    m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
 
 void SocketGlobals::initializeCloudConnectivity()
 {
-    m_impl->m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>();
-    m_impl->m_addressPublisher = std::make_unique<cloud::MediatorAddressPublisher>(
-        m_impl->m_mediatorConnector->systemConnection());
-    m_impl->m_outgoingTunnelPool = std::make_unique<cloud::OutgoingTunnelPool>();
-    m_impl->m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
+    m_impl->cloudConnectController = std::make_unique<cloud::CloudConnectController>(
         &m_impl->m_aioServiceGuard.aioService(),
-        m_impl->m_mediatorConnector->clientConnection());
-    m_impl->m_addressResolver = std::make_unique<cloud::AddressResolver>(
-        m_impl->m_mediatorConnector->clientConnection());
-    m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
+        m_impl->m_addressResolver.get());
+}
+
+void SocketGlobals::deinitializeCloudConnectivity()
+{
+    m_impl->cloudConnectController.reset();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -340,8 +284,10 @@ void SocketGlobalsHolder::reinitialize(bool initializePeerId)
     m_socketGlobalsGuard.reset();
     m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>(m_initializationFlags);
 
+    // TODO: #ak It is not clear why following call is in reinitialize,
+    // but not in initial initialization. Remove it from here.
     if (initializePeerId)
-        SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
+        SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
 }
 
 } // namespace network

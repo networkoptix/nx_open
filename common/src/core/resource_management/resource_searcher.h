@@ -128,9 +128,8 @@ protected:
 
 public:
     QStringList getPathCheckList() const;
-    void setPathCheckList(const QStringList& paths);
-    inline void clearPathCheckList()
-    { setPathCheckList(QStringList()); }
+    virtual void setPathCheckList(const QStringList& paths);
+    virtual void clearPathCheckList();
 
     // creates an instance of proper resource from file
     virtual QnResourcePtr checkFile(const QString &filename) const = 0;

@@ -9,7 +9,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>

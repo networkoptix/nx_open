@@ -31,9 +31,10 @@ boost::optional<SocketAddress> PredefinedMediatorConnector::udpEndpoint() const
     return m_udpEndpoint;
 }
 
-bool PredefinedMediatorConnector::isConnected() const
+void PredefinedMediatorConnector::setOnMediatorAvailabilityChanged(
+    hpm::api::MediatorAvailabilityChangedHandler /*handler*/)
 {
-    return true;
+    // TODO
 }
 
 } // namespace test

@@ -115,7 +115,7 @@ public:
         nx_http::RequestProcessedHandler completionHandler) override
     {
         nx_http::ConnectionEvents events;
-        events.onResponseHasBeenSent = 
+        events.onResponseHasBeenSent =
             [threadStorage = m_threadStorage](nx_http::HttpServerConnection* connection)
             {
                 threadStorage->add(std::make_unique<ResumableThread>(
@@ -313,6 +313,6 @@ TEST_F(TakingHttpSocketTest, SslSocket)
 TEST_F(TakingHttpSocketTest, TcpSocket)
 {
     launchTest(nx_http::kUrlSchemeName);
-} 
+}
 
 } // namespace nx_http

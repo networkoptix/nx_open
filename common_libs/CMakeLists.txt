@@ -4,7 +4,7 @@ add_subdirectory(nx_network)
 add_subdirectory(nx_update)
 add_subdirectory(udt)
 
-if(withClouds)
+if(((LINUX AND arch STREQUAL "x64") OR (WINDOWS AND arch STREQUAL "x64")) AND withClouds)
     add_subdirectory(nx_cassandra)
 endif()
 

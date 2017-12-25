@@ -64,8 +64,6 @@ QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
         return QList<QnResourcePtr>();
 }
 
-
-
 QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager )
 :
     m_discoveryManager( discoveryManager )
@@ -75,6 +73,11 @@ QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDele
 void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 {
     m_discoveryManager->doResourceDiscoverIteration();
+}
+
+void QnResourceDiscoveryManagerTimeoutDelegate::onForceSearch()
+{
+    m_discoveryManager->doLocalSearch();
 }
 
 
@@ -141,6 +144,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
 QnAbstractResourceSearcher* QnResourceDiscoveryManager::searcherByManufacture(
     const QString& manufacture) const
 {
+    QnMutexLocker locker(&m_searchersListMutex);
     for (const auto& searcher: m_searchersList)
     {
         if (searcher && searcher->manufacture() == manufacture)
@@ -201,44 +205,63 @@ void QnResourceDiscoveryManager::run()
 {
     initSystemThreadId();
     m_runNumber = 0;
+    // dkargin: I really want to move m_timer inside QnResourceDiscoveryManagerTimeoutDelegate
     m_timer.reset( new QTimer() );
     m_timer->setSingleShot( true );
+
+    m_state = InitialSearch;
+
     QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
+
+    connect(this, &QnResourceDiscoveryManager::forceLocalSearch,
+        &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onForceSearch, Qt::QueuedConnection);
+
     connect(m_timer, &QTimer::timeout,
         &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onTimeout);
+
     m_timer->start( 0 );    //immediate execution
-    m_state = InitialSearch;
 
     exec();
 
     m_timer.reset();
 }
 
+void QnResourceDiscoveryManager::queryLocalDiscovery()
+{
+    emit forceLocalSearch();
+}
+
 static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 static const int MIN_DISCOVERY_SEARCH_MS = 1000 * 15;
+
+void QnResourceDiscoveryManager::doLocalSearch()
+{
+    ResourceSearcherList searchersList;
+    {
+        QnMutexLocker locker(&m_searchersListMutex);
+        searchersList = m_searchersList;
+    }
+
+    for (QnAbstractResourceSearcher *searcher : searchersList)
+    {
+        if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
+        {
+            QnResourceList lst = searcher->search();
+            m_resourceProcessor->processResources(lst);
+        }
+    }
+    emit localSearchDone();
+}
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
     QElapsedTimer discoveryTime;
     discoveryTime.restart();
-    ResourceSearcherList searchersList;
-    {
-        QnMutexLocker locker( &m_searchersListMutex );
-        searchersList = m_searchersList;
-    }
 
     switch( m_state )
     {
         case InitialSearch:
-            for (QnAbstractResourceSearcher *searcher: searchersList)
-            {
-                if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
-                {
-                    QnResourceList lst = searcher->search();
-                    m_resourceProcessor->processResources(lst);
-                }
-            }
-            emit localSearchDone();
+            this->doLocalSearch();
             m_state = PeriodicSearch;
             break;
 
@@ -631,7 +654,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
     int addedCount = 0;
     for (const auto& camera: cameras)
     {
-        // This is important to use reverse order of searchers as ONVIF resource type fits both 
+        // This is important to use reverse order of searchers as ONVIF resource type fits both
         // ONVIF and FLEX searchers, while ONVIF is always last one.
         for (auto searcherIterator = m_searchersList.rbegin();
             searcherIterator != m_searchersList.rend();

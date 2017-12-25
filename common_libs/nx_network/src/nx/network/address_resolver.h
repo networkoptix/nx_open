@@ -3,15 +3,13 @@
 #include <set>
 #include <deque>
 
+#include <nx/network/async_stoppable.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/scope_guard.h>
 
-#include "mediator_client_connections.h"
-
 namespace nx {
 namespace network {
-namespace cloud {
 
 enum class AddressType
 {
@@ -34,17 +32,8 @@ struct TypedAddress
 enum class AddressAttributeType
 {
     unknown,
-    port, //!< NX peer port
-};
-
-enum class CloudConnectType
-{
-    unknown = 0,
-    forwardedTcpPort = 0x01,   /**< E.g., Upnp */
-    udpHp = 0x02,      /**< UDP hole punching */
-    tcpHp = 0x04,      /**< TCP hole punching */
-    proxy = 0x08,      /**< Proxy server address */
-    all = forwardedTcpPort | udpHp | tcpHp | proxy,
+    /** NX peer port. */
+    port,
 };
 
 struct NX_NETWORK_API AddressAttribute
@@ -75,62 +64,56 @@ struct NX_NETWORK_API AddressEntry
     QString toString() const;
 };
 
-//!Contains peer names, their known addresses and some attributes
-class NX_NETWORK_API AddressResolver
-        : public QnStoppableAsync
+/**
+ * Resolves hostname to IP address or cloud host id which
+ * is enough to establish connection to the host.
+ */
+class NX_NETWORK_API AddressResolver:
+    public QnStoppableAsync
 {
 public:
-    typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
-    AddressResolver(std::unique_ptr<MediatorConnection> mediatorConnection);
+    AddressResolver();
     virtual ~AddressResolver() = default;
 
-    //!Add new peer address
-    /*!
-        Peer addresses are resolved from time to time in the following way:\n
-        - custom NX resolve request is sent if nxApiPort attribute is provided.
-            If peer responds and reports same name as peerName than address
-            considered "resolved"
-        - if host does not respond to custom NX resolve request or no
-            nxApiPort attribute, than ping is used from time to time
-        - resolved address is "resolved" for only some period of time
-
-        \param attributes Attributes refer to hostAddress not peerName
-
-        NOTE: Peer can have multiple addresses
-    */
+    /**
+     * Add new peer address.
+     * Peer addresses are resolved from time to time in the following way:\n
+     * - Custom NX resolve request is sent if nxApiPort attribute is provided.
+     *   If peer responds and reports same name as peerName than address
+     *   considered "resolved".
+     * - If host does not respond to custom NX resolve request or no
+     *   nxApiPort attribute, than ping is used from time to time.
+     * - Resolved address is "resolved" for only some period of time.
+     *
+     * @param attributes Attributes refer to hostAddress not peerName.
+     *
+     * NOTE: Peer can have multiple addresses.
+     */
     void addFixedAddress(
         const HostAddress& hostName, const SocketAddress& endpoint);
 
-    //!Removes added address, if endpoint is boost::none, removes all addresses.
-    void removeFixedAddress(
-        const HostAddress& hostName, boost::optional<SocketAddress> endpoint = boost::none);
-
-    //!Resolves domain address to the list of subdomains
-    /*!
-        \example resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
-
-        NOTE: handler might be called within this function in case if
-            values are avaliable from cache
+    /**
+     * Removes added address, if endpoint is boost::none, removes all addresses.
      */
-    void resolveDomain(
-        const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler);
+    void removeFixedAddress(
+        const HostAddress& hostName,
+        boost::optional<SocketAddress> endpoint = boost::none);
 
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::deque<AddressEntry>)> ResolveHandler;
 
-    //!Resolves hostName like DNS server does
-    /*!
-        handler is called with complete address list includung:
-            - addresses reported by \fn addPeerAddress
-            - resolve result from \class DnsResolver
-            - resolve result from \class MediatorAddressResolver (TODO :)
-
-        NOTE: handler might be called within this function in case if
-            values are avaliable from cache
-
-        natTraversal defines if mediator should be used for address resolution
-    */
+    /**
+     * Resolves hostName like DNS server does.
+     * handler is called with complete address list includung:
+     * - Addresses reported by AddressResolver::addFixedAddress.
+     * - Resolve result from DnsResolver.
+     * - Resolve result from MediatorAddressResolver (TODO :).
+     *
+     * @param natTraversalSupport defines if mediator should be used for address resolution.
+     *
+     * NOTE: Handler might be called within this function in case if
+     *   values are avaliable from cache.
+     */
     void resolveAsync(
         const HostAddress& hostName,
         ResolveHandler handler,
@@ -143,11 +126,11 @@ public:
         NatTraversalSupport natTraversalSupport,
         int ipVersion);
 
-    //!Cancels request
-    /*!
-        if handler not provided the method will block until actual
-        cancelation is done
-    */
+    /**
+     * Cancels request.
+     * If handler not provided the method will block until actual
+     *   cancelation is done.
+     */
     void cancel(
         void* requestId,
         nx::utils::MoveOnlyFunc<void()> handler = nullptr);
@@ -158,18 +141,13 @@ public:
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
-    /**
-     * true: resolve on mediator to have a chanse to get direct IPs, DNS is used in case if
-     *      mediator returned nothing.
-     * false: do not resolve on mediator, set cloud address in case of patter match pattern match,
-     *      DNS is involved only if pattern does not match.
-     */
-    static const bool kResolveOnMediator = false;
-
     DnsResolver& dnsResolver() { return m_dnsResolver; }
 
     /** @return true If endpoint is valid for socket connect. */
     bool isValidForConnect(const SocketAddress& endpoint) const;
+
+    void setCloudResolveEnabled(bool isEnabled);
+    bool isCloudResolveEnabled() const;
 
 protected:
     struct NX_NETWORK_API HostAddressInfo
@@ -221,17 +199,12 @@ protected:
             ResolveHandler handler);
     };
 
-    virtual bool isMediatorAvailable() const;
-
     void tryFastDomainResolve(HaInfoIterator info);
 
     void dnsResolve(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion);
 
     void mediatorResolve(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
-
-    void mediatorResolveImpl(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
 
     std::vector<Guard> grabHandlers(
@@ -260,9 +233,9 @@ protected:
     mutable QnWaitCondition m_condition;
     HostInfoMap m_info;
     std::multimap<void*, RequestInfo> m_requests;
+    bool m_isCloudResolveEnabled = false;
 
     DnsResolver m_dnsResolver;
-    std::unique_ptr<MediatorConnection> m_mediatorConnection;
     const QRegExp m_cloudAddressRegExp;
 
     bool isCloudHostName(
@@ -270,6 +243,5 @@ protected:
         const QString& hostName) const;
 };
 
-} // namespace cloud
 } // namespace network
 } // namespace nx

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
@@ -31,9 +32,9 @@ protected:
             m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(
@@ -48,7 +49,7 @@ protected:
 
     void enableReveseConnectionsOnClient(boost::optional<size_t> poolSize = boost::none)
     {
-        auto& pool = SocketGlobals::tcpReversePool();
+        auto& pool = SocketGlobals::cloud().tcpReversePool();
         pool.setPoolSize(poolSize);
         pool.setKeepAliveOptions(KeepAliveOptions(
             std::chrono::seconds(60), std::chrono::seconds(10), 3));

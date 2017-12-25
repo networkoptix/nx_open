@@ -28,6 +28,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay lable to detected object description.");
     NX_INI_FLAG(0, enableProgressInformers, "Enable global operation progress informers in the notification panel.");
+    NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
 };
 
 inline Ini& ini()

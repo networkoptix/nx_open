@@ -54,6 +54,6 @@ private:
     };
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

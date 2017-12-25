@@ -37,6 +37,7 @@
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
@@ -72,10 +73,10 @@ QnMobileClientModule::QnMobileClientModule(
     m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);

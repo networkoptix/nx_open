@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/nettools.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/sync_queue.h>

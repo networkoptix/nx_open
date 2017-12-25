@@ -17,13 +17,6 @@ class ManualDeviceSearcher: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    enum class State
-    {
-        InitializationError,
-        Searching,
-        Finished
-    };
-
     ManualDeviceSearcher(
         const QnMediaServerResourcePtr& server,
         const QString& address,
@@ -43,7 +36,7 @@ public:
 
     QnManualResourceSearchStatus::State progress() const;
 
-    QString lastErrorText() const;
+    QString initialError() const;
 
     QnMediaServerResourcePtr server() const;
 

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/aio_service.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>

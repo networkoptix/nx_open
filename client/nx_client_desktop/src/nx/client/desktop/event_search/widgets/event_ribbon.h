@@ -37,6 +37,6 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

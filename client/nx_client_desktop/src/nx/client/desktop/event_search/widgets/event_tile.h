@@ -119,6 +119,6 @@ private:
     qreal m_progressValue = 0.0;
 };
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

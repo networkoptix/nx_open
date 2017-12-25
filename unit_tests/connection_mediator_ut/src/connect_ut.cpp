@@ -5,7 +5,8 @@
 
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/stun/async_client.h>
@@ -60,7 +61,7 @@ protected:
 
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
-        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_address));
     }
 
@@ -124,16 +125,7 @@ TEST_F( ConnectTest, BindConnect )
         .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID));
 
     nx_http::HttpClient client;
-    if( nx::network::cloud::AddressResolver::kResolveOnMediator )
-    {
-        ASSERT_TRUE( client.doGet(address) );
-        ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
-        ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
-    }
-    else
-    {
-        ASSERT_FALSE( client.doGet(address) );
-    }
+    ASSERT_FALSE( client.doGet(address) );
 }
 
 } // namespace test

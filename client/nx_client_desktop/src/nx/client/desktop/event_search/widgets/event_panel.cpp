@@ -25,6 +25,6 @@ void EventPanel::paintEvent(QPaintEvent* /*event*/)
     d->paintBackground();
 }
 
-} // namespace
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -46,6 +46,14 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     connect(generalPageWidget, &QnGeneralPreferencesWidget::recordingSettingsChanged, this,
         updateRecorderSettings);
 
+    auto updateMediaDirectories = [this]
+    {
+        context()->menu()->trigger(action::UpdateLocalFilesAction);
+    };
+
+    connect(generalPageWidget, &QnGeneralPreferencesWidget::mediaDirectoriesChanged, this,
+        updateMediaDirectories);
+
     addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
     const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);

@@ -11,6 +11,7 @@
 
 #include "abstract_outgoing_tunnel_connection.h"
 #include "tunnel.h"
+#include "../data/connection_result_data.h"
 
 namespace nx {
 namespace network {

@@ -13,7 +13,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 
 #include "utils/common/synctime.h"

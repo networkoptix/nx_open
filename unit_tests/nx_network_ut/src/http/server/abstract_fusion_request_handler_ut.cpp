@@ -93,7 +93,7 @@ private:
             nullptr,
             std::move(message),
             nx::utils::stree::ResourceContainer(),
-            std::bind(&HttpServerAbstractFusionRequestHandler::onRequestProcessed, this, 
+            std::bind(&HttpServerAbstractFusionRequestHandler::onRequestProcessed, this,
                 _1, _2, _3));
     }
 

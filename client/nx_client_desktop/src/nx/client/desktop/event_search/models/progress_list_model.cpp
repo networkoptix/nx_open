@@ -3,18 +3,16 @@
 #include <client/client_globals.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/client/desktop/ui/workbench/extensions/activity_manager.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-using namespace ui::workbench;
-
 ProgressListModel::ProgressListModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_activities(context()->instance<ActivityManager>()->activities())
+    m_activities(context()->instance<WorkbenchProgressManager>()->activities())
 {
     const auto added =
         [this](const QnUuid& activityId)
@@ -58,12 +56,15 @@ ProgressListModel::ProgressListModel(QObject* parent):
                 };
         };
 
-    auto manager = context()->instance<ActivityManager>();
-    connect(manager, &ActivityManager::added, this, added);
-    connect(manager, &ActivityManager::removed, this, removed);
-    connect(manager, &ActivityManager::progressChanged, this, changed({Qn::ProgressValueRole}));
-    connect(manager, &ActivityManager::descriptionChanged, this, changed({Qn::DescriptionTextRole}));
-    connect(manager, &ActivityManager::cancellableChanged, this, changed({Qn::RemovableRole}));
+    auto manager = context()->instance<WorkbenchProgressManager>();
+    connect(manager, &WorkbenchProgressManager::added, this, added);
+    connect(manager, &WorkbenchProgressManager::removed, this, removed);
+    connect(manager, &WorkbenchProgressManager::progressChanged,
+        this, changed({Qn::ProgressValueRole}));
+    connect(manager, &WorkbenchProgressManager::descriptionChanged,
+        this, changed({Qn::DescriptionTextRole}));
+    connect(manager, &WorkbenchProgressManager::cancellableChanged,
+        this, changed({Qn::RemovableRole}));
 }
 
 int ProgressListModel::rowCount(const QModelIndex& parent) const
@@ -79,7 +80,7 @@ QVariant ProgressListModel::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
-    const auto manager = context()->instance<ActivityManager>();
+    const auto manager = context()->instance<WorkbenchProgressManager>();
     const auto& activityId = m_activities[index.row()];
 
     switch (role)
@@ -107,7 +108,7 @@ bool ProgressListModel::setData(const QModelIndex& index, const QVariant& value,
         return false;
     }
 
-    context()->instance<ActivityManager>()->interact(m_activities[index.row()]);
+    context()->instance<WorkbenchProgressManager>()->interact(m_activities[index.row()]);
     return true;
 }
 

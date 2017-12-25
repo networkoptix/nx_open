@@ -66,7 +66,7 @@ protected:
         createChannel(AsyncChannel::InputDepletionPolicy::ignore);
         m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
-    
+
     void givenIdleBridge()
     {
         initializeFixedDataInput();
@@ -121,7 +121,7 @@ protected:
     {
         m_leftFile->setErrorState();
     }
-    
+
     void assertBridgeIsDoneDueToError()
     {
         ASSERT_NE(SystemError::noError, m_bridgeDone.get_future().get());

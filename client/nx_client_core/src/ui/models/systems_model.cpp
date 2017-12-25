@@ -12,7 +12,7 @@
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 
 namespace
 {

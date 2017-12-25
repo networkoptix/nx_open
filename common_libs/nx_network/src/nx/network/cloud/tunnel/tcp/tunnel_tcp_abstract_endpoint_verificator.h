@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>

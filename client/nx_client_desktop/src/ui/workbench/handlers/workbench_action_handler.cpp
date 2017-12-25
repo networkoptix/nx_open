@@ -70,7 +70,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 
@@ -1513,20 +1513,8 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
             {
                 messages::LocalFiles::fileIsBusy(mainWindowWidget(), oldPath);
             }
-            else
-            {
-                if (resource->hasFlags(Qn::layout))
-                {
-                    result = QnResourceDirectoryBrowser::layoutFromFile(filePath, resourcePool());
-                }
-                else
-                {
-                    QString targetName = QFileInfo(filePath).fileName();
-                    result->setName(targetName);
-                    result->setUrl(filePath);
-                }
-            }
-            resourcePool()->addResource(result);
+            // Renamed file is discovered immediately by ResourceDirectoryBrowser.
+            // It will deal with adding a resource with new name
         },
         kTimeToCloseResourceMs,
         this);
