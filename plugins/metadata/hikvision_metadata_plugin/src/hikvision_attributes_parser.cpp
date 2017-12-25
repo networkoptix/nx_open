@@ -73,7 +73,7 @@ HikvisionEvent AttributesParser::parseEventXml(
         {
             result.channel = reader.readElementText().toInt();
         }
-        else if (name == "dateTime")
+        else if (name == "datetime")
         {
             result.dateTime = QDateTime::fromString(reader.readElementText(), Qt::ISODate);
         }
@@ -81,7 +81,7 @@ HikvisionEvent AttributesParser::parseEventXml(
         {
             result.isActive = reader.readElementText() == "active";
         }
-        else if (name == "eventType")
+        else if (name == "eventtype")
         {
             const auto internalName = parseInternalName(reader.readElementText());
             result.typeId = manifest.eventTypeByInternalName(internalName);
@@ -89,11 +89,11 @@ HikvisionEvent AttributesParser::parseEventXml(
         else if (name == "eventdescription")
         {
             description = parseInternalName(reader.readElementText());
-            //result.description = parseInternalName(reader.readElementText());
-            //result.caption = result.description;
         }
-
-        reader.skipCurrentElement();
+        else
+        {
+            reader.skipCurrentElement();
+        }
     }
 
     result.caption = HikvisionStringHelper::buildCaption(

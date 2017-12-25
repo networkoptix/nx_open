@@ -45,7 +45,8 @@ const Hikvision::EventDescriptor& Hikvision::DriverManifest::eventDescriptorById
         }
     }
 
-    return Hikvision::EventDescriptor();
+    static const Hikvision::EventDescriptor kEmptyDescriptor;
+    return kEmptyDescriptor;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EventDescriptor, (json), EventDescriptor_Fields)

@@ -44,10 +44,12 @@ bool HikvisionBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest, &success);
     if (!success)
         return false;
-
-    std::vector<HikvisionEvent> result;
-    result.push_back(hikvisionEvent);
-    m_handler(result);
+    if (!hikvisionEvent.typeId.isNull())
+    {
+        std::vector<HikvisionEvent> result;
+        result.push_back(hikvisionEvent);
+        m_handler(result);
+    }
     return true;
 }
 
