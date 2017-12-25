@@ -88,6 +88,17 @@ void DeviceAdditionDialog::initializeControls()
     for (const auto server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
 
+    ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
+    ui->startAddressEdit->setPlaceholderText(tr("Start address"));
+    ui->endAddressEdit->setPlaceholderText(tr("End address"));
+    ui->knownAddressPortSpinBox->setEnabled(!ui->knownAddressAutoPortCheckBox->isChecked());
+    ui->subnetScanPortSpinBox->setEnabled(!ui->subnetScanAutoPortCheckBox->isChecked());
+
+    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
+    ui->hintLabel->setToolTip(tr("Examples:")
+        + lit("\n192.168.1.15\nwww.example.com:8080\nhttp://example.com:7090/image.jpg"
+            "\nrtsp://example.com:554/video\nudp://239.250.5.5:1234"));
+
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
         [this]()
         {
