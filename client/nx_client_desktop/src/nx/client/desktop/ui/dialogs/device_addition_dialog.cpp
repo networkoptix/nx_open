@@ -9,7 +9,9 @@
 #include <ui/style/custom_style.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/widgets/views/fake_resource_list_view.h>
 
+#include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
 
@@ -19,6 +21,26 @@ bool isKnownAddressPage(QTabWidget* tabWidget)
 {
     static constexpr auto kKnownAddressPageIndex = 0;
     return tabWidget->currentIndex() == kKnownAddressPageIndex;
+}
+
+QnFakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
+{
+    QnFakeResourceList result;
+
+    for(const auto& device: devices)
+    {
+        const QnFakeResourceDescription camera =
+            {
+                device.uniqueId,
+                qnSkin->icon("tree/camera.png"),
+                device.name,
+                device.url
+            };
+
+        result.append(camera);
+    }
+
+    return result;
 }
 
 } // namespace
@@ -46,8 +68,6 @@ DeviceAdditionDialog::~DeviceAdditionDialog()
 
 void DeviceAdditionDialog::initializeControls()
 {
-    //FIXME: remove default address
-    ui->addressEdit->setText(lit("rtsp://media.smart-streaming.com/mytest/mp4:sample_phone_150k.mp4"));
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
     connect(ui->stopSearchButton, &QPushButton::clicked,
@@ -218,8 +238,8 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
     if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted)
     {
-        // FIXME: add error message handling
-        qDebug() << "----- ERROR: " << m_currentSearch->lastErrorText();
+
+        QnMessageBox::critical(this, tr("Device search failed"), m_currentSearch->initialError());
         stopSearch();
         return;
     }
@@ -306,11 +326,10 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     {
         for (auto& state: prevStates)
             state = FoundDevicesModel::alreadyAddedState;
-        qDebug() << "Added!";
     }
     else
     {
-        qDebug() << "Failed!";
+        showAdditionFailedDialog(toFakeResourcesList(devices));
     }
 
     for (auto it = prevStates.begin(); it != prevStates.end(); ++it)
@@ -321,6 +340,17 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
             id, FoundDevicesModel::presentedStateColumn);
         m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
     }
+}
+
+void DeviceAdditionDialog::showAdditionFailedDialog(const QnFakeResourceList& resources)
+{
+    QnMessageBox dialog(QnMessageBoxIcon::Critical,
+        tr("Failed to add %n devices", "", resources.size()), QString(),
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok,
+        this);
+
+    dialog.addCustomWidget(new QnFakeResourceListView(resources, this));
+    dialog.exec();
 }
 
 void DeviceAdditionDialog::stopSearch()
@@ -340,7 +370,6 @@ void DeviceAdditionDialog::stopSearch()
         connect(m_currentSearch, &ManualDeviceSearcher::progressChanged, this,
             [this, searcher = m_currentSearch]()
             {
-                qDebug() << searcher->progress();
                 if (!searcher->searching())
                 {
                     searcher->disconnect(this);
@@ -470,7 +499,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     ui->searchProgressBar->setFormat(progressMessage());
 
     if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted
-        && !m_currentSearch->lastErrorText().isEmpty())
+        && !m_currentSearch->initialError().isEmpty())
     {
         QnMessageBox::critical(this, tr("Device search failed"));
     }

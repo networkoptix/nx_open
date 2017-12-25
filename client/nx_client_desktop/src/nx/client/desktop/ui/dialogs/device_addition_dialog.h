@@ -2,6 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/models/resource/fake_resource_list_model.h>
 #include <nx/client/desktop/watchers/system_servers_watcher.h>
 #include <nx/client/desktop/watchers/server_online_status_watcher.h>
 
@@ -57,6 +58,8 @@ private:
         const QModelIndex& bottomRight,
         const QVector<int>& roles);
 
+    void showAdditionFailedDialog(const QnFakeResourceList& resources);
+
     int port() const;
     QString password() const;
     QString login() const;
@@ -74,8 +77,6 @@ private:
     SearchersList m_unfinishedSearches;
 
     QScopedPointer<FoundDevicesModel> m_model;
-
-
 };
 
 } // namespace ui
