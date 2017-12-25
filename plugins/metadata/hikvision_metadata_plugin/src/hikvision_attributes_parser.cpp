@@ -16,15 +16,16 @@ static const QString kAlarmInputParameter = lit("AlarmInput");
 static const QString kAlarmOutputParameter = lit("AlarmOutput");
 static const QString kSystemEventParameter = lit("SystemEvent");
 
-QString parseInternalName(const QString& rawInternalName)
+QString normalizeInternalName(const QString& rawInternalName)
 {
+
     static const std::array<QString, 2> kIgnoredPostfixes = { "TriggerCap", "Cap" };
     for (const auto& postfix : kIgnoredPostfixes)
     {
         if (rawInternalName.endsWith(postfix))
             return rawInternalName.left(rawInternalName.length() - postfix.length());
-        return QString();
     }
+    return rawInternalName;
 }
 
 } // namespace
@@ -42,7 +43,7 @@ std::vector<QString> AttributesParser::parseSupportedEventsXml(
         return result; //< Read root element
     while (reader.readNextStartElement())
     {
-        auto eventTypeName = parseInternalName(reader.name().toString());
+        auto eventTypeName = normalizeInternalName(reader.name().toString());
         if (!eventTypeName.isEmpty())
             result.push_back(eventTypeName);
         reader.skipCurrentElement();
@@ -71,24 +72,24 @@ HikvisionEvent AttributesParser::parseEventXml(
         auto name = reader.name().toString().toLower().trimmed();
         if (name == "channelid")
         {
-            result.channel = reader.readElementText().toInt();
+            result.channel = reader.readElementText().toInt() -1; //< Convert to range [0..x].
         }
         else if (name == "datetime")
         {
             result.dateTime = QDateTime::fromString(reader.readElementText(), Qt::ISODate);
         }
-        else if (name == "state")
+        else if (name == "eventstate")
         {
             result.isActive = reader.readElementText() == "active";
         }
         else if (name == "eventtype")
         {
-            const auto internalName = parseInternalName(reader.readElementText());
+            auto internalName = normalizeInternalName(reader.readElementText());
             result.typeId = manifest.eventTypeByInternalName(internalName);
         }
         else if (name == "eventdescription")
         {
-            description = parseInternalName(reader.readElementText());
+            description = reader.readElementText();
         }
         else
         {
@@ -96,20 +97,8 @@ HikvisionEvent AttributesParser::parseEventXml(
         }
     }
 
-    result.caption = HikvisionStringHelper::buildCaption(
-        manifest,
-        result.typeId,
-        result.channel,
-        result.region,
-        result.isActive);
-
-    result.description = HikvisionStringHelper::buildDescription(
-        manifest,
-        result.typeId,
-        result.channel,
-        result.region,
-        result.isActive);
-
+    result.caption = HikvisionStringHelper::buildCaption(manifest, result);
+    result.description = HikvisionStringHelper::buildDescription(manifest, result);
 
     if (outSuccess)
         *outSuccess = true;

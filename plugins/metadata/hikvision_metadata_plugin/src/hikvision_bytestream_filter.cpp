@@ -11,11 +11,8 @@ namespace plugins {
 
 namespace {
 
-static const QString kChannelField = lit("channel");
-static const QString kRegionField = lit("regionid");
+static const std::chrono::seconds kExpiredEventTimeout(5);
 
-static const QString kActive = lit("true");
-static const QString kInactive = lit("false");
 
 } // namespace
 
@@ -44,13 +41,54 @@ bool HikvisionBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
     auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest, &success);
     if (!success)
         return false;
+    std::vector<HikvisionEvent> result;
     if (!hikvisionEvent.typeId.isNull())
-    {
-        std::vector<HikvisionEvent> result;
         result.push_back(hikvisionEvent);
-        m_handler(result);
+
+    auto getEventKey = [](const HikvisionEvent& event)
+    {
+        QString result = event.typeId.toString();
+        if (event.region)
+            result += QString::number(*event.region) + lit("_");
+        if (event.channel)
+            result += QString::number(*event.channel);
+        return result;
+    };
+
+    auto eventDescriptor = m_manifest.eventDescriptorById(hikvisionEvent.typeId);
+    if (eventDescriptor.flags.testFlag(Hikvision::EventTypeFlag::stateDependent))
+    {
+        QString key = getEventKey(hikvisionEvent);
+        if (hikvisionEvent.isActive)
+            m_startedEvents[key] = StartedEvent(hikvisionEvent);
+        else
+            m_startedEvents.remove(key);
     }
+    addExpiredEvents(result);
+
+    if (!result.empty())
+        m_handler(result);
     return true;
+}
+
+void HikvisionBytestreamFilter::addExpiredEvents(std::vector<HikvisionEvent>& result)
+{
+    for (auto itr = m_startedEvents.begin(); itr != m_startedEvents.end();)
+    {
+        if (itr.value().timer.hasExpired(kExpiredEventTimeout))
+        {
+            auto& event = itr.value().event;
+            event.isActive = false;
+            event.caption = HikvisionStringHelper::buildCaption(m_manifest, event);
+            event.description = HikvisionStringHelper::buildDescription(m_manifest, event);
+            result.push_back(std::move(itr.value().event));
+            itr = m_startedEvents.erase(itr);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
 }
 
 } // namespace plugins

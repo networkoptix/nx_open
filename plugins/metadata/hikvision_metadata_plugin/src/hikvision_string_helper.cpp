@@ -13,37 +13,31 @@ namespace plugins {
 
 QString HikvisionStringHelper::buildCaption(
     const Hikvision::DriverManifest& manifest,
-    const QnUuid& eventTypeId,
-    boost::optional<int> eventChannel,
-    boost::optional<int> eventRegion,
-    bool isActive)
+    const HikvisionEvent& event)
 {
-    const auto descriptor = manifest.eventDescriptorById(eventTypeId);
+    const auto descriptor = manifest.eventDescriptorById(event.typeId);
     return descriptor.eventName.value;
 }
 
 QString HikvisionStringHelper::buildDescription(
     const Hikvision::DriverManifest& manifest,
-    const QnUuid& eventTypeId,
-    boost::optional<int> eventChannel,
-    boost::optional<int> eventRegion,
-    bool isActive)
+    const HikvisionEvent& event)
 {
-    const auto descriptor = manifest.eventDescriptorById(eventTypeId);
+    const auto descriptor = manifest.eventDescriptorById(event.typeId);
     auto description = descriptor.description;
     if (description.isEmpty())
         return QString();
 
     if (descriptor.flags.testFlag(Hikvision::EventTypeFlag::stateDependent))
     {
-        auto stateStr = isActive ? descriptor.positiveState : descriptor.negativeState;
+        auto stateStr = event.isActive ? descriptor.positiveState : descriptor.negativeState;
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
     if (descriptor.flags.testFlag(Hikvision::EventTypeFlag::regionDependent))
     {
-        auto regionStr = descriptor.regionDescription.arg(eventRegion ? *eventRegion : 0);
+        auto regionStr = descriptor.regionDescription.arg(event.region ? *event.region : 0);
         description = description.arg(regionStr);
     }
 

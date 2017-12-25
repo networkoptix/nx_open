@@ -46,7 +46,7 @@
             },
 
             "internalName": "videoloss",
-            "description": "Loitering %1",
+            "description": "videoloss %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",
             "flags": "stateDependent"
@@ -140,7 +140,7 @@
                 "localization": {
                 }
             },
-            "internalName": "AudioExceptionCap",
+            "internalName": "AudioException",
             "description": "The audio volume level is %1 the threshold",
             "positiveState": "above",
             "negativeState": "below",
@@ -153,7 +153,7 @@
                 "localization": {
                 }
             },
-            "internalName": "Tamper",
+            "internalName": "Tamper,shelteralarm",
             "description": "Tampering %1",
             "positiveState": "has been detected",
             "negativeState": "has ended",
@@ -179,8 +179,7 @@
                 "localization": {
                 }
             },
-            "internalName": "Motion",
-			"shortInternalName": "VMD",
+            "internalName": "Motion,VMD",
             "description": "Motion %1%2",
             "positiveState": "has been detected",
             "negativeState": "has ended",

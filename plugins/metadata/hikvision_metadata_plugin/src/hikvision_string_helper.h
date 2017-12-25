@@ -19,17 +19,11 @@ class HikvisionStringHelper
 public:
     static QString buildCaption(
         const Hikvision::DriverManifest& manifest,
-        const QnUuid& eventTypeId,
-        boost::optional<int> eventChannel,
-        boost::optional<int> eventRegion,
-        bool isActive);
+        const HikvisionEvent& event);
 
     static QString buildDescription(
         const Hikvision::DriverManifest& manifest,
-        const QnUuid& eventTypeId,
-        boost::optional<int> eventChannel,
-        boost::optional<int> eventRegion,
-        bool isActive);
+        const HikvisionEvent& event);
 
 private:
     template<typename Key, typename Value>
