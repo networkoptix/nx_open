@@ -257,6 +257,7 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_dbReadOnly(false),
+    m_needReparentLayouts(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
     m_timeSyncManager(nullptr),
@@ -324,6 +325,40 @@ bool createCorruptedDbBackup(const QString& dbFileName)
 QString QnDbManager::getDatabaseName(const QString& baseName)
 {
     return baseName + commonModule()->moduleGUID().toString();
+}
+
+bool QnDbManager::setMediaServersStatus(Qn::ResourceStatus status)
+{
+    QSqlQuery queryServers(m_sdb);
+    if (!prepareSQLQuery(
+        &queryServers,
+        "SELECT guid FROM vms_resource WHERE xtype_guid = ?",
+        Q_FUNC_INFO))
+    {
+        return false;
+    }
+
+    QSqlQuery updateStatusQuery(m_sdb);
+    if (!prepareSQLQuery(
+        &updateStatusQuery,
+        "INSERT OR REPLACE INTO vms_resource_status(guid, status) values (?, ?)",
+        Q_FUNC_INFO))
+    {
+        return false;
+    }
+
+    queryServers.addBindValue(m_serverTypeId.toRfc4122());
+    if (!execSQLQuery(&queryServers, Q_FUNC_INFO))
+        return false;
+    while (queryServers.next())
+    {
+        QnUuid id = QnSql::deserialized_field<QnUuid>(queryServers.value(0));
+        updateStatusQuery.addBindValue( id.toRfc4122());
+        updateStatusQuery.addBindValue((int) status);
+        if (!execSQLQuery(&updateStatusQuery, Q_FUNC_INFO))
+            return false;
+    }
+    return true;
 }
 
 bool QnDbManager::init(const QUrl& dbUrl)
@@ -480,16 +515,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         NX_CRITICAL(!m_adminUserID.isNull());
 
 
-        QSqlQuery queryServers(m_sdb);
-        queryServers.prepare("UPDATE vms_resource_status set status = ? WHERE guid in (select guid from vms_resource where xtype_guid = ?)"); // todo: only mserver without DB?
-        queryServers.bindValue(0, Qn::Offline);
-        queryServers.bindValue(1, m_serverTypeId.toRfc4122());
-        if (!queryServers.exec())
-        {
-            qWarning() << Q_FUNC_INFO << __LINE__ << queryServers.lastError();
-            NX_ASSERT(false);
+        if (!setMediaServersStatus(Qn::Offline))
             return false;
-        }
 
         // read license overflow time
         QSqlQuery query(m_sdb);
@@ -861,6 +888,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<QnUuid, ApiDiscoveryData, ApiDiscoveryDataList>(ApiCommand::addDiscoveryInformation))
+        return false;
+
+    if (!fillTransactionLogInternal<nullptr_t, ApiServerFootageData, ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
         return false;
 
     return true;
@@ -1381,6 +1411,19 @@ bool QnDbManager::encryptKvPairs()
     return true;
 }
 
+bool QnDbManager::updateDefaultRules(const nx::vms::event::RuleList& rules)
+{
+    // TODO: #GDM move to migration
+    for (const auto& rule: rules)
+    {
+        ApiBusinessRuleData ruleData;
+        fromResourceToApi(rule, ruleData);
+        if (updateBusinessRule(ruleData) != ErrorCode::ok)
+            return false;
+    }
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName.endsWith(lit("/07_videowall.sql")))
@@ -1444,28 +1487,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/43_add_business_rules.sql")))
     {
-        // TODO: #GDM move to migration
-        for (const auto& rule: vms::event::Rule::getRulesUpd43())
-        {
-            ApiBusinessRuleData ruleData;
-            fromResourceToApi(rule, ruleData);
-            if (updateBusinessRule(ruleData) != ErrorCode::ok)
-                return false;
-        }
-        return resyncIfNeeded(ResyncRules);
+        updateDefaultRules(vms::event::Rule::getRulesUpd43()) && resyncIfNeeded(ResyncRules);
     }
 
     if (updateName.endsWith(lit("/48_add_business_rules.sql")))
     {
-        // TODO: #GDM move to migration
-        for (const auto& rule: vms::event::Rule::getRulesUpd48())
-        {
-            ApiBusinessRuleData ruleData;
-            fromResourceToApi(rule, ruleData);
-            if (updateBusinessRule(ruleData) != ErrorCode::ok)
-                return false;
-        }
-        return resyncIfNeeded(ResyncRules);
+        return updateDefaultRules(vms::event::Rule::getRulesUpd48()) && resyncIfNeeded(ResyncRules);
     }
 
     if (updateName.endsWith(lit("/43_resync_client_info_data.sql")))
@@ -1558,8 +1585,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/87_migrate_videowall_layouts.sql")))
     {
-        return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceQueries)
-            && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
+        m_needReparentLayouts = true;
+        return resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
     }
     if (updateName.endsWith(lit("/92_rename_recording_param_name.sql")))
         return updateBusinessActionParameters();
@@ -1572,6 +1599,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
         return ec2::db::migrateEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+    if (updateName.endsWith(lit("/96_add_layout_item_path.sql")))
+    {
+        if (m_needReparentLayouts)
+            return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceQueries);
+    }
 
     if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
         return ec2::db::cleanupClientInfoList(m_sdb);
@@ -1585,7 +1617,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
 
     if (updateName.endsWith(lit("/99_20171214_update_http_action_enum_values.sql")))
-        return resyncIfNeeded(ResyncRules);
+        return updateDefaultRules(vms::event::Rule::getDefaultRules()) && resyncIfNeeded(ResyncRules);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -2062,7 +2094,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
-    }   
+    }
 
     return ErrorCode::ok;
 }

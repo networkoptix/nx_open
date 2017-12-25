@@ -272,6 +272,9 @@
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
+#include <nx/mediaserver/fs/media_paths/media_paths.h>
+#include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -543,47 +546,15 @@ static int freeGB(QString drive)
 
 static QStringList listRecordFolders(bool includeNetwork = false)
 {
-    QStringList folderPaths;
+    using namespace nx::mediaserver::fs::media_paths;
 
-#ifdef Q_OS_WIN
-    using namespace nx::utils::file_system;
-    (void)includeNetwork;
-    for (const WinDriveInfo& drive: getWinDrivesInfo())
-    {
-        if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
-            continue;
+    const NetworkDrives networkDrivesFlag = includeNetwork
+        ? NetworkDrives::allowed
+        : NetworkDrives::notAllowed;
 
-        folderPaths.append(QDir::toNativeSeparators(drive.path) + QnAppInfo::mediaFolderName());
-     }
-
-#endif
-
-#ifdef Q_OS_LINUX
-    QnPlatformMonitor::PartitionTypes searchFlags = QnPlatformMonitor::LocalDiskPartition;
-    if (includeNetwork)
-        searchFlags |= QnPlatformMonitor::NetworkPartition;
-
-    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(searchFlags);
-
-    //always adding storage in data dir
-    const QString& dataDirStorage = QDir::cleanPath(getDataDirectory() + "/data");
-    for(int i = 0; i < partitions.size(); ++i)
-    {
-        if( dataDirStorage.startsWith(partitions[i].path) )
-            folderPaths.append( dataDirStorage );
-        else
-            folderPaths.append( QDir::cleanPath( QDir::toNativeSeparators(partitions[i].path) + lit("/") + QnAppInfo::mediaFolderName() ) );
-    }
-#endif
-
-    if (qnServerModule->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() != 0)
-    {
-        for (auto& path: folderPaths)
-            path = closeDirPath(path) + serverGuid().toString();
-    }
-
-    NX_VERBOSE(kLogTag, lm("Record folders: %1").container(folderPaths));
-    return folderPaths;
+    auto mediaPathList = get(FilterConfig::createDefault(networkDrivesFlag));
+    NX_VERBOSE(kLogTag, lm("Record folders: %1").container(mediaPathList));
+    return mediaPathList;
 }
 
 QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)

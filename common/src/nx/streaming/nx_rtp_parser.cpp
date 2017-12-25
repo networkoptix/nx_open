@@ -24,7 +24,7 @@ QnNxRtpParser::~QnNxRtpParser()
 
 }
 
-void QnNxRtpParser::setSDPInfo(QList<QByteArray>)
+void QnNxRtpParser::setSdpInfo(QList<QByteArray>)
 {
 
 }

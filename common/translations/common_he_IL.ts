@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>רישיונות Bridge</translation>
     </message>
   </context>
   <context>
@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>ייצוא נתונים לא בוצע.</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>ארוע אנליטיקה</translation>
     </message>
     <message>
       <source>%1 at %2</source>
