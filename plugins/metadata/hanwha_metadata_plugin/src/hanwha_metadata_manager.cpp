@@ -45,7 +45,10 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
+Error HanwhaMetadataManager::startFetchingMetadata(
+    AbstractMetadataHandler* handler,
+    nxpl::NX_GUID* /*eventTypeList*/,
+    int /*eventTypeListSize*/)
 {
     auto monitorHandler =
         [this](const HanwhaEventList& events)
