@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Live Viewer</translation>
+      <translation>Live kijker</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1047,7 +1047,7 @@
     </message>
     <message>
       <source>Write to log</source>
-      <translation>Schrijf weg naar het log</translation>
+      <translation>Schrijf weg naar het logboek</translation>
     </message>
     <message>
       <source>Show notification</source>
@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Toon op alarm layout</translation>
+      <translation>Toon op alarm scherm</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
@@ -1457,20 +1457,20 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n Gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n Rollen</numerusform>
-        <numerusform>%n Rollen</numerusform>
+        <numerusform>%n Profielen</numerusform>
+        <numerusform>%n Profielen</numerusform>
       </translation>
     </message>
     <message>

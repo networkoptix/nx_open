@@ -6350,7 +6350,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Rögzített videók távoli szinkronizálása</translation>
     </message>
   </context>
   <context>
@@ -8107,7 +8107,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Showreel %1 törlése?</translation>
     </message>
   </context>
   <context>

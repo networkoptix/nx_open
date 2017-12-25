@@ -67,12 +67,12 @@
     <message>
       <location/>
       <source>Black level</source>
-      <translation>黑色準位</translation>
+      <translation>黑階</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation>白色準位</translation>
+      <translation>白階</translation>
     </message>
   </context>
   <context>
@@ -353,7 +353,7 @@
     <message>
       <location/>
       <source>Timeout</source>
-      <translation>&amp;逾時</translation>
+      <translation>逾時</translation>
     </message>
     <message>
       <location/>
@@ -540,7 +540,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -669,7 +669,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>恢復預設值</translation>
+      <translation>回復預設值</translation>
     </message>
     <message>
       <location/>
@@ -874,7 +874,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>變更密碼</translation>
+      <translation>更改密碼</translation>
     </message>
   </context>
   <context>
@@ -957,7 +957,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>事件記錄</translation>
+      <translation>事件日誌</translation>
     </message>
     <message>
       <location/>
@@ -995,7 +995,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -1099,7 +1099,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小:</translation>
+      <translation>大小</translation>
     </message>
     <message>
       <location/>
@@ -1112,7 +1112,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>其他</translation>
+      <translation>其他設定</translation>
     </message>
     <message>
       <location/>
@@ -1340,7 +1340,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>從LDAP中選取使用者...</translation>
+      <translation>從LDAP獲取使用者...</translation>
     </message>
     <message>
       <location/>
@@ -1546,7 +1546,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -1589,7 +1589,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>時間模式:</translation>
+      <translation>時間模式</translation>
     </message>
     <message>
       <location/>
@@ -1604,7 +1604,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>明亮度:</translation>
+      <translation>亮度</translation>
     </message>
     <message>
       <location/>
@@ -1619,7 +1619,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>巡曳週期</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>認證</translation>
+      <translation>身份驗証</translation>
     </message>
     <message>
       <location/>
@@ -1655,7 +1655,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>啟用聲音</translation>
+      <translation>允許聲音</translation>
     </message>
     <message>
       <location/>
@@ -1683,7 +1683,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>測試…</translation>
+      <translation>測試...</translation>
     </message>
     <message>
       <location/>
@@ -1757,7 +1757,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>詳細</translation>
+      <translation>細節</translation>
     </message>
     <message>
       <location/>
@@ -1824,7 +1824,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>書籤</translation>
+      <translation>寫入書籤</translation>
     </message>
   </context>
   <context>
@@ -1912,7 +1912,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>登入:</translation>
+      <translation>登入帳號:</translation>
     </message>
     <message>
       <location/>
@@ -2152,7 +2152,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>秒</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2312,7 +2312,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 位址:</translation>
+      <translation>IP 位址</translation>
     </message>
     <message>
       <location/>
@@ -2404,7 +2404,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>驗證</translation>
+      <translation>身份驗証</translation>
     </message>
     <message>
       <location/>
@@ -2414,7 +2414,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>位移偵測</translation>
+      <translation>位移</translation>
     </message>
     <message>
       <location/>
@@ -2479,7 +2479,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -2489,7 +2489,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 位址:</translation>
+      <translation>IP 位址</translation>
     </message>
     <message>
       <location/>
@@ -2723,7 +2723,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>登入:</translation>
+      <translation>登入帳號:</translation>
     </message>
     <message>
       <location/>

@@ -361,7 +361,7 @@ Press ESC to cancel</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>型態</translation>
+      <translation>類型</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -700,7 +700,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>型態</translation>
+      <translation>類型</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -936,7 +936,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>關閉</translation>
+      <translation>關閉​​​</translation>
     </message>
     <message>
       <source>Cancel</source>

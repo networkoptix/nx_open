@@ -1619,7 +1619,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Ciclo de Gira</translation>
     </message>
   </context>
   <context>

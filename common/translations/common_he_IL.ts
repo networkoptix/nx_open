@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>שגיאה לא ידועה.</translation>
+      <translation>שגיאה לא מוכרת.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
+      <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>זמן</translation>
+      <translation>שעה</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>שגיאה לא מוגדרת</translation>
+      <translation>שגיאה לא מוכרת</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>מודולי קלט פלט</translation>
+      <translation>מודולי קלט/פלט</translation>
     </message>
     <message>
       <source>I/O modules</source>
@@ -708,7 +708,7 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>נמוכה</translation>
+      <translation>נמוך</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -716,11 +716,11 @@
     </message>
     <message>
       <source>High</source>
-      <translation>גבוהה</translation>
+      <translation>גבוה</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>מיטבית</translation>
+      <translation>הטוב ביותר</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -1032,7 +1032,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>צופה בוידאו חי</translation>
+      <translation>צופה בשידור חי</translation>
     </message>
     <message>
       <source>Custom Role</source>

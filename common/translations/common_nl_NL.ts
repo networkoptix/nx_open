@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(onbekend)</translation>
+      <translation>(unknown)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -323,7 +323,7 @@
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
+      <translation>Kon geen encoder vinden voor codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
+      <translation>Kan de output stream niet toewijzen voor opname.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -389,7 +389,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kon geen encoder vinden voor codec %1.</translation>
+      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -657,7 +657,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de output stream niet toewijzen voor opname.</translation>
+      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -988,7 +988,7 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Geavanceerde Kijker</translation>
+      <translation>Geavanceerde kijker</translation>
     </message>
     <message>
       <source>Viewer</source>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Live Viewer</translation>
+      <translation>Live kijker</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1462,7 +1462,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n Gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>

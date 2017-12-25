@@ -30,7 +30,7 @@
         "unexpectedError": "Failed: unexpected error has happened",
         "connnetionError": "Erro de ligação",
         "wrongPassword": "Wrong password.",
-        "error": "Error: ",
+        "error": "Erro: ",
         "restartNeeded": "Changes saved. Restart server to apply new settings?",
         "settingsSaved": "Settings saved",
         "confirmHardwareRestart": "Restart server operation system?",
@@ -51,6 +51,53 @@
         "confirmChangePasswordTitle": "Change system password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Save new password",
         "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
+    },
+    "settingsConfig": {
+        "auditTrailEnabled": "Audit trail enabled",
+        "cameraSettingsOptimization": "Allow device setting optimization",
+        "disabledVendors": "Disabled vendors",
+        "ec2AliveUpdateIntervalSec": "System alive update interval (seconds)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Connection keep alive timeout (seconds)",
+        "ec2KeepAliveProbeCount": "Connection keep alive probes (seconds)",
+        "emailFrom": "Email from",
+        "emailSignature": "Email signature",
+        "emailSupportEmail": "Support Email",
+        "ldapAdminDn": "LDAP admin DN",
+        "ldapAdminPassword": "LDAP admin password",
+        "ldapSearchBase": "LDAP search base",
+        "ldapSearchFilter": "LDAP search filter",
+        "ldapUri": "LDAP URI",
+        "autoDiscoveryEnabled": "Enable device auto discovery",
+        "smtpConnectionType": "SMTP connection type",
+        "smtpHost": "SMTP host",
+        "smtpPort": "SMTP port",
+        "smtpSimple": "SMTP simple",
+        "smtpTimeout": "SMTP timeout",
+        "smptPassword": "SMTP password",
+        "smtpUser": "SMTP user",
+        "updateNotificationsEnabled": "Update notifications enabled",
+        "arecontRtspEnabled": "Arecont RTSP Enabled",
+        "backupNewCamerasByDefault": "Backup new cameras by default",
+        "statisticsAllowed": "Send anonymous usage statistics and crash reports",
+        "backupQualities": "Backup qualities",
+        "serverDiscoveryPingTimeoutSec": "Server discovery timeout",
+        "cloudAccountName": "Cloud owner account",
+        "cloudHost": "Cloud host",
+        "cloudAuthKey": "Cloud auth key",
+        "cloudSystemID": "Cloud system id",
+        "systemName": "System name",
+        "newSystem": "Server is \"New\"",
+        "proxyConnectTimeoutSec": "Proxy connection timeout (seconds)",
+        "crossdomainEnabled": "Enable web client",
+        "statisticsReportLastNumber": "Statistics report - last number",
+        "statisticsReportLastTime": "Statistics report - last time",
+        "statisticsReportServerApi": "Statistics server api",
+        "statisticsReportTimeCycle": "Statistics report interval",
+        "systemId": "System ID",
+        "systemNameForId": "System name",
+        "takeCameraOwnershipWithoutLock": "Take cameras ownership without lock",
+        "timeSynchronizationEnabled": "Time synchronization enabled",
+        "upnpPortMappingEnabled": "UPNP port mapping enabled"
     },
     "info": {
         "tabs": {
@@ -88,12 +135,12 @@
         "cannotGetUser": "Server failure: cannot retrieve current user data"
     },
     "offlineDialog": {
-        "serverOffline": "server is offline"
+        "serverOffline": "servidor offline"
     },
     "restartDialog": {
         "serverStarting": "server is starting",
         "serverRestarting": "server is restarting",
-        "serverOffline": "server is offline"
+        "serverOffline": "servidor offline"
     },
     "fileUpload": {
         "started": "Update successfully started. It will take several minutes",
@@ -118,13 +165,13 @@
         "cameraLinks": {
             "copyToClipboard": "copy to clipboard",
             "highStream": "High stream",
-            "copyDefaultText": "copy",
+            "copyDefaultText": "copiar",
             "unknown": "Desconhecido",
             "lowStream": "Low stream",
             "transcoding": "Transcoding",
             "copyActiveText": "copied to clipboard"
         },
-        "searchCamPlaceholder": "search",
+        "searchCamPlaceholder": "pesquisa",
         "cameraStates": {
             "noFormat": "This browser or device does not support video playback from  this camera.",
             "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",

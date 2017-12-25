@@ -248,7 +248,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimise</translation>
+      <translation>Minimize</translation>
     </message>
     <message>
       <source>Maximize</source>
@@ -6354,7 +6354,7 @@ to %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Remote archive synchronization</translation>
     </message>
   </context>
   <context>
@@ -8111,7 +8111,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

@@ -27,7 +27,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Password</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>Соединиться</translation>
+      <translation>Соединение</translation>
     </message>
   </context>
   <context>

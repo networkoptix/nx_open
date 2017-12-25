@@ -68,14 +68,14 @@
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
  placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">Gb</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
  placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">Gb</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Aviso!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
         </div>

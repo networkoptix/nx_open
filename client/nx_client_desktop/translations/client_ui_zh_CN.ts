@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>开发环境</translation>
+      <translation>认证</translation>
     </message>
     <message>
       <location/>
@@ -186,12 +186,12 @@
     <message>
       <location/>
       <source>Server actions</source>
-      <translation>服务端操作</translation>
+      <translation>服务器操作</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation>系统设置</translation>
+      <translation>系统操作</translation>
     </message>
     <message>
       <location/>
@@ -206,7 +206,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>内容</translation>
+      <translation>配置信息</translation>
     </message>
     <message>
       <location/>
@@ -315,7 +315,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
@@ -455,7 +455,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>服务器离线</translation>
+      <translation>服务器已离线</translation>
     </message>
     <message>
       <location/>
@@ -669,7 +669,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>还原为默认值</translation>
+      <translation>恢复默认</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
@@ -761,7 +761,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>计划设定</translation>
+      <translation>录像计划设置</translation>
     </message>
     <message>
       <location/>
@@ -771,7 +771,7 @@
     <message>
       <location/>
       <source>Quality</source>
-      <translation>画质</translation>
+      <translation>质量</translation>
     </message>
     <message>
       <location/>
@@ -985,7 +985,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation>HTTP内容</translation>
+      <translation>HTTP 文本</translation>
     </message>
     <message>
       <location/>
@@ -1340,7 +1340,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>获取用户的LDAP...</translation>
+      <translation>从LDAP获取用户...</translation>
     </message>
     <message>
       <location/>
@@ -1393,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation>已关联硬件ID</translation>
+      <translation>已关联硬件ID:</translation>
     </message>
   </context>
   <context>
@@ -1467,7 +1467,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>激活许可</translation>
+      <translation>激活授权</translation>
     </message>
     <message>
       <location/>
@@ -1492,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>硬件ID:</translation>
+      <translation>硬件 Id</translation>
     </message>
   </context>
   <context>
@@ -1569,7 +1569,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>常规设置</translation>
+      <translation>界面外观</translation>
     </message>
     <message>
       <location/>
@@ -1589,7 +1589,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>时间模式:</translation>
+      <translation>时间模式</translation>
     </message>
     <message>
       <location/>
@@ -1604,7 +1604,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>对比度:</translation>
+      <translation>对比度</translation>
     </message>
     <message>
       <location/>
@@ -1614,12 +1614,12 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>轮巡周期</translation>
     </message>
   </context>
   <context>
@@ -1635,7 +1635,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <location/>
@@ -1824,7 +1824,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>标签</translation>
+      <translation>标记</translation>
     </message>
   </context>
   <context>
@@ -2177,7 +2177,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
   </context>
   <context>
@@ -2312,7 +2312,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP地址:</translation>
+      <translation>IP地址</translation>
     </message>
     <message>
       <location/>
@@ -2343,7 +2343,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
@@ -2389,7 +2389,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <location/>
@@ -2414,7 +2414,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>移动侦测</translation>
+      <translation>监控</translation>
     </message>
     <message>
       <location/>
@@ -2489,7 +2489,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP地址:</translation>
+      <translation>IP地址</translation>
     </message>
     <message>
       <location/>
@@ -2598,7 +2598,7 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>确认</translation>
+      <translation>确定</translation>
     </message>
     <message>
       <location/>

@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Support</translation>
+      <translation>Ondersteuning</translation>
     </message>
     <message>
       <location/>
@@ -389,7 +389,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation>Gebeurtenis</translation>
     </message>
     <message>
       <location/>
@@ -419,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>Bron</translation>
+      <translation>Naar</translation>
     </message>
   </context>
   <context>
@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Gebeurtnisregels</translation>
+      <translation>Event regels</translation>
     </message>
     <message>
       <location/>
@@ -535,12 +535,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -669,7 +669,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Herstel standaardwaarden</translation>
+      <translation>Standaardinstellingen herstellen</translation>
     </message>
     <message>
       <location/>
@@ -977,7 +977,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Gebeurtenisregels...</translation>
+      <translation>Event regels...</translation>
     </message>
   </context>
   <context>
@@ -995,7 +995,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -1005,7 +1005,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1089,12 +1089,12 @@
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation>Y-as verschuiving</translation>
+      <translation>Y Offset</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>X-as verschuiving</translation>
+      <translation>X Offset</translation>
     </message>
     <message>
       <location/>
@@ -1132,12 +1132,12 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Toevoegen...</translation>
+      <translation>Voeg toe...</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <location/>
@@ -1322,7 +1322,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1340,7 +1340,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen van LDAP...</translation>
+      <translation>Gebruikers ophalen via LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1373,7 +1373,7 @@
     <message>
       <location/>
       <source>Generic</source>
-      <translation>Generiek</translation>
+      <translation>Algemeen</translation>
     </message>
     <message>
       <location/>
@@ -1467,7 +1467,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>Activeer licentie</translation>
+      <translation>Licentie activeren</translation>
     </message>
     <message>
       <location/>
@@ -1546,12 +1546,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1650,7 +1650,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
@@ -1724,7 +1724,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Events</translation>
+      <translation>Evenementen</translation>
     </message>
   </context>
   <context>
@@ -1747,7 +1747,7 @@
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Start tour</translation>
+      <translation>Start Tour</translation>
     </message>
     <message>
       <location/>
@@ -1845,7 +1845,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Wachtwoord:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -1902,7 +1902,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Wachtwoord:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -1912,7 +1912,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Aanmelden:</translation>
+      <translation>Gebruikersnaam:</translation>
     </message>
     <message>
       <location/>
@@ -1935,7 +1935,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Voeg toe...</translation>
+      <translation>Toevoegen...</translation>
     </message>
     <message>
       <location/>
@@ -2073,7 +2073,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2215,7 +2215,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>Resolutie</translation>
+      <translation>Resolution</translation>
     </message>
     <message>
       <location/>
@@ -2479,12 +2479,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -2723,12 +2723,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Gebruikersnaam:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Wachtwoord:</translation>
+      <translation>Password:</translation>
     </message>
   </context>
   <context>
@@ -2881,7 +2881,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation>Schema</translation>
+      <translation>Rooster</translation>
     </message>
     <message>
       <location/>

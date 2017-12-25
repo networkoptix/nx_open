@@ -169,7 +169,7 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <label class="col-sm-6" for="{{setting}}">{{L.settingsConfig[setting]}}</label>
             <div class="col-sm-6">
                 <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
@@ -208,7 +208,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>경고!</b> 일부 변경 내용은 시스템을 재시작 해야합니다. <b>모든</b> 서버가 시스템에 존재 합니다.<br><br>
+        <b>주의!</b> 일부 변경 내용은 시스템을 재시작 해야합니다. <b>모든</b> 서버가 시스템에 존재 합니다.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >현재 서버 다시 시작</button>
         </div>

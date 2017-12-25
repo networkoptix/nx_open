@@ -6352,7 +6352,7 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Synchronisation d'archives à distance</translation>
     </message>
   </context>
   <context>
@@ -8109,7 +8109,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Supprimer Showreel %1 ?</translation>
     </message>
   </context>
   <context>
