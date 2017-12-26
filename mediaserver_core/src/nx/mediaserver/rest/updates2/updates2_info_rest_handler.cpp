@@ -28,7 +28,7 @@ JsonRestResponse createResponse()
 
 JsonRestResponse Updates2InfoRestHandler::executeGet(const JsonRestRequest& request)
 {
-    NX_ASSERT(request.path == kUpdates2Path);
+    NX_ASSERT(request.path == kUpdates2AvailablePath);
     if (request.path != kUpdates2AvailablePath)
         return nx_http::StatusCode::notFound;
 

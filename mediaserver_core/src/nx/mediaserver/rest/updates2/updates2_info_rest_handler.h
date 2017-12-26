@@ -7,6 +7,8 @@ namespace mediaserver {
 namespace rest {
 namespace updates2 {
 
+static const QString kUpdates2AvailablePath = "/api/updates2/available";
+
 class Updates2InfoRestHandler: public QnJsonRestHandler
 {
 public:
