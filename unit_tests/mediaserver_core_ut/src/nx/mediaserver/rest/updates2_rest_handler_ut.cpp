@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <nx/mediaserver/rest/updates2_rest_handler.h>
+#include <nx/mediaserver/rest/updates2/updates2_info_rest_handler.h>
+#include <nx/mediaserver/rest/updates2/detail/update_request_data_factory.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/test_support/impl/async_json_provider_mockup.h>
 #include <nx/update/info/update_request_data.h>
@@ -10,6 +11,7 @@
 namespace nx {
 namespace mediaserver {
 namespace rest {
+namespace updates2 {
 namespace test {
 
 using namespace update::info::detail::data_provider;
@@ -32,7 +34,7 @@ protected:
     virtual void TearDown() override
     {
         RawDataProviderFactory::setFactoryFunction(nullptr);
-        UpdateRequestDataFactory::setFactoryFunc(nullptr);
+        detail::UpdateRequestDataFactory::setFactoryFunc(nullptr);
     }
 
     static void whenRequestDataMockedUpWith(
@@ -40,7 +42,7 @@ protected:
         const QString& customization,
         const QnSoftwareVersion& version)
     {
-        UpdateRequestDataFactory::setFactoryFunc(
+        detail::UpdateRequestDataFactory::setFactoryFunc(
             [=]()
             {
                 return update::info::UpdateRequestData(cloudHost, customization, version);
@@ -126,6 +128,7 @@ TEST_F(Updates2RestHandler, checkResults_Null_WrongCustomization)
 }
 
 } // namespace test
+} // namespace updates2
 } // namespace rest
 } // namespace mediaserver
 } // namespace nx
