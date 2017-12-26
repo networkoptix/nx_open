@@ -194,6 +194,10 @@ if(LINUX AND box STREQUAL "none") #< Desktop Linux.
     add_subdirectory(debsetup)
 endif()
 
+if(MACOSX)
+    add_subdirectory(macsetup)
+endif()
+
 include(fix_qt_vars)
 
 nx_configure_file(
