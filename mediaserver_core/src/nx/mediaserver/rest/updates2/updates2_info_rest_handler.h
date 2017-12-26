@@ -1,14 +1,13 @@
 #pragma once
 
-#include <nx/utils/move_only_func.h>
 #include <rest/server/json_rest_handler.h>
-#include <nx/update/info/update_request_data.h>
 
 namespace nx {
 namespace mediaserver {
 namespace rest {
+namespace updates2 {
 
-class Updates2RestHandler: public QnJsonRestHandler
+class Updates2InfoRestHandler: public QnJsonRestHandler
 {
 public:
     virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
@@ -23,17 +22,7 @@ public:
 private:
 };
 
-class UpdateRequestDataFactory
-{
-public:
-    using FactoryFunc = utils::MoveOnlyFunc<update::info::UpdateRequestData()>;
-
-    static update::info::UpdateRequestData create();
-    static void setFactoryFunc(FactoryFunc factoryFunc);
-private:
-    static FactoryFunc s_factoryFunc;
-};
-
+} // namespace updates2
 } // namespace rest
 } // namespace mediaserver
 } // namespace nx
