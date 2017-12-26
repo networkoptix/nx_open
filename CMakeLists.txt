@@ -164,9 +164,7 @@ if(withMediaServer)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
 
-    if(targetDevice MATCHES "linux-*"
-        OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")
-    )
+    if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()
 endif()
@@ -192,9 +190,7 @@ if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     add_subdirectory(edge_firmware)
 endif()
 
-if(targetDevice MATCHES "linux-*"
-    OR (targetDevice STREQUAL "" AND platform STREQUAL "linux" AND NOT ANDROID)
-)
+if(LINUX AND box STREQUAL "none") #< Desktop Linux.
     add_subdirectory(debsetup)
 endif()
 
