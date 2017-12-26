@@ -320,7 +320,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     {
         // MP3 seek is buggy in the current ffmpeg version.
         if (!reopen())
-            return -1;
+            return kSeekError;
     }
 
     m_lastSeekTime = timeToSeek + m_startTimeUs; //< File physical time to UTC time.
