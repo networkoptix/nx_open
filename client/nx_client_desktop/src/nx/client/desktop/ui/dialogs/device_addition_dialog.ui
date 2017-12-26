@@ -139,7 +139,32 @@
            <widget class="QWidget" name="widget_2" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
-              <widget class="QSpinBox" name="knownAddressPortSpinBox"/>
+              <widget class="QStackedWidget" name="knownAddressPortSpinWidget">
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <widget class="QWidget" name="knownAddressSpinBoxPage">
+                <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <item>
+                  <widget class="QSpinBox" name="knownAddressPortSpinBox"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="knownAddressAutoWidgetPage">
+                <layout class="QHBoxLayout" name="horizontalLayout_9">
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit">
+                   <property name="text">
+                    <string>Auto</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="knownAddressAutoPortCheckBox">
@@ -329,7 +354,32 @@
            <widget class="QWidget" name="widget_3" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QSpinBox" name="subnetScanPortSpinBox"/>
+              <widget class="QStackedWidget" name="subnetScanPortSpinWidget">
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <widget class="QWidget" name="subnetScanSpinBoxPage">
+                <layout class="QHBoxLayout" name="horizontalLayout_11">
+                 <item>
+                  <widget class="QSpinBox" name="subnetScanPortSpinBox"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="subnetScanAutoWidgetPage">
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_2">
+                   <property name="text">
+                    <string>Auto</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="subnetScanAutoPortCheckBox">
@@ -370,7 +420,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="startSearchPage">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
