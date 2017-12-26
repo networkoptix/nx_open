@@ -57,7 +57,7 @@ private:
 
 } // namespace
 
-using TestServerConnection = TestConnection<nx::network::TCPSocket>;
+using TestServerConnection = TestTcpConnection;
 
 class UDPHolePunchingConnectionInitiationFsm:
     public ::testing::Test
