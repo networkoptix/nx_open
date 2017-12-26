@@ -253,7 +253,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<WorkbenchExportHandler>();
     context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
-    context->instance<workbench::PermissionsHandler>();
+    context->instance<PermissionsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
