@@ -1901,8 +1901,17 @@ void ActionHandler::at_mainMenuAddDeviceManually_triggered()
         return;
     }
 
+    const auto itOnlineServer = std::find_if(servers.begin(), servers.end(),
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getStatus() == Qn::Online;
+        });
+
+    if (itOnlineServer == servers.end())
+        return;
+
     menu()->triggerForced(action::AddDeviceManuallyAction,
-        action::Parameters(servers.first()));
+        action::Parameters(*itOnlineServer));
 }
 
 void ActionHandler::at_addDeviceManually_triggered()
