@@ -102,6 +102,7 @@ public:
     void setAuthType(AsyncHttpClient::AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
+    void setDisablePrecalculatedAuthorization(bool value);
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
     void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
@@ -133,6 +134,7 @@ private:
     boost::optional<SocketAddress> m_proxyEndpoint;
     boost::optional<AsyncHttpClient::AuthType> m_authType;
 
+    bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;
     bool m_ignoreMutexAnalyzer = false;
 
