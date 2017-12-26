@@ -8,6 +8,7 @@
 #include <nx/streaming/config.h>
 
 #include <motion/motion_detection.h>
+#include <nx/utils/log/log_main.h>
 
 QnNxRtpParser::QnNxRtpParser()
 :
@@ -34,14 +35,18 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
     gotData = false;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
     {
-        qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP packet. len < RTP header size. Ignored";
+        NX_WARNING(this,
+            lm("Invalid RTP packet size=%1. size < RTP header size. Ignored.").arg(dataSize));
         return false;
     }
     const quint8* data = rtpBufferBase + bufferOffset;
     RtpHeader* rtpHeader = (RtpHeader*) data;
 
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
+    {
+        NX_WARNING(this, lm("Got mailformed RTP packet header. Ignored."));
         return false;
+    }
 
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     dataSize -= RtpHeader::RTP_HEADER_SIZE;
@@ -81,7 +86,10 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 m_nextDataPacketBuffer = &emptyMediaData->m_data;
                 if (dataSize != 0)
                 {
-                    qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
+                    NX_WARNING(
+                        this,
+                        lm("Unexpected data size for EOF/BOF packet. Got %1 expected %2 bytes.")
+                        .arg(dataSize).arg(0));
                     return false;
                 }
             }
@@ -91,7 +99,10 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataType == QnAbstractMediaData::META_V1
                     && dataSize != Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
                 {
-                    qWarning() << "Unexpected data size for metadata. got" << dataSize << "expected" << Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 << "bytes. Packet ignored.";
+                    NX_WARNING(
+                        this,
+                        lm("Unexpected data size for metadata packet. Got %1 expected %2 bytes.")
+                        .arg(dataSize).arg(Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8));
                     return false;
                 }
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
@@ -150,13 +161,22 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             else
             {
                 if (context)
-                    qWarning() << "Unsupported RTP codec or packet type. codec_type: " << context->getCodecType();
+                {
+                    NX_WARNING(this, lm("Unsupported codec or packet type %1")
+                        .arg(context->getCodecType()));
+                }
                 else if (dataType == QnAbstractMediaData::AUDIO)
-                    qWarning() << "Unsupported audio codec or codec params";
+                {
+                    NX_WARNING(this, lm("Unsupported audio codec or codec params"));
+                }
                 else if (dataType == QnAbstractMediaData::VIDEO)
-                    qWarning() << "Unsupported video or codec params";
+                {
+                    NX_WARNING(this, lm("Unsupported video or codec params"));
+                }
                 else
-                    qWarning() << "Unsupported or unknown packet";
+                {
+                    NX_WARNING(this, lm("Unsupported or unknown packet"));
+                }
                 return false;
             }
 
