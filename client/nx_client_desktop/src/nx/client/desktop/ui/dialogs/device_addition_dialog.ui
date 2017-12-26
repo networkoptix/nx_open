@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>655</width>
-    <height>602</height>
+    <width>684</width>
+    <height>626</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -107,7 +107,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="knownAddressesPage">
          <property name="sizePolicy">
@@ -141,7 +141,7 @@
              <item>
               <widget class="QStackedWidget" name="knownAddressPortSpinWidget">
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="knownAddressSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -356,7 +356,7 @@
              <item>
               <widget class="QStackedWidget" name="subnetScanPortSpinWidget">
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="subnetScanSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -656,6 +656,26 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>addressEdit</tabstop>
+  <tabstop>knownAddressPortSpinBox</tabstop>
+  <tabstop>knownAddressAutoPortCheckBox</tabstop>
+  <tabstop>knownAddressLoginEdit</tabstop>
+  <tabstop>knownAddressPasswordEdit</tabstop>
+  <tabstop>searchButton</tabstop>
+  <tabstop>stopSearchButton</tabstop>
+  <tabstop>foundDevicesTable</tabstop>
+  <tabstop>addDevicesButton</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>startAddressEdit</tabstop>
+  <tabstop>endAddressEdit</tabstop>
+  <tabstop>subnetScanPortSpinBox</tabstop>
+  <tabstop>subnetScanAutoPortCheckBox</tabstop>
+  <tabstop>subnetScanLoginEdit</tabstop>
+  <tabstop>subnetScanPasswordEdit</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>
