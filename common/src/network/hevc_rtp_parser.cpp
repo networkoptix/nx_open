@@ -347,7 +347,6 @@ bool HevcParser::handlePayload(const uint8_t* payload, int payloadLength)
     skipPayloadHeader(&payload, &payloadLength);
 
     auto packetType = hevc::fromNalUnitTypeToPacketType(packetHeader.unitType);
-
     switch (packetType)
     {
         case hevc::PacketType::singleNalUnitPacket:
@@ -520,18 +519,15 @@ void HevcParser::updateNalFlags(
 {
     if (unitType == hevc::NalUnitType::vpsNut)
     {
-
         m_context.inStreamVpsFound = true;
     }
     else if (unitType == hevc::NalUnitType::spsNut)
     {
-
         m_context.inStreamSpsFound = true;
         extractPictureDimensionsFromSps(payload, payloadLength);
     }
     else if (unitType == hevc::NalUnitType::ppsNut)
     {
-
         m_context.inStreamPpsFound = true;
     }
     else if(hevc::isRandomAccessPoint(unitType))
