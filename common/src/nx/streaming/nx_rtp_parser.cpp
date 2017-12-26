@@ -39,6 +39,10 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
     }
     const quint8* data = rtpBufferBase + bufferOffset;
     RtpHeader* rtpHeader = (RtpHeader*) data;
+
+    if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
+        return false;
+
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     dataSize -= RtpHeader::RTP_HEADER_SIZE;
     const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
