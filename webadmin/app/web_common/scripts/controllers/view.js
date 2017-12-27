@@ -2,9 +2,9 @@
 
 angular.module('nxCommon').controller('ViewCtrl',
             ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
-              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
+              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'voiceControl',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
-              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
+              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl) {
 
         var channels = {
             Auto: 'lo',
@@ -17,6 +17,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
         $scope.systemAPI = systemAPI;
 
+        $scope.betaMode = Config.allowBetaMode;
         $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
@@ -28,6 +29,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
+        $scope.voiceControls = {enabled: false};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
@@ -318,6 +320,18 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
             }*/
         };
+
+        if($scope.betaMode && window.jscd.browser == "Chrome"){
+            voiceControl.initControls($scope.cameraLinks, $scope.switchPlaying, $scope.switchPosition);
+            $scope.$watch('voiceControls.enabled', function(){
+                if($scope.voiceControls.enabled){
+                    voiceControl.startListening();
+                }
+                else{
+                    voiceControl.stopListening();
+                }
+            });
+        }
 
         //On player error update source to cause player to restart
         $scope.crashCount = 0;

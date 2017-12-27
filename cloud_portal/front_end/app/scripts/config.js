@@ -223,6 +223,7 @@ var Config = {
     globalViewArchivePermission: 'GlobalViewArchivePermission',
     globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
     allowCastMode: false, //Enables usage of chromecast
+    allowBetaMode: true, //Enables usage of beta features
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
