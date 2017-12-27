@@ -200,6 +200,11 @@ endif()
 
 include(fix_qt_vars)
 
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
+endif()
 nx_configure_file(
     build_variables/maven/filter-resources/build_info.txt
     ${CMAKE_CURRENT_BINARY_DIR})
