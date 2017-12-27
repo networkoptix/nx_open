@@ -207,7 +207,6 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
     if (!url.isValid() || !isHostBelongsToValidSubnet(QHostAddress(url.host())))
         return false;
     outData->presentationUrl = url.toString(QUrl::RemovePath);
-
     outData->manufacturer = kHanwhaManufacturerName;
 
     return true;
@@ -340,7 +339,12 @@ void HanwhaResourceSearcher::createResource(
     resource->setVendor(kHanwhaManufacturerName);
     resource->setName(devInfo.modelName);
     resource->setModel(devInfo.modelName);
-    resource->setUrl(devInfo.presentationUrl);
+
+    QUrl url(devInfo.presentationUrl);
+    if (url.port() == -1)
+        url.setPort(nx_http::DEFAULT_HTTP_PORT);
+
+    resource->setUrl(url.toString(QUrl::RemovePath));
     resource->setMAC(mac);
 
     auto resPool = commonModule()->resourcePool();
