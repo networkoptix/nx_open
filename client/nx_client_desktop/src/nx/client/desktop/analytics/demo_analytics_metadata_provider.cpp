@@ -102,7 +102,7 @@ QList<common::metadata::DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvide
     const auto precision = ini().demoAnalyticsProviderTimestampPrecisionUs;
     if (precision > 0)
     {
-        startTimestamp = startTimestamp - startTimestamp % precision + precision;
+        startTimestamp = startTimestamp - startTimestamp % precision;
         endTimestamp -= endTimestamp % precision;
     }
 

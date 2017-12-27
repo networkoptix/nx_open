@@ -28,7 +28,7 @@ static const QString kMonitorUrlTemplate =
 static const int kDefaultHttpPort = 80;
 
 static const std::chrono::minutes kKeepAliveTimeout{2};
-static const std::chrono::seconds kUpdateInterval{10};
+static const std::chrono::seconds kMinReopenInterval{10};
 
 } // namespace
 
@@ -117,6 +117,7 @@ void MetadataMonitor::initMonitorUnsafe()
         this, &MetadataMonitor::at_connectionClosed,
         Qt::DirectConnection);
 
+    m_timeSinceLastOpen.restart();
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
@@ -156,7 +157,10 @@ void MetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClie
 
 void MetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr /*httpClient*/)
 {
-    m_timer.start(kUpdateInterval, [this]() { initMonitorUnsafe(); });
+    const auto elapsed = m_timeSinceLastOpen.elapsed();
+    std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
+        <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
+    m_timer.start(reopenDelay, [this]() { initMonitorUnsafe(); });
 }
 
 } // namespace hanwha

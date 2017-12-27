@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
 
+#include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop::ui;
@@ -142,6 +144,15 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_resizerWidget->setZValue(ResizerItemZOrder);
     connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged);
+
+    //TODO #vkutin Think how to do it differently.
+    //  See another TODO in at_resizerWidget_geometryChanged.
+    executeDelayed(
+        [this]()
+        {
+            installEventHandler(mainWindowWidget(), QEvent::Resize, this,
+                [this]() { updatePaneWidth(item->size().width()); });
+        });
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
@@ -359,13 +370,18 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
     if (widget->isScrollBarVisible())
         x += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
+    updatePaneWidth(x);
+}
+
+void ResourceTreeWorkbenchPanel::updatePaneWidth(qreal desiredWidth)
+{
     const qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
 
     //TODO #vkutin Think how to do it differently.
     // At application startup m_controlsWidget has default (not maximized) size, so we cannot use its width here.
     const qreal maxWidth = mainWindowWidget()->width() / 2;
 
-    const qreal targetWidth = qBound(minWidth, x, maxWidth);
+    const qreal targetWidth = qBound(minWidth, desiredWidth, maxWidth);
 
     QRectF geometry = item->geometry();
     if (!qFuzzyEquals(geometry.width(), targetWidth))

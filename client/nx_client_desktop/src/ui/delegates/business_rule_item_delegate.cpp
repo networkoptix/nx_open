@@ -351,10 +351,22 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         }
         case Column::event:
         {
-            QComboBox* comboBox = new QComboBox(parent);
+            using EventSubType = QnBusinessTypesComparator::EventSubType;
+            auto comboBox = new QComboBox(parent);
+            auto addItem = [this, comboBox](vms::event::EventType eventType)
+                {
+                    comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
+                };
+
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (const auto eventType: m_lexComparator->lexSortedEvents())
-                comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
+            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::user))
+                addItem(eventType);
+            comboBox->insertSeparator(comboBox->count());
+            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::failure))
+                addItem(eventType);
+            comboBox->insertSeparator(comboBox->count());
+            for (const auto eventType: m_lexComparator->lexSortedEvents(EventSubType::success))
+                addItem(eventType);
             return comboBox;
         }
         case Column::action:

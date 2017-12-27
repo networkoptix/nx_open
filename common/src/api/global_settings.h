@@ -261,6 +261,9 @@ public:
     bool cloudConnectUdpHolePunchingEnabled() const;
     bool cloudConnectRelayingEnabled() const;
 
+    std::chrono::seconds maxRtspConnectDuration() const;
+    void setMaxRtspConnectDuration(std::chrono::seconds newValue);
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -400,6 +403,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs;
+    QnResourcePropertyAdaptor<int>* m_maxRtspConnectDuration;
 
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;

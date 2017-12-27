@@ -70,7 +70,6 @@ private:
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);
     void closeDecoder();
-    int findMotionInfo(qint64 pkt_dts);
     void reallocateDeinterlacedFrame();
     void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
 private:
@@ -112,7 +111,6 @@ private:
     int m_forceSliceDecoding;
     // I have used vector instead map because of 2-3 elements is typical size
     typedef QVector<QPair<qint64, FrameMetadata> > MotionMap;
-    MotionMap m_motionMap;
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
     bool m_forcedMtDecoding;

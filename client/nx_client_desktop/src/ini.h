@@ -14,6 +14,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("http://96.64.226.250:8888/image",
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
+    NX_INI_FLAG(0, showVideoQualityOverlay, "Show video quality overlay.");
+
     NX_INI_FLAG(0, unifiedEventPanel, "Use unified event panel instead of old notifications panel.");
     NX_INI_FLAG(1, enableAnalytics, "Enable analytics engine");
     NX_INI_FLAG(0, enableOldAnalyticsController, "Enable old analytics controller (zoom-window based).");
@@ -26,7 +28,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, hideEnhancedVideo, "Hide enhanced video from the scene.");
     NX_INI_FLAG(0, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
-    NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay lable to detected object description.");
+    NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
     NX_INI_FLAG(0, enableProgressInformers, "Enable global operation progress informers in the notification panel.");
     NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
 };

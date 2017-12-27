@@ -55,7 +55,8 @@ set(CMAKE_DEBUG_POSTFIX "" CACHE INTERNAL "" FORCE)
 
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/cmake)
+    ${PROJECT_SOURCE_DIR}/cmake
+)
 
 include(CMakeParseArguments)
 include(ExternalProject)
@@ -173,9 +174,7 @@ if(withMediaServer)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
 
-    if(targetDevice MATCHES "linux-*"
-        OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")
-    )
+    if(LINUX AND box MATCHES "none|tx1")
         add_subdirectory(root_tool)
     endif()
 endif()
@@ -216,6 +215,14 @@ endif()
 
 if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
     add_subdirectory(edge_firmware)
+endif()
+
+if(LINUX AND box STREQUAL "none") #< Desktop Linux.
+    add_subdirectory(debsetup)
+endif()
+
+if(MACOSX)
+    add_subdirectory(macsetup)
 endif()
 
 include(fix_qt_vars)

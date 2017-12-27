@@ -642,7 +642,7 @@ void QnMulticodecRtpReader::createTrackParsers()
             if (m_tracks[i].parser)
             {
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
-                m_tracks[i].parser->setSDPInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
+                m_tracks[i].parser->setSdpInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
                 m_tracks[i].ioDevice = trackInfo[i]->ioDevice;
 
                 auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();

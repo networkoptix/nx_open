@@ -156,7 +156,6 @@ void QnFfmpegVideoDecoder::closeDecoder()
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
     delete m_frameTypeExtractor;
-    m_motionMap.clear();
 }
 
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
@@ -303,7 +302,6 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
 
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
-    m_motionMap.clear();
     m_frame->data[0] = 0;
     m_spsFound = false;
 }
@@ -322,15 +320,6 @@ void QnFfmpegVideoDecoder::setSpeed( float newValue )
 {
     Q_UNUSED(newValue)
     //ffmpeg-based decoder has nothing to do here
-}
-
-int QnFfmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
-{
-    for (int i = 0; i < m_motionMap.size(); ++i) {
-        if (m_motionMap[i].first == pkt_dts)
-            return i;
-    }
-    return -1;
 }
 
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
@@ -514,15 +503,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
-        if (!data->metadata.isEmpty())
-        {
-            while (m_motionMap.size() > MAX_DECODE_THREAD+1)
-                m_motionMap.remove(0);
-
-            m_motionMap
-                << QPair<qint64, FrameMetadata>(data->timestamp, data->metadata);
-        }
-
         // -------------------------
         if(m_context->codec)
         {
@@ -577,17 +557,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (got_picture)
     {
-        int motionIndex = findMotionInfo(m_frame->pkt_dts);
-        if (motionIndex >= 0)
-        {
-            outFrame->metadata = m_motionMap[motionIndex].second;
-            m_motionMap.remove(motionIndex);
-        }
-        else
-        {
-            outFrame->metadata.clear();
-        }
-
         AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||

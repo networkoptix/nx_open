@@ -137,7 +137,6 @@ public:
     ObjectInfo& addOrUpdateObject(const nx::common::metadata::DetectedObject& object);
     void removeObject(const QnUuid& objectId);
 
-    void updateFutureRectangles(qint64 timestamp, int channel);
     void updateObjectAreas(qint64 timestamp);
 
 public:
@@ -267,35 +266,6 @@ void WidgetAnalyticsController::Private::removeObject(const QnUuid& objectId)
     }
 }
 
-void WidgetAnalyticsController::Private::updateFutureRectangles(qint64 timestamp, int channel)
-{
-    const auto metadataList = metadataProvider->metadataRange(
-        timestamp, timestamp + kFutureMetadataLength.count(), channel, kMaxFutureMetadataPackets);
-
-    QSet<QnUuid> objectsToUpdate = objectInfoById.keys().toSet();
-
-    for (const auto& metadata: metadataList)
-    {
-        if (objectsToUpdate.isEmpty())
-            break;
-
-        for (const auto& object: metadata->objects)
-        {
-            auto it = objectsToUpdate.find(object.objectId);
-            if (it == objectsToUpdate.end())
-                continue;
-
-            auto& info = objectInfoById[object.objectId];
-            if (metadata->timestampUsec > info.metadataTimestamp)
-            {
-                info.futureRectangle = object.boundingBox;
-                info.futureRectangleTimestamp = metadata->timestampUsec;
-                objectsToUpdate.erase(it);
-            }
-        }
-    }
-}
-
 void WidgetAnalyticsController::Private::updateObjectAreas(qint64 timestamp)
 {
     for (auto it = objectInfoById.begin(); it != objectInfoById.end(); ++it)
@@ -365,12 +335,15 @@ void WidgetAnalyticsController::updateAreas(qint64 timestamp, int channel)
 
     const auto elapsed = d->timer.elapsed();
 
-    const auto metadata = d->metadataProvider->metadata(timestamp, channel);
+    auto metadataList = d->metadataProvider->metadataRange(
+        timestamp, timestamp + kFutureMetadataLength.count(), channel, kMaxFutureMetadataPackets);
 
     QSet<QnUuid> objectIds;
 
-    if (metadata)
+    if (!metadataList.isEmpty())
     {
+        const auto metadata = metadataList.takeFirst();
+
         for (const auto& object: metadata->objects)
         {
             auto& objectInfo = d->addOrUpdateObject(object);
@@ -386,12 +359,31 @@ void WidgetAnalyticsController::updateAreas(qint64 timestamp, int channel)
             d->removeObject(it.key());
 
         if (it->active || elapsed - it->lastUsedTime < kObjectTimeToLive.count())
+        {
+            [&] // Find and update future rectangle for the object.
+            {
+                for (const auto& metadata: metadataList)
+                {
+                    for (const auto& object: metadata->objects)
+                    {
+                        if (object.objectId == it.key())
+                        {
+                            it->futureRectangle = object.boundingBox;
+                            it->futureRectangleTimestamp = metadata->timestampUsec;
+                            return;
+                        }
+                    }
+                }
+            }();
+
             ++it;
+        }
         else
+        {
             it = d->objectInfoById.erase(it);
+        }
     }
 
-    d->updateFutureRectangles(timestamp, channel);
     d->updateObjectAreas(timestamp);
 }
 

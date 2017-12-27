@@ -160,7 +160,20 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
     if(view == NULL)
         return adjustedRect; /* Graphics view was destroyed, cannot adjust. */
 
-    const auto margins = viewportMargins();
+    auto margins = viewportMargins();
+    const auto viewportSize = view->viewport()->size();
+
+    // Ensure we don't get negative viewport width.
+    const auto overflow = margins.left() + margins.right() - viewportSize.width() + 1;
+    if (overflow > 0)
+    {
+        const auto leftCorrection = qMin(overflow, margins.left());
+        const auto rightCorrection = overflow - leftCorrection;
+        margins.setLeft(margins.left() - leftCorrection);
+        margins.setRight(margins.right() - rightCorrection);
+    }
+
+    NX_ASSERT(margins.top() + margins.bottom() < viewportSize.height());
 
     QMarginsF relativeMargins = Geometry::cwiseDiv(margins, view->viewport()->size());
 
@@ -171,7 +184,7 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
     /* Calculate size to match adjusted aspect ratio. */
     QSizeF fixedAdjustedSize;
     {
-        QSize adjustedViewportSize = view->viewport()->size();
+        QSize adjustedViewportSize = viewportSize;
         if(m_marginFlags & Qn::MarginsAffectSize)
             adjustedViewportSize = Geometry::eroded(adjustedViewportSize, margins);
 
