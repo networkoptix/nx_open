@@ -68,9 +68,9 @@ EventRibbon::Private::Private(EventRibbon* q):
     auto viewportAnchor = new QnWidgetAnchor(m_viewport);
     viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
-    static constexpr int kExtraPadding = 1;
-    viewportAnchor->setMargins(style::Metrics::kStandardPadding, 0,
-        style::Metrics::kStandardPadding + kExtraPadding, 0);
+    const int mainPadding = q->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+    static constexpr int kExtraPadding = 1; //< Gap between scrollbar and tiles.
+    viewportAnchor->setMargins(mainPadding, 0, mainPadding + kExtraPadding, 0);
 
     installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest},
         this, &Private::updateView);
