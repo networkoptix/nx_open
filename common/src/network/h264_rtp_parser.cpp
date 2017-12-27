@@ -123,24 +123,6 @@ int CLH264RtpParser::getSpsPpsSize() const
     return result;
 }
 
-void CLH264RtpParser::backupCurrentData(quint8* bufferStart)
-{
-    size_t chunksLength = 0;
-    for (const auto& chunk: m_chunks)
-        chunksLength += chunk.len;
-
-    m_nextFrameChunksBuffer.resize(chunksLength);
-
-    size_t offset = 0;
-    quint8* nextFrameBufRaw = m_nextFrameChunksBuffer.data();
-    for (auto& chunk: m_chunks)
-    {
-        memcpy(nextFrameBufRaw + offset, bufferStart + chunk.bufferOffset, chunk.len);
-        chunk.bufferStart = nextFrameBufRaw;
-        chunk.bufferOffset = (int) offset;
-        offset += chunk.len;
-    }
-}
 void CLH264RtpParser::serializeSpsPps(QnByteArray& dst)
 {
     for (int i = 0; i < m_sdpSpsPps.size(); ++i)
