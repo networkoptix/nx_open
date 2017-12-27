@@ -229,7 +229,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 }
 
-const auto createServerSocketFunc = 
+const auto createServerSocketFunc =
     []() -> std::unique_ptr<AbstractStreamServerSocket>
     {
         return SocketFactory::createStreamServerSocket();
@@ -566,16 +566,15 @@ protected:
 
     void assertThatSocketHasBeenShutdownCorrectly()
     {
-        m_continueReadingSocket.set_value(true);
-
         m_terminated = true;
+        m_continueReadingSocket.set_value(true);
         m_socketReadThread.join();
     }
 
 private:
     std::unique_ptr<CloudStreamSocket> m_clientSocket;
     nx::utils::thread m_socketReadThread;
-    bool m_terminated;
+    std::atomic<bool> m_terminated;
     CrossNatConnectorFactory::Function m_oldFactory;
     nx::utils::promise<void> m_socketInRecv;
     nx::utils::promise<bool> m_continueReadingSocket;
