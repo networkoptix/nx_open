@@ -150,7 +150,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     executeDelayed(
         [this]()
         {
-            installEventHandler(mainWindow(), QEvent::Resize, this,
+            installEventHandler(mainWindowWidget(), QEvent::Resize, this,
                 [this]() { updatePaneWidth(item->size().width()); });
         });
 
