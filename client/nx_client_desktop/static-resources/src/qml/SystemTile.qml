@@ -102,6 +102,7 @@ BaseTile
     NxPopupMenu
     {
         id: tileMenu;
+
         NxMenuItem
         {
             text: "Edit";
@@ -110,11 +111,20 @@ BaseTile
 
             onTriggered: control.toggle();
         }
+
+        NxMenuItem
+        {
+            text: "Hide";
+            leftPadding: 16;
+            rightPadding: 16;
+
+            onTriggered: context.moveToBack(control.localId);
+        }
     }
 
     onCollapsedTileClicked:
     {
-        if (!control.isAvailable)
+        if (!menuButton.visible)
             return;
 
         if (buttons == Qt.RightButton)
@@ -161,7 +171,8 @@ BaseTile
 
     menuButton
     {
-        visible: impl.hasSavedConnection && control.isAvailable;
+        visible: control.isAvailable
+            && control.impl.tileType == control.impl.kLocalSystemTileType
 
         menu: tileMenu;
     }
