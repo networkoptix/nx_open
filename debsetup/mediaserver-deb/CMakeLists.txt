@@ -20,6 +20,7 @@ set(common_depends
     "cifs-utils"
 )
 string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
+set(arch.depends ", syslinux")
 
 # Variables which may depend on current project and are used by build-dist.sh.
 set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})

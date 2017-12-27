@@ -8,7 +8,6 @@ elseif(arch STREQUAL "x86")
     set(arch.dir "i386-linux-gnu/")
 endif()
 set(target.arch "${os.arch}")
-set(arch.depends ", syslinux")
 set(license.text "TODO license.text") #< TODO: #dklychkov: Include license text to cmake build.
 
 nx_configure_file(
