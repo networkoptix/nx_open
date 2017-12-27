@@ -29,6 +29,7 @@ private:
     void at_userRolesAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
+    void at_updateLocalFilesAction_triggered();
 
 private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr& layout);

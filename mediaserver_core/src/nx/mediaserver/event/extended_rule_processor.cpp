@@ -300,10 +300,7 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
 
     if (result)
     {
-        // Check whether we need to save this action to DB
-        //const vms::event::EventParameters& eventParameters = action->getRuntimeParams();
-        //bool omitLogging = eventParameters.omitDbLogging && eventParameters.eventType == vms::event::EventType::softwareTriggerEvent;
-        if (!shouldOmitActionLogging(action))
+        if (actionRequiresLogging(action))
         {
             qnServerDb->saveActionToDB(action);
         }
@@ -503,7 +500,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                action->getRecordBeforeSec(), /* Record-before setup is not forbidden after VMS-7148 */
+                action->getRecordBeforeSec(), //< Record-before setup is allowed after VMS-7148 is implemented
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }

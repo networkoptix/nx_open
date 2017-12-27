@@ -9,7 +9,9 @@
 #include <ui/style/custom_style.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/widgets/views/fake_resource_list_view.h>
 
+#include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
 
@@ -19,6 +21,26 @@ bool isKnownAddressPage(QTabWidget* tabWidget)
 {
     static constexpr auto kKnownAddressPageIndex = 0;
     return tabWidget->currentIndex() == kKnownAddressPageIndex;
+}
+
+QnFakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
+{
+    QnFakeResourceList result;
+
+    for(const auto& device: devices)
+    {
+        const QnFakeResourceDescription camera =
+            {
+                device.uniqueId,
+                qnSkin->icon("tree/camera.png"),
+                device.name,
+                device.url
+            };
+
+        result.append(camera);
+    }
+
+    return result;
 }
 
 } // namespace
@@ -46,8 +68,6 @@ DeviceAdditionDialog::~DeviceAdditionDialog()
 
 void DeviceAdditionDialog::initializeControls()
 {
-    //FIXME: remove default address
-    ui->addressEdit->setText(lit("rtsp://media.smart-streaming.com/mytest/mp4:sample_phone_150k.mp4"));
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
     connect(ui->stopSearchButton, &QPushButton::clicked,
@@ -67,6 +87,15 @@ void DeviceAdditionDialog::initializeControls()
         ui->selectServerMenuButton, &QnChooseServerButton::removeServer);
     for (const auto server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
+
+    ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
+    ui->startAddressEdit->setPlaceholderText(tr("Start address"));
+    ui->endAddressEdit->setPlaceholderText(tr("End address"));
+
+    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
+    ui->hintLabel->setToolTip(tr("Examples:")
+        + lit("\n192.168.1.15\nwww.example.com:8080\nhttp://example.com:7090/image.jpg"
+            "\nrtsp://example.com:554/video\nudp://239.250.5.5:1234"));
 
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
         [this]()
@@ -91,8 +120,8 @@ void DeviceAdditionDialog::initializeControls()
         this, &DeviceAdditionDialog::handleDialogClosed);
 
     setupTable();
-    setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinBox);
-    setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinBox);
+    setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
+    setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
 
     setAccentStyle(ui->searchButton);
     setAccentStyle(ui->addDevicesButton);
@@ -149,13 +178,22 @@ void DeviceAdditionDialog::setupTableHeader()
         FoundDevicesModel::presentedStateColumn, QHeaderView::ResizeToContents);
 }
 
-void DeviceAdditionDialog::setupPortStuff(QCheckBox* autoCheckbox, QSpinBox* portSpinBox)
+void DeviceAdditionDialog::setupPortStuff(
+    QCheckBox* autoCheckbox,
+    QStackedWidget* portStackedWidget)
 {
-    connect(autoCheckbox, &QCheckBox::toggled, this,
-        [portSpinBox](bool checked)
+    const auto handleAutoChecked =
+        [portStackedWidget](bool checked)
         {
-            portSpinBox->setEnabled(!checked);
-        });
+            static constexpr int kSpinBoxPage = 0;
+            static constexpr int kPlaceholderPage = 1;
+            portStackedWidget->setCurrentIndex(checked
+                ? kPlaceholderPage
+                : kSpinBoxPage);
+        };
+
+    connect(autoCheckbox, &QCheckBox::toggled, this, handleAutoChecked);
+    handleAutoChecked(autoCheckbox->isChecked());
 }
 
 void DeviceAdditionDialog::setServer(const QnMediaServerResourcePtr& value)
@@ -218,8 +256,8 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
     if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted)
     {
-        // FIXME: add error message handling
-        qDebug() << "----- ERROR: " << m_currentSearch->lastErrorText();
+
+        QnMessageBox::critical(this, tr("Device search failed"), m_currentSearch->initialError());
         stopSearch();
         return;
     }
@@ -290,7 +328,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     connect(&result, &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
     connect(this, &DeviceAdditionDialog::rejected, &loop, &QEventLoop::quit);
 
-
     const auto connection =
         connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged, this,
             [this, &loop]()
@@ -306,11 +343,10 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     {
         for (auto& state: prevStates)
             state = FoundDevicesModel::alreadyAddedState;
-        qDebug() << "Added!";
     }
     else
     {
-        qDebug() << "Failed!";
+        showAdditionFailedDialog(toFakeResourcesList(devices));
     }
 
     for (auto it = prevStates.begin(); it != prevStates.end(); ++it)
@@ -321,6 +357,17 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
             id, FoundDevicesModel::presentedStateColumn);
         m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
     }
+}
+
+void DeviceAdditionDialog::showAdditionFailedDialog(const QnFakeResourceList& resources)
+{
+    QnMessageBox dialog(QnMessageBoxIcon::Critical,
+        tr("Failed to add %n devices", "", resources.size()), QString(),
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok,
+        this);
+
+    dialog.addCustomWidget(new QnFakeResourceListView(resources, this));
+    dialog.exec();
 }
 
 void DeviceAdditionDialog::stopSearch()
@@ -340,7 +387,6 @@ void DeviceAdditionDialog::stopSearch()
         connect(m_currentSearch, &ManualDeviceSearcher::progressChanged, this,
             [this, searcher = m_currentSearch]()
             {
-                qDebug() << searcher->progress();
                 if (!searcher->searching())
                 {
                     searcher->disconnect(this);
@@ -457,7 +503,6 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     else
         resetButtonStyle(ui->searchButton);
 
-
     const bool showSearchProgressControls = m_currentSearch && m_currentSearch->searching();
     ui->searchControls->setCurrentIndex(showSearchProgressControls ? 1 : 0);
     ui->searchButton->setVisible(!showSearchProgressControls);
@@ -470,7 +515,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     ui->searchProgressBar->setFormat(progressMessage());
 
     if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted
-        && !m_currentSearch->lastErrorText().isEmpty())
+        && !m_currentSearch->initialError().isEmpty())
     {
         QnMessageBox::critical(this, tr("Device search failed"));
     }

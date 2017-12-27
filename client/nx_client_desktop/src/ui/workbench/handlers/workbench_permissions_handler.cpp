@@ -2,69 +2,27 @@
 
 #include <QtWidgets/QAction>
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-
-#include <api/app_server_connection.h>
-#include <api/global_settings.h>
-
-#include <client/client_globals.h>
-#include <client/client_settings.h>
-#include <client/client_message_processor.h>
-
-#include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
+
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/resources_changes_manager.h>
 
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/providers/resource_access_provider.h>
-#include <nx/client/desktop/radass/radass_resource_manager.h>
-
-#include <nx_ec/dummy_handler.h>
-#include <nx_ec/managers/abstract_layout_manager.h>
-
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/actions/action_parameters.h>
-#include <nx/client/desktop/ui/actions/action_parameter_types.h>
-#include <ui/dialogs/layout_name_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <ui/widgets/views/resource_list_view.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
-#include <ui/workbench/workbench_state_manager.h>
-#include <ui/workbench/extensions/workbench_layout_change_validator.h>
-#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
-#include <nx/utils/string.h>
-
-#include <nx/utils/counter.h>
-#include <utils/common/delete_later.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
-#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
-
-using boost::algorithm::any_of;
-using boost::algorithm::all_of;
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace workbench {
 
 namespace {
 
@@ -84,21 +42,24 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
 
 } // namespace
 
-PermissionsHandler::PermissionsHandler(QObject *parent):
+PermissionsHandler::PermissionsHandler(QObject* parent):
     QObject(parent),
     QnSessionAwareDelegate(parent)
 {
-    connect(action(action::ShareLayoutAction),                   &QAction::triggered, this, &PermissionsHandler::at_shareLayoutAction_triggered);
-    connect(action(action::StopSharingLayoutAction),             &QAction::triggered, this, &PermissionsHandler::at_stopSharingLayoutAction_triggered);
-    connect(action(action::ShareCameraAction),                   &QAction::triggered, this, &PermissionsHandler::at_shareCameraAction_triggered);
+    connect(action(ui::action::ShareLayoutAction), &QAction::triggered,
+        this, &PermissionsHandler::at_shareLayoutAction_triggered);
+    connect(action(ui::action::StopSharingLayoutAction), &QAction::triggered,
+        this, &PermissionsHandler::at_stopSharingLayoutAction_triggered);
+    connect(action(ui::action::ShareCameraAction), &QAction::triggered,
+        this, &PermissionsHandler::at_shareCameraAction_triggered);
 }
 
 PermissionsHandler::~PermissionsHandler()
 {
 }
 
-void PermissionsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
-    const QnResourceAccessSubject &subject)
+void PermissionsHandler::shareLayoutWith(const QnLayoutResourcePtr& layout,
+    const QnResourceAccessSubject& subject)
 {
     NX_ASSERT(layout && subject.isValid());
     if (!layout || !subject.isValid())
@@ -137,7 +98,6 @@ void PermissionsHandler::shareCameraWith(const QnVirtualCameraResourcePtr &camer
     if (!camera || !subject.isValid())
         return;
 
-    /* Admins anyway have all shared layouts. */
     if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         return;
 
@@ -158,14 +118,14 @@ bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject
     /* Calculate all resources that were available through these layouts. */
     QSet<QnUuid> layoutsIds;
     QSet<QnResourcePtr> resourcesOnLayouts;
-    for (const auto& layout : layouts)
+    for (const auto& layout: layouts)
     {
         layoutsIds << layout->getId();
         resourcesOnLayouts += layout->layoutResources();
     }
 
     QnResourceList resourcesBecomeUnaccessible;
-    for (const auto& resource : resourcesOnLayouts)
+    for (const auto& resource: resourcesOnLayouts)
     {
         if (!QnResourceAccessFilter::isShareableMedia(resource))
             continue;
@@ -176,7 +136,7 @@ bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject
             continue;
 
         QSet<QnUuid> providerIds;
-        for (const auto& provider : providers)
+        for (const auto& provider: providers)
             providerIds << provider->getId();
 
         providerIds -= layoutsIds;
@@ -195,10 +155,10 @@ bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject
 // -------------------------------------------------------------------------- //
 void PermissionsHandler::at_shareLayoutAction_triggered()
 {
-    auto params = menu()->currentParameters(sender());
-    auto layout = params.resource().dynamicCast<QnLayoutResource>();
-    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
+    const auto params = menu()->currentParameters(sender());
+    const auto layout = params.resource().dynamicCast<QnLayoutResource>();
+    const auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    const auto roleId = params.argument<QnUuid>(Qn::UuidRole);
 
     QnResourceAccessSubject subject = user
         ? QnResourceAccessSubject(user)
@@ -217,9 +177,9 @@ void PermissionsHandler::at_shareLayoutAction_triggered()
 
 void PermissionsHandler::at_stopSharingLayoutAction_triggered()
 {
-    auto params = menu()->currentParameters(sender());
-    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
+    const auto params = menu()->currentParameters(sender());
+    const auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    const auto roleId = params.argument<QnUuid>(Qn::UuidRole);
     NX_ASSERT(user || !roleId.isNull());
     if (!user && roleId.isNull())
         return;
@@ -243,7 +203,7 @@ void PermissionsHandler::at_stopSharingLayoutAction_triggered()
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(subject);
-    for (const auto& layout : sharedLayouts)
+    for (const auto& layout: sharedLayouts)
     {
         NX_ASSERT(!layout->isFile());
         accessible.remove(layout->getId());
@@ -253,22 +213,14 @@ void PermissionsHandler::at_stopSharingLayoutAction_triggered()
 
 void PermissionsHandler::at_shareCameraAction_triggered()
 {
-    auto params = menu()->currentParameters(sender());
-    auto camera = params.resource().dynamicCast<QnVirtualCameraResource>();
-    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
-    auto roleId = params.argument<QnUuid>(Qn::UuidRole);
+    const auto params = menu()->currentParameters(sender());
+    const auto camera = params.resource().dynamicCast<QnVirtualCameraResource>();
+    const auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    const auto roleId = params.argument<QnUuid>(Qn::UuidRole);
 
     QnResourceAccessSubject subject = user
         ? QnResourceAccessSubject(user)
         : QnResourceAccessSubject(userRolesManager()->userRole(roleId));
-
-    QnUserResourcePtr owner = camera->getParentResource().dynamicCast<QnUserResource>();
-    if (owner && owner == user)
-        return; /* Sharing layout with its owner does nothing. */
-
-    /* Here layout will become shared, and owner will keep access rights. */
-    //if (owner && !camera->isShared())
-    //    shareCameraWith(layout, owner);
 
     shareCameraWith(camera, subject);
 }
@@ -284,8 +236,6 @@ void PermissionsHandler::forcedUpdate()
     //do nothing
 }
 
-} // namespace workbench
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -1586,11 +1586,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20171218_remove_extra_buisiness_rules.sql")))
     {
-        // Removing extra business rule, that was added through Rule::getRulesUpd43()
-        // That fixes VMS-7696
-        // id=900024 -> uuid = "{1d378edd-06ae-0df0-c85a-664c2f445ff5}"
-        QnUuid guid("{1d378edd-06ae-0df0-c85a-664c2f445ff5}");
-        return removeBusinessRule(guid) == ErrorCode::ok;
+        for (const auto& rule : vms::event::Rule::getDisabledRulesUpd48())
+        {
+            removeBusinessRule(rule->id());
+        }
+        return resyncIfNeeded(ResyncRules);
     }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);

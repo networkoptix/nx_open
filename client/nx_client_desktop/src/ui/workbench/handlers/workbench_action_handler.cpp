@@ -164,7 +164,9 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <nx/client/desktop/watchers/system_servers_watcher.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+
 #include <nx/utils/app_info.h>
 
 #ifdef Q_OS_MACX
@@ -316,6 +318,9 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::AddDeviceManuallyAction), &QAction::triggered,
         this, &ActionHandler::at_addDeviceManually_triggered);
+
+    connect(action(action::MainMenuAddDeviceManuallyAction), &QAction::triggered,
+        this, &ActionHandler::at_mainMenuAddDeviceManually_triggered);
 
     connect(action(action::ConvertCameraToEntropix), &QAction::triggered,
         this, &ActionHandler::at_convertCameraToEntropix_triggered);
@@ -1513,20 +1518,8 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
             {
                 messages::LocalFiles::fileIsBusy(mainWindowWidget(), oldPath);
             }
-            else
-            {
-                if (resource->hasFlags(Qn::layout))
-                {
-                    result = QnResourceDirectoryBrowser::layoutFromFile(filePath, resourcePool());
-                }
-                else
-                {
-                    QString targetName = QFileInfo(filePath).fileName();
-                    result->setName(targetName);
-                    result->setUrl(filePath);
-                }
-            }
-            resourcePool()->addResource(result);
+            // Renamed file is discovered immediately by ResourceDirectoryBrowser.
+            // It will deal with adding a resource with new name
         },
         kTimeToCloseResourceMs,
         this);
@@ -1899,6 +1892,27 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
     }
 }
 
+void ActionHandler::at_mainMenuAddDeviceManually_triggered()
+{
+    const auto servers = nx::client::desktop::SystemServersWatcher(this).servers();
+    if (servers.isEmpty())
+    {
+        NX_EXPECT(false, "No servers for device searching");
+        return;
+    }
+
+    const auto itOnlineServer = std::find_if(servers.begin(), servers.end(),
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getStatus() == Qn::Online;
+        });
+
+    if (itOnlineServer == servers.end())
+        return;
+
+    menu()->triggerForced(action::AddDeviceManuallyAction,
+        action::Parameters(*itOnlineServer));
+}
 
 void ActionHandler::at_addDeviceManually_triggered()
 {
