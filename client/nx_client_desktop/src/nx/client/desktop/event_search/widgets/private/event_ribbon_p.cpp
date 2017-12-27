@@ -42,6 +42,7 @@ static constexpr int kMaximumThumbnailWidth = 1024;
 static const auto kHighlightCurtainColor = QColor(Qt::white);
 static const qreal kHighlightCurtainOpacity = 0.25;
 static const auto kHighlightDuration = std::chrono::milliseconds(400);
+static const auto kAnimationDuration = std::chrono::milliseconds(250);
 
 QSize minimumWidgetSize(QWidget* widget)
 {
@@ -72,7 +73,8 @@ EventRibbon::Private::Private(EventRibbon* q):
     static constexpr int kExtraPadding = 1; //< Gap between scrollbar and tiles.
     viewportAnchor->setMargins(mainPadding, 0, mainPadding + kExtraPadding, 0);
 
-    installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest},
+    installEventHandler(m_viewport,
+        {QEvent::Show, QEvent::Hide, QEvent::Resize, QEvent::LayoutRequest},
         this, &Private::updateView);
 
     connect(m_scrollBar, &QScrollBar::valueChanged, this, &Private::updateView);
@@ -263,6 +265,7 @@ void EventRibbon::Private::debugCheckGeometries()
     for (int i = 0; i < m_tiles.size(); ++i)
     {
         NX_ASSERT(pos == m_positions[m_tiles[i]]);
+        pos += m_currentShifts.value(i);
         pos += m_tiles[i]->height() + kDefaultTileSpacing;
     }
 
@@ -309,9 +312,22 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
         if (!tile)
             continue;
 
-        tile->setVisible(false);
-        tile->resize(qMax(1, m_viewport->width()), kApproximateTileHeight);
-        tile->setParent(m_viewport);
+        if (m_viewport->isVisible() && m_viewport->width() > 0)
+        {
+            tile->move(-10000, 0); //< Somewhere outside of visible area.
+            tile->setParent(m_viewport);
+            tile->setVisible(true); //< For sizeHint calculation.
+            tile->resize(m_viewport->width(), calculateHeight(tile));
+            tile->setVisible(false);
+        }
+        else
+        {
+            tile->setVisible(false);
+            tile->resize(qMax(1, m_viewport->width()), kApproximateTileHeight);
+            tile->setParent(m_viewport);
+            updateMode = UpdateMode::instant;
+        }
+
         m_tiles.insert(nextIndex++, tile);
         m_positions[tile] = currentPosition;
         currentPosition += kApproximateTileHeight + kDefaultTileSpacing;
@@ -325,14 +341,26 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     m_totalHeight += delta;
     q->updateGeometry();
 
-    debugCheckGeometries();
-
-    updateView();
-
-    // TODO: #vkutin Implement animated insertion besides highlighting.
+    m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
     if (position < m_scrollBar->value())
         m_scrollBar->setValue(m_scrollBar->value() + delta);
+
+    // Correct current animations.
+    for (auto& animatedIndex: m_itemShiftAnimations)
+    {
+        if (animatedIndex >= index)
+            animatedIndex += count;
+    }
+
+    // Animated shift of subsequent tiles.
+    if (updateMode == UpdateMode::animated && nextIndex < m_tiles.size())
+    {
+        if (m_model->data(m_model->index(nextIndex - 1), Qn::AnimatedRole).toBool())
+            addAnimatedShift(nextIndex, -m_tiles[nextIndex - 1]->height());
+    }
+
+    updateView();
 
     if (updateMode == UpdateMode::animated)
     {
@@ -344,7 +372,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
     }
 }
 
-void EventRibbon::Private::removeTiles(int first, int count, UpdateMode /*updateMode*/)
+void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
 {
     NX_EXPECT(count);
     if (count == 0)
@@ -356,11 +384,12 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode /*update
         return;
     }
 
-    int delta = 0;
-
     const int last = first + count - 1;
     const int nextPosition = m_positions.value(m_tiles[last]) + m_tiles[last]->height()
         + kDefaultTileSpacing;
+
+    int delta = 0;
+    const bool topmostTileWasVisible = m_tiles[first]->isVisible();
 
     for (int i = first; i <= last; ++i)
     {
@@ -376,14 +405,27 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode /*update
 
     m_totalHeight -= delta;
 
-    debugCheckGeometries();
-
-    // TODO: #vkutin Implement animated removal.
-
-    updateView();
-
     if (nextPosition < m_scrollBar->value())
         m_scrollBar->setValue(m_scrollBar->value() - delta);
+
+    // Correct current animations.
+    for (auto& animatedIndex: m_itemShiftAnimations)
+    {
+        if (animatedIndex > first)
+            animatedIndex = qMax(first, animatedIndex - count);
+    }
+
+    if (first != m_tiles.size())
+    {
+        if (first == 0)
+            m_positions[m_tiles[0]] = 0; //< Keep integrity: positions must start from 0.
+
+        // In case of several tiles removing, animate only the topmost tile collapsing.
+        if (topmostTileWasVisible && updateMode == UpdateMode::animated)
+            addAnimatedShift(first, delta);
+    }
+
+    updateView();
 }
 
 void EventRibbon::Private::clear()
@@ -396,10 +438,24 @@ void EventRibbon::Private::clear()
     m_visible.clear();
     m_totalHeight = 0;
 
+    clearShiftAnimations();
+
     m_scrollBar->setVisible(false);
     m_scrollBar->setValue(0);
 
     q->updateGeometry();
+}
+
+void EventRibbon::Private::clearShiftAnimations()
+{
+    for (auto animator: m_itemShiftAnimations.keys())
+    {
+        animator->stop();
+        animator->deleteLater();
+    }
+
+    m_itemShiftAnimations.clear();
+    m_currentShifts.clear();
 }
 
 int EventRibbon::Private::indexOf(EventTile* tile) const
@@ -443,10 +499,15 @@ void EventRibbon::Private::updateScrollRange()
 
 void EventRibbon::Private::updateView()
 {
-    if (m_tiles.empty() || !q->isVisible())
+    if (m_tiles.empty())
     {
-        m_scrollBar->setValue(0);
-        m_scrollBar->setVisible(false);
+        clear();
+        return;
+    }
+
+    if (!q->isVisible())
+    {
+        clearShiftAnimations();
         return;
     }
 
@@ -462,14 +523,17 @@ void EventRibbon::Private::updateView()
 
     QSet<EventTile*> newVisible;
 
+    updateCurrentShifts();
+
     while (iter != m_tiles.end() && currentPosition < positionLimit)
     {
         m_positions[*iter] = currentPosition;
+        currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
         (*iter)->setVisible(true);
         (*iter)->setGeometry(0, currentPosition - base,
             m_viewport->width(), calculateHeight(*iter));
+        newVisible.insert((*iter));
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
-        newVisible.insert(*iter);
         ++iter;
     }
 
@@ -499,6 +563,9 @@ void EventRibbon::Private::updateView()
 
     updateScrollRange();
     debugCheckVisibility();
+
+    if (!m_currentShifts.empty()) //< If has running animations.
+        qApp->postEvent(m_viewport, new QEvent(QEvent::LayoutRequest));
 }
 
 void EventRibbon::Private::highlightAppearance(EventTile* tile)
@@ -536,6 +603,42 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
 
     animation->start(QAbstractAnimation::DeleteWhenStopped);
     curtain->setVisible(true);
+}
+
+void EventRibbon::Private::addAnimatedShift(int index, int shift)
+{
+    if (shift == 0)
+        return;
+
+    using namespace std::chrono;
+
+    auto animator = new QVariantAnimation(this);
+    animator->setStartValue(qreal(shift));
+    animator->setEndValue(0.0);
+    animator->setEasingCurve(QEasingCurve::OutCubic);
+    animator->setDuration(duration_cast<milliseconds>(kAnimationDuration).count());
+
+    connect(animator, &QAbstractAnimation::finished, this,
+        [this, animator]()
+        {
+            m_itemShiftAnimations.remove(animator);
+            animator->deleteLater();
+        });
+
+    m_itemShiftAnimations[animator] = index;
+    animator->start(QAbstractAnimation::KeepWhenStopped);
+}
+
+void EventRibbon::Private::updateCurrentShifts()
+{
+    m_currentShifts.clear();
+
+    for (auto iter = m_itemShiftAnimations.begin(); iter != m_itemShiftAnimations.end(); ++iter)
+    {
+        const auto shift = iter.key()->currentValue().toInt();
+        if (shift != 0)
+            m_currentShifts[iter.value()] += shift;
+    }
 }
 
 } // namespace desktop
