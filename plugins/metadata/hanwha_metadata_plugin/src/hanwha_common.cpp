@@ -36,6 +36,8 @@ QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEv
 
 const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const QnUuid& id) const
 {
+    static const Hanwha::EventDescriptor defaultEventDescriptor{};
+
     auto itr = m_recordById.find(id);
     if (itr != m_recordById.end())
         return itr.value();
@@ -48,7 +50,7 @@ const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const
         }
     }
 
-    return Hanwha::EventDescriptor();
+    return defaultEventDescriptor;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hanwha::EventDescriptor, (json), EventDescriptor_Fields)

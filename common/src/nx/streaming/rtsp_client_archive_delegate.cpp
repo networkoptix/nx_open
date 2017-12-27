@@ -768,7 +768,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     }
     QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
-    parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData);
+    if (!parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData))
+        return QnAbstractDataPacketPtr(); //< Report error to reopen connection.
     *parserPosition = parser->position();
     if (gotData) {
         result = parser->nextData();
@@ -792,7 +793,7 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     bool needSendRequest = !m_opened || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
     if (!needSendRequest)
         return;
-    
+
     bool fromLive = newReverseMode && m_position == DATETIME_NOW;
     m_blockReopening = false;
 
