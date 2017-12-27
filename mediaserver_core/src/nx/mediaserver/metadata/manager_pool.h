@@ -34,11 +34,11 @@ public:
         nx::sdk::metadata::AbstractMetadataManager*,
         nx::sdk::metadata::AbstractMetadataHandler*);
 
+    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
+
     std::unique_ptr<
         nx::sdk::metadata::AbstractMetadataManager,
         ManagerDeleter> manager;
-
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
 };
 
 class ManagerPool final:
