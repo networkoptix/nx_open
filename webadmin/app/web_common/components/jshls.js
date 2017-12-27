@@ -304,7 +304,7 @@ function JsHlsAPI(){
                         hls.destroy();
                         break;
                 }
-                jshlsApi.errorHandler("Fatal Error");
+                jshlsApi.errorHandler(data);
             }
             if(!stats) stats = {};
             // track all errors independently

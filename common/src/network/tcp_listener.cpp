@@ -152,6 +152,7 @@ AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
 {
     auto serverSocket = SocketFactory::createStreamServerSocket(sslNeeded);
     if (!serverSocket->setReuseAddrFlag(true) ||
+        !serverSocket->setReusePortFlag(true) ||
         !serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {

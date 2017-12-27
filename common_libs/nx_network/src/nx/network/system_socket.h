@@ -81,6 +81,8 @@ public:
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag(bool reuseAddr) override;
     virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool getMtu(unsigned int* mtuValue) const override;

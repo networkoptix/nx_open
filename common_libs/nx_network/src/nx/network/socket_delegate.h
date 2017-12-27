@@ -95,6 +95,16 @@ public:
         return m_target->getReuseAddrFlag(val);
     }
 
+    virtual bool setReusePortFlag(bool value) override
+    {
+        return m_target->setReusePortFlag(value);
+    }
+
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        return m_target->getReusePortFlag(value);
+    }
+
     virtual bool setNonBlockingMode(bool val) override
     {
         return m_target->setNonBlockingMode(val);

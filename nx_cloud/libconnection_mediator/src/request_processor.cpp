@@ -18,7 +18,7 @@ RequestProcessor::~RequestProcessor()
 }
 
 api::ResultCode RequestProcessor::getMediaserverData(
-    const ConnectionStrongRef& connection,
+    const nx::stun::AbstractServerConnection& connection,
     stun::Message& request,
     MediaserverData* const foundData,
     nx::String* errorMessage)
@@ -27,7 +27,7 @@ api::ResultCode RequestProcessor::getMediaserverData(
     if (!systemAttr)
     {
         NX_LOGX(lm("Ignoring request %1 from %2 without SystemId")
-            .args(request.header.method, connection->getSourceAddress()), cl_logDEBUG1);
+            .args(request.header.method, connection.getSourceAddress()), cl_logDEBUG1);
 
         *errorMessage = "Attribute SystemId is required";
         return api::ResultCode::badRequest;
@@ -37,7 +37,7 @@ api::ResultCode RequestProcessor::getMediaserverData(
     if (!serverAttr)
     {
         NX_LOGX(lm("Ignoring request %1 from %2 without ServerId")
-            .args(request.header.method, connection->getSourceAddress()), cl_logDEBUG1);
+            .args(request.header.method, connection.getSourceAddress()), cl_logDEBUG1);
 
         *errorMessage = "Attribute ServerId is required";
         return api::ResultCode::badRequest;
@@ -54,7 +54,7 @@ api::ResultCode RequestProcessor::getMediaserverData(
     if (!system)
     {
         NX_LOGX(lm("Ignoring request %1 from %2, system %3 could not be found")
-            .args(request.header.method, connection->getSourceAddress(), data.systemId), cl_logDEBUG1);
+            .args(request.header.method, connection.getSourceAddress(), data.systemId), cl_logDEBUG1);
 
         *errorMessage = "System could not be found";
         return api::ResultCode::notAuthorized;
@@ -70,7 +70,7 @@ api::ResultCode RequestProcessor::getMediaserverData(
     if (!request.verifyIntegrity(data.systemId, system->authKey))
     {
         NX_LOGX(lm("Ignoring request %1 from %2 with wrong message integrity, credentials: %3:%4")
-            .args(request.header.method, connection->getSourceAddress(), data.systemId,
+            .args(request.header.method, connection.getSourceAddress(), data.systemId,
                 system->authKey), cl_logDEBUG1);
 
         *errorMessage = "Wrong message integrity";

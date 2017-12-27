@@ -265,6 +265,7 @@ std::vector<std::unique_ptr<AbstractStreamServerSocket>>
                 ipVersion);
 
             if (!socket->setReuseAddrFlag(true) ||
+                !socket->setReusePortFlag(true) ||
                 !socket->bind(localAddress) ||
                 !socket->listen())
             {

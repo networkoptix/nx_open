@@ -67,11 +67,23 @@ public:
     virtual bool shutdown() = 0;
 
     /**
-     * Allows mutiple sockets to bind to same address and port.
+     * Allows mutiple sockets to bind to same address and port EXCEPT
+     * multiple active listening sockets on the same.
      * @return false on error.
+     * NOTE: Same as SO_REUSEADDR option on linux.
      */
-    virtual bool setReuseAddrFlag(bool reuseAddr) = 0;
-    virtual bool getReuseAddrFlag(bool* val) const = 0;
+    virtual bool setReuseAddrFlag(bool value) = 0;
+    virtual bool getReuseAddrFlag(bool* value) const = 0;
+
+    /**
+     * Allows mutiple listening sockets on the same address and port.
+     * @return false on error.
+     * NOTE: Same as SO_REUSEPORT option on linux.
+     * NOTE: Due to lack of support in win32 API on mswin this option actually does nothing.
+     *   Only AbstractSocket::setReuseAddrFlag(true) is enough for reusing port.
+     */
+    virtual bool setReusePortFlag(bool value) = 0;
+    virtual bool getReusePortFlag(bool* value) const = 0;
 
     /**
      * if val is true turns non-blocking mode on, else turns it off.

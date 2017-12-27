@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TS language="en_US" sourcelanguage="en" version="2.1">
+  <context>
+    <name>global</name>
+    <message>
+      <source>{{PRODUCT_NAME}}</source>
+      <translation>WAVE Sync</translation>
+    </message>
+    <message>
+      <source>{{CLIENT_PROTOCOL}}</source>
+      <translation>hanwha-vms</translation>
+    </message>
+    <message>
+      <source>{{VMS_NAME}}</source>
+      <translation>Wisenet WAVE</translation>
+    </message>
+    <message>
+      <source>{{downloadLink}}</source>
+      <translation>https://www.hanwhasecurity.com/wave</translation>
+    </message>
+    <message>
+      <source>{{supportLink}}</source>
+      <translation>http://wavevms.com/support</translation>
+    </message>
+    <message>
+      <source>{{supportLinkText}}</source>
+      <translation>http://wavevms.com/support</translation>
+    </message>
+    <message>
+      <source>{{companyUrl}}</source>
+      <translation>https://www.hanwhasecurity.com</translation>
+    </message>
+    <message>
+      <source>{{iOSappID}}</source>
+      <translation>Q5VL4R39XK.com.hanwhasecurity.wavemobile</translation>
+    </message>
+    <message>
+      <source>{{IOS_APP_LINK}}</source>
+      <translation>https://itunes.apple.com/us/app/wave-mobile/id1284037424</translation>
+    </message>
+    <message>
+      <source>{{ANDROID_APP_LINK}}</source>
+      <translation>https://play.google.com/store/apps/details?id=com.hanwhasecurity.wavemobile</translation>
+    </message>
+    <message>
+      <source>{{COMPANY_NAME}}</source>
+      <translation>Hanwha</translation>
+    </message>
+  </context>
+</TS>

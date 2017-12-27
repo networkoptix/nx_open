@@ -5,7 +5,7 @@ from celery import shared_task
 from .engines import email_engine
 
 
-from smtplib import SMTPException
+from smtplib import SMTPException, SMTPConnectError
 from ssl import SSLError
 from celery.exceptions import Ignore
 
@@ -26,7 +26,10 @@ def log_error(error, user_email, type, message, customization, attempt):
                 attempt,
                 traceback.format_exc())
 
-    logger.error(error_formatted)
+    if isinstance(error, SMTPException):
+        logger.warning(error_formatted)
+    else:
+        logger.error(error_formatted)
 
 
 @shared_task

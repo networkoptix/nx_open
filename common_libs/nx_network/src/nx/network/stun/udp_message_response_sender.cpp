@@ -37,7 +37,9 @@ SocketAddress UDPMessageResponseSender::getSourceAddress() const
 void UDPMessageResponseSender::addOnConnectionCloseHandler(
     nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
-    //TODO #ak
+    // This class emulates "server connection" on top of UDP for convenience.
+    // So, connection-related logic like this one is not appropriate.
+    // Adding assert to make sure noone waits forever for this object to report "connection closed".
     NX_ASSERT(false);
 }
 
@@ -48,12 +50,15 @@ AbstractCommunicatingSocket* UDPMessageResponseSender::socket()
 
 void UDPMessageResponseSender::close()
 {
-    // Doing nothing, since it is UDP.
+    // This class emulates "server connection" on top of UDP for convenience.
+    // So, connection-related logic like this one is not appropriate.
 }
 
 void UDPMessageResponseSender::setInactivityTimeout(
     boost::optional<std::chrono::milliseconds> /*value*/)
 {
+    // This class emulates "server connection" on top of UDP for convenience.
+    // So, connection-related logic like this one is not appropriate.
 }
 
 } // namespace stun

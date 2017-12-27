@@ -31,6 +31,16 @@ bool DummySocket::getReuseAddrFlag(bool* /*val*/) const
     return true;
 }
 
+bool DummySocket::setReusePortFlag(bool /*value*/)
+{
+    return true;
+}
+
+bool DummySocket::getReusePortFlag(bool* /*value*/) const
+{
+    return true;
+}
+
 bool DummySocket::setNonBlockingMode(bool /*val*/)
 {
     return true;

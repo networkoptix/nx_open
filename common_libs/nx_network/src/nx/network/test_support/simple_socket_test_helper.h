@@ -1317,6 +1317,7 @@ protected:
         if (m_reuseAddr)
         {
             ASSERT_TRUE(m_sockets.back()->setReuseAddrFlag(true));
+            ASSERT_TRUE(m_sockets.back()->setReusePortFlag(true));
         }
     }
 
