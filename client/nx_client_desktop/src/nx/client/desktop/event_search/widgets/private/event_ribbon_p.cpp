@@ -68,21 +68,9 @@ EventRibbon::Private::Private(EventRibbon* q):
     auto viewportAnchor = new QnWidgetAnchor(m_viewport);
     viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
-    const auto updateViewportMargins =
-        [this, viewportAnchor, guard = QPointer<Private>(this)]()
-        {
-            if (!guard)
-                return;
-
-            const auto margin = style::Metrics::kStandardPadding;
-            const auto extra = m_scrollBar->isHidden() ? 0 : m_scrollBar->width();
-            viewportAnchor->setMargins(margin, 0, margin + extra, 0);
-        };
-
-    installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide},
-        this, updateViewportMargins, Qt::QueuedConnection);
-
-    updateViewportMargins();
+    static constexpr int kExtraPadding = 1;
+    viewportAnchor->setMargins(style::Metrics::kStandardPadding, 0,
+        style::Metrics::kStandardPadding + kExtraPadding, 0);
 
     installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest},
         this, &Private::updateView);
