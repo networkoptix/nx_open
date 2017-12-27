@@ -1,6 +1,6 @@
 #pragma once
 
-#include "private/system_servers_watcher.h"
+#include "private/current_system_servers.h"
 #include "private/server_online_status_watcher.h"
 
 #include <core/resource/resource_fwd.h>
@@ -69,7 +69,7 @@ private:
     QString progressMessage() const;
 
 private:
-    SystemServersWatcher m_serversWatcher;
+    CurrentSystemServers m_serversWatcher;
     ServerOnlineStatusWatcher m_serverStatusWatcher;
 
     QScopedPointer<Ui::DeviceAdditionDialog> ui;
