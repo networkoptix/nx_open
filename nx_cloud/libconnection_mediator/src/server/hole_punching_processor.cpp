@@ -245,8 +245,7 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
-    const auto peerConnectionStrongRef = targetPeerData.peerConnection.lock();
-    if (!peerConnectionStrongRef)
+    if (!targetPeerData.peerConnection)
     {
         NX_LOGX(lm("Failed connect request %1: no connection to the target peer")
             .arg(logRequest(connection, request)), cl_logDEBUG1);
