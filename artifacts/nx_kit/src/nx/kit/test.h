@@ -20,10 +20,12 @@ namespace test {
 
 #define TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
+    static const nx::kit::test::detail::Test testDescriptor_##TEST_CASE##_##TEST_NAME = \
+        {#TEST_CASE, #TEST_NAME, &test_##TEST_CASE##_##TEST_NAME}; \
     static const int unused_##TEST_CASE##_##TEST_NAME = \
-        nx::kit::test::detail::regTest( \
-            {#TEST_CASE, #TEST_NAME, &test_##TEST_CASE##_##TEST_NAME}); \
+        nx::kit::test::detail::regTest(testDescriptor_##TEST_CASE##_##TEST_NAME); \
     static void test_##TEST_CASE##_##TEST_NAME()
+    // Function body follows the macro.
 
 #define ASSERT_TRUE(COND) \
     nx::kit::test::detail::assertBool(true, (COND), #COND, __FILE__, __LINE__)
