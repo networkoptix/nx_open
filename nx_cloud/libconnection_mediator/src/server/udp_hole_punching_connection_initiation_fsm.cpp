@@ -26,7 +26,8 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_settings(settings),
     m_relayClusterClient(relayClusterClient),
     m_serverConnectionWeakRef(serverPeerData.peerConnection),
-    m_serverPeerData(serverPeerData)
+    m_serverPeerEndpoints(serverPeerData.endpoints),
+    m_serverPeerHostName(serverPeerData.hostName)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -271,7 +272,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
     auto tcpEndpoints = std::move(request.forwardedTcpEndpointList);
     tcpEndpoints.insert(
         tcpEndpoints.begin(),
-        m_serverPeerData.endpoints.begin(), m_serverPeerData.endpoints.end());
+        m_serverPeerEndpoints.begin(), m_serverPeerEndpoints.end());
 
     if (request.udpEndpointList.empty() &&
         tcpEndpoints.empty() &&
@@ -306,7 +307,7 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
         std::bind(&UDPHolePunchingConnectionInitiationFsm::finishConnect, this));
 
     m_relayClusterClient->findRelayInstancePeerIsListeningOn(
-        m_serverPeerData.hostName.toStdString(),
+        m_serverPeerHostName.toStdString(),
         [this, operationGuard = m_asyncOperationGuard.sharedGuard()](
             nx::cloud::relay::api::ResultCode resultCode,
             QUrl relayInstanceUrl)
@@ -377,7 +378,7 @@ api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectRespo
     connectResponse.udpEndpointList = std::move(connectionAckRequest.udpEndpointList);
     connectResponse.forwardedTcpEndpointList = std::move(tcpEndpoints);
     connectResponse.cloudConnectVersion = connectionAckRequest.cloudConnectVersion;
-    connectResponse.destinationHostFullName = m_serverPeerData.hostName;
+    connectResponse.destinationHostFullName = m_serverPeerHostName;
     if (relayInstanceUrl)
         connectResponse.trafficRelayUrl = relayInstanceUrl->toString().toUtf8();
 
