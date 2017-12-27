@@ -57,6 +57,9 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     if (!isValid(index))
         return QVariant();
 
+    if (role == Qn::AnimatedRole)
+        return data(index, Qn::TimestampRole).value<qint64>() >= d->fetchedTimePeriod().startTimeMs;
+
     bool handled = false;
     const auto result = d->data(index, role, handled);
 

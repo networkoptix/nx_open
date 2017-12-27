@@ -1,9 +1,11 @@
 #include "event_ribbon_p.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QPointer>
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QVariantAnimation>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
@@ -12,7 +14,7 @@
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
-#include <utils/multi_image_provider.h>
+#include <ui/common/custom_painted.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
@@ -36,7 +38,10 @@ static constexpr int kApproximateTileHeight = 40;
 
 static constexpr int kDefaultThumbnailWidth = 224;
 static constexpr int kMaximumThumbnailWidth = 1024;
-static constexpr int kMultiThumbnailSpacing = 1;
+
+static const auto kHighlightCurtainColor = QColor(Qt::white);
+static const qreal kHighlightCurtainOpacity = 0.25;
+static const auto kHighlightDuration = std::chrono::milliseconds(400);
 
 QSize minimumWidgetSize(QWidget* widget)
 {
@@ -108,7 +113,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
     if (!m_model)
         return;
 
-    insertNewTiles(0, m_model->rowCount());
+    insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
 
     m_modelConnections.reset(new QnDisconnectHelper());
 
@@ -116,19 +121,19 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         [this]()
         {
             clear();
-            insertNewTiles(0, m_model->rowCount());
+            insertNewTiles(0, m_model->rowCount(), UpdateMode::instant);
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
-            insertNewTiles(first, last - first + 1);
+            insertNewTiles(first, last - first + 1, UpdateMode::animated);
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
         [this](const QModelIndex& /*parent*/, int first, int last)
         {
-            removeTiles(first, last - first + 1);
+            removeTiles(first, last - first + 1, UpdateMode::animated);
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
@@ -142,7 +147,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
         [this](const QModelIndex& /*sourceParent*/, int sourceFirst, int sourceLast)
         {
             // TODO: #vkutin Optimize.
-            removeTiles(sourceFirst, sourceLast - sourceFirst + 1);
+            removeTiles(sourceFirst, sourceLast - sourceFirst + 1, UpdateMode::instant);
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
@@ -156,7 +161,7 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
                 ? destinationIndex
                 : destinationIndex - count;
 
-            insertNewTiles(position, count);
+            insertNewTiles(position, count, UpdateMode::instant);
         });
 }
 
@@ -290,7 +295,7 @@ void EventRibbon::Private::debugCheckVisibility()
 #endif
 }
 
-void EventRibbon::Private::insertNewTiles(int index, int count)
+void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updateMode)
 {
     if (!m_model || count == 0)
         return;
@@ -336,11 +341,22 @@ void EventRibbon::Private::insertNewTiles(int index, int count)
 
     updateView();
 
+    // TODO: #vkutin Implement animated insertion besides highlighting.
+
     if (position < m_scrollBar->value())
         m_scrollBar->setValue(m_scrollBar->value() + delta);
+
+    if (updateMode == UpdateMode::animated)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            if (m_model->data(m_model->index(index + i), Qn::AnimatedRole).toBool())
+               highlightAppearance(m_tiles[index + i]);
+        }
+    }
 }
 
-void EventRibbon::Private::removeTiles(int first, int count)
+void EventRibbon::Private::removeTiles(int first, int count, UpdateMode /*updateMode*/)
 {
     NX_EXPECT(count);
     if (count == 0)
@@ -373,6 +389,8 @@ void EventRibbon::Private::removeTiles(int first, int count)
     m_totalHeight -= delta;
 
     debugCheckGeometries();
+
+    // TODO: #vkutin Implement animated removal.
 
     updateView();
 
@@ -493,6 +511,43 @@ void EventRibbon::Private::updateView()
 
     updateScrollRange();
     debugCheckVisibility();
+}
+
+void EventRibbon::Private::highlightAppearance(EventTile* tile)
+{
+    if (!tile->isVisible())
+        return;
+
+    using namespace std::chrono;
+
+    auto animation = new QVariantAnimation(tile);
+    animation->setStartValue(kHighlightCurtainOpacity);
+    animation->setEndValue(0.0);
+    animation->setDuration(duration_cast<milliseconds>(kHighlightDuration).count());
+    animation->setEasingCurve(QEasingCurve::InCubic);
+
+    auto curtain = new CustomPainted<QWidget>(tile);
+    new QnWidgetAnchor(curtain);
+
+    curtain->setCustomPaintFunction(
+        [animation, curtain, guard = QPointer<QVariantAnimation>(animation)]
+            (QPainter* painter, const QStyleOption* /*option*/, const QWidget* /*widget*/)
+        {
+            if (!guard)
+                return true;
+
+            QColor color = kHighlightCurtainColor;
+            color.setAlphaF(animation->currentValue().toReal());
+            painter->fillRect(curtain->rect(), color);
+            curtain->update();
+            return true;
+        });
+
+    connect(animation, &QObject::destroyed, curtain, &QObject::deleteLater);
+    installEventHandler(curtain, QEvent::Hide, animation, &QAbstractAnimation::stop);
+
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    curtain->setVisible(true);
 }
 
 } // namespace desktop

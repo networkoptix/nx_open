@@ -94,6 +94,9 @@ QVariant ProgressListModel::data(const QModelIndex& index, int role) const
         case Qn::DescriptionTextRole:
             return manager->description(activityId);
 
+        case Qn::AnimatedRole:
+            return true;
+
         default:
             return QVariant();
     }
