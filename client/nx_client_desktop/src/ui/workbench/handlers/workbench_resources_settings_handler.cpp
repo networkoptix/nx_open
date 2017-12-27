@@ -28,6 +28,14 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
 
+/// For local resource discovery
+#include <core/resource_management/resource_discovery_manager.h>
+#include <ui/workbench/workbench_context.h>
+#include <common/common_module.h>
+#include <client/client_settings.h>
+#include <core/resource/resource_directory_browser.h>
+
+
 using namespace nx::client::desktop;
 using namespace ui;
 
@@ -49,6 +57,9 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
     connect(action(action::CurrentLayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered);
+
+    connect(action(action::UpdateLocalFilesAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered);
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
@@ -198,6 +209,24 @@ void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered()
 {
     openLayoutSettingsDialog(workbench()->currentLayout()->resource());
+}
+
+void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
+{
+    QnResourceDiscoveryManager* discoveryManager = context()->commonModule()->resourceDiscoveryManager();
+
+    // We should update local media directories
+    // Is there a better place for it?
+    auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>();
+    if (localFilesSearcher)
+    {
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        localFilesSearcher->setPathCheckList(dirs);
+    }
+
+    discoveryManager->queryLocalDiscovery();
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(

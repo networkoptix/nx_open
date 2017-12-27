@@ -166,7 +166,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
         // We need to save action to the log before proxy.
         // It is needed for event log for 'view video' operation.
         // Foreign server won't be able to perform this.
-        if (!shouldOmitActionLogging(action))
+        if (actionRequiresLogging(action))
         {
             qnServerDb->saveActionToDB(action);
         }
@@ -226,7 +226,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
                 // These actions are marked as requiring camera resource,
                 // but in "play to client" mode they don't require it.
                 // And we should skip logging for generic user events
-                if (!shouldOmitActionLogging(action))
+                if (actionRequiresLogging(action))
                 {
                     qnServerDb->saveActionToDB(action);
                 }
@@ -396,7 +396,7 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     const auto actions = matchActions(event);
 
     for (const auto& action: actions)
-        executeAction(action.second);
+        executeAction(action);
 }
 
 bool RuleProcessor::containsResource(const QnResourceList& resList, const QnUuid& resId) const
@@ -523,18 +523,18 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     return vms::event::AbstractActionPtr();
 }
 
-bool RuleProcessor::shouldOmitActionLogging(const vms::event::AbstractActionPtr& action) const
+bool RuleProcessor::actionRequiresLogging(const vms::event::AbstractActionPtr& action) const
 {
     nx::vms::event::RuleManager* manager = commonModule()->eventRuleManager();
     const vms::event::RulePtr& rule = manager->rule(action->getRuleId());
     if (rule.isNull())
         return false;
+
     const vms::event::EventParameters& eventParameters = rule->eventParams();
-    if (!eventParameters.omitDbLogging)
-        return false;
     const auto eventType = action->getRuntimeParams().eventType;
-    return eventType == vms::event::EventType::softwareTriggerEvent
-        || eventType == vms::event::EventType::userDefinedEvent;
+    if (eventType == vms::event::EventType::userDefinedEvent && eventParameters.omitDbLogging)
+        return false;
+    return true;
 }
 
 void RuleProcessor::at_timer()
@@ -579,10 +579,10 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     return true;
 }
 
-RuleProcessor::EventActions RuleProcessor::matchActions(
+vms::event::AbstractActionList RuleProcessor::matchActions(
     const vms::event::AbstractEventPtr& event)
 {
-    RuleProcessor::EventActions result;
+    vms::event::AbstractActionList result;
     for (const vms::event::RulePtr& rule: m_rules)
     {
         bool condOK = checkEventCondition(event, rule);
@@ -608,7 +608,7 @@ RuleProcessor::EventActions RuleProcessor::matchActions(
             action = processInstantAction(event, rule);
 
         if (action)
-            result.push_back(std::make_pair(rule, action));
+            result.push_back(action);
 
         // Remove from rulesInProgress
         RunningRuleMap::Iterator itr = m_rulesInProgress.find(rule->getUniqueId());

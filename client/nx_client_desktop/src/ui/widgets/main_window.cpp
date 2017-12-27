@@ -40,7 +40,7 @@
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 #include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
-#include <nx/client/desktop/ui/workbench/extensions/activity_manager.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -253,7 +253,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<WorkbenchExportHandler>();
     context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
-    context->instance<workbench::PermissionsHandler>();
+    context->instance<PermissionsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
@@ -283,7 +283,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
-    context->instance<workbench::ActivityManager>();
+    context->instance<WorkbenchProgressManager>();
 
     /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(action::NextLayoutAction));

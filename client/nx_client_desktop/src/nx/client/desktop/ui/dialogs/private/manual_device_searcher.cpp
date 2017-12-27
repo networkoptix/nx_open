@@ -65,7 +65,7 @@ QnManualResourceSearchStatus::State ManualDeviceSearcher::progress() const
     return m_progress;
 }
 
-QString ManualDeviceSearcher::lastErrorText() const
+QString ManualDeviceSearcher::initialError() const
 {
     return m_lastErrorText;
 }

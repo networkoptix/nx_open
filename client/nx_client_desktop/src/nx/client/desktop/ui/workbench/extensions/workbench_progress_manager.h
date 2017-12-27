@@ -11,21 +11,19 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace workbench {
 
 /**
 * A class that maintains a list of global operations currently in progress.
 * Acts as a mediator between global asynchonous operations and UI displaying their progess.
 */
-class ActivityManager: public QObject
+class WorkbenchProgressManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    ActivityManager(QObject* parent = nullptr);
-    virtual ~ActivityManager() override = default;
+    WorkbenchProgressManager(QObject* parent = nullptr);
+    virtual ~WorkbenchProgressManager() override = default;
 
     QList<QnUuid> activities() const;
 
@@ -83,8 +81,6 @@ private:
     mutable QnMutex m_mutex;
 };
 
-} // namespace workbench
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

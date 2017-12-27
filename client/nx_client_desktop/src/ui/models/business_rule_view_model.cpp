@@ -485,7 +485,6 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
             m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
             m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
             m_eventParams.caption = QString();
-            m_eventParams.omitDbLogging = false;
             break;
 
         default:
