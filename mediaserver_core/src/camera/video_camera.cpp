@@ -614,9 +614,14 @@ QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(bool primaryLiveS
 
 void QnVideoCamera::inUse(void* user)
 {
-    QnMutexLocker lock( &m_getReaderMutex );
-    m_cameraUsers << user;
-    m_lastActivityTimer.restart();
+    {
+        QnMutexLocker lock(&m_getReaderMutex);
+        m_cameraUsers << user;
+        m_lastActivityTimer.restart();
+    }
+
+    // This call is required so camera is ready to use right after inUse call.
+    updateActivity();
 }
 
 void QnVideoCamera::notInUse(void* user)

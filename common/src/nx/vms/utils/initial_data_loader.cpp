@@ -162,7 +162,7 @@ void loadResourcesFromEcs(
                         const auto auth = QnNetworkResource::getResourceAuth(commonModule,
                             camera.id, camera.typeId);
                         manualCameras.emplace_back(nx::utils::Url(camera.url), auth,
-                            resType->getName());
+                            resType->getName(), camera.physicalId);
                     }
                     else
                     {

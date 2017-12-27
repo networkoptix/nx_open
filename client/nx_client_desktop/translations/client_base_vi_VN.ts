@@ -746,7 +746,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation>volume Down</translation>
+      <translation>Giảm âm lượng</translation>
     </message>
     <message>
       <source>Volume Up</source>
@@ -1070,7 +1070,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>di chuyển sang trái</translation>
+      <translation>Di chuyển sang trái</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1078,7 +1078,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>di chuyển sang phải</translation>
+      <translation>Di chuyển sang phải</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -1166,7 +1166,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím.</translation>
+      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím %1.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -1177,13 +1177,13 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>Mật khẩu phải có ít nhất 8 ký tự.</numerusform>
+        <numerusform>Mật khẩu phải có ít nhất %n ký tự.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation>
-        <numerusform>Mật khẩu của bạn có thể không dài quá 20 ký tự.</numerusform>
+        <numerusform>Mật khẩu của bạn có thể không dài quá %n ký tự.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2292,7 +2292,7 @@ to view more bookmarks</source>
     <name>QnCameraExpertSettingsWidget</name>
     <message>
       <source>Primary</source>
-      <translation>chìa khóa</translation>
+      <translation>Сhìa khóa</translation>
     </message>
     <message>
       <source>Secondary</source>
@@ -2410,7 +2410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Nhà cung cấp:</translation>
+      <translation>Nhà cung cấp</translation>
     </message>
     <message>
       <source>Model</source>
@@ -3504,7 +3504,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>thời gian máy chủ...</translation>
+      <translation>Thời gian máy chủ...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -4070,7 +4070,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>tẩy</translation>
+      <translation>Tẩy</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4293,7 +4293,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation> Quên mật khẩu? </translation>
+      <translation>Quên Mật Khẩu?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -5000,7 +5000,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>máy chụp hình</translation>
+      <translation>Máy chụp hình</translation>
     </message>
     <message>
       <source>Archived duration in calendar days since the first recording</source>
@@ -5302,7 +5302,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>máy chụp hình</translation>
+      <translation>Máy chụp hình</translation>
     </message>
     <message>
       <source>Created</source>
@@ -6194,7 +6194,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>tẩy</translation>
+      <translation>Tẩy</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -7753,7 +7753,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>thời gian máy chủ...</translation>
+      <translation>Thời gian máy chủ...</translation>
     </message>
   </context>
   <context>
@@ -7817,7 +7817,7 @@ to %1</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>Đối với xuất dưới dạng Xem nhanh, độ dài của video phải là ít nhất 10 giây.</numerusform>
+        <numerusform>Đối với xuất dưới dạng Xem nhanh, độ dài của video phải là ít nhất %n giây.</numerusform>
       </translation>
     </message>
   </context>
@@ -7836,7 +7836,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation>Phân tích - Thống kê</translation>
+      <translation>%1 Phân tích - Thống kê</translation>
     </message>
   </context>
   <context>
@@ -8085,7 +8085,7 @@ to %1</source>
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation>bản sao</translation>
+      <translation>Bản sao</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -8094,7 +8094,7 @@ to %1</source>
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation>dán</translation>
+      <translation>Dán</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
@@ -8309,7 +8309,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>thời gian máy chủ...</translation>
+      <translation>Thời gian máy chủ...</translation>
     </message>
     <message>
       <source>Too short period selected</source>

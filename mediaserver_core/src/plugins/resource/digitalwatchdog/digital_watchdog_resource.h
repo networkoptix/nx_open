@@ -15,6 +15,8 @@
 
 #include "dw_resource_settings.h"
 
+#include <QtXml/QDomDocument>
+
 class QnDigitalWatchdogResource : public QnPlOnvifResource
 {
     Q_OBJECT
@@ -45,11 +47,15 @@ private:
     bool disableB2FramesForActiDW();
     bool isCproChipset() const;
     bool useOnvifAdvancedParameterProviders() const;
+    bool loadCproAdvancedParameters(QnCameraAdvancedParams& params) const;
 
 private:
     bool m_hasZoom;
 
     QScopedPointer<DWAbstractCameraProxy> m_cameraProxy;
+
+    class CproApiClient;
+    std::unique_ptr<CproApiClient> m_cproApiClient;
 };
 
 #endif //ENABLE_ONVIF

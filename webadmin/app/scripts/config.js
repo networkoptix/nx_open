@@ -102,6 +102,7 @@ var Config = {
         newSystem: {type: 'static'},
         proxyConnectTimeoutSec: {type: 'number'},
         crossdomainEnabled: {type: 'checkbox'},
+        maxRtspConnectDurationSec: {label: 'Maximum duration for RTSP connection (seconds)', type: 'number'},
 
         statisticsReportLastNumber: {type: 'static'},
         statisticsReportLastTime: {type: 'static'},

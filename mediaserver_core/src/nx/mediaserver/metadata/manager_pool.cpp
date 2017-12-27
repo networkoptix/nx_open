@@ -276,10 +276,6 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
     {
-        NX_ERROR(
-            this,
-            lm("Resource %1 (%2) is not an instance of SecurityCamResource.")
-                .args(resource->getName(), resource->getId()));
         return;
     }
 

@@ -146,14 +146,19 @@ public:
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult)
     {
-        // Waiting for server to come up
-
         nx_http::HttpClient httpClient;
         httpClient.setUserName(login);
         httpClient.setUserPassword(password);
         httpClient.setAuthType(authType);
         httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+        testServerReturnCode(&httpClient, expectedStatusCode, expectedAuthResult);
+    }
 
+    void testServerReturnCode(
+        nx_http::HttpClient* httpClient,
+        int expectedStatusCode,
+        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
+    {
         const auto startTime = std::chrono::steady_clock::now();
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
         while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
@@ -165,16 +170,17 @@ public:
             }
             nx::utils::Url url = mediaServerLauncher->apiUrl();
             url.setPath("/ec2/getUsers");
-            if (httpClient.doGet(url))
+            if (httpClient->doGet(url))
                 break;  //< Server is alive
         }
-        ASSERT_TRUE(httpClient.response());
-        auto statusCode = httpClient.response()->statusLine.statusCode;
+        ASSERT_TRUE(httpClient->response());
+        auto statusCode = httpClient->response()->statusLine.statusCode;
         ASSERT_EQ(expectedStatusCode, statusCode);
 
         if (expectedAuthResult)
         {
-            QString authResultStr = nx_http::getHeaderValue(httpClient.response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+            QString authResultStr = nx_http::getHeaderValue(
+                httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
             ASSERT_FALSE(authResultStr.isEmpty());
 
             Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
@@ -269,4 +275,42 @@ TEST_F(AuthReturnCodeTest, noLdapConnect)
         nx_http::AuthType::authDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
+}
+
+static std::unique_ptr<nx_http::HttpClient> manualDigestClient(
+    const QByteArray& method, const QByteArray& uri)
+{
+    nx_http::header::WWWAuthenticate unquthorizedHeader;
+    EXPECT_TRUE(unquthorizedHeader.parse(
+        "Digest realm=\"VMS\", "
+        "nonce=\"" + QnAuthHelper::instance()->generateNonce() + "\", "
+        "algorithm=MD5"));
+
+    nx_http::header::DigestAuthorization digestHeader;
+    EXPECT_TRUE(nx_http::calcDigestResponse(
+        method, "admin", QByteArray("admin"), boost::none, uri,
+        unquthorizedHeader, &digestHeader));
+
+    auto client = std::make_unique<nx_http::HttpClient>();
+    client->setDisablePrecalculatedAuthorization(true);
+    client->addAdditionalHeader(nx_http::header::Authorization::NAME, digestHeader.serialized());
+    return client;
+}
+
+TEST_F(AuthReturnCodeTest, manualDigest)
+{
+    auto client = manualDigestClient("GET", "/ec2/getUsers");
+    testServerReturnCode(client.get(), 200);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongUri)
+{
+    auto client = manualDigestClient("GET", "/api/getCameras");
+    testServerReturnCode(client.get(), 401, Qn::AuthResult::Auth_WrongDigest);
+}
+
+TEST_F(AuthReturnCodeTest, manualDigestWrongMethod)
+{
+    auto client = manualDigestClient("POST", "/api/getUsers");
+    testServerReturnCode(client.get(), 401, Qn::AuthResult::Auth_WrongDigest);
 }

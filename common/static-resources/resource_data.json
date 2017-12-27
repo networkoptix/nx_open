@@ -1841,7 +1841,7 @@
         },
         {
             "keys": [
-                "DW|*|A*"
+                "DW|*|A*", "CPRO|*|A*"
             ],
             "showUrl": true,
             "urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
@@ -2154,6 +2154,20 @@
         },
         {
             "keys": [
+                "Hikvision|DS-2DP1636Z-D"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201,VideoEncoderToken_202",
+                    "VideoEncoderToken_301,VideoEncoderToken_302"
+                ]
+            }
+        },        
+        {
+            "keys": [
                 "IQA*|IQEYE*"
             ],
             "ignoreONVIF": true
@@ -2166,32 +2180,9 @@
         },
         {
             "keys": [
-                "DW|DWC-MD421D",
-                "DW|DWC-MD421TIR",
-                "DW|DWC-MV421D",
-                "DW|DWC-MV421TIR",
-                "DW|DWC-MB421TIR",
-                "DW|DWC-MD421DB",
-                "DW|DWC-MD421TIRB",
-                "DW|DWC-MV421DB",
-                "DW|DWC-MV421TIRB",
-                "DW|DWC-MD44WA",
-                "DW|DWC-MD44WiA",
-                "DW|DWC-MV44WA",
-                "DW|DWC-MV44WiA",
-                "DW|DWC-MB44WiA",
-                "DW|DWC-MB44iALPR",
-                "DW|DWC-MB44Wi650",
-                "DW|DWC-MD44WAB",
-                "DW|DWC-MD44WiAB",
-                "DW|DWC-MV44WAB",
-                "DW|DWC-MV44WiAB",
-                "DW|DWC-PB6M4T",
-                "DW|DWC-PF5M1TIR",
-                "DW|DWC-MV85DiA",
-                "DW|DWC-MB45DiA"
+                "DW|DWC-MTT4Wi36"
             ],
-            "2WayAudio": { "engine": "onvif" }
+            "forceOnvifAdvancedParameters": true
         }
     ]
 }

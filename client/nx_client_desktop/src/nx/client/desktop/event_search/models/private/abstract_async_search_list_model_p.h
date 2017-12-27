@@ -36,6 +36,8 @@ public:
     void commit(qint64 earliestTimeToCommitMs);
     bool fetchInProgress() const;
 
+    QnTimePeriod fetchedTimePeriod() const;
+
 protected:
     virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) = 0;
     virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) = 0;
@@ -45,8 +47,6 @@ protected:
     bool shouldSkipResponse(rest::Handle requestId) const;
     void complete(qint64 earliestTimeMs); //< Calls and clears m_prefetchCompletionHandler.
     void cancelPrefetch();
-
-    QnTimePeriod fetchedTimePeriod() const;
 
     template<class DataContainer, class UpperBoundPredicate>
     void clipToTimePeriod(DataContainer& data,

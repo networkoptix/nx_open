@@ -284,6 +284,7 @@ namespace Qn
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (int). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
+        AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

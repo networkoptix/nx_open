@@ -970,8 +970,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
     auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local ? QnPlatformMonitor::LocalDiskPartition :
-        QnPlatformMonitor::NetworkPartition);
+        local ? QnPlatformMonitor::LocalDiskPartition : QnPlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
         return baseSpaceLimit;
@@ -993,9 +992,10 @@ qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType pt
         nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
     ).toLongLong();
 
-    return ptype == QnPlatformMonitor::LocalDiskPartition ?
-           defaultStorageSpaceLimit :
-           QnStorageResource::kNasStorageLimit;
+    const bool isLocal = QnPlatformMonitor::LocalDiskPartition
+        || ptype == QnPlatformMonitor::RemovableDiskPartition;
+
+    return isLocal ? defaultStorageSpaceLimit : kNasStorageLimit;
 }
 
 bool QnFileStorageResource::isLocal()
@@ -1007,9 +1007,8 @@ bool QnFileStorageResource::isLocal()
     auto storageTypeString = getStorageType();
     if (!storageTypeString.isEmpty())
     {
-       if (storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition))
-          return true;
-       return false;
+        return storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition)
+            || storageTypeString == QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
     }
 
     auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
