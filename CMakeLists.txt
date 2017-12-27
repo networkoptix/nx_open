@@ -125,7 +125,7 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(withDesktopClient OR withMobileClient)
+if(withDesktopClient OR withMobileClient OR withNxTool)
     find_package(Qt5
         COMPONENTS
             Qml
@@ -135,6 +135,7 @@ endif()
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
     "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
 if(ANDROID)
@@ -174,6 +175,10 @@ endif()
 
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
+endif()
+
+if(withNxTool)
+    add_subdirectory(nxtool)
 endif()
 
 if(withTests)
