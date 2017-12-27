@@ -1,9 +1,9 @@
 {
-    "version" : "${release.version}.${buildNumber}",
-    "platform" : "${platform}",
-    "arch" : "${arch}",
-    "modification" : "${modification}",
-    "cloudHost" : "${cloudHost}",
+    "version" : "@release.version@.@buildNumber@",
+    "platform" : "@platform@",
+    "arch" : "@arch@",
+    "modification" : "@modification@",
+    "cloudHost" : "@cloudHost@",
     "client" : true,
     "minimalVersion" : "3.0.0.0"
 }

@@ -35,12 +35,13 @@ GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::Camera
     m_pluginRef(GenericMulticastPlugin::instance()),
     m_info(info),
     m_capabilities(0)
-{    
-    m_capabilities 
+{
+    m_capabilities
         |= nxcip::BaseCameraManager::audioCapability
-        | nxcip::BaseCameraManager::shareIpCapability 
+        | nxcip::BaseCameraManager::shareIpCapability
         | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability
-        | nxcip::BaseCameraManager::nativeMediaStreamCapability;
+        | nxcip::BaseCameraManager::nativeMediaStreamCapability
+        | nxcip::BaseCameraManager::relativeTimestampCapability;
 }
 
 GenericMulticastCameraManager::~GenericMulticastCameraManager()

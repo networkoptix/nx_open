@@ -56,6 +56,18 @@ private:
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
     HanwhaResult<HanwhaInformation> cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url);
+    void addResourcesViaSunApi(QnResourceList& upnpResults);
+    void sendSunApiProbe();
+    void readSunApiResponse(QnResourceList& resultResourceList);
+    void updateSocketList();
+
+    struct SunApiData: public nx_upnp::DeviceInfo
+    {
+        QnMacAddress macAddress;
+    };
+    bool parseSunApiData(const QByteArray& data, SunApiData* outData);
+    bool isHostBelongsToValidSubnet(const QHostAddress& address) const;
+    static std::vector<std::vector<quint8>> createProbePackets();
 private:
     QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData
@@ -74,9 +86,10 @@ private:
     // There is only one session key per group now.
 
     mutable QMap<QString, SessionKeyPtr> m_sessionKeys;
-    //mutable QMap<QString, QString> m_sessionKeys;
-    //mutable QMap<QString, bool> m_groupLocks;
-    //mutable QnWaitCondition m_wait;
+
+    const std::vector<std::vector<quint8>> m_sunapiProbePackets;
+    std::vector<std::unique_ptr<AbstractDatagramSocket>> m_sunApiSocketList;
+    QList<QnInterfaceAndAddr> m_lastInterfaceList;
 };
 
 } // namespace plugins

@@ -323,7 +323,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>"Fundir" Sistemas... (Merge)</translation>
+      <translation>"Fundir" Sistemas (Merge)...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -2062,11 +2062,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Server went offline - search aborted.</source>
-      <translation>Servidor foi desconectado -  pesquisa cancelada.</translation>
+      <translation>Servidor foi desconectado - pesquisa cancelada.</translation>
     </message>
     <message>
       <source>Server has been removed - search aborted.</source>
-      <translation>Servidor foi removido -  pesquisa cancelada.</translation>
+      <translation>Servidor foi removido - pesquisa cancelada.</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -2439,7 +2439,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante:</translation>
+      <translation>Fabricante</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2749,7 +2749,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation>Password  actual inválida.</translation>
+      <translation>Password actual inválida.</translation>
     </message>
   </context>
   <context>
@@ -3881,7 +3881,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença:</translation>
+      <translation>Chave da Licença</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3900,7 +3900,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença:</translation>
+      <translation>Chave da Licença</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3928,7 +3928,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;Servidor não encontrado></translation>
+      <translation>Servidor não encontrado</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4680,7 +4680,7 @@ to %1</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation>Introduza  novo título:</translation>
+      <translation>Introduza novo título:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
@@ -5072,7 +5072,7 @@ to %1</translation>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;Câmaras de outros servidores e câmaras removidas></translation>
+      <translation>Câmaras de outros servidores e câmaras removidas</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -8008,11 +8008,11 @@ to %1</translation>
     <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
     <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Ficheiro  executável %1 (x64) (*.exe)</translation>
+      <translation>Ficheiro executável %1 (x64) (*.exe)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Ficheiro  executável %1 (x86) (*.exe)</translation>
+      <translation>Ficheiro executável %1 (x86) (*.exe)</translation>
     </message>
     <message>
       <source>File already used for recording</source>

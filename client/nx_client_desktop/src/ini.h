@@ -14,6 +14,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("http://96.64.226.250:8888/image",
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
+    NX_INI_FLAG(0, showVideoQualityOverlay, "Show video quality overlay.");
+
     NX_INI_FLAG(0, unifiedEventPanel, "Use unified event panel instead of old notifications panel.");
     NX_INI_FLAG(1, enableAnalytics, "Enable analytics engine");
     NX_INI_FLAG(0, enableOldAnalyticsController, "Enable old analytics controller (zoom-window based).");

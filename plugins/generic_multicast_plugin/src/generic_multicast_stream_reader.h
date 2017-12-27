@@ -48,7 +48,7 @@ public:
     void setAudioEnabled(bool audioEnabled);
     void resetAudioFormat();
     nxcip::AudioFormat audioFormat() const;
-    
+
 
 private:
 
@@ -85,7 +85,6 @@ private:
     CyclicAllocator m_allocator;
 
     AVFormatContext* m_formatContext = nullptr;
-    int64_t m_startTimeUs = 0;
     std::map<int64_t, int64_t> m_streamIndexToChannelNumber;
     int m_firstVideoIndex = 0;
 

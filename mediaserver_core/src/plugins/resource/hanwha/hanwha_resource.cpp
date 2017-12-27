@@ -346,11 +346,22 @@ bool HanwhaResource::getParamsPhysical(
                     if (profile != kHanwhaInvalidProfile)
                         parameterString += lit(".Profile.%1").arg(profile);
 
-                    parameterString += lit(".%1").arg(parameterName);
-                    auto value = response.parameter<QString>(parameterString);
+                    const auto fullParameterNameTemplate = lit("%1.%2")
+                        .arg(parameterString);
+
+                    auto fullParameterName = fullParameterNameTemplate.arg(parameterName);
+                    auto value = response.parameter<QString>(fullParameterName);
 
                     if (!value)
-                        value = defaultValue(parameterString.split(L'.').last(), info->profileDependency());
+                    {
+                        // Some cameras sometimes send parameter name in wrong register.
+                        fullParameterName = fullParameterNameTemplate.arg(
+                            parameterName.toLower());
+                        value = response.parameter<QString>(fullParameterName);
+                    }
+
+                    if (!value)
+                        value = defaultValue(parameterName, info->profileDependency());
 
                     if (!value)
                         continue;

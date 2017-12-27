@@ -2345,7 +2345,7 @@ to view more bookmarks</source>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>Automatisch</translation>
+      <translation>automatisch</translation>
     </message>
   </context>
   <context>
@@ -8573,7 +8573,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Showreel verwijderen?</translation>
+      <translation>Showreel %1 verwijderen?</translation>
     </message>
   </context>
   <context>

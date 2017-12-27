@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>브릿지</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>브릿지 라이센스</translation>
     </message>
   </context>
   <context>

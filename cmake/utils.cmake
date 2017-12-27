@@ -74,13 +74,23 @@ function(nx_configure_file input output)
 endfunction()
 
 function(nx_configure_directory input output)
+    cmake_parse_arguments(ARG "" "OUTPUT_FILES_VARIABLE" "" ${ARGN})
+
+    set(output_files)
+
+    message(STATUS "Configuring directory (recursively) ${input}")
     file(GLOB_RECURSE files RELATIVE ${input} ${input}/*)
     foreach(file ${files})
         set(src_template_path ${input}/${file})
         if(NOT IS_DIRECTORY ${src_template_path})
-            nx_configure_file(${input}/${file} ${output}/${file})
+            nx_configure_file(${input}/${file} ${output}/${file} ${ARG_UNPARSED_ARGUMENTS})
+            list(APPEND output_files ${output}/${file})
         endif()
     endforeach()
+
+    if(ARG_OUTPUT_FILES_VARIABLE)
+        set(${ARG_OUTPUT_FILES_VARIABLE} ${output_files} PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(nx_copy_package_for_configuration package_dir config)

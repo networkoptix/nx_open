@@ -70,11 +70,24 @@ QHostAddress QnInterfaceAndAddr::broadcastAddress() const
 
 QHostAddress QnInterfaceAndAddr::subNetworkAddress() const
 {
-    quint32 networkIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
-    return QHostAddress(networkIpv4);
+    quint32 subnetworkIpV4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(subnetworkIpV4);
 }
 
-QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
+bool QnInterfaceAndAddr::isHostBelongToIpv4Network(const QHostAddress& address) const
+{
+    auto between = [](const quint32 min, const quint32 value, const quint32 max)
+        { return min <= value && value < max; };
+
+    return between(
+        subNetworkAddress().toIPv4Address(),
+        address.toIPv4Address(),
+        broadcastAddress().toIPv4Address());
+}
+
+QnInterfaceAndAddrList getAllIPv4Interfaces(
+    bool allowInterfacesWithoutAddress,
+    bool keepAllAddressesPerInterface)
 {
     struct LocalCache
     {
@@ -86,7 +99,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     enum { kCacheLinesCount = 2};
     static LocalCache caches[kCacheLinesCount];
 
-    LocalCache &cache = caches[allowItfWithoutAddress ? 1 : 0];
+    LocalCache &cache = caches[allowInterfacesWithoutAddress ? 1 : 0];
     {
         // speed optimization
         QnMutexLocker lock(&cache.guard);
@@ -108,7 +121,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
             continue;
 #endif
 
-        bool addInterfaceAnyway = allowItfWithoutAddress;
+        bool addInterfaceAnyway = allowInterfacesWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
@@ -121,7 +134,8 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     addInterfaceAnyway = false;
-                    break;
+                    if (!keepAllAddressesPerInterface)
+                        break;
                 }
             }
         }
