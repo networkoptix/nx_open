@@ -65,6 +65,8 @@ void SystemServersWatcher::tryAddServer(const QnResourcePtr& resource)
     if (!server)
         return;
 
+    qDebug() << "--------------------";
+
     if (server->getModuleInformation().localSystemId != m_localSystemId)
         return;
 
