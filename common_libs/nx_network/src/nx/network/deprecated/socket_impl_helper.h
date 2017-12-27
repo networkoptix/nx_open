@@ -26,6 +26,8 @@ public:
     virtual bool isClosed() const override { return m_abstractSocketProvider()->isClosed(); }
     virtual bool setReuseAddrFlag(bool reuseAddr) override { return m_abstractSocketProvider()->setReuseAddrFlag(reuseAddr); }
     virtual bool getReuseAddrFlag(bool* val) const override { return m_abstractSocketProvider()->getReuseAddrFlag(val); }
+    virtual bool setReusePortFlag(bool value) override { return m_abstractSocketProvider()->setReusePortFlag(value); }
+    virtual bool getReusePortFlag(bool* value) const override { return m_abstractSocketProvider()->getReusePortFlag(value); }
     virtual bool setNonBlockingMode(bool val) override { return m_abstractSocketProvider()->setNonBlockingMode(val); }
     virtual bool getNonBlockingMode(bool* val) const override { return m_abstractSocketProvider()->getNonBlockingMode(val); }
     virtual bool getMtu(unsigned int* mtuValue) const override { return m_abstractSocketProvider()->getMtu(mtuValue); }

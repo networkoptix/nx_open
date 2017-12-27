@@ -132,6 +132,8 @@ angular.module('cloudApp')
                 var tempPassword = auth.substring(index+1);
                 var requestingLogin = service.login(tempLogin, tempPassword, false).then(function(){
                     $location.search('auth', null);
+                },function(){
+                    $location.search('auth', null);
                 });
             }
         }

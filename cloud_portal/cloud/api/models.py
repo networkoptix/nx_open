@@ -6,6 +6,10 @@ from django.utils.html import format_html
 
 
 class Account(PermissionsMixin):
+    class Meta:
+        permissions = (
+            ("can_view_release", "Can view releases and patches"),
+        )
 
     objects = AccountManager()
 

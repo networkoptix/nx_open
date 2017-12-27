@@ -646,6 +646,13 @@ table.webclient-window>tbody>tr>td{
   cursor: pointer;
 }
 
+.cast-button{
+  max-width:20px;
+  background-color:transparent;
+  border:none;
+  padding:0px;
+}
+
 .fullscreen-notification{
   position: absolute;
   top: 16px;

@@ -170,7 +170,8 @@ AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     const AbstractCloudDataProvider::System& system,
-    nx::String name, ServerTweak::Value tweak)
+    nx::String name,
+    ServerTweak::Value tweak)
 {
     auto server = std::make_unique<MediaServerEmulator>(
         stunEndpoint(),

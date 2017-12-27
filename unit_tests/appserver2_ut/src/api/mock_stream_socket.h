@@ -109,6 +109,19 @@ public:
         return true;
     }
 
+    virtual bool setReusePortFlag(bool value) override
+    {
+        m_reusePortFlag = value;
+        return true;
+    }
+
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        if (value)
+            *value = m_reusePortFlag;
+        return true;
+    }
+
     virtual bool setNonBlockingMode(bool val) override
     {
         m_nonBlockingMode = val;
@@ -212,13 +225,14 @@ public:
     }
 
 private:
-    bool m_reuseAddrFlag;
-    bool m_nonBlockingMode;
-    int m_sendBufferSize;
-    int m_recvBufferSize;
-    unsigned int m_recvTimeoutMs;
-    unsigned int m_sendTimeoutMs;
-    nx::network::aio::AbstractAioThread* m_aioThread;
+    bool m_reuseAddrFlag = false;
+    bool m_reusePortFlag = false;
+    bool m_nonBlockingMode = false;
+    int m_sendBufferSize = 0;
+    int m_recvBufferSize = 0;
+    unsigned int m_recvTimeoutMs = 0;
+    unsigned int m_sendTimeoutMs = 0;
+    nx::network::aio::AbstractAioThread* m_aioThread = nullptr;
     SocketAddress m_localAddress;
 };
 

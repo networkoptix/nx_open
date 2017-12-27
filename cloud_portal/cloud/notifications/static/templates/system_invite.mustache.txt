@@ -6,7 +6,7 @@ Welcome to %PRODUCT_NAME%
 
 {{^message.sharer_name}}
 You are invited you to join %PRODUCT_NAME%.
-The system {{message.system_name}} was shared with you.
+You have been granted access to {{message.system_name}}.
 {{/message.sharer_name}}
 
 Register and view the system: {{config.portal_url}}/register/{{message.code}}
