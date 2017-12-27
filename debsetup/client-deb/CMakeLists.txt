@@ -26,6 +26,24 @@ file(COPY "${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.co
 
 # Variables used by build-dist.sh.
 set(ClientHelpSourceDir "${help_directory}/bin/help")
+set(common_depends
+    "libstdc++6 (>= 4.1.1)"
+    "zlib1g (>= 1:1.1.4)"
+    "debconf (>= 0.5) | debconf-2.0"
+    "upstart-job"
+    "psmisc"
+    "upstart (>= 0.6.5-8)"
+    "libgstreamer-plugins-base0.10-0"
+    "libxi6"
+    "libxrender1"
+    "libxcomposite1"
+    "libxt6"
+    "libfontconfig1"
+    "libsm6"
+    "libice6"
+    "libaudio2"
+)
+string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
 
 # Variables which may depend on the current project and are used by build-dist.sh.
 set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})

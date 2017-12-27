@@ -1,5 +1,26 @@
 set(depends mediaserver)
 
+# Variables used by build-dist.sh.
+set(common_depends
+    "libstdc++6 (>= 4.1.1)"
+    "zlib1g (>= 1:1.1.4)"
+    "debconf (>= 0.5) | debconf-2.0"
+    "python"
+    "upstart-job"
+    "psmisc"
+    "upstart (>= 0.6.5-8)"
+    "libsm6"
+    "libice6"
+    "libaudio2"
+    "libogg0"
+    "libxfixes3"
+    "libxrender1"
+    "libfontconfig1"
+    "libgl1-mesa-glx"
+    "cifs-utils"
+)
+string(REPLACE ";" ", " common.depends "${common_depends}") #< Make a comma-separated list.
+
 # Variables which may depend on current project and are used by build-dist.sh.
 set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})
 set(basedir ${CMAKE_CURRENT_SOURCE_DIR}) # For ${basedir}/../scripts
