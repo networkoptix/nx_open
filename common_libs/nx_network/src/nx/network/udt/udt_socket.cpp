@@ -248,6 +248,18 @@ bool UdtSocket<InterfaceToImplement>::getReuseAddrFlag(bool* val) const
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::setReusePortFlag(bool /*value*/)
+{
+    return true;
+}
+
+template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::getReusePortFlag(bool* value) const
+{
+    return getReuseAddrFlag(value);
+}
+
+template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::setNonBlockingMode(bool val)
 {
     NX_ASSERT(!isClosed());
