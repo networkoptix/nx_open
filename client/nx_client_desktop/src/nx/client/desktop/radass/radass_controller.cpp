@@ -215,14 +215,14 @@ struct RadassController::Private
     {
         if (consumer == consumers.end())
         {
-            NX_VERBOSE(this) message;
+            NX_VERBOSE(this) << message;
             #if defined(TRACE_RADASS)
                 qDebug() << message;
             #endif
         }
         else
         {
-            NX_VERBOSE(this) message << *consumer;
+            NX_VERBOSE(this) << message << *consumer;
             #if defined(TRACE_RADASS)
                 qDebug() << message << consumer->toString();
             #endif
