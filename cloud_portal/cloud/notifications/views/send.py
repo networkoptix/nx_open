@@ -27,8 +27,11 @@ def format_message(notification):
     return message
 
 
-def send_to_all_users(sent_by, notification):
-    users = Account.objects.filter(is_superuser=True)
+def send_to_all_users(sent_by, notification, force=False):
+    if force:
+        user = users = Account.objects.filter(is_superuser=True)
+    else:
+        users = Account.objects.filter(subscribe=True).filter(is_superuser=True)
     message = format_message(notification)
     notification.sent_by = sent_by
     notification.sent_date = datetime.now()
@@ -102,13 +105,16 @@ def cloud_notification_action(request):
     if 'Save' in request.data:
         notification_id = str(update_or_create_notification(request.data))
     elif 'Preview' in request.data:
+        if not notification_id:
+            notification_id = str(update_or_create_notification(request.data))
         notification = CloudNotification.objects.get(id=notification_id)
         message = format_message(notification)
         message['full_name'] = request.user.get_full_name()
         api.send(request.user.email, 'cloud_notification', message, 'default')
     elif 'Send' in request.data:
+        force = 'ignore_subscriptions' in request.data
         notification = CloudNotification.objects.get(id=notification_id)
-        send_to_all_users(reqeust.user, notification)
+        send_to_all_users(request.user, notification, force)
     else:
         return Response("Invalid")
 

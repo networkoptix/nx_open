@@ -10,6 +10,8 @@
         {% block submit_buttons_bottom %}{% endblock %}
         {% if not cloud_notification.sent_date %}
         <div class="submit-row">
+            <label for="ignoreSubscriptions">Ignore Subscriptions:</label>
+            <input class="float-left" id="ignoreSubscriptions" name="ignore_subscriptions" type="checkbox">
             <button class="button" type="submit" name="Save">Save Draft</button>
             <button class="button" type="submit" name="Preview">Preview Draft</button>
             <button class="button" type="submit" name="Send">Send Notification</button>
