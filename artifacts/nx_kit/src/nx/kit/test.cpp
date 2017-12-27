@@ -1,9 +1,11 @@
 // Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 #include "test.h"
 
+#include <ctime>
 #include <cstdio>
 #include <cstdarg>
 #include <vector>
+#include <cstring>
 
 namespace nx {
 namespace kit {
@@ -86,7 +88,7 @@ int regTest(const Test& test)
 int runAllTests()
 {
     std::cerr << std::endl << "Running " << allTests().size() << " test(s) from test suite ["
-        << std::hex << (uintptr_t) &allTests() << "]" << std::endl;
+        << std::hex << (uintptr_t) &allTests() << "]" << std::dec << std::endl;
 
     std::vector<size_t> failedTests;
     for (size_t i = 1; i <= allTests().size(); ++i)
@@ -142,6 +144,74 @@ int runAllTests()
     }
     printSection("SUCCESS: All %lu test(s) PASSED.", allTests().size());
     return 0;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Temp files
+
+std::string tempDir()
+{
+    static std::string tempDir;
+
+    if (tempDir.empty())
+    {
+        char tempDirStr[L_tmpnam] = "";
+        ASSERT_TRUE(std::tmpnam(tempDirStr) != nullptr);
+
+        // Extract dir name from the file path - truncate after the last path separator.
+        for (int i = (int) strlen(tempDirStr) - 1; i >= 0; --i)
+        {
+            if (tempDirStr[i] == '/' || tempDirStr[i] == '\\')
+            {
+                tempDirStr[i + 1] = '\0';
+                break;
+            }
+        }
+
+        tempDir = tempDirStr;
+        std::cerr << "NOTE: Using temp path for creating temp files: " << tempDir << std::endl;
+    }
+
+    return tempDir;
+}
+
+TempFile::TempFile(const std::string& prefix, const std::string& suffix)
+{
+    static bool randomized = false;
+    if (!randomized)
+    {
+        srand((unsigned int) time(nullptr));
+        randomized = true;
+    }
+
+    char randStr[20];
+    snprintf(randStr, sizeof(randStr), "%d", rand());
+    m_filename = tempDir() + prefix + randStr + suffix;
+}
+
+TempFile::~TempFile()
+{
+    if (keepFiles())
+    {
+        std::cerr << "ATTENTION: Temp file not deleted because "
+            << "NX_KIT_TEST_KEEP_TEMP_FILES is defined: " << m_filename << std::endl;
+        return;
+    }
+
+    if (std::uncaught_exception()) //< A test failed - keep the file.
+    {
+        std::cerr << "ATTENTION: Temp file not deleted because an exception was thrown: "
+            << m_filename << std::endl;
+        return;
+    }
+
+    std::remove(m_filename.c_str());
+}
+
+/*static*/ bool& TempFile::keepFiles()
+{
+    static bool value = false;
+    return value;
 }
 
 } // namespace test
