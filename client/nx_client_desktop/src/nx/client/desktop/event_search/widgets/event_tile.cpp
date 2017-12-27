@@ -304,6 +304,9 @@ void EventTile::handleHoverChanged(bool hovered)
     m_closeButton->setVisible(showCloseButton);
     updateBackgroundRole(hovered && !m_closeButton->underMouse());
 
+    if (showCloseButton)
+        m_closeButton->raise();
+
     if (m_autoCloseTimer)
     {
         if (hovered)
