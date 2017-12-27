@@ -37,10 +37,13 @@ public:
 
     void startMonitoring();
     void stopMonitoring();
+    void restartMonitoring();
 
     void addHandler(const QString& handlerId, const Handler& handler);
     void removeHandler(const QString& handlerId);
     void clearHandlers();
+
+    void setResourceAccess(const QUrl& url, const QAuthenticator& auth);
 
 private:
     QUrl buildMonitoringUrl(const QUrl& url) const;
@@ -53,8 +56,8 @@ private:
 
 private:
     const Hanwha::DriverManifest& m_manifest;
-    const QUrl m_url;
-    const QAuthenticator m_auth;
+    QUrl m_url;
+    QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
     QElapsedTimer m_timeSinceLastOpen;
     nx_http::AsyncHttpClientPtr m_httpClient;
@@ -62,6 +65,7 @@ private:
 
     mutable QnMutex m_mutex;
     QMap<QString, Handler> m_handlers;
+    std::atomic<bool> m_monitoringIsInProgress;
 };
 
 } // namespace plugins
