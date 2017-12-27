@@ -289,7 +289,7 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
-#include "nx/mediaserver/rest/updates2/updates2_info_rest_handler.h"
+#include "nx/mediaserver/rest/updates2/updates2_rest_handler.h"
 
 #if defined(__arm__)
     #include "nx1/info.h"
@@ -1679,7 +1679,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 
     using namespace mediaserver::rest::updates2;
-    reg(kUpdates2AvailablePath, new Updates2InfoRestHandler());
+    reg(kUpdates2Path, new Updates2RestHandler());
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>

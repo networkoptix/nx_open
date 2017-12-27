@@ -74,7 +74,7 @@ bool AsyncHttpJsonProvider::hasTransportError(HandlerFunction handlerFunction)
 {
     if (m_asyncHttpClient.state() != nx_http::AsyncClient::State::sDone)
     {
-        NX_ERROR(
+        NX_WARNING(
             this,
             lm("Http client transport error: %1").args(m_asyncHttpClient.lastSysErrorCode()));
         handlerFunction(ResultCode::getRawDataError, QByteArray());
@@ -84,7 +84,7 @@ bool AsyncHttpJsonProvider::hasTransportError(HandlerFunction handlerFunction)
     int statusCode = m_asyncHttpClient.response()->statusLine.statusCode;
     if (statusCode != nx_http::StatusCode::ok)
     {
-        NX_ERROR(this, lm("Http client http error: ").args(statusCode));
+        NX_WARNING(this, lm("Http client http error: %1").args(statusCode));
         handlerFunction(ResultCode::getRawDataError, QByteArray());
         return true;
     }

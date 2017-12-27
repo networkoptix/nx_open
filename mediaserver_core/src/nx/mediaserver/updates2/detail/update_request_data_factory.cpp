@@ -4,7 +4,6 @@
 
 namespace nx {
 namespace mediaserver {
-namespace rest {
 namespace updates2 {
 namespace detail {
 
@@ -16,9 +15,9 @@ update::info::UpdateRequestData UpdateRequestDataFactory::create()
         return s_factoryFunc();
 
     return update::info::UpdateRequestData(
-        nx::network::AppInfo::defaultCloudHost(),
-        QnAppInfo::customizationName(),
-        QnSoftwareVersion(QnAppInfo::applicationVersion()));
+        /*nx::network::AppInfo::defaultCloudHost()*/"nxvms.com",
+        /*QnAppInfo::customizationName()*/"default",
+        /*QnSoftwareVersion(QnAppInfo::applicationVersion())*/QnSoftwareVersion(2, 0, 0, 1));
 }
 
 void UpdateRequestDataFactory::setFactoryFunc(UpdateRequestDataFactory::FactoryFunc factoryFunc)
@@ -28,6 +27,5 @@ void UpdateRequestDataFactory::setFactoryFunc(UpdateRequestDataFactory::FactoryF
 
 } // namespace detail
 } // namespace updates2
-} // namespace rest
 } // namespace mediaserver
 } // namespace nx

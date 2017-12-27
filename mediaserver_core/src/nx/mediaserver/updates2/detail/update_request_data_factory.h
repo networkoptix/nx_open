@@ -6,7 +6,6 @@
 
 namespace nx {
 namespace mediaserver {
-namespace rest {
 namespace updates2 {
 namespace detail {
 
@@ -23,6 +22,5 @@ private:
 
 } // namespace detail
 } // namespace updates2
-} // namespace rest
 } // namespace mediaserver
 } // namespace nx

@@ -116,6 +116,8 @@ namespace nx_ms_conf
     static const QLatin1String P2P_MODE_FLAG("p2pMode");
 
     static const QLatin1String SYSTEM_USER("systemUser");
+
+    static const QLatin1String CHECK_FOR_UPDATE_REFRESH_TIMEOUT("checkForUpdateRefreshTimeout");
 }
 
 /**

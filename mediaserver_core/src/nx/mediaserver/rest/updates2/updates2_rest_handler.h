@@ -7,10 +7,9 @@ namespace mediaserver {
 namespace rest {
 namespace updates2 {
 
-static const QString kUpdates2ActionPath = "/api/updates2";
+static const QString kUpdates2Path = "api/updates2";
 
-
-class Updates2ActionRestHandler: public QnJsonRestHandler
+class Updates2RestHandler: public QnJsonRestHandler
 {
 public:
     virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;

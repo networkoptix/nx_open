@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <nx/mediaserver/rest/updates2/updates2_info_rest_handler.h>
+#include <nx/mediaserver/rest/updates2/updates2_rest_handler.h>
 #include <nx/mediaserver/rest/updates2/detail/update_request_data_factory.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
 #include <nx/update/info/detail/data_provider/test_support/impl/async_json_provider_mockup.h>
 #include <nx/update/info/update_request_data.h>
 #include <test_support/mediaserver_launcher.h>
 #include <nx/network/http/http_client.h>
-#include <nx/api/updates2/available_update_info_data.h>
+#include <nx/api/updates2/updates2_status_data.h>
 
 namespace nx {
 namespace mediaserver {
