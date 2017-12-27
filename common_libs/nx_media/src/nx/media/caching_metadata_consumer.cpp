@@ -1,7 +1,8 @@
 #include "caching_metadata_consumer.h"
 
+#include <queue>
+
 #include <QtCore/QVector>
-#include <QtCore/QQueue>
 #include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
@@ -31,28 +32,19 @@ bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const
 class MetadataCache
 {
 public:
-    MetadataCache(int cacheSize = -1):
-        m_maxItemsCount(std::max(1, cacheSize >= 0 ? cacheSize : ini().metadataCacheSize))
+    MetadataCache(size_t cacheSize = 1):
+        m_cacheSize(cacheSize)
     {
-        m_metadataCache.reserve(m_maxItemsCount);
     }
 
     void insertMetadata(const QnAbstractCompressedMetadataPtr& metadata)
     {
         QnMutexLocker lock(&m_mutex);
 
-        if (m_metadataCache.size() == m_maxItemsCount)
-        {
-            const auto oldestMetadata = m_metadataCache.dequeue();
-            const auto it = m_metadataByTimestamp.find(oldestMetadata->timestamp);
-            // Check the value equality is necessary because the stored value can be replaced by
-            // other metadata with the same timestamp.
-            NX_ASSERT(it != m_metadataByTimestamp.end());
-            if (it != m_metadataByTimestamp.end() && *it == oldestMetadata)
-                m_metadataByTimestamp.erase(it);
-        }
+        if (m_metadataCache.size() == m_cacheSize)
+            removeOldestMetadataItem();
 
-        m_metadataCache.enqueue(metadata);
+        m_metadataCache.push(metadata);
         m_metadataByTimestamp[metadata->timestamp] = metadata;
     }
 
@@ -109,11 +101,40 @@ public:
         return result;
     }
 
+    void setCacheSize(size_t cacheSize)
+    {
+        if (cacheSize == 0 || cacheSize == m_cacheSize)
+            return;
+
+        trimCacheToSize(cacheSize);
+        m_cacheSize = cacheSize;
+    }
+
+private:
+    void removeOldestMetadataItem()
+    {
+        const auto metadata = m_metadataCache.front();
+        m_metadataCache.pop();
+
+        const auto it = m_metadataByTimestamp.find(metadata->timestamp);
+        // Check the value equality is necessary because the stored value can be replaced by
+        // other metadata with the same timestamp.
+        NX_ASSERT(it != m_metadataByTimestamp.end());
+        if (it != m_metadataByTimestamp.end() && *it == metadata)
+            m_metadataByTimestamp.erase(it);
+    }
+
+    void trimCacheToSize(size_t size)
+    {
+        while (m_metadataCache.size() > size)
+            removeOldestMetadataItem();
+    }
+
 private:
     mutable QnMutex m_mutex;
-    QQueue<QnAbstractCompressedMetadataPtr> m_metadataCache;
+    std::queue<QnAbstractCompressedMetadataPtr> m_metadataCache;
     QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
-    const int m_maxItemsCount;
+    size_t m_cacheSize;
 };
 
 using MetadataCachePtr = QSharedPointer<MetadataCache>;
@@ -124,16 +145,37 @@ class CachingMetadataConsumer::Private
 {
 public:
     QVector<MetadataCachePtr> cachePerChannel;
+    size_t cacheSize = 1;
 };
 
 CachingMetadataConsumer::CachingMetadataConsumer(MetadataType metadataType):
     base_type(metadataType),
     d(new Private())
 {
+    d->cacheSize = static_cast<size_t>(std::max(1, ini().metadataCacheSize));
 }
 
 CachingMetadataConsumer::~CachingMetadataConsumer()
 {
+}
+
+size_t CachingMetadataConsumer::cacheSize() const
+{
+    return d->cacheSize;
+}
+
+void CachingMetadataConsumer::setCacheSize(size_t cacheSize)
+{
+    if (cacheSize < 1 || d->cacheSize == cacheSize)
+        return;
+
+    d->cacheSize = cacheSize;
+
+    for (const auto& cache: d->cachePerChannel)
+    {
+        if (cache)
+            cache->setCacheSize(d->cacheSize);
+    }
 }
 
 QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
@@ -170,7 +212,7 @@ void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadata
 
     auto& cache = d->cachePerChannel[channel];
     if (cache.isNull())
-        cache.reset(new MetadataCache());
+        cache.reset(new MetadataCache(d->cacheSize));
 
     cache->insertMetadata(metadata);
 }

@@ -13,6 +13,9 @@ public:
     CachingMetadataConsumer(MetadataType metadataType);
     virtual ~CachingMetadataConsumer() override;
 
+    size_t cacheSize() const;
+    void setCacheSize(size_t cacheSize);
+
     QnAbstractCompressedMetadataPtr metadata(qint64 timestamp, int channel) const;
     QList<QnAbstractCompressedMetadataPtr> metadataRange(
         qint64 startTimestamp, qint64 endTimestamp, int channel, int maximumCount = -1) const;
