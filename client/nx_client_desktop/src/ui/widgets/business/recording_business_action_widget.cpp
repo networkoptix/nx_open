@@ -23,8 +23,6 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
     }
 
     static constexpr int kMaxPreRecordingSecs = 60;
-    ui->beforeLabel->setVisible(true);
-    ui->beforeSpinBox->setVisible(true);
     ui->beforeSpinBox->setMaximum(kMaxPreRecordingSecs);
 
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));

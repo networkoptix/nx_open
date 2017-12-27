@@ -584,18 +584,26 @@ void QnScheduleSync::run()
             if (allowedDays.testFlag(ec2::backup::fromQtDOW(today)))
             {
                 const auto curTime = now.time();
-                if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec* 1000 &&
-                    m_schedule.backupDurationSec == -1) // sync without end time
-                {
-                    return SyncCode::Ok;
-                }
+                const bool nowIsPastTheBackupStartPoint =
+                    curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000;
+                const bool syncUntilFinished = m_schedule.backupDurationSec == -1;
 
-                if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000 &&
-                    curTime.msecsSinceStartOfDay() < m_schedule.backupStartSec * 1000 +
-                                                        m_schedule.backupDurationSec * 1000) // 'normal' schedule sync
-                {
+                if (nowIsPastTheBackupStartPoint && syncUntilFinished)
                     return SyncCode::Ok;
-                }
+
+                const auto backupFinishTimePointMs =
+                    m_schedule.backupStartSec * 1000 + m_schedule.backupDurationSec * 1000;
+                const bool backupPeriodNotFinishedYet =
+                    curTime.msecsSinceStartOfDay() < backupFinishTimePointMs;
+
+                if (nowIsPastTheBackupStartPoint && backupPeriodNotFinishedYet)
+                    return SyncCode::Ok;
+
+                if (m_syncing && syncUntilFinished)
+                    return SyncCode::Ok;
+
+                if (m_syncing && backupPeriodNotFinishedYet)
+                    return SyncCode::Ok;
             }
             return SyncCode::OutOfTime;
         };

@@ -515,7 +515,7 @@ enum IDType
     * Shares selected camera with another user.
     *
     * Parameters:
-    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
+    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user or role to share camera with.
     */
     ShareCameraAction,
 
@@ -656,6 +656,11 @@ enum IDType
      * Opens manual device addition dialog.
      */
     AddDeviceManuallyAction,
+
+    /**
+     * Opens manual device addition dialog from main menu.
+     */
+    MainMenuAddDeviceManuallyAction,
 
     /**
      * Opens camera list by server

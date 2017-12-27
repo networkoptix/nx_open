@@ -225,12 +225,8 @@ angular.module('nxCommon')
         /* End of Authentication  */
 
         /* Server settings */
-        ServerConnection.prototype.getTime = function(serverId, localTime){
-            var local = localTime?'?local':'';
-            if(serverId){
-                return this._get('/proxy/http/' + serverId + '/api/gettime' + local);
-            }
-            return this._get('/api/gettime' + local);
+        ServerConnection.prototype.getServerTimes = function(){
+            return this._get('/ec2/getTimeOfServers');
         };
         /* End of Server settings */
 
@@ -323,14 +319,14 @@ angular.module('nxCommon')
             }
             return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet(), true);
         };
-        ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
+        ServerConnection.prototype.webmUrl = function(cameraId, position, resolution, force){
             var data = {
                 resolution:resolution
             };
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/media/' + cleanId(cameraId) + '.webm?rt' , data, this.authGet());
+            return this._setGetParams('/media/' + cleanId(cameraId) + '.webm?rt' , data, this.authGet(), force);
         };
         /* End of formatting urls */
 

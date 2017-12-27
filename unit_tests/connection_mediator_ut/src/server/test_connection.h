@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/stun/abstract_server_connection.h>
+#include <nx/network/stun/server_connection.h>
 #include <nx/network/system_socket.h>
 
 namespace nx {
@@ -23,6 +23,8 @@ template<> struct SocketTypeToProtocolType<nx::network::UDPSocket>
     static const nx::network::TransportProtocol value =
         nx::network::TransportProtocol::udp;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 template<typename Socket>
 class TestConnection:
@@ -86,6 +88,31 @@ private:
     Socket m_socket;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::utils::MoveOnlyFunc<void()> m_connectionCloseHandler;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class TestTcpConnection:
+    public stun::ServerConnection
+{
+    using base_type = stun::ServerConnection;
+
+public:
+    TestTcpConnection();
+
+    virtual void sendMessage(
+        nx::stun::Message /*message*/,
+        std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override;
+
+    virtual SocketAddress getSourceAddress() const override;
+
+    virtual void setInactivityTimeout(
+        boost::optional<std::chrono::milliseconds> value) override;
+
+    boost::optional<std::chrono::milliseconds> inactivityTimeout() const;
+
+private:
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
 };
 
 } // namespace test

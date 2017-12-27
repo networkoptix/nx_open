@@ -82,6 +82,7 @@ public:
     static RuleList getSystemRules();
     static RuleList getRulesUpd43();
     static RuleList getRulesUpd48();
+    static RuleList getDisabledRulesUpd48();
 
     Rule* clone();
     void removeResource(const QnUuid& resId);

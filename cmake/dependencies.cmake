@@ -102,7 +102,7 @@ function(nx_get_dependencies)
         nx_rdep_add_package(cassandra)
     endif()
 
-    if (WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
+    if (WINDOWS OR MACOSX OR (LINUX AND box MATCHES "none|tx1"))
         set(haveDesktopClient TRUE)
     endif()
 
@@ -111,7 +111,7 @@ function(nx_get_dependencies)
     endif()
 
     if(WINDOWS OR MACOSX
-        OR (LINUX AND NOT arch STREQUAL "x86" AND NOT ANDROID AND box MATCHES "none|bpi|tx1"))
+        OR (LINUX AND NOT arch STREQUAL "x86" AND box MATCHES "none|bpi|tx1"))
 
         set(haveTests TRUE)
     endif()
@@ -149,6 +149,12 @@ function(nx_get_dependencies)
 
     if(ANDROID OR WINDOWS OR box MATCHES "bpi")
         nx_rdep_add_package(openal)
+    endif()
+
+
+    if(LINUX AND box STREQUAL "none")
+        nx_rdep_add_package(cifs-utils)
+        nx_rdep_add_package(appserver-2.2.1)
     endif()
 
     if(WINDOWS)

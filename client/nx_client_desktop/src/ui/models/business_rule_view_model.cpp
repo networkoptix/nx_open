@@ -154,16 +154,31 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_actionTypesModel(new QStandardItemModel(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    QnBusinessTypesComparator lexComparator(true);
-    for (vms::event::EventType eventType : lexComparator.lexSortedEvents())
-    {
-        QStandardItem *item = new QStandardItem(m_helper->eventName(eventType));
-        item->setData(eventType);
+    auto addEventItem = [this](vms::event::EventType eventType)
+        {
+            auto item = new QStandardItem(m_helper->eventName(eventType));
+            item->setData(eventType);
+            m_eventTypesModel->appendRow(item);
+        };
 
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventTypesModel->appendRow(row);
-    }
+    auto addSeparator = [](QStandardItemModel* model)
+        {
+            auto item = new QStandardItem(lit("-"));
+            item->setData(lit("separator"), Qt::AccessibleDescriptionRole);
+            model->appendRow(item);
+        };
+
+    using EventSubType = QnBusinessTypesComparator::EventSubType;
+
+    QnBusinessTypesComparator lexComparator(true);
+    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
+        addEventItem(eventType);
+    addSeparator(m_eventTypesModel);
+    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::failure))
+        addEventItem(eventType);
+    addSeparator(m_eventTypesModel);
+    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::success))
+        addEventItem(eventType);
 
     for (vms::event::ActionType actionType : lexComparator.lexSortedActions())
     {
@@ -485,7 +500,6 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
             m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
             m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
             m_eventParams.caption = QString();
-            m_eventParams.omitDbLogging = false;
             break;
 
         default:

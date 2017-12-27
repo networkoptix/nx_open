@@ -323,7 +323,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>"Fundir" Sistemas... (Merge)</translation>
+      <translation>"Fundir" Sistemas (Merge)...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -2439,7 +2439,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante:</translation>
+      <translation>Fabricante</translation>
     </message>
     <message>
       <source>Model</source>
@@ -3881,7 +3881,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença:</translation>
+      <translation>Chave da Licença</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3900,7 +3900,7 @@ to %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença:</translation>
+      <translation>Chave da Licença</translation>
     </message>
     <message>
       <source>Status</source>

@@ -647,6 +647,15 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
+    factory(MainMenuAddDeviceManuallyAction)
+        .flags(Main)
+        .text(ContextMenu::tr("Add Device..."))
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::isLoggedIn()
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+
     factory(MergeSystems)
         .flags(Main | Tree)
         .text(ContextMenu::tr("Merge Systems..."))

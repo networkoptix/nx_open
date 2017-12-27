@@ -91,8 +91,6 @@ void DeviceAdditionDialog::initializeControls()
     ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->startAddressEdit->setPlaceholderText(tr("Start address"));
     ui->endAddressEdit->setPlaceholderText(tr("End address"));
-    ui->knownAddressPortSpinBox->setEnabled(!ui->knownAddressAutoPortCheckBox->isChecked());
-    ui->subnetScanPortSpinBox->setEnabled(!ui->subnetScanAutoPortCheckBox->isChecked());
 
     ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
     ui->hintLabel->setToolTip(tr("Examples:")
@@ -122,8 +120,8 @@ void DeviceAdditionDialog::initializeControls()
         this, &DeviceAdditionDialog::handleDialogClosed);
 
     setupTable();
-    setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinBox);
-    setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinBox);
+    setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
+    setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
 
     setAccentStyle(ui->searchButton);
     setAccentStyle(ui->addDevicesButton);
@@ -180,13 +178,22 @@ void DeviceAdditionDialog::setupTableHeader()
         FoundDevicesModel::presentedStateColumn, QHeaderView::ResizeToContents);
 }
 
-void DeviceAdditionDialog::setupPortStuff(QCheckBox* autoCheckbox, QSpinBox* portSpinBox)
+void DeviceAdditionDialog::setupPortStuff(
+    QCheckBox* autoCheckbox,
+    QStackedWidget* portStackedWidget)
 {
-    connect(autoCheckbox, &QCheckBox::toggled, this,
-        [portSpinBox](bool checked)
+    const auto handleAutoChecked =
+        [portStackedWidget](bool checked)
         {
-            portSpinBox->setEnabled(!checked);
-        });
+            static constexpr int kSpinBoxPage = 0;
+            static constexpr int kPlaceholderPage = 1;
+            portStackedWidget->setCurrentIndex(checked
+                ? kPlaceholderPage
+                : kSpinBoxPage);
+        };
+
+    connect(autoCheckbox, &QCheckBox::toggled, this, handleAutoChecked);
+    handleAutoChecked(autoCheckbox->isChecked());
 }
 
 void DeviceAdditionDialog::setServer(const QnMediaServerResourcePtr& value)
@@ -320,7 +327,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     QEventLoop loop;
     connect(&result, &QnConnectionRequestResult::replyProcessed, &loop, &QEventLoop::quit);
     connect(this, &DeviceAdditionDialog::rejected, &loop, &QEventLoop::quit);
-
 
     const auto connection =
         connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged, this,
@@ -496,7 +502,6 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         setAccentStyle(ui->searchButton);
     else
         resetButtonStyle(ui->searchButton);
-
 
     const bool showSearchProgressControls = m_currentSearch && m_currentSearch->searching();
     ui->searchControls->setCurrentIndex(showSearchProgressControls ? 1 : 0);

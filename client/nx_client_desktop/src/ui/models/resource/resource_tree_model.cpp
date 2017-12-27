@@ -113,7 +113,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
     /* Create top-level nodes. */
-    for (Qn::NodeType t : rootNodeTypes())
+    for (Qn::NodeType t: rootNodeTypes())
     {
         const auto node = QnResourceTreeModelNodeFactory::createNode(t, this, false);
         m_rootNodes[t] = node;
@@ -160,7 +160,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     rebuildTree();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
-    for (const QnResourcePtr &resource: resourcePool()->getResources())
+    for (const QnResourcePtr& resource: resourcePool()->getResources())
         at_resPool_resourceAdded(resource);
 }
 
@@ -172,12 +172,12 @@ QnResourceTreeModel::~QnResourceTreeModel()
         node->deinitialize();
 }
 
-QnResourcePtr QnResourceTreeModel::resource(const QModelIndex &index) const
+QnResourcePtr QnResourceTreeModel::resource(const QModelIndex& index) const
 {
     return data(index, Qn::ResourceRole).value<QnResourcePtr>();
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex &index) const
+QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex& index) const
 {
     /* Root node. */
     if (!index.isValid())
@@ -203,7 +203,7 @@ QList<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(const QnResource
     return result;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResourcePtr &resource)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResourcePtr& resource)
 {
     if (!resource)
         return m_rootNodes[Qn::BastardNode];
@@ -272,7 +272,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         m_nodesByResource[resource].removeAll(node);
 
     /* Recursively remove all child nodes. */
-    for (auto child : children(node))
+    for (auto child: children(node))
         removeNode(child);
 
     switch (node->type())
@@ -519,11 +519,13 @@ Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
     }
 }
 
-QnResourceTreeModelCustomColumnDelegate* QnResourceTreeModel::customColumnDelegate() const {
+QnResourceTreeModelCustomColumnDelegate* QnResourceTreeModel::customColumnDelegate() const
+{
     return m_customColumnDelegate.data();
 }
 
-void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate) {
+void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate* columnDelegate)
+{
     if (m_customColumnDelegate == columnDelegate)
         return;
 
@@ -565,7 +567,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::rootNode(Qn::NodeType nodeType) 
 // -------------------------------------------------------------------------- //
 // QnResourceTreeModel :: QAbstractItemModel implementation
 // -------------------------------------------------------------------------- //
-QModelIndex QnResourceTreeModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex QnResourceTreeModel::index(int row, int column, const QModelIndex& parent) const
 {
     if(!hasIndex(row, column, parent)) /* hasIndex calls rowCount and columnCount. */
         return QModelIndex();
@@ -573,24 +575,24 @@ QModelIndex QnResourceTreeModel::index(int row, int column, const QModelIndex &p
     return node(parent)->child(row)->createIndex(row, column);
 }
 
-QModelIndex QnResourceTreeModel::buddy(const QModelIndex &index) const
+QModelIndex QnResourceTreeModel::buddy(const QModelIndex& index) const
 {
     return index;
 }
 
-QModelIndex QnResourceTreeModel::parent(const QModelIndex &index) const
+QModelIndex QnResourceTreeModel::parent(const QModelIndex& index) const
 {
     if (!index.isValid() || index.model() != this)
         return QModelIndex();
     return node(index)->parent()->createIndex(Qn::NameColumn);
 }
 
-bool QnResourceTreeModel::hasChildren(const QModelIndex &parent) const
+bool QnResourceTreeModel::hasChildren(const QModelIndex& parent) const
 {
     return rowCount(parent) > 0;
 }
 
-int QnResourceTreeModel::rowCount(const QModelIndex &parent) const
+int QnResourceTreeModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.column() > Qn::NameColumn)
         return 0;
@@ -598,13 +600,13 @@ int QnResourceTreeModel::rowCount(const QModelIndex &parent) const
     return node(parent)->children().size();
 }
 
-int QnResourceTreeModel::columnCount(const QModelIndex &parent) const
+int QnResourceTreeModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return Qn::ColumnCount;
 }
 
-Qt::ItemFlags QnResourceTreeModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QnResourceTreeModel::flags(const QModelIndex& index) const
 {
     if(!index.isValid())
         return Qt::NoItemFlags;
@@ -615,7 +617,7 @@ Qt::ItemFlags QnResourceTreeModel::flags(const QModelIndex &index) const
     return node(index)->flags(index.column());
 }
 
-QVariant QnResourceTreeModel::data(const QModelIndex &index, int role) const
+QVariant QnResourceTreeModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
@@ -627,7 +629,7 @@ QVariant QnResourceTreeModel::data(const QModelIndex &index, int role) const
     return node(index)->data(role, index.column());
 }
 
-bool QnResourceTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool QnResourceTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if(!index.isValid())
         return false;
@@ -666,7 +668,7 @@ QStringList QnResourceTreeModel::mimeTypes() const
     return result;
 }
 
-QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
+QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
 {
     auto mimeData = base_type::mimeData(indexes);
     if (!mimeData)
@@ -801,7 +803,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
                 return !layout->isFile();
             });
         QnUuid roleId = node->uuid();
-        for (const auto& layout : layoutsToShare)
+        for (const auto& layout: layoutsToShare)
         {
             TRACE("Sharing layout " << layout->getName() << " with role "
                 << node->m_displayName);
@@ -813,7 +815,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             );
         }
         auto camerasToShare = data.resources().filtered<QnVirtualCameraResource>();
-        for (const auto& camera : camerasToShare)
+        for (const auto& camera: camerasToShare)
         {
             TRACE("Sharing camera " << camera->getName() << " with role "
                 << node->m_displayName);
@@ -842,7 +844,7 @@ Qt::DropActions QnResourceTreeModel::supportedDropActions() const
 // -------------------------------------------------------------------------- //
 // QnResourceTreeModel :: handlers
 // -------------------------------------------------------------------------- //
-void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource)
+void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource)
 {
     if (m_scope == UsersScope)
         return;
@@ -904,7 +906,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
                 QnResourcePtr parent = resource->getParentResource();
                 if (QnMediaServerResource::isEdgeServer(parent))
                 {
-                    for (auto node : m_nodesByResource.value(parent))
+                    for (auto node: m_nodesByResource.value(parent))
                         node->update();
                 }
             };
@@ -924,7 +926,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (server)
     {
-        for (const QnResourcePtr &camera : resourcePool()->getResourcesByParentId(server->getId()))
+        for (const QnResourcePtr &camera: resourcePool()->getResourcesByParentId(server->getId()))
         {
             if (m_resourceNodeByResource.contains(camera))
                 at_resource_parentIdChanged(camera);
@@ -941,7 +943,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     }
 }
 
-void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resource)
+void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resource)
 {
     if (!resource)
         return;
@@ -985,7 +987,7 @@ void QnResourceTreeModel::rebuildTree()
             at_server_redundancyChanged(resource);
     }
 
-    for (auto nodeType : rootNodeTypes())
+    for (auto nodeType: rootNodeTypes())
     {
         auto node = m_rootNodes[nodeType];
         if (!node)
@@ -995,7 +997,7 @@ void QnResourceTreeModel::rebuildTree()
         node->update();
     }
 
-    for (auto node : m_resourceNodeByResource)
+    for (auto node: m_resourceNodeByResource)
     {
         updateNodeParent(node);
         node->update();
@@ -1041,7 +1043,7 @@ void QnResourceTreeModel::handleDrop(
                 .withArgument(Qn::UserResourceRole, targetUser));
         }
 
-        for (const auto& sourceCamera : sourceResources.filtered<QnVirtualCameraResource>())
+        for (const auto& sourceCamera: sourceResources.filtered<QnVirtualCameraResource>())
         {
             TRACE("Sharing camera " << sourceCamera->getName() << " with " << targetUser->getName());
 
@@ -1073,7 +1075,7 @@ void QnResourceTreeModel::handlePermissionsChanged(const QnResourcePtr& resource
 {
     if (m_resourceNodeByResource.contains(resource))
     {
-        for (auto node : m_nodesByResource[resource])
+        for (auto node: m_nodesByResource[resource])
             node->updateRecursive();
     }
 }
@@ -1146,7 +1148,7 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
     updateNodeParent(node);
 }
 
-void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
+void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr& videoWall, const QnVideoWallItem& item)
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = ensureItemNode(parentNode, item.uuid, Qn::VideoWallItemNode);
@@ -1161,7 +1163,7 @@ void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &v
         node->update(); // in case of _changed method call, where setResource will exit instantly
 }
 
-void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
+void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr& videoWall, const QnVideoWallItem& item)
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = m_itemNodesByParent[parentNode].take(item.uuid);
@@ -1169,14 +1171,14 @@ void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr 
         removeNode(node);
 }
 
-void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)
+void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix)
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = ensureItemNode(parentNode, matrix.uuid, Qn::VideoWallMatrixNode);
     node->update(); // TODO: #GDM what for?
 }
 
-void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)
+void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix)
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = m_itemNodesByParent[parentNode].take(matrix.uuid);
@@ -1184,7 +1186,7 @@ void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePt
         removeNode(node);
 }
 
-void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resource)
+void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr& resource)
 {
     auto node = ensureResourceNode(resource);
     node->update();
@@ -1192,7 +1194,7 @@ void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resou
     /* Update edge nodes if we are the admin. */
     if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
     {
-        for (const QnVirtualCameraResourcePtr &cameraResource : resourcePool()->getAllCameras(resource, true))
+        for (const QnVirtualCameraResourcePtr &cameraResource: resourcePool()->getAllCameras(resource, true))
         {
             auto existingNode = m_resourceNodeByResource.take(cameraResource);
             removeNode(existingNode);

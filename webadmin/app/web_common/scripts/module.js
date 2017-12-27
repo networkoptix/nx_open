@@ -23,6 +23,9 @@ angular.module('nxCommon', [
         if($location.search().debug){
             Config.allowDebugMode = $location.search().debug;
         }
+        if($location.search().cast){
+            Config.allowCastMode = $location.search().cast && window.chrome;
+        }
         return original.apply($location, [path]);
     };
 

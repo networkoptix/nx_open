@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>About %1</source>
-      <translation>Over  %1 </translation>
+      <translation>Over %1</translation>
     </message>
   </context>
   <context>

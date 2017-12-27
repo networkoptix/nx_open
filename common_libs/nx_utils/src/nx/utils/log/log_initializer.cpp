@@ -58,7 +58,7 @@ void initialize(
 
     const auto filePath = logger->filePath();
     write(lm("Log level: %1").arg(settings.level));
-    write(lm("Log maxFileSize: %2, maxBackupCount: %3, file: %4").args(
+    write(lm("Log file size: %2, backup count: %3, file: %4").args(
         nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
         filePath ? *filePath : lit("-")));
 }

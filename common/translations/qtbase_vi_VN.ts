@@ -216,11 +216,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>bản sao</translation>
+      <translation>Bản sao</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>dán</translation>
+      <translation>Dán</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -530,7 +530,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>tất cả các file (*)</translation>
+      <translation>Tất cả các tệp (*)</translation>
     </message>
     <message>
       <source>Directories</source>

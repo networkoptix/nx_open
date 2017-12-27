@@ -50,7 +50,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>ייצוא סימנייה</translation>
     </message>
   </context>
   <context>
@@ -854,15 +854,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation type="unfinished">Start Analytics...</translation>
+      <translation>התחל אנליטיקה...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>נדרשת סיסמא עבור מצלמות מסוימות</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>יצא וידאו...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -870,15 +870,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>רזולוציה...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>שנה את יחס הגובה-רוחב של התאים...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>מרווח בין תאים...</translation>
     </message>
   </context>
   <context>
@@ -975,58 +975,58 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>ההגדרות שנבחרו יקודדו. השימוש במעבד יוגדל ועשוי להימשך זמן רב.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>פורמט AVI אינו מומלץ לייצוא הקלטה לא רציפה עם שמע.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>מומלץ לייצא וידאו מהמצלמה הזאת בתור&quot; "מולטי וידאו"&quot; כדי להימנע downscaling.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation>. את/ה עומד לייצא וידאו ארוך... הוא עשוי לדרוש מעל ג'יגה של שטח דיסק קשיח, ולקחת כמה דקות.</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>ההגדרות אינן זמינות עבור. קבצי ה-EXE.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>קבצים מקומיים, רכיבי יישומי שרת ודפי אינטרנט לא ייוצאו.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>קובץ EXE המיוצא יהיה בגודל מעל 4 GB ולא ניתן לפתוח אותו על ידי לחיצה כפולה ב- Windows. ניתן להפעיל אותו רק בתחנת קליינט בתוכנה %1.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 חלק 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 קובץ מדיה</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>קובץ הפעלה %1 קובץ מדיה (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>(Executable %1 Media File (x86</translation>
     </message>
   </context>
   <context>
@@ -1164,11 +1164,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>ארוך</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>רק אותיות לטינית, מספרים וסימני מקלדת %1 מותרים.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -1191,8 +1191,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
         <numerusform>Password must be no longer than %n characters.</numerusform>
         <numerusform>Password must be no longer than %n characters.</numerusform>
       </translation>
@@ -1200,16 +1200,16 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
+        <numerusform>הסיסמה לא צריכה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
+        <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
         <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
@@ -2368,7 +2368,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>שינוי של Don&apos;t</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2490,7 +2490,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ספק:</translation>
+      <translation>ספק</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2498,7 +2498,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>קושחה:</translation>
+      <translation>קושחה</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2574,7 +2574,7 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>סיסמא לא יכולה&apos; להיות זהה לשם מצלמה&apos; או לשם משתמש</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2582,7 +2582,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>חזור על הסיסמא</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2590,7 +2590,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>הסיסמה תכיל לפחות 8 סימני מקלדת ותכיל סוגים שונים של תווים.</translation>
     </message>
   </context>
   <context>
@@ -2676,11 +2676,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>פחות הגדרות</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>הגדרות נוספות</translation>
     </message>
   </context>
   <context>
@@ -3228,16 +3228,16 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>נדרשת סיסמא להגדרת המצלמה.</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
+      <translation>לחלק מהמצלמות שנבחרו נדרשת סיסמא להגדרה.</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
       <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
+        <numerusform>הגדר סיסמא</numerusform>
         <numerusform>Set Password</numerusform>
         <numerusform>Set Password</numerusform>
         <numerusform>Set Password</numerusform>
@@ -3245,7 +3245,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>בקש ממנהל המערכת שלך לעשות זאת.</translation>
     </message>
   </context>
   <context>
@@ -3509,7 +3509,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>בסיסי</translation>
     </message>
   </context>
   <context>
@@ -3953,7 +3953,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון:</translation>
+      <translation>מפתח רשיון</translation>
     </message>
     <message>
       <source>Features:</source>
@@ -3972,7 +3972,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון:</translation>
+      <translation>מפתח רשיון</translation>
     </message>
     <message>
       <source>Status</source>
@@ -4322,16 +4322,16 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
-        <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
-        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
-        <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
+        <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Use licenses for selected %n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
         <numerusform>Use licenses to view these %n cameras</numerusform>
         <numerusform>Use licenses to view these %n cameras</numerusform>
         <numerusform>Use licenses to view these %n cameras</numerusform>
@@ -4582,7 +4582,7 @@ to %1</source>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
         <numerusform>Set for all %n Cameras</numerusform>
         <numerusform>Set for all %n Cameras</numerusform>
         <numerusform>Set for all %n Cameras</numerusform>
@@ -4730,7 +4730,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>המצלמות לא תומכות בשחזור וידאו לא מסונכרן</translation>
     </message>
   </context>
   <context>
@@ -4830,7 +4830,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>הגדר סיסמאות</translation>
     </message>
   </context>
   <context>
@@ -6241,15 +6241,15 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>חיבורים רבים מדי</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>דרושה סיסמה</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>הגדר למצלמה הזאת</translation>
     </message>
   </context>
   <context>
@@ -6667,7 +6667,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>זוהתה בעיית שלמות בארכיון</translation>
     </message>
   </context>
   <context>
@@ -6735,11 +6735,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרת שנבחר ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרת שנבחר ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
     </message>
   </context>
   <context>
@@ -7936,38 +7936,38 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>דינמי</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>מדיה לא נתמכת לייצוא נתונים.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>הפורמט הנבחר אינו נתמך על-ידי ספריית FFMPEG.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>שגיאת ספריית FFMPEG.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>Codec וידאו או אודיו אינו תואם לתבנית שנבחרה.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>שגיאת כתיבה בקובץ.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>שגיאה פנימית</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>אין נתונים לייצוא.</translation>
     </message>
   </context>
   <context>
@@ -7986,15 +7986,15 @@ to %1</source>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>הגדרות ייצוא</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>הוספת חותמת זמן</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>מחק חותמת זמן</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -8002,11 +8002,11 @@ to %1</source>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>הוסף תמונה</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>מחיקת תמונה</translation>
     </message>
     <message>
       <source>Image</source>
@@ -8014,31 +8014,31 @@ to %1</source>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>הוספת טקסט</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>מחק טקסט</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>טקסט</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>איפוס מהירות</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>מחק את פרטי הסימניה</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>מחק את פרטי הסימניה</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>פרטי הסימניה</translation>
     </message>
   </context>
   <context>
@@ -8068,7 +8068,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>תמונות (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8076,7 +8076,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>לא ניתן לטעון את התמונה.</translation>
     </message>
   </context>
   <context>
@@ -8087,7 +8087,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>לא מצלמה</translation>
     </message>
   </context>
   <context>
@@ -8113,7 +8113,7 @@ to %1</source>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>הגדר את רזולוציית הפריסה ל- &quot;Auto&quot; כדי לשפר את הביצועים.</translation>
     </message>
   </context>
   <context>
@@ -8121,7 +8121,7 @@ to %1</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
         <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
         <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
         <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
@@ -8132,7 +8132,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>אורך</translation>
     </message>
     <message>
       <source>Short</source>
@@ -8143,14 +8143,14 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 Analytics</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>לעצור את הייצוא</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -8158,16 +8158,16 @@ to %1</source>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>ייצוא נכשל</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>אין אפשרות לכתוב את הקובץ</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 נמצא בשימוש על-ידי ייצוא אחר.</translation>
     </message>
   </context>
   <context>
@@ -8377,14 +8377,14 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>סוגי אירועים לא נתמך</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>האירוע יופעל רק אם אירוע Analytics יעמוד בכל התנאים שלמעלה. אם השדה 'מילת מפתח' ריק, המצב תמיד מתקיים. אם לא, התנאי מתקיים אם השדה המתאים של אירוע Analytics מכיל מילת מפתח כלשהי.</translation>
     </message>
   </context>
   <context>
@@ -8747,11 +8747,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>שינוי הסיסמה נכשל</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>כישלון בשינוי סיסמה במצלמות %1 ו- %2</translation>
     </message>
   </context>
   <context>
@@ -8792,7 +8792,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>מחק Showreel %1?</translation>
     </message>
   </context>
   <context>

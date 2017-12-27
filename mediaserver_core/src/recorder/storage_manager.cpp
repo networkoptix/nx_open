@@ -434,7 +434,10 @@ private:
             return fileStorage->isLocal();
 
         const auto localDiskType = QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition);
-        return storage->getStorageType() == localDiskType;
+        const auto removableDiskType = QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
+        const auto storageType = storage->getStorageType();
+
+        return storageType == localDiskType || storageType == removableDiskType;
     }
 };
 

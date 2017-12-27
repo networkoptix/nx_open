@@ -15,7 +15,6 @@ QnSimpleSelectionTableView::~QnSimpleSelectionTableView()
 {
 }
 
-
 void QnSimpleSelectionTableView::setCheckboxColumn(int column, bool checkboxInHeader)
 {
     m_checkboxColumn = column;

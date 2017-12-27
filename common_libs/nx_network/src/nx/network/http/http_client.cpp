@@ -225,6 +225,11 @@ void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     m_proxyEndpoint = proxyEndpoint;
 }
 
+void HttpClient::setDisablePrecalculatedAuthorization(bool value)
+{
+    m_precalculatedAuthorizationDisabled = value;
+}
+
 void HttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
 {
     m_expectOnlyBody = expectOnlyBody;
@@ -337,7 +342,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
-
+        
+        m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
 
         lk.relock();

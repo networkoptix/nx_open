@@ -129,14 +129,17 @@ void PeerRegistrator::bind(
             stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
+    auto serverConnection =
+        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode =
-        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
+        getMediaserverData(*serverConnection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(
-            connection,
+            serverConnection,
             requestMessage.header,
             resultCode,
             api::resultCodeToStunErrorCode(resultCode),
@@ -145,7 +148,7 @@ void PeerRegistrator::bind(
     }
 
     auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
-        connection,
+        serverConnection,
         mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
@@ -159,7 +162,7 @@ void PeerRegistrator::bind(
         .arg(QString::fromUtf8(mediaserverData.serverId))
         .arg(containerString(peerDataLocker.value().endpoints)), cl_logDEBUG1);
 
-    sendSuccessResponse(connection, requestMessage.header);
+    sendSuccessResponse(serverConnection, requestMessage.header);
 }
 
 void PeerRegistrator::listen(
@@ -171,14 +174,17 @@ void PeerRegistrator::listen(
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return completionHandler(api::ResultCode::badTransport, {});    //Only tcp is allowed for listen request
 
+    auto serverConnection =
+        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode =
-        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
+        getMediaserverData(*serverConnection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(
-            connection,
+            serverConnection,
             requestMessage.header,
             resultCode,
             api::resultCodeToStunErrorCode(resultCode),
@@ -187,7 +193,7 @@ void PeerRegistrator::listen(
     }
 
     auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
-        connection,
+        serverConnection,
         MediaserverData(requestData.systemId, requestData.serverId));
 
     peerDataLocker.value().isListening = true;
@@ -200,13 +206,13 @@ void PeerRegistrator::listen(
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
-        [this, connection, completionHandler = std::move(completionHandler),
+        [this, serverConnection, completionHandler = std::move(completionHandler),
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
                 QUrl relayInstanceUrl)
         {
             sendListenResponse(
-                connection,
+                serverConnection,
                 resultCode == nx::cloud::relay::api::ResultCode::ok
                     ? boost::make_optional(relayInstanceUrl)
                     : boost::none,
@@ -223,7 +229,7 @@ void PeerRegistrator::checkOwnState(
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode =
-        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
+        getMediaserverData(*connection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(

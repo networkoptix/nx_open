@@ -38,6 +38,7 @@ var Config = {
     dateInternalFormat:'yyyy-MM-ddThh:mm:ss',
 
     visualLog: false,
+    allowCastMode: false, //Enables usage of chromecast
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
@@ -101,6 +102,7 @@ var Config = {
         newSystem: {type: 'static'},
         proxyConnectTimeoutSec: {type: 'number'},
         crossdomainEnabled: {type: 'checkbox'},
+        maxRtspConnectDurationSec: {label: 'Maximum duration for RTSP connection (seconds)', type: 'number'},
 
         statisticsReportLastNumber: {type: 'static'},
         statisticsReportLastTime: {type: 'static'},
@@ -129,7 +131,9 @@ var Config = {
         staticResources: "web_common/",
         maxCrashCount: 2,
         nativeTimeout: 60 * 1000, //60s
-        playerReadyTimeout: 100
+        playerReadyTimeout: 100,
+        endOfArchiveTime: 30 * 1000, //30s
+        chunksToCheckFatal: 30 //This is used in short cache when requesting chunks for jumpToPosition in timeline directive
     },
     debugEvents: {
         events: [

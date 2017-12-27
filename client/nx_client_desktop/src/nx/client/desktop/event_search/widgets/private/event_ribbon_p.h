@@ -4,6 +4,9 @@
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QHash>
+#include <QtCore/QList>
+#include <QtCore/QSet>
 
 #include <nx/utils/disconnect_helper.h>
 
@@ -36,9 +39,17 @@ private:
 
     int calculateHeight(QWidget* widget) const;
 
-    void insertNewTiles(int index, int count);
-    void removeTiles(int first, int count);
+    enum class UpdateMode
+    {
+        instant,
+        animated
+    };
+
+    void insertNewTiles(int index, int count, UpdateMode updateMode);
+    void removeTiles(int first, int count, UpdateMode updateMode);
     void clear();
+
+    void highlightAppearance(EventTile* tile);
 
     int indexOf(EventTile* tile) const;
 

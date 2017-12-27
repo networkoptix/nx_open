@@ -19,6 +19,11 @@
         proxy_pass http://vms_gateway:3347;
     }
 
+    location ~* /gateway/[\w\-\.\/]+/hls {
+        proxy_pass http://vms_gateway:3347;
+        add_header 'Access-Control-Allow-Origin' 'https://www.gstatic.com';
+    }
+
     # config to don't allow the browser to render the page inside an frame or iframe
     # and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking
     # if you need to allow [i]frames, you can use SAMEORIGIN or even set an uri with ALLOW-FROM uri

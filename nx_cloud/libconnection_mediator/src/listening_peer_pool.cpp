@@ -108,11 +108,19 @@ ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
 
 ListeningPeerPool::~ListeningPeerPool()
 {
+    m_counter.wait();
+
+    PeerContainer peers;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_peers.swap(peers);
+    }
+    peers.clear();
     m_asyncOperationGuard->terminate();
 }
 
 ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
-    const ConnectionStrongRef& connection,
+    const std::shared_ptr<nx::stun::ServerConnection>& connection,
     const MediaserverData& peerData)
 {
     QnMutexLocker lock(&m_mutex);
@@ -126,15 +134,16 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.hostName = peerIter->first.hostName();
     }
 
-    const auto curConnectionStrongRef = peerIter->second.peerConnection.lock();
-    if (curConnectionStrongRef != connection)
+    if (peerIter->second.peerConnection != connection)
     {
+        if (peerIter->second.peerConnection)
+            closeConnectionAsync(std::move(peerIter->second.peerConnection));
         // Binding to a new connection.
         peerIter->second.peerConnection = connection;
         connection->setInactivityTimeout(
             m_settings.connectionInactivityTimeout);
         connection->addOnConnectionCloseHandler(
-            [this, peerData, curConnectionStrongRef,
+            [this, peerData, connectionPtr = connection.get(),
                 guard = m_asyncOperationGuard.sharedGuard()]()
             {
                 // TODO: #ak Get rid of this guard after resolving
@@ -142,7 +151,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
                 auto lock = guard->lock();
                 if (!lock)
                     return; //< ListeningPeerPool has been destroyed.
-                onListeningPeerConnectionClosed(peerData, curConnectionStrongRef.get());
+                onListeningPeerConnectionClosed(peerData, connectionPtr);
             });
     }
 
@@ -209,9 +218,8 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
     for (const auto& peerPair: m_peers)
     {
         data::ListeningPeer peerData;
-        const auto peerConnetion = peerPair.second.peerConnection.lock();
-        if (peerConnetion)
-            peerData.connectionEndpoint = peerConnetion->getSourceAddress().toString().toUtf8();
+        peerData.connectionEndpoint =
+            peerPair.second.peerConnection->getSourceAddress().toString().toUtf8();
 
         for (const auto& forwardedEndpoint: peerPair.second.endpoints)
             peerData.directTcpEndpoints.push_back(forwardedEndpoint.toString());
@@ -228,7 +236,7 @@ std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
     QnMutexLocker lock(&m_mutex);
 
     std::vector<ConnectionWeakRef> connections;
-    for (const auto peer: m_peers)
+    for (const auto& peer: m_peers)
         connections.push_back(peer.second.peerConnection);
 
     return connections;
@@ -244,11 +252,23 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
     if (peerIter == m_peers.end())
         return;
 
-    const auto peerConnectionStrongRef = peerIter->second.peerConnection.lock();
-    if (peerConnectionStrongRef.get() != connection)
+    if (peerIter->second.peerConnection.get() != connection)
         return; //< Peer has been bound to another connection.
     NX_DEBUG(this, lm("Peer %1 has disconnected").args(peerIter->first.hostName()));
     m_peers.erase(peerIter);
+}
+
+void ListeningPeerPool::closeConnectionAsync(
+    std::shared_ptr<nx::stun::ServerConnection> peerConnection)
+{
+    auto peerConnectionPtr = peerConnection.get();
+    peerConnectionPtr->pleaseStop(
+        [peerConnection = std::move(peerConnection),
+            lock = m_counter.getScopedIncrement()]() mutable
+        {
+            peerConnection->closeConnection(SystemError::connectionReset);
+            peerConnection.reset();
+        });
 }
 
 } // namespace hpm

@@ -1,7 +1,8 @@
 #include "caching_metadata_consumer.h"
 
+#include <queue>
+
 #include <QtCore/QVector>
-#include <QtCore/QQueue>
 #include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
@@ -28,52 +29,32 @@ bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const
     return timestamp >= metadata->timestamp && timestamp < metadata->timestamp + duration;
 }
 
-enum class SearchPolicy
-{
-    exact,
-    closestBefore,
-    closestAfter
-};
-
 class MetadataCache
 {
 public:
-    MetadataCache(int cacheSize = -1):
-        m_maxItemsCount(std::max(1, cacheSize >= 0 ? cacheSize : ini().metadataCacheSize))
+    MetadataCache(size_t cacheSize = 1):
+        m_cacheSize(cacheSize)
     {
-        m_metadataCache.reserve(m_maxItemsCount);
     }
 
     void insertMetadata(const QnAbstractCompressedMetadataPtr& metadata)
     {
         QnMutexLocker lock(&m_mutex);
 
-        if (m_metadataCache.size() == m_maxItemsCount)
-        {
-            const auto oldestMetadata = m_metadataCache.dequeue();
-            const auto it = m_metadataByTimestamp.find(oldestMetadata->timestamp);
-            // Check the value equality is necessary because the stored value can be replaced by
-            // other metadata with the same timestamp.
-            NX_ASSERT(it != m_metadataByTimestamp.end());
-            if (it != m_metadataByTimestamp.end() && *it == oldestMetadata)
-                m_metadataByTimestamp.erase(it);
-        }
+        if (m_metadataCache.size() == m_cacheSize)
+            removeOldestMetadataItem();
 
-        m_metadataCache.enqueue(metadata);
+        m_metadataCache.push(metadata);
         m_metadataByTimestamp[metadata->timestamp] = metadata;
     }
 
     QnAbstractCompressedMetadataPtr findMetadata(const qint64 timestamp) const
     {
-        QnMutexLocker lock(&m_mutex);
-
-        const auto it = findMetadataIterator(timestamp, SearchPolicy::exact);
-        if (it == m_metadataByTimestamp.end())
+        const auto& metadataList = findMetadataInRange(timestamp, timestamp + 1, 1);
+        if (metadataList.isEmpty())
             return {};
 
-        NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
-
-        return *it;
+        return metadataList.first();
     }
 
     QList<QnAbstractCompressedMetadataPtr> findMetadataInRange(
@@ -81,76 +62,79 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
 
-        const auto startIt = findMetadataIterator(startTimestamp, SearchPolicy::closestAfter);
-        if (startIt == m_metadataByTimestamp.end())
+        if (m_metadataByTimestamp.isEmpty())
             return {};
 
-        const auto endIt = findMetadataIterator(endTimestamp, SearchPolicy::closestBefore);
+        // Check metadata at lower_bound first (will match when only when timestamps are
+        // equal). Then if it fails check the previous item (may match by duration). Since
+        // we check the previous item anyway we can exclude the first item from
+        // lower_bound. Thus explicit check for possibility to decrement the iterator
+        // can be omitted.
+
+        auto startIt = std::lower_bound(
+            std::next(m_metadataByTimestamp.keyBegin()),
+            m_metadataByTimestamp.keyEnd(),
+            startTimestamp).base();
+
+        if (startIt == m_metadataByTimestamp.end() || startTimestamp < (*startIt)->timestamp)
+        {
+            --startIt;
+            if (!metadataContainsTime(*startIt, startTimestamp))
+                ++startIt;
+        }
 
         QList<QnAbstractCompressedMetadataPtr> result;
+
         auto itemsLeft = maxCount;
-        for (auto it = startIt; itemsLeft != 0 && it != endIt; ++it, --itemsLeft)
+        auto it = startIt;
+        while (itemsLeft != 0 && it != m_metadataByTimestamp.end()
+            && (*it)->timestamp < endTimestamp)
         {
             NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
             if (*it)
                 result.append(*it);
+
+            ++it;
+            --itemsLeft;
         }
+
         return result;
     }
 
-private:
-    QMap<qint64, QnAbstractCompressedMetadataPtr>::const_iterator findMetadataIterator(
-        const qint64 timestamp, SearchPolicy searchPolicy) const
+    void setCacheSize(size_t cacheSize)
     {
-        if (m_metadataByTimestamp.isEmpty())
-            return m_metadataByTimestamp.end();
+        if (cacheSize == 0 || cacheSize == m_cacheSize)
+            return;
 
-        switch (searchPolicy)
-        {
-            case SearchPolicy::exact:
-            {
-                // Check metadata at lower_bound first (will match when only when timestamps are
-                // equal). Then if it fails check the previous item (may match by duration). Since
-                // we check the previous item anyway we can exclude the first item from
-                // lower_bound. Thus explicit check for possibility to decrement the iterator
-                // can be omitted.
-
-                auto it = std::lower_bound(
-                    std::next(m_metadataByTimestamp.keyBegin()),
-                    m_metadataByTimestamp.keyEnd(),
-                    timestamp).base();
-
-                if (it != m_metadataByTimestamp.end() && metadataContainsTime(*it, timestamp))
-                    return it;
-
-                --it;
-
-                if (metadataContainsTime(*it, timestamp))
-                    return it;
-
-                return m_metadataByTimestamp.end();
-            }
-
-            case SearchPolicy::closestAfter:
-                return std::lower_bound(
-                    m_metadataByTimestamp.keyBegin(),
-                    m_metadataByTimestamp.keyEnd(),
-                    timestamp).base();
-
-            case SearchPolicy::closestBefore:
-                return std::upper_bound(
-                    m_metadataByTimestamp.keyBegin(),
-                    m_metadataByTimestamp.keyEnd(),
-                    timestamp).base();
-        }
-
-        return m_metadataByTimestamp.end();
+        trimCacheToSize(cacheSize);
+        m_cacheSize = cacheSize;
     }
 
+private:
+    void removeOldestMetadataItem()
+    {
+        const auto metadata = m_metadataCache.front();
+        m_metadataCache.pop();
+
+        const auto it = m_metadataByTimestamp.find(metadata->timestamp);
+        // Check the value equality is necessary because the stored value can be replaced by
+        // other metadata with the same timestamp.
+        NX_ASSERT(it != m_metadataByTimestamp.end());
+        if (it != m_metadataByTimestamp.end() && *it == metadata)
+            m_metadataByTimestamp.erase(it);
+    }
+
+    void trimCacheToSize(size_t size)
+    {
+        while (m_metadataCache.size() > size)
+            removeOldestMetadataItem();
+    }
+
+private:
     mutable QnMutex m_mutex;
-    QQueue<QnAbstractCompressedMetadataPtr> m_metadataCache;
+    std::queue<QnAbstractCompressedMetadataPtr> m_metadataCache;
     QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
-    const int m_maxItemsCount;
+    size_t m_cacheSize;
 };
 
 using MetadataCachePtr = QSharedPointer<MetadataCache>;
@@ -161,16 +145,37 @@ class CachingMetadataConsumer::Private
 {
 public:
     QVector<MetadataCachePtr> cachePerChannel;
+    size_t cacheSize = 1;
 };
 
 CachingMetadataConsumer::CachingMetadataConsumer(MetadataType metadataType):
     base_type(metadataType),
     d(new Private())
 {
+    d->cacheSize = static_cast<size_t>(std::max(1, ini().metadataCacheSize));
 }
 
 CachingMetadataConsumer::~CachingMetadataConsumer()
 {
+}
+
+size_t CachingMetadataConsumer::cacheSize() const
+{
+    return d->cacheSize;
+}
+
+void CachingMetadataConsumer::setCacheSize(size_t cacheSize)
+{
+    if (cacheSize < 1 || d->cacheSize == cacheSize)
+        return;
+
+    d->cacheSize = cacheSize;
+
+    for (const auto& cache: d->cachePerChannel)
+    {
+        if (cache)
+            cache->setCacheSize(d->cacheSize);
+    }
 }
 
 QnAbstractCompressedMetadataPtr CachingMetadataConsumer::metadata(
@@ -207,7 +212,7 @@ void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadata
 
     auto& cache = d->cachePerChannel[channel];
     if (cache.isNull())
-        cache.reset(new MetadataCache());
+        cache.reset(new MetadataCache(d->cacheSize));
 
     cache->insertMetadata(metadata);
 }

@@ -6,6 +6,8 @@
 #include <nx/client/desktop/watchers/system_servers_watcher.h>
 #include <nx/client/desktop/watchers/server_online_status_watcher.h>
 
+class QStackedWidget;
+
 namespace Ui {
 class DeviceAdditionDialog;
 } // namespace Ui
@@ -38,7 +40,7 @@ private:
     void initializeControls();
     void setupTable();
     void setupTableHeader();
-    void setupPortStuff(QCheckBox* autoCheckbox, QSpinBox* portSpinBox);
+    void setupPortStuff(QCheckBox* autoCheckbox, QStackedWidget* portStackedWidget);
 
     void updateProgress();
     void handleStartSearchClicked();

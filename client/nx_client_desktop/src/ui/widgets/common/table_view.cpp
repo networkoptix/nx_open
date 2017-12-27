@@ -123,7 +123,6 @@ void QnTableView::setModel(QAbstractItemModel* newModel)
     if (currentModel == newModel)
         return;
 
-    /// FIXME: add initial rows processing
     if (currentModel)
         disconnect(currentModel);
 
