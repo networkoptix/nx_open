@@ -45,17 +45,21 @@ HanwhaMetadataMonitor::~HanwhaMetadataMonitor()
 
 void HanwhaMetadataMonitor::startMonitoring()
 {
-    m_monitoringIsInProgress = true;
-    m_timer.post([this]() { initMonitorUnsafe(); });
+    m_timer.post(
+        [this]()
+        {
+            m_monitoringIsInProgress = true;
+            initMonitorUnsafe();
+        });
 }
 
 void HanwhaMetadataMonitor::stopMonitoring()
 {
-    m_monitoringIsInProgress = false;
     utils::promise<void> promise;
     m_timer.post(
         [this, &promise]()
         {
+            m_monitoringIsInProgress = false;
             if (m_httpClient)
                 m_httpClient->pleaseStopSync();
 
@@ -65,12 +69,6 @@ void HanwhaMetadataMonitor::stopMonitoring()
 
     promise.get_future().wait();
     std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
-}
-
-void HanwhaMetadataMonitor::restartMonitoring()
-{
-    stopMonitoring();
-    startMonitoring();
 }
 
 void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -93,14 +91,15 @@ void HanwhaMetadataMonitor::clearHandlers()
 
 void HanwhaMetadataMonitor::setResourceAccess(const QUrl& url, const QAuthenticator& auth)
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_url = buildMonitoringUrl(url);
-        m_auth = auth;
-    }
+    m_timer.post(
+        [this, url, auth]()
+        {
+            m_url = buildMonitoringUrl(url);
+            m_auth = auth;
 
-    if (m_monitoringIsInProgress)
-        restartMonitoring();
+            if (m_monitoringIsInProgress)
+                initMonitorUnsafe();
+        });
 }
 
 QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
@@ -135,18 +134,10 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
         this, &HanwhaMetadataMonitor::at_connectionClosed,
         Qt::DirectConnection);
 
-    QUrl url;
-    QAuthenticator auth;
-    {
-        QnMutexLocker lock(&m_mutex);
-        url = m_url;
-        auth = m_auth;
-    }
-
     m_timeSinceLastOpen.restart();
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
-    httpClient->setUserName(auth.user());
-    httpClient->setUserPassword(auth.password());
+    httpClient->setUserName(m_auth.user());
+    httpClient->setUserPassword(m_auth.password());
     httpClient->setMessageBodyReadTimeoutMs(
         std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
 
@@ -162,7 +153,7 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
     m_contentParser->setForceParseAsBinary(true);
     m_contentParser->setNextFilter(std::make_shared<HanwhaBytestreamFilter>(m_manifest, handler));
 
-    httpClient->doGet(url);
+    httpClient->doGet(m_url);
     m_httpClient = httpClient;
 }
 

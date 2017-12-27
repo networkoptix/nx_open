@@ -37,7 +37,6 @@ public:
 
     void startMonitoring();
     void stopMonitoring();
-    void restartMonitoring();
 
     void addHandler(const QString& handlerId, const Handler& handler);
     void removeHandler(const QString& handlerId);
@@ -65,7 +64,7 @@ private:
 
     mutable QnMutex m_mutex;
     QMap<QString, Handler> m_handlers;
-    std::atomic<bool> m_monitoringIsInProgress;
+    std::atomic<bool> m_monitoringIsInProgress{false};
 };
 
 } // namespace plugins
