@@ -16,8 +16,9 @@ class XmlRequestHelper
 {
 public:
     XmlRequestHelper(
-        QUrl url, const QAuthenticator& authenticator, 
-        nx_http::AsyncHttpClient::AuthType authType = nx_http::AsyncHttpClient::authDigest);
+        nx::utils::Url url,
+        const QAuthenticator& authenticator,
+        nx_http::AuthType authType = nx_http::AuthType::authDigest);
 
     boost::optional<QDomDocument> get(const QString& path);
     bool put(const QString& path, const QString& data = {});
@@ -27,7 +28,7 @@ public:
     boost::optional<QDomDocument> readBody();
 
 protected:
-    const QUrl m_url;
+    const nx::utils::Url m_url;
     const std::unique_ptr<nx_http::HttpClient> m_client;
 };
 

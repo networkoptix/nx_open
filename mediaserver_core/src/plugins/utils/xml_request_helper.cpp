@@ -29,8 +29,9 @@ bool isResponseOK(const nx_http::HttpClient* client)
 
 
 XmlRequestHelper::XmlRequestHelper(
-    QUrl url, const QAuthenticator& authenticator,
-    nx_http::AsyncHttpClient::AuthType authType)
+    nx::utils::Url url,
+    const QAuthenticator& authenticator,
+    nx_http::AuthType authType)
 :
     m_url(std::move(url)),
     m_client(makeHttpClient(authenticator))

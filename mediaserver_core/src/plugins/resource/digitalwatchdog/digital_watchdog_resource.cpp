@@ -16,7 +16,7 @@
 
 static const int HTTP_PORT = 80;
 
-// NOTE: This class using hardcoded XML reding/writeing intentionally, because CPro API may 
+// NOTE: This class using hardcoded XML reding/writeing intentionally, because CPro API may
 // reject or crash on on requests, which are different from the original.
 // TODO: Move out to a separate file as soon as it makes sense.
 class QnDigitalWatchdogResource::CproApiClient
@@ -34,7 +34,7 @@ public:
             return (bool)m_videoConfig;
 
         nx::plugins::utils::XmlRequestHelper requestHelper(
-            m_resource->getUrl(), m_resource->getAuth(), nx_http::AsyncHttpClient::authBasic);
+            m_resource->getUrl(), m_resource->getAuth(), nx_http::AuthType::authBasic);
 
         if (requestHelper.post(lit("GetVideoStreamConfig")))
             m_videoConfig = requestHelper.readRawBody();
@@ -122,7 +122,7 @@ public:
             .args(isPrimary, value, m_resource->getUrl()));
 
         nx::plugins::utils::XmlRequestHelper requestHelper(
-            m_resource->getUrl(), m_resource->getAuth(), nx_http::AsyncHttpClient::authBasic);
+            m_resource->getUrl(), m_resource->getAuth(), nx_http::AuthType::authBasic);
 
         m_videoConfig->replace(type->first, type->second, value.toUtf8());
         return requestHelper.post("SetVideoStreamConfig", *m_videoConfig);
@@ -135,7 +135,7 @@ private:
     }
 
     boost::optional<std::pair<int, int>> rangeOfTag(
-        const QByteArray& openTag, const QByteArray& closeTag, 
+        const QByteArray& openTag, const QByteArray& closeTag,
         int rangeBegin = 0, int rangeSize = 0)
     {
         auto start = m_videoConfig->indexOf(openTag, rangeBegin);
@@ -325,7 +325,7 @@ bool QnDigitalWatchdogResource::loadCproAdvancedParameters(QnCameraAdvancedParam
 {
     if (!m_cproApiClient->updateVideoConfig())
         return true;
-    
+
     // Those paramiters are hardcoded as they are supposed to be applied on top of templates.
     // TODO: Makes sence to move into some template as soon as it supports paramiter merge.
     QnCameraAdvancedParamGroup streams;
@@ -429,7 +429,7 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
 }
 
 
-bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) 
+bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
 {
     QSet<QString> result;
     if (m_cproApiClient->updateVideoConfig())
@@ -440,7 +440,7 @@ bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedPara
         if (const auto codec = m_cproApiClient->getVedioCodec(/*isPrimary*/ false))
             values.insert(kCproSecondaryVideoCodec, *codec);
     }
-    
+
     bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
 
     if (!m_cameraProxy)
@@ -482,7 +482,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     for(const QnCameraAdvancedParamValue &value: values)
     {
         QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
-        if (parameter.isValid()) 
+        if (parameter.isValid())
         {
             if (parameter.id == kCproPrimaryVideoCodec || parameter.id == kCproSecondaryVideoCodec)
             {

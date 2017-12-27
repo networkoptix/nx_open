@@ -412,7 +412,7 @@ void QnAuthHelper::authenticationExpired(const QString& authKey, quint64 /*timer
     m_authenticatedPaths.erase(authKey);
 }
 
-static bool verifyDigestUri(const QUrl& requestUrl, const QByteArray& uri)
+static bool verifyDigestUri(const nx::utils::Url& requestUrl, const QByteArray& uri)
 {
     const QUrl digestUrl(QString::fromUtf8(uri));
     const auto requestPath = requestUrl.path();
@@ -544,7 +544,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     }
     else
     {
-        NX_ASSERT(false); 
+        NX_ASSERT(false);
     }
 
     return authResult;
