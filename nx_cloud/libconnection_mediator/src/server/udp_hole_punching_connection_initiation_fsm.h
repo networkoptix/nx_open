@@ -32,7 +32,7 @@ class UDPHolePunchingConnectionInitiationFsm:
     using base_type = network::aio::BasicPollable;
 
 public:
-    /** 
+    /**
      * @note onFsmFinishedEventHandler is allowed to free
      *     UDPHolePunchingConnectionInitiationFsm instance.
      */
@@ -80,7 +80,8 @@ private:
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
-    ListeningPeerData m_serverPeerData;
+    const std::list<SocketAddress> m_serverPeerEndpoints;
+    const nx::String m_serverPeerHostName;
     stats::ConnectSession m_sessionStatisticsInfo;
     api::ConnectResponse m_preparedConnectResponse;
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
@@ -88,7 +89,7 @@ private:
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
 
     virtual void stopWhileInAioThread() override;
-    
+
     void processConnectRequest(
         const ConnectionStrongRef& originatingPeerConnection,
         api::ConnectRequest request,

@@ -371,7 +371,7 @@ class HolePunchingProcessor:
     public ::testing::Test
 {
     using TestClientConnection = TestConnection<nx::network::UDPSocket>;
-    using TestServerConnection = TestConnection<nx::network::TCPSocket>;
+    using TestServerConnection = TestTcpConnection;
 
 public:
     HolePunchingProcessor():

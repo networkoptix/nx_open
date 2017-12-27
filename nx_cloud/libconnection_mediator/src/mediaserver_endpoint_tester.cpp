@@ -53,7 +53,7 @@ void MediaserverEndpointTesterBase::ping(
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode =
-        getMediaserverData(connection, message, &mediaserverData, &errorMessage);
+        getMediaserverData(*connection, message, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(

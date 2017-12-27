@@ -23,7 +23,7 @@ public:
             std::chrono::milliseconds(nx::utils::random::number<int>());
         m_listeningPeerPool = std::make_unique<hpm::ListeningPeerPool>(m_settings);
 
-        m_connection = std::make_shared<TestConnection<nx::network::TCPSocket>>();
+        m_connection = std::make_shared<TestTcpConnection>();
     }
 
 protected:
@@ -36,13 +36,15 @@ protected:
 
     void thenConnectionInactivityTimeoutIsSetProperly()
     {
-        ASSERT_EQ(m_settings.connectionInactivityTimeout, m_connection->inactivityTimeout());
+        ASSERT_EQ(
+            m_settings.connectionInactivityTimeout,
+            m_connection->inactivityTimeout());
     }
 
 private:
     conf::ListeningPeer m_settings;
     std::unique_ptr<hpm::ListeningPeerPool> m_listeningPeerPool;
-    std::shared_ptr<TestConnection<nx::network::TCPSocket>> m_connection;
+    std::shared_ptr<TestTcpConnection> m_connection;
 };
 
 TEST_F(ListeningPeerPool, sets_connection_inactivity_timeout)
