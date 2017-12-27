@@ -325,13 +325,6 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        bool isLive =
-            requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME) == requestParams.end();
-        auto requiredPermission = isLive
-            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
-            return nx_http::StatusCode::forbidden;
-
         if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
         {
             return getPlaylist(
@@ -514,11 +507,10 @@ namespace nx_hls
             }
         }
 
-        if (!session->isLive() &&
-            !commonModule()->resourceAccessManager()->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
-        {
+        auto requiredPermission = session->isLive()
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+        if (!commonModule()->resourceAccessManager()->hasGlobalPermission(accessRights, requiredPermission))
             return nx_http::StatusCode::forbidden;
-        }
 
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
@@ -771,12 +763,11 @@ namespace nx_hls
             params.streamQuality,
             requestParams);
 
-        if (!currentChunkKey.live() &&
-            !commonModule()->resourceAccessManager()->hasGlobalPermission(
-                d_ptr->accessRights, Qn::GlobalViewArchivePermission))
-        {
+        auto requiredPermission = currentChunkKey.live()
+            ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
+        if (!commonModule()->resourceAccessManager()->hasGlobalPermission(d_ptr->accessRights, requiredPermission))
             return nx_http::StatusCode::forbidden;
-        }
+
 
         //streaming chunk
         if (m_currentChunk)
