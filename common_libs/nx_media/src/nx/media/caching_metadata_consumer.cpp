@@ -28,13 +28,6 @@ bool metadataContainsTime(const QnAbstractCompressedMetadataPtr& metadata, const
     return timestamp >= metadata->timestamp && timestamp < metadata->timestamp + duration;
 }
 
-enum class SearchPolicy
-{
-    exact,
-    closestBefore,
-    closestAfter
-};
-
 class MetadataCache
 {
 public:
@@ -65,15 +58,11 @@ public:
 
     QnAbstractCompressedMetadataPtr findMetadata(const qint64 timestamp) const
     {
-        QnMutexLocker lock(&m_mutex);
-
-        const auto it = findMetadataIterator(timestamp, SearchPolicy::exact);
-        if (it == m_metadataByTimestamp.end())
+        const auto& metadataList = findMetadataInRange(timestamp, timestamp + 1, 1);
+        if (metadataList.isEmpty())
             return {};
 
-        NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
-
-        return *it;
+        return metadataList.first();
     }
 
     QList<QnAbstractCompressedMetadataPtr> findMetadataInRange(
@@ -81,72 +70,46 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
 
-        const auto startIt = findMetadataIterator(startTimestamp, SearchPolicy::closestAfter);
-        if (startIt == m_metadataByTimestamp.end())
+        if (m_metadataByTimestamp.isEmpty())
             return {};
 
-        const auto endIt = findMetadataIterator(endTimestamp, SearchPolicy::closestBefore);
+        // Check metadata at lower_bound first (will match when only when timestamps are
+        // equal). Then if it fails check the previous item (may match by duration). Since
+        // we check the previous item anyway we can exclude the first item from
+        // lower_bound. Thus explicit check for possibility to decrement the iterator
+        // can be omitted.
+
+        auto startIt = std::lower_bound(
+            std::next(m_metadataByTimestamp.keyBegin()),
+            m_metadataByTimestamp.keyEnd(),
+            startTimestamp).base();
+
+        if (startIt == m_metadataByTimestamp.end() || startTimestamp < (*startIt)->timestamp)
+        {
+            --startIt;
+            if (!metadataContainsTime(*startIt, startTimestamp))
+                ++startIt;
+        }
 
         QList<QnAbstractCompressedMetadataPtr> result;
+
         auto itemsLeft = maxCount;
-        for (auto it = startIt; itemsLeft != 0 && it != endIt; ++it, --itemsLeft)
+        auto it = startIt;
+        while (itemsLeft != 0 && it != m_metadataByTimestamp.end()
+            && (*it)->timestamp < endTimestamp)
         {
             NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers.");
             if (*it)
                 result.append(*it);
+
+            ++it;
+            --itemsLeft;
         }
+
         return result;
     }
 
 private:
-    QMap<qint64, QnAbstractCompressedMetadataPtr>::const_iterator findMetadataIterator(
-        const qint64 timestamp, SearchPolicy searchPolicy) const
-    {
-        if (m_metadataByTimestamp.isEmpty())
-            return m_metadataByTimestamp.end();
-
-        switch (searchPolicy)
-        {
-            case SearchPolicy::exact:
-            {
-                // Check metadata at lower_bound first (will match when only when timestamps are
-                // equal). Then if it fails check the previous item (may match by duration). Since
-                // we check the previous item anyway we can exclude the first item from
-                // lower_bound. Thus explicit check for possibility to decrement the iterator
-                // can be omitted.
-
-                auto it = std::lower_bound(
-                    std::next(m_metadataByTimestamp.keyBegin()),
-                    m_metadataByTimestamp.keyEnd(),
-                    timestamp).base();
-
-                if (it != m_metadataByTimestamp.end() && metadataContainsTime(*it, timestamp))
-                    return it;
-
-                --it;
-
-                if (metadataContainsTime(*it, timestamp))
-                    return it;
-
-                return m_metadataByTimestamp.end();
-            }
-
-            case SearchPolicy::closestAfter:
-                return std::lower_bound(
-                    m_metadataByTimestamp.keyBegin(),
-                    m_metadataByTimestamp.keyEnd(),
-                    timestamp).base();
-
-            case SearchPolicy::closestBefore:
-                return std::upper_bound(
-                    m_metadataByTimestamp.keyBegin(),
-                    m_metadataByTimestamp.keyEnd(),
-                    timestamp).base();
-        }
-
-        return m_metadataByTimestamp.end();
-    }
-
     mutable QnMutex m_mutex;
     QQueue<QnAbstractCompressedMetadataPtr> m_metadataCache;
     QMap<qint64, QnAbstractCompressedMetadataPtr> m_metadataByTimestamp;
