@@ -487,8 +487,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logLevel = qnSettings->logLevel();
 
     nx::utils::log::Settings logSettings;
-    logSettings.maxFileSize = 10 * 1024 * 1024;
-    logSettings.maxBackupCount = 5;
+    logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
+    logSettings.maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);

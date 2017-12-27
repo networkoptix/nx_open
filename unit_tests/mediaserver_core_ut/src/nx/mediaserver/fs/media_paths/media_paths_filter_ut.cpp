@@ -97,19 +97,20 @@ protected:
     void thenPathsShouldBeAmendedCorrectly() const
     {
         assertMediaFolders();
+        assertSeparators();
         assertServerUuid();
         assertDataDirectory();
     }
 
     void assertMediaFolders() const
     {
-        const size_t foldersWithMediaSuffixCount = std::count_if(
+        const int foldersWithMediaSuffixCount = static_cast<int>(std::count_if(
             m_mediaPaths.cbegin(),
             m_mediaPaths.cend(),
             [](const QString& path)
             {
                 return path.contains(kMediaFolder);
-            });
+            }));
 
         if (m_isWindows)
         {
@@ -118,6 +119,13 @@ protected:
         }
 
         ASSERT_EQ(qMax(m_mediaPaths.size() - 1, 0), foldersWithMediaSuffixCount);
+    }
+
+    void assertSeparators() const
+    {
+        const QString unexpectedSeparator = m_isWindows ? "/" : "\\";
+        for (const auto& mediaPath: m_mediaPaths)
+            ASSERT_FALSE(mediaPath.contains(unexpectedSeparator));
     }
 
     void assertServerUuid() const
