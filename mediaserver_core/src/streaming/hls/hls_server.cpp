@@ -509,7 +509,7 @@ namespace nx_hls
 
         auto requiredPermission = session->isLive()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-        if (!commonModule()->resourceAccessManager()->hasGlobalPermission(accessRights, requiredPermission))
+        if (!commonModule()->resourceAccessManager()->hasPermission(accessRights, camResource, requiredPermission))
             return nx_http::StatusCode::forbidden;
 
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
@@ -763,9 +763,10 @@ namespace nx_hls
             params.streamQuality,
             requestParams);
 
+        const auto resource = commonModule()->resourcePool()->getResourceByUniqueId(currentChunkKey.srcResourceUniqueID());
         auto requiredPermission = currentChunkKey.live()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-        if (!commonModule()->resourceAccessManager()->hasGlobalPermission(d_ptr->accessRights, requiredPermission))
+        if (!commonModule()->resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
             return nx_http::StatusCode::forbidden;
 
 
