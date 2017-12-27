@@ -46,7 +46,7 @@ protected:
 
     void whenCloseAllConnections()
     {
-        m_connection->reportConnectionClosure();
+        m_connection->close();
     }
 
     void whenDeletePool()

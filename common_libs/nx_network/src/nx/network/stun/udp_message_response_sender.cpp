@@ -61,10 +61,5 @@ void UDPMessageResponseSender::setInactivityTimeout(
     // So, connection-related logic like this one is not appropriate.
 }
 
-void UDPMessageResponseSender::setInactivityTimeout(
-    boost::optional<std::chrono::milliseconds> /*value*/)
-{
-}
-
 } // namespace stun
 } // namespace nx
