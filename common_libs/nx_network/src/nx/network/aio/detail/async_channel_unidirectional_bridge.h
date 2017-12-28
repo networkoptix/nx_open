@@ -243,7 +243,7 @@ private:
         }
 
         // Resuming read, if needed.
-        if (!m_isReading)
+        if (m_isSourceOpened && !m_isReading)
             scheduleRead();
     }
 
