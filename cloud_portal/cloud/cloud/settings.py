@@ -326,6 +326,9 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
+    'cloud_notification':{
+        'engine': 'email'
+    }
 }
 
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
