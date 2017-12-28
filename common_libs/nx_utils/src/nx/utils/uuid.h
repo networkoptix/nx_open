@@ -90,3 +90,4 @@ NX_UTILS_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
 NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
 NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);
 NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+NX_UTILS_API QString toString(const QnUuid& id);

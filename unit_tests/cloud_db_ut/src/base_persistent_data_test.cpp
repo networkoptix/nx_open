@@ -7,6 +7,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <utils/common/id.h>
 
 namespace nx {
 namespace cdb {

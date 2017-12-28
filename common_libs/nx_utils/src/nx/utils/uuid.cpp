@@ -191,3 +191,8 @@ QDataStream& operator>>(QDataStream& s, QnUuid& id)
 {
     return s >> id.m_uuid;
 }
+
+QString toString(const QnUuid& id)
+{
+    return id.toString();
+}

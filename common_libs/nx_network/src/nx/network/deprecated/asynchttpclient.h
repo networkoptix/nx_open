@@ -373,6 +373,10 @@ private:
     std::shared_ptr<AsyncHttpClient> m_obj;
 };
 
+inline QDebug& operator<<(QDebug& stream, const AsyncHttpClientPtr& value)
+{
+    return stream << toString(value.get());
+}
 
 /**
  * Helper function that uses nx::network::http::AsyncHttpClient for file download.

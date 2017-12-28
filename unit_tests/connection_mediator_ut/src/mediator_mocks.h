@@ -5,8 +5,6 @@
 
 #include <mediaserver_endpoint_tester.h>
 
-#include "custom_printers.h"
-
 namespace nx {
 namespace hpm {
 namespace test {

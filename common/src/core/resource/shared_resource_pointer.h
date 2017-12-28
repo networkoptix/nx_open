@@ -133,3 +133,9 @@ public:
             resource->initWeakPointer(resource);
     }
 };
+
+template<typename T>
+QDebug& operator<<(QDebug& stream, const QnSharedResourcePointer<T>& value)
+{
+    return stream << static_cast<const QSharedPointer<T>&>(value);
+}

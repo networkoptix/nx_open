@@ -20,7 +20,7 @@ nx_add_target(nx_utils LIBRARY ${library_type}
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
         ${ios_sources}
     PUBLIC_LIBS
-        boost openssl Qt5::Core Qt5::Xml Qt5::Sql
+        boost openssl Qt5::Core Qt5::Network Qt5::Xml Qt5::Sql
         nx_kit
 )
 

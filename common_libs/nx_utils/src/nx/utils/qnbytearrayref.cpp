@@ -198,6 +198,11 @@ QByteArray QnByteArrayConstRef::toByteArrayWithRawData() const
 //-------------------------------------------------------------------------------------------------
 // Non-member operators.
 
+QDebug& operator<<( QDebug& stream, const QnByteArrayConstRef& value)
+{
+    return stream << value.toByteArrayWithRawData();
+}
+
 bool operator==(const QnByteArrayConstRef& left, const QByteArray& right)
 {
     if (left.size() != (QnByteArrayConstRef::size_type)right.size())

@@ -8,11 +8,6 @@ namespace network {
 namespace http {
 namespace header {
 
-void PrintTo(const Via& val, ::std::ostream* os)
-{
-    PrintTo(val.toString(), os);
-}
-
 bool operator==(const Via::ProxyEntry& left, const Via::ProxyEntry& right)
 {
     return left.protoName == right.protoName &&

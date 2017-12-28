@@ -62,6 +62,8 @@ private:
     size_type m_count;
 };
 
+QDebug& NX_UTILS_API operator<<(QDebug& stream, const QnByteArrayConstRef& left);
+
 bool NX_UTILS_API operator==(const QnByteArrayConstRef& left, const QByteArray& right);
 bool NX_UTILS_API operator!=(const QnByteArrayConstRef& left, const QByteArray& right);
 bool NX_UTILS_API operator==(const QByteArray& left, const QnByteArrayConstRef& right);

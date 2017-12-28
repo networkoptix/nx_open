@@ -6,6 +6,7 @@
 #include <QtNetwork/QTcpSocket>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace utils {
@@ -14,7 +15,7 @@ namespace test {
 template<typename T>
 void assertToString(const T& value, const char* string)
 {
-    EXPECT_EQ(QString::fromUtf8(string), toString(value));
+    EXPECT_EQ(QString::fromUtf8(string), ::toString(value));
 }
 
 TEST(ToString, BuildIn)
@@ -120,7 +121,7 @@ TEST(ToString, NxTypes)
 template<typename T>
 void assertToStringPattern(const T& value, const char* pattern)
 {
-    const auto valueString = toString(value);
+    const auto valueString = ::toString(value);
     const QRegExp regExp(QString::fromUtf8(pattern), Qt::CaseSensitive, QRegExp::Wildcard);
 
     EXPECT_TRUE(regExp.exactMatch(valueString))
