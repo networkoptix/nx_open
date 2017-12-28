@@ -73,7 +73,7 @@ public:
         dnsResolver.removeEtcHost(kLocalCloudHost.toString());
     }
 
-    void expectConnect(const QnUuid& id, const SocketAddress& endpoint)
+    void expectConnect(const QnUuid& id, const nx::network::SocketAddress& endpoint)
     {
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
@@ -123,7 +123,7 @@ public:
         return endpoint;
     }
 
-    void removeMediaserver(const SocketAddress& endpoint)
+    void removeMediaserver(const nx::network::SocketAddress& endpoint)
     {
         EXPECT_GT(m_mediaservers.erase(endpoint), 0);
         NX_INFO(this, lm("Server is removed on %2").args(endpoint));
@@ -147,7 +147,7 @@ protected:
     ModuleConnector connector;
 
 private:
-    std::map<SocketAddress, std::unique_ptr<TestHttpServer>> m_mediaservers;
+    std::map<nx::network::SocketAddress, std::unique_ptr<nx::network::http::TestHttpServer>> m_mediaservers;
 
     QnMutex m_mutex;
     QnWaitCondition m_condition;
