@@ -60,6 +60,7 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
+include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
 include(utils)
@@ -149,9 +150,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_subdirectory(wixsetup)
-    endif()
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
@@ -190,8 +188,14 @@ if(withTests)
     add_subdirectory(tests)
 endif()
 
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-    add_subdirectory(edge_firmware)
+if(withDistributions)
+    if(WINDOWS)
+        add_subdirectory(wixsetup)
+    endif()
+
+    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+        add_subdirectory(edge_firmware)
+    endif()
 endif()
 
 include(fix_qt_vars)

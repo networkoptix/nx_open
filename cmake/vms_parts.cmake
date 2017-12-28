@@ -57,6 +57,11 @@ option(withClouds "Enable cloud components" ${_withClouds})
 option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
 
+cmake_dependent_option(withDistributions "Enable distributions build"
+    OFF "developerBuild"
+    ON
+)
+
 unset(_withMediaServer)
 unset(_withNxTool)
 unset(_withTrayTool)
