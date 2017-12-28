@@ -18,6 +18,14 @@ JsonRestResponse::JsonRestResponse(
 {
 }
 
+JsonRestResponse::JsonRestResponse(
+    nx_http::StatusCode::Value status, QnJsonRestResult::Error error)
+:
+    statusCode(statusCode)
+{
+    json.setError(error);
+}
+
 RestResponse JsonRestResponse::toRest(bool extraFormatting) const
 {
     RestContent content{kJsonContetnType, QJson::serialized(json)};

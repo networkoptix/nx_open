@@ -33,7 +33,6 @@ SYSTEMDSTAGE=$STAGE$SYSTEMDTARGET
 
 SERVER_BIN_PATH=@libdir@/bin/@build.configuration@
 SERVER_SHARE_PATH=@libdir@/share
-#SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_DEB_PATH=@libdir@/deb
 SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
 SERVER_LIB_PATH=@libdir@/lib/@build.configuration@
@@ -83,10 +82,7 @@ do
     cp -P @qt.dir@/lib/$qtlib* $LIBSTAGE
 done
 
-#cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
-
 # Strip and remove rpath
-
 if [[ ('@build.configuration@' == 'release' || '@CMAKE_BUILD_TYPE@' == 'Release') \
     && '@arch@' != 'arm' ]]
 then
@@ -106,7 +102,7 @@ find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod -R 755 $BINSTAGE
 if [ '@arch@' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}; fi
 
-# Copy mediaserver binary and sqldrivers
+# Copy mediaserver binaries and scripts.
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
 install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
 install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE

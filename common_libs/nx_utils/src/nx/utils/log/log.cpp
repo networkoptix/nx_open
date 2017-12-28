@@ -1,7 +1,7 @@
 #include "log.h"
 
+static QString kMainLogName("MAIN");
 const nx::utils::log::Tag QnLog::MAIN_LOG_ID(lit(""));
-const nx::utils::log::Tag QnLog::CUSTOM_LOG_BASE_ID(lit("CUSTOM"));
 const nx::utils::log::Tag QnLog::HTTP_LOG_INDEX(lit("HTTP"));
 const nx::utils::log::Tag QnLog::EC2_TRAN_LOG(lit("EC2_TRAN"));
 const nx::utils::log::Tag QnLog::HWID_LOG(lit("HWID"));
@@ -18,25 +18,35 @@ QnLogs& QnLog::instance()
     return logs;
 }
 
-std::shared_ptr<nx::utils::log::Logger> QnLogs::logger(int id)
+std::vector<QString> QnLogs::getLoggerNames()
 {
-    if (id == 0)
+    return
+    {
+        kMainLogName,
+        QnLog::HTTP_LOG_INDEX.toString(),
+        QnLog::EC2_TRAN_LOG.toString(),
+        QnLog::HWID_LOG.toString(),
+        QnLog::PERMISSIONS_LOG.toString(),
+    };
+}
+
+std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(int id)
+{
+    // Currently hardcoded in some places client.
+    if (id == 0) return nx::utils::log::mainLogger();
+    if (id == 1) return nx::utils::log::getExactLogger(QnLog::HTTP_LOG_INDEX);
+    if (id == 2) return nx::utils::log::getExactLogger(QnLog::HWID_LOG);
+    if (id == 3) return nx::utils::log::getExactLogger(QnLog::EC2_TRAN_LOG);
+    if (id == 4) return nx::utils::log::getExactLogger(QnLog::PERMISSIONS_LOG);
+    return nullptr;
+}
+
+std::shared_ptr<nx::utils::log::Logger> QnLogs::getLogger(const QString& name)
+{
+    if (name == kMainLogName) 
         return nx::utils::log::mainLogger();
 
-    static std::vector<nx::utils::log::Tag> kAllLogs =
-    {
-        QnLog::MAIN_LOG_ID,
-        QnLog::CUSTOM_LOG_BASE_ID,
-        QnLog::HTTP_LOG_INDEX,
-        QnLog::EC2_TRAN_LOG,
-        QnLog::HWID_LOG,
-        QnLog::PERMISSIONS_LOG,
-    };
-
-    if (id < 0 || (size_t) id >= kAllLogs.size())
-        return nullptr;
-
-    return nx::utils::log::getLogger(kAllLogs[id], /*allowMain*/ false);
+    return nx::utils::log::getExactLogger(nx::utils::log::Tag(name));
 }
 
 QnLog* QnLogs::get()

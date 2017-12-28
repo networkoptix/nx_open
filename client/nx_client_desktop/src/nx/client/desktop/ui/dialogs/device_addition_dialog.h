@@ -1,10 +1,11 @@
 #pragma once
 
+#include "private/current_system_servers.h"
+#include "private/server_online_status_watcher.h"
+
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/resource/fake_resource_list_model.h>
-#include <nx/client/desktop/watchers/system_servers_watcher.h>
-#include <nx/client/desktop/watchers/server_online_status_watcher.h>
 
 class QStackedWidget;
 
@@ -68,7 +69,7 @@ private:
     QString progressMessage() const;
 
 private:
-    SystemServersWatcher m_serversWatcher;
+    CurrentSystemServers m_serversWatcher;
     ServerOnlineStatusWatcher m_serverStatusWatcher;
 
     QScopedPointer<Ui::DeviceAdditionDialog> ui;

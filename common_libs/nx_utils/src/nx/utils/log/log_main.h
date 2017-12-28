@@ -13,7 +13,10 @@ NX_UTILS_API std::shared_ptr<Logger> mainLogger();
 NX_UTILS_API std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters);
 
 /** @return Logger by tag or main if no specific logger is set. */
-NX_UTILS_API std::shared_ptr<Logger> getLogger(const Tag& tag, bool allowMain = true);
+NX_UTILS_API std::shared_ptr<Logger> getLogger(const Tag& tag);
+
+/** @return Logger by exact tag, nullptr otherwise. */
+NX_UTILS_API std::shared_ptr<Logger> getExactLogger(const Tag& tag);
 
 /** Removes specific loggers for filters, so such messagess will go to main log. */
 NX_UTILS_API void removeLoggers(const std::set<Tag>& filters);

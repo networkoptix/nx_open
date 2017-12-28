@@ -29,10 +29,8 @@ public:
 
 protected:
     const nx::utils::Url m_url;
-    const std::unique_ptr<nx_http::HttpClient> m_client;
+    std::unique_ptr<nx_http::HttpClient> m_client;
 };
-
-std::vector<QDomElement> xmlElements(const QDomNodeList& nodeList);
 
 } // namespace utils
 } // namespace plugins

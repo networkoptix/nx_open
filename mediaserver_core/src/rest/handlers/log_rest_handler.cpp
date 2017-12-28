@@ -12,11 +12,7 @@
 
 #include <media_server/serverutil.h>
 
-
-namespace {
 static const int kReadBlockSize = 1024 * 512;
-static const QString kIdParam = lit("id");
-}
 
 int QnLogRestHandler::executeGet(
     const QString& path,
@@ -44,18 +40,25 @@ int QnLogRestHandler::executeGet(
         }
     }
 
-    int logId = 0;
-    const auto idIter = params.find(kIdParam);
-    if (idIter != params.end())
-        logId = idIter->second.toInt();
-
     boost::optional<QString> logFilePath;
-    if (const auto logger = QnLogs::logger(logId))
-        logFilePath = logger->filePath();
+    {
+        const auto name = params.value(lit("name"));
+        if (!name.isEmpty())
+        {
+            if (auto logger = QnLogs::getLogger(name))
+                logFilePath = logger->filePath();
+        }
+        else
+        {
+            const auto id = params.value(lit("id")).toInt();
+            if (auto logger = QnLogs::getLogger(id))
+                logFilePath = logger->filePath();
+        }
+    }
 
     if (!logFilePath)
     {
-        result.append(QString("<root>Bad log file id</root>\n"));
+        result.append(QString("<root>Bad log file id or name</root>\n"));
         return nx_http::StatusCode::badRequest;
     }
 

@@ -230,7 +230,14 @@ enum ActionType
      */
     execHttpRequestAction = 15,
 
-    acknowledgeAction = 16
+    acknowledgeAction = 16,
+
+    /**
+    * Open layout as an action.
+    * actionParams:
+    * - layoutResourceId - Uuid of layout to be opened
+    */
+    openLayoutAction = 17,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 

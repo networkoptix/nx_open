@@ -100,6 +100,8 @@ public slots:
 public slots:
     void hideSystem(const QString& systemId, const QString& localSystemId);
 
+    void moveToBack(const QUuid& localSystemId);
+
 signals:
     void cloudUserNameChanged();
 

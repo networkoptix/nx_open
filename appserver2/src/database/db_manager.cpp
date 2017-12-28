@@ -1621,7 +1621,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20171218_remove_extra_buisiness_rules.sql")))
     {
-        for (const auto& rule : vms::event::Rule::getDisabledRulesUpd48())
+        for (const auto& rule: vms::event::Rule::getDisabledRulesUpd48())
         {
             removeBusinessRule(rule->id());
         }
