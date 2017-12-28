@@ -2,7 +2,7 @@
 
 angular.module('nxCommon')
     .service('voiceControl', function () {
-        if(window.jscd.browser != 'Chrome'){
+        if(!window.chrome){
             return;
         }
         var self = this;
@@ -63,9 +63,6 @@ angular.module('nxCommon')
         };
         recognition.onspeechend = function() {
             recognition.stop();
-        };
-        recognition.onnomatch = function(event) {
-            console.log('I didnt recognise that color.');
         };
         recognition.onerror = function(event) {
             console.log('Error occurred in recognition: %s', event.error);

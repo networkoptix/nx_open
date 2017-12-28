@@ -321,7 +321,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
-        if($scope.betaMode && window.jscd.browser == "Chrome"){
+        if($scope.betaMode && window.chrome){
             voiceControl.initControls($scope.cameraLinks, $scope.switchPlaying, $scope.switchPosition);
             $scope.$watch('voiceControls.enabled', function(){
                 if($scope.voiceControls.enabled){
