@@ -44,46 +44,6 @@ fi
 
 #--------------------------------------------------------------------------------------------------
 
-help()
-{
-    echo "Options:"
-    echo " --no-client: Do not pack Lite Client."
-    echo " -v, --verbose: Do not redirect output to a log file."
-}
-
-# [out] LITE_CLIENT
-# [out] VERBOSE
-parseArgs() # "$@"
-{
-    LITE_CLIENT=1
-    VERBOSE=0
-
-    local ARG
-    for ARG in "$@"; do
-        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
-            help
-            exit 0
-        elif [ "$ARG" = "--no-client" ] ; then
-            LITE_CLIENT=0
-        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
-            VERBOSE=1
-        fi
-    done
-}
-
-redirectOutput() # log-file
-{
-    local -r LOG_FILE="$1"; shift
-
-    echo "  See the log in $LOG_FILE"
-
-    rm -rf "$LOG_FILE"
-    exec 1<&- #< Close stdout fd.
-    exec 2<&- #< Close stderr fd.
-    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
-    exec 2>&1 #< Redirect stderr to stdout.
-}
-
 createArchive() # archive dir command...
 {
     local -r ARCHIVE="$1"; shift
@@ -539,25 +499,13 @@ buildDebugSymbolsArchive()
 
 #--------------------------------------------------------------------------------------------------
 
-main()
+# [in] WORK_DIR
+createArmInstaller()
 {
-    local -i LITE_CLIENT
-    local -i VERBOSE
-    parseArgs "$@"
-
-    local -r WORK_DIR="$BUILD_DIR/arm_installer"
-    rm -rf "$WORK_DIR"
-
     local -r TAR_DIR="$WORK_DIR/tar"
     local -r INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
     local -r LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
     local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
-
-    echo "Creating installer in $WORK_DIR (will be deleted on success)."
-
-    if [ $VERBOSE = 0 ]; then
-        redirectOutput "$BUILD_DIR/create_arm_installer.log"
-    fi
 
     mkdir -p "$INSTALL_DIR"
     mkdir -p "$LIB_INSTALL_DIR"
@@ -595,11 +543,90 @@ main()
 
     buildInstaller
     buildDebugSymbolsArchive
+}
 
+#--------------------------------------------------------------------------------------------------
+
+help()
+{
+    echo "Options:"
+    echo " --no-client: Do not pack Lite Client."
+    echo " -v, --verbose: Do not redirect output to a log file."
+}
+
+# [out] LITE_CLIENT
+# [out] VERBOSE
+parseArgs() # "$@"
+{
+    LITE_CLIENT=1
+    VERBOSE=0
+
+    local ARG
+    for ARG in "$@"; do
+        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
+            help
+            exit 0
+        elif [ "$ARG" = "--no-client" ] ; then
+            LITE_CLIENT=0
+        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
+            VERBOSE=1
+        fi
+    done
+}
+
+redirectOutputToLog()
+{
+    local -r LOG_FILE="$LOGS_DIR/create_arm_installer.log"
+
+    echo "  See the log in $LOG_FILE"
+
+    mkdir -p "$LOGS_DIR" #< In case log dir is not created yet.
+    rm -rf "$LOG_FILE"
+
+    # Redirect only stdout to the log file, leaving stderr as is, because there seems to be no
+    # reliable way to duplicate error output to both log file and stderr, keeping the correct order
+    # of regular and error lines in the log file.
+    exec 1>"$LOG_FILE" #< Open log file for writing as stdout.
+}
+
+# Called by trap.
+# [in] $?
+# [in] VERBOSE
+onExit()
+{
+    local RESULT=$?
+    echo "" #< Newline, to separate SUCCESS/FAILURE message from the above log.
+    if [ $RESULT != 0 ]; then #< Failure.
+        echo "FAILURE (status $RESULT); see the error message(s) above." >&2 #< To stderr.
+        if [ $VERBOSE = 0 ]; then #< stdout redirected to log file.
+            echo "FAILURE (status $RESULT); see the error message(s) on stderr." #< To log file.
+        fi
+    else
+        echo "SUCCESS"
+    fi
+    return $RESULT
+}
+
+main()
+{
+    trap onExit EXIT
+
+    local -r WORK_DIR="$BUILD_DIR/create_arm_installer_tmp"
     rm -rf "$WORK_DIR"
 
-    echo ""
-    echo "FINISHED"
+    local -i LITE_CLIENT
+    declare -i VERBOSE #< Mot local - needed by onExit().
+    parseArgs "$@"
+
+    echo "Creating installer in $WORK_DIR (will be deleted on success)."
+
+    if [ $VERBOSE = 0 ]; then
+        redirectOutputToLog
+    fi
+
+    createArmInstaller
+
+    rm -rf "$WORK_DIR"
 }
 
 main "$@"

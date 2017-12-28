@@ -1,8 +1,8 @@
 function(set_distribution_names)
     set(prefix ${installer.name})
 
-# Allowed values are: win64, win86, linux64, linux86, mac, android, ios,
-#  bpi, rpi, bananapi, tx1, isd, isd_s2
+    # Allowed values are: win64, win86, linux64, linux86, mac, android, ios,
+    #  bpi, rpi, bananapi, tx1, isd, isd_s2
     set(distribution_platform "${targetDevice}")
     if(platform STREQUAL "windows")
         if(arch STREQUAL "x64")

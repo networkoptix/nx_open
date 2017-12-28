@@ -324,13 +324,14 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 
     if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
     {
+        const auto hotkey = action(action::OpenBookmarksSearchAction)->shortcut().toString(
+            QKeySequence::NativeText);
         QnGraphicsMessageBox::information(
-            tr("Press %1 to search bookmarks").arg(action(action::OpenBookmarksSearchAction)->shortcut().toString())
+            tr("Press %1 to search bookmarks").arg(hotkey)
             , kHintTimeoutMs
         );
         m_hintDisplayed = true;
     }
-
 
     navigator()->setBookmarksModeEnabled(checked);
 }

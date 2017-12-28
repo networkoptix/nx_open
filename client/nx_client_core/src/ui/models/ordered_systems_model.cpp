@@ -8,20 +8,22 @@
 
 namespace {
 
+using namespace nx::client::core;
+
 bool getWeightFromData(
     const QnWeightsDataHash& weights,
     const QModelIndex& modelIndex,
-    qreal& weight)
+    WeightData& weightData)
 {
     const auto fillWeightByRole =
-        [weights, modelIndex](int role, qreal& weight)
+        [weights, modelIndex](int role, WeightData& weight)
         {
             const auto id = modelIndex.data(role).toString();
             const auto itWeight = weights.find(id);
             if (itWeight == weights.end())
                 return false;
 
-            weight = itWeight.value().weight;
+            weight = itWeight.value();
             return true;
         };
 
@@ -30,14 +32,18 @@ bool getWeightFromData(
         QnSystemsModel::SystemIdRoleId,
         QnSystemsModel::LocalIdRoleId};
 
-    weight = 0.0;
+    weightData = WeightData();
+
     bool result = false;
-    for (const auto& role : kIdRoles)
+    for (const auto& role: kIdRoles)
     {
-        qreal foundWeight = 0.0;
+        WeightData foundWeight;
         if (fillWeightByRole(role, foundWeight))
         {
-            weight = std::max(weight, foundWeight);
+            weightData = weightData.weight > foundWeight.weight
+                ? weightData
+                : foundWeight;
+
             result = true;
         }
     }
@@ -103,12 +109,12 @@ bool FilterModel::filterAcceptsRow(
     if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
         return true;    //< Skips offline cloud systems
 
-    qreal weight = 0.0;
-    if (!getWeightFromData(m_weights, dataIndex, weight))
+    WeightData weightData;
+    if (!getWeightFromData(m_weights, dataIndex, weightData))
         return true;
 
     static const auto kMinWeight = 0.00001;
-    return (weight > kMinWeight);
+    return (weightData.weight > kMinWeight);
 }
 
 } // namespace
@@ -163,18 +169,19 @@ void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
 
 void QnOrderedSystemsModel::forceUpdate()
 {
+    base_type::forceUpdate();
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         model->forceUpdate();
     else
         NX_EXPECT(false, "Wrong source model!");
 }
 
-qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
+WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
-    qreal result = 0.0;
+    WeightData result;
     return getWeightFromData(m_weights, modelIndex, result)
         ? result
-        : m_unknownSystemsWeight;
+        : WeightData{QnUuid::createUuid(), m_unknownSystemsWeight, 0, false};
 }
 
 bool QnOrderedSystemsModel::lessThan(
@@ -205,12 +212,22 @@ bool QnOrderedSystemsModel::lessThan(
         return leftIsFactory;
 
     // Sort by weight
-    const auto leftWeight = getWeight(left);
-    const auto rightWeight = getWeight(right);
-    if (leftWeight == rightWeight)
-        return finalLess(left, right);
+    const auto leftData = getWeight(left);
+    const auto rightData = getWeight(right);
 
-    return (leftWeight > rightWeight);  // System with greater weight will be placed at begin
+    if (leftData.weight == rightData.weight)
+    {
+        if (qFuzzyIsNull(leftData.weight) &&
+            leftData.lastConnectedUtcMs != rightData.lastConnectedUtcMs)
+        {
+            return leftData.lastConnectedUtcMs < rightData.lastConnectedUtcMs;
+        }
+
+        return finalLess(left, right);
+    }
+
+    // System with greater weight will be placed at begin
+    return (leftData.weight > rightData.weight);
 }
 
 void QnOrderedSystemsModel::handleWeightsChanged()

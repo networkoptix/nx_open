@@ -121,7 +121,7 @@ Item
                 PropertyChanges
                 {
                     target: hideTileButton;
-                    opacity: (isConnectable ? 0 : 1);
+                    opacity: (isConnectable && isAvailable ? 0 : 1);
                 }
 
                 PropertyChanges
@@ -415,7 +415,13 @@ Item
                     showBackground: false;
 
                     backgroundColor: tileArea.color;
-                    onClicked: context.hideSystem(control.systemId, control.localId);
+                    onClicked:
+                    {
+                        if (control.isConnectable)
+                            context.moveToBack(control.localId)
+                        else
+                            context.hideSystem(control.systemId, control.localId);
+                    }
                 }
 
                 Loader

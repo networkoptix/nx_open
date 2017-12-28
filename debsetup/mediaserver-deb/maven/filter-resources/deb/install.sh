@@ -1,28 +1,29 @@
 #!/bin/bash
 
-DISTRIB=@artifact.name.server@.deb
+DISTRIB="@artifact.name.server@.deb"
 
-RELEASE_YEAR=$(lsb_release -a | grep "Release:" | awk {'print $2'} | awk -F  "." '/1/ {print $1}')
+RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/1/ {print $1}')
 
-install_deb () {
-    if [ $(whoami) == root ]; then
+installDeb()
+{
+    if [ "$(whoami)" == root ]; then
         dpkg -i "$1"
     else
-        /opt/${deb.customization.company.name}/mediaserver/bin/root_tools install "$1"
+        "/opt/@deb.customization.company.name@/mediaserver/bin/root_tools" install "$1"
     fi
 }
 
-update () {
+update()
+{
     export DEBIAN_FRONTEND=noninteractive
-    CIFSUTILS=$(dpkg -l | grep cifs-utils | grep ii | awk '{print $2}')
+    CIFSUTILS=$(dpkg -l |grep cifs-utils |grep ii |awk '{print $2}')
     if [ -z "$CIFSUTILS" ]; then
-        [ -d "ubuntu${RELEASE_YEAR}" ] && install_deb ubuntu${RELEASE_YEAR}/cifs-utils/*.deb
+        [ -d "ubuntu${RELEASE_YEAR}" ] && installDeb ubuntu${RELEASE_YEAR}/cifs-utils/*.deb
     fi
-    install_deb $DISTRIB
+    installDeb "$DISTRIB"
 }
 
-if [ "$1" != "" ]
-then
+if [ "$1" != "" ]; then
     update >> $1 2>&1
 else
     update 2>&1
