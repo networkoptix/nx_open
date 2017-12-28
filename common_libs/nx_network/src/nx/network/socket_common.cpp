@@ -17,9 +17,6 @@ bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
         && sysErrorCode != SystemError::inProgress;
 }
 
-} // namespace network
-} // namespace nx
-
 //-------------------------------------------------------------------------------------------------
 // HostAddress
 
@@ -485,3 +482,6 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
     options.probeCount = (size_t)split[2].trimmed().toUInt();
     return options;
 }
+
+} // namespace network
+} // namespace nx

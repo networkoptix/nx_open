@@ -72,7 +72,7 @@ int QnDetachFromSystemRestHandler::execute(
         NX_LOGX(lm("Cannot detach from system. Password check failed.")
             , cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     dropConnectionsToRemotePeers(m_messageBus);
@@ -101,5 +101,5 @@ int QnDetachFromSystemRestHandler::execute(
     }
 
     resumeConnectionsToRemotePeers();
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

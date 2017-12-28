@@ -13,12 +13,12 @@ namespace conf {
 class RunTimeOptions
 {
 public:
-    void enforceSsl(const SocketAddress& address, bool enabled = true);
-    bool isSslEnforced(const SocketAddress& address) const;
+    void enforceSsl(const network::SocketAddress& address, bool enabled = true);
+    bool isSslEnforced(const network::SocketAddress& address) const;
 
 private:
     mutable QnMutex m_mutex;
-    std::set<SocketAddress> m_enforcedSslAddresses;
+    std::set<network::SocketAddress> m_enforcedSslAddresses;
 };
 
 } // namespace conf

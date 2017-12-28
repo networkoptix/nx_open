@@ -30,10 +30,16 @@
 #include "transaction_transport.h"
 #include "../access_control/auth_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
+
 class HttpServerConnection;
 class MessageDispatcher;
-} // namespace nx_http
+
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 namespace cdb {
@@ -71,26 +77,26 @@ public:
      * Mediaserver calls this method to open 2-way transaction exchange channel.
      */
     void createTransactionConnection(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler);
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler);
     void createWebsocketTransactionConnection(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler);
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler);
     /**
      * Mediaserver uses this method to push transactions.
      */
     void pushTransaction(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler);
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler);
 
     /**
      * Dispatches transaction to corresponding peers.
@@ -199,7 +205,7 @@ private:
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
 
     bool fetchDataFromConnectRequest(
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         ConnectionRequestAttributes* connectionRequestAttributes);
 
     template<typename TransactionDataType>
@@ -209,12 +215,12 @@ private:
         ::ec2::QnTransaction<TransactionDataType> data,
         TransactionProcessedHandler handler);
 
-    nx_http::RequestResult prepareOkResponseToCreateTransactionConnection(
+    nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
-        nx_http::Response* const response);
+        nx::network::http::Response* const response);
 
     void onHttpConnectionUpgraded(
-        nx_http::HttpServerConnection* connection,
+        nx::network::http::HttpServerConnection* connection,
         ::ec2::ApiPeerDataEx remotePeerInfo,
         nx::utils::stree::ResourceContainer authInfo,
         const nx::String systemId);

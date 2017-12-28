@@ -49,7 +49,7 @@ static void createData(const Appserver2Ptr& server)
 
     initResourceTypes(connection);
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setUserName("admin");
     httpClient.setUserPassword("admin");
 

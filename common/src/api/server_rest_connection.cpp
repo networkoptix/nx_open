@@ -61,16 +61,16 @@ ServerConnection::ServerConnection(
     QnCommonModuleAware(commonModule),
     m_serverId(serverId)
 {
-    auto httpPool = nx_http::ClientPool::instance();
+    auto httpPool = nx::network::http::ClientPool::instance();
     Qn::directConnect(
-        httpPool, &nx_http::ClientPool::done,
+        httpPool, &nx::network::http::ClientPool::done,
         this, &ServerConnection::onHttpClientDone);
 }
 
 ServerConnection::~ServerConnection()
 {
     directDisconnectAll();
-    auto httpPool = nx_http::ClientPool::instance();
+    auto httpPool = nx::network::http::ClientPool::instance();
     for (const auto& handle : m_runningRequests.keys())
         httpPool->terminate(handle);
 }
@@ -154,10 +154,10 @@ Handle ServerConnection::getStatisticsSettingsAsync(
     if (!server)
         return Handle(); //< can't process request now. No internet access
 
-    nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::get, prepareUrl(path, emptyRequest.toParams()));
-    nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    nx_http::insertOrReplaceHeader(&request.headers, header);
+    nx::network::http::ClientPool::Request request = prepareRequest(
+        nx::network::http::Method::get, prepareUrl(path, emptyRequest.toParams()));
+    nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    nx::network::http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
     trace(handle, path);
     return handle;
@@ -168,24 +168,24 @@ Handle ServerConnection::sendStatisticsAsync(
     PostCallback callback,
     QThread *targetThread)
 {
-    static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    static const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     static const auto path = lit("/ec2/statistics/send");
 
     auto server = getServerWithInternetAccess();
     if (!server)
         return Handle(); //< can't process request now. No internet access
 
-    const nx_http::BufferType data = QJson::serialized(statisticsData.metricsList);
+    const nx::network::http::BufferType data = QJson::serialized(statisticsData.metricsList);
     if (data.isEmpty())
         return Handle();
 
-    nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::post,
+    nx::network::http::ClientPool::Request request = prepareRequest(
+        nx::network::http::Method::post,
         prepareUrl(path, statisticsData.toParams()),
         kJsonContentType,
         data);
-    nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    nx_http::insertOrReplaceHeader(&request.headers, header);
+    nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    nx::network::http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
     trace(handle, path);
     return handle;
@@ -465,12 +465,12 @@ Handle ServerConnection::changeCameraPassword(
 
     QnEmptyRequestData params;
     params.format = Qn::SerializationFormat::UbjsonFormat;
-    nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::post,
+    nx::network::http::ClientPool::Request request = prepareRequest(
+        nx::network::http::Method::post,
         prepareUrl(lit("/api/changeCameraPassword"), params.toParams()));
     request.messageBody = QJson::serialized(std::move(data));
-    nx_http::insertOrReplaceHeader(&request.headers,
-        nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray()));
+    nx::network::http::insertOrReplaceHeader(&request.headers,
+        nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray()));
 
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
     trace(handle, request.url.toString());
@@ -509,7 +509,7 @@ template<typename T,
     typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(
     const Qn::SerializationFormat& format,
-    const nx_http::BufferType& msgBody,
+    const nx::network::http::BufferType& msgBody,
     bool* success)
 {
      switch (format)
@@ -537,7 +537,7 @@ template<typename T,
     typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(
     const Qn::SerializationFormat& format,
-    const nx_http::BufferType& msgBody,
+    const nx::network::http::BufferType& msgBody,
     bool* success)
 {
     switch (format)
@@ -562,7 +562,7 @@ Handle ServerConnection::executeGet(
     Callback<ResultType> callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx_http::Method::get, prepareUrl(path, params));
+    auto request = prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -575,13 +575,13 @@ template <typename ResultType>
 Handle ServerConnection::executePost(
     const QString& path,
     const QnRequestParamList& params,
-    const nx_http::StringType& contentType,
-    const nx_http::StringType& messageBody,
+    const nx::network::http::StringType& contentType,
+    const nx::network::http::StringType& messageBody,
     Callback<ResultType> callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
-        nx_http::Method::post, prepareUrl(path, params), contentType, messageBody);
+        nx::network::http::Method::post, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -594,13 +594,13 @@ template <typename ResultType>
 Handle ServerConnection::executePut(
     const QString& path,
     const QnRequestParamList& params,
-    const nx_http::StringType& contentType,
-    const nx_http::StringType& messageBody,
+    const nx::network::http::StringType& contentType,
+    const nx::network::http::StringType& messageBody,
     Callback<ResultType> callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
-        nx_http::Method::put, prepareUrl(path, params), contentType, messageBody);
+        nx::network::http::Method::put, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -616,7 +616,7 @@ Handle ServerConnection::executeDelete(
     Callback<ResultType> callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx_http::Method::delete_, prepareUrl(path, params));
+    auto request = prepareRequest(nx::network::http::Method::delete_, prepareUrl(path, params));
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -658,7 +658,7 @@ void invoke(Callback<ResultType> callback,
 
 template <typename ResultType>
 Handle ServerConnection::executeRequest(
-    const nx_http::ClientPool::Request& request,
+    const nx::network::http::ClientPool::Request& request,
     Callback<ResultType> callback,
     QThread* targetThread)
 {
@@ -673,11 +673,11 @@ Handle ServerConnection::executeRequest(
             (Handle id,
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
-                nx_http::StringType contentType,
-                nx_http::BufferType msgBody)
+                nx::network::http::StringType contentType,
+                nx::network::http::BufferType msgBody)
             {
                 bool success = false;
-                if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+                if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
                 {
                     const auto format = Qn::serializationFormatFromHttpContentType(contentType);
                     auto result = parseMessageBody<ResultType>(format, msgBody, &success);
@@ -700,7 +700,7 @@ Handle ServerConnection::executeRequest(
 }
 
 Handle ServerConnection::executeRequest(
-    const nx_http::ClientPool::Request& request,
+    const nx::network::http::ClientPool::Request& request,
     Callback<QByteArray> callback,
     QThread* targetThread)
 {
@@ -713,12 +713,12 @@ Handle ServerConnection::executeRequest(
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
             [callback, targetThread, targetThreadGuard, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)
             {
                 Q_UNUSED(contentType)
                 bool success = (osErrorCode == SystemError::noError
-                    && statusCode >= nx_http::StatusCode::ok
-                    && statusCode <= nx_http::StatusCode::partialContent);
+                    && statusCode >= nx::network::http::StatusCode::ok
+                    && statusCode <= nx::network::http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
                     return;
@@ -731,7 +731,7 @@ Handle ServerConnection::executeRequest(
 }
 
 Handle ServerConnection::executeRequest(
-    const nx_http::ClientPool::Request& request,
+    const nx::network::http::ClientPool::Request& request,
     Callback<EmptyResponseType> callback,
     QThread* targetThread)
 {
@@ -744,11 +744,11 @@ Handle ServerConnection::executeRequest(
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
             [callback, targetThread, targetThreadGuard, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType, nx::network::http::BufferType)
             {
                 bool success = (osErrorCode == SystemError::noError
-                    && statusCode >= nx_http::StatusCode::ok
-                    && statusCode <= nx_http::StatusCode::partialContent);
+                    && statusCode >= nx::network::http::StatusCode::ok
+                    && statusCode <= nx::network::http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
                     return;
@@ -762,26 +762,26 @@ Handle ServerConnection::executeRequest(
 
 void ServerConnection::cancelRequest(const Handle& requestId)
 {
-    nx_http::ClientPool::instance()->terminate(requestId);
+    nx::network::http::ClientPool::instance()->terminate(requestId);
     QnMutexLocker lock(&m_mutex);
     m_runningRequests.remove(requestId);
 }
 
-nx_http::ClientPool::Request ServerConnection::prepareRequest(
-    nx_http::Method::ValueType method,
+nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
+    nx::network::http::Method::ValueType method,
     const QUrl& url,
-    const nx_http::StringType& contentType,
-    const nx_http::StringType& messageBody)
+    const nx::network::http::StringType& contentType,
+    const nx::network::http::StringType& messageBody)
 {
     auto resPool = commonModule()->resourcePool();
     const auto server = resPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
-        return nx_http::ClientPool::Request();
+        return nx::network::http::ClientPool::Request();
     const auto connection = commonModule()->ec2Connection();
     if (!connection)
-        return nx_http::ClientPool::Request();
+        return nx::network::http::ClientPool::Request();
 
-    nx_http::ClientPool::Request request;
+    nx::network::http::ClientPool::Request request;
     request.method = method;
     request.url = server->getApiUrl();
     request.url.setPath(url.path());
@@ -812,7 +812,7 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
         // no route exists. proxy via nearest server
         auto nearestServer = commonModule()->currentServer();
         if (!nearestServer)
-            return nx_http::ClientPool::Request();
+            return nx::network::http::ClientPool::Request();
         nx::utils::Url nearestUrl(server->getApiUrl());
         if (nearestServer->getId() == commonModule()->moduleGUID())
             request.url.setHost(lit("127.0.0.1"));
@@ -834,17 +834,17 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
 }
 
 Handle ServerConnection::sendRequest(
-    const nx_http::ClientPool::Request& request,
+    const nx::network::http::ClientPool::Request& request,
     HttpCompletionFunc callback)
 {
-    auto httpPool = nx_http::ClientPool::instance();
+    auto httpPool = nx::network::http::ClientPool::instance();
     QnMutexLocker lock(&m_mutex);
     Handle requestId = httpPool->sendRequest(request);
     m_runningRequests.insert(requestId, callback);
     return requestId;
 }
 
-void ServerConnection::onHttpClientDone(int requestId, nx_http::AsyncHttpClientPtr httpClient)
+void ServerConnection::onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient)
 {
     QnMutexLocker lock(&m_mutex);
     auto itr = m_runningRequests.find(requestId);
@@ -854,15 +854,15 @@ void ServerConnection::onHttpClientDone(int requestId, nx_http::AsyncHttpClientP
     m_runningRequests.remove(requestId);
 
     SystemError::ErrorCode systemError = SystemError::noError;
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-    nx_http::StringType contentType;
-    nx_http::BufferType messageBody;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
+    nx::network::http::StringType contentType;
+    nx::network::http::BufferType messageBody;
 
     if (httpClient->failed()) {
         systemError = SystemError::connectionReset;
     }
     else {
-        statusCode = (nx_http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
+        statusCode = (nx::network::http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
         contentType = httpClient->contentType();
         messageBody = httpClient->fetchMessageBodyBuffer();
     }

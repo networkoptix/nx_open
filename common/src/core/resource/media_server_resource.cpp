@@ -175,7 +175,7 @@ void QnMediaServerResource::setName( const QString& name )
     emit nameChanged(toSharedPointer(this));
 }
 
-void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
+void QnMediaServerResource::setNetAddrList(const QList<nx::network::SocketAddress>& netAddrList)
 {
     {
         QnMutexLocker lock( &m_mutex );
@@ -186,7 +186,7 @@ void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrLi
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
+QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_netAddrList;
@@ -224,13 +224,13 @@ QList<nx::utils::Url> QnMediaServerResource::getIgnoredUrls() const
     return commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
 
-boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
+boost::optional<nx::network::SocketAddress> QnMediaServerResource::getCloudAddress() const
 {
     const auto cloudId = getModuleInformation().cloudId();
     if (cloudId.isEmpty())
         return boost::none;
     else
-        return SocketAddress(cloudId);
+        return nx::network::SocketAddress(cloudId);
 }
 
 quint16 QnMediaServerResource::getPort() const
@@ -238,15 +238,15 @@ quint16 QnMediaServerResource::getPort() const
     return getPrimaryAddress().port;
 }
 
-QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
+QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
 {
-    auto toAddress = [](const nx::utils::Url& url) { return SocketAddress(url.host(), url.port(0)); };
+    auto toAddress = [](const nx::utils::Url& url) { return nx::network::SocketAddress(url.host(), url.port(0)); };
 
-    QSet<SocketAddress> ignored;
+    QSet<nx::network::SocketAddress> ignored;
     for (const nx::utils::Url &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
-    QSet<SocketAddress> result;
+    QSet<nx::network::SocketAddress> result;
     for (const auto& address : getNetAddrList())
     {
         if (ignored.contains(address))
@@ -256,7 +256,7 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
 
     for (const nx::utils::Url &url : getAdditionalUrls())
     {
-        SocketAddress address = toAddress(url);
+        nx::network::SocketAddress address = toAddress(url);
         if (ignored.contains(address))
             continue;
         result.insert(address);
@@ -335,7 +335,7 @@ QnStorageResourceList QnMediaServerResource::getStorages() const
     return commonModule()->resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
-void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
+void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& primaryAddress)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -371,7 +371,7 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
     emit primaryAddressChanged(toSharedPointer(this));
 }
 
-SocketAddress QnMediaServerResource::getPrimaryAddress() const
+nx::network::SocketAddress QnMediaServerResource::getPrimaryAddress() const
 {
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
@@ -432,7 +432,7 @@ QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) 
 void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     /* Calculate primary address before the url is changed. */
-    const SocketAddress oldPrimaryAddress = getPrimaryAddress();
+    const nx::network::SocketAddress oldPrimaryAddress = getPrimaryAddress();
     const auto oldApiUrl = getUrl();
 
     base_type::updateInternal(other, notifiers);

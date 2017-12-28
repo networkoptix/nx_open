@@ -9,6 +9,7 @@
 #include "udp_message_response_sender.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
@@ -105,4 +106,5 @@ void UdpServer::ioFailure(SystemError::ErrorCode)
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

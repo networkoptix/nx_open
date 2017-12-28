@@ -81,7 +81,7 @@ private:
     CloudModuleUrlProvider m_cloudModuleUrlProviderDeprecated;
     CloudModuleUrlProvider m_cloudModuleUrlProvider;
 
-    std::unique_ptr<nx_http::AuthMethodRestrictionList> m_authRestrictionList;
+    std::unique_ptr<nx::network::http::AuthMethodRestrictionList> m_authRestrictionList;
     std::unique_ptr<AuthenticationManager> m_authenticationManager;
     std::unique_ptr<AuthorizationManager> m_authorizationManager;
 

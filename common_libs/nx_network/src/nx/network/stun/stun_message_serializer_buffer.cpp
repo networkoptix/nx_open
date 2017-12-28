@@ -5,6 +5,7 @@
 #include <nx/utils/log/assert.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 MessageSerializerBuffer::MessageSerializerBuffer(nx::Buffer* buffer):
@@ -116,4 +117,5 @@ const nx::Buffer* MessageSerializerBuffer::buffer() const
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

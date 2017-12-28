@@ -16,9 +16,6 @@ namespace network {
 class Pollable;
 namespace aio { class AIOThread; }
 
-} // namespace network
-} // namespace nx
-
 class NX_NETWORK_API CommonSocketImpl
 {
 public:
@@ -42,3 +39,6 @@ public:
     CommonSocketImpl();
     virtual ~CommonSocketImpl() = default;
 };
+
+} // namespace network
+} // namespace nx

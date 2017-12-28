@@ -155,7 +155,7 @@ TEST_F(SystemSharingInvitingUser, basic_scenario)
 
     // Setting new password.
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         newAccountEmail.c_str(),
         moduleInfo().realm.c_str(),
         newAccountPassword.c_str()).constData();

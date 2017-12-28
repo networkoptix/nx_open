@@ -37,7 +37,7 @@ public:
 
     bool start()
     {
-        if (!m_serverSocket->bind(SocketAddress(HostAddress::localhost, 0)) ||
+        if (!m_serverSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)) ||
             !m_serverSocket->listen() ||
             !m_serverSocket->setNonBlockingMode(true))
         {
@@ -55,7 +55,7 @@ public:
         return true;
     }
 
-    SocketAddress serverEndpoint() const
+    nx::network::SocketAddress serverEndpoint() const
     {
         return m_serverSocket->getLocalAddress();
     }
@@ -64,7 +64,7 @@ protected:
     struct ConnectResult
     {
         SystemError::ErrorCode errorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
     };
 
@@ -77,8 +77,8 @@ protected:
     };
 
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
-    std::unique_ptr<AbstractStreamSocket> m_controlConnection;
-    std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_controlConnection;
+    std::list<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
 
     std::vector<ConnectContext> startConnections(
         udp::OutgoingTunnelConnection* const tunnelConnection,
@@ -101,7 +101,7 @@ protected:
                 SocketAttributes(),
                 [&connectContext](
                     SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> connection,
+                    std::unique_ptr<nx::network::AbstractStreamSocket> connection,
                     bool stillValid)
             {
                 connectContext.endTime = std::chrono::steady_clock::now();
@@ -135,7 +135,7 @@ private:
 
     void onNewConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> socket)
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket)
     {
         using namespace std::placeholders;
 

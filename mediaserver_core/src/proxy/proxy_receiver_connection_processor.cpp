@@ -6,7 +6,7 @@
 #include <nx/network/http/custom_headers.h>
 
 QnProxyReceiverConnection::QnProxyReceiverConnection(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
     QnTCPConnectionProcessor(socket, owner)
@@ -34,9 +34,9 @@ void QnProxyReceiverConnection::run()
     }
     */
 
-    sendResponse(nx_http::StatusCode::ok, QByteArray());
+    sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
-    auto guid = nx_http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
+    auto guid = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
     auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
     if (owner->registerProxyReceiverConnection(guid, d->socket))
         takeSocket();

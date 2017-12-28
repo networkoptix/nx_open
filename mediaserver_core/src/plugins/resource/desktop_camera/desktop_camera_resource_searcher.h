@@ -32,7 +32,7 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection,
+    void registerCamera(const QSharedPointer<nx::network::AbstractStreamSocket>& connection,
         const QString& userName,
         const QString& uniqueId);
 

@@ -21,7 +21,7 @@ class OutgoingTunnelPool;
 class CloudConnectSettings;
 namespace tcp { class ReverseConnectionPool; }
 
-struct CloudConnectControllerImpl;
+struct NX_NETWORK_API CloudConnectControllerImpl;
 
 class NX_NETWORK_API CloudConnectController
 {

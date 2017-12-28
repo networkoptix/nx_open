@@ -99,7 +99,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
 
     if (!m_rateControlEnabled)
-        m_rtpReader.addRequestHeader(lit("PLAY"), nx_http::HttpHeader("Rate-Control", "no"));
+        m_rtpReader.addRequestHeader(lit("PLAY"), nx::network::http::HttpHeader("Rate-Control", "no"));
 
     m_rtpReader.setRequest(streamUrlString);
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);

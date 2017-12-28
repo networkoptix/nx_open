@@ -3,7 +3,9 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace header {
 namespace test {
 
@@ -76,4 +78,6 @@ TEST_F(HttpHeaderStrictTransportSecurity, parse_ignores_unknown_attributes)
 
 } // namespace test
 } // namespace header
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

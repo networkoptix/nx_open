@@ -22,7 +22,7 @@ static const char* const kTestRequestPath = "ProxyUsingRelayingTest";
 
 class ProxyUsingRelaying:
     public BasicComponentTest,
-    public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public network::server::StreamConnectionHolder<nx::network::http::AsyncMessagePipeline>
 {
 public:
     ProxyUsingRelaying():
@@ -52,7 +52,7 @@ protected:
 
     void whenIssueProxyRequest()
     {
-        m_httpClient = std::make_unique<nx_http::AsyncClient>();
+        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
         m_httpClient->doGet(nx::network::url::Builder(m_baseUrl)
             .appendPath(lm("/%1/%2").arg(m_peerName).arg(kTestRequestPath)));
     }
@@ -70,7 +70,7 @@ protected:
         ASSERT_TRUE(m_prevAcceptedConnection->setRecvTimeout(
             std::chrono::milliseconds::zero()));
 
-        m_serverConnection = std::make_unique<nx_http::AsyncMessagePipeline>(
+        m_serverConnection = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             this,
             std::make_unique<nx::network::deprecated::SslSocket>(
                 std::move(m_prevAcceptedConnection),
@@ -87,18 +87,18 @@ private:
     {
         relay::api::ResultCode resultCode;
         relay::api::BeginListeningResponse response;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
     };
 
     std::unique_ptr<nx::network::cloud::relay::ConnectionAcceptor> m_relayConnectionAcceptor;
     nx::utils::Url m_baseUrl;
     nx::String m_peerName;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    std::unique_ptr<nx_http::AsyncMessagePipeline> m_serverConnection;
-    nx::utils::SyncQueue<nx_http::Message> m_receivedMessageQueue;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_serverConnection;
+    nx::utils::SyncQueue<nx::network::http::Message> m_receivedMessageQueue;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosureReasons;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
-    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
+    nx::utils::SyncQueue<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedConnections;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_prevAcceptedConnection;
 
     virtual void SetUp() override
     {
@@ -107,7 +107,7 @@ private:
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_baseUrl = nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint())
+            .setScheme(nx::network::http::kUrlSchemeName).setEndpoint(endpoint())
             .setPath(nx::cloud::gateway::kApiPathPrefix).toUrl();
 
         auto relayUrl = m_baseUrl;
@@ -121,19 +121,19 @@ private:
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* /*connection*/) override
+        nx::network::http::AsyncMessagePipeline* /*connection*/) override
     {
         m_connectionClosureReasons.push(closeReason);
     }
 
-    void saveMessageReceived(nx_http::Message message)
+    void saveMessageReceived(nx::network::http::Message message)
     {
         m_receivedMessageQueue.push(std::move(message));
     }
 
     void saveAcceptedConnection(
         SystemError::ErrorCode /*systemErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> connection)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
         m_acceptedConnections.push(std::move(connection));
     }

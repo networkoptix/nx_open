@@ -56,6 +56,8 @@ static QList<QHostAddress> allowedInterfaces;
 
 } // namespace
 
+namespace nx {
+namespace network {
 
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
@@ -859,3 +861,6 @@ QString getMacFromPrimaryIF()
         return QString();
     return QString::fromLatin1(mac);
 }
+
+} // namespace network
+} // namespace nx

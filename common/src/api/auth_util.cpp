@@ -3,19 +3,19 @@
 #include <nx/network/app_info.h>
 
 void AuthKey::calcResponse(
-    const nx_http::AuthToken& authToken,
-    nx_http::Method::ValueType httpMethod,
+    const nx::network::http::AuthToken& authToken,
+    nx::network::http::Method::ValueType httpMethod,
     const nx::String& url)
 {
     const auto ha1 =
-        authToken.type == nx_http::AuthTokenType::ha1
+        authToken.type == nx::network::http::AuthTokenType::ha1
         ? authToken.value
-        : nx_http::calcHa1(
+        : nx::network::http::calcHa1(
             username,
             nx::network::AppInfo::realm().toUtf8(),
             authToken.value);
-    const auto ha2 = nx_http::calcHa2(httpMethod, url);
-    response = nx_http::calcResponse(ha1, nonce, ha2);
+    const auto ha2 = nx::network::http::calcHa2(httpMethod, url);
+    response = nx::network::http::calcResponse(ha1, nonce, ha2);
 }
 
 nx::String AuthKey::toString() const
@@ -36,8 +36,8 @@ bool AuthKey::parse(const nx::String& str)
 }
 
 bool AuthKey::verify(
-    const nx_http::AuthToken& authToken,
-    nx_http::Method::ValueType httpMethod,
+    const nx::network::http::AuthToken& authToken,
+    nx::network::http::Method::ValueType httpMethod,
     const nx::String& url)
 {
     AuthKey key2(*this);

@@ -12,8 +12,10 @@ ConnectionRequestedEvent::ConnectionRequestedEvent():
 {
 }
 
-void ConnectionRequestedEvent::serializeAttributes(nx::stun::Message* const message)
+void ConnectionRequestedEvent::serializeAttributes(nx::network::stun::Message* const message)
 {
+    using namespace nx::network;
+
     message->newAttribute<stun::extension::attrs::ConnectionId>(std::move(connectSessionId));
     message->newAttribute<stun::extension::attrs::PeerId>(std::move(originatingPeerID));
     message->newAttribute<stun::extension::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
@@ -24,8 +26,10 @@ void ConnectionRequestedEvent::serializeAttributes(nx::stun::Message* const mess
     message->addAttribute(stun::extension::attrs::isPersistent, isPersistent);
 }
 
-bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
+bool ConnectionRequestedEvent::parseAttributes(const nx::network::stun::Message& message)
 {
+    using namespace nx::network;
+
     if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 

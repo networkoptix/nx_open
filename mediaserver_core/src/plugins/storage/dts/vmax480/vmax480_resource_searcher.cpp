@@ -33,14 +33,14 @@ QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
 }
 
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
-                                                const SocketAddress& deviceEndpoint,
-                                                const nx_upnp::DeviceInfo& devInfo,
+                                                const nx::network::SocketAddress& deviceEndpoint,
+                                                const nx::network::upnp::DeviceInfo& devInfo,
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
     Q_UNUSED(discoveryAddr)
 
-    QnMacAddress mac(devInfo.serialNumber);
+    nx::network::QnMacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;

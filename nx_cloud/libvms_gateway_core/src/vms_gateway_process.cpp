@@ -55,7 +55,7 @@ VmsGatewayProcess::~VmsGatewayProcess()
     }
 }
 
-const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
+const std::vector<network::SocketAddress>& VmsGatewayProcess::httpEndpoints() const
 {
     return m_httpEndpoints;
 }
@@ -70,7 +70,7 @@ const relaying::RelayEngine& VmsGatewayProcess::relayEngine() const
     return *m_relayEngine;
 }
 
-void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
+void VmsGatewayProcess::enforceSslFor(const network::SocketAddress& targetAddress, bool enabled)
 {
     m_runTimeOptions.enforceSsl(targetAddress, enabled);
 }
@@ -109,10 +109,10 @@ int VmsGatewayProcess::serviceMain(
             attrNameSet,
             settings.auth().rulesXmlPath);
 
-        nx_http::server::rest::MessageDispatcher httpMessageDispatcher;
+        nx::network::http::server::rest::MessageDispatcher httpMessageDispatcher;
 
         // TODO: #ak Move following to stree xml.
-        nx_http::AuthMethodRestrictionList authRestrictionList;
+        nx::network::http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(
             authRestrictionList,
@@ -123,7 +123,7 @@ int VmsGatewayProcess::serviceMain(
             &httpMessageDispatcher);
         m_relayEngine = &relayEngine;
 
-        nx_http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
+        nx::network::http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
             std::make_unique<UrlRewriter>());
         registerApiHandlers(
             settings,
@@ -139,7 +139,7 @@ int VmsGatewayProcess::serviceMain(
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
-       network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+       network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
@@ -179,7 +179,7 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
     {
         nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
-                .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
+                .setEndpoint(network::SocketAddress(settings.general().mediatorEndpoint)).toUrl());
         nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
@@ -253,10 +253,10 @@ void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
     relaying::RelayEngine* relayEngine,
-    nx_http::server::rest::MessageDispatcher* const msgDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* const msgDispatcher)
 {
     msgDispatcher->registerRequestProcessor<ProxyHandler>(
-        nx_http::kAnyPath,
+        nx::network::http::kAnyPath,
         [&settings, &runTimeOptions, relayEngine]() -> std::unique_ptr<ProxyHandler>
         {
             return std::make_unique<ProxyHandler>(
@@ -271,12 +271,12 @@ void VmsGatewayProcess::registerApiHandlers(
             "please see implementation TODOs");
 
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
-            nx_http::kAnyPath,
+            nx::network::http::kAnyPath,
             [&settings]() -> std::unique_ptr<ConnectHandler>
             {
                 return std::make_unique<ConnectHandler>(settings);
             },
-            nx_http::StringType("CONNECT"));
+            nx::network::http::StringType("CONNECT"));
     }
 
     msgDispatcher->addModRewriteRule(

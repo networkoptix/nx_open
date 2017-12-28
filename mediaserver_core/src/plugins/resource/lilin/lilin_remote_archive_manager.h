@@ -59,8 +59,8 @@ private:
         end
     };
 
-    std::unique_ptr<nx_http::HttpClient> initHttpClient() const;
-    boost::optional<nx_http::BufferType> doRequest(const QString& requestPath, bool expectOnlyBody = false);
+    std::unique_ptr<nx::network::http::HttpClient> initHttpClient() const;
+    boost::optional<nx::network::http::BufferType> doRequest(const QString& requestPath, bool expectOnlyBody = false);
 
     boost::optional<int64_t> getRecordingBound(RecordingBound bound);
     boost::optional<int64_t> getRecordingStart();

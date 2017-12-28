@@ -19,8 +19,8 @@ CreateClientSessionHandler::CreateClientSessionHandler(
 }
 
 void CreateClientSessionHandler::prepareRequestData(
-    nx_http::HttpServerConnection* const /*connection*/,
-    const nx_http::Request& /*httpRequest*/,
+    nx::network::http::HttpServerConnection* const /*connection*/,
+    const nx::network::http::Request& /*httpRequest*/,
     api::CreateClientSessionRequest* request)
 {
     request->targetPeerName = requestPathParams()[0].toStdString();
@@ -40,8 +40,8 @@ ConnectToPeerHandler::ConnectToPeerHandler(
 }
 
 controller::ConnectToPeerRequestEx ConnectToPeerHandler::prepareRequestData(
-    nx_http::HttpServerConnection* const connection,
-    const nx_http::Request& /*httpRequest*/)
+    nx::network::http::HttpServerConnection* const connection,
+    const nx::network::http::Request& /*httpRequest*/)
 {
     controller::ConnectToPeerRequestEx inputData;
     inputData.clientEndpoint = connection->socket()->getForeignAddress();

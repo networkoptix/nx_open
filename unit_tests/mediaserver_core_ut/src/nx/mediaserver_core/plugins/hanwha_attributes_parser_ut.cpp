@@ -22,7 +22,7 @@ struct HanwhaAttributesParser: ::testing::Test
 
     void shortTest(const QString& data)
     {
-        attributes = HanwhaAttributes(data, nx_http::StatusCode::ok);
+        attributes = HanwhaAttributes(data, nx::network::http::StatusCode::ok);
         ASSERT_TRUE(attributes.isValid());
 
         ASSERT_EQ("16", attrValue("System/MaxChannel"));
@@ -30,7 +30,7 @@ struct HanwhaAttributesParser: ::testing::Test
 
     void longTest(const QString& data)
     {
-        attributes = HanwhaAttributes(data, nx_http::StatusCode::ok);
+        attributes = HanwhaAttributes(data, nx::network::http::StatusCode::ok);
         ASSERT_TRUE(attributes.isValid());
 
         ASSERT_EQ("True",  attrValue("System/ISPVersion"));

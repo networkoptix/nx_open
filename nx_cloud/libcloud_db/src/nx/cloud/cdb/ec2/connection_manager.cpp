@@ -83,11 +83,11 @@ ConnectionManager::~ConnectionManager()
 }
 
 void ConnectionManager::createTransactionConnection(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer authInfo,
-    nx_http::Request request,
-    nx_http::Response* const response,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     // GET /ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
     //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
@@ -99,7 +99,7 @@ void ConnectionManager::createTransactionConnection(
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")
             .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     ConnectionRequestAttributes connectionRequestAttributes;
@@ -110,7 +110,7 @@ void ConnectionManager::createTransactionConnection(
             .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
             .arg(connection->socket()->getForeignAddress()),
             cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     if (!isProtocolVersionCompatible(connectionRequestAttributes.remotePeerProtocolVersion))
@@ -121,7 +121,7 @@ void ConnectionManager::createTransactionConnection(
             .arg(connection->socket()->getForeignAddress())
             .arg(connectionRequestAttributes.remotePeerProtocolVersion),
             cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     NX_LOGX(QnLog::EC2_TRAN_LOG,
@@ -154,7 +154,7 @@ void ConnectionManager::createTransactionConnection(
             .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
             .arg(connection->socket()->getForeignAddress()).arg(connectionRequestAttributes.connectionId),
             cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::forbidden);
+        return completionHandler(nx::network::http::StatusCode::forbidden);
     }
 
     auto requestResult =
@@ -165,11 +165,11 @@ void ConnectionManager::createTransactionConnection(
 }
 
 void ConnectionManager::createWebsocketTransactionConnection(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer authInfo,
-    nx_http::Request request,
-    nx_http::Response* const response,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
     using namespace nx::network;
@@ -182,7 +182,7 @@ void ConnectionManager::createWebsocketTransactionConnection(
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createWebsocketTransactionConnection request without systemId from peer %1")
             .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
     const nx::String systemIdLocal(systemId.c_str());
 
@@ -198,10 +198,10 @@ void ConnectionManager::createWebsocketTransactionConnection(
             .arg(connection->socket()->getForeignAddress())
             .arg((int) error),
             cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    nx_http::RequestResult result(nx_http::StatusCode::switchingProtocols);
+    nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
         std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
             _1, std::move(remotePeerInfo), std::move(authInfo), std::move(systemIdLocal));
@@ -209,18 +209,18 @@ void ConnectionManager::createWebsocketTransactionConnection(
 }
 
 void ConnectionManager::pushTransaction(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx_http::Request request,
-    nx_http::Response* const /*response*/,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const /*response*/,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     const auto path = request.requestLine.url.path();
     if (!path.startsWith(api::kPushEc2TransactionPath + lit("/")) &&
         // TODO: #ak remove (together with the constant) after 3.0 release.
         !path.startsWith(api::kDeprecatedPushEc2TransactionPath + lit("/")))
     {
-        return completionHandler(nx_http::StatusCode::notFound);
+        return completionHandler(nx::network::http::StatusCode::notFound);
     }
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
@@ -231,7 +231,7 @@ void ConnectionManager::pushTransaction(
             .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME),
             cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
     const auto connectionId = connectionIdIter->second;
 
@@ -246,14 +246,14 @@ void ConnectionManager::pushTransaction(
             .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
             .arg(connectionId),
             cl_logDEBUG1);
-        return completionHandler(nx_http::StatusCode::notFound);
+        return completionHandler(nx::network::http::StatusCode::notFound);
     }
 
     auto transactionTransport =
         dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
     if (!transactionTransport)
     {
-        return completionHandler(nx_http::StatusCode::badRequest);
+        return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     NX_LOGX(QnLog::EC2_TRAN_LOG,
@@ -271,7 +271,7 @@ void ConnectionManager::pushTransaction(
                 std::move(request.messageBody));
         });
 
-    completionHandler(nx_http::StatusCode::ok);
+    completionHandler(nx::network::http::StatusCode::ok);
 }
 
 void ConnectionManager::dispatchTransaction(
@@ -610,7 +610,7 @@ void ConnectionManager::onTransactionDone(
 }
 
 bool ConnectionManager::fetchDataFromConnectRequest(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     ConnectionRequestAttributes* connectionRequestAttributes)
 {
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
@@ -618,7 +618,7 @@ bool ConnectionManager::fetchDataFromConnectRequest(
         return false;
     connectionRequestAttributes->connectionId = connectionIdIter->second;
 
-    if (!nx_http::readHeader(
+    if (!nx::network::http::readHeader(
             request.headers,
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
             &connectionRequestAttributes->remotePeerProtocolVersion))
@@ -656,7 +656,7 @@ bool ConnectionManager::fetchDataFromConnectRequest(
     auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
     if (acceptEncodingHeaderIter != request.headers.end())
     {
-        nx_http::header::AcceptEncodingHeader acceptEncodingHeader(
+        nx::network::http::header::AcceptEncodingHeader acceptEncodingHeader(
             acceptEncodingHeaderIter->second);
         if (acceptEncodingHeader.encodingIsAllowed("identity"))
             connectionRequestAttributes->contentEncoding = "identity";
@@ -696,9 +696,9 @@ void ConnectionManager::processSpecialTransaction(
     }
 }
 
-nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionConnection(
+nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionConnection(
     const ConnectionRequestAttributes& connectionRequestAttributes,
-    nx_http::Response* const response)
+    nx::network::http::Response* const response)
 {
     response->headers.emplace("Content-Type", ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE);
     response->headers.emplace("Content-Encoding", connectionRequestAttributes.contentEncoding);
@@ -714,11 +714,11 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
     response->headers.emplace("X-Nx-Cloud", "true");
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
 
-    nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+    nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, connectionId = connectionRequestAttributes.connectionId](
-            nx_http::HttpServerConnection* connection)
+            nx::network::http::HttpServerConnection* connection)
         {
             QnMutexLocker lk(&m_mutex);
 
@@ -731,13 +731,13 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
             if (transactionTransport)
             {
                 transactionTransport->setOutgoingConnection(
-                    QSharedPointer<AbstractCommunicatingSocket>(\
+                    QSharedPointer<network::AbstractCommunicatingSocket>(\
                         connection->takeSocket().release()));
                 transactionTransport->startOutgoingChannel();
             }
         };
     requestResult.dataSource =
-        std::make_unique<nx_http::EmptyMessageBodySource>(
+        std::make_unique<nx::network::http::EmptyMessageBodySource>(
             ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE,
             boost::none);
 
@@ -745,7 +745,7 @@ nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionCo
 }
 
 void ConnectionManager::onHttpConnectionUpgraded(
-    nx_http::HttpServerConnection* connection,
+    nx::network::http::HttpServerConnection* connection,
     ::ec2::ApiPeerDataEx remotePeerInfo,
     nx::utils::stree::ResourceContainer /*authInfo*/,
     const nx::String systemId)

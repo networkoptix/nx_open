@@ -5,6 +5,7 @@
 #include "server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class MessageDispatcher;
@@ -47,4 +48,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

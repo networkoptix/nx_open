@@ -62,13 +62,13 @@ void loadResourcesFromEcs(
         for (const auto &mediaServer : mediaServerList)
         {
             const auto defaultPort = nx::utils::Url(mediaServer.url).port();
-            QList<SocketAddress> addresses;
+            QList<nx::network::SocketAddress> addresses;
             ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses, defaultPort);
 
             QList<nx::utils::Url> additionalAddresses = additionalAddressesById.values(mediaServer.id);
             for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */)
             {
-                const SocketAddress addr(it->host(), it->port(defaultPort));
+                const nx::network::SocketAddress addr(it->host(), it->port(defaultPort));
                 if (addresses.contains(addr))
                     it = additionalAddresses.erase(it);
                 else

@@ -14,7 +14,7 @@ static const int TESTCAM_TIMEOUT = 5 * 1000;
 QnTestCameraStreamReader::QnTestCameraStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res)
 {
-    m_tcpSock = SocketFactory::createStreamSocket();
+    m_tcpSock = nx::network::SocketFactory::createStreamSocket();
     m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
 }
 
@@ -152,7 +152,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCa
 
     if (m_tcpSock->isClosed())
     {
-        m_tcpSock = SocketFactory::createStreamSocket();
+        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
         m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
     }
 

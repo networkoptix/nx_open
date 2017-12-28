@@ -32,7 +32,7 @@ private:
     void setSDPInfo(QByteArray sdpInfo);
 private:
     QnMutex m_controlPortSync;
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     //UDPSocket* m_videoSock;
     //UDPSocket* m_audioSock;
 

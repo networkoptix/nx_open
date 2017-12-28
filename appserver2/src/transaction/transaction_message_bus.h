@@ -50,11 +50,11 @@ public:
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const ApiPeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         std::function<void()> ttFinishCallback,
         const Qn::UserAccessData &userAccessData);
@@ -65,15 +65,15 @@ public:
     */
     void gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         const ApiPeerData &remotePeer,
         qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestBuf);
     //!Process transaction received via standard HTTP server interface
     bool gotTransactionFromRemotePeer(
         const QnUuid& connectionGuid,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestMsgBody);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
     void waitForNewTransactionsReady(const QnUuid& connectionGuid);

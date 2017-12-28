@@ -5,7 +5,9 @@
 #include "http_stream_reader.h"
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Pushes parsed message to the next filter.
@@ -22,10 +24,12 @@ public:
      *   call of the next filter.
      * @return previous http message.
      */
-    nx_http::Message currentMessage() const;
+    nx::network::http::Message currentMessage() const;
 
 private:
-    nx_http::HttpStreamReader m_httpStreamReader;
+    nx::network::http::HttpStreamReader m_httpStreamReader;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

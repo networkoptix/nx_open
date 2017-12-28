@@ -28,7 +28,7 @@ class RelayOutgoingTunnelConnection:
     struct Result
     {
         SystemError::ErrorCode sysErrorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
 
         Result():
@@ -39,7 +39,7 @@ class RelayOutgoingTunnelConnection:
 
         Result(
             SystemError::ErrorCode sysErrorCode,
-            std::unique_ptr<AbstractStreamSocket> connection,
+            std::unique_ptr<nx::network::AbstractStreamSocket> connection,
             bool stillValid)
             :
             sysErrorCode(sysErrorCode),
@@ -228,7 +228,7 @@ private:
     std::chrono::milliseconds m_connectTimeout;
     int m_connectionsToCreateCount;
     boost::optional<std::chrono::milliseconds> m_tunnelInactivityTimeout;
-    std::unique_ptr<AbstractStreamSocket> m_connection;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_connection;
     aio::BasicPollable m_aioThreadBinder;
     nx::network::SocketAttributes m_resultingSocketAttributes;
 
@@ -270,7 +270,7 @@ private:
 
     void onConnectDone(
         SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection,
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         bool stillValid)
     {
         ASSERT_TRUE(m_tunnelConnection->isInSelfAioThread());

@@ -26,7 +26,7 @@ class AbstractTransactionTransport:
 public:
     virtual ~AbstractTransactionTransport() = default;
 
-    virtual SocketAddress remoteSocketAddr() const = 0;
+    virtual network::SocketAddress remoteSocketAddr() const = 0;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) = 0;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) = 0;
     virtual QnUuid connectionGuid() const = 0;

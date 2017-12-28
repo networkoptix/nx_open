@@ -22,12 +22,12 @@ public:
     VmsGatewayEmbeddable(bool isSslEnabled, const QString& certPath = {});
 
     bool isSslEnabled() const;
-    SocketAddress endpoint() const;
-    void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
+    network::SocketAddress endpoint() const;
+    void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
 
 private:
     const bool m_isSslEnabled;
-    SocketAddress m_endpoint;
+    network::SocketAddress m_endpoint;
 };
 
 } // namespace gateway

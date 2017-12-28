@@ -32,7 +32,7 @@ private:
     quint16 m_port;
     QnMutex m_mutex;
     quint32 m_sessionHandle;
-    std::unique_ptr<AbstractStreamSocket> m_eipSocket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_eipSocket;
     bool m_connected;
     char m_recvBuffer[kBufferSize];
 
@@ -41,8 +41,8 @@ private:
     bool initSocket();
     bool connectIfNeeded();
 
-    bool sendAll(AbstractStreamSocket* socket, QByteArray& data);
-    bool receiveMessage(AbstractStreamSocket* socket, char* const buffer);
+    bool sendAll(nx::network::AbstractStreamSocket* socket, QByteArray& data);
+    bool receiveMessage(nx::network::AbstractStreamSocket* socket, char* const buffer);
     void handleSocketError();
 
     bool registerSessionUnsafe();

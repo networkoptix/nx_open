@@ -11,7 +11,7 @@ class Ec2ConnectionProcessor:
 {
 public:
     Ec2ConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     virtual ~Ec2ConnectionProcessor();
@@ -21,7 +21,7 @@ protected:
     virtual void pleaseStop() override;
     bool processRequest(bool noAuth);
     bool authenticate();
-    void addAuthHeader(nx_http::Response& response);
+    void addAuthHeader(nx::network::http::Response& response);
 private:
     QnMutex m_mutex;
     QnTCPConnectionProcessor* m_processor = nullptr;

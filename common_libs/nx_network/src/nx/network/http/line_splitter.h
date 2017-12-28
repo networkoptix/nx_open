@@ -4,7 +4,9 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Splits source bytes stream to lines. Accepts any line ending: CR, LF, CRLF.
@@ -66,4 +68,6 @@ private:
     std::size_t m_dataOffset = 0;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

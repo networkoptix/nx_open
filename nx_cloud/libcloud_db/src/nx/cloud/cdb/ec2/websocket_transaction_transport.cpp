@@ -154,7 +154,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
         m_sendHandshakeDone = true; //< All data are sent.
 }
 
-SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
+network::SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
 {
     return webSocket()->socket()->getForeignAddress();
 }
@@ -212,7 +212,7 @@ int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePee
 }
 
 void WebSocketTransactionTransport::fillAuthInfo(
-    nx_http::AsyncClient* /*httpClient*/,
+    nx::network::http::AsyncClient* /*httpClient*/,
     bool /*authByKey*/)
 {
     NX_ASSERT(0, "This method is used for outgoing connections only. Not implemented");

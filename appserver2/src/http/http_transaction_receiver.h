@@ -23,7 +23,7 @@ namespace ec2
     public:
         QnHttpTransactionReceiver(
             QnTransactionMessageBus* messageBus,
-            QSharedPointer<AbstractStreamSocket> socket,
+            QSharedPointer<nx::network::AbstractStreamSocket> socket,
             QnTcpListener* owner );
         virtual ~QnHttpTransactionReceiver();
 

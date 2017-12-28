@@ -10,7 +10,7 @@ CloudMediaServerEndpointVerificator::CloudMediaServerEndpointVerificator(
     :
     m_connectSessionId(connectSessionId)
 {
-    m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient = nx::network::http::AsyncHttpClient::create();
 
     bindToAioThread(getAioThread());
 }
@@ -29,7 +29,7 @@ void CloudMediaServerEndpointVerificator::setTimeout(
 }
 
 void CloudMediaServerEndpointVerificator::verifyHost(
-    const SocketAddress& endpointToVerify,
+    const nx::network::SocketAddress& endpointToVerify,
     const nx::network::AddressEntry& targetHostAddress,
     nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler)
 {
@@ -55,7 +55,7 @@ SystemError::ErrorCode CloudMediaServerEndpointVerificator::lastSystemErrorCode(
     return m_lastSystemErrorCode;
 }
 
-std::unique_ptr<AbstractStreamSocket> CloudMediaServerEndpointVerificator::takeSocket()
+std::unique_ptr<nx::network::AbstractStreamSocket> CloudMediaServerEndpointVerificator::takeSocket()
 {
     return m_httpClient->takeSocket();
 }
@@ -84,12 +84,12 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
             VerificationResult::ioError);
     }
 
-    if (!nx_http::StatusCode::isSuccessCode(
+    if (!nx::network::http::StatusCode::isSuccessCode(
             m_httpClient->response()->statusLine.statusCode))
     {
         NX_LOGX(lm("cross-nat %1. Http request to %2 has failed: %3")
             .arg(m_connectSessionId).arg(m_endpointToVerify.toString())
-            .arg(nx_http::StatusCode::toString(
+            .arg(nx::network::http::StatusCode::toString(
                 m_httpClient->response()->statusLine.statusCode)),
             cl_logDEBUG2);
         return nx::utils::swapAndCall(
@@ -110,9 +110,9 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
 }
 
 bool CloudMediaServerEndpointVerificator::verifyHostResponse(
-    nx_http::AsyncHttpClientPtr httpClient)
+    nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    const auto contentType = nx_http::getHeaderValue(
+    const auto contentType = nx::network::http::getHeaderValue(
         httpClient->response()->headers, "Content-Type");
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {

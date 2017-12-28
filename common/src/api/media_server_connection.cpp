@@ -333,7 +333,7 @@ QnMediaServerConnection::QnMediaServerConnection(
     m_enableOfflineRequests(enableOfflineRequests)
 {
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
-    nx_http::HttpHeaders extraHeaders;
+    nx::network::http::HttpHeaders extraHeaders;
 
     if (mserver)
     {
@@ -357,7 +357,7 @@ QnMediaServerConnection::QnMediaServerConnection(
         extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
             connection->connectionInfo().ecUrl.userName().toUtf8());
     }
-	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
+	extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
 
@@ -397,7 +397,7 @@ int QnMediaServerConnection::sendAsyncGetRequestLogged(
 
 int QnMediaServerConnection::sendAsyncPostRequestLogged(
     int object,
-    nx_http::HttpHeaders headers,
+    nx::network::http::HttpHeaders headers,
     const QnRequestParamList& params,
     const QByteArray& data,
     const char* replyTypeName,
@@ -423,8 +423,8 @@ int QnMediaServerConnection::checkCameraList(
     for (const QnResourcePtr& c: cameras)
         camList.uniqueIdList << c->getUniqueId();
 
-    nx_http::HttpHeaders headers;
-    headers.emplace(nx_http::header::kContentType, "application/json");
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "application/json");
 
     return sendAsyncPostRequestLogged(checkCamerasObject,
         std::move(headers), QnRequestParamList(), QJson::serialized(camList),
@@ -702,8 +702,8 @@ int QnMediaServerConnection::ptzCreateTourAsync(
     params << QnRequestParam("command", QnLexical::serialized(Qn::CreateTourPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    nx_http::HttpHeaders headers;
-    headers.emplace(nx_http::header::kContentType, "application/json");
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "application/json");
 
     return sendAsyncPostRequestLogged(PtzCreateTourObject,
         std::move(headers), params, QJson::serialized(tour), nullptr, target, slot);
@@ -844,8 +844,8 @@ int QnMediaServerConnection::getSystemIdAsync(QObject* target, const char* slot)
 int QnMediaServerConnection::testEmailSettingsAsync(
     const QnEmailSettings& settings, QObject* target, const char* slot)
 {
-    nx_http::HttpHeaders headers;
-    headers.emplace(nx_http::header::kContentType, "application/json");
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "application/json");
 
     ec2::ApiEmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
@@ -857,8 +857,8 @@ int QnMediaServerConnection::testEmailSettingsAsync(
 int QnMediaServerConnection::testLdapSettingsAsync(
     const QnLdapSettings& settings, QObject* target, const char* slot)
 {
-    nx_http::HttpHeaders headers;
-    headers.emplace(nx_http::header::kContentType, "application/json");
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "application/json");
     return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
         QnRequestParamList(), QJson::serialized(settings),
         QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
@@ -949,8 +949,8 @@ int QnMediaServerConnection::uploadUpdateChunk(
     params << QnRequestParam("updateId", updateId);
     params << QnRequestParam("offset", offset);
 
-    nx_http::HttpHeaders headers;
-    headers.emplace(nx_http::header::kContentType, "text/xml");
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "text/xml");
 
     return sendAsyncPostRequestLogged(InstallUpdateObject,
         std::move(headers), params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);

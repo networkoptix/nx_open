@@ -5,7 +5,7 @@ namespace cloud {
 namespace gateway {
 namespace conf {
 
-void RunTimeOptions::enforceSsl(const SocketAddress& address, bool enabled)
+void RunTimeOptions::enforceSsl(const network::SocketAddress& address, bool enabled)
 {
     QnMutexLocker lock(&m_mutex);
     if (enabled)
@@ -14,7 +14,7 @@ void RunTimeOptions::enforceSsl(const SocketAddress& address, bool enabled)
         m_enforcedSslAddresses.erase(address);
 }
 
-bool RunTimeOptions::isSslEnforced(const SocketAddress& address) const
+bool RunTimeOptions::isSslEnforced(const network::SocketAddress& address) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_enforcedSslAddresses.find(address) != m_enforcedSslAddresses.end();

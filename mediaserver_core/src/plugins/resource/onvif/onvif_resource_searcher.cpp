@@ -164,7 +164,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
     if (!typePtr)
         return resList;
 
-    const int onvifPort = url.port(nx_http::DEFAULT_HTTP_PORT);
+    const int onvifPort = url.port(nx::network::http::DEFAULT_HTTP_PORT);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));

@@ -35,5 +35,5 @@ private:
     bool authorize(
         const Qn::UserAccessData& accessRights,
         QnJsonRestResult* result,
-        nx_http::StatusCode::Value* const authorizationStatusCode);
+        nx::network::http::StatusCode::Value* const authorizationStatusCode);
 };

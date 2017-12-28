@@ -9,7 +9,7 @@ namespace discovery {
 
 static const int kMaxDatagramSize(1500); //< Expected MTU size with a little reserve.
 
-const SocketAddress UdpMulticastFinder::kMulticastEndpoint("239.255.11.11:5008");
+const nx::network::SocketAddress UdpMulticastFinder::kMulticastEndpoint("239.255.11.11:5008");
 const std::chrono::milliseconds UdpMulticastFinder::kUpdateInterfacesInterval = std::chrono::minutes(1);
 const std::chrono::milliseconds UdpMulticastFinder::kSendInterval = std::chrono::seconds(10);
 
@@ -23,7 +23,7 @@ UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread):
     m_inData.reserve(kMaxDatagramSize);
 }
 
-void UdpMulticastFinder::setMulticastEndpoint(SocketAddress endpoint)
+void UdpMulticastFinder::setMulticastEndpoint(nx::network::SocketAddress endpoint)
 {
     m_multicastEndpoint = std::move(endpoint);
 }
@@ -70,8 +70,8 @@ void UdpMulticastFinder::stopWhileInAioThread()
 
 void UdpMulticastFinder::updateInterfaces()
 {
-    std::set<HostAddress> localIpList;
-    for (const auto& ip: getLocalIpV4AddressList())
+    std::set<nx::network::HostAddress> localIpList;
+    for (const auto& ip: nx::network::getLocalIpV4AddressList())
         localIpList.insert(ip);
 
     NX_LOGX(lm("Update interfaces to %1").container(localIpList), cl_logDEBUG1);
@@ -105,7 +105,7 @@ void UdpMulticastFinder::updateInterfaces()
 
     if (!m_receiver)
     {
-        m_receiver = makeSocket({HostAddress::anyHost, m_multicastEndpoint.port});
+        m_receiver = makeSocket({nx::network::HostAddress::anyHost, m_multicastEndpoint.port});
         for (const auto& ip: localIpList)
             joinMulticastGroup(ip);
 
@@ -125,7 +125,7 @@ void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool(
         });
 }
 
-std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const SocketAddress& endpoint)
+std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const nx::network::SocketAddress& endpoint)
 {
     auto socket = std::make_unique<network::UDPSocket>();
     socket->bindToAioThread(getAioThread());
@@ -143,7 +143,7 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const SocketA
     return nullptr;
 }
 
-void UdpMulticastFinder::joinMulticastGroup(const HostAddress& ip)
+void UdpMulticastFinder::joinMulticastGroup(const nx::network::HostAddress& ip)
 {
     if (!m_receiver)
         return; //< Will be fixed in updateInterfaces().
@@ -166,7 +166,7 @@ void UdpMulticastFinder::receiveModuleInformation()
 
     m_inData.resize(0);
     m_receiver->recvFromAsync(&m_inData,
-        [this](SystemError::ErrorCode code, SocketAddress endpoint, size_t /*size*/)
+        [this](SystemError::ErrorCode code, nx::network::SocketAddress endpoint, size_t /*size*/)
         {
             if (code != SystemError::noError)
             {
@@ -206,7 +206,7 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
     }
 
     socket->sendToAsync(m_ownModuleInformation, m_multicastEndpoint,
-        [this, senderIterator, socket](SystemError::ErrorCode code, SocketAddress, size_t)
+        [this, senderIterator, socket](SystemError::ErrorCode code, nx::network::SocketAddress, size_t)
         {
             if (code == SystemError::noError)
             {

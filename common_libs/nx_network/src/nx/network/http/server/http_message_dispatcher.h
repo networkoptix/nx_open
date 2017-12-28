@@ -11,9 +11,11 @@
 #include "http_server_exact_path_matcher.h"
 #include "http_server_connection.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
-static const nx_http::StringType kAnyMethod;
+static const nx::network::http::StringType kAnyMethod;
 static const QString kAnyPath;
 
 template<typename Value>
@@ -46,12 +48,12 @@ public:
     template<class CompletionFuncRefType>
     bool dispatchRequest(
         HttpServerConnection* const connection,
-        nx_http::Message message,
+        nx::network::http::Message message,
         nx::utils::stree::ResourceContainer authInfo,
         CompletionFuncRefType completionFunc) const
     {
-        NX_ASSERT(message.type == nx_http::MessageType::request);
-        nx_http::RequestLine& request = message.request->requestLine;
+        NX_ASSERT(message.type == nx::network::http::MessageType::request);
+        nx::network::http::RequestLine& request = message.request->requestLine;
         applyModRewrite(&request.url);
 
         auto handler = getHandler(request.method, request.url.path());
@@ -62,8 +64,8 @@ public:
         return handlerPtr->processRequest(
             connection, std::move(message), std::move(authInfo),
             [handler = std::move(handler), completionFunc = std::move(completionFunc)](
-                nx_http::Message message,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource,
+                nx::network::http::Message message,
+                std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
                 ConnectionEvents connectionEvents) mutable
             {
                 completionFunc(
@@ -96,7 +98,7 @@ public:
     bool registerRequestProcessor(
         const QString& path,
         std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc,
-        const nx_http::StringType& method = kAnyMethod)
+        const nx::network::http::StringType& method = kAnyMethod)
     {
         NX_ASSERT(factoryFunc);
         PathMatchContext& pathMatchContext = m_factories[method];
@@ -114,7 +116,7 @@ public:
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
         const QString& path = kAnyPath,
-        const nx_http::StringType& method = kAnyMethod)
+        const nx::network::http::StringType& method = kAnyMethod)
     {
         return registerRequestProcessor<RequestHandlerType>(
             path,
@@ -138,7 +140,7 @@ private:
     };
 
     std::map<QString, QString> m_rewritePrefixes;
-    std::map<nx_http::StringType /*method*/, PathMatchContext> m_factories;
+    std::map<nx::network::http::StringType /*method*/, PathMatchContext> m_factories;
 
     virtual void applyModRewrite(nx::utils::Url* url) const override
     {
@@ -195,4 +197,6 @@ class MessageDispatcher:
 {
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

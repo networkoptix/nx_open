@@ -52,11 +52,11 @@ static void loadRemoteDataAsync(
 {
     auto requestCompletionFunc =
         [ctx, &outputData, server, requestNum, timer](
-            SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+            SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody)
         {
             MultiServerPeriodDataList remoteData;
             bool success = false;
-            if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+            if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
             {
                 remoteData = QnCompressedTime::deserialized(
                     msgBody, MultiServerPeriodDataList(), &success);
@@ -204,7 +204,7 @@ int QnMultiserverChunksRestHandler::executeGet(
     {
         restResult.setError(QnRestResult::InvalidParameter, "Invalid parameters");
         QnFusionRestHandlerDetail::serializeRestReply(outputData, params, result, contentType, restResult);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     outputData = loadDataSync(request, owner, requestNum, timer);
     NX_VERBOSE(kTag) << " In progress request QnMultiserverChunksRestHandler::executeGet #"
@@ -246,5 +246,5 @@ int QnMultiserverChunksRestHandler::executeGet(
     NX_VERBOSE(kTag) << "Finish executing request QnMultiserverChunksRestHandler::executeGet #"
         << requestNum << ". timeout=" << timer.elapsed();
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

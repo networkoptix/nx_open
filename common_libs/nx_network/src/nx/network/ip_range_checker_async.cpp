@@ -85,13 +85,13 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         return false;  //all ip addresses are being scanned at the moment
     quint32 ipToCheck = m_nextIPToCheck++;
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
         this, &QnIpRangeCheckerAsync::onDone,
         Qt::DirectConnection);
     connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnIpRangeCheckerAsync::onDone,
         Qt::DirectConnection);
     httpClient->doGet(nx::utils::Url(lit("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan)));
@@ -99,11 +99,11 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
     return true;
 }
 
-void QnIpRangeCheckerAsync::onDone(nx_http::AsyncHttpClientPtr httpClient)
+void QnIpRangeCheckerAsync::onDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     QnMutexLocker lk(&m_mutex);
 
-    std::set<nx_http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find(httpClient);
+    std::set<nx::network::http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find(httpClient);
     NX_ASSERT(it != m_socketsBeingScanned.end());
     if (httpClient->bytesRead() > 0)
         m_openedIPs.push_back(httpClient->url().host());

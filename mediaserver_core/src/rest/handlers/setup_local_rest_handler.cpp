@@ -62,7 +62,7 @@ int QnSetupLocalSystemRestHandler::execute(
         owner->authSession(),
         data,
         &result);
-    if (resultCode != nx_http::StatusCode::ok)
+    if (resultCode != nx::network::http::StatusCode::ok)
         return resultCode;
 
     if (auto admin = setupSystemProcessor.getModifiedLocalAdmin())

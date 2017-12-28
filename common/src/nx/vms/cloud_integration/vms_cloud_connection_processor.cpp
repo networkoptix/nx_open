@@ -40,18 +40,18 @@ void VmsCloudConnectionProcessor::setSystemSettingsProcessor(
     m_systemSettingsProcessor = systemSettingsProcessor;
 }
 
-nx_http::StatusCode::Value VmsCloudConnectionProcessor::bindSystemToCloud(
+nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::bindSystemToCloud(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
     if (!validateInputData(data, result))
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     if (!checkInternetConnection(result))
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     if (!saveCloudData(data, result))
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
 
     // Trying to connect to the cloud to activate system.
     // We connect to the cloud after saving properties to DB because
@@ -63,16 +63,16 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::bindSystemToCloud(
     if (!fetchNecessaryDataFromCloud(data, result))
     {
         if (rollback())
-            return nx_http::StatusCode::serviceUnavailable;
+            return nx::network::http::StatusCode::serviceUnavailable;
         else
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
     }
 
     result->setError(QnJsonRestResult::NoError);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
-nx_http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
+nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
     const QnAuthSession& authSession,
     const SetupCloudSystemData& data,
     QnJsonRestResult* result)
@@ -82,20 +82,20 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
         result->setError(
             QnJsonRestResult::Forbidden,
             lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     QString newSystemName = data.systemName;
     if (newSystemName.isEmpty())
     {
         result->setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     }
 
     if (!m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(m_commonModule->moduleGUID()))
     {
         result->setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error."));
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     const auto systemNameBak = m_commonModule->globalSettings()->systemName();
@@ -110,11 +110,11 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
     
-    const nx_http::StatusCode::Value httpResult = bindSystemToCloud(data, result);
-    if (!nx_http::StatusCode::isSuccessCode(httpResult))
+    const nx::network::http::StatusCode::Value httpResult = bindSystemToCloud(data, result);
+    if (!nx::network::http::StatusCode::isSuccessCode(httpResult))
     {
         // Changing system name back.
         m_commonModule->globalSettings()->setSystemName(systemNameBak);
@@ -135,7 +135,7 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
             &errStr))
     {
         result->setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     std::unique_ptr<nx::vms::utils::SystemSettingsProcessor> defaultSystemSettingsProcessor;
@@ -160,10 +160,10 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
         NX_WARNING(this, lm("Failed to write system settings"));
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
-nx_http::StatusCode::Value VmsCloudConnectionProcessor::detachFromCloud(
+nx::network::http::StatusCode::Value VmsCloudConnectionProcessor::detachFromCloud(
     const DetachFromCloudData& data,
     DetachFromCloudReply* result)
 {
@@ -173,7 +173,7 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::detachFromCloud(
             .arg(m_commonModule->globalSettings()->cloudSystemId()), cl_logDEBUG1);
         *result = DetachFromCloudReply(
             DetachFromCloudReply::ResultCode::invalidPasswordData);
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     auto adminUser = m_commonModule->resourcePool()->getAdministrator();
@@ -188,7 +188,7 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::detachFromCloud(
                 .arg(m_commonModule->globalSettings()->cloudSystemId()), cl_logDEBUG1);
             *result = DetachFromCloudReply(
                 DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials);
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
         }
     }
     else
@@ -208,7 +208,7 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::detachFromCloud(
                 .arg(m_commonModule->globalSettings()->cloudSystemId()), cl_logDEBUG1);
             *result = DetachFromCloudReply(
                 DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials);
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
         }
     }
 
@@ -242,13 +242,13 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::detachFromCloud(
         m_errorDescription = lit("Failed to save cloud credentials to local DB");
         *result = DetachFromCloudReply(
             DetachFromCloudReply::ResultCode::cannotCleanUpCloudDataInLocalDb);
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     NX_LOGX(lm("Successfully detached from cloud. cloudSystemId %1")
         .arg(m_commonModule->globalSettings()->cloudSystemId()), cl_logDEBUG2);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 QString VmsCloudConnectionProcessor::errorDescription() const

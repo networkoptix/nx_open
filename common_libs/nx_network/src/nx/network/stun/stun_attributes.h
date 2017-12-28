@@ -9,6 +9,7 @@
 #include "stun_message_serializer_buffer.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 namespace error {
@@ -233,4 +234,5 @@ struct NX_NETWORK_API IntAttribute: Unknown
 } // namespace attrs
 
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -264,7 +264,7 @@ void nx::SystemName::loadFromConfig()
 
 void nx::SystemName::resetToDefault()
 {
-    m_value = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(getMacFromPrimaryIF());
+    m_value = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(nx::network::getMacFromPrimaryIF());
 }
 
 bool nx::SystemName::isDefault() const

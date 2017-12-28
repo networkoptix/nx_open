@@ -22,8 +22,8 @@ class QnTCPConnectionProcessor;
 namespace ec2 {
 
 using ProcessorHandler = std::function<
-    nx_http::StatusCode::Value(
-        const nx_http::Request&,
+    nx::network::http::StatusCode::Value(
+        const nx::network::http::Request&,
         QnHttpConnectionListener* owner,
         QnJsonRestResult* result)>;
 
@@ -33,7 +33,7 @@ class JsonConnectionProcessor:
 public:
     JsonConnectionProcessor(
         ProcessorHandler handler,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     virtual void run() override;
@@ -57,12 +57,12 @@ public:
 
     ~QnSimpleHttpConnectionListener();
 
-    bool needAuth(const nx_http::Request& request) const;
+    bool needAuth(const nx::network::http::Request& request) const;
     void disableAuthForPath(const QString& path);
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override;
+        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
 
 private:
     QSet<QString> m_disableAuthPrefixes;

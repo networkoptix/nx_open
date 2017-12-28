@@ -39,20 +39,20 @@ public:
     void bind();
     void listen();
 
-    std::vector<SocketAddress> endpoints() const;
+    std::vector<network::SocketAddress> endpoints() const;
 
 private:
     template<typename ManagerType>
     class CustomHttpHandler:
-        public nx_http::AbstractHttpRequestHandler
+        public nx::network::http::AbstractHttpRequestHandler
     {
     public:
         typedef void (ManagerType::*ManagerFuncType)(
-            nx_http::HttpServerConnection* const connection,
+            nx::network::http::HttpServerConnection* const connection,
             nx::utils::stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::RequestProcessedHandler completionHandler);
+            nx::network::http::Request request,
+            nx::network::http::Response* const response,
+            nx::network::http::RequestProcessedHandler completionHandler);
 
         CustomHttpHandler(
             ManagerType* manager,
@@ -65,11 +65,11 @@ private:
 
     protected:
         virtual void processRequest(
-            nx_http::HttpServerConnection* const connection,
+            nx::network::http::HttpServerConnection* const connection,
             nx::utils::stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::RequestProcessedHandler completionHandler) override
+            nx::network::http::Request request,
+            nx::network::http::Response* const response,
+            nx::network::http::RequestProcessedHandler completionHandler) override
         {
             (m_manager->*m_managerFuncPtr)(
                 connection,
@@ -86,8 +86,8 @@ private:
 
     const conf::Settings& m_settings;
     Controller* m_controller;
-    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
-    nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> m_multiAddressHttpServer;
+    nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer> m_multiAddressHttpServer;
 
     void registerApiHandlers(
         const AuthorizationManager& authorizationManager,
@@ -132,7 +132,7 @@ private:
 
     template<typename ManagerType>
     void registerHttpHandler(
-        nx_http::Method::ValueType method,
+        nx::network::http::Method::ValueType method,
         const char* handlerPath,
         typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
         ManagerType* manager);
@@ -140,13 +140,13 @@ private:
     /**
      * @param handler is
      * void(const AuthorizationInfo& authzInfo,
-     *     const std::vector<nx_http::StringType>& restPathParams,
+     *     const std::vector<nx::network::http::StringType>& restPathParams,
      *     InputData inputData,
      *     std::function<void(api::ResultCode)> completionHandler);
      */
     template<typename InputData, typename HandlerType>
     void registerWriteOnlyRestHandler(
-        nx_http::Method::ValueType method,
+        nx::network::http::Method::ValueType method,
         const char* handlerPath,
         EntityType entityType,
         DataActionType dataActionType,

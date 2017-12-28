@@ -8,9 +8,15 @@
 
 #include "auth_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
+
 class AuthMethodRestrictionList;
-} // namespace nx_http
+
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 namespace cdb {
@@ -28,34 +34,34 @@ class AbstractAuthenticationDataProvider;
  * NOTE: Listens to user data change events.
  */
 class AuthenticationManager:
-    public nx_http::server::AbstractAuthenticationManager
+    public nx::network::http::server::AbstractAuthenticationManager
 {
 public:
     AuthenticationManager(
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-        const nx_http::AuthMethodRestrictionList& authRestrictionList,
+        const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
     virtual void authenticate(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
-        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
+        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
     static nx::String realm();
 
 private:
-    const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
+    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
 
-    bool validateNonce(const nx_http::StringType& nonce);
+    bool validateNonce(const nx::network::http::StringType& nonce);
     api::ResultCode authenticateInDataManagers(
-        const nx_http::StringType& username,
+        const nx::network::http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const nx::utils::stree::AbstractResourceReader& authSearchInputData,
         nx::utils::stree::ResourceContainer* const authProperties);
     void addWWWAuthenticateHeader(
-        boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
+        boost::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();
 };
 

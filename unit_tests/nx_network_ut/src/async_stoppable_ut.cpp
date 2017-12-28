@@ -7,6 +7,9 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 
+namespace nx {
+namespace network {
+
 struct StoppableTestClass:
     public QnStoppableAsync
 {
@@ -87,3 +90,6 @@ TEST(QnStoppableAsync, MultiManual)
     s3.pleaseStopSync();
     EXPECT_EQ(runningCount(), 0);
 }
+
+} // namespace network
+} // namespace nx

@@ -16,7 +16,7 @@ static void givenCorrectHeaders(Message* message)
     headers.emplace("Upgrade", "websocket");
 }
 
-static void givenCorrectRequestHeaders(nx_http::Request* request)
+static void givenCorrectRequestHeaders(nx::network::http::Request* request)
 {
     givenCorrectHeaders(request);
 
@@ -28,15 +28,15 @@ static void givenCorrectRequestHeaders(nx_http::Request* request)
     headers.emplace("Sec-WebSocket-Version", "13");
 }
 
-static void givenCorrectRequestLine(nx_http::Request* request)
+static void givenCorrectRequestLine(nx::network::http::Request* request)
 {
     request->requestLine.method = "GET";
-    request->requestLine.version = nx_http::http_1_1;
+    request->requestLine.version = nx::network::http::http_1_1;
 }
 
 TEST(WebsocketHandshake, validateRequest_requestLine)
 {
-    nx_http::Request request;
+    nx::network::http::Request request;
     givenCorrectRequestHeaders(&request);
     givenCorrectRequestLine(&request);
 
@@ -46,13 +46,13 @@ TEST(WebsocketHandshake, validateRequest_requestLine)
     ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
 
     givenCorrectRequestLine(&request);
-    request.requestLine.version = nx_http::http_1_0;
+    request.requestLine.version = nx::network::http::http_1_0;
     ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
 }
 
 TEST(WebsocketHandshake, validateRequest_headers)
 {
-    nx_http::Request request;
+    nx::network::http::Request request;
     givenCorrectRequestLine(&request);
 
     givenCorrectRequestHeaders(&request);
@@ -82,12 +82,12 @@ TEST(WebsocketHandshake, validateRequest_headers)
 
 TEST(WebsocketHandshake, validateRequest_response)
 {
-    nx_http::Request request;
+    nx::network::http::Request request;
     givenCorrectRequestLine(&request);
     givenCorrectRequestHeaders(&request);
 
 
-    nx_http::Response response;
+    nx::network::http::Response response;
     ASSERT_EQ(validateRequest(request, &response), Error::noError);
 
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Protocol")->second, "test");
@@ -97,7 +97,7 @@ TEST(WebsocketHandshake, validateRequest_response)
 
 TEST(WebsocketHandshake, addClientHeaders)
 {
-    nx_http::Request request;
+    nx::network::http::Request request;
     addClientHeaders(&request.headers, "test");
 
     ASSERT_EQ(request.headers.find("Connection")->second, "Upgrade");
@@ -109,8 +109,8 @@ TEST(WebsocketHandshake, addClientHeaders)
 
 TEST(WebsocketHandshake, validateResponse)
 {
-    nx_http::Request request;
-    nx_http::Response response;
+    nx::network::http::Request request;
+    nx::network::http::Response response;
 
     givenCorrectRequestLine(&request);
     givenCorrectRequestHeaders(&request);

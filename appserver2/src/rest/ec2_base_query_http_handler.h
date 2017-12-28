@@ -83,13 +83,13 @@ public:
         switch (errorCode)
         {
             case ErrorCode::ok:
-                return nx_http::StatusCode::ok;
+                return nx::network::http::StatusCode::ok;
             case ErrorCode::unauthorized:
-                return nx_http::StatusCode::unauthorized;
+                return nx::network::http::StatusCode::unauthorized;
             case ErrorCode::forbidden:
-                return nx_http::StatusCode::forbidden;
+                return nx::network::http::StatusCode::forbidden;
             default:
-                return nx_http::StatusCode::internalServerError;
+                return nx::network::http::StatusCode::internalServerError;
         }
     }
 
@@ -106,7 +106,7 @@ public:
         const QnRestConnectionProcessor*) override
     {
         QN_UNUSED(path, params, body, srcBodyContentType, result, contentType);
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     }
 
 private:
@@ -173,7 +173,7 @@ public:
         base_type(cmdCode),
         m_queryHandler(
             [queryHandler](
-                InputData input, OutputData* output, const Qn::UserAccessData& accessData, nx_http::Response* response) -> ErrorCode
+                InputData input, OutputData* output, const Qn::UserAccessData& accessData, nx::network::http::Response* response) -> ErrorCode
             {
                 QN_UNUSED(response);
                 return queryHandler(std::move(input), output, accessData);
@@ -183,11 +183,11 @@ public:
 
     FlexibleQueryHttpHandler(
         ApiCommand::Value cmdCode,
-        std::function<ErrorCode(InputData, OutputData*, nx_http::Response*)> queryHandler)
+        std::function<ErrorCode(InputData, OutputData*, nx::network::http::Response*)> queryHandler)
         :
         base_type(cmdCode)
     {
-        m_queryHandler = [queryHandler](InputData input, OutputData* output, const Qn::UserAccessData&, nx_http::Response* response)
+        m_queryHandler = [queryHandler](InputData input, OutputData* output, const Qn::UserAccessData&, nx::network::http::Response* response)
         {
             return queryHandler(input, output, response);
         };
@@ -213,7 +213,7 @@ public:
     }
 
 private:
-    std::function<ErrorCode(InputData, OutputData*, const Qn::UserAccessData& accessData, nx_http::Response*)> m_queryHandler;
+    std::function<ErrorCode(InputData, OutputData*, const Qn::UserAccessData& accessData, nx::network::http::Response*)> m_queryHandler;
 };
 
 } // namespace ec2

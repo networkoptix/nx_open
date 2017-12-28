@@ -12,7 +12,7 @@ AsyncRequestsExecutor::AsyncRequestsExecutor(
     m_cdbEndPointFetcher(
         std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
             cdbEndPointFetcher)),
-    m_requestTimeout(nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout)
+    m_requestTimeout(nx::network::http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout)
 {
 }
 
@@ -48,7 +48,7 @@ void AsyncRequestsExecutor::setProxyCredentials(
     m_auth.proxyUser.authToken.setPassword(password.c_str());
 }
 
-void AsyncRequestsExecutor::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncRequestsExecutor::setProxyVia(const nx::network::SocketAddress& proxyEndpoint)
 {
     NX_ASSERT(proxyEndpoint.port > 0);
 

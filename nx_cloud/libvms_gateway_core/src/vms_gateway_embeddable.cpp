@@ -48,12 +48,12 @@ bool VmsGatewayEmbeddable::isSslEnabled() const
     return m_isSslEnabled;
 }
 
-SocketAddress VmsGatewayEmbeddable::endpoint() const
+network::SocketAddress VmsGatewayEmbeddable::endpoint() const
 {
     return m_endpoint;
 }
 
-void VmsGatewayEmbeddable::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
+void VmsGatewayEmbeddable::enforceSslFor(const network::SocketAddress& targetAddress, bool enabled)
 {
     moduleInstance()->impl()->enforceSslFor(targetAddress, enabled);
 }

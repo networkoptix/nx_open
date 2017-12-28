@@ -15,7 +15,7 @@ class TransactionTransportHeader
 {
 public:
     nx::String systemId;
-    SocketAddress endpoint;
+    network::SocketAddress endpoint;
     nx::String connectionId;
     ::ec2::QnTransactionTransportHeader vmsTransportHeader;
     int transactionFormatVersion;

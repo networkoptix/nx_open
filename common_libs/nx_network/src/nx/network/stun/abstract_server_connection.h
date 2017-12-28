@@ -13,6 +13,7 @@
 #include "message.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class AbstractServerConnection
@@ -24,7 +25,7 @@ public:
      * @param handler Triggered to report send result. Can be NULL.
      */
     virtual void sendMessage(
-        nx::stun::Message message,
+        nx::network::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler = nullptr) = 0;
     virtual nx::network::TransportProtocol transportProtocol() const = 0;
     virtual SocketAddress getSourceAddress() const = 0;
@@ -38,4 +39,5 @@ public:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

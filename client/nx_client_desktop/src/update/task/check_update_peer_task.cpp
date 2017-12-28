@@ -225,7 +225,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline()
     nx::utils::Url url(lit("%1/%2/%3")
         .arg(m_updateLocationPrefix).arg(m_target.version.build()).arg(buildInformationSuffix));
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
@@ -355,7 +355,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
 
     reply->deleteLater();
 
-    if (reply->isFailed() || (reply->response().statusLine.statusCode != nx_http::StatusCode::ok))
+    if (reply->isFailed() || (reply->response().statusLine.statusCode != nx::network::http::StatusCode::ok))
     {
         NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.")
             .arg(reply->url().toString()), cl_logDEBUG2);
@@ -598,7 +598,7 @@ bool QnCheckForUpdatesPeerTask::tryNextServer()
     const auto serverInfo = m_updateServers.takeFirst();
     m_currentUpdateUrl = serverInfo.url;
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,

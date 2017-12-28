@@ -51,9 +51,9 @@ private:
         stun::MessagePipeline* connection) override;
 
     void onConnectCompleted(SystemError::ErrorCode errorCode);
-    void onMessageReceived(nx::stun::Message message);
-    void processUdpHolePunchingSynAck(nx::stun::Message message);
-    void processTunnelConnectionChosen(nx::stun::Message message);
+    void onMessageReceived(nx::network::stun::Message message);
+    void processUdpHolePunchingSynAck(nx::network::stun::Message message);
+    void processTunnelConnectionChosen(nx::network::stun::Message message);
     void onTimeout(nx::String requestName);
     void processError(SystemError::ErrorCode errorCode);
 };

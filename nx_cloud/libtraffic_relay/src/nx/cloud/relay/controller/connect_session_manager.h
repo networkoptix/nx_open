@@ -32,7 +32,7 @@ class AbstractTrafficRelay;
 struct ConnectToPeerRequestEx:
     api::ConnectToPeerRequest
 {
-    SocketAddress clientEndpoint;
+    network::SocketAddress clientEndpoint;
 };
 
 class AbstractConnectSessionManager
@@ -45,7 +45,7 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::CreateClientSessionResponse)>;
 
     using ConnectToPeerHandler =
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx_http::ConnectionEvents)>;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::http::ConnectionEvents)>;
 
     //---------------------------------------------------------------------------------------------
 
@@ -85,10 +85,10 @@ private:
     {
         std::string id;
         std::string clientPeerName;
-        std::unique_ptr<AbstractStreamSocket> clientConnection;
+        std::unique_ptr<network::AbstractStreamSocket> clientConnection;
         std::string listeningPeerName;
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection;
-        nx_http::StringType openTunnelNotificationBuffer;
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection;
+        nx::network::http::StringType openTunnelNotificationBuffer;
     };
 
     const conf::Settings& m_settings;
@@ -106,12 +106,12 @@ private:
         const std::string& listeningPeerName,
         ConnectSessionManager::ConnectToPeerHandler completionHandler,
         api::ResultCode resultCode,
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection);
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection);
     void startRelaying(
         const std::string& connectSessionId,
         const std::string& listeningPeerName,
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
-        nx_http::HttpServerConnection* httpConnection);
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection,
+        nx::network::http::HttpServerConnection* httpConnection);
     void startRelaying(RelaySession relaySession);
 };
 

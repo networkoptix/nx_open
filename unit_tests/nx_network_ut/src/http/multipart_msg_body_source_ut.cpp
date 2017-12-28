@@ -6,7 +6,9 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/byte_stream/buffer_output_stream.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace test {
 
 class HttpMultipartMessageBodySource:
@@ -125,11 +127,11 @@ TEST_F(HttpMultipartMessageBodySource, general)
         if (closeMultipartBody)
             testData += "\r\n--boundary--"; //terminating multipart body
 
-        m_msgBodySource->serializer()->beginPart("application/json", nx_http::HttpHeaders(), BufferType());
+        m_msgBodySource->serializer()->beginPart("application/json", nx::network::http::HttpHeaders(), BufferType());
         m_msgBodySource->serializer()->writeData("1xxxxxxxxxxxxx2");
-        m_msgBodySource->serializer()->beginPart("application/text", nx_http::HttpHeaders(), "3xxxxxx!");
+        m_msgBodySource->serializer()->beginPart("application/text", nx::network::http::HttpHeaders(), "3xxxxxx!");
         m_msgBodySource->serializer()->writeData("!xxxxxxx4");
-        m_msgBodySource->serializer()->writeBodyPart("text/html", nx_http::HttpHeaders(), "5xxxxxxxxxxxx6");
+        m_msgBodySource->serializer()->writeBodyPart("text/html", nx::network::http::HttpHeaders(), "5xxxxxxxxxxxx6");
 
         if (closeMultipartBody)
             m_msgBodySource->serializer()->writeEpilogue();
@@ -148,4 +150,6 @@ TEST_F(HttpMultipartMessageBodySource, onlyEpilogue)
 }
 
 } // namespace test
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

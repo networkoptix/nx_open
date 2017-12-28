@@ -9,8 +9,8 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-std::unique_ptr<nx_http::HttpClient> makeHttpClient(const QAuthenticator& authenticator);
-bool isResponseOK(const nx_http::HttpClient* client);
+std::unique_ptr<nx::network::http::HttpClient> makeHttpClient(const QAuthenticator& authenticator);
+bool isResponseOK(const nx::network::http::HttpClient* client);
 
 class XmlRequestHelper
 {
@@ -18,7 +18,7 @@ public:
     XmlRequestHelper(
         nx::utils::Url url,
         const QAuthenticator& authenticator,
-        nx_http::AuthType authType = nx_http::AuthType::authDigest);
+        nx::network::http::AuthType authType = nx::network::http::AuthType::authDigest);
 
     boost::optional<QDomDocument> get(const QString& path);
     bool put(const QString& path, const QString& data = {});
@@ -29,7 +29,7 @@ public:
 
 protected:
     const nx::utils::Url m_url;
-    const std::unique_ptr<nx_http::HttpClient> m_client;
+    const std::unique_ptr<nx::network::http::HttpClient> m_client;
 };
 
 std::vector<QDomElement> xmlElements(const QDomNodeList& nodeList);

@@ -16,7 +16,7 @@ namespace hpm {
 PeerRegistrator::PeerRegistrator(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
-    nx::stun::MessageDispatcher* dispatcher,
+    nx::network::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool,
     AbstractRelayClusterClient* const relayClusterClient)
 :
@@ -28,13 +28,13 @@ PeerRegistrator::PeerRegistrator(
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::bind,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
+            network::stun::extension::methods::bind,
+            [this](const ConnectionStrongRef& connection, network::stun::Message message)
                 { bind( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::listen,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
+            network::stun::extension::methods::listen,
+            [this](const ConnectionStrongRef& connection, network::stun::Message message)
             {
                 processRequestWithOutput(
                     &PeerRegistrator::listen,
@@ -44,8 +44,8 @@ PeerRegistrator::PeerRegistrator(
             } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::getConnectionState,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
+            network::stun::extension::methods::getConnectionState,
+            [this](const ConnectionStrongRef& connection, network::stun::Message message)
             {
                 processRequestWithOutput(
                     &PeerRegistrator::checkOwnState,
@@ -55,8 +55,8 @@ PeerRegistrator::PeerRegistrator(
             } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::resolveDomain,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
+            network::stun::extension::methods::resolveDomain,
+            [this](const ConnectionStrongRef& connection, network::stun::Message message)
             {
                 processRequestWithOutput(
                     &PeerRegistrator::resolveDomain,
@@ -66,8 +66,8 @@ PeerRegistrator::PeerRegistrator(
             }) &&
 
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::resolvePeer,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
+            network::stun::extension::methods::resolvePeer,
+            [this](const ConnectionStrongRef& connection, network::stun::Message message)
             {
                 processRequestWithOutput(
                     &PeerRegistrator::resolvePeer,
@@ -77,8 +77,8 @@ PeerRegistrator::PeerRegistrator(
             }) &&
 
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::clientBind,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
+            network::stun::extension::methods::clientBind,
+            [this](const ConnectionStrongRef& connection, network::stun::Message message)
             {
                 processRequestWithOutput(
                     &PeerRegistrator::clientBind,
@@ -119,18 +119,18 @@ data::ListeningPeers PeerRegistrator::getListeningPeers() const
 
 void PeerRegistrator::bind(
     const ConnectionStrongRef& connection,
-    stun::Message requestMessage)
+    network::stun::Message requestMessage)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return sendErrorResponse(
             connection,
             requestMessage.header,
             api::ResultCode::badTransport,
-            stun::error::badRequest,
+            network::stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
     auto serverConnection =
-        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+        std::dynamic_pointer_cast<network::stun::ServerConnection>(connection);
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -152,7 +152,7 @@ void PeerRegistrator::bind(
         mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
-    if (const auto attr = requestMessage.getAttribute< stun::extension::attrs::PublicEndpointList >())
+    if (const auto attr = requestMessage.getAttribute< network::stun::extension::attrs::PublicEndpointList >())
         peerDataLocker.value().endpoints = attr->get();
     else
         peerDataLocker.value().endpoints.clear();
@@ -168,14 +168,14 @@ void PeerRegistrator::bind(
 void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
     api::ListenRequest requestData,
-    stun::Message requestMessage,
+    network::stun::Message requestMessage,
     std::function<void(api::ResultCode, api::ListenResponse)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return completionHandler(api::ResultCode::badTransport, {});    //Only tcp is allowed for listen request
 
     auto serverConnection =
-        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+        std::dynamic_pointer_cast<network::stun::ServerConnection>(connection);
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -223,7 +223,7 @@ void PeerRegistrator::listen(
 void PeerRegistrator::checkOwnState(
     const ConnectionStrongRef& connection,
     api::GetConnectionStateRequest /*requestData*/,
-    stun::Message requestMessage,
+    network::stun::Message requestMessage,
     std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler)
 {
     MediaserverData mediaserverData;
@@ -252,7 +252,7 @@ void PeerRegistrator::checkOwnState(
 void PeerRegistrator::resolveDomain(
     const ConnectionStrongRef& connection,
     api::ResolveDomainRequest requestData,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(
         api::ResultCode, api::ResolveDomainResponse)> completionHandler)
 {
@@ -283,7 +283,7 @@ void PeerRegistrator::resolveDomain(
 void PeerRegistrator::resolvePeer(
     const ConnectionStrongRef& connection,
     api::ResolvePeerRequest requestData,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(
         api::ResultCode, api::ResolvePeerResponse)> completionHandler)
 {
@@ -319,7 +319,7 @@ void PeerRegistrator::resolvePeer(
 void PeerRegistrator::clientBind(
     const ConnectionStrongRef& connection,
     api::ClientBindRequest requestData,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler)
 {
     const auto reject = [&](api::ResultCode code)
@@ -338,7 +338,7 @@ void PeerRegistrator::clientBind(
         return reject(api::ResultCode::badRequest);
 
     auto peerId = std::move(requestData.originatingPeerID);
-    nx::stun::Message indication;
+    network::stun::Message indication;
     std::vector<ConnectionWeakRef> listeningPeerConnections;
     {
         QnMutexLocker lk(&m_mutex);
@@ -393,7 +393,7 @@ void PeerRegistrator::sendListenResponse(
 void PeerRegistrator::sendClientBindIndications(
     const ConnectionStrongRef& connection)
 {
-    std::vector<nx::stun::Message> clientBindIndications;
+    std::vector<network::stun::Message> clientBindIndications;
     {
         QnMutexLocker lk(&m_mutex);
         for (const auto& client: m_boundClients)
@@ -404,7 +404,7 @@ void PeerRegistrator::sendClientBindIndications(
         connection->sendMessage(std::move(indication));
 }
 
-nx::stun::Message PeerRegistrator::makeIndication(
+network::stun::Message PeerRegistrator::makeIndication(
     const String& id,
     const ClientBindInfo& info) const
 {
@@ -415,7 +415,10 @@ nx::stun::Message PeerRegistrator::makeIndication(
     event.params = m_settings.connectionParameters();
     event.isPersistent = true;
 
-    nx::stun::Message indication(stun::Header(stun::MessageClass::indication, event.kMethod));
+    network::stun::Message indication(
+        network::stun::Header(
+            network::stun::MessageClass::indication,
+            event.kMethod));
     event.serialize(&indication);
     return indication;
 }

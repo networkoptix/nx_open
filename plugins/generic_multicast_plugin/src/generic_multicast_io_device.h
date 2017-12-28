@@ -30,5 +30,5 @@ private:
 
 private:
     QUrl m_url;
-    std::unique_ptr<AbstractDatagramSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_socket;
 };

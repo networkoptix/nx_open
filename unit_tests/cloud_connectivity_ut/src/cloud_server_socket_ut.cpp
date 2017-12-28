@@ -72,7 +72,7 @@ public:
 
         m_server->acceptAsync(
             [this, handler](
-                SystemError::ErrorCode c, std::unique_ptr<AbstractStreamSocket> s)
+                SystemError::ErrorCode c, std::unique_ptr<nx::network::AbstractStreamSocket> s)
             {
                 EXPECT_EQ(c, SystemError::noError);
                 --m_clientsLimit;
@@ -98,7 +98,7 @@ private:
         m_server->bindToAioThread(aioThread);
         ASSERT_TRUE(m_server->setNonBlockingMode(true))
             << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress))
+        ASSERT_TRUE(m_server->bind(nx::network::SocketAddress::anyPrivateAddress))
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(m_server->listen())
             << SystemError::getLastOSErrorText().toStdString();
@@ -191,7 +191,7 @@ public:
     {
     }
 
-    virtual SocketAddress getLocalAddress() const override
+    virtual nx::network::SocketAddress getLocalAddress() const override
     {
         return m_addressManager.key;
     }
@@ -278,7 +278,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto tunnelAcceptorFactoryFuncBak =
         TunnelAcceptorFactory::instance().setCustomFunc(
             [&addressManager](
-                const SocketAddress& /*mediatorUdpEndpoint*/,
+                const nx::network::SocketAddress& /*mediatorUdpEndpoint*/,
                 hpm::api::ConnectionRequestedEvent)
             {
                 std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
@@ -370,12 +370,12 @@ protected:
         m_tunnelAcceptorFactoryFuncBak =
             TunnelAcceptorFactory::instance().setCustomFunc(
                 [this](
-                    const SocketAddress& /*mediatorUdpEndpoint*/,
+                    const nx::network::SocketAddress& /*mediatorUdpEndpoint*/,
                     hpm::api::ConnectionRequestedEvent event)
                 {
                     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
 
-                    SocketAddress address(QLatin1String(event.originatingPeerID));
+                    nx::network::SocketAddress address(QLatin1String(event.originatingPeerID));
                     auto acceptor = std::make_unique<FakeTcpTunnelAcceptor>(
                         network::test::AddressBinder::Manager(
                             &m_addressBinder, std::move(address)));
@@ -402,7 +402,7 @@ protected:
     void acceptServerForever()
     {
         m_server->acceptAsync(
-            [this](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
+            [this](SystemError::ErrorCode code, std::unique_ptr<nx::network::AbstractStreamSocket> socket)
             {
                 ASSERT_EQ(code, SystemError::noError);
                 acceptServerForever();
@@ -440,7 +440,7 @@ protected:
         m_threads.push_back(std::move(thread));
     }
 
-    void startClient(const SocketAddress& peer)
+    void startClient(const nx::network::SocketAddress& peer)
     {
         auto socketPtr = std::make_unique<TCPSocket>(AF_INET);
         auto socket = socketPtr.get();
@@ -460,7 +460,7 @@ protected:
         connectClient(socket, peer);
     }
 
-    void connectClient(AbstractStreamSocket* socket, const SocketAddress& peer)
+    void connectClient(nx::network::AbstractStreamSocket* socket, const nx::network::SocketAddress& peer)
     {
         const auto delay = 500 * utils::TestOptions::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
@@ -494,7 +494,7 @@ protected:
         }
     }
 
-    void emitIndication(SocketAddress peer)
+    void emitIndication(nx::network::SocketAddress peer)
     {
         String peerId = peer.address.toString().toUtf8();
 
@@ -510,7 +510,7 @@ protected:
         m_stunClient->emulateIndication(message);
     }
 
-    void readOnClient(AbstractStreamSocket* socketPtr, const SocketAddress& peer)
+    void readOnClient(nx::network::AbstractStreamSocket* socketPtr, const nx::network::SocketAddress& peer)
     {
         auto buffer = std::make_shared<Buffer>();
         buffer->reserve(network::test::kTestMessage.size() + 1);
@@ -518,7 +518,7 @@ protected:
             buffer.get(),
             [=](SystemError::ErrorCode code, size_t size)
             {
-                std::unique_ptr<AbstractStreamSocket> socket;
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket;
                 {
                     QnMutexLocker lock(&m_mutex);
                     auto socketIt = m_connectSockets.find(socketPtr);
@@ -567,7 +567,7 @@ protected:
     }
 
     network::test::AddressBinder m_addressBinder;
-    std::set<SocketAddress> m_boundPeers;
+    std::set<nx::network::SocketAddress> m_boundPeers;
 
     std::unique_ptr<hpm::api::AbstractMediatorConnector> m_mediatorConnector;
     std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
@@ -576,8 +576,8 @@ protected:
     std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
-    std::map<void*, std::unique_ptr<AbstractStreamSocket>> m_connectSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
+    std::map<void*, std::unique_ptr<nx::network::AbstractStreamSocket>> m_connectSockets;
     TunnelAcceptorFactory::Function m_tunnelAcceptorFactoryFuncBak;
 };
 
@@ -854,7 +854,7 @@ private:
 
     void onAcceptCompletion(
         SystemError::ErrorCode /*sysErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
     {
     }
 };

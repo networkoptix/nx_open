@@ -47,7 +47,7 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
     auto host  = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);
 
-    SocketAddress endpoint(host, port);
+    nx::network::SocketAddress endpoint(host, port);
 
     nx::modbus::QnModbusClient testClient(endpoint);
 

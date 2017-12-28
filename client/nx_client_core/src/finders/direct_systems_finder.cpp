@@ -20,7 +20,7 @@ bool isOldServer(const QnModuleInformation& info)
     return (info.version < kMinVersionWithSystem);
 }
 
-bool isCloudAddress(const HostAddress& address)
+bool isCloudAddress(const nx::network::HostAddress& address)
 {
     return nx::network::SocketGlobals::addressResolver()
         .isCloudHostName(address.toString());

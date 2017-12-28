@@ -102,7 +102,7 @@ TEST_F(CrossNatConnector, timeout)
     const auto connectResult = doSimpleConnectTest(
         connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake::ignoreIndication,
-        SocketAddress(HostAddress::localhost, 10345));
+        nx::network::SocketAddress(nx::network::HostAddress::localhost, 10345));
 
     ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
@@ -200,7 +200,7 @@ protected:
         using namespace std::placeholders;
 
         m_redirector.server = std::make_unique<stun::UdpServer>(&m_redirector.messageDispatcher);
-        ASSERT_TRUE(m_redirector.server->bind(SocketAddress(HostAddress::localhost, 0)));
+        ASSERT_TRUE(m_redirector.server->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)));
         ASSERT_TRUE(m_redirector.server->listen());
 
         m_redirector.messageDispatcher.registerRequestProcessor(
@@ -240,7 +240,7 @@ private:
     void redirectHandler(
         std::shared_ptr<stun::AbstractServerConnection> connection,
         stun::Message message,
-        SocketAddress targetAddress)
+        nx::network::SocketAddress targetAddress)
     {
         ++m_requestsRedirected;
 

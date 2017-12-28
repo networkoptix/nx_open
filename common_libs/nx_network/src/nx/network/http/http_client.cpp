@@ -10,7 +10,9 @@ const std::size_t kDefaultMaxInternalBufferSize = 200 * 1024 * 1024; //< 200MB s
 
 } // namespace
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 HttpClient::HttpClient():
     m_done(false),
@@ -39,7 +41,7 @@ bool HttpClient::doGet(const nx::utils::Url& url)
     using namespace std::placeholders;
     return doRequest(std::bind(
         static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&)>(
-            &nx_http::AsyncHttpClient::doGet), _1, url));
+            &nx::network::http::AsyncHttpClient::doGet), _1, url));
 }
 
 bool HttpClient::doUpgrade(
@@ -49,24 +51,24 @@ bool HttpClient::doUpgrade(
     using namespace std::placeholders;
     return doRequest(std::bind(
         static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&, const StringType&)>(
-            &nx_http::AsyncHttpClient::doUpgrade), _1, url, protocolToUpgradeTo));
+            &nx::network::http::AsyncHttpClient::doUpgrade), _1, url, protocolToUpgradeTo));
 }
 
 bool HttpClient::doPost(
     const nx::utils::Url& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody)
+    const nx::network::http::StringType& contentType,
+    nx::network::http::StringType messageBody)
 {
     using namespace std::placeholders;
 
     typedef void(AsyncHttpClient::*FuncType)(
         const nx::utils::Url& /*url*/,
-        const nx_http::StringType& /*contentType*/,
-        nx_http::StringType /*messageBody*/,
+        const nx::network::http::StringType& /*contentType*/,
+        nx::network::http::StringType /*messageBody*/,
         bool /*includeContentLength*/);
 
     return doRequest(std::bind(
-        static_cast<FuncType>(&nx_http::AsyncHttpClient::doPost),
+        static_cast<FuncType>(&nx::network::http::AsyncHttpClient::doPost),
         _1,
         url,
         contentType,
@@ -76,16 +78,16 @@ bool HttpClient::doPost(
 
 bool HttpClient::doPut(
     const nx::utils::Url& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody)
+    const nx::network::http::StringType& contentType,
+    nx::network::http::StringType messageBody)
 {
     typedef void(AsyncHttpClient::*FuncType)(
         const nx::utils::Url& /*url*/,
-        const nx_http::StringType& /*contentType*/,
-        nx_http::StringType /*messageBody*/);
+        const nx::network::http::StringType& /*contentType*/,
+        nx::network::http::StringType /*messageBody*/);
 
     return doRequest(std::bind(
-        static_cast<FuncType>(&nx_http::AsyncHttpClient::doPut),
+        static_cast<FuncType>(&nx::network::http::AsyncHttpClient::doPut),
         std::placeholders::_1,
         url,
         contentType,
@@ -97,7 +99,7 @@ bool HttpClient::doDelete(const nx::utils::Url& url)
     using namespace std::placeholders;
     return doRequest(std::bind(
         static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&)>(
-            &nx_http::AsyncHttpClient::doDelete), _1, url));
+            &nx::network::http::AsyncHttpClient::doDelete), _1, url));
 }
 
 const Response* HttpClient::response() const
@@ -129,7 +131,7 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     while (!m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done && !m_error))
         m_cond.wait(lk.mutex());
 
-    nx_http::BufferType result;
+    nx::network::http::BufferType result;
     if (m_error)
         return result;
 
@@ -274,7 +276,7 @@ bool HttpClient::fetchResource(
     BufferType* msgBody,
     StringType* contentType)
 {
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     if (!client.doGet(url))
         return false;
 
@@ -287,7 +289,7 @@ bool HttpClient::fetchResource(
 
 void HttpClient::instantiateHttpClient()
 {
-    m_asyncHttpClient = nx_http::AsyncHttpClient::create();
+    m_asyncHttpClient = nx::network::http::AsyncHttpClient::create();
     connect(
         m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived,
         this, &HttpClient::onResponseReceived,
@@ -407,4 +409,6 @@ void HttpClient::onReconnected()
     // TODO: #ak
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

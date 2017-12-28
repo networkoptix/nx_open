@@ -25,7 +25,7 @@ namespace {
 
 const auto kSendStatUser = lit("nx");
 const auto kSendStatPass = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
-const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
 QString makeFullPath(const QString& basePath, const QString& postfix)
 {
@@ -65,10 +65,10 @@ bool isCorrectMetricsListJson(const QByteArray& body)
     return QJson::deserialize(body, &dummy);
 };
 
-bool isSuccessHttpCode(nx_http::StatusCode::Value code)
+bool isSuccessHttpCode(nx::network::http::StatusCode::Value code)
 {
-    return qBetween<int>(nx_http::StatusCode::ok, code,
-        nx_http::StatusCode::lastSuccessCode + 1);
+    return qBetween<int>(nx::network::http::StatusCode::ok, code,
+        nx::network::http::StatusCode::lastSuccessCode + 1);
 }
 
 class SettingsCache
@@ -150,7 +150,7 @@ public:
         QByteArray& /*result*/,
         QByteArray& /*resultContentType*/)
     {
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
     virtual int executePost(
@@ -161,7 +161,7 @@ public:
         QByteArray& /*result*/,
         QByteArray& /*resultContentType*/)
     {
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
 
 private:
@@ -184,7 +184,7 @@ public:
 
 private:
     typedef QnMultiserverRequestContext<QnEmptyRequestData> Context;
-    nx_http::StatusCode::Value loadSettingsLocally(QnCommonModule* commonModule,
+    nx::network::http::StatusCode::Value loadSettingsLocally(QnCommonModule* commonModule,
         QnStatisticsSettings& outputSettings);
 };
 
@@ -207,20 +207,20 @@ int SettingsActionHandler::executeGet(
         (commonModule->resourcePool(), params);
 
     QnStatisticsSettings settings;
-    nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notFound;
+    nx::network::http::StatusCode::Value resultCode = nx::network::http::StatusCode::notFound;
 
     resultCode = loadSettingsLocally(commonModule, settings);
     if (isSuccessHttpCode(resultCode))
     {
         QnFusionRestHandlerDetail::serialize(settings, result, resultContentType, Qn::JsonFormat,
             request.extraFormatting);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     return resultCode;
 }
 
-nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnCommonModule* commonModule,
+nx::network::http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnCommonModule* commonModule,
     QnStatisticsSettings& outputSettings)
 {
     const auto moduleGuid = commonModule->moduleGUID();
@@ -228,7 +228,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnCommonMo
         (moduleGuid);
 
     if (!server || !hasInternetConnection(server))
-        return nx_http::StatusCode::serviceUnavailable;
+        return nx::network::http::StatusCode::serviceUnavailable;
 
     const auto settingsUrl = [commonModule]()
     {
@@ -242,20 +242,20 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnCommonMo
     }();
 
     if (SettingsCache::copyTo(outputSettings))
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
 
     SettingsCache::clear();
 
-    nx_http::BufferType buffer;
-    int statusCode = nx_http::StatusCode::notFound;
-    if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
-        return nx_http::StatusCode::notFound;
+    nx::network::http::BufferType buffer;
+    int statusCode = nx::network::http::StatusCode::notFound;
+    if (nx::network::http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
+        return nx::network::http::StatusCode::notFound;
 
     if (!QJson::deserialize(buffer, &outputSettings))
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
 
     SettingsCache::update(outputSettings);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 class SendStatisticsActionHandler: public AbstractStatisticsActionHandler
@@ -278,7 +278,7 @@ public:
 private:
     typedef QnMultiserverRequestContext<QnSendStatisticsRequestData> Context;
 
-    nx_http::StatusCode::Value sendStatisticsLocally(
+    nx::network::http::StatusCode::Value sendStatisticsLocally(
         QnCommonModule* commonModule,
         const QByteArray& metricsList,
         const QString& statisticsServerUrl);
@@ -311,12 +311,12 @@ int SendStatisticsActionHandler::executePost(
 
     NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorrect json with metrics received!");
     if (!correctJson)
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     return sendStatisticsLocally(commonModule, body, request.statisticsServerUrl);
 }
 
-nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
+nx::network::http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
     QnCommonModule* commonModule,
     const QByteArray& metricsList,
     const QString& statisticsServerUrl)
@@ -326,21 +326,21 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
         <QnMediaServerResource>(moduleGuid);
 
     if (!server || !hasInternetConnection(server))
-        return nx_http::StatusCode::notAcceptable;
+        return nx::network::http::StatusCode::notAcceptable;
 
-    auto httpCode = nx_http::StatusCode::notAcceptable;
-    const auto error = nx_http::uploadDataSync(
+    auto httpCode = nx::network::http::StatusCode::notAcceptable;
+    const auto error = nx::network::http::uploadDataSync(
         statisticsServerUrl,
         metricsList,
         kJsonContentType,
         kSendStatUser,
         kSendStatPass,
-        nx_http::AuthType::authBasicAndDigest,
+        nx::network::http::AuthType::authBasicAndDigest,
         &httpCode);
 
     return error == SystemError::noError
         ? httpCode
-        : nx_http::StatusCode::internalServerError;
+        : nx::network::http::StatusCode::internalServerError;
 }
 
 QnMultiserverStatisticsRestHandler::QnMultiserverStatisticsRestHandler(const QString& path):
@@ -407,11 +407,11 @@ int QnMultiserverStatisticsRestHandler::processRequest(const QString& fullPath,
     const RunHandlerFunc& runHandler)
 {
     if (!runHandler)
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     const auto handlerIt = m_handlers.find(fullPath);
     if (handlerIt == m_handlers.end())
-        return nx_http::StatusCode::notFound;
+        return nx::network::http::StatusCode::notFound;
 
     const auto handler = handlerIt.value();
     return runHandler(handler);

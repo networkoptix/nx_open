@@ -9,11 +9,11 @@ GetConnectionStateRequest::GetConnectionStateRequest():
 {
 }
 
-void GetConnectionStateRequest::serializeAttributes(nx::stun::Message* const /*message*/)
+void GetConnectionStateRequest::serializeAttributes(nx::network::stun::Message* const /*message*/)
 {
 }
 
-bool GetConnectionStateRequest::parseAttributes(const nx::stun::Message& /*message*/)
+bool GetConnectionStateRequest::parseAttributes(const nx::network::stun::Message& /*message*/)
 {
     return true;
 }
@@ -25,14 +25,14 @@ GetConnectionStateResponse::GetConnectionStateResponse():
 {
 }
 
-void GetConnectionStateResponse::serializeAttributes(nx::stun::Message* const message)
+void GetConnectionStateResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->addAttribute(stun::extension::attrs::isListening, (int) state);
+    message->addAttribute(network::stun::extension::attrs::isListening, (int) state);
 }
 
-bool GetConnectionStateResponse::parseAttributes(const nx::stun::Message& message)
+bool GetConnectionStateResponse::parseAttributes(const nx::network::stun::Message& message)
 {
-    return readAttributeValue(message, stun::extension::attrs::isListening, (int*) &state);
+    return readAttributeValue(message, network::stun::extension::attrs::isListening, (int*) &state);
 }
 
 } // namespace api

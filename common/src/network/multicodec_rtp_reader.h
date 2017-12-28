@@ -51,7 +51,7 @@ public:
 
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
-        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
+        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
     virtual ~QnMulticodecRtpReader();
 
     /** Implementation of QnAbstractMediaStreamProvider::getNextData. */
@@ -77,7 +77,7 @@ public:
 
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
-    void setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme);
+    void setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme);
 
     static void setDefaultTransport(const RtpTransport::Value& defaultTransportToUse);
     void setRtpTransport(const RtpTransport::Value& value);
@@ -101,7 +101,7 @@ public:
 
     void setTimePolicy(TimePolicy timePolicy);
 
-    void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
+    void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
     void setRtpFrameTimeoutMs(int value);
 
     /**
@@ -178,7 +178,7 @@ private:
     bool m_gotData;
     QElapsedTimer m_dataTimer;
     bool m_rtpStarted;
-    nx_http::header::AuthScheme::Value m_prefferedAuthScheme;
+    nx::network::http::header::AuthScheme::Value m_prefferedAuthScheme;
     QString m_currentStreamUrl;
     QString m_rtpTransport;
 

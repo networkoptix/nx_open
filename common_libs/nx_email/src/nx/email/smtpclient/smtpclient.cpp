@@ -100,7 +100,7 @@ void SmtpClient::setConnectionType(ConnectionType ct)
     this->connectionType = ct;
 
     m_lineSpliter.reset();
-    m_socket = SocketFactory::createStreamSocket(connectionType == SslConnection);
+    m_socket = nx::network::SocketFactory::createStreamSocket(connectionType == SslConnection);
 }
 
 const QString& SmtpClient::getHost() const
@@ -410,12 +410,12 @@ void SmtpClient::waitForResponse()
 
     for (int bufPos = 0;; )
     {
-        nx_http::ConstBufferRefType lineBufferRef;
+        nx::network::http::ConstBufferRefType lineBufferRef;
         size_t bytesParsed = 0;
         NX_ASSERT(bufPos <= readBuffer.size());
         if (bufPos == readBuffer.size() ||
             !m_lineSpliter.parseByLines(
-                nx_http::ConstBufferRefType(readBuffer, bufPos, readBuffer.size()),
+                nx::network::http::ConstBufferRefType(readBuffer, bufPos, readBuffer.size()),
                 &lineBufferRef,
                 &bytesParsed))
         {

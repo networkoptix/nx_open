@@ -18,7 +18,7 @@ const QString kUnknownErrorString = lit("Unknown error");
 
 
 HanwhaResponse::HanwhaResponse(
-    nx_http::StatusCode::Value statusCode,
+    nx::network::http::StatusCode::Value statusCode,
     const QString& requestUrl)
     :
     m_errorCode(HanwhaError::kUnknownError),
@@ -30,7 +30,7 @@ HanwhaResponse::HanwhaResponse(
 
 HanwhaResponse::HanwhaResponse(
     const nx::Buffer& rawBuffer,
-    nx_http::StatusCode::Value statusCode,
+    nx::network::http::StatusCode::Value statusCode,
     const QString& requestUrl,
     const QString& groupBy,
     bool isListMode)
@@ -46,7 +46,7 @@ HanwhaResponse::HanwhaResponse(
 bool HanwhaResponse::isSuccessful() const
 {
     return m_errorCode == HanwhaError::kNoError
-        && nx_http::StatusCode::isSuccessCode(m_statusCode);
+        && nx::network::http::StatusCode::isSuccessCode(m_statusCode);
 }
 
 int HanwhaResponse::errorCode() const
@@ -58,12 +58,12 @@ QString HanwhaResponse::errorString() const
 {
     if (!m_errorString.isEmpty())
         return m_errorString;
-    if (!nx_http::StatusCode::isSuccessCode(m_statusCode))
+    if (!nx::network::http::StatusCode::isSuccessCode(m_statusCode))
     {
         if (m_statusCode == kHanwhaBlockedHttpCode)
             return "Temporary unauthorized";
         else
-            return nx_http::StatusCode::toString(m_statusCode);
+            return nx::network::http::StatusCode::toString(m_statusCode);
     }
     return m_errorCode == HanwhaError::kNoError ? QString() : "Unknown error";
 }
@@ -73,7 +73,7 @@ std::map<QString, QString> HanwhaResponse::response() const
     return m_response;
 }
 
-nx_http::StatusCode::Value HanwhaResponse::statusCode() const
+nx::network::http::StatusCode::Value HanwhaResponse::statusCode() const
 {
     return m_statusCode;
 }

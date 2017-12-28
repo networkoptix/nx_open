@@ -23,7 +23,7 @@ protected:
 
     template<typename AttributeType, typename AttributeValueType>
     bool readAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         AttributeValueType* const value)
     {
         return readAttributeValue<AttributeType, AttributeValueType>(
@@ -34,7 +34,7 @@ protected:
 
     template<typename AttributeType, typename AttributeValueType>
     bool readAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         const int type,
         AttributeValueType* const value)
     {
@@ -42,8 +42,8 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(
-                    static_cast<stun::extension::attrs::AttributeType>(type)));
+                network::stun::extension::attrs::toString(
+                    static_cast<network::stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = attribute->get();
@@ -52,14 +52,14 @@ protected:
 
     template<typename AttributeType>
     bool readStringAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         nx::String* const value)
     {
         const auto attribute = message.getAttribute< AttributeType >();
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(AttributeType::TYPE));
+                network::stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = attribute->getString();
@@ -68,14 +68,14 @@ protected:
 
     template<typename AttributeType>
     bool readIntAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         int* const value)
     {
         const auto attribute = message.getAttribute< AttributeType >();
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(AttributeType::TYPE));
+                network::stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         //TODO #ak why getString???
@@ -84,15 +84,15 @@ protected:
     }
 
     bool readAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         const int type,
         int* const value)
     {
-        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        const auto attribute = message.getAttribute< network::stun::attrs::IntAttribute >(type);
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
+                network::stun::extension::attrs::toString(static_cast<network::stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = attribute->value();
@@ -100,15 +100,15 @@ protected:
     }
 
     bool readAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         const int type,
         bool* const value)
     {
-        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        const auto attribute = message.getAttribute< network::stun::attrs::IntAttribute >(type);
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
+                network::stun::extension::attrs::toString(static_cast<network::stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = attribute->value() > 0;
@@ -120,16 +120,16 @@ protected:
     */
     template<typename Rep, typename Period>
     bool readAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         const int type,
         std::chrono::duration<Rep, Period>* const value,
         typename std::enable_if<std::is_arithmetic<Rep>::value>::type* = nullptr)
     {
-        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        const auto attribute = message.getAttribute< network::stun::attrs::IntAttribute >(type);
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
+                network::stun::extension::attrs::toString(static_cast<network::stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = std::chrono::duration<Rep, Period>(attribute->value());
@@ -138,7 +138,7 @@ protected:
 
     template<typename Attribute>
     void readAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         const int type,
         Attribute* value,
         Attribute defaultValue)
@@ -149,14 +149,14 @@ protected:
 
     template<typename AttributeType, typename EnumType>
     bool readEnumAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         EnumType* const value)
     {
         const auto attribute = message.getAttribute< AttributeType >();
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(AttributeType::TYPE));
+                network::stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = static_cast<EnumType>(attribute->value());
@@ -165,15 +165,15 @@ protected:
 
     template<typename EnumType>
     bool readEnumAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         const int type,
         EnumType* const value)
     {
-        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        const auto attribute = message.getAttribute< network::stun::attrs::IntAttribute >(type);
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
+                network::stun::extension::attrs::toString(static_cast<network::stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = static_cast<EnumType>(attribute->value());
@@ -182,14 +182,14 @@ protected:
 
     template<typename AttributeType>
     bool readUuidAttributeValue(
-        const nx::stun::Message& message,
+        const nx::network::stun::Message& message,
         QnUuid* const value)
     {
         const auto attribute = message.getAttribute< AttributeType >();
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(AttributeType::TYPE));
+                network::stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = QnUuid::fromStringSafe(attribute->getString());
@@ -207,21 +207,20 @@ class NX_NETWORK_API StunMessageAttributesData:
 public:
     virtual ~StunMessageAttributesData();
 
-    virtual void serializeAttributes(nx::stun::Message* const message) = 0;
-    virtual bool parseAttributes(const nx::stun::Message& message) = 0;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) = 0;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) = 0;
 };
 
-class NX_NETWORK_API StunRequestData
-:
+class NX_NETWORK_API StunRequestData:
     public StunMessageAttributesData
 {
 public:
     StunRequestData(int method);
 
     /** Fills in all message header and calls StunRequestData::serializeAttributes. */
-    void serialize(nx::stun::Message* const message);
+    void serialize(nx::network::stun::Message* const message);
     /** Validates message header and calls StunRequestData::parseAttributes. */
-    bool parse(const nx::stun::Message& message);
+    bool parse(const nx::network::stun::Message& message);
 
 private:
     int m_method;
@@ -238,9 +237,9 @@ public:
      * NOTE: Sets messageClass to successResponse.
      * WARNING: Does not add tansactionId since it MUST match one in request.
      */
-    void serialize(nx::stun::Message* const message);
+    void serialize(nx::network::stun::Message* const message);
     /** Validates message header and calls StunResponseData::parseAttributes. */
-    bool parse(const nx::stun::Message& message);
+    bool parse(const nx::network::stun::Message& message);
 
 private:
     int m_method;
@@ -256,9 +255,9 @@ public:
      * Fills in all message header and calls StunResponseData::serializeAttributes.
      * NOTE: Sets messageClass to indication.
      */
-    void serialize(nx::stun::Message* const message);
+    void serialize(nx::network::stun::Message* const message);
     /** Validates message header and calls StunResponseData::parseAttributes. */
-    bool parse(const nx::stun::Message& message);
+    bool parse(const nx::network::stun::Message& message);
 
 private:
     int m_method;

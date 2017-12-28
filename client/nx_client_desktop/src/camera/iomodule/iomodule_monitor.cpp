@@ -54,26 +54,26 @@ QnIOModuleMonitor::~QnIOModuleMonitor()
 bool QnIOModuleMonitor::open()
 {
     {
-        nx_http::AsyncHttpClientPtr httpClient;
+        nx::network::http::AsyncHttpClientPtr httpClient;
         QnMutexLocker lk(&m_mutex);
         std::swap(httpClient, m_httpClient);
     }
 
-    m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient = nx::network::http::AsyncHttpClient::create();
     m_httpClient->setResponseReadTimeoutMs(HTTP_READ_TIMEOUT);
     m_httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
 
     connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
         this, &QnIOModuleMonitor::at_MonitorResponseReceived, Qt::DirectConnection);
     connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        m_httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
         this, &QnIOModuleMonitor::at_MonitorMessageBodyAvailable, Qt::DirectConnection);
     connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnIOModuleMonitor::at_MonitorConnectionClosed, Qt::DirectConnection);
 
-    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
+    m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(std::make_shared<QnMessageBodyParser>(this));
 
     QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
@@ -103,13 +103,13 @@ bool QnIOModuleMonitor::open()
     return true;
 }
 
-void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
+void QnIOModuleMonitor::at_MonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     QnMutexLocker lk( &m_mutex );
     if (httpClient != m_httpClient)
         return;
 
-    if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    if( httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok )
     {
         NX_LOG( lit("Failed to subscribe to i/o monitor for camera %1. reason: %2").
             arg(m_camera->getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
@@ -130,18 +130,18 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
     emit connectionOpened();
 }
 
-void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
+void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
     QnMutexLocker lk(&m_mutex);
     if (httpClient == m_httpClient)
     {
-        const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
+        const nx::network::http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
         m_multipartContentParser->processData(msgBodyBuf);
     }
 }
 
-void QnIOModuleMonitor::at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
+void QnIOModuleMonitor::at_MonitorConnectionClosed( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     {
         QnMutexLocker lk(&m_mutex);

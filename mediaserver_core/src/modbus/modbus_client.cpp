@@ -20,7 +20,7 @@ QnModbusClient::QnModbusClient():
 {
 }
 
-QnModbusClient::QnModbusClient(const SocketAddress& sockaddr) :
+QnModbusClient::QnModbusClient(const nx::network::SocketAddress& sockaddr) :
     m_requestTransactionId(0),
     m_endpoint(sockaddr),
     m_connected(false)
@@ -41,7 +41,7 @@ bool QnModbusClient::initSocket()
     if (m_socket)
         m_socket->shutdown();
 
-    m_socket = SocketFactory::createStreamSocket(false);
+    m_socket = nx::network::SocketFactory::createStreamSocket(false);
 
     if (!m_socket->setRecvTimeout(kReceiveTimeout)
         || !m_socket->setSendTimeout(kSendTimeout))
@@ -52,7 +52,7 @@ bool QnModbusClient::initSocket()
     return true;
 }
 
-void QnModbusClient::setEndpoint(const SocketAddress& endpoint)
+void QnModbusClient::setEndpoint(const nx::network::SocketAddress& endpoint)
 {
     m_endpoint = endpoint;
     initSocket();

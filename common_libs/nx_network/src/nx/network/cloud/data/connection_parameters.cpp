@@ -4,6 +4,8 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+using namespace nx::network;
+
 ConnectionParameters::ConnectionParameters():
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
@@ -28,7 +30,7 @@ bool ConnectionParameters::operator==(const ConnectionParameters& rhs) const
         && directTcpConnectStartDelay == rhs.directTcpConnectStartDelay;
 }
 
-void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
+void ConnectionParameters::serializeAttributes(nx::network::stun::Message* const message)
 {
     message->addAttribute(
         stun::extension::attrs::rendezvousConnectTimeout,
@@ -79,7 +81,7 @@ void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
         directTcpConnectStartDelay);
 }
 
-bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
+bool ConnectionParameters::parseAttributes(const nx::network::stun::Message& message)
 {
     // All attributes are optional.
 
@@ -122,15 +124,15 @@ bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseHttpSendTimeout,
         &tcpReverseHttpTimeouts.sendTimeout,
-        (std::chrono::milliseconds)nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+        (std::chrono::milliseconds)nx::network::http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseHttpReadTimeout,
         &tcpReverseHttpTimeouts.responseReadTimeout,
-        (std::chrono::milliseconds)nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+        (std::chrono::milliseconds)nx::network::http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseHttpMsgBodyTimeout,
         &tcpReverseHttpTimeouts.messageBodyReadTimeout,
-        (std::chrono::milliseconds)nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+        (std::chrono::milliseconds)nx::network::http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
 
     // Start delays.
 

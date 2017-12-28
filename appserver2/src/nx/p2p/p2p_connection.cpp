@@ -47,7 +47,7 @@ Connection::Connection(
 {
 }
 
-void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
+void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)
 {
     if (!commonModule()->videowallGuid().isNull())
     {
@@ -78,7 +78,7 @@ void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
-                httpClient->setUserAuthToken(nx_http::Ha1AuthToken(adminUser->getDigest()));
+                httpClient->setUserAuthToken(nx::network::http::Ha1AuthToken(adminUser->getDigest()));
         }
         else
         {

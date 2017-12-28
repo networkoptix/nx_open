@@ -133,7 +133,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
     if( !url.scheme().isEmpty() && doMultichannelCheck )
         return result;
 
-    SocketAddress endpoint(url.host(), url.port(nx::modbus::kDefaultModbusPort));
+    nx::network::SocketAddress endpoint(url.host(), url.port(nx::modbus::kDefaultModbusPort));
 
     nx::modbus::QnModbusClient modbusClient(endpoint);
 
@@ -174,7 +174,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
     // Advantech ADAM modules do not have any unique identifier that we can obtain.
     auto uid = generatePhysicalId(modbusUrl.toString());
     resource->setPhysicalId(uid);
-    resource->setMAC( QnMacAddress(uid));
+    resource->setMAC( nx::network::QnMacAddress(uid));
 
     resource->setDefaultAuth(auth);
 
@@ -186,7 +186,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
 QnResourceList QnAdamResourceSearcher::findResources()
 {
     QnResourceList result;
-    auto interfaces = getAllIPv4Interfaces();
+    auto interfaces = nx::network::getAllIPv4Interfaces();
 
     for (const auto& iface: interfaces)
     {
@@ -196,14 +196,14 @@ QnResourceList QnAdamResourceSearcher::findResources()
         auto socket = std::make_shared<nx::network::UDPSocket>(AF_INET);
         socket->setReuseAddrFlag(true);
 
-        SocketAddress localAddress(iface.address.toString(), 0);
+        nx::network::SocketAddress localAddress(iface.address.toString(), 0);
         if (!socket->bind(localAddress))
         {
             qDebug() << "Unable to bind socket to local address" << localAddress.toString();
             continue;
         }
 
-        SocketAddress foreignEndpoint(BROADCAST_ADDRESS, kAdamAutodiscoveryPort);
+        nx::network::SocketAddress foreignEndpoint(nx::network::BROADCAST_ADDRESS, kAdamAutodiscoveryPort);
         if (!socket->sendTo(kAdamSearchMessage, sizeof(kAdamSearchMessage), foreignEndpoint))
         {
             qDebug() << "Unable to send data to " << foreignEndpoint.toString();
@@ -215,9 +215,9 @@ QnResourceList QnAdamResourceSearcher::findResources()
         while (socket->hasData())
         {
             QByteArray datagram;
-            datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+            datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-            SocketAddress remoteEndpoint;
+            nx::network::SocketAddress remoteEndpoint;
             auto bytesRead = socket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
 
             if (bytesRead <= 0)
@@ -250,7 +250,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
                     resource->setFirmware(secRes->getFirmware());
                     resource->setPhysicalId(secRes->getPhysicalId());
                     resource->setVendor(secRes->getVendor());
-                    resource->setMAC( QnMacAddress(secRes->getPhysicalId()));
+                    resource->setMAC( nx::network::QnMacAddress(secRes->getPhysicalId()));
                     resource->setUrl(secRes->getUrl());
                     resource->setAuth(secRes->getAuth());
 

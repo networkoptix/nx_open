@@ -31,34 +31,34 @@ public:
         bool useSsl);
     ~QnUniversalTcpListener();
 
-    void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
-    nx_http::HttpModManager* httpModManager() const;
-    virtual void applyModToRequest(nx_http::Request* request) override;
+    void addProxySenderConnections(const nx::network::SocketAddress& proxyUrl, int size);
+    nx::network::http::HttpModManager* httpModManager() const;
+    virtual void applyModToRequest(nx::network::http::Request* request) override;
 
-    bool isAuthentificationRequired(nx_http::Request& request);
+    bool isAuthentificationRequired(nx::network::http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
 
-    void setPreparedTcpSockets(std::vector<std::unique_ptr<AbstractStreamServerSocket>> sockets);
+    void setPreparedTcpSockets(std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets);
 
-    static std::vector<std::unique_ptr<AbstractStreamServerSocket>> 
-        createAndPrepareTcpSockets(const SocketAddress& localAddress);
+    static std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> 
+        createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress);
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override;
-    virtual AbstractStreamServerSocket* createAndPrepareSocket(
+        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
+    virtual nx::network::AbstractStreamServerSocket* createAndPrepareSocket(
         bool sslNeeded,
-        const SocketAddress& localAddress) override;
-    virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
+        const nx::network::SocketAddress& localAddress) override;
+    virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
 
 private:
     const nx::vms::cloud_integration::CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
-    std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
-    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
+    std::unique_ptr<nx::network::http::HttpModManager> m_httpModManager;
     //#define LISTEN_ON_UDT_SOCKET
 #if defined(LISTEN_ON_UDT_SOCKET)
     std::atomic<int> m_cloudSocketIndex{1};
@@ -69,7 +69,7 @@ private:
 #endif
 
     std::set<QString> m_unauthorizedForwardingPaths;
-    std::vector<std::unique_ptr<AbstractStreamServerSocket>> m_preparedTcpSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> m_preparedTcpSockets;
 
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);

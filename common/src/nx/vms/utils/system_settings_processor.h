@@ -27,7 +27,7 @@ public:
 
     void setOnBeforeUpdatingSettingValue(BeforeUpdatingSettingValueHandler handler);
 
-    nx_http::StatusCode::Value updateSettings(
+    nx::network::http::StatusCode::Value updateSettings(
         const Qn::UserAccessData& accessRights,
         const QnAuthSession& authSession,
         const QnRequestParams& params,

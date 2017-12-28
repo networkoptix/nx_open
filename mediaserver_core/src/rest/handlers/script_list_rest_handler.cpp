@@ -11,5 +11,5 @@ int QnScriptListRestHandler::executeGet(const QString &path, const QnRequestPara
     QDir dir(getDataDirectory() + "/scripts");
     result.setReply(dir.entryList(QDir::NoDotAndDotDot | QDir::Files));
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

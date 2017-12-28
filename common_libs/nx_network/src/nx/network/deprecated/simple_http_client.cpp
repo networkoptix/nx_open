@@ -76,7 +76,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int t
 
 void CLSimpleHTTPClient::initSocket(bool ssl)
 {
-    m_sock = TCPSocketPtr(SocketFactory::createStreamSocket(ssl).release());
+    m_sock = TCPSocketPtr(nx::network::SocketFactory::createStreamSocket(ssl).release());
 
     if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
     {
@@ -314,7 +314,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
             }
         }
 
-        const SocketAddress& localHostAndPort = m_sock->getLocalAddress();
+        const nx::network::SocketAddress& localHostAndPort = m_sock->getLocalAddress();
         m_localAddress = localHostAndPort.address.toString();
         m_localPort = localHostAndPort.port;
 
@@ -356,17 +356,17 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
         //m_responseLine = m_responseLine.toLower();
 
         //got following status line: http/1.1 401 n/a, and this method returned CL_TRANSPORT_ERROR
-        nx_http::StatusLine statusLine;
+        nx::network::http::StatusLine statusLine;
         if( !statusLine.parse( m_responseLine ) )
             return CL_TRANSPORT_ERROR;
 
         //if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
-        if( statusLine.statusCode != nx_http::StatusCode::ok && statusLine.statusCode != nx_http::StatusCode::noContent )
+        if( statusLine.statusCode != nx::network::http::StatusCode::ok && statusLine.statusCode != nx::network::http::StatusCode::noContent )
         {
             close();
 
             //if (m_responseLine.contains("401 unauthorized"))
-            if( statusLine.statusCode == nx_http::StatusCode::unauthorized )
+            if( statusLine.statusCode == nx::network::http::StatusCode::unauthorized )
             {
                 getAuthInfo();
 
@@ -379,23 +379,23 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
                     return CL_HTTP_AUTH_REQUIRED;
             }
             //else if (m_responseLine.contains("not found"))
-            else if( statusLine.statusCode == nx_http::StatusCode::notFound )
+            else if( statusLine.statusCode == nx::network::http::StatusCode::notFound )
             {
                 return CL_HTTP_NOT_FOUND;
             }
-            else if( statusLine.statusCode == nx_http::StatusCode::notAllowed )
+            else if( statusLine.statusCode == nx::network::http::StatusCode::notAllowed )
             {
                 return CL_HTTP_NOT_ALLOWED;
             }
-            else if( statusLine.statusCode == nx_http::StatusCode::forbidden )
+            else if( statusLine.statusCode == nx::network::http::StatusCode::forbidden )
             {
                 return CL_HTTP_FORBIDDEN;
             }
-            else if( statusLine.statusCode == nx_http::StatusCode::found )
+            else if( statusLine.statusCode == nx::network::http::StatusCode::found )
             {
                 return CL_HTTP_REDIRECT;
             }
-            else if( statusLine.statusCode == nx_http::StatusCode::serviceUnavailable)
+            else if( statusLine.statusCode == nx::network::http::StatusCode::serviceUnavailable)
             {
                 return CL_HTTP_SERVICEUNAVAILABLE;
             }

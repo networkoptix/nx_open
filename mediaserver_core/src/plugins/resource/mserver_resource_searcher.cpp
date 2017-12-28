@@ -29,7 +29,7 @@ QByteArray localAppServerHost()
 {
     QByteArray result = qnServerModule->roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
     if (isLocalAppServer(result)) {
-        QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
+        QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
         if (!interfaces.isEmpty())
             result = interfaces[0].address.toString().toUtf8();
     }
@@ -179,12 +179,12 @@ void QnMServerResourceSearcher::run()
 void QnMServerResourceSearcher::updateSocketList()
 {
     deleteSocketList();
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
         UDPSocket* socket = new UDPSocket(AF_INET);
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
-        if (socket->bind(SocketAddress(iface.address.toString())))
+        if (socket->bind(nx::network::SocketAddress(iface.address.toString())))
         {
             socket->setMulticastIF(localAddress);
             m_socketList << socket;
@@ -197,7 +197,7 @@ void QnMServerResourceSearcher::updateSocketList()
 
     m_receiveSocket.reset( new UDPSocket(AF_INET) );
     m_receiveSocket->setReuseAddrFlag(true);
-    m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, DISCOVERY_PORT));
+    m_receiveSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, DISCOVERY_PORT));
 
     for (int i = 0; i < m_localAddressList.size(); ++i)
         m_receiveSocket->joinGroup(groupAddress, m_localAddressList[i]);
@@ -226,7 +226,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        AbstractDatagramSocket* sock = m_socketList[i];
+        nx::network::AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
         QByteArray datagram = DiscoveryPacket::getRequest(commonModule());
@@ -246,12 +246,12 @@ void QnMServerResourceSearcher::readDataFromSocket()
     }
 }
 
-void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QnCameraConflictList& conflictList)
+void QnMServerResourceSearcher::readSocketInternal(nx::network::AbstractDatagramSocket* socket, QnCameraConflictList& conflictList)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
     {
-        SocketAddress remoteEndpoint;
+        nx::network::SocketAddress remoteEndpoint;
         int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint);
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);

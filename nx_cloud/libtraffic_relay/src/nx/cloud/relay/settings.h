@@ -18,7 +18,7 @@ namespace conf {
 
 struct Http
 {
-    std::list<SocketAddress> endpoints;
+    std::list<network::SocketAddress> endpoints;
     /**
      * Backlog value to pass to tcpServerSocket->listen call.
      */

@@ -305,7 +305,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 
     {
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         nx::utils::Url url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=1").arg(testSetup->endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
@@ -313,7 +313,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 
     {
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         nx::utils::Url url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
             arg(testSetup->endpoint().port).arg(QString::fromStdString(system1.id)));
         url.setUserName(QString::fromStdString(account1.email));
@@ -324,7 +324,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 
     {
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         QString urlStr(
             lm("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
                 arg(testSetup->endpoint().port).arg(nx::utils::Url::toPercentEncoding(QString::fromStdString(system1.id))));
@@ -683,14 +683,14 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
                 getCdbNonce(system1.id, system1.authKey, &nonceData));
 
             // Checking HTTP status code.
-            nx_http::HttpClient httpClient;
+            nx::network::http::HttpClient httpClient;
             nx::utils::Url requestUrl(lit("http://127.0.0.1:%1/cdb/auth/get_nonce").arg(endpoint().port));
             requestUrl.setUserName(QString::fromStdString(system1.id));
             requestUrl.setPassword(QString::fromStdString(system1.authKey));
             ASSERT_TRUE(httpClient.doGet(requestUrl));
             ASSERT_NE(nullptr, httpClient.response());
             ASSERT_EQ(
-                nx_http::StatusCode::unauthorized,
+                nx::network::http::StatusCode::unauthorized,
                 httpClient.response()->statusLine.statusCode);
 
             if (i == 0)

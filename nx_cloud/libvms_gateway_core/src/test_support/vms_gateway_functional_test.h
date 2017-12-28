@@ -32,8 +32,8 @@ public:
     bool startAndWaitUntilStarted(
         bool allowIpTarget, bool proxyTargetPort, bool connectSupport);
 
-    SocketAddress endpoint() const;
-    const std::unique_ptr<TestHttpServer>& testHttpServer() const;
+    network::SocketAddress endpoint() const;
+    const std::unique_ptr<nx::network::http::TestHttpServer>& testHttpServer() const;
 
     /** Test will use path to store all of its files. */
     static void setTemporaryDirectoryPath(const QString& path);
@@ -41,7 +41,7 @@ public:
 private:
     QString m_tmpDir;
     int m_httpPort;
-    std::unique_ptr<TestHttpServer> m_testHttpServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer;
 };
 
 } // namespace gateway

@@ -19,14 +19,14 @@ SimpleEIPClient::~SimpleEIPClient()
 bool SimpleEIPClient::initSocket()
 {
     m_connected = false;
-    m_eipSocket = SocketFactory::createStreamSocket(false);
+    m_eipSocket = nx::network::SocketFactory::createStreamSocket(false);
     bool success = m_eipSocket->setSendTimeout(kDefaultEipTimeout * 1000)
         && m_eipSocket->setRecvTimeout(kDefaultEipTimeout * 1000);
 
     return success;
 }
 
-bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
+bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteArray& data)
 {
     int totalBytesSent = 0;
     int dataSize = data.size();
@@ -52,7 +52,7 @@ bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
     return true;
 }
 
-bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const buffer)
+bool SimpleEIPClient::receiveMessage(nx::network::AbstractStreamSocket* socket, char* const buffer)
 {
     int totalBytesRead = 0;
 

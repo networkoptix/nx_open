@@ -28,18 +28,18 @@ public:
      */
     virtual Qn::AuthResult authorize(
         const QnResourcePtr& res,
-        const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader,
-        nx_http::HttpHeaders* const responseHeaders) = 0;
+        const nx::network::http::Method::ValueType& method,
+        const nx::network::http::header::Authorization& authorizationHeader,
+        nx::network::http::HttpHeaders* const responseHeaders) = 0;
 
     /**
      * Authorizes authorizationHeader with any resource (user or server).
      * @return Resource is returned regardless of authentication result.
      */
     virtual std::tuple<Qn::AuthResult, QnResourcePtr> authorize(
-        const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader,
-        nx_http::HttpHeaders* const responseHeaders) = 0;
+        const nx::network::http::Method::ValueType& method,
+        const nx::network::http::header::Authorization& authorizationHeader,
+        nx::network::http::HttpHeaders* const responseHeaders) = 0;
 };
 
 } // namespace auth

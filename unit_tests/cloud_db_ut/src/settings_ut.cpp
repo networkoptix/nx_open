@@ -55,13 +55,14 @@ public:
     {
         using namespace std::placeholders;
 
-        m_serverSocketFactoryBak = SocketFactory::setCreateStreamServerSocketFunc(
-            std::bind(&SettingsHttp::serverSocketFactoryFunc, this, _1, _2));
+        m_serverSocketFactoryBak =
+            nx::network::SocketFactory::setCreateStreamServerSocketFunc(
+                std::bind(&SettingsHttp::serverSocketFactoryFunc, this, _1, _2));
     }
 
     ~SettingsHttp()
     {
-        SocketFactory::setCreateStreamServerSocketFunc(
+        nx::network::SocketFactory::setCreateStreamServerSocketFunc(
             std::move(m_serverSocketFactoryBak));
     }
 
@@ -82,9 +83,9 @@ protected:
 private:
     int m_expectedTcpBacklogSize;
     nx::utils::SyncQueue<int> m_backlogValuesPassedToServerSocketListen;
-    SocketFactory::CreateStreamServerSocketFuncType m_serverSocketFactoryBak;
+    nx::network::SocketFactory::CreateStreamServerSocketFuncType m_serverSocketFactoryBak;
 
-    std::unique_ptr<AbstractStreamServerSocket> serverSocketFactoryFunc(
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocketFactoryFunc(
         bool /*sslRequired*/,
         nx::network::NatTraversalSupport /*natTraversalRequired*/)
     {

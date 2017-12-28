@@ -174,7 +174,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
             fileName, url, chunkIndex, chunkSize, handleReply, thread());
     }
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);

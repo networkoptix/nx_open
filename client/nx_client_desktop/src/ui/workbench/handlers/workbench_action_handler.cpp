@@ -2592,7 +2592,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
     {
         // No other requests to this proxy, so we have to get nonce by ourselves.
-        auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
+        auto reply = new QnAsyncHttpClientReply(nx::network::http::AsyncHttpClient::create(), this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
             this, &ActionHandler::at_nonceReceived);
@@ -2631,7 +2631,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
-            auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
+            auth.realm, nx::network::http::Method::get, auth.nonce.toUtf8());
 
         nx::utils::Url targetUrl(request.url);
         QUrlQuery urlQuery(targetUrl.toQUrl());

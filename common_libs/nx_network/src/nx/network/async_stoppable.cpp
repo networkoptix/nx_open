@@ -6,6 +6,9 @@
 
 #include "socket_global.h"
 
+namespace nx {
+namespace network {
+
 void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
 {
     const nx::network::aio::AIOService* aioService = nullptr;
@@ -35,3 +38,6 @@ void QnStoppableAsync::pleaseStopSync(
     pleaseStop([&]() { promise.set_value(); });
     fut.wait();
 }
+
+} // namespace network
+} // namespace nx

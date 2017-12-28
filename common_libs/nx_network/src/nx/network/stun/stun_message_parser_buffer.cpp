@@ -3,6 +3,7 @@
 #include <QtEndian>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 MessageParserBuffer::MessageParserBuffer(std::deque<char>* temp_buffer, const nx::Buffer& buffer):
@@ -128,4 +129,5 @@ bool MessageParserBuffer::ensure(std::size_t count, void* buffer)
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

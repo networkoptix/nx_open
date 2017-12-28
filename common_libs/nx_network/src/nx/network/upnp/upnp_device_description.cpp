@@ -2,7 +2,9 @@
 
 static const QString urnTemplate = lit("urn:schemas-upnp-org:%1:%2:%3");
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 QString toUpnpUrn(const QString& id, const QString& suffix, int version)
 {
@@ -131,4 +133,6 @@ bool DeviceDescriptionHandler::charactersInService(const QString& ch)
     return true;
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

@@ -18,7 +18,7 @@ class QnProgressiveDownloadingConsumer
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnProgressiveDownloadingConsumer(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();

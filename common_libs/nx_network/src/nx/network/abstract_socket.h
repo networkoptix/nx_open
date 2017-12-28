@@ -30,9 +30,6 @@ constexpr static const std::chrono::milliseconds kDefaultConnectTimeout =
 constexpr static const std::chrono::milliseconds kNoTimeout =
     std::chrono::milliseconds::zero();
 
-} // namespace network
-} // namespace nx
-
 /**
  * Base interface for sockets. Provides methods to set different socket configuration parameters.
  * Removing socket:
@@ -604,3 +601,6 @@ public:
     virtual bool leaveGroup(const QString &multicastGroup) = 0;
     virtual bool leaveGroup(const QString &multicastGroup, const QString& multicastIF) = 0;
 };
+
+} // namespace network
+} // namespace nx

@@ -14,7 +14,7 @@
 namespace {
 
 static const std::chrono::hours kConnectionTimeout(10);
-static const KeepAliveOptions kKeepAliveOptions(
+static const nx::network::KeepAliveOptions kKeepAliveOptions(
     std::chrono::seconds(10), std::chrono::seconds(10), 3);
 
 template<typename P>
@@ -32,7 +32,7 @@ bool keepConnectionOpenMode(const P& p) { return p.contains(lit("keepConnectionO
 template<typename P>
 bool updateStreamMode(const P& p) { return p.contains(lit("updateStream")); }
 
-static void clearSockets(std::set<QSharedPointer<AbstractStreamSocket>>* sockets)
+static void clearSockets(std::set<QSharedPointer<nx::network::AbstractStreamSocket>>* sockets)
 {
     for (const auto& s: *sockets)
         s->cancelIOSync(nx::network::aio::etNone);
@@ -66,11 +66,11 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
             request.owner->resourcePool(), request.owner->accessRights()))
     {
         JsonRestResponse response;
-        response.statusCode = (nx_http::StatusCode::Value) QnPermissionsHelper::notOwnerError(response.json);
+        response.statusCode = (nx::network::http::StatusCode::Value) QnPermissionsHelper::notOwnerError(response.json);
         return response;
     }
 
-    JsonRestResponse response(nx_http::StatusCode::ok, {}, updateStreamMode(request.params));
+    JsonRestResponse response(nx::network::http::StatusCode::ok, {}, updateStreamMode(request.params));
     if (allModulesMode(request.params))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
@@ -103,7 +103,7 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
         response.json.setReply(request.owner->commonModule()->moduleInformation());
     }
 
-    response.statusCode = nx_http::StatusCode::ok;
+    response.statusCode = nx::network::http::StatusCode::ok;
     if (updateStreamMode(request.params))
         response.isUndefinedContentLength = true;
 
@@ -190,7 +190,7 @@ int QnModuleInformationRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 void QnModuleInformationRestHandler::updateModuleImformation()
@@ -201,7 +201,7 @@ void QnModuleInformationRestHandler::updateModuleImformation()
 }
 
 void QnModuleInformationRestHandler::sendModuleImformation(
-    const QSharedPointer<AbstractStreamSocket>& socket)
+    const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
 {
     if (m_moduleInformatiom.isEmpty())
         updateModuleImformation();
@@ -223,7 +223,7 @@ void QnModuleInformationRestHandler::sendModuleImformation(
 
 
 void QnModuleInformationRestHandler::sendKeepAliveByTimer(
-    const QSharedPointer<AbstractStreamSocket>& socket)
+    const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
 {
     socket->registerTimer(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2,
         [this, socket]()

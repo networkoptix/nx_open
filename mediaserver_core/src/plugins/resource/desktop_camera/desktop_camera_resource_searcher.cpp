@@ -58,7 +58,7 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 void QnDesktopCameraResourceSearcher::registerCamera(
-    const QSharedPointer<AbstractStreamSocket>& connection,
+    const QSharedPointer<nx::network::AbstractStreamSocket>& connection,
     const QString& userName,
     const QString& uniqueId)
 {

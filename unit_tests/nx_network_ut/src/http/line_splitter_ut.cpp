@@ -7,7 +7,7 @@
 namespace {
 
 void splitToLines(
-    nx_http::LineSplitter* const lineSplitter,
+    nx::network::http::LineSplitter* const lineSplitter,
     const nx::Buffer& sourceText,
     std::vector<nx::Buffer>* const lines)
 {
@@ -27,7 +27,7 @@ void splitToLines(
 #if 0
 void splitToLines(const nx::Buffer& sourceText, std::vector<nx::Buffer>* const lines)
 {
-    nx_http::LineSplitter lineSplitter;
+    nx::network::http::LineSplitter lineSplitter;
     splitToLines(&lineSplitter, sourceText, lines);
 }
 #endif
@@ -71,7 +71,7 @@ TEST(LineSplitter, TrailingLFTest)
         "xxxxxxxx"
         ;
 
-    nx_http::LineSplitter lineSplitter;
+    nx::network::http::LineSplitter lineSplitter;
     std::vector<nx::Buffer> lines;
     enum State
     {
@@ -135,7 +135,7 @@ TEST(LineSplitter, common)
         "line2\r\n"
         "line3";
 
-    nx_http::LineSplitter lineSplitter;
+    nx::network::http::LineSplitter lineSplitter;
     std::vector<nx::Buffer> lines;
     splitToLines(&lineSplitter, testData, &lines);
     QnByteArrayConstRef lineBuffer;

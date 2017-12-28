@@ -32,9 +32,9 @@ private:
 private:
     struct DiscoveryInfo
     {
-        DiscoveryInfo( AbstractDatagramSocket* _sock, const QHostAddress& _ifAddr): sock(_sock), ifAddr(_ifAddr) {}
+        DiscoveryInfo( nx::network::AbstractDatagramSocket* _sock, const QHostAddress& _ifAddr): sock(_sock), ifAddr(_ifAddr) {}
         ~DiscoveryInfo() { }
-        AbstractDatagramSocket* sock;
+        nx::network::AbstractDatagramSocket* sock;
         QHostAddress ifAddr;
     };
     QList<DiscoveryInfo> m_sockList;
