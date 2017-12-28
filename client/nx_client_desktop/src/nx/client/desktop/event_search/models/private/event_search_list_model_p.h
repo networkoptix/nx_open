@@ -71,6 +71,7 @@ private:
     mutable QScopedPointer<vms::event::StringsHelper> m_helper;
     qint64 m_latestTimeMs = 0;
     rest::Handle m_currentUpdateId = rest::Handle();
+    int m_requestLimitMultiplier = 1;
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;

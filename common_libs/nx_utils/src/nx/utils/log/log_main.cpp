@@ -34,16 +34,22 @@ public:
         return logger;
     }
 
-    std::shared_ptr<Logger> get(const Tag& tag, bool allowMainLogger) const
+    std::shared_ptr<Logger> get(const Tag& tag, bool exactMatch) const
     {
         QnMutexLocker lock(&m_mutex);
+        if (exactMatch)
+        {
+            const auto it = m_loggersByTags.find(tag);
+            return (it == m_loggersByTags.end()) ? std::shared_ptr<Logger>() : it->second;
+        }
+
         for (auto& it: m_loggersByTags)
         {
             if (tag.matches(it.first))
                 return it.second;
         }
 
-        return allowMainLogger ? m_mainLogger : std::shared_ptr<Logger>();
+        return m_mainLogger;
     }
 
     void remove(const std::set<Tag>& filters)
@@ -98,9 +104,14 @@ std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters)
     return loggerCollection()->add(filters);
 }
 
-std::shared_ptr<Logger> getLogger(const Tag& tag, bool allowMainLogger)
+std::shared_ptr<Logger> getLogger(const Tag& tag)
 {
-    return loggerCollection()->get(tag, allowMainLogger);
+    return loggerCollection()->get(tag, /*exactMatch*/ false);
+}
+
+std::shared_ptr<Logger> getExactLogger(const Tag& tag)
+{
+    return loggerCollection()->get(tag, /*exactMatch*/ true);
 }
 
 void removeLoggers(const std::set<Tag>& filters)

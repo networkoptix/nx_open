@@ -31,7 +31,7 @@ private: // overrides
 private:
     void handleWeightsChanged();
 
-    qreal getWeight(const QModelIndex& modelIndex) const;
+    WeightData getWeight(const QModelIndex& modelIndex) const;
 
 private:
     QnWeightsDataHash m_weights;

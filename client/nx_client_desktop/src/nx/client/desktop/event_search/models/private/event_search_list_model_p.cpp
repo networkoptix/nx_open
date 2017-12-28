@@ -155,6 +155,7 @@ void EventSearchListModel::Private::clear()
     m_prefetch.clear();
     m_currentUpdateId = rest::Handle();
     m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), selectedTimePeriod().endTimeMs());
+    m_requestLimitMultiplier = 1;
     base_type::clear();
 
     refreshUpdateTimer();
@@ -167,14 +168,40 @@ bool EventSearchListModel::Private::hasAccessRights() const
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint64 toMs)
 {
+    const auto limit = kFetchBatchSize * m_requestLimitMultiplier;
     const auto eventsReceived =
-        [this](bool success, rest::Handle handle, vms::event::ActionDataList&& data)
+        [this, fromMs, toMs, limit]
+            (bool success, rest::Handle handle, vms::event::ActionDataList&& data)
         {
             if (shouldSkipResponse(handle))
                 return;
 
             m_prefetch = success ? std::move(data) : vms::event::ActionDataList();
             m_success = success;
+
+            const bool limitReached = m_prefetch.size() >= limit;
+
+            // Event log lookup has precision of seconds, so we need to do additional filtering.
+            while (!m_prefetch.empty() && timestampMs(m_prefetch.back()) < fromMs)
+                m_prefetch.pop_back();
+
+            auto begin = m_prefetch.begin();
+            while (begin != m_prefetch.end() && timestampMs(*begin) > toMs)
+                ++begin;
+
+            // TODO: #vkutin Optimize it.
+            m_prefetch.erase(m_prefetch.begin(), begin);
+
+            // Correct limit multiplier.
+            if (limitReached)
+            {
+                static constexpr int kMaxMultiplier = 64;
+
+                if (m_prefetch.size() < kFetchBatchSize)
+                    m_requestLimitMultiplier = qMin(m_requestLimitMultiplier * 2, kMaxMultiplier);
+                else
+                    m_requestLimitMultiplier = qMax(m_requestLimitMultiplier / 2, 1);
+            }
 
             if (m_prefetch.empty())
             {
@@ -187,15 +214,15 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(qint64 fromMs, qint6
                     << utils::timestampToRfc2822(timestampMs(m_prefetch.front()));
             }
 
-            complete(m_prefetch.size() >= kFetchBatchSize
+            complete(limitReached
                 ? timestampMs(m_prefetch.back()) + 1 /*discard last ms*/
                 : 0);
         };
 
-    qDebug() << "Requesting events from" << utils::timestampToRfc2822(fromMs)
+    qDebug() << "Requesting up to" << limit << "events from" << utils::timestampToRfc2822(fromMs)
         << "to" << utils::timestampToRfc2822(toMs);
 
-    return getEvents(fromMs, toMs, eventsReceived, kFetchBatchSize);
+    return getEvents(fromMs, toMs, eventsReceived, limit);
 }
 
 bool EventSearchListModel::Private::commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll)

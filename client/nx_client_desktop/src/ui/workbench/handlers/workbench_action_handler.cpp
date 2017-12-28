@@ -164,7 +164,6 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <nx/client/desktop/watchers/system_servers_watcher.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/app_info.h>
@@ -1894,24 +1893,15 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
 
 void ActionHandler::at_mainMenuAddDeviceManually_triggered()
 {
-    const auto servers = nx::client::desktop::SystemServersWatcher(this).servers();
+    const auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
     if (servers.isEmpty())
     {
-        NX_EXPECT(false, "No servers for device searching");
+        NX_EXPECT(false, "No online servers for device searching");
         return;
     }
 
-    const auto itOnlineServer = std::find_if(servers.begin(), servers.end(),
-        [](const QnMediaServerResourcePtr& server)
-        {
-            return server->getStatus() == Qn::Online;
-        });
-
-    if (itOnlineServer == servers.end())
-        return;
-
     menu()->triggerForced(action::AddDeviceManuallyAction,
-        action::Parameters(*itOnlineServer));
+        action::Parameters(servers.first()));
 }
 
 void ActionHandler::at_addDeviceManually_triggered()

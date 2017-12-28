@@ -1,10 +1,11 @@
 #pragma once
 
+#include "server_online_status_watcher.h"
+
 #include <ui/widgets/common/dropdown_button.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
-#include <nx/client/desktop/watchers/server_online_status_watcher.h>
 
 class QMenu;
 class QnUuid;

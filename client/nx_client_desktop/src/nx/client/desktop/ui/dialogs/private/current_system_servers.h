@@ -5,18 +5,19 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/uuid.h>
+#include <utils/common/connective.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class SystemServersWatcher: public QObject, public QnCommonModuleAware
+class CurrentSystemServers: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
 public:
-    SystemServersWatcher(QObject* parent = nullptr);
+    CurrentSystemServers(QObject* parent = nullptr);
 
     QnMediaServerResourceList servers() const;
 
@@ -30,11 +31,9 @@ signals:
 private:
     void tryAddServer(const QnResourcePtr& resource);
     void tryRemoveServer(const QnResourcePtr& resource);
-    void cleanServers();
-    void updateLocalSystemId();
+    void handleFlagsChanged(const QnMediaServerResourcePtr& server);
 
 private:
-    QnUuid m_localSystemId;
     QnMediaServerResourceList m_servers;
 };
 

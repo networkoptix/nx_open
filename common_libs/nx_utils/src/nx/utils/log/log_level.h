@@ -85,15 +85,15 @@ struct NX_UTILS_API LevelSettings
      *     none, verbose[nx::media::media_player_quality_chooser], debug[ec2::DbManager]
      * </code></pre>
      */
-    void parse(const QString& s);
+    bool parse(const QString& s);
 
     template<typename ... Args>
-    void parse(const QString& arg, Args ... args)
+    bool parse(const QString& arg, Args ... args)
     {
         if (arg.isEmpty())
-            parse(std::forward<Args>(args) ...);
+            return parse(std::forward<Args>(args) ...);
         else
-            parse(arg);
+            return parse(arg);
     }
 };
 

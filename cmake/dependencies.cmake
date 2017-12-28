@@ -135,6 +135,7 @@ function(nx_get_dependencies)
     if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(opengl-es-mali)
+        nx_rdep_add_package(libstdc++-6.0.19)
     endif()
 
     if(box MATCHES "rpi")
