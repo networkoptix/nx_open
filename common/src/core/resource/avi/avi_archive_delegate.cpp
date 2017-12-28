@@ -230,6 +230,19 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     av_free_packet(&packet);
                     continue; // seek is broken for audio only media streams
                 }
+
+                if (stream->codec->codec_id == AV_CODEC_ID_ADPCM_G726 &&
+                    stream->codec->bits_per_coded_sample == 16)
+                {
+                    // Workaround for ffmpeg bug. It losts 'bits_per_coded_sample' field when saves G726 to the MKV.
+                    // Valid range for this field is [2..5]. Try to restore value from field 'block_align' if possible.
+                    // Otherwise use default value 4. Value 2 can't be restored.
+                    // https://ffmpeg.org/pipermail/ffmpeg-devel/2014-January/153139.html
+                    stream->codec->bits_per_coded_sample =
+                        stream->codec->block_align > 1 ? stream->codec->block_align : 4;
+                }
+
+
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
