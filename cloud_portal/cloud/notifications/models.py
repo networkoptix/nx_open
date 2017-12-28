@@ -5,6 +5,9 @@ from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
 
+if hasattr(settings, "CLOUD_NOTIFICATIONS"):
+    CLOUD_NOTIFICATIONS = settings.CLOUD_NOTIFICATIONS
+
 
 class Event(models.Model):
     object = models.CharField(max_length=255)
@@ -71,7 +74,11 @@ class Message(models.Model):
         from .tasks import send_email
 
         if settings.USE_ASYNC_QUEUE:
-            result = send_email.delay(self.user_email, self.type, self.message, self.customization)
+            if self.type == 'cloud_notification' and CLOUD_NOTIFICATIONS:
+                result = send_email.apply_async(args=[self.user_email, self.type, self.message, self.customization],
+                                                queue=CLOUD_NOTIFICATIONS)
+            else:
+                result = send_email.delay(self.user_email, self.type, self.message, self.customization)
             self.task_id = result.task_id
         else:
             send_email(self.user_email, self.type, self.message, self.customization)

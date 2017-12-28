@@ -242,6 +242,7 @@ if not BROKER_URL:
         'queue_name_prefix' : conf['queue_name'] + '-',
         'region' : 'us-east-1'
     }
+    CLOUD_NOTIFICATIONS = "cloud-notifications"
 
 RESULT_PERSISTENT = True
 CELERY_RESULT_BACKEND = 'django-db'

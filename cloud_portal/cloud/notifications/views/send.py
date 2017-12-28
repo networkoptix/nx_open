@@ -15,7 +15,7 @@ import re
 #Replaces </p> and <br> with \n and then remove all html tags
 def html_to_text(html):
     new_line = re.compile(r'<(\/p|br)>')
-    tags = re.compile(r'<[\/\w]+>')
+    tags = re.compile(r'<[\w\=\'\"\:\;\_\-\,\!\/\ ]+>')
     return tags.sub('', new_line.sub('\n', html))
 
 
