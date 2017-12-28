@@ -13,6 +13,7 @@
 #include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/basic_service_settings.h>
+#include <nx/utils/random.h>
 #include <nx/utils/string.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/test_support/settings_loader.h>
@@ -520,7 +521,8 @@ TEST_F(ListeningPeerPool, enables_tcp_keep_alive)
 
 TEST_F(ListeningPeerPool, connection_closed_simultaneously_with_take_request)
 {
-    setConnectionPostDelay(std::chrono::milliseconds(17));
+    setConnectionPostDelay(
+        std::chrono::milliseconds(nx::utils::random::number<int>(0, 50)));
 
     givenConnectionFromPeer();
 
