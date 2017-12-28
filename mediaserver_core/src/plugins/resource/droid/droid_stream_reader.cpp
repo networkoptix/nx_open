@@ -114,7 +114,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
 
     if (m_tcpSock->isClosed())
         m_tcpSock->reopen();
-    if (!m_tcpSock->connect(host, m_connectionPort))
+    if (!m_tcpSock->connect(host, m_connectionPort, nx::network::deprecated::kDefaultConnectTimeout))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_resource->getUrl(), m_connectionPort);

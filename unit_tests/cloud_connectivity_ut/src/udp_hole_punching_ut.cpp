@@ -202,7 +202,7 @@ protected:
     bool tryOpenTunnel()
     {
         auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-        m_tunnelOpened = clientSocket->connect(serverAddress(), 2000);
+        m_tunnelOpened = clientSocket->connect(serverAddress(), std::chrono::seconds(2));
         clientSocket.reset();
         return m_tunnelOpened;
     }
@@ -210,7 +210,7 @@ protected:
     void openConnection()
     {
         auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-        ASSERT_TRUE(clientSocket->connect(serverAddress(), 300000))
+        ASSERT_TRUE(clientSocket->connect(serverAddress(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         m_tunnelOpened = true;
     }

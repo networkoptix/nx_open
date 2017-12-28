@@ -190,7 +190,7 @@ void SmtpClient::setSendMessageTimeout(int msec)
 
 SmtpOperationResult SmtpClient::connectToHost()
 {
-    if (!m_socket->connect(host, port, connectionTimeout))
+    if (!m_socket->connect(host, port, std::chrono::milliseconds(connectionTimeout)))
         return {SmtpError::ConnectionTimeoutError};
 
     try

@@ -118,7 +118,7 @@ Pollable* DummySocket::pollable()
 
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int /*timeoutMillis*/)
+    std::chrono::milliseconds /*timeout*/)
 {
     m_remotePeerAddress = remoteSocketAddress;
     return true;
@@ -142,7 +142,7 @@ void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
 
 bool DummySocket::reopen()
 {
-    return connect(m_remotePeerAddress);
+    return connect(m_remotePeerAddress, nx::network::deprecated::kDefaultConnectTimeout);
 }
 
 bool DummySocket::setNoDelay(bool /*value*/)

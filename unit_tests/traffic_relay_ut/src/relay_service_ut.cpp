@@ -130,8 +130,8 @@ protected:
     {
         m_connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(m_connection->connect(
-            SocketAddress(HostAddress::localhost, moduleInstance()->httpEndpoints().front().port))
-        ) << SystemError::getLastOSErrorText().toStdString();
+            SocketAddress(HostAddress::localhost, moduleInstance()->httpEndpoints().front().port),
+            nx::network::kNoTimeout)) << SystemError::getLastOSErrorText().toStdString();
     }
 
     void assertConnectionClosedByRelay()

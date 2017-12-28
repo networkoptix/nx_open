@@ -58,11 +58,11 @@ protected:
 
                 cc->start(nullptr /* do not wait for select in test */);
                 m_connection = std::make_unique<udp::IncomingTunnelConnection>(std::move(cc));
-                
+
                 acceptForever();
                 startedPromise.set_value();
             });
-            
+
         startedPromise.get_future().wait();
     }
 
@@ -277,7 +277,7 @@ TEST_F(UdpIncomingTunnelConnectionTest, PleaseStopOnRun)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
                     ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
-                    if (!socket->connect(m_connectionAddress))
+                    if (!socket->connect(m_connectionAddress, nx::network::deprecated::kDefaultConnectTimeout))
                         return;
                 }
             }));

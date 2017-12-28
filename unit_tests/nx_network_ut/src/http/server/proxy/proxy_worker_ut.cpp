@@ -102,7 +102,7 @@ private:
         translatedRequest.requestLine.version = nx_http::http_1_1;
 
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(tcpSocket->connect(m_httpServer.serverAddress()))
+        ASSERT_TRUE(tcpSocket->connect(m_httpServer.serverAddress(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
 

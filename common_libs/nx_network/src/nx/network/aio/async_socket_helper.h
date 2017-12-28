@@ -470,7 +470,9 @@ private:
             [this, resolvedAddress, sendTimeout]()
             {
                 NX_CRITICAL(resolvedAddress.address.isIpAddress());
-                this->m_socket->connect(resolvedAddress, sendTimeout);
+                this->m_socket->connect(
+                    resolvedAddress,
+                    std::chrono::milliseconds(sendTimeout));
             });    //< Functor will be called between pollset.add and pollset.poll.
         return true;
     }

@@ -560,10 +560,10 @@ bool UdtStreamSocket::setRendezvous(bool val)
 
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMs)
+    std::chrono::milliseconds timeout)
 {
     if (remoteAddress.address.isIpAddress())
-        return connectToIp(remoteAddress, timeoutMs);
+        return connectToIp(remoteAddress, timeout);
 
     std::deque<HostAddress> ips;
     const SystemError::ErrorCode resultCode =
@@ -579,7 +579,7 @@ bool UdtStreamSocket::connect(
     {
         auto ip = std::move(ips.front());
         ips.pop_front();
-        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeout))
             return true;
     }
 
@@ -758,7 +758,7 @@ void UdtStreamSocket::registerTimer(
 
 bool UdtStreamSocket::connectToIp(
     const SocketAddress& remoteAddress,
-    unsigned int /*timeoutMs*/)
+    std::chrono::milliseconds /*timeout*/)
 {
     // TODO: #ak use timeoutMs.
 

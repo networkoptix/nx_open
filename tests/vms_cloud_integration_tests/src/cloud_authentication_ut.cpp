@@ -46,7 +46,7 @@ protected:
                 accountEmail(), accountPassword(),
                 temporaryCredentialsParams, &temporaryCredentials));
 
-        m_customCredentials = 
+        m_customCredentials =
             std::make_pair(temporaryCredentials.login, temporaryCredentials.password);
     }
 
@@ -56,7 +56,7 @@ protected:
 
         //issuing request to mediaserver using that nonce
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), 3000));
+        ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), nx::network::kNoTimeout));
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
         auto httpMsgPipeline = std::make_unique<nx_http::deprecated::AsyncMessagePipeline>(
             nullptr,

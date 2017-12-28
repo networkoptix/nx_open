@@ -92,8 +92,10 @@ TEST( TcpConnectionProcessor, sendAsyncData )
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     auto clientSocket = SocketFactory::createStreamSocket(false);
-    clientSocket->setRecvTimeout(kDataTransferTimeout);
-    clientSocket->connect(QLatin1String("127.0.0.1"), tcpListener.getPort());
+    ASSERT_TRUE(clientSocket->setRecvTimeout(kDataTransferTimeout));
+    ASSERT_TRUE(clientSocket->connect(
+        SocketAddress(HostAddress::localhost, tcpListener.getPort()),
+        nx::network::kNoTimeout));
 
     char buffer[kTotalTestBytes / 128];
     int gotBytes = 0;

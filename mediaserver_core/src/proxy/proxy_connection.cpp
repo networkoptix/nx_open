@@ -165,7 +165,10 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             .release());
         d->dstSocket->setRecvTimeout(d->connectTimeout.count());
         d->dstSocket->setSendTimeout(d->connectTimeout.count());
-        if (!d->dstSocket->connect(SocketAddress(url.host().toLatin1().data(), url.port()))) {
+        if (!d->dstSocket->connect(
+                SocketAddress(url.host().toLatin1().data(), url.port()),
+                nx::network::deprecated::kDefaultConnectTimeout))
+        {
             d->socket->close();
             return QString(); // now answer from destination address
         }

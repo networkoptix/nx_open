@@ -162,7 +162,7 @@ void QnProxySenderConnection::run()
         return;
     }
 
-    if (!d->socket->connect(d->proxyServerUrl, kSocketTimeout))
+    if (!d->socket->connect(d->proxyServerUrl, std::chrono::milliseconds(kSocketTimeout)))
         return;
 
     d->socket->setSendTimeout(kSocketTimeout);

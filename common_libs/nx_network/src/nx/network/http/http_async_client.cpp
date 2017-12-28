@@ -34,9 +34,9 @@ namespace nx_http {
 
 static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 
-constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultSendTimeout;
-constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
-constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
+constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultSendTimeout;
+constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
+constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
 
 constexpr int kMaxNumberOfRedirects = 5;
 

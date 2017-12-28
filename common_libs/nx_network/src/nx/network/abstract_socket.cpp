@@ -27,18 +27,9 @@ bool AbstractSocket::isInSelfAioThread() const
 bool AbstractCommunicatingSocket::connect(
     const QString& foreignAddress,
     unsigned short foreignPort,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
-    // TODO: #ak this method MUST replace the previous one
-    return connect(SocketAddress(foreignAddress, foreignPort), timeoutMillis);
-}
-
-bool AbstractCommunicatingSocket::connect(
-    const SocketAddress& remoteSocketAddress,
-    std::chrono::milliseconds timeoutMillis)
-{
-    // TODO: #ak this method MUST replace the previous one
-    return connect(remoteSocketAddress, timeoutMillis.count());
+    return connect(SocketAddress(foreignAddress, foreignPort), timeout);
 }
 
 int AbstractCommunicatingSocket::send(const QByteArray& data)

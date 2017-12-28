@@ -1884,7 +1884,9 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     // TODO: #ak should read local address only once
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(nx_http::DEFAULT_HTTP_PORT) ) )
+    if( !sock->connect(
+            eventServiceURL.host(), eventServiceURL.port(nx_http::DEFAULT_HTTP_PORT),
+            nx::network::deprecated::kDefaultConnectTimeout) )
     {
         NX_LOGX( lit("Failed to connect to %1:%2 to determine local address. %3").
             arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );

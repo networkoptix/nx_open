@@ -172,8 +172,12 @@ bool ConnectedSocketsSupplier::connectSockets()
 
 bool ConnectedSocketsSupplier::connect()
 {
-    while (!m_clientSocket->connect(m_acceptor->getLocalAddress()))
+    while (!m_clientSocket->connect(
+                m_acceptor->getLocalAddress(),
+                nx::network::deprecated::kDefaultConnectTimeout))
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
 
     m_lastError = m_connectedFuture.get();
     m_acceptor->pleaseStopSync();

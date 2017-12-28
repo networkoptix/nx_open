@@ -3,9 +3,9 @@
 
 namespace
 {
-    const int kDefaultConnectionTimeoutMs = 4000;
-    const int kSendTimeout = 4000;
-    const int kReceiveTimeout = 4000;
+static const std::chrono::seconds kDefaultConnectionTimeout(4);
+const int kSendTimeout = 4000;
+const int kReceiveTimeout = 4000;
 }
 
 namespace nx
@@ -63,7 +63,7 @@ bool QnModbusClient::connect()
     if (!m_socket && !initSocket())
         return false;
 
-    m_connected = m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
+    m_connected = m_socket->connect(m_endpoint, kDefaultConnectionTimeout);
 
     return m_connected;
 }
@@ -258,7 +258,7 @@ ModbusResponse QnModbusClient::readDiscreteInputs(quint16 startAddress, quint16 
 {
     NX_ASSERT(false, "QnModbusClient::readDiscreteInputs not implemented.");
 
-    *outStatus = false; 
+    *outStatus = false;
     return ModbusResponse();
 }
 

@@ -33,7 +33,7 @@ protected:
 
         typename SocketTypeSet::ClientSocket clientSocket;
         SocketAddress addr("127.0.0.1", m_serverPort.get_future().get());
-        ASSERT_TRUE(clientSocket.connect(addr));
+        ASSERT_TRUE(clientSocket.connect(addr, nx::network::kNoTimeout));
         if (doServerDelay)
             clientSocket.setSendTimeout(duration_cast<milliseconds>(kClientDelay).count());
 

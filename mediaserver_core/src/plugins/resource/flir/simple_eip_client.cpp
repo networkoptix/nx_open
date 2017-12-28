@@ -46,7 +46,7 @@ bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
         }
 
         totalBytesSent += bytesSent;
-        dataSize -= bytesSent; 
+        dataSize -= bytesSent;
     }
 
     return true;
@@ -69,7 +69,7 @@ bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const b
     }
 
     auto header = EIPPacket::parseHeader(QByteArray(buffer, EIPEncapsulationHeader::SIZE));
-    
+
     auto totalMesssageLength = header.dataLength + EIPEncapsulationHeader::SIZE;
 
     while (totalBytesRead < totalMesssageLength)
@@ -80,7 +80,7 @@ bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const b
 
         if (bytesRead <= 0)
             return false;
-        
+
         totalBytesRead += bytesRead;
     }
 
@@ -183,7 +183,7 @@ MessageRouterResponse SimpleEIPClient::getServiceResponseData(const QByteArray& 
         header.dataLength);
 
     auto cpf = CPFPacket::decode(data.mid(
-        sizeof(decltype(EIPEncapsulationData::handle)) + 
+        sizeof(decltype(EIPEncapsulationData::handle)) +
         sizeof(decltype(EIPEncapsulationData::timeout))));
 
     for(const auto& item: cpf.items)
@@ -219,7 +219,7 @@ bool SimpleEIPClient::tryGetResponse(const MessageRouterRequest &request, QByteA
         *outStatus = header.status;
 
     return true;
-    
+
 }
 
 MessageRouterResponse SimpleEIPClient::doServiceRequest(
@@ -269,7 +269,9 @@ bool SimpleEIPClient::connectIfNeeded()
     if (!m_eipSocket && !initSocket())
         return false;
 
-    m_connected = m_eipSocket->connect(m_hostAddress, m_port, kDefaultEipTimeout * 1000);
+    m_connected = m_eipSocket->connect(
+        m_hostAddress, m_port,
+        std::chrono::milliseconds(kDefaultEipTimeout * 1000));
 
     if (!m_connected)
         m_eipSocket.reset();

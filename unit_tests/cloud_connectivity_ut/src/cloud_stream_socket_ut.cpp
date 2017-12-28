@@ -162,7 +162,7 @@ TEST_F(CloudStreamSocketTest, simple)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), 0));
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), nx::network::kNoTimeout));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
@@ -172,7 +172,7 @@ TEST_F(CloudStreamSocketTest, simple)
     // also try to connect just by system name
     {
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), nx::network::kNoTimeout));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
@@ -287,9 +287,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(
-            SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()))
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.reserve(bytesToSendThroughConnection);
@@ -306,9 +304,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(
-            SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()))
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
@@ -386,7 +382,7 @@ TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
 
                 if (!socket->isConnected())
                 {
-                    ASSERT_TRUE(socket->connect(targetAddress, 3000));
+                    ASSERT_TRUE(socket->connect(targetAddress, nx::network::kNoTimeout));
                     socketState = SocketState::connected;
                 }
 
@@ -534,7 +530,8 @@ protected:
     {
         m_clientSocket = std::make_unique<CloudStreamSocket>(
             SocketFactory::tcpServerIpVersion());
-        ASSERT_TRUE(m_clientSocket->connect(QnUuid::createUuid().toSimpleString(), -1));
+        ASSERT_TRUE(m_clientSocket->connect(
+            QnUuid::createUuid().toSimpleString(), nx::network::kNoTimeout));
     }
 
     void startSocketReadThread()

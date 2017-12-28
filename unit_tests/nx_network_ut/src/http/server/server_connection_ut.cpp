@@ -135,7 +135,8 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
     auto sock = SocketFactory::createStreamSocket();
     ASSERT_TRUE(sock->connect(SocketAddress(
         HostAddress::localhost,
-        m_testHttpServer->serverAddress().port)));
+        m_testHttpServer->serverAddress().port),
+        nx::network::kNoTimeout));
 
     int msgCounter = 0;
     for (; msgCounter < REQUESTS_TO_SEND; ++msgCounter)
@@ -224,7 +225,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
     const auto socket = std::make_unique<nx::network::TCPSocket>(
         SocketFactory::tcpServerIpVersion());
 
-    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress(), nx::network::kNoTimeout));
     ASSERT_EQ((int)sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
 }
 
@@ -243,7 +244,7 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     const auto socket = std::make_unique<nx::network::TCPSocket>(
         SocketFactory::tcpServerIpVersion());
 
-    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress(), nx::network::kNoTimeout));
     ASSERT_EQ(kQuery.size(), socket->send(kQuery.data(), kQuery.size()));
 
     nx::Buffer buffer(1024, Qt::Uninitialized);

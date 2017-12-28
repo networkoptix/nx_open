@@ -660,7 +660,7 @@ void QnRtspClient::parseSDP()
             isBackChannel = true;
         }
     }
-    if (mapNum >= 0) 
+    if (mapNum >= 0)
     {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
@@ -764,7 +764,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     else
         targetAddress = SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
-    if (!m_tcpSock->connect(targetAddress, TCP_CONNECT_TIMEOUT_MS))
+    if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
 
     m_tcpSock->setNoDelay(true);

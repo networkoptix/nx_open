@@ -273,7 +273,10 @@ int QnNetworkResource::getChannel() const
 bool QnNetworkResource::ping()
 {
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    return sock->connect(
+        getHostAddress(),
+        QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT),
+        nx::network::deprecated::kDefaultConnectTimeout);
 }
 
 void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )

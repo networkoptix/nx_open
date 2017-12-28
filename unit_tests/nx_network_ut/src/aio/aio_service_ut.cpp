@@ -55,7 +55,7 @@ protected:
     {
         givenSocket();
 
-        ASSERT_TRUE(m_socket->connect(m_tcpServer.endpoint())) <<
+        ASSERT_TRUE(m_socket->connect(m_tcpServer.endpoint(), nx::network::kNoTimeout)) <<
             SystemError::getLastOSErrorText().toStdString();
     }
 

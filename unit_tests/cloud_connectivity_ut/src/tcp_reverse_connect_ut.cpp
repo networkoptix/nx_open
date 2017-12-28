@@ -113,7 +113,9 @@ TEST_F(TcpReverseConnectTest, SimpleMultiserver)
 
     // Cause old tunnel to expire to close by unsuccessful connect attempt.
     CloudStreamSocket socket(AF_INET);
-    ASSERT_FALSE(socket.connect(m_system.id, 100));
+    ASSERT_FALSE(socket.connect(
+        SocketAddress(m_system.id.toStdString(), 100),
+        std::chrono::milliseconds(10)));
     ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
 
     // Ensure new tunnel to open and function normaly.

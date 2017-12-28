@@ -122,7 +122,7 @@ protected:
     void givenRegisteredListeningPeer()
     {
         auto connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(connection->connect(m_testServer.serverAddress()));
+        ASSERT_TRUE(connection->connect(m_testServer.serverAddress(), nx::network::kNoTimeout));
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         m_serverConnection = connection.get();
 

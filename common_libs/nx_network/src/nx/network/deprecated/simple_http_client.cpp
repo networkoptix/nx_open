@@ -117,7 +117,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
                 return CL_TRANSPORT_ERROR;
 
             NX_VERBOSE(this, lm("Connecting to %1:%2").arg(m_host).arg(m_port));
-            if (!m_sock->connect(m_host, m_port))
+            if (!m_sock->connect(m_host, m_port, nx::network::deprecated::kDefaultConnectTimeout))
             {
                 const auto systemErrorCode = SystemError::getLastOSErrorCode();
                 NX_VERBOSE(this, lm("Failed to connect. %1")
@@ -307,7 +307,8 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
     {
         if (!m_connected)
         {
-            if (m_host.isEmpty() || !m_sock->connect(m_host, m_port))
+            if (m_host.isEmpty() ||
+                !m_sock->connect(m_host, m_port, nx::network::deprecated::kDefaultConnectTimeout))
             {
                 return CL_TRANSPORT_ERROR;
             }

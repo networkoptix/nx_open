@@ -405,7 +405,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
             });
 
         UdtStreamSocket clientSock(AF_INET);
-        ASSERT_TRUE(clientSock.connect(serverAddress))
+        ASSERT_TRUE(clientSock.connect(serverAddress, nx::network::kNoTimeout))
             << serverAddress.toStdString() <<", "
             << SystemError::getLastOSErrorText().toStdString();
 
@@ -444,7 +444,7 @@ protected:
     void connectToUdtServer()
     {
         m_clientSock = std::make_unique<UdtStreamSocket>(AF_INET);
-        ASSERT_TRUE(m_clientSock->connect(m_serverAddress))
+        ASSERT_TRUE(m_clientSock->connect(m_serverAddress, nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
     }
 
@@ -547,7 +547,7 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         ASSERT_TRUE(clientSock->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_NE(server.getLocalAddress(), clientSock->getLocalAddress());
 
-        ASSERT_TRUE(clientSock->connect(server.getLocalAddress()));
+        ASSERT_TRUE(clientSock->connect(server.getLocalAddress(), nx::network::kNoTimeout));
 
         auto connectionAcceptedFuture = connectionAcceptedPromise.get_future();
         ASSERT_EQ(
@@ -628,7 +628,7 @@ protected:
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         socketConfig(socket.get());
-        EXPECT_TRUE((bool) socket->connect(address));
+        EXPECT_TRUE(socket->connect(address, nx::network::kNoTimeout));
         return socket;
     }
 

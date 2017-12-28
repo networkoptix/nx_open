@@ -67,12 +67,12 @@ public:
     class NX_NETWORK_API Timeouts
     {
     public:
-        constexpr static const std::chrono::seconds kDefaultSendTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultResponseReadTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultMessageBodyReadTimeout =
-            std::chrono::seconds::zero();  //no timeout
+        constexpr static const std::chrono::milliseconds kDefaultSendTimeout =
+            std::chrono::milliseconds(3001);
+        constexpr static const std::chrono::milliseconds kDefaultResponseReadTimeout =
+            std::chrono::milliseconds(3002);
+        constexpr static const std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
+            std::chrono::milliseconds::zero();  //no timeout
 
         std::chrono::milliseconds sendTimeout;
         std::chrono::milliseconds responseReadTimeout;

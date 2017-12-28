@@ -43,8 +43,11 @@ public:
         aio::AbstractAioThread* aioThread, String sessionId)
     {
         auto socket = std::make_unique<TCPSocket>(AF_INET);
-        if (!socket->connect(m_testServer->serverAddress()) || !socket->setNonBlockingMode(true))
+        if (!socket->connect(m_testServer->serverAddress(), nx::network::deprecated::kDefaultConnectTimeout) ||
+            !socket->setNonBlockingMode(true))
+        {
             return nullptr;
+        }
 
         return std::make_unique<DirectTcpEndpointTunnel>(
             aioThread, sessionId, m_testServer->serverAddress(), std::move(socket));
@@ -62,12 +65,12 @@ public:
         m_tunnel->start();
         expectingTunnelFunctionsSuccessfully();
     }
-    
+
     void whenRemotePeerHasDisappeared()
     {
         m_testServer.reset();
     }
-    
+
     void expectingTunnelFunctionsSuccessfully()
     {
         openNewConnection(
@@ -136,7 +139,7 @@ TEST_F(TcpTunnel, cancellation)
         for (int j = 0; j < 3; ++j)
         {
             SocketAttributes socketAttributes;
-            socketAttributes.aioThread = 
+            socketAttributes.aioThread =
                 nx::network::SocketGlobals::aioService().getRandomAioThread();
             tunnel->establishNewConnection(
                 defaultConnectTimeout,
