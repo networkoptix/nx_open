@@ -15,9 +15,9 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override
+        std::chrono::milliseconds timeout) override
     {
-        QN_UNUSED(remoteSocketAddress, timeoutMillis);
+        QN_UNUSED(remoteSocketAddress, timeout);
         return true;
     }
 
