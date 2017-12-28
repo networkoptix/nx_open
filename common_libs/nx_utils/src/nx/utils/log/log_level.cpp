@@ -136,24 +136,40 @@ void LevelSettings::reset()
     filters.clear();
 }
 
+const QChar kSeparator(',');
+const QChar kOpenBracket('[');
+const QChar kCloseBracket(']');
+
 QString LevelSettings::toString() const
 {
-    return lit("%1, filters=%2").arg(log::toString(primary).toUpper(), containerString(filters));
+    std::map<nx::utils::log::Level, QStringList> filersByLevel;
+    for (const auto& tag: filters)
+        filersByLevel[tag.second] << tag.first.toString();
+
+    QStringList levelList(log::toString(primary));
+    for (const auto& filterGroup : filersByLevel)
+    {
+        const auto level = log::toString(filterGroup.first);
+        const auto filters = filterGroup.second.join(kSeparator);
+        levelList << (level + kOpenBracket + filters + kCloseBracket);
+    }
+
+    return levelList.join(kSeparator + QString(" "));
 }
 
 static bool isSeparator(const QChar& c)
 {
-    return c == QChar(',');
+    return c == kSeparator;
 };
 
 static bool isOpenBracket(const QChar& c)
 {
-    return c == QChar('[');
+    return c == kOpenBracket;
 };
 
 static bool isCloseBracket(const QChar& c)
 {
-    return c == QChar(']');
+    return c == kCloseBracket;
 };
 
 static bool isTokenPart(const QChar& c)
@@ -194,23 +210,25 @@ static std::set<QString> readTokenList(const QString& s, int* position)
     }
 }
 
-void LevelSettings::parse(const QString& s)
+bool LevelSettings::parse(const QString& s)
 {
     if (s.trimmed().isEmpty())
-        return;
+        return true; //< Not an error, default value will be used.
 
+    bool hasErrors = false;
     for (int position = 0; position < s.size(); ++position)
     {
         if (isSeparator(s[position]))
             continue;
 
         const auto levelToken = readToken(s, &position);
-        auto level = levelFromString(levelToken);
         auto filtersTokens = readTokenList(s, &position);
 
+        auto level = levelFromString(levelToken);
         if (level == Level::undefined)
         {
             qWarning() << Q_FUNC_INFO << "ignore wrong level" << levelToken;
+            hasErrors = true;
             continue;
         }
 
@@ -220,15 +238,20 @@ void LevelSettings::parse(const QString& s)
             continue;
         }
 
-        for (auto& t : filtersTokens)
+        for (auto& t: filtersTokens)
         {
             Tag tag(std::move(t));
             if (filters.find(tag) != filters.end())
+            {
                 qWarning() << Q_FUNC_INFO << "redefine filter" << tag.toString();
+                hasErrors = true;
+            }
 
             filters.emplace(std::move(tag), level);
         }
     }
+
+    return !hasErrors;
 }
 
 } // namespace log
