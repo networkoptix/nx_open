@@ -32,6 +32,7 @@ bool requiresCameraResource(ActionType actionType)
         case sendMailAction:
         case diagnosticsAction:
         case showPopupAction:
+        case openLayoutAction:
             return false;
 
         case playSoundOnceAction:
@@ -69,6 +70,7 @@ bool requiresUserResource(ActionType actionType)
         case showTextOverlayAction:
         case showOnAlarmLayoutAction:
         case execHttpRequestAction:
+        case openLayoutAction:
             return false;
 
         case acknowledgeAction:
@@ -97,6 +99,7 @@ bool requiresAdditionalUserResource(ActionType actionType)
         case execHttpRequestAction:
         case acknowledgeAction:
         case sendMailAction:
+        case openLayoutAction:
             return false;
 
         case bookmarkAction:
@@ -126,6 +129,7 @@ bool hasToggleState(ActionType actionType)
         case showOnAlarmLayoutAction:
         case execHttpRequestAction:
         case acknowledgeAction:
+        case openLayoutAction:
             return false;
 
         case cameraOutputAction:
@@ -217,7 +221,8 @@ QList<ActionType> userAvailableActions()
         executePtzPresetAction,
         showTextOverlayAction,
         showOnAlarmLayoutAction,
-        execHttpRequestAction
+        execHttpRequestAction,
+        openLayoutAction,
     };
 
     return result;

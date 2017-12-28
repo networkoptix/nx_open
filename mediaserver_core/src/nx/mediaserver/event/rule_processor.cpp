@@ -106,6 +106,7 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         case vms::event::showTextOverlayAction:
         case vms::event::showOnAlarmLayoutAction:
         case vms::event::execHttpRequestAction:
+        case vms::event::openLayoutAction:
             return QnMediaServerResourcePtr(); //< Don't transfer to other server, execute here.
 
         default:
@@ -297,6 +298,7 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
             action->getParams().actionId = QnUuid::createUuid();
             /*fallthrough*/
         case vms::event::showOnAlarmLayoutAction:
+        case vms::event::openLayoutAction:
         case vms::event::showTextOverlayAction:
             return broadcastAction(action);
         default:

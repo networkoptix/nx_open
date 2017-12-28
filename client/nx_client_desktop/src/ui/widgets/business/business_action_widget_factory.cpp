@@ -12,6 +12,7 @@
 #include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
 #include <ui/widgets/business/ptz_preset_business_action_widget.h>
 #include <ui/widgets/business/exec_http_request_action_widget.h>
+#include <ui/widgets/business/open_layout_action_widget.h>
 
 using namespace nx;
 
@@ -44,6 +45,8 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
             return new QnShowOnAlarmLayoutActionWidget(parent);
         case vms::event::execHttpRequestAction:
             return new QnExecHttpRequestActionWidget(parent);
+        case vms::event::openLayoutAction:
+            return new nx::client::desktop::OpenLayoutActionWidget(parent);
         default:
             break;
     }
