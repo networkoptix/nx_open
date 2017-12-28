@@ -30,7 +30,7 @@
 namespace nx {
 namespace cdb {
 
-using namespace nx_http;
+using namespace nx::network::http;
 
 AuthenticationManager::AuthenticationManager(
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,

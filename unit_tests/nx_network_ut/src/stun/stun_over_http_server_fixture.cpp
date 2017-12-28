@@ -3,6 +3,7 @@
 #include <nx/network/url/url_builder.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -18,7 +19,7 @@ StunOverHttpServer::StunOverHttpServer():
         kStunOverHttpPath);
 }
 
-bool StunOverHttpServer::bind(const SocketAddress& localEndpoint)
+bool StunOverHttpServer::bind(const network::SocketAddress& localEndpoint)
 {
     return m_httpServer.bindAndListen(localEndpoint);
 }
@@ -42,7 +43,7 @@ nx::network::stun::MessageDispatcher& StunOverHttpServer::dispatcher()
 }
 
 void StunOverHttpServer::sendIndicationThroughEveryConnection(
-    nx::network::stun::Message message)
+    stun::Message message)
 {
     m_stunOverHttpServer.stunConnectionPool().forEachConnection(
         nx::network::server::MessageSender<nx::network::stun::ServerConnection>(std::move(message)));
@@ -65,7 +66,7 @@ void StunOverHttpServerFixture::SetUp()
         kStunMethodToUse,
         std::bind(&StunOverHttpServerFixture::processStunMessage, this, _1, _2));
 
-    ASSERT_TRUE(m_server.bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(m_server.bind(network::SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(m_server.listen());
 }
 
@@ -135,4 +136,5 @@ void StunOverHttpServerFixture::processStunMessage(
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -90,7 +90,7 @@ void LicenseWatcher::startUpdate()
         return;
 
     m_httpClient->setProxyVia(
-    SocketAddress(HostAddress::localhost, QUrl(server->getUrl()).port()));
+    nx::network::SocketAddress(nx::network::HostAddress::localhost, QUrl(server->getUrl()).port()));
     m_httpClient->setProxyUserName(server->getId().toString());
     m_httpClient->setProxyUserPassword(server->getAuthKey());
 

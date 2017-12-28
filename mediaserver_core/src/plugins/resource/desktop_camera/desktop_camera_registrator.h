@@ -9,7 +9,7 @@ class QnDesktopCameraRegistratorPrivate;
 class QnDesktopCameraRegistrator: public QnTCPConnectionProcessor
 {
 public:
-    QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnDesktopCameraRegistrator(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
 
 protected:
     virtual void run() override;

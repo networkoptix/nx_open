@@ -2,6 +2,9 @@
 
 #include "nettools.h"
 
+namespace nx {
+namespace network {
+
 QnMacAddress::QnMacAddress()
 {
     memset(m_data.bytes, 0, 6);
@@ -90,3 +93,6 @@ uint qHash(const QnMacAddress& value)
 
     return value.m_data.uints.u32 * 863 + value.m_data.uints.u16;
 }
+
+} // namespace network
+} // namespace nx

@@ -78,7 +78,7 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& pa
 }
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
     QnTCPConnectionProcessor(socket, owner),

@@ -17,6 +17,7 @@
 #include <nx/utils/sync_call.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -695,4 +696,5 @@ TEST_F(UdpClientRedirect, content_server_does_not_respond)
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -28,7 +28,7 @@ template<> struct SocketTypeToProtocolType<nx::network::UDPSocket>
 
 template<typename Socket>
 class TestConnection:
-    public stun::AbstractServerConnection,
+    public nx::network::stun::AbstractServerConnection,
     public nx::network::aio::BasicPollable
 {
 public:
@@ -43,9 +43,9 @@ public:
         return SocketTypeToProtocolType<Socket>::value;
     }
 
-    virtual SocketAddress getSourceAddress() const override
+    virtual nx::network::SocketAddress getSourceAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
     virtual void addOnConnectionCloseHandler(
@@ -54,7 +54,7 @@ public:
         m_connectionCloseHandler.swap(handler);
     }
 
-    virtual AbstractCommunicatingSocket* socket() override
+    virtual nx::network::AbstractCommunicatingSocket* socket() override
     {
         return &m_socket;
     }
@@ -93,9 +93,9 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class TestTcpConnection:
-    public stun::ServerConnection
+    public nx::network::stun::ServerConnection
 {
-    using base_type = stun::ServerConnection;
+    using base_type = nx::network::stun::ServerConnection;
 
 public:
     TestTcpConnection();
@@ -104,7 +104,7 @@ public:
         nx::network::stun::Message /*message*/,
         std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override;
 
-    virtual SocketAddress getSourceAddress() const override;
+    virtual nx::network::SocketAddress getSourceAddress() const override;
 
     virtual void setInactivityTimeout(
         boost::optional<std::chrono::milliseconds> value) override;

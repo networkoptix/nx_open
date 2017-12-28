@@ -310,7 +310,7 @@ QSet<QString> QnResourceDiscoveryManager::lastDiscoveredIds() const
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
 {
-    QList<QHostAddress> localAddresses = allLocalIpV4Addresses();
+    QList<QHostAddress> localAddresses = nx::network::allLocalIpV4Addresses();
     if (localAddresses != m_allLocalAddresses)
     {
         // Skip first time.
@@ -374,7 +374,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         // return own camera back for edge server
         char  mac[MAC_ADDR_LEN];
         char* host = 0;
-        getMacFromPrimaryIF(mac, &host);
+        nx::network::getMacFromPrimaryIF(mac, &host);
         return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
     }
 #endif
@@ -547,7 +547,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 #ifdef EDGE_SERVER
                 char  mac[MAC_ADDR_LEN];
                 char* host = 0;
-                getMacFromPrimaryIF(mac, &host);
+                nx::network::getMacFromPrimaryIF(mac, &host);
                 if( existingCamRes->getUniqueId().toLocal8Bit() == QByteArray(mac) )
                 {
                     //on edge server always discovering camera to be able to move it to the edge server if needed

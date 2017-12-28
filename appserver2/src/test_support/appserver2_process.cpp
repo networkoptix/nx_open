@@ -226,12 +226,12 @@ QnCommonModule* Appserver2Process::commonModule() const
     return m_commonModule.get();
 }
 
-SocketAddress Appserver2Process::endpoint() const
+nx::network::SocketAddress Appserver2Process::endpoint() const
 {
     QnMutexLocker lk(&m_mutex);
     auto endpoint = m_tcpListener->getLocalEndpoint();
-    if (endpoint.address == HostAddress::anyHost)
-        endpoint.address = HostAddress::localhost;
+    if (endpoint.address == nx::network::HostAddress::anyHost)
+        endpoint.address = nx::network::HostAddress::localhost;
     return endpoint;
 }
 
@@ -476,7 +476,7 @@ ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
     return m_impl->ecConnection();
 }
 
-SocketAddress Appserver2ProcessPublic::endpoint() const
+nx::network::SocketAddress Appserver2ProcessPublic::endpoint() const
 {
     return m_impl->endpoint();
 }

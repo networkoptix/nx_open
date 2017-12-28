@@ -99,7 +99,7 @@ public:
 };
 
 QnFileConnectionProcessor::QnFileConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+    QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
 :
     QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {

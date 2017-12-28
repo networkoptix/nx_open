@@ -87,7 +87,7 @@ private:
     {
         relay::api::ResultCode resultCode;
         relay::api::BeginListeningResponse response;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
     };
 
     std::unique_ptr<nx::network::cloud::relay::ConnectionAcceptor> m_relayConnectionAcceptor;
@@ -97,8 +97,8 @@ private:
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_serverConnection;
     nx::utils::SyncQueue<nx::network::http::Message> m_receivedMessageQueue;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosureReasons;
-    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
-    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
+    nx::utils::SyncQueue<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedConnections;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_prevAcceptedConnection;
 
     virtual void SetUp() override
     {
@@ -133,7 +133,7 @@ private:
 
     void saveAcceptedConnection(
         SystemError::ErrorCode /*systemErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> connection)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
         m_acceptedConnections.push(std::move(connection));
     }

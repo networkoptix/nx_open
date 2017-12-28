@@ -12,6 +12,7 @@
 #include "stun_over_http_server_fixture.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -147,4 +148,5 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

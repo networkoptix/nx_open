@@ -85,12 +85,12 @@ QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPo
 {
     if (!m_tcpMode)
     {
-        m_mediaSocket = SocketFactory::createDatagramSocket().release();
-        m_mediaSocket->bind(SocketAddress(HostAddress::anyHost, 0));
+        m_mediaSocket = nx::network::SocketFactory::createDatagramSocket().release();
+        m_mediaSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, 0));
         m_mediaSocket->setRecvTimeout(500);
 
-        m_rtcpSocket = SocketFactory::createDatagramSocket().release();
-        m_rtcpSocket->bind(SocketAddress(HostAddress::anyHost, 0));
+        m_rtcpSocket = nx::network::SocketFactory::createDatagramSocket().release();
+        m_rtcpSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, 0));
         m_rtcpSocket->setRecvTimeout(500);
     }
 }
@@ -118,7 +118,7 @@ qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
     return bytesRead;
 }
 
-AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
+nx::network::AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
 {
     if (m_tcpMode)
         return m_owner->m_tcpSock.get();
@@ -151,7 +151,7 @@ void QnRtspIoDevice::processRtcpData()
     bool rtcpReportAlreadySent = false;
     while( m_rtcpSocket->hasData() )
     {
-        SocketAddress senderEndpoint;
+        nx::network::SocketAddress senderEndpoint;
         int bytesRead = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
         if (bytesRead > 0)
         {
@@ -188,7 +188,7 @@ void QnRtspIoDevice::processRtcpData()
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
-                auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
+                auto remoteEndpoint = nx::network::SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
                 if (!m_rtcpSocket->setDestAddr(remoteEndpoint))
                 {
                     qWarning()
@@ -484,7 +484,7 @@ static std::atomic<int> RTPSessionInstanceCounter(0);
 
 QnRtspClient::QnRtspClient(
     bool shoulGuessAuthDigest,
-    std::unique_ptr<AbstractStreamSocket> tcpSock)
+    std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
 :
     m_csec(2),
     //m_rtpIo(*this),
@@ -511,7 +511,7 @@ QnRtspClient::QnRtspClient(
     m_responseBufferLen = 0;
 
     if( !m_tcpSock )
-        m_tcpSock = SocketFactory::createStreamSocket();
+        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
 
     m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
 
@@ -752,17 +752,17 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     {
         QnMutexLocker lock(&m_socketMutex);
-        m_tcpSock = SocketFactory::createStreamSocket();
+        m_tcpSock = nx::network::SocketFactory::createStreamSocket();
         m_additionalReadBufferSize = 0;
     }
 
     m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT_MS);
 
-    SocketAddress targetAddress;
+    nx::network::SocketAddress targetAddress;
     if (m_proxyAddress)
         targetAddress = *m_proxyAddress;
     else
-        targetAddress = SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
+        targetAddress = nx::network::SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
@@ -1956,7 +1956,7 @@ bool QnRtspClient::isAudioEnabled() const
 
 void QnRtspClient::setProxyAddr(const QString& addr, int port)
 {
-    m_proxyAddress = SocketAddress(addr, (uint16_t) port);
+    m_proxyAddress = nx::network::SocketAddress(addr, (uint16_t) port);
 }
 
 QString QnRtspClient::mediaTypeToStr(TrackType trackType)
@@ -2165,7 +2165,7 @@ void QnRtspClient::setTrackInfo(const TrackMap& tracks)
     m_sdpTracks = tracks;
 }
 
-AbstractStreamSocket* QnRtspClient::tcpSock()
+nx::network::AbstractStreamSocket* QnRtspClient::tcpSock()
 {
     return m_tcpSock.get();
 }

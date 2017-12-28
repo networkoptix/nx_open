@@ -60,7 +60,7 @@ protected:
                 onUdpRequest(std::move(c), std::move(m));
             });
 
-        NX_CRITICAL(udpStunServer.bind(SocketAddress("127.0.0.1:0")));
+        NX_CRITICAL(udpStunServer.bind(nx::network::SocketAddress("127.0.0.1:0")));
         NX_CRITICAL(udpStunServer.listen());
         EXPECT_CALL(*stunClientMock, remoteAddress())
             .Times(::testing::AnyNumber())
@@ -108,7 +108,7 @@ protected:
         tunnelConnection->accept(
             [this, socketsToAccept](
                 SystemError::ErrorCode code,
-                std::unique_ptr<AbstractStreamSocket> socket)
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket)
             {
                 acceptedSockets.push_back(std::move(socket));
                 acceptResults.push(code);
@@ -134,11 +134,11 @@ protected:
         ASSERT_TRUE(ack.parse(message));
         ASSERT_EQ(ack.connectSessionId, kConnectionSessionId);
 
-        SocketAddress destinationAddress = connection->getSourceAddress();
+        nx::network::SocketAddress destinationAddress = connection->getSourceAddress();
         NX_LOGX(lm("Got connectionAck from %1")
             .arg(destinationAddress), cl_logDEBUG1);
 
-        SocketAddress sourceAddress = get2ndPeerAddress();
+        nx::network::SocketAddress sourceAddress = get2ndPeerAddress();
         NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2")
             .arg(sourceAddress).arg(destinationAddress), cl_logDEBUG2);
 
@@ -155,8 +155,8 @@ protected:
     }
 
     void connectControlSocket(
-        const SocketAddress& sourceAddress,
-        const SocketAddress& destinationAddress)
+        const nx::network::SocketAddress& sourceAddress,
+        const nx::network::SocketAddress& destinationAddress)
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(socket->setRendezvous(true));
@@ -181,7 +181,7 @@ protected:
 
     void selectControlSocket(
         UdtStreamSocket* socket,
-        const SocketAddress& destinationAddress)
+        const nx::network::SocketAddress& destinationAddress)
     {
         stun::Message request(stun::Header(
             stun::MessageClass::request,
@@ -224,7 +224,7 @@ protected:
         });
     }
 
-    void connectClientSocket(const SocketAddress& address)
+    void connectClientSocket(const nx::network::SocketAddress& address)
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
@@ -246,12 +246,12 @@ protected:
         connectSockets.push_back(std::move(socket));
     }
 
-    SocketAddress get2ndPeerAddress()
+    nx::network::SocketAddress get2ndPeerAddress()
     {
         if (!m_udtAddressKeeper)
         {
             m_udtAddressKeeper.reset(new UdtStreamSocket(AF_INET));
-            EXPECT_TRUE(m_udtAddressKeeper->bind(SocketAddress("127.0.0.1:0")));
+            EXPECT_TRUE(m_udtAddressKeeper->bind(nx::network::SocketAddress("127.0.0.1:0")));
         }
 
         return m_udtAddressKeeper->getLocalAddress();
@@ -273,7 +273,7 @@ protected:
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
 
     bool manualAcceptorStop;
-    std::unique_ptr<AbstractStreamSocket> m_udtAddressKeeper;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_udtAddressKeeper;
     std::unique_ptr<TunnelAcceptor> tunnelAcceptor;
     stun::MessageDispatcher stunMessageDispatcher;
     stun::UdpServer udpStunServer;
@@ -281,11 +281,11 @@ protected:
     bool isUdpServerEnabled;
     size_t connectionRequests;
     utils::TestSyncQueue<SystemError::ErrorCode> connectResults;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> connectSockets;
 
     utils::TestSyncQueue<SystemError::ErrorCode> acceptResults;
     std::unique_ptr<AbstractIncomingTunnelConnection> tunnelConnection;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> acceptedSockets;
 };
 
 TEST_F(UdpHolePunchingTunnelAcceptorTest, UdpRequestTimeout)

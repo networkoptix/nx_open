@@ -41,7 +41,7 @@ public:
     void setProxyCredentials(
         const std::string& login,
         const std::string& password);
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const nx::network::SocketAddress& proxyEndpoint);
 
     void setRequestTimeout(std::chrono::milliseconds);
     std::chrono::milliseconds requestTimeout() const;
@@ -60,7 +60,7 @@ public:
         // TODO #ak Introduce generic implementation with variadic templates available.
 
         nx::network::http::AuthInfo auth;
-        SocketAddress proxyEndpoint;
+        nx::network::SocketAddress proxyEndpoint;
         {
             QnMutexLocker lk(&m_mutex);
             auth = m_auth;

@@ -30,6 +30,7 @@
 
 #include "mediator_mocks.h"
 
+using namespace nx::network;
 
 namespace nx {
 namespace hpm {
@@ -56,11 +57,11 @@ protected:
             false,
             nx::network::NatTraversalSupport::disabled);
 
-        EXPECT_TRUE(server->bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
+        EXPECT_TRUE(server->bind(std::vector<nx::network::SocketAddress>{nx::network::SocketAddress::anyAddress}));
         EXPECT_TRUE(server->listen());
 
         EXPECT_TRUE(server->endpoints().size());
-        m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
+        m_address = nx::network::SocketAddress(nx::network::HostAddress::localhost, server->endpoints().front().port);
         network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_address));
     }
@@ -74,13 +75,13 @@ protected:
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
     std::unique_ptr<network::server::MultiAddressServer<stun::SocketServer>> server;
 
-    SocketAddress address() const
+    nx::network::SocketAddress address() const
     {
         return m_address;
     }
 
 private:
-    SocketAddress m_address;
+    nx::network::SocketAddress m_address;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
@@ -89,7 +90,7 @@ static const auto AUTH_KEY = QnUuid::createUuid().toSimpleString().toUtf8();
 
 TEST_F( ConnectTest, BindConnect )
 {
-    TestHttpServer testHttpServer;
+    nx::network::http::TestHttpServer testHttpServer;
     {
         ASSERT_TRUE( testHttpServer.registerStaticProcessor( "/test", "test", "application/text" ) );
         ASSERT_TRUE( testHttpServer.bindAndListen() );
@@ -107,7 +108,7 @@ TEST_F( ConnectTest, BindConnect )
         request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
         request.newAttribute< stun::extension::attrs::ServerId >( SERVER_ID );
         request.newAttribute< stun::extension::attrs::PublicEndpointList >(
-            std::list< SocketAddress >( 1, testHttpServer.serverAddress() ) );
+            std::list< nx::network::SocketAddress >( 1, testHttpServer.serverAddress() ) );
 
         request.insertIntegrity( SYSTEM_ID, AUTH_KEY );
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );

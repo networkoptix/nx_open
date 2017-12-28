@@ -35,21 +35,21 @@ class MediaserverEndpointTesterMock
         : public MediaserverEndpointTesterBase
 {
 public:
-    MOCK_METHOD3( pingServer, void( const SocketAddress&, const String&,
-                                    std::function< void( SocketAddress, bool ) > ) );
+    MOCK_METHOD3( pingServer, void( const nx::network::SocketAddress&, const String&,
+                                    std::function< void(nx::network::SocketAddress, bool ) > ) );
 
     MediaserverEndpointTesterMock( AbstractCloudDataProvider* cloudData,
                         nx::network::stun::MessageDispatcher* dispatcher )
         : MediaserverEndpointTesterBase( cloudData, dispatcher ) {}
 
     inline
-    void expect_pingServer( const SocketAddress& address, const String& serverId,
+    void expect_pingServer( const nx::network::SocketAddress& address, const String& serverId,
                             bool result, size_t count = 1 )
     {
         EXPECT_CALL( *this, pingServer( address, serverId, ::testing::_ ) )
             .Times( count ).WillRepeatedly( ::testing::Invoke(
-                [ = ]( const SocketAddress&, const String&,
-                    std::function< void( SocketAddress, bool ) > onPinged )
+                [ = ]( const nx::network::SocketAddress&, const String&,
+                    std::function< void(nx::network::SocketAddress, bool ) > onPinged )
                 { onPinged( address, result ); } ) );
     }
 };

@@ -30,8 +30,8 @@ public:
 protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result) override;
 
@@ -45,8 +45,8 @@ private:
     struct CachedDevInfo
     {
         QElapsedTimer timer;
-        nx_upnp::DeviceInfo info;
-        QnMacAddress mac;
+        nx::network::upnp::DeviceInfo info;
+        nx::network::QnMacAddress mac;
     };
 
     QMap<QString, CacheInfo> m_cachedXml;
@@ -55,11 +55,11 @@ private:
     QMap<QString, nx::network::http::AsyncHttpClientPtr > m_httpInProgress;
     QnMutex m_mutex;
 
-    nx_upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
+    nx::network::upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
     QByteArray getDeviceXmlAsync(const nx::utils::Url &url);
-    nx_upnp::DeviceInfo getDeviceInfoSync(const nx::utils::Url& url, bool* outStatus) const;
+    nx::network::upnp::DeviceInfo getDeviceInfoSync(const nx::utils::Url& url, bool* outStatus) const;
 
-    bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
+    bool isNxDevice(const nx::network::upnp::DeviceInfo& devInfo) const;
 
     QString chooseProperPhysicalId(
         const QString& hostAddress,
@@ -71,15 +71,15 @@ private:
         const QString& macAddress);
 
     void createResource(
-        const nx_upnp::DeviceInfo& devInfo,
-        const QnMacAddress& mac,
+        const nx::network::upnp::DeviceInfo& devInfo,
+        const nx::network::QnMacAddress& mac,
         const QAuthenticator &auth,
         QnResourceList& result );
 
     void processDeviceXml(
         const QByteArray& foundDeviceDescription,
-        const HostAddress& host,
-        const HostAddress& sender,
+        const nx::network::HostAddress& host,
+        const nx::network::HostAddress& sender,
         QnResourceList& result );
 
     boost::optional<QnActiResource::ActiSystemInfo> getActiSystemInfo(

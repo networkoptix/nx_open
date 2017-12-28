@@ -15,15 +15,15 @@ public:
     void setClientPeerName(nx::String name);
     const nx::String& clientPeerName() const;
 
-    void setClientEndpoint(SocketAddress endpoint);
-    const SocketAddress& clientEndpoint() const;
+    void setClientEndpoint(network::SocketAddress endpoint);
+    const network::SocketAddress& clientEndpoint() const;
 
     nx::network::http::Message toHttpMessage() const;
     bool parse(const nx::network::http::Message& message);
 
 private:
     nx::String m_clientPeerName;
-    SocketAddress m_clientEndpoint;
+    network::SocketAddress m_clientEndpoint;
 };
 
 } // namespace api

@@ -17,8 +17,8 @@ class NX_NETWORK_API ResolveDomainRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::resolveDomain;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::resolveDomain;
 
     nx::String domainName;
 
@@ -32,8 +32,8 @@ class NX_NETWORK_API ResolveDomainResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::resolveDomain;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::resolveDomain;
 
     std::vector<nx::String> hostNames;
 

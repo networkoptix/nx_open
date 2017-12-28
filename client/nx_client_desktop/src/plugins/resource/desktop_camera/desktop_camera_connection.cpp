@@ -108,7 +108,7 @@ public:
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     void* sslContext,
     QnDesktopResource* desktop)
     :
@@ -241,7 +241,7 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
         msleep(10);
 }
 
-QSharedPointer<AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
+QSharedPointer<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
     std::unique_ptr<nx::network::http::HttpClient>& httpClient)
 {
     auto socket = QSharedPointer<nx::network::BufferedStreamSocket>(

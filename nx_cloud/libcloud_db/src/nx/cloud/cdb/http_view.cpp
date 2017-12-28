@@ -84,7 +84,7 @@ void HttpView::listen()
         throw std::system_error(SystemError::getLastOSErrorCode(), std::system_category());
 }
 
-std::vector<SocketAddress> HttpView::endpoints() const
+std::vector<network::SocketAddress> HttpView::endpoints() const
 {
     return m_multiAddressHttpServer.endpoints();
 }

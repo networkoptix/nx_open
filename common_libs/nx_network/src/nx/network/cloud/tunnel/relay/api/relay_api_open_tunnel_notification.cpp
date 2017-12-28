@@ -20,12 +20,12 @@ const nx::String& OpenTunnelNotification::clientPeerName() const
     return m_clientPeerName;
 }
 
-void OpenTunnelNotification::setClientEndpoint(SocketAddress endpoint)
+void OpenTunnelNotification::setClientEndpoint(network::SocketAddress endpoint)
 {
     m_clientEndpoint = std::move(endpoint);
 }
 
-const SocketAddress& OpenTunnelNotification::clientEndpoint() const
+const network::SocketAddress& OpenTunnelNotification::clientEndpoint() const
 {
     return m_clientEndpoint;
 }
@@ -57,7 +57,7 @@ bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
     auto clientEndpointIter = message.request->headers.find(kClientEndpoint);
     if (clientEndpointIter == message.request->headers.end())
         return false;
-    m_clientEndpoint = SocketAddress(clientEndpointIter->second);
+    m_clientEndpoint = network::SocketAddress(clientEndpointIter->second);
 
     return true;
 }

@@ -82,7 +82,7 @@ QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFrom
     QnNetworkAddressEntryList entryList;
 
     const bool allInterfaces = (QnAppInfo::isBpi());
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces))
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces(allInterfaces))
     {
         static const QChar kColon = ':';
         if (allInterfaces && iface.name.contains(kColon))

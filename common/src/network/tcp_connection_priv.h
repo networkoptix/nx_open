@@ -68,7 +68,7 @@ public:
     }
 
 public:
-    QSharedPointer<AbstractStreamSocket> socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> socket;
     nx::network::http::Request request;
     nx::network::http::Response response;
     nx::network::http::HttpStreamReader httpStreamReader;

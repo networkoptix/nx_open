@@ -120,7 +120,7 @@ protected:
 
     /* [4] Protected members */
 
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
 
     QString host;
     int port;

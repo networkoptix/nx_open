@@ -19,7 +19,7 @@ namespace hpm {
 
 class MediaServerEmulator:
     public network::aio::BasicPollable,
-    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<network::stun::MessagePipeline>
 {
 public:
     enum class ActionToTake
@@ -37,7 +37,7 @@ public:
         \param serverName If empty, name is generated
     */
     MediaServerEmulator(
-        const SocketAddress& mediatorEndpoint,
+        const network::SocketAddress& mediatorEndpoint,
         AbstractCloudDataProvider::System systemData,
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();
@@ -51,15 +51,15 @@ public:
     /** returns serverId.systemId */
     nx::String fullName() const;
     /** Server endpoint */
-    SocketAddress endpoint() const;
+    network::SocketAddress endpoint() const;
 
     nx::hpm::api::ResultCode bind();
     std::pair<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse> listen() const;
 
     /** Address of connection to mediator */
-    SocketAddress mediatorConnectionLocalAddress() const;
+    network::SocketAddress mediatorConnectionLocalAddress() const;
     /** server's UDP address for hole punching */
-    SocketAddress udpHolePunchingEndpoint() const;
+    network::SocketAddress udpHolePunchingEndpoint() const;
 
     /** if \a handler returns \a false then no indication will NOT be processed */
     void setOnConnectionRequestedHandler(
@@ -72,7 +72,7 @@ public:
     void setServerIdForModuleInformation(
         boost::optional<nx::String> serverId);
 
-    nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
+    nx::hpm::api::ResultCode updateTcpAddresses(std::list<network::SocketAddress> addresses);
     hpm::api::MediatorConnector& mediatorConnector();
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
 
@@ -90,7 +90,7 @@ private:
     nx::hpm::api::ConnectionRequestedEvent m_connectionRequestedData;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtStreamSocket;
     std::unique_ptr<nx::network::UdtStreamServerSocket> m_udtStreamServerSocket;
-    std::unique_ptr<stun::MessagePipeline> m_stunPipeline;
+    std::unique_ptr<network::stun::MessagePipeline> m_stunPipeline;
     ActionToTake m_action;
     const int m_cloudConnectionMethodMask;
     std::unique_ptr<network::cloud::MediatorAddressPublisher> m_mediatorAddressPublisher;
@@ -103,12 +103,12 @@ private:
     void onUdtConnectDone(SystemError::ErrorCode errorCode);
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket);
-    void onMessageReceived(nx::network::stun::Message message);
+        std::unique_ptr<network::AbstractStreamSocket> acceptedSocket);
+    void onMessageReceived(network::stun::Message message);
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        stun::MessagePipeline* connection) override;
+        network::stun::MessagePipeline* connection) override;
     virtual void stopWhileInAioThread() override;
 
     MediaServerEmulator(const MediaServerEmulator&);

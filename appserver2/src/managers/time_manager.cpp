@@ -734,7 +734,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
         //saving credentials has been used to establish connection
         startSynchronizingTimeWithPeer( //starting sending time sync info to peer
             transport->remotePeer().id,
-            SocketAddress( remoteAddr.host(), remoteAddr.port() ),
+            nx::network::SocketAddress( remoteAddr.host(), remoteAddr.port() ),
             transport->authData() );
     }
 }
@@ -746,7 +746,7 @@ void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
     const QnUuid& peerID,
-    SocketAddress peerAddress,
+    nx::network::SocketAddress peerAddress,
     nx::network::http::AuthInfoCache::AuthorizationCacheItem authData )
 {
     QnMutexLocker lock( &m_mutex );

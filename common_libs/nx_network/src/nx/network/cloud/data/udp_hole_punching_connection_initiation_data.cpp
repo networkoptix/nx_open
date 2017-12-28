@@ -4,7 +4,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-constexpr const stun::extension::methods::Value UdpHolePunchingSynRequest::kMethod;
+constexpr const network::stun::extension::methods::Value UdpHolePunchingSynRequest::kMethod;
 
 UdpHolePunchingSynRequest::UdpHolePunchingSynRequest():
     StunRequestData(kMethod)
@@ -21,7 +21,7 @@ bool UdpHolePunchingSynRequest::parseAttributes(const nx::network::stun::Message
 }
 
 
-constexpr const stun::extension::methods::Value UdpHolePunchingSynResponse::kMethod;
+constexpr const network::stun::extension::methods::Value UdpHolePunchingSynResponse::kMethod;
 
 UdpHolePunchingSynResponse::UdpHolePunchingSynResponse():
     StunResponseData(kMethod)
@@ -30,12 +30,12 @@ UdpHolePunchingSynResponse::UdpHolePunchingSynResponse():
 
 void UdpHolePunchingSynResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->newAttribute<stun::extension::attrs::ConnectionId>(connectSessionId);
+    message->newAttribute<network::stun::extension::attrs::ConnectionId>(connectSessionId);
 }
 
 bool UdpHolePunchingSynResponse::parseAttributes(const nx::network::stun::Message& message)
 {
-    return readStringAttributeValue<stun::extension::attrs::ConnectionId>(
+    return readStringAttributeValue<network::stun::extension::attrs::ConnectionId>(
         message,
         &connectSessionId);
 }

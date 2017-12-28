@@ -14,7 +14,7 @@
 namespace {
 
 static const std::chrono::hours kConnectionTimeout(10);
-static const KeepAliveOptions kKeepAliveOptions(
+static const nx::network::KeepAliveOptions kKeepAliveOptions(
     std::chrono::seconds(10), std::chrono::seconds(10), 3);
 
 template<typename P>
@@ -32,7 +32,7 @@ bool keepConnectionOpenMode(const P& p) { return p.contains(lit("keepConnectionO
 template<typename P>
 bool updateStreamMode(const P& p) { return p.contains(lit("updateStream")); }
 
-static void clearSockets(std::set<QSharedPointer<AbstractStreamSocket>>* sockets)
+static void clearSockets(std::set<QSharedPointer<nx::network::AbstractStreamSocket>>* sockets)
 {
     for (const auto& s: *sockets)
         s->cancelIOSync(nx::network::aio::etNone);
@@ -201,7 +201,7 @@ void QnModuleInformationRestHandler::updateModuleImformation()
 }
 
 void QnModuleInformationRestHandler::sendModuleImformation(
-    const QSharedPointer<AbstractStreamSocket>& socket)
+    const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
 {
     if (m_moduleInformatiom.isEmpty())
         updateModuleImformation();
@@ -223,7 +223,7 @@ void QnModuleInformationRestHandler::sendModuleImformation(
 
 
 void QnModuleInformationRestHandler::sendKeepAliveByTimer(
-    const QSharedPointer<AbstractStreamSocket>& socket)
+    const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
 {
     socket->registerTimer(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2,
         [this, socket]()

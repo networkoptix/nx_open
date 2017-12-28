@@ -11,7 +11,7 @@
 
 class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
-	public nx_upnp::SearchAutoHandler
+	public nx::network::upnp::SearchAutoHandler
 {
 
 public:
@@ -34,15 +34,15 @@ public:
     //Upnp resource searcher
     virtual bool processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
 private:
 
     void createResource(
-        const nx_upnp::DeviceInfo& devInfo,
-        const QnMacAddress& mac,
+        const nx::network::upnp::DeviceInfo& devInfo,
+        const nx::network::QnMacAddress& mac,
         const QAuthenticator& auth,
         QnResourceList& result );
 

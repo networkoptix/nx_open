@@ -13,7 +13,9 @@
 #include "server/handler/http_server_handler_custom.h"
 #include "server/rest/http_server_rest_message_dispatcher.h"
 
-//-------------------------------------------------------------------------------------------------
+namespace nx {
+namespace network {
+namespace http {
 
 class NX_NETWORK_API TestAuthenticationManager:
     public nx::network::http::server::BaseAuthenticationManager
@@ -205,3 +207,7 @@ private:
     virtual std::shared_ptr<RandomlyFailingHttpConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 };
+
+} // namespace http
+} // namespace network
+} // namespace nx

@@ -66,7 +66,7 @@ class CloudDbService:
 public:
     CloudDbService(int argc, char **argv);
 
-    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;

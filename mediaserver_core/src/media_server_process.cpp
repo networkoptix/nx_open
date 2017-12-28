@@ -447,7 +447,7 @@ QString defaultLocalAddress(const QHostAddress& target)
 
     {
         // if nothing else works use first enabled hostaddr
-        QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
+        QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
 
         for (int i = 0; i < interfaces.size();++i)
         {
@@ -803,7 +803,7 @@ QString getDefaultServerName()
 {
     QString id = getComputerName();
     if (id.isEmpty())
-        id = getMacFromPrimaryIF();
+        id = nx::network::getMacFromPrimaryIF();
     return lit("Server %1").arg(id);
 }
 
@@ -1248,34 +1248,34 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    AddressFilters addressMask =
-        AddressFilter::ipV4
-        | AddressFilter::ipV6
-        | AddressFilter::noLocal
-        | AddressFilter::noLoopback;
+    nx::network::AddressFilters addressMask =
+        nx::network::AddressFilter::ipV4
+        | nx::network::AddressFilter::ipV6
+        | nx::network::AddressFilter::noLocal
+        | nx::network::AddressFilter::noLoopback;
 
-    QList<SocketAddress> serverAddresses;
+    QList<nx::network::SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();
 
     for (const auto& host: allLocalAddresses(addressMask))
-        serverAddresses << SocketAddress(host, port);
+        serverAddresses << nx::network::SocketAddress(host, port);
 
     for (const auto& host : m_forwardedAddresses )
-        serverAddresses << SocketAddress(host.first, host.second);
+        serverAddresses << nx::network::SocketAddress(host.first, host.second);
 
     if (!m_ipDiscovery->publicIP().isNull())
-        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), port);
+        serverAddresses << nx::network::SocketAddress(m_ipDiscovery->publicIP().toString(), port);
 
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
             .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
     const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
-    const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
+    const nx::network::SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
     if (std::find(serverAddresses.begin(), serverAddresses.end(),
                   defaultAddress) == serverAddresses.end())
     {
-        SocketAddress newAddress;
+        nx::network::SocketAddress newAddress;
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
@@ -1292,7 +1292,7 @@ void MediaServerProcess::updateAddressesList()
     }
 
     nx::network::SocketGlobals::cloud().addressPublisher().updateAddresses(
-        std::list<SocketAddress>(
+        std::list<nx::network::SocketAddress>(
             serverAddresses.begin(),
             serverAddresses.end()));
 }
@@ -1378,7 +1378,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     if (isStopping())
         return;
 
-    SocketAddress mappedAddress(address);
+    nx::network::SocketAddress mappedAddress(address);
     if (mappedAddress.port)
     {
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
@@ -1804,7 +1804,7 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     const int port = qnServerModule->roSettings()->value(
         nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     m_preparedTcpServerSockets = QnUniversalTcpListener::createAndPrepareTcpSockets(
-        SocketAddress(HostAddress::anyHost, port));
+        nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     if (m_preparedTcpServerSockets.empty())
     {
         qWarning().noquote() << "WARNING: Unable to prealocate TCP sockets on port" << port << ":"
@@ -1819,11 +1819,11 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     }
 }
 
-std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
+std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>(
+    auto mapper = std::make_unique<nx::network::upnp::PortMapper>(
         /*isEnabled*/ false,
-        nx_upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
+        nx::network::upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
         QnAppInfo::organizationName());
     auto updateEnabled =
         [mapper = mapper.get(), this]()
@@ -1839,8 +1839,8 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
     updateEnabled();
 
     mapper->enableMapping(
-        m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
-        [this](SocketAddress address)
+        m_mediaServer->getPort(), nx::network::upnp::PortMapper::Protocol::TCP,
+        [this](nx::network::SocketAddress address)
         {
             const auto result = QMetaObject::invokeMethod(
                 this, "at_portMappingChanged", Qt::AutoConnection,
@@ -2025,7 +2025,7 @@ void MediaServerProcess::updateAllowedInterfaces()
 
     if (!allowedInterfaces.isEmpty())
         qWarning() << "Using net IF filter:" << allowedInterfaces;
-    setInterfaceListFilter(allowedInterfaces);
+    nx::network::setInterfaceListFilter(allowedInterfaces);
 }
 
 QString MediaServerProcess::hardwareIdAsGuid() const
@@ -2190,7 +2190,7 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
 class TcpLogReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
-    TcpLogReceiverConnection(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+    TcpLogReceiverConnection(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
         QnTCPConnectionProcessor(socket, owner),
         m_socket(socket),
         m_file(closeDirPath(getDataDirectory()) + lit("log/external_device.log"))
@@ -2213,7 +2213,7 @@ protected:
         }
     }
 private:
-    QSharedPointer<AbstractStreamSocket> m_socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     QFile m_file;
 };
 
@@ -2228,7 +2228,7 @@ public:
     virtual ~TcpLogReceiver() override { stop(); }
 
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
     {
         return new TcpLogReceiverConnection(clientSocket, this);
     }
@@ -2264,12 +2264,12 @@ void MediaServerProcess::run()
     updateAllowedInterfaces();
 
     if (!m_cmdLineArguments.enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);
+        nx::network::SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);
     auto ipVersion = m_cmdLineArguments.ipVersion;
     if (ipVersion.isEmpty())
         ipVersion = qnServerModule->roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    SocketFactory::setIpVersion(ipVersion);
+    nx::network::SocketFactory::setIpVersion(ipVersion);
 
     m_serverModule = serverModule;
 
@@ -2671,10 +2671,10 @@ void MediaServerProcess::run()
 
 
         server->setPrimaryAddress(
-            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
+            nx::network::SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
         cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
-            SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+            nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
         // used for statistics reported
@@ -2783,7 +2783,7 @@ void MediaServerProcess::run()
 
     // ============================
     GlobalSettingsToDeviceSearcherSettingsAdapter upnpDeviceSearcherSettings(globalSettings);
-    auto upnpDeviceSearcher = std::make_unique<nx_upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
+    auto upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(
@@ -2931,7 +2931,7 @@ void MediaServerProcess::run()
         {
             updateAddressesList();
             cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
-                SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+                nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
     m_firstRunningTime = qnServerModule->lastRunningTime().count();

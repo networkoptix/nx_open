@@ -9,17 +9,17 @@ namespace test {
 namespace network {
 
 
-static QList<SocketAddress> allLocalAddresses(int port)
+static QList<nx::network::SocketAddress> allLocalAddresses(int port)
 {
-    AddressFilters addressMask =
-        AddressFilter::ipV4
-        | AddressFilter::ipV6
-        | AddressFilter::noLocal
-        | AddressFilter::noLoopback;
+    nx::network::AddressFilters addressMask =
+        nx::network::AddressFilter::ipV4
+        | nx::network::AddressFilter::ipV6
+        | nx::network::AddressFilter::noLocal
+        | nx::network::AddressFilter::noLoopback;
 
-    QList<SocketAddress> serverAddresses;
+    QList<nx::network::SocketAddress> serverAddresses;
     for (const auto& host: allLocalAddresses(addressMask))
-        serverAddresses << SocketAddress(host, port);
+        serverAddresses << nx::network::SocketAddress(host, port);
 
     return serverAddresses;
 }

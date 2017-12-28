@@ -154,7 +154,7 @@ void WebSocketTransactionTransport::onTransactionsReadFromLog(
         m_sendHandshakeDone = true; //< All data are sent.
 }
 
-SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
+network::SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
 {
     return webSocket()->socket()->getForeignAddress();
 }

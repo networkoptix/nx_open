@@ -76,7 +76,7 @@ BasicTestFixture::BasicTestFixture(
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
 {
-    auto discoverFunc = []() {return HostAddress("127.0.0.1"); };
+    auto discoverFunc = []() {return network::HostAddress("127.0.0.1"); };
     controller::PublicIpDiscoveryService::setDiscoverFunc(discoverFunc);
 }
 
@@ -110,7 +110,7 @@ void BasicTestFixture::setInitFlags(int flags)
     m_initFlags = flags;
 }
 
-SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+network::SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
 {
     return m_relays[index]->moduleInstance()->httpEndpoints()[0];
 }
@@ -333,7 +333,7 @@ void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiPro
     m_mediatorApiProtocol = mediatorApiProtocol;
 }
 
-const std::unique_ptr<AbstractStreamSocket>& BasicTestFixture::clientSocket()
+const std::unique_ptr<network::AbstractStreamSocket>& BasicTestFixture::clientSocket()
 {
     return m_clientSocket;
 }
@@ -376,7 +376,7 @@ void BasicTestFixture::startHttpServer()
     auto cloudServerSocket = std::make_unique<CloudServerSocket>(
         &SocketGlobals::cloud().mediatorConnector());
 
-    m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
+    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
     m_staticUrl = nx::utils::Url(lm("http://%1/static").arg(serverSocketCloudAddress()));
 

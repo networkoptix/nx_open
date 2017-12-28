@@ -6,7 +6,7 @@
 #include <nx/network/http/custom_headers.h>
 
 QnProxyReceiverConnection::QnProxyReceiverConnection(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
     QnTCPConnectionProcessor(socket, owner)

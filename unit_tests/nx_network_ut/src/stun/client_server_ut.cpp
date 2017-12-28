@@ -16,6 +16,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -328,5 +329,6 @@ TEST_F(StunClientServerTest, cancellation)
 }
 
 } // namespace test
-} // namespace hpm
+} // namespace stun
+} // namespace network
 } // namespace nx

@@ -14,7 +14,7 @@ class QN_EXPORT QnNetworkResource : public QnResource
 {
     Q_OBJECT
     //Q_PROPERTY(QHostAddress hostAddress READ getHostAddress WRITE setHostAddress)
-    //Q_PROPERTY(QnMacAddress macAddress READ getMAC WRITE setMAC)
+    //Q_PROPERTY(nx::network::QnMacAddress macAddress READ getMAC WRITE setMAC)
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
     using base_type = QnResource;
@@ -33,8 +33,8 @@ public:
     virtual QString getHostAddress() const;
     virtual void setHostAddress(const QString &ip);
 
-    QnMacAddress getMAC() const;
-    void setMAC(const QnMacAddress &mac);
+    nx::network::QnMacAddress getMAC() const;
+    void setMAC(const nx::network::QnMacAddress &mac);
 
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
@@ -116,7 +116,7 @@ private:
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;
-    QnMacAddress m_macAddress;
+    nx::network::QnMacAddress m_macAddress;
     QString m_physicalId;
 
     NetworkStatus m_networkStatus;

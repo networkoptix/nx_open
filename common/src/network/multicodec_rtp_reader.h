@@ -51,7 +51,7 @@ public:
 
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
-        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
+        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
     virtual ~QnMulticodecRtpReader();
 
     /** Implementation of QnAbstractMediaStreamProvider::getNextData. */

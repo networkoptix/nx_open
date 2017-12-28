@@ -6,7 +6,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-using namespace stun::extension;
+using namespace network::stun::extension;
 
 SystemError::ErrorCode toSystemErrorCode(NatTraversalResultCode resultCode)
 {

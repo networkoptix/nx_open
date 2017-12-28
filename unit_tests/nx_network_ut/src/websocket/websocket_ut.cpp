@@ -10,6 +10,9 @@
 
 using namespace nx::network::websocket;
 
+namespace nx {
+namespace network {
+namespace websocket {
 namespace test {
 
 class TestStreamSocketDelegate : public nx::network::StreamSocketDelegate
@@ -1241,4 +1244,6 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
 }
 
 } // namespace test
-
+} // namespace websocket
+} // namespace network
+} // namespace nx

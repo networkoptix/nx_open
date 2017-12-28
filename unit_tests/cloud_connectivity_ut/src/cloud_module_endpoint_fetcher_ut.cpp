@@ -70,7 +70,7 @@ protected:
     }
 
 protected:
-    TestHttpServer& httpServer()
+    nx::network::http::TestHttpServer& httpServer()
     {
         return m_server;
     }
@@ -82,7 +82,7 @@ protected:
     }
 
 private:
-    TestHttpServer m_server;
+    nx::network::http::TestHttpServer m_server;
     const QByteArray m_modulesXmlBody;
     nx::utils::Url m_modulesUrl;
 

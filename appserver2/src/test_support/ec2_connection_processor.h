@@ -11,7 +11,7 @@ class Ec2ConnectionProcessor:
 {
 public:
     Ec2ConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     virtual ~Ec2ConnectionProcessor();

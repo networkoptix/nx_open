@@ -18,7 +18,7 @@ struct NX_RELAYING_API Settings
     std::chrono::milliseconds disconnectedPeerTimeout;
     std::chrono::milliseconds takeIdleConnectionTimeout;
     std::chrono::milliseconds internalTimerPeriod;
-    KeepAliveOptions tcpKeepAlive;
+    network::KeepAliveOptions tcpKeepAlive;
 
     Settings();
 

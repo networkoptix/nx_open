@@ -15,13 +15,13 @@ class NX_NETWORK_API ConnectionAckRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::connectionAck;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::connectionAck;
 
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
-    std::list<SocketAddress> forwardedTcpEndpointList;
-    std::list<SocketAddress> udpEndpointList;
+    std::list<network::SocketAddress> forwardedTcpEndpointList;
+    std::list<network::SocketAddress> udpEndpointList;
     CloudConnectVersion cloudConnectVersion;
 
     ConnectionAckRequest();

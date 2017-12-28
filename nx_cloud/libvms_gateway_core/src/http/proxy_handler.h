@@ -41,11 +41,11 @@ private:
     struct TargetHost
     {
         nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::notImplemented;
-        SocketAddress target;
+        network::SocketAddress target;
         conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
 
         TargetHost() = default;
-        TargetHost(nx::network::http::StatusCode::Value status, SocketAddress target = {});
+        TargetHost(nx::network::http::StatusCode::Value status, network::SocketAddress target = {});
     };
 
     const conf::Settings& m_settings;
@@ -67,9 +67,9 @@ private:
     TargetHost cutTargetFromPath(nx::network::http::Request* const request);
 
     void onConnected(
-        const SocketAddress& targetAddress,
+        const network::SocketAddress& targetAddress,
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection);
 };
 
 } // namespace gateway

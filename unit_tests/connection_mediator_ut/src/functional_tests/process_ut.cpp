@@ -94,7 +94,7 @@ protected:
 private:
     struct Result
     {
-        stun::TransportHeader transportHeader;
+        nx::network::stun::TransportHeader transportHeader;
         api::ResultCode resultCode = api::ResultCode::networkError;
         api::ConnectResponse response;
     };
@@ -122,7 +122,7 @@ private:
     }
 
     void onConnectResponse(
-        stun::TransportHeader transportHeader,
+        nx::network::stun::TransportHeader transportHeader,
         api::ResultCode resultCode,
         api::ConnectResponse response)
     {

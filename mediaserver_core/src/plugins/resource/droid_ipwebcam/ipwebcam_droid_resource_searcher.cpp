@@ -77,7 +77,7 @@ struct AnDroidDev
         android = false;
         QString request;
 
-        const auto sock = SocketFactory::createStreamSocket();
+        const auto sock = nx::network::SocketFactory::createStreamSocket();
         sock->setRecvTimeout(500);
         sock->setSendTimeout(500);
 
@@ -179,7 +179,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
                 resource->setTypeId(rt);
                 resource->setName(name);
-                resource->setMAC(QnMacAddress(smac));
+                resource->setMAC(nx::network::QnMacAddress(smac));
                 resource->setHostAddress(QHostAddress(ad.ip).toString());
 
                 result.push_back(resource);

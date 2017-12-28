@@ -39,14 +39,14 @@ void printConnectOptions(std::ostream* const outStream)
 }
 
 static bool resolveDomainName(
-    const SocketAddress& targetAddress,
-    std::vector<SocketAddress>* instanceEndpoints);
+    const network::SocketAddress& targetAddress,
+    std::vector<network::SocketAddress>* instanceEndpoints);
 
-static std::vector<SocketAddress> resolveTargets(
-    SocketAddress targetAddress,
+static std::vector<network::SocketAddress> resolveTargets(
+    network::SocketAddress targetAddress,
     const nx::utils::ArgumentParser& args)
 {
-    std::vector<SocketAddress> targets;
+    std::vector<network::SocketAddress> targets;
     if (targetAddress.address.toString().contains('.'))
     {
         targets.push_back(std::move(targetAddress));
@@ -59,9 +59,9 @@ static std::vector<SocketAddress> resolveTargets(
     if (args.read("server-id", &serverId) && args.read("server-count", &serverCount))
     {
         const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
-        targets.push_back(SocketAddress(serverId + systemSuffix, 0));
+        targets.push_back(network::SocketAddress(serverId + systemSuffix, 0));
         for (size_t i = 1; i < serverCount; ++i)
-            targets.push_back(SocketAddress(makeServerName(serverId, i) + systemSuffix));
+            targets.push_back(network::SocketAddress(makeServerName(serverId, i) + systemSuffix));
 
         return targets;
     }
@@ -71,8 +71,8 @@ static std::vector<SocketAddress> resolveTargets(
 }
 
 static bool resolveDomainName(
-    const SocketAddress& targetAddress,
-    std::vector<SocketAddress>* instanceEndpoints)
+    const network::SocketAddress& targetAddress,
+    std::vector<network::SocketAddress>* instanceEndpoints)
 {
     auto mediatorConnection = nx::network::SocketGlobals::cloud().mediatorConnector().clientConnection();
     auto mediatorConnectionGuard =
@@ -101,7 +101,7 @@ static bool resolveDomainName(
             nx::network::NatTraversalSupport::enabled,
             AF_INET);
         for (const auto& entry: entries)
-            instanceEndpoints->push_back(SocketAddress(entry.host, targetAddress.port));
+            instanceEndpoints->push_back(network::SocketAddress(entry.host, targetAddress.port));
     }
 
     return true;
@@ -153,7 +153,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     }
 
     if (args.get("udt"))
-        SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
+        nx::network::SocketFactory::enforceStreamSocketType(nx::network::SocketFactory::SocketType::udt);
 
     if (args.get("ssl"))
     {
@@ -163,7 +163,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
             return 2;
         }
 
-        SocketFactory::enforceSsl(true);
+        nx::network::SocketFactory::enforceSsl(true);
     }
 
     std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;

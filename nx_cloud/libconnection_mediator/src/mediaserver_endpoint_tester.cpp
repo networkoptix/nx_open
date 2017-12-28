@@ -14,7 +14,7 @@ struct PingCollector
 {
     QnMutex mutex;
     size_t expected;
-    std::list<SocketAddress> endpoints;
+    std::list<network::SocketAddress> endpoints;
     ConnectionWeakRef connection;
 
     PingCollector(
@@ -37,8 +37,8 @@ MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
 {
     const auto result =
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::ping,
-            [this](ConnectionStrongRef connection, stun::Message message)
+            network::stun::extension::methods::ping,
+            [this](ConnectionStrongRef connection, network::stun::Message message)
             {
                 ping(std::move(connection), std::move(message));
             });
@@ -48,7 +48,7 @@ MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
 
 void MediaserverEndpointTesterBase::ping(
     const ConnectionStrongRef& connection,
-    stun::Message message)
+    network::stun::Message message)
 {
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -66,14 +66,14 @@ void MediaserverEndpointTesterBase::ping(
     }
 
     const auto endpointsAttr =
-        message.getAttribute<stun::extension::attrs::PublicEndpointList>();
+        message.getAttribute<network::stun::extension::attrs::PublicEndpointList>();
     if (!endpointsAttr)
     {
         sendErrorResponse(
             connection,
             message.header,
             api::ResultCode::badRequest,
-            stun::error::badRequest,
+            network::stun::error::badRequest,
             "Attribute PublicEndpointList is required");
         return;
     }
@@ -82,7 +82,7 @@ void MediaserverEndpointTesterBase::ping(
     const auto collector = std::make_shared< PingCollector >(endpoints.size(), connection);
     const auto& method = message.header.method;
     const auto& transactionId = message.header.transactionId;
-    const auto onPinged = [=](SocketAddress address, bool result)
+    const auto onPinged = [=](network::SocketAddress address, bool result)
     {
         QnMutexLocker lk(&collector->mutex);
         if (result)
@@ -98,11 +98,11 @@ void MediaserverEndpointTesterBase::ping(
                 .arg(QString::fromUtf8(mediaserverData.serverId))
                 .arg(containerString(collector->endpoints)), cl_logDEBUG1);
 
-            stun::Message response(stun::Header(
-                stun::MessageClass::successResponse, method,
+            network::stun::Message response(network::stun::Header(
+                network::stun::MessageClass::successResponse, method,
                 std::move(transactionId)));
 
-            response.newAttribute< stun::extension::attrs::PublicEndpointList >(
+            response.newAttribute< network::stun::extension::attrs::PublicEndpointList >(
                 collector->endpoints);
 
             connection->sendMessage(std::move(response));
@@ -142,9 +142,9 @@ static QString scanResponseForErrors(const nx::Buffer& buffer, const String& exp
 }
 
 void MediaserverEndpointTester::pingServer(
-    const SocketAddress& address,
+    const network::SocketAddress& address,
     const String& expectedId,
-    std::function<void(SocketAddress, bool)> onPinged)
+    std::function<void(network::SocketAddress, bool)> onPinged)
 {
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     QObject::connect(

@@ -32,7 +32,7 @@ public:
 
     void listen();
     nx::network::http::server::rest::MessageDispatcher& messageDispatcher();
-    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
 
 private:
     const conf::Settings& m_settings;
@@ -41,7 +41,7 @@ private:
         m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
     nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool;
-    std::vector<SocketAddress> m_httpEndpoints;
+    std::vector<network::SocketAddress> m_httpEndpoints;
 
     bool launchHttpServerIfNeeded(
         const conf::Settings& settings,

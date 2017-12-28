@@ -100,7 +100,7 @@ void SmtpClient::setConnectionType(ConnectionType ct)
     this->connectionType = ct;
 
     m_lineSpliter.reset();
-    m_socket = SocketFactory::createStreamSocket(connectionType == SslConnection);
+    m_socket = nx::network::SocketFactory::createStreamSocket(connectionType == SslConnection);
 }
 
 const QString& SmtpClient::getHost() const

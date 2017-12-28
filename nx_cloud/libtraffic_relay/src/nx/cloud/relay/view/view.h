@@ -36,7 +36,7 @@ public:
 
     void start();
 
-    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
 
     const MultiHttpServer& httpServer() const;
 

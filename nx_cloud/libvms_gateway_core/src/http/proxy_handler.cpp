@@ -18,7 +18,7 @@ constexpr const int kSocketTimeoutMs = 29*1000;
 
 ProxyHandler::TargetHost::TargetHost(
     nx::network::http::StatusCode::Value status,
-    SocketAddress target)
+    network::SocketAddress target)
     :
     status(status),
     target(std::move(target))
@@ -151,7 +151,7 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromUrl(nx::network::http::Reque
     }
 
     // Using original url path.
-    auto targetEndpoint = SocketAddress(
+    auto targetEndpoint = network::SocketAddress(
         request->requestLine.url.host(),
         request->requestLine.url.port(nx::network::http::DEFAULT_HTTP_PORT));
 
@@ -205,7 +205,7 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx::network::http::Requ
         return {nx::network::http::StatusCode::badRequest};
 
     // Get address.
-    m_targetHost.target.address = HostAddress(targetParts.front().toString());
+    m_targetHost.target.address = network::HostAddress(targetParts.front().toString());
     pathItems.pop_front();
 
     // Restore path without 1st item: /[some/longer/url].
@@ -225,9 +225,9 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx::network::http::Requ
 }
 
 void ProxyHandler::onConnected(
-    const SocketAddress& targetAddress,
+    const network::SocketAddress& targetAddress,
     SystemError::ErrorCode errorCode,
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     if (errorCode != SystemError::noError)
     {

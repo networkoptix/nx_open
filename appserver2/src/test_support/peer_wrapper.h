@@ -58,7 +58,7 @@ public:
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;
 
-    SocketAddress endpoint() const;
+    nx::network::SocketAddress endpoint() const;
 
     ec2::AbstractECConnection* ecConnection();
 

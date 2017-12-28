@@ -50,7 +50,7 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
     m_disconnectedHandler = std::move(handler);
 }
 
-static void validateEndpoints(std::set<SocketAddress>* endpoints)
+static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
 {
     const auto& resolver = nx::network::SocketGlobals::addressResolver();
     for (auto it = endpoints->begin(); it != endpoints->end(); )
@@ -64,7 +64,7 @@ static void validateEndpoints(std::set<SocketAddress>* endpoints)
     }
 }
 
-void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
 {
     validateEndpoints(&endpoints);
     NX_ASSERT(endpoints.size());
@@ -78,7 +78,7 @@ void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUu
         });
 }
 
-void ModuleConnector::setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
 {
     validateEndpoints(&endpoints);
     dispatch(
@@ -135,7 +135,7 @@ void ModuleConnector::InformationReader::setHandler(
     m_handler = std::move(handler);
 }
 
-void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
+void ModuleConnector::InformationReader::start(const nx::network::SocketAddress& endpoint)
 {
     const auto handler =
         [this](nx::network::http::AsyncHttpClientPtr client) mutable
@@ -242,7 +242,7 @@ ModuleConnector::Module::~Module()
     m_connectedReader.reset();
 }
 
-void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
+void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
     if (m_id.isNull())
@@ -275,7 +275,7 @@ void ModuleConnector::Module::ensureConnection()
         connectToGroup(m_endpoints.begin());
 }
 
-void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endpoints)
+void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
@@ -283,12 +283,12 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
 }
 
 ModuleConnector::Module::Priority
-    ModuleConnector::Module::hostPriority(const HostAddress& host) const
+    ModuleConnector::Module::hostPriority(const nx::network::HostAddress& host) const
 {
     if (m_id.isNull())
         return kDefault;
 
-    if (host == HostAddress::localhost)
+    if (host == nx::network::HostAddress::localhost)
         return kLocalHost;
 
     if (host.isLocal())
@@ -309,16 +309,16 @@ QString ModuleConnector::Module::idForToStringFromPtr() const
 }
 
 boost::optional<ModuleConnector::Module::Endpoints::iterator>
-    ModuleConnector::Module::saveEndpoint(SocketAddress endpoint)
+    ModuleConnector::Module::saveEndpoint(nx::network::SocketAddress endpoint)
 {
     const auto getGroup =
         [&](Priority p)
         {
-            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
+            return m_endpoints.emplace(p, std::set<nx::network::SocketAddress>()).first;
         };
 
     const auto insertIntoGroup =
-        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
+        [&](Endpoints::iterator groupIterator, nx::network::SocketAddress endpoint)
         {
             auto& group = groupIterator->second;
             return group.insert(std::move(endpoint)).second;
@@ -384,7 +384,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 }
 
 void ModuleConnector::Module::connectToEndpoint(
-    const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
+    const nx::network::SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
     NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
     m_attemptingReaders.push_front(std::make_unique<InformationReader>(m_parent));
@@ -427,7 +427,7 @@ void ModuleConnector::Module::connectToEndpoint(
        });
 }
 
-bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
+bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint,
     std::unique_ptr<InformationReader> reader, const QnModuleInformation& information)
 {
     NX_ASSERT(!m_id.isNull());

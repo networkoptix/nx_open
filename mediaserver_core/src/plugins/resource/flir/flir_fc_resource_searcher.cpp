@@ -196,7 +196,7 @@ void FcResourceSearcher::initListenerUnsafe()
     m_receiveSocket.reset(new nx::network::UDPSocket(AF_INET));
     m_receiveSocket->setReuseAddrFlag(true);
     m_receiveSocket->setRecvBufferSize(kReceiveBufferSize);
-    m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, kDefaultBroadcastPort));
+    m_receiveSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, kDefaultBroadcastPort));
     m_receiveSocket->setNonBlockingMode(true);
     doNextReceiveUnsafe();
 }
@@ -221,10 +221,10 @@ void FcResourceSearcher::doNextReceiveUnsafe()
     if (m_terminated)
         return;
 
-    m_receiveBuffer.reserve(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+    m_receiveBuffer.reserve(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
     m_receiveSocket->recvFromAsync(
         &m_receiveBuffer,
-        [this](SystemError::ErrorCode erroCode, SocketAddress endpoint, std::size_t bytesRead)
+        [this](SystemError::ErrorCode erroCode, nx::network::SocketAddress endpoint, std::size_t bytesRead)
         {
             receiveFromCallback(erroCode, endpoint, bytesRead);
         });
@@ -232,7 +232,7 @@ void FcResourceSearcher::doNextReceiveUnsafe()
 
 void FcResourceSearcher::receiveFromCallback(
     SystemError::ErrorCode errorCode,
-    SocketAddress senderAddress,
+    nx::network::SocketAddress senderAddress,
     std::size_t bytesRead)
 {
     QnMutexLocker lock(&m_mutex);
@@ -276,7 +276,7 @@ void FcResourceSearcher::receiveFromCallback(
     doNextReceiveUnsafe();
 }
 
-bool FcResourceSearcher::hasValidCacheUnsafe(const SocketAddress& address) const
+bool FcResourceSearcher::hasValidCacheUnsafe(const nx::network::SocketAddress& address) const
 {
     auto itr = m_deviceInfoCache.find(address);
 
@@ -296,14 +296,14 @@ bool FcResourceSearcher::isDeviceSupported(const fc_private::DeviceInfo& deviceI
     return deviceInfo.model.startsWith(kFLirFcModelPrefix);
 }
 
-void FcResourceSearcher::cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint)
+void FcResourceSearcher::cleanUpEndpointInfoUnsafe(const nx::network::SocketAddress& endpoint)
 {
     m_deviceInfoCache.erase(endpoint);
     m_requestsInProgress.erase(endpoint);
 }
 
 void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
-    const SocketAddress& senderAddress,
+    const nx::network::SocketAddress& senderAddress,
     nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (m_terminated)

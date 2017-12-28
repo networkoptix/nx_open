@@ -98,7 +98,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorClass,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::http, FusionRequestErrorClass,
     (nx::network::http::FusionRequestErrorClass::noError, "noError")
     (nx::network::http::FusionRequestErrorClass::badRequest, "badRequest")
     (nx::network::http::FusionRequestErrorClass::unauthorized, "unauthorized")
@@ -107,7 +107,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorClass,
     (nx::network::http::FusionRequestErrorClass::internalError, "internalError")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorDetail,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::http, FusionRequestErrorDetail,
     (nx::network::http::FusionRequestErrorDetail::ok, "ok")
     (nx::network::http::FusionRequestErrorDetail::responseSerializationError, "responseSerializationError")
     (nx::network::http::FusionRequestErrorDetail::deserializationError, "deserializationError")

@@ -33,7 +33,7 @@ class JsonConnectionProcessor:
 public:
     JsonConnectionProcessor(
         ProcessorHandler handler,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     virtual void run() override;
@@ -62,7 +62,7 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override;
+        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
 
 private:
     QSet<QString> m_disableAuthPrefixes;

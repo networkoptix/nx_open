@@ -528,7 +528,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     commonModule->store(new ec2::DummyHandler());
     commonModule->store(new nx::network::http::HttpModManager());
     if (!startupParams.enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
+        nx::network::SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {

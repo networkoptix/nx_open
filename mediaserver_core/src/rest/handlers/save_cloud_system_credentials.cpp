@@ -61,7 +61,7 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
     QnJsonRestResult* result,
     nx::network::http::StatusCode::Value* const authorizationStatusCode)
 {
-    using namespace nx_http;
+    using namespace nx::network::http;
 
     if (QnPermissionsHelper::isSafeMode(m_commonModule))
     {

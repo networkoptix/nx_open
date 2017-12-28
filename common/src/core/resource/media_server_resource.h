@@ -15,7 +15,7 @@
 namespace nx {
 namespace network {
 
-class SocketAddress;
+class nx::network::SocketAddress;
 
 namespace http {
 
@@ -48,8 +48,8 @@ public:
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
 
-    void setNetAddrList(const QList<SocketAddress>& value);
-    QList<SocketAddress> getNetAddrList() const;
+    void setNetAddrList(const QList<nx::network::SocketAddress>& value);
+    QList<nx::network::SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList
     void setAdditionalUrls(const QList<nx::utils::Url> &urls);
@@ -58,7 +58,7 @@ public:
     void setIgnoredUrls(const QList<nx::utils::Url> &urls);
     QList<nx::utils::Url> getIgnoredUrls() const;
 
-    boost::optional<SocketAddress> getCloudAddress() const;
+    boost::optional<nx::network::SocketAddress> getCloudAddress() const;
 
     virtual QString getUrl() const override;
     virtual void setUrl(const QString& url) override;
@@ -66,14 +66,14 @@ public:
     quint16 getPort() const;
     virtual nx::utils::Url getApiUrl() const;
 
-    SocketAddress getPrimaryAddress() const;
-    void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
+    nx::network::SocketAddress getPrimaryAddress() const;
+    void setPrimaryAddress(const nx::network::SocketAddress &getPrimaryAddress);
 
     bool isSslAllowed() const;
     void setSslAllowed(bool sslAllowed);
 
     /** Get list of all available server addresses. */
-    QList<SocketAddress> getAllAvailableAddresses() const;
+    QList<nx::network::SocketAddress> getAllAvailableAddresses() const;
 
     /*
     * Deprecated server rest connection
@@ -166,10 +166,10 @@ signals:
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
 private:
-    SocketAddress m_primaryAddress;
+    nx::network::SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
-    QList<SocketAddress> m_netAddrList;
+    QList<nx::network::SocketAddress> m_netAddrList;
     QList<nx::utils::Url> m_additionalUrls;
     QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;

@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-SocketResourceReader::SocketResourceReader(const AbstractCommunicatingSocket& sock)
+SocketResourceReader::SocketResourceReader(const network::AbstractCommunicatingSocket& sock)
 :
     m_socket(sock)
 {

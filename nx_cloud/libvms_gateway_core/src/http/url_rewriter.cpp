@@ -10,7 +10,7 @@ namespace gateway {
 
 nx::utils::Url UrlRewriter::originalResourceUrlToProxyUrl(
     const nx::utils::Url& originalResourceUrl,
-    const SocketAddress& proxyEndpoint,
+    const network::SocketAddress& proxyEndpoint,
     const nx::String& targetHost) const
 {
     nx::utils::Url url = originalResourceUrl;

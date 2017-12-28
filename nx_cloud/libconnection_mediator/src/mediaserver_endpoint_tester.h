@@ -7,7 +7,7 @@
 
 namespace nx {
 
-namespace stun { class MessageDispatcher; }
+namespace network { namespace stun { class MessageDispatcher; } }
 
 namespace hpm {
 
@@ -22,15 +22,15 @@ public:
         AbstractCloudDataProvider* cloudData,
         nx::network::stun::MessageDispatcher* dispatcher);
 
-    void ping(const ConnectionStrongRef& connection, stun::Message message);
+    void ping(const ConnectionStrongRef& connection, network::stun::Message message);
 
     /**
      * Ping address to verify there is a mediaserver with expected id listening.
      */
     virtual void pingServer(
-        const SocketAddress& address,
+        const network::SocketAddress& address,
         const String& expectedId,
-        std::function<void(SocketAddress, bool)> onPinged) = 0;
+        std::function<void(network::SocketAddress, bool)> onPinged) = 0;
 };
 
 /**
@@ -46,9 +46,9 @@ public:
         nx::network::stun::MessageDispatcher* dispatcher);
 
     virtual void pingServer(
-        const SocketAddress& address,
+        const network::SocketAddress& address,
         const String& expectedId,
-        std::function<void(SocketAddress, bool)> onPinged) override;
+        std::function<void(network::SocketAddress, bool)> onPinged) override;
 
 private:
     QnMutex m_mutex;

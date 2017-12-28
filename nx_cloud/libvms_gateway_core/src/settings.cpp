@@ -162,7 +162,7 @@ void Settings::loadSettings()
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter(m_general.endpointsToListen),
-        [](const QString& str) { return SocketAddress(str); });
+        [](const QString& str) { return network::SocketAddress(str); });
 
     const QString& dataDirFromSettings = settings().value(kGeneralDataDir).toString();
     if (!dataDirFromSettings.isEmpty())
@@ -244,7 +244,7 @@ void Settings::loadSettings()
     m_cloudConnect.tcpReverse.poolSize =
         (size_t)settings().value(tcp_reverse::kPoolSize, (int)tcp_reverse::kDefaultPoolSize).toInt();
     m_cloudConnect.tcpReverse.keepAlive =
-        KeepAliveOptions::fromString(settings().value(
+        network::KeepAliveOptions::fromString(settings().value(
             tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
     m_cloudConnect.tcpReverse.startTimeout =
         std::chrono::duration_cast<std::chrono::seconds>(

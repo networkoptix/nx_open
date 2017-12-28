@@ -132,7 +132,7 @@ bool BaseHttpAudioTransmitter::processAudioData(const QnConstCompressedAudioData
     return true;
 }
 
-bool BaseHttpAudioTransmitter::sendBuffer(AbstractStreamSocket* socket, const char* buffer, size_t size)
+bool BaseHttpAudioTransmitter::sendBuffer(nx::network::AbstractStreamSocket* socket, const char* buffer, size_t size)
 {
     size_t bytesSent = 0;
 
@@ -150,11 +150,11 @@ bool BaseHttpAudioTransmitter::sendBuffer(AbstractStreamSocket* socket, const ch
     return true;
 }
 
-std::unique_ptr<AbstractStreamSocket> BaseHttpAudioTransmitter::takeSocket(
+std::unique_ptr<nx::network::AbstractStreamSocket> BaseHttpAudioTransmitter::takeSocket(
     const nx::network::http::AsyncHttpClientPtr& httpClient) const
 {
     //NOTE m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio thread
-    std::unique_ptr<AbstractStreamSocket> sock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> sock;
     nx::utils::promise<void> socketTakenPromise;
 
     httpClient->dispatch(

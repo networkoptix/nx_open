@@ -29,7 +29,7 @@ protected:
 
 private:
     QnNetworkResourcePtr findResourceHelper(const MacArray &mac,
-                                            const SocketAddress &addr);
+                                            const nx::network::SocketAddress &addr);
 };
 
 #endif

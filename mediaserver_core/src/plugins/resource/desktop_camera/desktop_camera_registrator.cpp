@@ -10,7 +10,7 @@
 #include <nx/utils/log/log_main.h>
 
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(socket, owner)

@@ -9,6 +9,8 @@
 #   include <netinet/in.h>
 #endif
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 /** Port Control Protocol (PCP)
@@ -104,5 +106,7 @@ NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, PeerMessage& data);
 QByteArray NX_NETWORK_API makeRandomNonce();
 
 } // namespace pcp
+} // namespace network
+} // namespace nx
 
 #endif // PCP_MESSAGING_H

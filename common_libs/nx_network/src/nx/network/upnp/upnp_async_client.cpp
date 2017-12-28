@@ -5,7 +5,9 @@
 #include "nx/fusion/serialization/lexical_functions.h"
 #include <nx/utils/log/log.h>
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 namespace /* noname */ {
 
 static const auto MESSAGE_BODY_READ_TIMEOUT_MS = 20 * 1000; // 20 sec
@@ -410,9 +412,11 @@ void AsyncClient::getAllMappings(
         });
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_upnp::AsyncClient, Protocol,
-    (nx_upnp::AsyncClient::Protocol::TCP, "tcp")
-    (nx_upnp::AsyncClient::Protocol::UDP, "udp")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::upnp::AsyncClient, Protocol,
+    (nx::network::upnp::AsyncClient::Protocol::TCP, "tcp")
+    (nx::network::upnp::AsyncClient::Protocol::UDP, "udp")
 )

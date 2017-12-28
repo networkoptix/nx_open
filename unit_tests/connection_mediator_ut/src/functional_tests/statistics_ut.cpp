@@ -25,7 +25,7 @@ TEST_F(StatisticsApi, listening_peer_list)
 
     hpm::api::ClientBindRequest request;
     request.originatingPeerID = "someClient";
-    request.tcpReverseEndpoints.push_back(SocketAddress("12.34.56.78:1234"));
+    request.tcpReverseEndpoints.push_back(nx::network::SocketAddress("12.34.56.78:1234"));
     nx::utils::promise<void> bindPromise;
     client->send(
         request,
@@ -53,7 +53,7 @@ TEST_F(StatisticsApi, listening_peer_list)
     const auto& boundClient = *listeningPeers.clients.begin();
     ASSERT_EQ("someClient", boundClient.first);
     ASSERT_EQ(1U, boundClient.second.tcpReverseEndpoints.size());
-    ASSERT_EQ(SocketAddress("12.34.56.78:1234"), boundClient.second.tcpReverseEndpoints.front());
+    ASSERT_EQ(nx::network::SocketAddress("12.34.56.78:1234"), boundClient.second.tcpReverseEndpoints.front());
 
     client->pleaseStopSync();
 }

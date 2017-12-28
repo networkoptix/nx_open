@@ -16,13 +16,13 @@ public:
     virtual void setTimeout(std::chrono::milliseconds timeout) override;
 
     virtual void verifyHost(
-        const SocketAddress& endpointToVerify,
+        const nx::network::SocketAddress& endpointToVerify,
         const nx::network::AddressEntry& targetHostAddress,
         nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
 
     virtual SystemError::ErrorCode lastSystemErrorCode() const override;
 
-    virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override;
+    virtual std::unique_ptr<nx::network::AbstractStreamSocket> takeSocket() override;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -32,7 +32,7 @@ private:
     SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;
     boost::optional<std::chrono::milliseconds> m_timeout;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
-    SocketAddress m_endpointToVerify;
+    nx::network::SocketAddress m_endpointToVerify;
     nx::network::AddressEntry m_targetHostAddress;
     nx::utils::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
 

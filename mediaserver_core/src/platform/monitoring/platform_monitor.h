@@ -113,7 +113,7 @@ public:
         QString interfaceName;
 
         /** Mac address. */
-        QnMacAddress macAddress;
+        nx::network::QnMacAddress macAddress;
 
         /** Type of the network interface. */
         NetworkInterfaceType type;

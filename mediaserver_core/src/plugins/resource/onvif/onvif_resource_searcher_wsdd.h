@@ -80,7 +80,7 @@ private:
 
     //If iface is not null, the function will perform multicast search, otherwise - unicast
     //iface and camAddr MUST NOT be 0 at the same time
-    void findEndpointsImpl( EndpointInfoHash& result, const QnInterfaceAndAddr& iface ) const;
+    void findEndpointsImpl( EndpointInfoHash& result, const nx::network::QnInterfaceAndAddr& iface ) const;
 
     template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
     template <class T> QString extractScope(const T* source, const QString& pattern) const;
@@ -95,7 +95,7 @@ private:
     class ProbeContext
     {
     public:
-        std::unique_ptr<AbstractDatagramSocket> sock;
+        std::unique_ptr<nx::network::AbstractDatagramSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;
@@ -114,8 +114,8 @@ private:
     mutable std::map<QString, ProbeContext*> m_ifaceToSock;
     bool m_isFirstSearch;
 
-    bool sendProbe( const QnInterfaceAndAddr& iface );
-    bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
+    bool sendProbe( const nx::network::QnInterfaceAndAddr& iface );
+    bool readProbeMatches( const nx::network::QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
 
 #endif //ENABLE_ONVIF

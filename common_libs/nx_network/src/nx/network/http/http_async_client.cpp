@@ -1505,8 +1505,8 @@ AsyncClient::Result AsyncClient::invokeHandler(
 } // namespace network
 } // namespace http
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, AuthType,
-(nx::network::http::AuthType::authBasicAndDigest, "authBasicAndDigest")
-(nx::network::http::AuthType::authDigest, "authDigest")
-(nx::network::http::AuthType::authBasic, "authBasic")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::http, AuthType,
+    (nx::network::http::AuthType::authBasicAndDigest, "authBasicAndDigest")
+    (nx::network::http::AuthType::authDigest, "authDigest")
+    (nx::network::http::AuthType::authBasic, "authBasic")
 )

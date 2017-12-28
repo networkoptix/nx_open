@@ -12,7 +12,7 @@ class NX_NETWORK_API UdpHolePunchingSynRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::udpHolePunchingSyn;
+    constexpr static const auto kMethod = network::stun::extension::methods::udpHolePunchingSyn;
 
     UdpHolePunchingSynRequest();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
@@ -23,7 +23,7 @@ class NX_NETWORK_API UdpHolePunchingSynResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::udpHolePunchingSyn;
+    constexpr static const auto kMethod = network::stun::extension::methods::udpHolePunchingSyn;
 
     nx::String connectSessionId;
 

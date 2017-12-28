@@ -23,18 +23,18 @@ public:
     void listen();
     void stopAcceptingNewRequests();
 
-    const std::vector<SocketAddress>& endpoints() const;
+    const std::vector<network::SocketAddress>& endpoints() const;
     nx::network::stun::MessageDispatcher& dispatcher();
 
     void initializeHttpTunnelling(http::Server* httpServer);
 
 private:
     const conf::Settings& m_settings;
-    nx::network::stun::MessageDispatcher m_stunMessageDispatcher;
-    nx::network::stun::StunOverHttpServer m_stunOverHttpServer;
-    std::unique_ptr<nx::network::server::MultiAddressServer<stun::SocketServer>> m_tcpStunServer;
-    std::unique_ptr<nx::network::server::MultiAddressServer<stun::UdpServer>> m_udpStunServer;
-    std::vector<SocketAddress> m_endpoints;
+    network::stun::MessageDispatcher m_stunMessageDispatcher;
+    network::stun::StunOverHttpServer m_stunOverHttpServer;
+    std::unique_ptr<network::server::MultiAddressServer<network::stun::SocketServer>> m_tcpStunServer;
+    std::unique_ptr<network::server::MultiAddressServer<network::stun::UdpServer>> m_udpStunServer;
+    std::vector<network::SocketAddress> m_endpoints;
 
     bool bind();
 };

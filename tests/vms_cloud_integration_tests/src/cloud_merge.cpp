@@ -309,7 +309,7 @@ private:
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
-    TestHttpServer m_httpProxy;
+    nx::network::http::TestHttpServer m_httpProxy;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 

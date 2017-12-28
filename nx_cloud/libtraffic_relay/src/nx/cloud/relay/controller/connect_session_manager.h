@@ -32,7 +32,7 @@ class AbstractTrafficRelay;
 struct ConnectToPeerRequestEx:
     api::ConnectToPeerRequest
 {
-    SocketAddress clientEndpoint;
+    network::SocketAddress clientEndpoint;
 };
 
 class AbstractConnectSessionManager
@@ -85,9 +85,9 @@ private:
     {
         std::string id;
         std::string clientPeerName;
-        std::unique_ptr<AbstractStreamSocket> clientConnection;
+        std::unique_ptr<network::AbstractStreamSocket> clientConnection;
         std::string listeningPeerName;
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection;
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection;
         nx::network::http::StringType openTunnelNotificationBuffer;
     };
 
@@ -106,11 +106,11 @@ private:
         const std::string& listeningPeerName,
         ConnectSessionManager::ConnectToPeerHandler completionHandler,
         api::ResultCode resultCode,
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection);
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection);
     void startRelaying(
         const std::string& connectSessionId,
         const std::string& listeningPeerName,
-        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
+        std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection,
         nx::network::http::HttpServerConnection* httpConnection);
     void startRelaying(RelaySession relaySession);
 };

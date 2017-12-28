@@ -47,7 +47,7 @@
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
 using std::make_pair;
-using namespace nx_http;
+using namespace nx::network::http;
 
 namespace nx_hls
 {
@@ -66,7 +66,7 @@ namespace nx_hls
 
     size_t QnHttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
 
-    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
+    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner )
     :
         QnTCPConnectionProcessor( socket, owner ),
         m_state( sReceiving ),

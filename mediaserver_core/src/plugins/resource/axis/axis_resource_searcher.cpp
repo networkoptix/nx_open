@@ -129,7 +129,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     resource->setTypeId(typeId);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(mac));
+    resource->setMAC(nx::network::QnMacAddress(mac));
     nx::utils::Url finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
@@ -243,7 +243,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(nx::network::QnMacAddress(smac));
 
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;

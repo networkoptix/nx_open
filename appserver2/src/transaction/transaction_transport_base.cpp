@@ -311,7 +311,7 @@ void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
 }
 
 void QnTransactionTransportBase::setOutgoingConnection(
-    QSharedPointer<AbstractCommunicatingSocket> socket)
+    QSharedPointer<nx::network::AbstractCommunicatingSocket> socket)
 {
     using namespace std::chrono;
 
@@ -456,10 +456,10 @@ nx::utils::Url QnTransactionTransportBase::remoteAddr() const
     return tmpUrl;
 }
 
-SocketAddress QnTransactionTransportBase::remoteSocketAddr() const
+nx::network::SocketAddress QnTransactionTransportBase::remoteSocketAddr() const
 {
     QnMutexLocker lock(&m_mutex);
-    SocketAddress addr = SocketAddress(
+    nx::network::SocketAddress addr = nx::network::SocketAddress(
         m_remoteAddr.host(),
         m_remoteAddr.port()
     );
@@ -826,7 +826,7 @@ QnUuid QnTransactionTransportBase::connectionGuid() const
 }
 
 void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
-    QSharedPointer<AbstractCommunicatingSocket> socket,
+    QSharedPointer<nx::network::AbstractCommunicatingSocket> socket,
     const nx::network::http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
@@ -1389,7 +1389,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
                     keepAliveHeader.timeout);
         }
 
-        m_incomingDataSocket = QSharedPointer<AbstractCommunicatingSocket>(m_httpClient->takeSocket().release());
+        m_incomingDataSocket = QSharedPointer<nx::network::AbstractCommunicatingSocket>(m_httpClient->takeSocket().release());
         if( m_connectionType == ConnectionType::bidirectional )
             m_outgoingDataSocket = m_incomingDataSocket;
 

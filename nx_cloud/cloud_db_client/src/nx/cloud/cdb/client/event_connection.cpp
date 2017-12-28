@@ -53,7 +53,7 @@ void EventConnection::setProxyVia(
     const std::string& proxyHost,
     std::uint16_t proxyPort)
 {
-    m_auth.proxyEndpoint = SocketAddress(proxyHost.c_str(), proxyPort);
+    m_auth.proxyEndpoint = nx::network::SocketAddress(proxyHost.c_str(), proxyPort);
 }
 
 EventConnection::~EventConnection()

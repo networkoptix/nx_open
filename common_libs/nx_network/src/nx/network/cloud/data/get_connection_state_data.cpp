@@ -27,12 +27,12 @@ GetConnectionStateResponse::GetConnectionStateResponse():
 
 void GetConnectionStateResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->addAttribute(stun::extension::attrs::isListening, (int) state);
+    message->addAttribute(network::stun::extension::attrs::isListening, (int) state);
 }
 
 bool GetConnectionStateResponse::parseAttributes(const nx::network::stun::Message& message)
 {
-    return readAttributeValue(message, stun::extension::attrs::isListening, (int*) &state);
+    return readAttributeValue(message, network::stun::extension::attrs::isListening, (int*) &state);
 }
 
 } // namespace api

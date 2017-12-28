@@ -13,7 +13,7 @@
 int QnPlSonyResource::MAX_RESOLUTION_DECREASES_NUM = 3;
 static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
-using namespace nx_http;
+using namespace nx::network::http;
 
 QnPlSonyResource::QnPlSonyResource()
 {

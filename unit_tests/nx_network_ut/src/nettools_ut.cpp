@@ -2,6 +2,8 @@
 
 #include <nx/network/nettools.h>
 
+namespace nx {
+namespace network {
 namespace test {
 
 TEST(getAllLocalAddresses, returns_valid_ip_addresses)
@@ -14,3 +16,5 @@ TEST(getAllLocalAddresses, returns_valid_ip_addresses)
 }
 
 } // namespace test
+} // namespace network
+} // namespace nx

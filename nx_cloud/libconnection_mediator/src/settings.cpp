@@ -262,7 +262,7 @@ void Settings::loadSettings()
             m_cloudDB.url = nx::utils::Url(endpointString);
             if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
             {
-                const SocketAddress endpoint(endpointString);
+                const network::SocketAddress endpoint(endpointString);
                 *m_cloudDB.url = nx::network::url::Builder()
                     .setScheme("http").setHost(endpoint.address.toString())
                     .setPort(endpoint.port).toUrl();
@@ -284,7 +284,7 @@ void Settings::loadSettings()
         settings().value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
         &m_stun.addrToListenList);
 
-    m_stun.keepAliveOptions = KeepAliveOptions::fromString(
+    m_stun.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
 
     m_stun.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
@@ -294,7 +294,7 @@ void Settings::loadSettings()
         settings().value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
 
-    m_http.keepAliveOptions = KeepAliveOptions::fromString(
+    m_http.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
 
     m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
@@ -424,14 +424,14 @@ void Settings::loadListeningPeer()
 
 void Settings::readEndpointList(
     const QString& str,
-    std::list<SocketAddress>* const addrToListenList)
+    std::list<network::SocketAddress>* const addrToListenList)
 {
     const QStringList& httpAddrToListenStrList = str.split(',');
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter(*addrToListenList),
-        [](const QString& str) { return SocketAddress(str); });
+        [](const QString& str) { return network::SocketAddress(str); });
 }
 
 } // namespace conf

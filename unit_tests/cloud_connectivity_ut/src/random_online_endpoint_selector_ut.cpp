@@ -25,7 +25,7 @@ public:
     RandomOnlineEndpointSelector()
     {
         for (int i = 0; i < kTestHostCount; ++i)
-            m_testEndpoints.push_back(SocketAddress(QnUuid::createUuid().toString() + ".ru", 80));
+            m_testEndpoints.push_back(nx::network::SocketAddress(QnUuid::createUuid().toString() + ".ru", 80));
     }
 
     ~RandomOnlineEndpointSelector()
@@ -41,7 +41,7 @@ protected:
     {
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
-        SocketAddress& onlineHostEndpoint =
+        nx::network::SocketAddress& onlineHostEndpoint =
             m_testEndpoints[nx::utils::random::number<size_t>(0, m_testEndpoints.size()-1)];
         onlineHostEndpoint = m_testHttpServer.serverAddress();
         m_onlineHostEndpoint = onlineHostEndpoint;
@@ -49,7 +49,7 @@ protected:
 
     void whenSelectorIsInvoked()
     {
-        nx::utils::promise<std::pair<nx::network::http::StatusCode::Value, SocketAddress>> promiseToSelect;
+        nx::utils::promise<std::pair<nx::network::http::StatusCode::Value, nx::network::SocketAddress>> promiseToSelect;
         nx::network::cloud::RandomOnlineEndpointSelector selector;
 
         auto selected = promiseToSelect.get_future();
@@ -58,7 +58,7 @@ protected:
             QString(),
             m_testEndpoints,
             [&promiseToSelect](
-                nx::network::http::StatusCode::Value result, SocketAddress endpoint)
+                nx::network::http::StatusCode::Value result, nx::network::SocketAddress endpoint)
             {
                 promiseToSelect.set_value(std::make_pair(result, std::move(endpoint)));
             });
@@ -71,22 +71,22 @@ protected:
         ASSERT_EQ(nx::network::http::StatusCode::ok, m_selectResult.first);
         ASSERT_EQ(m_onlineHostEndpoint, m_selectResult.second);
     }
-    
+
     void thenNoHostHasBeenSelected()
     {
         ASSERT_NE(nx::network::http::StatusCode::ok, m_selectResult.first);
     }
 
-    const std::vector<SocketAddress>& testEndpoints() const
+    const std::vector<nx::network::SocketAddress>& testEndpoints() const
     {
         return m_testEndpoints;
     }
 
 private:
-    std::vector<SocketAddress> m_testEndpoints;
-    TestHttpServer m_testHttpServer;
-    SocketAddress m_onlineHostEndpoint;
-    std::pair<nx::network::http::StatusCode::Value, SocketAddress> m_selectResult;
+    std::vector<nx::network::SocketAddress> m_testEndpoints;
+    nx::network::http::TestHttpServer m_testHttpServer;
+    nx::network::SocketAddress m_onlineHostEndpoint;
+    std::pair<nx::network::http::StatusCode::Value, nx::network::SocketAddress> m_selectResult;
 };
 
 TEST_F(RandomOnlineEndpointSelector, online_endpoint_is_selected)
@@ -107,7 +107,7 @@ TEST_F(RandomOnlineEndpointSelector, cancellation_of_select)
 {
     for (int i = 0; i < 20; ++i)
     {
-        nx::utils::promise<std::pair<nx::network::http::StatusCode::Value, SocketAddress>> promiseToSelect;
+        nx::utils::promise<std::pair<nx::network::http::StatusCode::Value, nx::network::SocketAddress>> promiseToSelect;
 
         nx::network::cloud::RandomOnlineEndpointSelector selector;
         auto selected = promiseToSelect.get_future();
@@ -116,7 +116,7 @@ TEST_F(RandomOnlineEndpointSelector, cancellation_of_select)
             "",
             testEndpoints(),
             [&promiseToSelect](
-                nx::network::http::StatusCode::Value result, SocketAddress endpoint)
+                nx::network::http::StatusCode::Value result, nx::network::SocketAddress endpoint)
             {
                 promiseToSelect.set_value(std::make_pair(result, std::move(endpoint)));
             });

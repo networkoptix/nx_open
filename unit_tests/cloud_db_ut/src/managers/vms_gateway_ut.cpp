@@ -114,7 +114,7 @@ protected:
 
 private:
     AccountManagerStub m_accountManagerStub;
-    std::unique_ptr<TestHttpServer> m_mediaserverEmulator;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_mediaserverEmulator;
     nx::utils::SyncQueue<nx::network::http::Request> m_vmsApiRequests;
     boost::optional<nx::network::http::Request> m_prevReceivedVmsApiRequest;
     nx::utils::SyncQueue<VmsRequestResult> m_vmsRequestResults;
@@ -132,7 +132,7 @@ private:
         m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
         m_accountManagerStub.addAccount(m_ownerAccount);
 
-        m_mediaserverEmulator = std::make_unique<TestHttpServer>();
+        m_mediaserverEmulator = std::make_unique<nx::network::http::TestHttpServer>();
         m_mediaserverEmulator->registerRequestProcessorFunc(
             "/gateway/{systemId}/api/mergeSystems",
             std::bind(&VmsGateway::vmsApiRequestStub, this, _1, _2, _3, _4, _5));

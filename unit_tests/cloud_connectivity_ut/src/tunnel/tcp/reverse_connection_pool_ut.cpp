@@ -132,7 +132,7 @@ protected:
         using namespace std::placeholders;
 
         m_reverseConnector.connect(
-            SocketAddress(HostAddress::localhost, m_reverseConnectionPool.port()),
+            nx::network::SocketAddress(nx::network::HostAddress::localhost, m_reverseConnectionPool.port()),
             std::bind(&ReverseConnectionPool::saveReverseConnectorResult, this, _1));
     }
 

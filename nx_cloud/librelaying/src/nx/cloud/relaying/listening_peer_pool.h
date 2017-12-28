@@ -28,12 +28,12 @@ namespace cloud {
 namespace relaying {
 
 using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
-    void(relay::api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
+    void(relay::api::ResultCode, std::unique_ptr<network::AbstractStreamSocket>)>;
 
 struct ClientInfo
 {
     std::string relaySessionId;
-    SocketAddress endpoint;
+    network::SocketAddress endpoint;
     std::string peerName;
 };
 
@@ -44,7 +44,7 @@ public:
 
     virtual void addConnection(
         const std::string& peerName,
-        std::unique_ptr<AbstractStreamSocket> connection) = 0;
+        std::unique_ptr<network::AbstractStreamSocket> connection) = 0;
 
     virtual std::size_t getConnectionCountByPeerName(const std::string& peerName) const = 0;
 
@@ -87,7 +87,7 @@ public:
 
     virtual void addConnection(
         const std::string& peerName,
-        std::unique_ptr<AbstractStreamSocket> connection) override;
+        std::unique_ptr<network::AbstractStreamSocket> connection) override;
 
     virtual std::size_t getConnectionCountByPeerName(
         const std::string& peerName) const override;
@@ -119,7 +119,7 @@ private:
 
     struct ConnectionContext
     {
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<network::AbstractStreamSocket> connection;
         nx::Buffer readBuffer;
     };
 

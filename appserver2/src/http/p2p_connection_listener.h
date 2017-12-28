@@ -19,7 +19,7 @@ public:
     const static QString kCloudPathPrefix;
 
     ConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
 
     virtual ~ConnectionProcessor();

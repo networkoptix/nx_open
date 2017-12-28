@@ -132,7 +132,7 @@ void ConnectSessionManager::connectToPeer(
             scopedCallGuard = m_apiCallCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
-                std::unique_ptr<AbstractStreamSocket> serverConnection) mutable
+                std::unique_ptr<network::AbstractStreamSocket> serverConnection) mutable
         {
             onAcquiredListeningPeerConnection(
                 clientSessionId,
@@ -148,7 +148,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
     const std::string& listeningPeerName,
     ConnectSessionManager::ConnectToPeerHandler completionHandler,
     api::ResultCode resultCode,
-    std::unique_ptr<AbstractStreamSocket> listeningPeerConnection)
+    std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection)
 {
     if (resultCode != api::ResultCode::ok)
     {
@@ -182,7 +182,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
 void ConnectSessionManager::startRelaying(
     const std::string& connectSessionId,
     const std::string& listeningPeerName,
-    std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
+    std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection,
     nx::network::http::HttpServerConnection* httpConnection)
 {
     QnMutexLocker lock(&m_mutex);

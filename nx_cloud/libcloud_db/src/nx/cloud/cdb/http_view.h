@@ -39,7 +39,7 @@ public:
     void bind();
     void listen();
 
-    std::vector<SocketAddress> endpoints() const;
+    std::vector<network::SocketAddress> endpoints() const;
 
 private:
     template<typename ManagerType>

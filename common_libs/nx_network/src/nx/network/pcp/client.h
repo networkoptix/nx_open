@@ -5,6 +5,8 @@
 
 #include <QtCore/QMutex>
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 /** PCP Mapping information */
@@ -35,3 +37,5 @@ private:
 };
 
 } // namespace pcp
+} // namespace network
+} // namespace nx

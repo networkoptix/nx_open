@@ -47,15 +47,15 @@ protected:
     virtual void onWebSocketAccepted(std::unique_ptr<nx::network::WebSocket> connection);
 
     utils::Url getUrl() const;
-    TestHttpServer& httpServer();
+    nx::network::http::TestHttpServer& httpServer();
     void stopHttpServer();
 
     void registerWebSocketAcceptHandlerAt(const nx::network::http::StringType path);
 
 private:
-    std::unique_ptr<TestHttpServer> m_httpServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
 
-    void onUpgradedConnectionAccepted(std::unique_ptr<AbstractStreamSocket> connection);
+    void onUpgradedConnectionAccepted(std::unique_ptr<nx::network::AbstractStreamSocket> connection);
 };
 
 } // namespace test

@@ -76,7 +76,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int t
 
 void CLSimpleHTTPClient::initSocket(bool ssl)
 {
-    m_sock = TCPSocketPtr(SocketFactory::createStreamSocket(ssl).release());
+    m_sock = TCPSocketPtr(nx::network::SocketFactory::createStreamSocket(ssl).release());
 
     if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
     {
@@ -314,7 +314,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
             }
         }
 
-        const SocketAddress& localHostAndPort = m_sock->getLocalAddress();
+        const nx::network::SocketAddress& localHostAndPort = m_sock->getLocalAddress();
         m_localAddress = localHostAndPort.address.toString();
         m_localPort = localHostAndPort.port;
 

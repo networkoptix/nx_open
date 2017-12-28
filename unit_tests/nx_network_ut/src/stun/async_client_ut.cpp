@@ -17,6 +17,7 @@
 #include "stun_async_client_acceptance_tests.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -448,4 +449,5 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

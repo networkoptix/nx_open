@@ -43,7 +43,7 @@ int QnTimeSyncRestHandler::executeGet(
 
         if (!rttMillis)
         {
-            StreamSocketInfo sockInfo;
+            nx::network::StreamSocketInfo sockInfo;
             if (connection->socket() && connection->socket()->getConnectionStatistics(&sockInfo))
                 rttMillis = sockInfo.rttVar;
         }

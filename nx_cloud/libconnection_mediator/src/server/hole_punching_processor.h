@@ -14,7 +14,7 @@
 
 namespace nx {
 
-namespace stun { class MessageDispatcher; }
+namespace network { namespace stun { class MessageDispatcher; } }
 
 namespace hpm {
 
@@ -45,17 +45,17 @@ public:
     void connect(
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
     void onConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
     void connectionResult(
         const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
 
 private:

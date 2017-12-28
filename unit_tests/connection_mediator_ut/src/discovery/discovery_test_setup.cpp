@@ -37,7 +37,7 @@ bool operator==(const PeerInformation& left, const PeerInformation& right)
 
 void DiscoveryTestSetup::SetUp()
 {
-    m_httpServer = std::make_unique<TestHttpServer>();
+    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>();
     registerWebSocketAcceptHandlerAt(kTestPath);
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
@@ -57,7 +57,7 @@ nx::utils::Url DiscoveryTestSetup::getUrl() const
         .setPath(kTestPath);
 }
 
-TestHttpServer& DiscoveryTestSetup::httpServer()
+nx::network::http::TestHttpServer& DiscoveryTestSetup::httpServer()
 {
     return *m_httpServer;
 }
@@ -82,7 +82,7 @@ void DiscoveryTestSetup::registerWebSocketAcceptHandlerAt(const nx::network::htt
 }
 
 void DiscoveryTestSetup::onUpgradedConnectionAccepted(
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
     auto webSocket = std::make_unique<nx::network::WebSocket>(
         std::move(connection));

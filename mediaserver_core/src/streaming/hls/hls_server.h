@@ -50,7 +50,7 @@ namespace nx_hls
     public:
         static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-        QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
+        QnHttpLiveStreamingProcessor( QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner );
         virtual ~QnHttpLiveStreamingProcessor();
 
         /** Processes request, generates and sends response asynchronously. */

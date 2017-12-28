@@ -27,7 +27,7 @@
 #ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */
 static_assert(
-    boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
+    boost::is_same<nx::network::AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
     "Invalid socket type is used in AbstractSocket.");
 typedef char raw_type;       // Type used for raw data on this platform
 #else

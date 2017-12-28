@@ -88,7 +88,7 @@ public:
      * @param flags Bitset of BasicTestFixture::Flag values.
      */
     void setInitFlags(int flags);
-    SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
+    network::SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
 
 protected:
     virtual void SetUp() override;
@@ -115,7 +115,7 @@ protected:
     void setRemotePeerName(const nx::String& peerName);
     void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
-    const std::unique_ptr<AbstractStreamSocket>& clientSocket();
+    const std::unique_ptr<network::AbstractStreamSocket>& clientSocket();
 
 private:
     friend class MemoryRemoteRelayPeerPool;
@@ -136,8 +136,8 @@ private:
     const nx::network::http::BufferType m_staticMsgBody;
     nx::hpm::MediatorFunctionalTest m_mediator;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
-    std::unique_ptr<TestHttpServer> m_httpServer;
-    TestHttpServer m_cloudModulesXmlProvider;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
+    nx::network::http::TestHttpServer m_cloudModulesXmlProvider;
     nx::utils::Url m_staticUrl;
     std::list<std::unique_ptr<nx::network::http::AsyncClient>> m_httpClients;
     std::atomic<int> m_unfinishedRequestsLeft;
@@ -147,7 +147,7 @@ private:
 
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx::network::http::BufferType m_expectedMsgBody;
-    std::unique_ptr<AbstractStreamSocket> m_clientSocket;
+    std::unique_ptr<network::AbstractStreamSocket> m_clientSocket;
 
     RelayPtrList m_relays;
     int m_relayCount;

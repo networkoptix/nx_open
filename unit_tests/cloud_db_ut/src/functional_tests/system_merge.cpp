@@ -192,7 +192,7 @@ private:
     api::ResultCode m_prevResultCode = api::ResultCode::ok;
     SystemHealthInfoProviderStub* m_systemHealthInfoProviderStub = nullptr;
     SystemHealthInfoProviderFactory::Function m_factoryBak;
-    TestHttpServer m_vmsGatewayEmulator;
+    nx::network::http::TestHttpServer m_vmsGatewayEmulator;
     nx::utils::SyncQueue<nx::network::http::Request> m_vmsApiRequests;
     boost::optional<nx::network::http::Request> m_prevVmsApiRequest;
     boost::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;

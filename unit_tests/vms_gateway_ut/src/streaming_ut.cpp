@@ -56,7 +56,7 @@ protected:
     }
 
 private:
-    TestHttpServer m_httpServer;
+    nx::network::http::TestHttpServer m_httpServer;
     nx::network::http::HttpClient m_httpClient;
     nx::Buffer m_fixedResource;
 

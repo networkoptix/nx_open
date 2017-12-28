@@ -13,8 +13,8 @@
 
 namespace nx { namespace network { class UDPSocket; } }
 struct QnModuleInformation;
-class HostAddress;
-class SocketAddress;
+class nx::network::HostAddress;
+class nx::network::SocketAddress;
 
 namespace nx {
 namespace vms {
@@ -79,7 +79,7 @@ private slots:
 signals:
     void responseReceived(
         const QnModuleInformation &moduleInformation,
-        const SocketAddress &endpoint, const HostAddress& ip);
+        const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip);
 
 protected:
     virtual void run() override;

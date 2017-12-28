@@ -55,16 +55,16 @@ private:
     void doNextReceiveUnsafe();
     void receiveFromCallback(
         SystemError::ErrorCode errorCode,
-        SocketAddress senderAddress,
+        nx::network::SocketAddress senderAddress,
         std::size_t bytesRead);
 
-    bool hasValidCacheUnsafe(const SocketAddress& address) const;
+    bool hasValidCacheUnsafe(const nx::network::SocketAddress& address) const;
     bool isDeviceSupported(const DeviceInfo& deviceInfo) const;
     void handleDeviceInfoResponseUnsafe(
-        const SocketAddress& senderAddress,
+        const nx::network::SocketAddress& senderAddress,
         nx::network::http::AsyncHttpClientPtr httpClient);
 
-    void cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint);
+    void cleanUpEndpointInfoUnsafe(const nx::network::SocketAddress& endpoint);
 
 private:
     QnUuid m_flirFcTypeId;
@@ -72,9 +72,9 @@ private:
     std::unique_ptr<nx::network::UDPSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
 
-    std::unordered_map<SocketAddress, nx::network::http::AsyncHttpClientPtr> m_httpClients;
-    std::unordered_map<SocketAddress, TimestampedDeviceInfo> m_deviceInfoCache;
-    std::set<SocketAddress> m_requestsInProgress;
+    std::unordered_map<nx::network::SocketAddress, nx::network::http::AsyncHttpClientPtr> m_httpClients;
+    std::unordered_map<nx::network::SocketAddress, TimestampedDeviceInfo> m_deviceInfoCache;
+    std::set<nx::network::SocketAddress> m_requestsInProgress;
     bool m_terminated;
 
     mutable QnMutex m_mutex;

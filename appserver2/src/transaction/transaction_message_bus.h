@@ -50,7 +50,7 @@ public:
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const ApiPeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
@@ -65,7 +65,7 @@ public:
     */
     void gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         const ApiPeerData &remotePeer,
         qint64 remoteSystemIdentityTime,
         const nx::network::http::Request& request,

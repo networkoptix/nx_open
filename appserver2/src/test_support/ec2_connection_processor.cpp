@@ -12,7 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
     QnTCPConnectionProcessor(socket, owner)

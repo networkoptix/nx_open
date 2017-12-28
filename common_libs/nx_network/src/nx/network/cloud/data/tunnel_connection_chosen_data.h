@@ -12,7 +12,7 @@ class NX_NETWORK_API TunnelConnectionChosenRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::tunnelConnectionChosen;
+    constexpr static const auto kMethod = network::stun::extension::methods::tunnelConnectionChosen;
 
     TunnelConnectionChosenRequest();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
@@ -23,7 +23,7 @@ class NX_NETWORK_API TunnelConnectionChosenResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::tunnelConnectionChosen;
+    constexpr static const auto kMethod = network::stun::extension::methods::tunnelConnectionChosen;
 
     TunnelConnectionChosenResponse();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;

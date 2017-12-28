@@ -21,7 +21,7 @@ class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorP
 };
 
 QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(

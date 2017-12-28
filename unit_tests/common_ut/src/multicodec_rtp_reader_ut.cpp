@@ -203,9 +203,10 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP )
 
 TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP2 )
 {
-    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    std::unique_ptr<nx::network::AbstractStreamSocket> sock(
+        nx::network::SocketFactory::createStreamSocket() );
     ASSERT_TRUE(sock->connect(
-        SocketAddress("192.168.0.1", 80),
+        nx::network::SocketAddress("192.168.0.1", 80),
         nx::network::kNoTimeout));
     sock->send( QByteArray("GET /valgrind-arm-linaro-multilib-2013.09.tar.gz HTTP/1.0\r\n\r\n") );
     char buf[4*1024];
@@ -333,7 +334,7 @@ namespace
         qint64 totalBytesRead;
         size_t readsCount;
 
-        AsyncReadHandler( AbstractCommunicatingSocket* sock )
+        AsyncReadHandler(nx::network::AbstractCommunicatingSocket* sock )
         :
             totalBytesRead( 0 ),
             readsCount( 0 ),
@@ -395,7 +396,7 @@ namespace
         }
 
     private:
-        AbstractCommunicatingSocket* m_sock;
+        nx::network::AbstractCommunicatingSocket* m_sock;
         nx::Buffer m_buf;
         std::mutex m_mutex;
         std::condition_variable m_cond;

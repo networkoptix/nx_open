@@ -24,7 +24,7 @@ struct BeginListeningRequest
 struct NX_NETWORK_API BeginListeningResponse
 {
     int preemptiveConnectionCount;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
 
     BeginListeningResponse();
 

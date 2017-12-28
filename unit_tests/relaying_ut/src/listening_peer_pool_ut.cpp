@@ -85,7 +85,7 @@ public:
         addArg("-listeningPeer/takeIdleConnectionTimeout", "1ms");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
 
-        m_clientInfo.endpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_clientInfo.endpoint = nx::network::SocketAddress(nx::network::HostAddress::localhost, 12345);
         m_clientInfo.relaySessionId = nx::utils::generateRandomName(7).toStdString();
         m_clientInfo.peerName = nx::utils::generateRandomName(7).toStdString();
     }
@@ -280,7 +280,7 @@ protected:
 
     void thenKeepAliveHasBeenEnabledOnConnection()
     {
-        boost::optional<KeepAliveOptions> keepAliveOptions;
+        boost::optional<nx::network::KeepAliveOptions> keepAliveOptions;
         ASSERT_TRUE(m_peerConnection->getKeepAlive(&keepAliveOptions));
         ASSERT_TRUE(static_cast<bool>(keepAliveOptions));
         ASSERT_EQ(
@@ -341,7 +341,7 @@ private:
     struct TakeIdleConnectionResult
     {
         relay::api::ResultCode code;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
     };
 
     std::unique_ptr<relaying::ListeningPeerPool> m_pool;
@@ -360,7 +360,7 @@ private:
 
     void onTakeIdleConnectionCompletion(
         relay::api::ResultCode resultCode,
-        std::unique_ptr<AbstractStreamSocket> connection)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         ASSERT_FALSE(m_poolHasBeenDestroyed.load());

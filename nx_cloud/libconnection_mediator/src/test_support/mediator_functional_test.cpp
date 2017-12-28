@@ -31,12 +31,12 @@ namespace hpm {
 
 static constexpr size_t kMaxBindRetryCount = 10;
 
-static SocketAddress findFreeTcpAndUdpLocalAddress()
+static network::SocketAddress findFreeTcpAndUdpLocalAddress()
 {
     for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
     {
-        const SocketAddress address(
-            HostAddress::localhost,
+        const network::SocketAddress address(
+            network::HostAddress::localhost,
             nx::utils::random::number<uint16_t>(5000, 50000));
 
         network::TCPServerSocket tcpSocket(AF_INET);
@@ -50,7 +50,7 @@ static SocketAddress findFreeTcpAndUdpLocalAddress()
         return address;
     }
 
-    return SocketAddress::anyPrivateAddress;
+    return network::SocketAddress::anyPrivateAddress;
 }
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
@@ -71,7 +71,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
-    addArg("-http/addrToListenList", SocketAddress::anyPrivateAddress.toStdString().c_str());
+    addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddress.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
 
@@ -118,14 +118,14 @@ bool MediatorFunctionalTest::waitUntilStarted()
     return true;
 }
 
-SocketAddress MediatorFunctionalTest::stunEndpoint() const
+network::SocketAddress MediatorFunctionalTest::stunEndpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_stunPort);
+    return network::SocketAddress(network::HostAddress::localhost, m_stunPort);
 }
 
-SocketAddress MediatorFunctionalTest::httpEndpoint() const
+network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_httpPort);
+    return network::SocketAddress(network::HostAddress::localhost, m_httpPort);
 }
 
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
@@ -271,7 +271,7 @@ void MediatorFunctionalTest::beforeModuleCreation()
         }
     }
 
-    SocketAddress httpEndpoint = SocketAddress::anyPrivateAddress;
+    network::SocketAddress httpEndpoint = network::SocketAddress::anyPrivateAddress;
     if (m_httpPort != 0)
         httpEndpoint.port = m_httpPort;
 

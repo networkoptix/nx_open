@@ -39,7 +39,7 @@ public:
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QnTransactionMessageBus* messageBus,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)

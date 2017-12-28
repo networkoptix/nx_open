@@ -16,7 +16,7 @@ class QnHttpConnectionListener;
 
 template<class T>
 QnTCPConnectionProcessor* handlerInstance(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
     return new T(socket, owner);
@@ -25,7 +25,7 @@ QnTCPConnectionProcessor* handlerInstance(
 template <class T, class ExtraParam>
 QnTCPConnectionProcessor* handlerInstance(
     ExtraParam extraParam,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
     return new T(extraParam, socket, owner);
@@ -35,7 +35,7 @@ class QnHttpConnectionListener: public QnTcpListener
 {
 public:
     typedef std::function<QnTCPConnectionProcessor*(
-        QSharedPointer<AbstractStreamSocket>, QnHttpConnectionListener*)> InstanceFunc;
+        QSharedPointer<nx::network::AbstractStreamSocket>, QnHttpConnectionListener*)> InstanceFunc;
 
     struct HandlerInfo
     {
@@ -99,11 +99,11 @@ public:
     // Proxy support functions.
 
     bool registerProxyReceiverConnection(
-        const QString& url, QSharedPointer<AbstractStreamSocket> socket);
+        const QString& url, QSharedPointer<nx::network::AbstractStreamSocket> socket);
 
     typedef std::function<void(int count)> SocketRequest;
 
-    QSharedPointer<AbstractStreamSocket> getProxySocket(
+    QSharedPointer<nx::network::AbstractStreamSocket> getProxySocket(
         const QString& guid, int timeout, const SocketRequest& socketRequest);
 
     void disableAuth();
@@ -121,13 +121,13 @@ private:
 
     struct AwaitProxyInfo
     {
-        explicit AwaitProxyInfo(const QSharedPointer<AbstractStreamSocket>& socket):
+        explicit AwaitProxyInfo(const QSharedPointer<nx::network::AbstractStreamSocket>& socket):
             socket(socket)
         {
             timer.restart();
         }
 
-        QSharedPointer<AbstractStreamSocket> socket;
+        QSharedPointer<nx::network::AbstractStreamSocket> socket;
         QElapsedTimer timer;
     };
 

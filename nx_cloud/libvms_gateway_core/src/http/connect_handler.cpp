@@ -29,7 +29,7 @@ void ConnectHandler::processRequest(
     static_cast<void>(authInfo);
     static_cast<void>(response);
 
-    SocketAddress targetAddress(request.requestLine.url.path());
+    network::SocketAddress targetAddress(request.requestLine.url.path());
     if (!network::SocketGlobals::addressResolver()
             .isCloudHostName(targetAddress.address.toString()))
     {
@@ -41,7 +41,7 @@ void ConnectHandler::processRequest(
             targetAddress.port = m_settings.http().proxyTargetPort;
     }
 
-    m_targetSocket = SocketFactory::createStreamSocket();
+    m_targetSocket = nx::network::SocketFactory::createStreamSocket();
     m_targetSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetSocket->setNonBlockingMode(true) ||
         !m_targetSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
@@ -67,7 +67,7 @@ void ConnectHandler::closeConnection(
     m_targetSocket.reset();
 }
 
-void ConnectHandler::connect(const SocketAddress& address)
+void ConnectHandler::connect(const network::SocketAddress& address)
 {
     NX_LOGX(lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
         .arg(m_connectionSocket).arg(m_targetSocket), cl_logDEBUG1);

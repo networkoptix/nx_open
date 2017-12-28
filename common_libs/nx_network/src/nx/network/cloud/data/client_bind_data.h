@@ -12,11 +12,11 @@ class NX_NETWORK_API ClientBindRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::clientBind;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::clientBind;
 
     nx::String originatingPeerID;
-    std::list<SocketAddress> tcpReverseEndpoints;
+    std::list<network::SocketAddress> tcpReverseEndpoints;
 
     ClientBindRequest();
     void serializeAttributes(nx::network::stun::Message* const message) override;
@@ -27,10 +27,10 @@ class NX_NETWORK_API ClientBindResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::clientBind;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::clientBind;
 
-    boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
+    boost::optional<network::KeepAliveOptions> tcpConnectionKeepAlive;
 
     ClientBindResponse();
     void serializeAttributes(nx::network::stun::Message* const message) override;

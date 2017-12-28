@@ -211,8 +211,7 @@ public:
     virtual bool parseAttributes(const nx::network::stun::Message& message) = 0;
 };
 
-class NX_NETWORK_API StunRequestData
-:
+class NX_NETWORK_API StunRequestData:
     public StunMessageAttributesData
 {
 public:

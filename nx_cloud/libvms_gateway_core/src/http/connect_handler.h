@@ -35,8 +35,8 @@ public:
         nx::network::http::deprecated::AsyncMessagePipeline* connection) override;
 
 private:
-    typedef AbstractCommunicatingSocket Socket;
-    void connect(const SocketAddress& address);
+    typedef network::AbstractCommunicatingSocket Socket;
+    void connect(const network::SocketAddress& address);
     void socketError(Socket* socket, SystemError::ErrorCode error);
     void stream(Socket* source, Socket* target, Buffer* buffer);
 
@@ -47,9 +47,9 @@ private:
     nx::network::http::RequestProcessedHandler m_completionHandler;
 
     Buffer m_connectionBuffer;
-    std::unique_ptr<AbstractCommunicatingSocket> m_connectionSocket;
+    std::unique_ptr<network::AbstractCommunicatingSocket> m_connectionSocket;
     Buffer m_targetBuffer;
-    std::unique_ptr<AbstractCommunicatingSocket> m_targetSocket;
+    std::unique_ptr<network::AbstractCommunicatingSocket> m_targetSocket;
 };
 
 } // namespace gateway

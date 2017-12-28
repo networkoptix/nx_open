@@ -14,6 +14,7 @@
 #include "stun_async_client_acceptance_tests.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -23,15 +24,15 @@ class StunOverHttpServer:
 public:
     StunOverHttpServer();
 
-    virtual bool bind(const SocketAddress& localEndpoint) override;
+    virtual bool bind(const network::SocketAddress& localEndpoint) override;
     virtual bool listen() override;
     virtual utils::Url getServerUrl() const override;
     virtual nx::network::stun::MessageDispatcher& dispatcher() override;
-    virtual void sendIndicationThroughEveryConnection(nx::network::stun::Message) override;
+    virtual void sendIndicationThroughEveryConnection(stun::Message) override;
     virtual std::size_t connectionCount() const override;
 
 private:
-    TestHttpServer m_httpServer;
+    network::http::TestHttpServer m_httpServer;
     nx::network::stun::MessageDispatcher m_dispatcher;
     nx::network::stun::StunOverHttpServer m_stunOverHttpServer;
 };
@@ -63,4 +64,5 @@ private:
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

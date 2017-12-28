@@ -24,7 +24,9 @@
 
 #include "upnp_search_handler.h"
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 class NX_NETWORK_API AbstractDeviceSearcherSettings
 {
@@ -194,5 +196,6 @@ private slots:
     void onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient);
 };
 
-} // namespace nx_upnp
-
+} // namespace nx
+} // namespace network
+} // namespace upnp

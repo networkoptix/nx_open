@@ -127,7 +127,7 @@ public:
     virtual nx::utils::log::Settings logging() const override;
 
     /** List of local endpoints to bind to. By default, 0.0.0.0:3346. */
-    std::list<SocketAddress> endpointsToListen() const;
+    std::list<network::SocketAddress> endpointsToListen() const;
 
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;

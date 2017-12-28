@@ -20,7 +20,7 @@ public:
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const nx::network::http::Request& request,
         const QByteArray& contentEncoding,

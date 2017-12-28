@@ -128,7 +128,7 @@ TEST_F(OutgoingTunnelConnectionWatcher, using_tunnel)
             std::chrono::milliseconds::zero(),
             SocketAttributes(),
             [](SystemError::ErrorCode,
-               std::unique_ptr<AbstractStreamSocket>,
+               std::unique_ptr<nx::network::AbstractStreamSocket>,
                bool /*stillValid*/)
             {
             });

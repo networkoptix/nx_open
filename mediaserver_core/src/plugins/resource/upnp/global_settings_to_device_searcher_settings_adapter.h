@@ -5,7 +5,7 @@
 class QnGlobalSettings;
 
 class GlobalSettingsToDeviceSearcherSettingsAdapter:
-    public nx_upnp::AbstractDeviceSearcherSettings
+    public nx::network::upnp::AbstractDeviceSearcherSettings
 {
 public:
     GlobalSettingsToDeviceSearcherSettingsAdapter(QnGlobalSettings* globalSettings);
@@ -15,5 +15,5 @@ public:
 
 private:
     QnGlobalSettings* m_globalSettings;
-    const nx_upnp::DeviceSearcherDefaultSettings m_defaultSettings;
+    const nx::network::upnp::DeviceSearcherDefaultSettings m_defaultSettings;
 };

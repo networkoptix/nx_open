@@ -7,7 +7,9 @@
 #include <nx/network/http/server/handler/http_server_handler_static_data.h>
 #include <nx/utils/random.h>
 
-//-------------------------------------------------------------------------------------------------
+namespace nx {
+namespace network {
+namespace http {
 
 TestAuthenticationManager::TestAuthenticationManager(
     nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
@@ -244,3 +246,7 @@ std::shared_ptr<RandomlyFailingHttpConnection> RandomlyFailingHttpServer::create
     result->setResponseBuffer(m_responseBuffer);
     return result;
 }
+
+} // namespace http
+} // namespace network
+} // namespace nx

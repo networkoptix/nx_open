@@ -29,14 +29,14 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     if (serverData.status != oldData.status)
         emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
 
-    QList<SocketAddress> addressList;
+    QList<nx::network::SocketAddress> addressList;
     for (const QString &address : serverData.remoteAddresses)
-        addressList.append(SocketAddress(address));
+        addressList.append(nx::network::SocketAddress(address));
     setNetAddrList(addressList);
 
     if (!addressList.isEmpty())
     {
-        const SocketAddress endpoint(addressList.first().toString(), serverData.port);
+        const nx::network::SocketAddress endpoint(addressList.first().toString(), serverData.port);
         const auto url = nx::network::url::Builder()
             .setScheme(apiUrlScheme(serverData.sslAllowed))
             .setEndpoint(endpoint);

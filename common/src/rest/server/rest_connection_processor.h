@@ -40,7 +40,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 
 public:
     QnRestConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);

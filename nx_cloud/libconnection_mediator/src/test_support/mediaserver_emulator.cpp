@@ -20,6 +20,8 @@
 namespace nx {
 namespace hpm {
 
+using namespace nx::network;
+
 class ApiModuleInformationHandler:
     public nx::network::http::AbstractHttpRequestHandler
 {
@@ -70,7 +72,7 @@ private:
 };
 
 MediaServerEmulator::MediaServerEmulator(
-    const SocketAddress& mediatorEndpoint,
+    const network::SocketAddress& mediatorEndpoint,
     AbstractCloudDataProvider::System systemData,
     nx::String serverName)
 :
@@ -108,7 +110,7 @@ MediaServerEmulator::MediaServerEmulator(
 
     m_mediatorConnector->mockupMediatorUrl(
         nx::network::url::Builder()
-            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(mediatorEndpoint));
+            .setScheme(network::stun::kUrlSchemeName).setEndpoint(mediatorEndpoint));
 
     m_mediatorConnector->setSystemCredentials(
         api::SystemCredentials(
@@ -147,7 +149,7 @@ void MediaServerEmulator::bindToAioThread(network::aio::AbstractAioThread* aioTh
 
 bool MediaServerEmulator::start(bool listenToConnectRequests)
 {
-    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)) ||
+    if (!m_httpServer->bind(network::SocketAddress(network::HostAddress::localhost, 0)) ||
         !m_httpServer->listen())
     {
         return false;
@@ -185,7 +187,7 @@ nx::String MediaServerEmulator::fullName() const
     return m_serverId + "." + m_systemData.id;
 }
 
-SocketAddress MediaServerEmulator::endpoint() const
+network::SocketAddress MediaServerEmulator::endpoint() const
 {
     return m_httpServer->address();
 }
@@ -213,12 +215,12 @@ std::pair<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>
     return std::make_pair(resultCode, response);
 }
 
-SocketAddress MediaServerEmulator::mediatorConnectionLocalAddress() const
+network::SocketAddress MediaServerEmulator::mediatorConnectionLocalAddress() const
 {
     return m_serverClient->localAddress();
 }
 
-SocketAddress MediaServerEmulator::udpHolePunchingEndpoint() const
+network::SocketAddress MediaServerEmulator::udpHolePunchingEndpoint() const
 {
     return m_mediatorUdpClient->localAddress();
 }
@@ -248,7 +250,7 @@ void MediaServerEmulator::setServerIdForModuleInformation(
 }
 
 nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
-    std::list<SocketAddress> addresses)
+    std::list<network::SocketAddress> addresses)
 {
     utils::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(
@@ -377,7 +379,7 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
     if (errorCode != SystemError::noError)
         return;
 
-    m_stunPipeline = std::make_unique<stun::MessagePipeline>(
+    m_stunPipeline = std::make_unique<network::stun::MessagePipeline>(
         this,
         std::move(m_udtStreamSocket));
     m_stunPipeline->bindToAioThread(getAioThread());
@@ -390,17 +392,17 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
 
 void MediaServerEmulator::onUdtConnectionAccepted(
     SystemError::ErrorCode /*errorCode*/,
-    std::unique_ptr<AbstractStreamSocket> /*acceptedSocket*/)
+    std::unique_ptr<network::AbstractStreamSocket> /*acceptedSocket*/)
 {
 }
 
 void MediaServerEmulator::onMessageReceived(
-    nx::network::stun::Message message)
+    network::stun::Message message)
 {
     if (m_action <= ActionToTake::ignoreSyn)
         return;
 
-    if (message.header.messageClass != stun::MessageClass::request)
+    if (message.header.messageClass != network::stun::MessageClass::request)
         return;
 
     if (message.header.method == stun::extension::methods::udpHolePunchingSyn)

@@ -129,8 +129,8 @@ public:
     virtual qint64 read(char * data, qint64 maxSize );
     const QnRtspStatistic& getStatistic() { return m_statistic; }
     void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
-    AbstractCommunicatingSocket* getMediaSocket();
-    AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    nx::network::AbstractCommunicatingSocket* getMediaSocket();
+    nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void shutdown();
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
@@ -138,7 +138,7 @@ public:
 
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
-    void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
+    void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
     quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
     quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
@@ -148,11 +148,11 @@ private:
     QnRtspClient* m_owner;
     bool m_tcpMode;
     QnRtspStatistic m_statistic;
-    AbstractDatagramSocket* m_mediaSocket;
-    AbstractDatagramSocket* m_rtcpSocket;
+    nx::network::AbstractDatagramSocket* m_mediaSocket;
+    nx::network::AbstractDatagramSocket* m_rtcpSocket;
     quint16 m_mediaPort;
     quint16 m_remoteEndpointRtcpPort;
-    HostAddress m_hostAddress;
+    nx::network::HostAddress m_hostAddress;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
     QElapsedTimer m_reportTimer;
@@ -196,7 +196,7 @@ public:
 
             ioDevice = new QnRtspIoDevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
-            ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
+            ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host()));
             interleaved = QPair<int,int>(-1,-1);
         }
 
@@ -227,7 +227,7 @@ public:
 
     QnRtspClient(
         bool shouldGuessAuthDigest,
-        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
+        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
 
     ~QnRtspClient();
 
@@ -337,7 +337,7 @@ public:
 
     void setTrackInfo(const TrackMap& tracks);
 
-    AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
+    nx::network::AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);
 
     /** @return "Server" http header value */
@@ -410,7 +410,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
     nx::utils::Url m_url;
@@ -425,7 +425,7 @@ private:
     friend class QnRtspIoDevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     QAuthenticator m_auth;
-    boost::optional<SocketAddress> m_proxyAddress;
+    boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
     TransportType m_prefferedTransport;
 

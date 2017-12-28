@@ -130,9 +130,9 @@ bool CdbLauncher::waitUntilStarted()
     return false;
 }
 
-SocketAddress CdbLauncher::endpoint() const
+network::SocketAddress CdbLauncher::endpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_port);
+    return network::SocketAddress(network::HostAddress::localhost, m_port);
 }
 
 nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()

@@ -37,12 +37,12 @@ public:
 protected:
     virtual void run() override
     {
-        std::unique_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket().release() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> discoverySock(nx::network::SocketFactory::createDatagramSocket().release() );
 #if 1
-        discoverySock->bind(SocketAddress(HostAddress::anyHost, TestCamConst::DISCOVERY_PORT));
+        discoverySock->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, TestCamConst::DISCOVERY_PORT));
         for (const auto& addr: m_localInterfacesToListen)
         {
-            for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+            for (const auto& iface: nx::network::getAllIPv4Interfaces())
             {
                 if (iface.address == QHostAddress(addr))
                 {
@@ -63,9 +63,9 @@ protected:
 #endif
         discoverySock->setRecvTimeout(100);
         quint8 buffer[1024*8];
-        SocketAddress peerEndpoint;
+        nx::network::SocketAddress peerEndpoint;
 
-        auto hasRange = [&](const SocketAddress& peerEndpoint)
+        auto hasRange = [&](const nx::network::SocketAddress& peerEndpoint)
         {
             const auto addr = peerEndpoint.address.ipV4();
             if (!addr)
@@ -196,7 +196,8 @@ void QnCameraPool::addCameras(
     }
 }
 
-QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(
+    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
     return new QnTestCameraProcessor(clientSocket, this, m_noSecondaryStream, m_fps);

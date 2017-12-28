@@ -43,7 +43,7 @@ namespace ec2
 
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
         QnTransactionMessageBus* messageBus,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner )
     :
         QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner)

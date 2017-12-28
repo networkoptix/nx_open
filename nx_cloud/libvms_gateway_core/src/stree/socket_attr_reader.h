@@ -18,13 +18,13 @@ class SocketResourceReader
     public nx::utils::stree::AbstractResourceReader
 {
 public:
-    SocketResourceReader(const AbstractCommunicatingSocket& sock);
+    SocketResourceReader(const network::AbstractCommunicatingSocket& sock);
 
     //!Implementation of \a AbstractResourceReader::getAsVariant
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 
 private:
-    const AbstractCommunicatingSocket& m_socket;
+    const network::AbstractCommunicatingSocket& m_socket;
 };
 
 }   //namespace cloud

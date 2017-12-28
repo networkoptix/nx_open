@@ -28,7 +28,7 @@ class ShareSocketDelegate: public nx::network::StreamSocketDelegate
 {
     using base_type = nx::network::StreamSocketDelegate;
 public:
-    ShareSocketDelegate(QSharedPointer<AbstractStreamSocket> socket):
+    ShareSocketDelegate(QSharedPointer<nx::network::AbstractStreamSocket> socket):
         base_type(socket.data()),
         m_socket(std::move(socket))
     {
@@ -38,7 +38,7 @@ public:
 
     }
 private:
-    QSharedPointer<AbstractStreamSocket> m_socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
 };
 
 // -------------------------- ConnectionProcessor ---------------------
@@ -47,7 +47,7 @@ const QString ConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
 const QString ConnectionProcessor::kCloudPathPrefix(lit("/cdb"));
 
 ConnectionProcessor::ConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(socket, owner)

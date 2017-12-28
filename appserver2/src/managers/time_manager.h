@@ -186,7 +186,7 @@ private:
 
     struct PeerContext
     {
-        SocketAddress peerAddress;
+        nx::network::SocketAddress peerAddress;
         nx::network::http::AuthInfoCache::AuthorizationCacheItem authData;
         nx::utils::TimerManager::TimerGuard syncTimerID;
         nx::network::http::AsyncHttpClientPtr httpClient;
@@ -194,7 +194,7 @@ private:
         boost::optional<qint64> rttMillis;
 
         PeerContext(
-            SocketAddress _peerAddress,
+            nx::network::SocketAddress _peerAddress,
             nx::network::http::AuthInfoCache::AuthorizationCacheItem _authData )
         :
             peerAddress( std::move( _peerAddress ) ),
@@ -279,7 +279,7 @@ private:
     qint64 getSyncTimeNonSafe() const;
     void startSynchronizingTimeWithPeer(
         const QnUuid& peerID,
-        SocketAddress peerAddress,
+        nx::network::SocketAddress peerAddress,
         nx::network::http::AuthInfoCache::AuthorizationCacheItem authData );
     void stopSynchronizingTimeWithPeer( const QnUuid& peerID );
     void synchronizeWithPeer( const QnUuid& peerID );

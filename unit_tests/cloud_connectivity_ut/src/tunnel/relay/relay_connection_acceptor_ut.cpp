@@ -34,7 +34,7 @@ protected:
     };
 
     ServerType m_serverType = ServerType::happy;
-    utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverConnections;
+    utils::SyncQueue<std::unique_ptr<nx::network::AbstractStreamSocket>> m_serverConnections;
 
     virtual void SetUp() override
     {
@@ -79,7 +79,7 @@ protected:
     }
 
 private:
-    TestHttpServer m_testHttpServer;
+    nx::network::http::TestHttpServer m_testHttpServer;
     nx::utils::Url m_relayServerUrl;
     api::BeginListeningResponse m_beginListeningResponse;
 
@@ -127,7 +127,7 @@ class RelayReverseConnection:
 public:
     RelayReverseConnection()
     {
-        m_clientEndpoint.address = HostAddress::localhost;
+        m_clientEndpoint.address = nx::network::HostAddress::localhost;
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 60000);
     }
 
@@ -251,7 +251,7 @@ protected:
 
     void assertKeepAliveIsExpected()
     {
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         m_connection->executeInAioThreadSync(
             [this, &connection]()
             {
@@ -280,8 +280,8 @@ protected:
 private:
     utils::SyncQueue<SystemError::ErrorCode> m_connectResult;
     utils::SyncQueue<SystemError::ErrorCode> m_activateConnectionResult;
-    std::unique_ptr<AbstractStreamSocket> m_serverConnection;
-    SocketAddress m_clientEndpoint;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_serverConnection;
+    nx::network::SocketAddress m_clientEndpoint;
     nx::Buffer m_openTunnelNotificationBuffer;
     std::unique_ptr<detail::ReverseConnection> m_connection;
 
@@ -434,7 +434,7 @@ private:
 
     void onAccepted(
         SystemError::ErrorCode /*sysErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> /*streamSocket*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*streamSocket*/)
     {
     }
 };

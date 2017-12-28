@@ -11,8 +11,10 @@ ConnectionAckRequest::ConnectionAckRequest():
 {
 }
 
-void ConnectionAckRequest::serializeAttributes(nx::network::stun::Message* const message)
+void ConnectionAckRequest::serializeAttributes(network::stun::Message* const message)
 {
+    using namespace nx::network;
+
     message->newAttribute<stun::extension::attrs::ConnectionId>(connectSessionId);
     message->newAttribute<stun::extension::attrs::ConnectionMethods>(
         nx::String::number(connectionMethods));
@@ -25,6 +27,8 @@ void ConnectionAckRequest::serializeAttributes(nx::network::stun::Message* const
 
 bool ConnectionAckRequest::parseAttributes(const nx::network::stun::Message& message)
 {
+    using namespace nx::network;
+
     if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 

@@ -15,7 +15,7 @@ namespace nx { namespace vms { namespace discovery { class Manager; } } }
 struct QnRoute
 {
 
-    SocketAddress addr; // address for physical connect
+    nx::network::SocketAddress addr; // address for physical connect
     QnUuid id;          // requested server ID
     QnUuid gatewayId;   // proxy server ID. May be null
     bool reverseConnect;// if target server should connect to this one

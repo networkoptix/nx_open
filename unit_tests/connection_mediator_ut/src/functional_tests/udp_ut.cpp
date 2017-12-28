@@ -43,7 +43,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         //sending resolve request
         api::ResolvePeerRequest request(system1Servers[i]->serverId() + "." + system1.id);
         nx::network::stun::Message requestMessage(
-            stun::Header(
+            nx::network::stun::Header(
                 nx::network::stun::MessageClass::request,
                 nx::network::stun::extension::methods::resolvePeer));
         request.serialize(&requestMessage);
@@ -58,7 +58,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         //reading response
         nx::Buffer recvBuffer;
         recvBuffer.resize(nx::network::kMaxUDPDatagramSize);
-        SocketAddress serverAddress;
+        nx::network::SocketAddress serverAddress;
         const int bytesRead = udpSocket->recvFrom(recvBuffer.data(), recvBuffer.size(), &serverAddress);
         ASSERT_NE(-1, bytesRead);
         recvBuffer.resize(bytesRead);

@@ -97,7 +97,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<TestHttpServer> m_httpServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     std::unique_ptr<ClientImpl> m_client;
     nx::utils::Url m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
@@ -109,7 +109,7 @@ private:
     void saveBeginListeningCompletionResult(
         ResultCode resultCode,
         BeginListeningResponse response,
-        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
     {
         m_requestResultQueue.push(resultCode);
         m_prevBeginListeningResponse = std::move(response);
@@ -128,7 +128,7 @@ private:
         if (baseUrlPath.isEmpty())
             baseUrlPath = "/";
 
-        m_httpServer = std::make_unique<TestHttpServer>();
+        m_httpServer = std::make_unique<nx::network::http::TestHttpServer>();
 
         const auto realPath = nx::network::http::rest::substituteParameters(
             kServerClientSessionsPath,
@@ -172,7 +172,7 @@ private:
             nx::utils::random::number<int>(1, 99);
         if (nx::utils::random::number<int>(0, 1) > 0)
         {
-            m_expectedBeginListeningResponse.keepAliveOptions = KeepAliveOptions();
+            m_expectedBeginListeningResponse.keepAliveOptions = nx::network::KeepAliveOptions();
             m_expectedBeginListeningResponse.keepAliveOptions->probeCount =
                 nx::utils::random::number<int>(1, 99);
             m_expectedBeginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =

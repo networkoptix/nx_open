@@ -14,6 +14,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -22,10 +23,10 @@ class AbstractStunServer
 public:
     virtual ~AbstractStunServer() = default;
 
-    virtual bool bind(const SocketAddress&) = 0;
+    virtual bool bind(const network::SocketAddress&) = 0;
     virtual bool listen() = 0;
     virtual nx::utils::Url getServerUrl() const = 0;
-    virtual void sendIndicationThroughEveryConnection(nx::network::stun::Message) = 0;
+    virtual void sendIndicationThroughEveryConnection(stun::Message) = 0;
     virtual nx::network::stun::MessageDispatcher& dispatcher() = 0;
     virtual std::size_t connectionCount() const = 0;
 };
@@ -40,10 +41,10 @@ protected:
     void setSingleShotUnconnectableSocketFactory();
 
 private:
-    boost::optional<SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
+    boost::optional<network::SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     QnMutex m_mutex;
 
-    std::unique_ptr<AbstractStreamSocket> createUnconnectableStreamSocket(
+    std::unique_ptr<network::AbstractStreamSocket> createUnconnectableStreamSocket(
         bool /*sslRequired*/,
         nx::network::NatTraversalSupport /*natTraversalRequired*/);
 };
@@ -446,4 +447,5 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

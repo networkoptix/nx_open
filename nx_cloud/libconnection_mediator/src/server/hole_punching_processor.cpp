@@ -39,8 +39,8 @@ HolePunchingProcessor::HolePunchingProcessor(
     // TODO #ak: decouple STUN message handling and logic.
 
     dispatcher->registerRequestProcessor(
-        stun::extension::methods::connect,
-        [this](const ConnectionStrongRef& connection, stun::Message message)
+        network::stun::extension::methods::connect,
+        [this](const ConnectionStrongRef& connection, network::stun::Message message)
         {
             processRequestWithOutput(
                 &HolePunchingProcessor::connect,
@@ -50,8 +50,8 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::extension::methods::connectionAck,
-        [this](const ConnectionStrongRef& connection, stun::Message message)
+        network::stun::extension::methods::connectionAck,
+        [this](const ConnectionStrongRef& connection, network::stun::Message message)
         {
             processRequestWithNoOutput(
                 &HolePunchingProcessor::onConnectionAckRequest,
@@ -61,8 +61,8 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::extension::methods::connectionResult,
-        [this](const ConnectionStrongRef& connection, stun::Message message)
+        network::stun::extension::methods::connectionResult,
+        [this](const ConnectionStrongRef& connection, network::stun::Message message)
         {
             processRequestWithNoOutput(
                 &HolePunchingProcessor::connectionResult,
@@ -103,7 +103,7 @@ void HolePunchingProcessor::stop()
 void HolePunchingProcessor::connect(
     const ConnectionStrongRef& connection,
     api::ConnectRequest request,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
     api::ResultCode validationResult = api::ResultCode::ok;
@@ -152,7 +152,7 @@ void HolePunchingProcessor::connect(
 void HolePunchingProcessor::onConnectionAckRequest(
     const ConnectionStrongRef& connection,
     api::ConnectionAckRequest request,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -177,7 +177,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
 void HolePunchingProcessor::connectionResult(
     const ConnectionStrongRef& connection,
     api::ConnectionResultRequest request,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);

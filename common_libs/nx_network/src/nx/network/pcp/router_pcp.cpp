@@ -9,6 +9,8 @@ static const quint32 LIFETIME = 1 * 60 * 60;
 static const int RESPONCE_WAIT = 1000;
 static const int RESPONCE_BUFFER = 1024;
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 Router::Router(const HostAddress& address)
@@ -103,3 +105,5 @@ bool Router::parseMapResponse(const QByteArray& response, Mapping& mapping)
 }
 
 } // namespace pcp
+} // namespace network
+} // namespace nx

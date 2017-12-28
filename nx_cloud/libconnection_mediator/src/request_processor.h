@@ -63,7 +63,7 @@ protected:
     /** Returns mediaserver data from \a request */
     api::ResultCode getMediaserverData(
         const nx::network::stun::AbstractServerConnection& connection,
-        stun::Message& request,
+        network::stun::Message& request,
         MediaserverData* const foundData,
         nx::String* errorMessage);
 

@@ -97,7 +97,7 @@ void View::start()
     }
 }
 
-std::vector<SocketAddress> View::httpEndpoints() const
+std::vector<network::SocketAddress> View::httpEndpoints() const
 {
     return m_multiAddressHttpServer->endpoints();
 }

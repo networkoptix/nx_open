@@ -15,7 +15,7 @@ class OpenTunnelNotification:
 protected:
     void generateRandomData()
     {
-        m_original.setClientEndpoint(SocketAddress(HostAddress::localhost, 12345));
+        m_original.setClientEndpoint(nx::network::SocketAddress(nx::network::HostAddress::localhost, 12345));
         m_original.setClientPeerName(nx::utils::generateRandomName(7));
     }
 

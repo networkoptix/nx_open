@@ -18,7 +18,7 @@ Notes on address resolving
 Implementation decomposition:
 
 1. add UDT support to sockets
-    (done) 1.1. implement AbstractCommunicatingSocket, AbstractServerSocket using UDT
+    (done) 1.1. implement network::AbstractCommunicatingSocket, AbstractServerSocket using UDT
     (done) 1.2. add UDT support to aio
         (done) 1.2.1. implement PollSet via UDT
         (done) 1.2.2. AIOThread: must be able to use different Pollset (for system sockets and UDT sockets)

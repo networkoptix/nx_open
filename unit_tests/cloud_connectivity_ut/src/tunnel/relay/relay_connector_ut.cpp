@@ -278,12 +278,12 @@ private:
     struct ConnectResult
     {
         SystemError::ErrorCode systemErrorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
     };
 
-    TestHttpServer m_redirectingRelay;
-    TestHttpServer m_realRelay;
+    nx::network::http::TestHttpServer m_redirectingRelay;
+    nx::network::http::TestHttpServer m_realRelay;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     nx::utils::SyncQueue<int /*dummy*/> m_connectionsUpgradedByRealRelay;
 
@@ -323,7 +323,7 @@ private:
 
     void saveConnectionResult(
         SystemError::ErrorCode systemErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection,
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         bool stillValid)
     {
         m_connectResults.push({systemErrorCode, std::move(connection), stillValid});

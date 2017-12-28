@@ -24,7 +24,7 @@ protected:
 
     int receiveData(quint8* buffer, int size);
 private:
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     QnConstMediaContextPtr m_context;
 };
 

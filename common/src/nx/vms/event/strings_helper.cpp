@@ -626,7 +626,7 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
     if (const auto& connection = camera->commonModule()->ec2Connection())
     {
         auto appServerUrl = connection->connectionInfo().ecUrl;
-        if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+        if (appServerUrl.host().isEmpty() || nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
         {
             appServerUrl = server->getApiUrl();
             if (isPublic)

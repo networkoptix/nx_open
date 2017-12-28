@@ -29,7 +29,7 @@ public:
     QString dbFilePath() const;
     bool isP2pMode() const;
     int moduleInstance() const;
-    SocketAddress endpoint() const;
+    nx::network::SocketAddress endpoint() const;
     QnUuid moduleGuid() const;
     bool isAuthDisabled() const;
 

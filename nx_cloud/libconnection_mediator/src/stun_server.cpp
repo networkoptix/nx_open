@@ -13,11 +13,11 @@ namespace hpm {
 StunServer::StunServer(const conf::Settings& settings):
     m_settings(settings),
     m_stunOverHttpServer(&m_stunMessageDispatcher),
-    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::SocketServer>>(
+    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
         nx::network::NatTraversalSupport::disabled)),
-    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::UdpServer>>(
+    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::UdpServer>>(
         &m_stunMessageDispatcher))
 {
     if (!bind())
@@ -47,15 +47,15 @@ void StunServer::listen()
 void StunServer::stopAcceptingNewRequests()
 {
     m_tcpStunServer->pleaseStopSync();
-    m_udpStunServer->forEachListener(&stun::UdpServer::stopReceivingMessagesSync);
+    m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
 }
 
-const std::vector<SocketAddress>& StunServer::endpoints() const
+const std::vector<network::SocketAddress>& StunServer::endpoints() const
 {
     return m_endpoints;
 }
 
-nx::network::stun::MessageDispatcher& StunServer::dispatcher()
+network::stun::MessageDispatcher& StunServer::dispatcher()
 {
     return m_stunMessageDispatcher;
 }
@@ -76,7 +76,7 @@ bool StunServer::bind()
     }
 
     m_tcpStunServer->forEachListener(
-        [this](stun::SocketServer* server)
+        [this](network::stun::SocketServer* server)
         {
             server->setConnectionInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
         });

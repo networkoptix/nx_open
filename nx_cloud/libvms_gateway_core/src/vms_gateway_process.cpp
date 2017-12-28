@@ -55,7 +55,7 @@ VmsGatewayProcess::~VmsGatewayProcess()
     }
 }
 
-const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
+const std::vector<network::SocketAddress>& VmsGatewayProcess::httpEndpoints() const
 {
     return m_httpEndpoints;
 }
@@ -70,7 +70,7 @@ const relaying::RelayEngine& VmsGatewayProcess::relayEngine() const
     return *m_relayEngine;
 }
 
-void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
+void VmsGatewayProcess::enforceSslFor(const network::SocketAddress& targetAddress, bool enabled)
 {
     m_runTimeOptions.enforceSsl(targetAddress, enabled);
 }
@@ -179,7 +179,7 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
     {
         nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
-                .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
+                .setEndpoint(network::SocketAddress(settings.general().mediatorEndpoint)).toUrl());
         nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 

@@ -41,7 +41,7 @@ ListeningPeerPool::~ListeningPeerPool()
 
 void ListeningPeerPool::addConnection(
     const std::string& peerNameOriginal,
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     auto peerName = utils::reverseWords(peerNameOriginal, ".");
 

@@ -26,7 +26,7 @@ struct ListeningPeerData
     nx::String hostName;
     /** Valid for locally-registered peer only. */
     std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
-    std::list<SocketAddress> endpoints;
+    std::list<network::SocketAddress> endpoints;
     api::ConnectionMethods connectionMethods;
 
     ListeningPeerData():

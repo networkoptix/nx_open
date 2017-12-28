@@ -13,6 +13,8 @@
 namespace nx {
 namespace hpm {
 
+using namespace nx::network;
+
 UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
     const ListeningPeerData& serverPeerData,
@@ -229,7 +231,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
 
     api::ConnectResponse connectResponse = prepareConnectResponse(
         api::ConnectionAckRequest(),
-        std::list<SocketAddress>(),
+        std::list<network::SocketAddress>(),
         boost::none);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
@@ -370,7 +372,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
-    std::list<SocketAddress> tcpEndpoints,
+    std::list<network::SocketAddress> tcpEndpoints,
     boost::optional<QUrl> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;

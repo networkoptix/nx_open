@@ -7,9 +7,9 @@ namespace {
     static const int kDefaultPoolSize = 8;
     static const int kHttpDisconnectTimeout(60 * 1000);
 
-    SocketAddress toSocketAddress(const QUrl& url)
+    nx::network::SocketAddress toSocketAddress(const QUrl& url)
     {
-        return SocketAddress(url.host(), url.port(80));
+        return nx::network::SocketAddress(url.host(), url.port(80));
     }
 }
 

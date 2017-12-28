@@ -16,7 +16,7 @@ public:
     QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::MimeProtoVersion httpVersion):
         m_commonModule(/*clientMode*/ false, nx::core::access::Mode::direct),
         m_tcpListener(&m_commonModule),
-        m_hlsRequestProcessor(QSharedPointer<AbstractStreamSocket>(), &m_tcpListener)
+        m_hlsRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket>(), &m_tcpListener)
     {
         m_request.requestLine.version = httpVersion;
     }
@@ -168,7 +168,7 @@ TEST(HLSMimeTypes, main)
         {
             return nx_hls::QnHttpLiveStreamingProcessor::mimeTypeByExtension(extension);
         }
-    } hlsServerTest(QSharedPointer<AbstractStreamSocket>(), &tcpListener);
+    } hlsServerTest(QSharedPointer<nx::network::AbstractStreamSocket>(), &tcpListener);
 
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u8")), lit("application/vnd.apple.mpegurl"));
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U8")), lit("application/vnd.apple.mpegurl"));

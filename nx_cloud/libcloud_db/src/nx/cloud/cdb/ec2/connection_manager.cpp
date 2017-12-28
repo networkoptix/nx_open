@@ -731,7 +731,7 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
             if (transactionTransport)
             {
                 transactionTransport->setOutgoingConnection(
-                    QSharedPointer<AbstractCommunicatingSocket>(\
+                    QSharedPointer<network::AbstractCommunicatingSocket>(\
                         connection->takeSocket().release()));
                 transactionTransport->startOutgoingChannel();
             }

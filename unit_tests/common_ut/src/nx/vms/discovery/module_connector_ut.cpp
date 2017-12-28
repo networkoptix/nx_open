@@ -14,8 +14,8 @@ namespace vms {
 namespace discovery {
 namespace test {
 
-static const HostAddress kLocalDnsHost("local-doman-name.com");
-static const HostAddress kLocalCloudHost(QnUuid::createUuid().toSimpleString());
+static const nx::network::HostAddress kLocalDnsHost("local-doman-name.com");
+static const nx::network::HostAddress kLocalCloudHost(QnUuid::createUuid().toSimpleString());
 
 class DiscoveryModuleConnector: public testing::Test
 {
@@ -27,7 +27,7 @@ public:
             std::chrono::milliseconds(100), 2, std::chrono::seconds(1)));
 
         connector.setConnectHandler(
-            [this](QnModuleInformation information, SocketAddress endpoint, HostAddress /*ip*/)
+            [this](QnModuleInformation information, nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
             {
                 {
                     QnMutexLocker lock(&m_mutex);
@@ -56,8 +56,8 @@ public:
         connector.activate();
 
         auto& dnsResolver = network::SocketGlobals::addressResolver().dnsResolver();
-        dnsResolver.addEtcHost(kLocalDnsHost.toString(), {HostAddress::localhost});
-        dnsResolver.addEtcHost(kLocalCloudHost.toString(), {HostAddress::localhost});
+        dnsResolver.addEtcHost(kLocalDnsHost.toString(), {nx::network::HostAddress::localhost});
+        dnsResolver.addEtcHost(kLocalCloudHost.toString(), {nx::network::HostAddress::localhost});
     }
 
     ~DiscoveryModuleConnector()
@@ -72,14 +72,14 @@ public:
         EXPECT_TRUE(disconnectedQueue.isEmpty());
     }
 
-    void expectConnect(const QnUuid& id, const SocketAddress& endpoint)
+    void expectConnect(const QnUuid& id, const nx::network::SocketAddress& endpoint)
     {
         const auto server = connectedQueue.pop();
         EXPECT_EQ(id.toString(), server.first.toString());
         EXPECT_EQ(endpoint.toString(), server.second.toString()) << id.toStdString();
     }
 
-    SocketAddress addMediaserver(QnUuid id, HostAddress ip = HostAddress::localhost)
+    nx::network::SocketAddress addMediaserver(QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
     {
         QnModuleInformation module;
         module.id = std::move(id);
@@ -87,7 +87,7 @@ public:
         QnJsonRestResult result;
         result.setReply(module);
 
-        auto server = std::make_unique<TestHttpServer>();
+        auto server = std::make_unique<nx::network::http::TestHttpServer>();
         const bool registration = server->registerStaticProcessor(
             QLatin1String("/api/moduleInformation"), QJson::serialized(result),
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
@@ -102,12 +102,12 @@ public:
     }
 
     QnMutex m_mutex;
-    std::map<QnUuid, SocketAddress> m_knownServers;
+    std::map<QnUuid, nx::network::SocketAddress> m_knownServers;
 
     ModuleConnector connector;
-    utils::TestSyncMultiQueue<QnUuid, SocketAddress> connectedQueue;
+    utils::TestSyncMultiQueue<QnUuid, nx::network::SocketAddress> connectedQueue;
     utils::TestSyncQueue<QnUuid> disconnectedQueue;
-    std::map<SocketAddress, std::unique_ptr<TestHttpServer>> mediaservers;
+    std::map<nx::network::SocketAddress, std::unique_ptr<nx::network::http::TestHttpServer>> mediaservers;
 };
 
 TEST_F(DiscoveryModuleConnector, AddEndpoints)
@@ -170,8 +170,8 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
 TEST_F(DiscoveryModuleConnector, EndpointPriority)
 {
-    HostAddress interfaceIp;
-    const auto interfaceIpsV4 = getLocalIpV4AddressList();
+    nx::network::HostAddress interfaceIp;
+    const auto interfaceIpsV4 = nx::network::getLocalIpV4AddressList();
     if (interfaceIpsV4.empty())
         return;
 
@@ -194,8 +194,8 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 
     const auto dnsRealEndpoint = addMediaserver(id);
     const auto cloudRealEndpoint = addMediaserver(id);
-    const SocketAddress dnsEndpoint(kLocalDnsHost, dnsRealEndpoint.port);
-    const SocketAddress cloudEndpoint(kLocalCloudHost, cloudRealEndpoint.port);
+    const nx::network::SocketAddress dnsEndpoint(kLocalDnsHost, dnsRealEndpoint.port);
+    const nx::network::SocketAddress cloudEndpoint(kLocalCloudHost, cloudRealEndpoint.port);
     connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
 
     mediaservers.erase(networkEndpoint);
@@ -210,7 +210,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     expectConnect(id, cloudEndpoint);  //< Cloud endpoint is the last possible option.
 
     const auto newDnsRealEndpoint = addMediaserver(id);
-    const SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
+    const nx::network::SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
     connector.newEndpoints({newDnsEndpoint}, id);
     expectConnect(id, newDnsEndpoint);  //< Expected switch to DNS as better choise than cloud.
 
@@ -247,7 +247,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 // This unit test is just for easy debug agains real mediaserver.
 TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
 {
-    connector.newEndpoints({SocketAddress("127.0.0.1:7001")}, QnUuid());
+    connector.newEndpoints({nx::network::SocketAddress("127.0.0.1:7001")}, QnUuid());
     std::this_thread::sleep_for(std::chrono::hours(1));
 }
 

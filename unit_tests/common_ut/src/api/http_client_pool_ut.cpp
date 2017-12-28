@@ -35,25 +35,25 @@ class HttpClientPoolTest
 public:
     HttpClientPoolTest()
     :
-        m_testHttpServer(std::make_unique<TestHttpServer>()),
-        m_testHttpServer2(std::make_unique<TestHttpServer>())
+        m_testHttpServer(std::make_unique<nx::network::http::TestHttpServer>()),
+        m_testHttpServer2(std::make_unique<nx::network::http::TestHttpServer>())
     {
     }
 
-    TestHttpServer* testHttpServer()
+    nx::network::http::TestHttpServer* testHttpServer()
     {
         return m_testHttpServer.get();
     }
 
-    TestHttpServer* testHttpServer2()
+    nx::network::http::TestHttpServer* testHttpServer2()
     {
         return m_testHttpServer2.get();
     }
 
 protected:
     nx::network::SocketGlobals::InitGuard m_guard;
-    std::unique_ptr<TestHttpServer> m_testHttpServer;
-    std::unique_ptr<TestHttpServer> m_testHttpServer2;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer2;
 };
 
 TEST_F(HttpClientPoolTest, GeneralTest)

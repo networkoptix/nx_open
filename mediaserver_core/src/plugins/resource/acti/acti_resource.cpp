@@ -360,7 +360,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     auto report = parseSystemInfo(serverReport);
 
     setFirmware(report.value(kActiFirmawareVersionParamName));
-    setMAC(QnMacAddress(report.value(kActiMacAddressParamName)));
+    setMAC(nx::network::QnMacAddress(report.value(kActiMacAddressParamName)));
 
     m_platform = report.value(kActiPlatformParamName)
         .trimmed()

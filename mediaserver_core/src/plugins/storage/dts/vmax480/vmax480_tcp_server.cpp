@@ -33,7 +33,7 @@ public:
 };
 QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
-QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, owner)
 {
     Q_D(QnVMax480ConnectionProcessor);
@@ -395,7 +395,7 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
 }
 
 
-QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
     return new QnVMax480ConnectionProcessor(clientSocket, this);
 }

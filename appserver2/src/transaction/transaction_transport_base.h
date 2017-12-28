@@ -129,7 +129,7 @@ public:
     void setLocalPeerProtocolVersion(int version);
 
     /** Enables outgoing transaction channel. */
-    void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
+    void setOutgoingConnection(QSharedPointer<nx::network::AbstractCommunicatingSocket> socket);
     void monitorConnectionForClosure();
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
@@ -159,7 +159,7 @@ public:
     virtual const ec2::ApiPeerData& localPeer() const override;
     virtual const ec2::ApiPeerData& remotePeer() const override;
     virtual nx::utils::Url remoteAddr() const override;
-    SocketAddress remoteSocketAddr() const;
+    nx::network::SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
 
     virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
@@ -200,7 +200,7 @@ public:
 
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
-        QSharedPointer<AbstractCommunicatingSocket> socket,
+        QSharedPointer<nx::network::AbstractCommunicatingSocket> socket,
         const nx::network::http::Request& request,
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
@@ -262,8 +262,8 @@ private:
     bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QnMutex m_mutex;
-    QSharedPointer<AbstractCommunicatingSocket> m_incomingDataSocket;
-    QSharedPointer<AbstractCommunicatingSocket> m_outgoingDataSocket;
+    QSharedPointer<nx::network::AbstractCommunicatingSocket> m_incomingDataSocket;
+    QSharedPointer<nx::network::AbstractCommunicatingSocket> m_outgoingDataSocket;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     nx::Buffer m_readBuffer;

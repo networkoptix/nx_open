@@ -4,7 +4,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-BindRequest::BindRequest(std::list<SocketAddress> _publicEndpoints):
+BindRequest::BindRequest(std::list<network::SocketAddress> _publicEndpoints):
     StunRequestData(kMethod),
     publicEndpoints(std::move(_publicEndpoints))
 {
@@ -12,13 +12,13 @@ BindRequest::BindRequest(std::list<SocketAddress> _publicEndpoints):
 
 void BindRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
+    message->newAttribute<network::stun::extension::attrs::PublicEndpointList>(
         std::move(publicEndpoints));
 }
 
 bool BindRequest::parseAttributes(const nx::network::stun::Message& message)
 {
-    return readAttributeValue<stun::extension::attrs::PublicEndpointList>(
+    return readAttributeValue<network::stun::extension::attrs::PublicEndpointList>(
         message, &publicEndpoints);
 }
 

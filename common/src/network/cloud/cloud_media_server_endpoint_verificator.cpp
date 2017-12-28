@@ -29,7 +29,7 @@ void CloudMediaServerEndpointVerificator::setTimeout(
 }
 
 void CloudMediaServerEndpointVerificator::verifyHost(
-    const SocketAddress& endpointToVerify,
+    const nx::network::SocketAddress& endpointToVerify,
     const nx::network::AddressEntry& targetHostAddress,
     nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler)
 {
@@ -55,7 +55,7 @@ SystemError::ErrorCode CloudMediaServerEndpointVerificator::lastSystemErrorCode(
     return m_lastSystemErrorCode;
 }
 
-std::unique_ptr<AbstractStreamSocket> CloudMediaServerEndpointVerificator::takeSocket()
+std::unique_ptr<nx::network::AbstractStreamSocket> CloudMediaServerEndpointVerificator::takeSocket()
 {
     return m_httpClient->takeSocket();
 }

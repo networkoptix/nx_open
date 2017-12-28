@@ -10,7 +10,7 @@ public:
 };
 
 QnTestCameraProcessor::QnTestCameraProcessor(
-    const QSharedPointer<AbstractStreamSocket>& socket,
+    const QSharedPointer<nx::network::AbstractStreamSocket>& socket,
     QnTcpListener* owner,
     bool noSecondaryStream,
     int fps)

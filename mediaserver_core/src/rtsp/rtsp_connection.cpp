@@ -81,11 +81,11 @@ QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
 namespace {
 
-    bool updatePort(AbstractDatagramSocket* &socket, int port)
+    bool updatePort(nx::network::AbstractDatagramSocket* &socket, int port)
     {
         delete socket;
-        socket = SocketFactory::createDatagramSocket().release();
-        return socket->bind(SocketAddress(HostAddress::anyHost, port));
+        socket = nx::network::SocketFactory::createDatagramSocket().release();
+        return socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     }
 
     QByteArray getParamValue(const QByteArray& paramName, const QUrlQuery& urlQuery, const nx::network::http::HttpHeaders& headers)
@@ -117,17 +117,17 @@ bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
     QnMutexLocker lock( &m_createSocketMutex );
-    mediaSocket = SocketFactory::createDatagramSocket().release();
-    rtcpSocket = SocketFactory::createDatagramSocket().release();
+    mediaSocket = nx::network::SocketFactory::createDatagramSocket().release();
+    rtcpSocket = nx::network::SocketFactory::createDatagramSocket().release();
 
-    bool opened = mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+    bool opened = mediaSocket->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, 0 ) );
     if (!opened)
         return false;
     int startPort = mediaSocket->getLocalAddress().port;
     if(startPort&1)
         opened = updatePort(mediaSocket, ++startPort);
     if (opened)
-        opened = rtcpSocket->bind( SocketAddress( HostAddress::anyHost, startPort+1 ) );
+        opened = rtcpSocket->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, startPort+1 ) );
 
     while (!opened && startPort < 65534) {
         startPort+=2;
@@ -273,7 +273,7 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
 {
 }

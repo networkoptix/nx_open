@@ -31,7 +31,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-using namespace nx_http;
+using namespace nx::network::http;
 
 AuthenticationManager::AuthenticationManager(
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,

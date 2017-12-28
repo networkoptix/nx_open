@@ -90,7 +90,7 @@ bool MediaServerCloudIntegrationTest::saveCloudCredentialsToMediaServer()
         QnJsonRestResult::NoError;
 }
 
-SocketAddress MediaServerCloudIntegrationTest::mediaServerEndpoint() const
+nx::network::SocketAddress MediaServerCloudIntegrationTest::mediaServerEndpoint() const
 {
     return m_mediaServerLauncher.endpoint();
 }

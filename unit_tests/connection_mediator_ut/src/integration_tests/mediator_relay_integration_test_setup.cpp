@@ -150,7 +150,7 @@ void MediatorRelayIntegrationTestSetup::issueConnectRequest()
     m_mediatorUdpClient->connect(
         request,
         [this, &done](
-            stun::TransportHeader /*stunTransportHeader*/,
+            nx::network::stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode resultCode,
             nx::hpm::api::ConnectResponse response)
         {

@@ -16,21 +16,21 @@
 namespace nx {
 namespace hpm {
 
-typedef std::shared_ptr< nx::network::stun::AbstractServerConnection > ConnectionStrongRef;
-typedef std::weak_ptr< nx::network::stun::AbstractServerConnection > ConnectionWeakRef;
+typedef std::shared_ptr< network::stun::AbstractServerConnection > ConnectionStrongRef;
+typedef std::weak_ptr< network::stun::AbstractServerConnection > ConnectionWeakRef;
 
 /** Send success responce without attributes */
 template<typename ConnectionPtr>
 void sendSuccessResponse(
     const ConnectionPtr& connection,
-    stun::Header requestHeader)
+    network::stun::Header requestHeader)
 {
-    stun::Message response(
-        stun::Header(
-            stun::MessageClass::successResponse,
+    network::stun::Message response(
+        network::stun::Header(
+            network::stun::MessageClass::successResponse,
             requestHeader.method,
             std::move(requestHeader.transactionId)));
-    response.newAttribute<stun::extension::attrs::ResultCode>(api::ResultCode::ok);
+    response.newAttribute<network::stun::extension::attrs::ResultCode>(api::ResultCode::ok);
 
     connection->sendMessage(std::move(response), nullptr);
 }
@@ -39,19 +39,19 @@ void sendSuccessResponse(
 template<typename ConnectionPtr>
 void sendErrorResponse(
     const ConnectionPtr& connection,
-    stun::Header requestHeader,
+    network::stun::Header requestHeader,
     api::ResultCode resultCode,
     int stunErrorCode,
     String reason)
 {
-    stun::Message response(
-        stun::Header(
-            stun::MessageClass::errorResponse,
+    network::stun::Message response(
+        network::stun::Header(
+            network::stun::MessageClass::errorResponse,
             requestHeader.method,
             std::move(requestHeader.transactionId)));
 
-    response.newAttribute<stun::extension::attrs::ResultCode>(resultCode);
-    response.newAttribute< stun::attrs::ErrorCode >(
+    response.newAttribute<network::stun::extension::attrs::ResultCode>(resultCode);
+    response.newAttribute< network::stun::attrs::ErrorCode >(
         stunErrorCode,
         std::move(reason));
     connection->sendMessage(std::move(response), nullptr);
@@ -60,7 +60,7 @@ void sendErrorResponse(
 template<typename OutputData>
 void serialize(
     OutputData* outputData,
-    stun::Message* const response,
+    network::stun::Message* const response,
     typename std::enable_if<!std::is_void<OutputData>::value>::type* = nullptr)
 {
     outputData->serialize(response);
@@ -69,7 +69,7 @@ void serialize(
 template<typename OutputData>
 void serialize(
     OutputData* /*outputData*/,
-    stun::Message* const /*response*/,
+    network::stun::Message* const /*response*/,
     typename std::enable_if<std::is_void<OutputData>::value>::type* = nullptr)
 {
 }
@@ -78,7 +78,7 @@ template<
     typename ConnectionStrongRef,
     typename OutputData>
 void fillAndSendResponse(
-    nx::network::stun::Header requestHeader,
+    network::stun::Header requestHeader,
     const ConnectionStrongRef& connection,
     api::ResultCode resultCode,
     OutputData* outputData = nullptr)
@@ -91,13 +91,13 @@ void fillAndSendResponse(
             api::resultCodeToStunErrorCode(resultCode),
             QnLexical::serialized(resultCode).toLatin1());
 
-    stun::Message response(
-        stun::Header(
-            stun::MessageClass::successResponse,
+    network::stun::Message response(
+        network::stun::Header(
+            network::stun::MessageClass::successResponse,
             requestHeader.method,
             std::move(requestHeader.transactionId)));
     serialize(outputData, &response);
-    response.newAttribute<stun::extension::attrs::ResultCode>(resultCode);
+    response.newAttribute<network::stun::extension::attrs::ResultCode>(resultCode);
 
     connection->sendMessage(std::move(response));
 }
@@ -117,11 +117,11 @@ void processRequestWithNoOutput(
     void (ProcessorType::*processingFunc)(
         const ConnectionStrongRef&,
         InputData,
-        nx::network::stun::Message,
+        network::stun::Message,
         std::function<void(api::ResultCode)>),
     ProcessorType* processor,
     const ConnectionStrongRef& connection,
-    stun::Message request)
+    network::stun::Message request)
 {
     InputData input;
     if (!input.parse(request))
@@ -129,7 +129,7 @@ void processRequestWithNoOutput(
             connection,
             std::move(request.header),
             api::ResultCode::badRequest,
-            nx::network::stun::error::badRequest,
+            network::stun::error::badRequest,
             input.errorText());
 
     auto requestHeader = request.header;
@@ -178,11 +178,11 @@ void processRequestWithOutput(
     void (ProcessorType::*processingFunc)(
         const ConnectionStrongRef&,
         InputData,
-        nx::network::stun::Message,
+        network::stun::Message,
         std::function<void(api::ResultCode, OutputData)>),
     ProcessorType* processor,
     const ConnectionStrongRef& connection,
-    stun::Message request)
+    network::stun::Message request)
 {
     InputData input;
     if (!input.parse(request))
@@ -190,7 +190,7 @@ void processRequestWithOutput(
             connection,
             std::move(request.header),
             api::ResultCode::badRequest,
-            nx::network::stun::error::badRequest,
+            network::stun::error::badRequest,
             input.errorText());
 
     auto requestHeader = request.header;

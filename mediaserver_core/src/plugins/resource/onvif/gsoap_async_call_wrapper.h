@@ -102,7 +102,7 @@ public:
     */
     virtual void join() override
     {
-        std::unique_ptr<AbstractStreamSocket> socket;
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket;
         {
             QnMutexLocker lk( &m_mutex );
             socket = std::move(m_socket);
@@ -148,7 +148,7 @@ public:
 
         //NOTE not locking mutex because all public method calls are synchronized
             //by caller and no request interleaving is allowed
-        m_socket = SocketFactory::createStreamSocket(
+        m_socket = nx::network::SocketFactory::createStreamSocket(
             false,
             nx::network::NatTraversalSupport::disabled);
 
@@ -183,7 +183,7 @@ public:
         }
 
         m_socket->connectAsync(
-            SocketAddress(endpoint.host(), endpoint.port(nx::network::http::DEFAULT_HTTP_PORT)),
+            nx::network::SocketAddress(endpoint.host(), endpoint.port(nx::network::http::DEFAULT_HTTP_PORT)),
             std::bind(&GSoapAsyncCallWrapper::onConnectCompleted, this, _1));
     }
 
@@ -393,7 +393,7 @@ private:
     QByteArray m_serializedRequest;
     QByteArray m_responseBuffer;
     int m_responseDataPos;
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     std::function<void(int)> m_extCompletionHandler;
     std::function<void(int)> m_resultHandler;
     bool* m_terminatedFlagPtr;

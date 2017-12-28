@@ -15,7 +15,9 @@ static const quint16 PORT_SAFE_RANGE_END = 49151;
 
 static const quint16 MAPPING_TIME_RATIO = 10; // 10 times longer then we check
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 PortMapper::PortMapper(
     bool isEnabled,
@@ -470,4 +472,6 @@ void PortMapper::makeMapping(
     });
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

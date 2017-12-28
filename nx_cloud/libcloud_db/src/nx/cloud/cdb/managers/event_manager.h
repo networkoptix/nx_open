@@ -25,12 +25,17 @@
 #include "../data/account_data.h"
 
 
-namespace nx_http
-{
-    class HttpServerConnection;
-    class MessageDispatcher;
-    class MultipartMessageBodySource;
-}
+namespace nx {
+namespace network {
+namespace http {
+
+class HttpServerConnection;
+class MessageDispatcher;
+class MultipartMessageBodySource;
+
+} // namespace http
+} // namespace network
+} // namespace nx
 
 namespace nx {
 namespace cdb {

@@ -74,7 +74,7 @@ static Value defaultTransportToUse( RtpTransport::_auto );
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
-    std::unique_ptr<AbstractStreamSocket> tcpSock)
+    std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock)
 :
     QnResourceConsumer(res),
     m_RtpSession(/*shouldGuessAuthDigest*/ false, std::move(tcpSock)),

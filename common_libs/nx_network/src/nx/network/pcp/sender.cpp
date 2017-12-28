@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 Sender::Sender(const HostAddress& server)
@@ -38,3 +40,5 @@ void Sender::send(std::shared_ptr<QByteArray> request)
 }
 
 } // namespace pcp
+} // namespace network
+} // namespace nx

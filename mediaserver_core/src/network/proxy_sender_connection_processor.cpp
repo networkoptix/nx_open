@@ -28,19 +28,19 @@ static const int kProxyKeepAliveInterval = 60 * 1000;
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
 public:
-    SocketAddress proxyServerUrl;
+    nx::network::SocketAddress proxyServerUrl;
     QnUuid guid;
 };
 
 QnProxySenderConnection::QnProxySenderConnection(
-    const SocketAddress& proxyServerUrl,
+    const nx::network::SocketAddress& proxyServerUrl,
     const QnUuid& guid,
     QnUniversalTcpListener* owner,
     bool needAuth)
     :
     QnUniversalRequestProcessor(
         new QnProxySenderConnectionPrivate,
-        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket().release()),
+        QSharedPointer<nx::network::AbstractStreamSocket>(nx::network::SocketFactory::createStreamSocket().release()),
         owner,
         needAuth)
 {
@@ -106,7 +106,7 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
 }
 
 QByteArray QnProxySenderConnection::makeProxyRequest(
-    const QnUuid& serverUuid, const SocketAddress& address) const
+    const QnUuid& serverUuid, const nx::network::SocketAddress& address) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");

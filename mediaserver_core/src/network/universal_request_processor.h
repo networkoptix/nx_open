@@ -10,11 +10,11 @@ class QnUniversalRequestProcessorPrivate;
 class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnUniversalRequestProcessor(QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket,
                                 QnUniversalTcpListener* owner, bool needAuth);
 
     QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv,
-                                QSharedPointer<AbstractStreamSocket> socket,
+                                QSharedPointer<nx::network::AbstractStreamSocket> socket,
                                 QnUniversalTcpListener* owner, bool needAuth);
 
     virtual ~QnUniversalRequestProcessor();

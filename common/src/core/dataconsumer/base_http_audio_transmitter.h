@@ -43,8 +43,8 @@ protected:
     virtual void pleaseStop() override;
     virtual void endOfRun() override;
 protected:
-    bool sendBuffer(AbstractStreamSocket* socket, const char* buffer, size_t size);
-    std::unique_ptr<AbstractStreamSocket> takeSocket(
+    bool sendBuffer(nx::network::AbstractStreamSocket* socket, const char* buffer, size_t size);
+    std::unique_ptr<nx::network::AbstractStreamSocket> takeSocket(
         const nx::network::http::AsyncHttpClientPtr& httpClient) const;
 
     bool startTransmission();
@@ -64,7 +64,7 @@ protected:
     QnAudioFormat m_outputFormat;
     int m_bitrateKbps;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     QElapsedTimer m_timer;
     nx::network::http::StringType m_uploadMethod;
     mutable QnMutex m_mutex;

@@ -4,6 +4,8 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+using namespace nx::network;
+
 ConnectionParameters::ConnectionParameters():
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),

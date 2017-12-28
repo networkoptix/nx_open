@@ -71,7 +71,7 @@ public:
 
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const nx::network::SocketAddress& proxyEndpoint);
 
     bool detachSystemFromCloud();
 
@@ -82,7 +82,7 @@ signals:
     void disconnectedFromCloud();
 
 private:
-    boost::optional<SocketAddress> m_proxyAddress;
+    boost::optional<nx::network::SocketAddress> m_proxyAddress;
     mutable QnMutex m_mutex;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,

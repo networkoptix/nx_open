@@ -378,7 +378,7 @@ static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime trans
 static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
-QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
 {
     Q_D(QnProgressiveDownloadingConsumer);

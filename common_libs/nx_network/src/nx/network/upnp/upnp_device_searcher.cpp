@@ -20,7 +20,9 @@ static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512 * 1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5 * 60 * 1000;
 static const unsigned int READ_BUF_CAPACITY = 64 * 1024 + 1;    //max UDP packet size
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 int DeviceSearcherDefaultSettings::cacheTimeout() const
 {
@@ -597,4 +599,6 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncH
     m_httpClients.erase(httpClient);
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

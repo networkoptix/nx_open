@@ -34,7 +34,7 @@ public:
         ::ec2::ApiPeerDataEx localPeerData,
         ::ec2::ApiPeerDataEx remotePeerData);
 
-    virtual SocketAddress remoteSocketAddr() const override;
+    virtual network::SocketAddress remoteSocketAddr() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;

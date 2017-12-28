@@ -30,7 +30,7 @@
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
@@ -43,7 +43,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
@@ -56,7 +56,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnCommonModule* commonModule)
 :
     QnCommonModuleAware(commonModule),
@@ -356,7 +356,7 @@ void QnTCPConnectionProcessor::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
+QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket;
@@ -527,10 +527,10 @@ void QnTCPConnectionProcessor::execute(QnMutex& mutex)
     mutex.lock();
 }
 
-SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
+nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket ? d->socket->getForeignAddress() : SocketAddress();
+    return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
 bool QnTCPConnectionProcessor::isSocketTaken() const
@@ -539,7 +539,7 @@ bool QnTCPConnectionProcessor::isSocketTaken() const
     return d->isSocketTaken;
 }
 
-QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
 {
     Q_D(QnTCPConnectionProcessor);
     d->isSocketTaken = true;

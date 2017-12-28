@@ -22,13 +22,13 @@ using BeginListeningHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode,
         BeginListeningResponse,
-        std::unique_ptr<AbstractStreamSocket>)>;
+        std::unique_ptr<network::AbstractStreamSocket>)>;
 
 using StartClientConnectSessionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
 
 using OpenRelayConnectionHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<network::AbstractStreamSocket>)>;
 
 class NX_NETWORK_API Client:
     public network::aio::BasicPollable

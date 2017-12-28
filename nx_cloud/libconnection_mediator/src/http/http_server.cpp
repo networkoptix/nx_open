@@ -43,7 +43,7 @@ nx::network::http::server::rest::MessageDispatcher& Server::messageDispatcher()
     return *m_httpMessageDispatcher;
 }
 
-std::vector<SocketAddress> Server::httpEndpoints() const
+std::vector<network::SocketAddress> Server::httpEndpoints() const
 {
     return m_httpEndpoints;
 }

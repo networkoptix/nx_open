@@ -153,7 +153,7 @@ QnUuid PeerWrapper::id() const
     return m_process.moduleInstance()->impl()->commonModule()->moduleGUID();
 }
 
-SocketAddress PeerWrapper::endpoint() const
+nx::network::SocketAddress PeerWrapper::endpoint() const
 {
     return m_process.moduleInstance()->endpoint();
 }

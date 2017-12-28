@@ -30,7 +30,7 @@ void GetCloudModulesXml::processRequest(
     // Note: Host header has format host[:port].
     auto msgBody = std::make_unique<nx::network::http::BufferSource>(
         "text/xml",
-        m_generateModulesXmlFunc(SocketAddress(host).address.toString().toUtf8()));
+        m_generateModulesXmlFunc(network::SocketAddress(host).address.toString().toUtf8()));
 
     completionHandler(nx::network::http::RequestResult(nx::network::http::StatusCode::ok, std::move(msgBody)));
 }

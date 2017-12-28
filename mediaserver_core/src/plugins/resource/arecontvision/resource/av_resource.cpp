@@ -165,7 +165,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     nx::network::http::AsyncHttpClientPtr httpClientCaptured = nx::network::http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
 
-    const QnMacAddress cameraMAC = getMAC();
+    const nx::network::QnMacAddress cameraMAC = getMAC();
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
         ( const nx::network::http::AsyncHttpClientPtr& httpClient ) mutable
     {
@@ -187,7 +187,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
             return;
         }
         const QByteArray& mac = msgBody.mid( sepIndex+1 );
-        completionHandlerLocal( cameraMAC == QnMacAddress(mac) );
+        completionHandlerLocal( cameraMAC == nx::network::QnMacAddress(mac) );
     };
     connect( httpClientCaptured.get(), &nx::network::http::AsyncHttpClient::done,
              this, httpReqCompletionHandler,

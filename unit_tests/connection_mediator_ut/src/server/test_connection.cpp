@@ -7,7 +7,7 @@ namespace hpm {
 namespace test {
 
 // Introducing this variable just to simplify tests that do not need dispatcher explicitely.
-static stun::MessageDispatcher s_messageDispatcher;
+static nx::network::stun::MessageDispatcher s_messageDispatcher;
 
 TestTcpConnection::TestTcpConnection():
     base_type(
@@ -23,9 +23,9 @@ void TestTcpConnection::sendMessage(
 {
 }
 
-SocketAddress TestTcpConnection::getSourceAddress() const
+nx::network::SocketAddress TestTcpConnection::getSourceAddress() const
 {
-    return SocketAddress();
+    return nx::network::SocketAddress();
 }
 
 void TestTcpConnection::setInactivityTimeout(

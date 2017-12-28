@@ -241,7 +241,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     resource->setVendor(vendor);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(mac));
+    resource->setMAC(nx::network::QnMacAddress(mac));
     resource->setDefaultAuth(auth);
     if (port == 80)
         resource->setHostAddress(host);
@@ -375,7 +375,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(nx::network::QnMacAddress(smac));
 
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -419,8 +419,8 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
 
 bool QnPlISDResourceSearcher::processPacket(
     const QHostAddress& discoveryAddr,
-    const SocketAddress& deviceEndpoint,
-    const nx_upnp::DeviceInfo& devInfo,
+    const nx::network::SocketAddress& deviceEndpoint,
+    const nx::network::upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/)
 {
 
@@ -429,7 +429,7 @@ bool QnPlISDResourceSearcher::processPacket(
     if (!isDwOrIsd(devInfo.manufacturer, devInfo.modelName))
         return false;
 
-    QnMacAddress cameraMAC(devInfo.serialNumber);
+    nx::network::QnMacAddress cameraMAC(devInfo.serialNumber);
     QString model(devInfo.modelName);
     QnNetworkResourcePtr existingRes = resourcePool()->getResourceByMacAddress( devInfo.serialNumber );
     QAuthenticator cameraAuth;
@@ -477,8 +477,8 @@ bool QnPlISDResourceSearcher::processPacket(
 }
 
 void QnPlISDResourceSearcher::createResource(
-    const nx_upnp::DeviceInfo& devInfo,
-    const QnMacAddress& mac,
+    const nx::network::upnp::DeviceInfo& devInfo,
+    const nx::network::QnMacAddress& mac,
     const QAuthenticator& auth,
     QnResourceList& result )
 {

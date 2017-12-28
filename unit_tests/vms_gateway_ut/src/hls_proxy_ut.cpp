@@ -61,7 +61,8 @@ public:
 
     ~HlsProxy()
     {
-        SocketFactory::setCreateStreamSocketFunc(std::move(m_socketFactoryBak));
+        nx::network::SocketFactory::setCreateStreamSocketFunc(
+            std::move(m_socketFactoryBak));
     }
 
 protected:
@@ -118,12 +119,12 @@ protected:
     }
 
 private:
-    TestHttpServer m_hlsServer;
+    nx::network::http::TestHttpServer m_hlsServer;
     nx::network::m3u::Playlist m_receivedPlaylist;
     QString m_hlsServerFullCloudName;
     QString m_cloudSystemId;
     QString m_cloudServerId;
-    SocketFactory::CreateStreamSocketFuncType m_socketFactoryBak;
+    nx::network::SocketFactory::CreateStreamSocketFuncType m_socketFactoryBak;
     bool m_sslEnabled = false;
 
     virtual void SetUp() override
@@ -149,7 +150,7 @@ private:
             m_cloudSystemId,
             m_hlsServer.serverAddress());
 
-        m_socketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
+        m_socketFactoryBak = nx::network::SocketFactory::setCreateStreamSocketFunc(
             std::bind(&HlsProxy::createStreamSocket, this, _1, _2));
 
         m_hlsServer.registerStaticProcessor(
@@ -178,7 +179,7 @@ private:
             .arg(m_cloudSystemId).arg(kHlsPlaylistPath));
     }
 
-    std::unique_ptr<AbstractStreamSocket> createStreamSocket(
+    std::unique_ptr<nx::network::AbstractStreamSocket> createStreamSocket(
         bool sslRequired,
         nx::network::NatTraversalSupport /*natTraversalRequired*/)
     {
