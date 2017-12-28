@@ -106,19 +106,6 @@ boost::optional<QDomDocument> XmlRequestHelper::readBody()
     return document;
 }
 
-std::vector<QDomElement> xmlElements(const QDomNodeList& nodeList)
-{
-    std::vector<QDomElement> elementList;
-    for (int i = 0; i < nodeList.size(); ++i)
-    {
-        const auto element = nodeList.at(i).toElement();
-        if (!element.isNull())
-            elementList.push_back(element);
-    }
-
-    return elementList;
-}
-
 } // namespace utils
 } // namespace plugins
 } // namespace nx
