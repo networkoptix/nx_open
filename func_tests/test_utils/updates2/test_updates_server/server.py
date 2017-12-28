@@ -69,11 +69,8 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                         for file_key, file_obj in os_obj.items():
                             amend_file_name(file_obj, new_version)
 
-                try:
-                    amend_packages(new_update_obj, 'clientPackages')
-                    amend_packages(new_update_obj, 'packages')
-                except Exception as e:
-                    print(new_update_obj)
+                amend_packages(new_update_obj, 'clientPackages')
+                amend_packages(new_update_obj, 'packages')
 
                 path_to_update_obj[UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])] = new_update_obj
 
