@@ -60,8 +60,8 @@ mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
-mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
-mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
+cp debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
+cp debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/@installer.name@.desktop
 mv -f usr/share/applications/protocol.desktop usr/share/applications/@uri.protocol@.desktop
 
