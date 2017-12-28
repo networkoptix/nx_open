@@ -534,9 +534,8 @@ bool RuleProcessor::actionRequiresLogging(const vms::event::AbstractActionPtr& a
 
     const vms::event::EventParameters& eventParameters = rule->eventParams();
     const auto eventType = action->getRuntimeParams().eventType;
-    if (eventType == vms::event::EventType::userDefinedEvent && eventParameters.omitDbLogging)
-        return false;
-    return true;
+
+    return eventType != vms::event::EventType::userDefinedEvent || !eventParameters.omitDbLogging;
 }
 
 void RuleProcessor::at_timer()
