@@ -19,7 +19,7 @@ JsonRestResponse::JsonRestResponse(
 }
 
 JsonRestResponse::JsonRestResponse(
-    nx_http::StatusCode::Value status, QnJsonRestResult::Error error)
+    nx::network::http::StatusCode::Value status, QnJsonRestResult::Error error)
 :
     statusCode(statusCode)
 {

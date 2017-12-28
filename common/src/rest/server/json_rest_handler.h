@@ -51,7 +51,7 @@ struct JsonRestResponse
     template<typename T>
     JsonRestResponse(QnJsonRestResult::Error error, const T& value) { json.setError(error, value); }
 
-    JsonRestResponse(nx_http::StatusCode::Value status, QnJsonRestResult::Error error);
+    JsonRestResponse(nx::network::http::StatusCode::Value status, QnJsonRestResult::Error error);
 
     RestResponse toRest(bool extraFormatting) const;
 };

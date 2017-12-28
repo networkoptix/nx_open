@@ -55,7 +55,7 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
     if (!value.isEmpty())
     {
         if (!hasPermission(request.owner))
-            return {nx_http::StatusCode::forbidden, QnJsonRestResult::Forbidden};
+            return {nx::network::http::StatusCode::forbidden, QnJsonRestResult::Forbidden};
 
         LevelSettings settings;
         if (!settings.parse(value))

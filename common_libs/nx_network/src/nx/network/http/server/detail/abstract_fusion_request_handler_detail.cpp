@@ -59,7 +59,7 @@ bool BaseFusionRequestHandler::getDataFormat(
         const auto contentTypeIter = request.headers.find("Content-Type");
         if (contentTypeIter != request.headers.cend())
         {
-            // TODO: #ak Add Content-Type header parser to nx_http.
+            // TODO: #ak Add Content-Type header parser to nx::network::http.
             const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
             m_outputDataFormat = Qn::serializationFormatFromHttpContentType(dataFormatStr);
         }
