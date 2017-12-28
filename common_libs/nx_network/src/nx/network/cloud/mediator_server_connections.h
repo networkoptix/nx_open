@@ -122,13 +122,13 @@ protected:
     {
         using namespace nx::network;
 
-        stun::Message request(stun::Header(stun::MessageClass::request, RequestData::kMethod));
+        network::stun::Message request(network::stun::Header(network::stun::MessageClass::request, RequestData::kMethod));
         requestData.serialize(&request);
 
         if (auto credentials = m_connector->getSystemCredentials())
         {
-            request.newAttribute<stun::extension::attrs::SystemId>(credentials->systemId);
-            request.newAttribute<stun::extension::attrs::ServerId>(credentials->serverId);
+            request.newAttribute<network::stun::extension::attrs::SystemId>(credentials->systemId);
+            request.newAttribute<network::stun::extension::attrs::ServerId>(credentials->serverId);
             request.insertIntegrity(credentials->systemId, credentials->key);
         }
 

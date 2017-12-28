@@ -11,7 +11,7 @@
 
 namespace nx {
 
-namespace stun { class MessageDispatcher; }
+namespace network { namespace stun { class MessageDispatcher; } }
 
 namespace hpm {
 

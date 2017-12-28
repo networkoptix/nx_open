@@ -14,9 +14,6 @@
 
 namespace nx {
 namespace network {
-
-class nx::network::SocketAddress;
-
 namespace http {
 
 class AsyncHttpClientPtr;

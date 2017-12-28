@@ -13,8 +13,6 @@
 
 namespace nx { namespace network { class UDPSocket; } }
 struct QnModuleInformation;
-class nx::network::HostAddress;
-class nx::network::SocketAddress;
 
 namespace nx {
 namespace vms {

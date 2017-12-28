@@ -10,7 +10,6 @@
 #include <nx/vms/discovery/manager.h>
 
 struct QnModuleInformation;
-class nx::network::SocketAddress;
 
 class QnServerConnector:
     public QObject,
