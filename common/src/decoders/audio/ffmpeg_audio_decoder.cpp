@@ -7,6 +7,7 @@
 #include "nx/streaming/audio_data_packet.h"
 #include "audio_struct.h"
 #include "utils/media/ffmpeg_helper.h"
+#include <nx/utils/log/log_main.h>
 
 struct AVCodecContext;
 
@@ -50,6 +51,8 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
         NX_ASSERT(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
     }
     m_initialized = avcodec_open2(m_audioDecoderCtx, codec, NULL) >= 0;
+    if (m_audioDecoderCtx && !m_initialized)
+        NX_WARNING(this, lm("Can't create audio decoder for codec %1").arg(m_audioDecoderCtx->codec_name));
 }
 
 bool QnFfmpegAudioDecoder::isInitialized() const
