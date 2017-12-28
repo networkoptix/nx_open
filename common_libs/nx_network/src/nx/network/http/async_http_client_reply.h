@@ -14,30 +14,30 @@ class NX_NETWORK_API QnAsyncHttpClientReply:
 
 public:
     explicit QnAsyncHttpClientReply(
-        const nx_http::AsyncHttpClientPtr& client,
+        const nx::network::http::AsyncHttpClientPtr& client,
         QObject* parent = 0);
 
-    nx_http::AsyncHttpClientPtr asyncHttpClient() const;
+    nx::network::http::AsyncHttpClientPtr asyncHttpClient() const;
     bool isFailed() const;
     nx::utils::Url url() const;
     QByteArray contentType();
     QByteArray data();
-    nx_http::Response response();
+    nx::network::http::Response response();
 
 signals:
     void finished(QnAsyncHttpClientReply* reply);
 
 private slots:
-    void at_client_done(const nx_http::AsyncHttpClientPtr& client);
+    void at_client_done(const nx::network::http::AsyncHttpClientPtr& client);
 
 private:
     mutable QnMutex m_mutex;
 
-    nx_http::AsyncHttpClientPtr m_client;
+    nx::network::http::AsyncHttpClientPtr m_client;
 
     bool m_failed;
     nx::utils::Url m_url;
-    nx_http::BufferType m_contentType;
-    nx_http::BufferType m_data;
-    nx_http::Response m_response;
+    nx::network::http::BufferType m_contentType;
+    nx::network::http::BufferType m_data;
+    nx::network::http::Response m_response;
 };

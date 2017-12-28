@@ -270,7 +270,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     client.setSendTimeoutMs(15000);
     if (!client.doGet(urlStr) || !client.response())
     {
@@ -301,7 +301,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
     else
     {
-        if (nx_http::getHeaderValue(client.response()->headers, "Content-Type") == "application/json")
+        if (nx::network::http::getHeaderValue(client.response()->headers, "Content-Type") == "application/json")
             outputStream = &std::cout;
     }
 

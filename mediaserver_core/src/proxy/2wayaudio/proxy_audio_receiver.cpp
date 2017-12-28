@@ -146,10 +146,10 @@ void QnAudioProxyReceiver::run()
     QString errorStr;
     if (!QnAudioTransmissionRestHandler::validateParams(params, errorStr))
     {
-        sendResponse(nx_http::StatusCode::badRequest, QByteArray());
+        sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
         return;
     }
-    sendResponse(nx_http::StatusCode::ok, QByteArray());
+    sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
     const QnUuid clientId(params[kClientIdParamName]);
 

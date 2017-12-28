@@ -15,8 +15,8 @@ public:
     constexpr static const auto kMethod = stun::extension::methods::tunnelConnectionChosen;
 
     TunnelConnectionChosenRequest();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 class NX_NETWORK_API TunnelConnectionChosenResponse:
@@ -26,8 +26,8 @@ public:
     constexpr static const auto kMethod = stun::extension::methods::tunnelConnectionChosen;
 
     TunnelConnectionChosenResponse();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

@@ -34,7 +34,7 @@ BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     m_bitrateKbps(0),
     m_transcoder(nullptr),
     m_socket(nullptr),
-    m_uploadMethod(nx_http::Method::post)
+    m_uploadMethod(nx::network::http::Method::post)
 {
     connect(
         m_resource, &QnResource::parentIdChanged, this,
@@ -76,7 +76,7 @@ void BaseHttpAudioTransmitter::setBitrateKbps(int value)
     m_bitrateKbps = value;
 }
 
-void BaseHttpAudioTransmitter::setAudioUploadHttpMethod(nx_http::StringType method)
+void BaseHttpAudioTransmitter::setAudioUploadHttpMethod(nx::network::http::StringType method)
 {
     QnMutexLocker lock(&m_mutex);
     m_uploadMethod = method;
@@ -151,7 +151,7 @@ bool BaseHttpAudioTransmitter::sendBuffer(AbstractStreamSocket* socket, const ch
 }
 
 std::unique_ptr<AbstractStreamSocket> BaseHttpAudioTransmitter::takeSocket(
-    const nx_http::AsyncHttpClientPtr& httpClient) const
+    const nx::network::http::AsyncHttpClientPtr& httpClient) const
 {
     //NOTE m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio thread
     std::unique_ptr<AbstractStreamSocket> sock;
@@ -183,29 +183,29 @@ bool BaseHttpAudioTransmitter::startTransmission()
 
     m_socket.reset();
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     prepareHttpClient(httpClient);
 
     QObject::connect(
         httpClient.get(),
-        &nx_http::AsyncHttpClient::requestHasBeenSent,
+        &nx::network::http::AsyncHttpClient::requestHasBeenSent,
         this,
         &BaseHttpAudioTransmitter::at_requestHeadersHasBeenSent,
         Qt::DirectConnection);
 
     QObject::connect(
         httpClient.get(),
-        &nx_http::AsyncHttpClient::done,
+        &nx::network::http::AsyncHttpClient::done,
         this,
         &BaseHttpAudioTransmitter::at_httpDone,
         Qt::DirectConnection);
 
     auto url = transmissionUrl();
-    nx_http::StringType contentBody;
+    nx::network::http::StringType contentBody;
 
     QnMutexLocker lock(&m_mutex);
 
-    if (m_uploadMethod == nx_http::Method::post)
+    if (m_uploadMethod == nx::network::http::Method::post)
     {
         httpClient
             ->doPost(
@@ -214,7 +214,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
                 contentBody,
                 !contentBody.isEmpty());
     }
-    else if (m_uploadMethod == nx_http::Method::put)
+    else if (m_uploadMethod == nx::network::http::Method::put)
     {
         httpClient
             ->doPut(
@@ -254,7 +254,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
 }
 
 void BaseHttpAudioTransmitter::at_requestHeadersHasBeenSent(
-    nx_http::AsyncHttpClientPtr httpClient,
+    nx::network::http::AsyncHttpClientPtr httpClient,
     bool isRetryAfterUnauthorizedResponse)
 {
     if (isReadyForTransmission(httpClient, isRetryAfterUnauthorizedResponse))
@@ -265,9 +265,9 @@ void BaseHttpAudioTransmitter::at_requestHeadersHasBeenSent(
     }
 }
 
-void BaseHttpAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr httpClient)
+void BaseHttpAudioTransmitter::at_httpDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    if (httpClient->state() == nx_http::AsyncClient::State::sFailed)
+    if (httpClient->state() == nx::network::http::AsyncClient::State::sFailed)
     {
         QnMutexLocker lock(&m_mutex);
         m_state = TransmitterState::Failed;

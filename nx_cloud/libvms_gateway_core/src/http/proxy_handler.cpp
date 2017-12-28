@@ -17,7 +17,7 @@ namespace gateway {
 constexpr const int kSocketTimeoutMs = 29*1000;
 
 ProxyHandler::TargetHost::TargetHost(
-    nx_http::StatusCode::Value status,
+    nx::network::http::StatusCode::Value status,
     SocketAddress target)
     :
     status(status),
@@ -39,16 +39,16 @@ ProxyHandler::ProxyHandler(
 }
 
 void ProxyHandler::processRequest(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx_http::Request request,
-    nx_http::Response* const /*response*/,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const /*response*/,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
 
     m_targetHost = cutTargetFromRequest(*connection, &request);
-    if (!nx_http::StatusCode::isSuccessCode(m_targetHost.status))
+    if (!nx::network::http::StatusCode::isSuccessCode(m_targetHost.status))
     {
         completionHandler(m_targetHost.status);
         return;
@@ -82,8 +82,8 @@ void ProxyHandler::processRequest(
 }
 
 void ProxyHandler::sendResponse(
-    nx_http::RequestResult requestResult,
-    boost::optional<nx_http::Response> responseMessage)
+    nx::network::http::RequestResult requestResult,
+    boost::optional<nx::network::http::Response> responseMessage)
 {
     if (responseMessage)
         *response() = std::move(*responseMessage);
@@ -92,16 +92,16 @@ void ProxyHandler::sendResponse(
 }
 
 ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
-    const nx_http::HttpServerConnection& connection,
-    nx_http::Request* const request)
+    const nx::network::http::HttpServerConnection& connection,
+    nx::network::http::Request* const request)
 {
-    TargetHost m_targetHost(nx_http::StatusCode::internalServerError);
+    TargetHost m_targetHost(nx::network::http::StatusCode::internalServerError);
     if (!request->requestLine.url.host().isEmpty())
         m_targetHost = cutTargetFromUrl(request);
     else
         m_targetHost = cutTargetFromPath(request);
 
-    if (m_targetHost.status != nx_http::StatusCode::ok)
+    if (m_targetHost.status != nx::network::http::StatusCode::ok)
     {
         NX_DEBUG(this, lm("Failed to find address string in request path %1 received from %2")
             .arg(request->requestLine.url).arg(connection.socket()->getForeignAddress()));
@@ -117,7 +117,7 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
         {
             NX_DEBUG(this, lm("It is forbidden by settings to proxy to non-cloud address (%1)")
                 .arg(m_targetHost.target));
-            return {nx_http::StatusCode::forbidden};
+            return {nx::network::http::StatusCode::forbidden};
         }
 
         if (m_targetHost.target.port == 0)
@@ -135,47 +135,47 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromRequest(
         NX_DEBUG(this, lm("SSL requested but forbidden by settings. Originator endpoint: %1")
             .arg(connection.socket()->getForeignAddress()));
 
-        return {nx_http::StatusCode::forbidden};
+        return {nx::network::http::StatusCode::forbidden};
     }
 
     return m_targetHost;
 }
 
-ProxyHandler::TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
+ProxyHandler::TargetHost ProxyHandler::cutTargetFromUrl(nx::network::http::Request* const request)
 {
     if (!m_settings.http().allowTargetEndpointInUrl)
     {
         NX_DEBUG(this, lm("It is forbidden by settings to specify target in url (%1)")
             .arg(request->requestLine.url));
-        return {nx_http::StatusCode::forbidden};
+        return {nx::network::http::StatusCode::forbidden};
     }
 
     // Using original url path.
     auto targetEndpoint = SocketAddress(
         request->requestLine.url.host(),
-        request->requestLine.url.port(nx_http::DEFAULT_HTTP_PORT));
+        request->requestLine.url.port(nx::network::http::DEFAULT_HTTP_PORT));
 
     request->requestLine.url.setScheme(QString());
     request->requestLine.url.setHost(QString());
     request->requestLine.url.setPort(-1);
 
-    nx_http::insertOrReplaceHeader(
+    nx::network::http::insertOrReplaceHeader(
         &request->headers,
-        nx_http::HttpHeader("Host", targetEndpoint.toString().toUtf8()));
+        nx::network::http::HttpHeader("Host", targetEndpoint.toString().toUtf8()));
 
-    return {nx_http::StatusCode::ok, std::move(targetEndpoint)};
+    return {nx::network::http::StatusCode::ok, std::move(targetEndpoint)};
 }
 
-ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
+ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx::network::http::Request* const request)
 {
     // Parse path, expected format: /target[/some/longer/url].
     const auto path = request->requestLine.url.path();
     auto pathItems = path.splitRef('/', QString::SkipEmptyParts);
     if (pathItems.isEmpty())
-        return {nx_http::StatusCode::badRequest};
+        return {nx::network::http::StatusCode::badRequest};
 
     // Parse first path item, expected format: [protocol:]address[:port].
-    TargetHost m_targetHost(nx_http::StatusCode::ok);
+    TargetHost m_targetHost(nx::network::http::StatusCode::ok);
     auto targetParts = pathItems[0].split(':', QString::SkipEmptyParts);
 
     // Is port specified?
@@ -186,7 +186,7 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const
         if (isPortSpecified)
             targetParts.pop_back();
         else
-            m_targetHost.target.port = nx_http::DEFAULT_HTTP_PORT;
+            m_targetHost.target.port = nx::network::http::DEFAULT_HTTP_PORT;
     }
 
     // Is protocol specified?
@@ -202,7 +202,7 @@ ProxyHandler::TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const
     }
 
     if (targetParts.size() > 1)
-        return {nx_http::StatusCode::badRequest};
+        return {nx::network::http::StatusCode::badRequest};
 
     // Get address.
     m_targetHost.target.address = HostAddress(targetParts.front().toString());
@@ -238,8 +238,8 @@ void ProxyHandler::onConnected(
         return nx::utils::swapAndCall(
             m_requestCompletionHandler,
             (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreach)
-                ? nx_http::StatusCode::notFound
-                : nx_http::StatusCode::serviceUnavailable);
+                ? nx::network::http::StatusCode::notFound
+                : nx::network::http::StatusCode::serviceUnavailable);
     }
 
     if (!connection->setRecvTimeout(m_settings.tcp().recvTimeout) ||
@@ -250,7 +250,7 @@ void ProxyHandler::onConnected(
             .arg(SystemError::toString(osErrorCode)));
         return nx::utils::swapAndCall(
             m_requestCompletionHandler,
-            nx_http::StatusCode::internalServerError);
+            nx::network::http::StatusCode::internalServerError);
     }
 
     if (m_sslConnectionRequired)
@@ -262,7 +262,7 @@ void ProxyHandler::onConnected(
         {
             return nx::utils::swapAndCall(
                 m_requestCompletionHandler,
-                nx_http::StatusCode::internalServerError);
+                nx::network::http::StatusCode::internalServerError);
         }
     }
 
@@ -271,7 +271,7 @@ void ProxyHandler::onConnected(
         .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(),
             m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
 
-    m_requestProxyWorker = std::make_unique<nx_http::server::proxy::ProxyWorker>(
+    m_requestProxyWorker = std::make_unique<nx::network::http::server::proxy::ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,

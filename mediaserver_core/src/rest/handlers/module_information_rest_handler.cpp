@@ -66,11 +66,11 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
             request.owner->resourcePool(), request.owner->accessRights()))
     {
         JsonRestResponse response;
-        response.statusCode = (nx_http::StatusCode::Value) QnPermissionsHelper::notOwnerError(response.json);
+        response.statusCode = (nx::network::http::StatusCode::Value) QnPermissionsHelper::notOwnerError(response.json);
         return response;
     }
 
-    JsonRestResponse response(nx_http::StatusCode::ok, {}, updateStreamMode(request.params));
+    JsonRestResponse response(nx::network::http::StatusCode::ok, {}, updateStreamMode(request.params));
     if (allModulesMode(request.params))
     {
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
@@ -103,7 +103,7 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
         response.json.setReply(request.owner->commonModule()->moduleInformation());
     }
 
-    response.statusCode = nx_http::StatusCode::ok;
+    response.statusCode = nx::network::http::StatusCode::ok;
     if (updateStreamMode(request.params))
         response.isUndefinedContentLength = true;
 
@@ -190,7 +190,7 @@ int QnModuleInformationRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 void QnModuleInformationRestHandler::updateModuleImformation()

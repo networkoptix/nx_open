@@ -84,11 +84,11 @@ private:
     api::BeginListeningResponse m_beginListeningResponse;
 
     void processIncomingConnection(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
 
@@ -98,17 +98,17 @@ private:
             return;
         }
 
-        if (request.requestLine.method == nx_http::Method::post)
+        if (request.requestLine.method == nx::network::http::Method::post)
             api::serializeToHeaders(&response->headers, m_beginListeningResponse);
 
-        nx_http::RequestResult requestResult(
-            nx_http::StatusCode::switchingProtocols);
+        nx::network::http::RequestResult requestResult(
+            nx::network::http::StatusCode::switchingProtocols);
         requestResult.connectionEvents.onResponseHasBeenSent =
             std::bind(&RelayTest::saveConnection, this, _1);
         completionHandler(std::move(requestResult));
     }
 
-    void saveConnection(nx_http::HttpServerConnection* const connection)
+    void saveConnection(nx::network::http::HttpServerConnection* const connection)
     {
         auto socket = connection->takeSocket();
         NX_ASSERT(socket->isInSelfAioThread());

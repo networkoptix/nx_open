@@ -62,7 +62,7 @@ private:
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         relaying::RelayEngine* relayEngine,
-        nx_http::server::rest::MessageDispatcher* const msgDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* const msgDispatcher);
 };
 
 } // namespace gateway

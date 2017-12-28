@@ -31,21 +31,21 @@ bool StunOverHttpServer::listen()
 nx::utils::Url StunOverHttpServer::getServerUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(nx_http::kUrlSchemeName)
+        .setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_httpServer.serverAddress())
         .setPath(kStunOverHttpPath).toUrl();
 }
 
-nx::stun::MessageDispatcher& StunOverHttpServer::dispatcher()
+nx::network::stun::MessageDispatcher& StunOverHttpServer::dispatcher()
 {
     return m_dispatcher;
 }
 
 void StunOverHttpServer::sendIndicationThroughEveryConnection(
-    nx::stun::Message message)
+    nx::network::stun::Message message)
 {
     m_stunOverHttpServer.stunConnectionPool().forEachConnection(
-        nx::network::server::MessageSender<nx::stun::ServerConnection>(std::move(message)));
+        nx::network::server::MessageSender<nx::network::stun::ServerConnection>(std::move(message)));
 }
 
 std::size_t StunOverHttpServer::connectionCount() const
@@ -55,7 +55,7 @@ std::size_t StunOverHttpServer::connectionCount() const
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr int kStunMethodToUse = nx::stun::MethodType::userMethod + 1;
+static constexpr int kStunMethodToUse = nx::network::stun::MethodType::userMethod + 1;
 
 void StunOverHttpServerFixture::SetUp()
 {
@@ -69,7 +69,7 @@ void StunOverHttpServerFixture::SetUp()
     ASSERT_TRUE(m_server.listen());
 }
 
-nx::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
+nx::network::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
 {
     return m_server.dispatcher();
 }
@@ -79,16 +79,16 @@ nx::utils::Url StunOverHttpServerFixture::tunnelUrl() const
     return m_server.getServerUrl();
 }
 
-nx::stun::Message StunOverHttpServerFixture::popReceivedMessage()
+nx::network::stun::Message StunOverHttpServerFixture::popReceivedMessage()
 {
     return m_messagesReceived.pop();
 }
 
-nx::stun::Message StunOverHttpServerFixture::prepareRequest()
+nx::network::stun::Message StunOverHttpServerFixture::prepareRequest()
 {
-    return nx::stun::Message(
-        nx::stun::Header(
-            nx::stun::MessageClass::request,
+    return nx::network::stun::Message(
+        nx::network::stun::Header(
+            nx::network::stun::MessageClass::request,
             kStunMethodToUse));
 }
 
@@ -100,14 +100,14 @@ void StunOverHttpServerFixture::assertStunClientIsAbleToPerformRequest(
     AbstractAsyncClient* client)
 {
     nx::utils::promise<
-        std::tuple<SystemError::ErrorCode, nx::stun::Message>
+        std::tuple<SystemError::ErrorCode, nx::network::stun::Message>
     > responseReceived;
 
     client->sendRequest(
         prepareRequest(),
         [&responseReceived](
             SystemError::ErrorCode sysErrorCode,
-            nx::stun::Message response)
+            nx::network::stun::Message response)
         {
             responseReceived.set_value(
                 std::make_tuple(sysErrorCode, std::move(response)));
@@ -116,18 +116,18 @@ void StunOverHttpServerFixture::assertStunClientIsAbleToPerformRequest(
     auto result = responseReceived.get_future().get();
     ASSERT_EQ(SystemError::noError, std::get<0>(result));
     ASSERT_EQ(
-        nx::stun::MessageClass::successResponse,
+        nx::network::stun::MessageClass::successResponse,
         std::get<1>(result).header.messageClass);
 }
 
 void StunOverHttpServerFixture::processStunMessage(
-    std::shared_ptr<nx::stun::AbstractServerConnection> serverConnection,
-    nx::stun::Message message)
+    std::shared_ptr<nx::network::stun::AbstractServerConnection> serverConnection,
+    nx::network::stun::Message message)
 {
     m_messagesReceived.push(message);
 
-    nx::stun::Message response(nx::stun::Header(
-        nx::stun::MessageClass::successResponse,
+    nx::network::stun::Message response(nx::network::stun::Header(
+        nx::network::stun::MessageClass::successResponse,
         message.header.method,
         message.header.transactionId));
     serverConnection->sendMessage(std::move(response), nullptr);

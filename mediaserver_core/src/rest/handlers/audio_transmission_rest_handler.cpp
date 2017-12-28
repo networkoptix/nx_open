@@ -25,7 +25,7 @@ int QnAudioTransmissionRestHandler::executeGet(
     if (!validateParams(params, errorStr))
     {
         result.setError(QnJsonRestResult::InvalidParameter, errorStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     auto sourceId = params[kClientIdParamName];
@@ -43,7 +43,7 @@ int QnAudioTransmissionRestHandler::executeGet(
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
     }
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error)

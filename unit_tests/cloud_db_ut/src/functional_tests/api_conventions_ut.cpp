@@ -33,30 +33,30 @@ TEST_F(ApiConventions, general)
 
     {
         //missing required parameter
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         nx::utils::Url url(lit("http://%1:%2/cdb/system/bind?name=esadfwer").arg(endpoint().address.toString()).arg(endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(httpClient.doGet(url));
 
         auto msgBody = httpClient.fetchMessageBodyBuffer();
-        nx_http::FusionRequestResult requestResult =
-            QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+        nx::network::http::FusionRequestResult requestResult =
+            QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
-        ASSERT_EQ(nx_http::StatusCode::badRequest, httpClient.response()->statusLine.statusCode);
-        ASSERT_EQ(nx_http::FusionRequestErrorClass::badRequest, requestResult.errorClass);
+        ASSERT_EQ(nx::network::http::StatusCode::badRequest, httpClient.response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::FusionRequestErrorClass::badRequest, requestResult.errorClass);
         ASSERT_EQ(
-            QnLexical::serialized(nx_http::FusionRequestErrorDetail::deserializationError),
+            QnLexical::serialized(nx::network::http::FusionRequestErrorDetail::deserializationError),
             requestResult.resultCode);
         ASSERT_EQ(
-            (int)nx_http::FusionRequestErrorDetail::deserializationError,
+            (int)nx::network::http::FusionRequestErrorDetail::deserializationError,
             requestResult.errorDetail);
     }
 
     {
         //operation forbidden for account in this state
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         nx::utils::Url url(lit("http://%1:%2/cdb/system/bind?name=esadfwer&customization=%3").
             arg(endpoint().address.toString()).arg(endpoint().port).arg(nx::utils::AppInfo::customizationName()));
         url.setUserName(QString::fromStdString(account1.email));
@@ -64,12 +64,12 @@ TEST_F(ApiConventions, general)
         ASSERT_TRUE(httpClient.doGet(url));
 
         auto msgBody = httpClient.fetchMessageBodyBuffer();
-        nx_http::FusionRequestResult requestResult =
-            QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+        nx::network::http::FusionRequestResult requestResult =
+            QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
-        ASSERT_EQ(nx_http::StatusCode::forbidden, httpClient.response()->statusLine.statusCode);
-        ASSERT_EQ(nx_http::FusionRequestErrorClass::unauthorized, requestResult.errorClass);
+        ASSERT_EQ(nx::network::http::StatusCode::forbidden, httpClient.response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::FusionRequestErrorClass::unauthorized, requestResult.errorClass);
         ASSERT_EQ(
             QnLexical::serialized(api::ResultCode::accountNotActivated),
             requestResult.resultCode);
@@ -92,7 +92,7 @@ TEST_F(ApiConventions, using_post_method)
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    auto client = nx_http::AsyncHttpClient::create();
+    auto client = nx::network::http::AsyncHttpClient::create();
     nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
@@ -101,8 +101,8 @@ TEST_F(ApiConventions, using_post_method)
     nx::utils::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(
-        client.get(), &nx_http::AsyncHttpClient::done,
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) {
+        client.get(), &nx::network::http::AsyncHttpClient::done,
+        client.get(), [&donePromise](nx::network::http::AsyncHttpClientPtr /*client*/) {
             donePromise.set_value();
         },
         Qt::DirectConnection);
@@ -110,7 +110,7 @@ TEST_F(ApiConventions, using_post_method)
 
     doneFuture.wait();
     ASSERT_TRUE(client->response() != nullptr);
-    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 }
 
 TEST_F(ApiConventions, json_in_unauthorized_response)
@@ -119,7 +119,7 @@ TEST_F(ApiConventions, json_in_unauthorized_response)
 
     for (int i = 0; i < 2; ++i)
     {
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         nx::utils::Url url;
         url.setHost(endpoint().address.toString());
         url.setPort(endpoint().port);
@@ -133,19 +133,19 @@ TEST_F(ApiConventions, json_in_unauthorized_response)
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(
-            nx_http::StatusCode::unauthorized,
+            nx::network::http::StatusCode::unauthorized,
             client.response()->statusLine.statusCode);
 
-        nx_http::BufferType msgBody;
+        nx::network::http::BufferType msgBody;
         while (!client.eof())
             msgBody += client.fetchMessageBodyBuffer();
 
         ASSERT_FALSE(msgBody.isEmpty());
-        nx_http::FusionRequestResult requestResult =
-            QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+        nx::network::http::FusionRequestResult requestResult =
+            QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
 
         ASSERT_EQ(
-            nx_http::FusionRequestErrorClass::unauthorized,
+            nx::network::http::FusionRequestErrorClass::unauthorized,
             requestResult.errorClass);
         ASSERT_EQ(
             QnLexical::serialized(api::ResultCode::notAuthorized),
@@ -162,7 +162,7 @@ TEST_F(ApiConventions, api_conventions_ok)
     auto result = addActivatedAccount(&account1, &account1Password);
     ASSERT_EQ(api::ResultCode::ok, result);
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     for (int i = 0; i < 200; ++i)
     {
         nx::utils::Url url;
@@ -175,19 +175,19 @@ TEST_F(ApiConventions, api_conventions_ok)
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(
-            nx_http::StatusCode::ok,
+            nx::network::http::StatusCode::ok,
             client.response()->statusLine.statusCode);
 
-        nx_http::BufferType msgBody;
+        nx::network::http::BufferType msgBody;
         while (!client.eof())
             msgBody += client.fetchMessageBodyBuffer();
 
         ASSERT_FALSE(msgBody.isEmpty());
-        //nx_http::FusionRequestResult requestResult =
-        //    QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+        //nx::network::http::FusionRequestResult requestResult =
+        //    QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
 
         //ASSERT_EQ(
-        //    nx_http::FusionRequestErrorClass::unauthorized,
+        //    nx::network::http::FusionRequestErrorClass::unauthorized,
         //    requestResult.errorClass);
         //ASSERT_EQ(
         //    QnLexical::serialized(api::ResultCode::notAuthorized),
@@ -207,7 +207,7 @@ TEST_F(ApiConventions, json_in_ok_response)
     //changing password
     std::string account1NewPassword = account1Password + "new";
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
@@ -217,7 +217,7 @@ TEST_F(ApiConventions, json_in_ok_response)
     QUrlQuery urlQuery;
     nx::cdb::api::serializeToUrlQuery(update, &urlQuery);
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
@@ -229,22 +229,22 @@ TEST_F(ApiConventions, json_in_ok_response)
     ASSERT_TRUE(client.doGet(url));
     ASSERT_TRUE(client.response() != nullptr);
     ASSERT_EQ(
-        nx_http::StatusCode::ok,
+        nx::network::http::StatusCode::ok,
         client.response()->statusLine.statusCode);
 
-    nx_http::BufferType msgBody;
+    nx::network::http::BufferType msgBody;
     while (!client.eof())
         msgBody += client.fetchMessageBodyBuffer();
 
     ASSERT_FALSE(msgBody.isEmpty());
-    nx_http::FusionRequestResult requestResult =
-        QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+    nx::network::http::FusionRequestResult requestResult =
+        QJson::deserialized<nx::network::http::FusionRequestResult>(msgBody);
 
     ASSERT_EQ(
-        nx_http::FusionRequestErrorClass::noError,
+        nx::network::http::FusionRequestErrorClass::noError,
         requestResult.errorClass);
     ASSERT_EQ(
-        QnLexical::serialized(nx_http::FusionRequestErrorDetail::ok),
+        QnLexical::serialized(nx::network::http::FusionRequestErrorDetail::ok),
         requestResult.resultCode);
 
     result = getAccount(account1.email, account1NewPassword, &account1);

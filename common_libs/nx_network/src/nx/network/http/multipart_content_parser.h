@@ -3,7 +3,9 @@
 #include "nx/utils/byte_stream/abstract_byte_stream_filter.h"
 #include "line_splitter.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Input: http multipart content stream.
@@ -29,7 +31,7 @@ public:
     /**
      * @return Headers of last read frame.
      */
-    const nx_http::HttpHeaders& prevFrameHeaders() const;
+    const nx::network::http::HttpHeaders& prevFrameHeaders() const;
     /**
      * @return True if epilogue has been received.
      */
@@ -61,7 +63,7 @@ private:
     ParsingState m_state;
     ParsingState m_nextState;
     LineSplitter m_lineSplitter;
-    nx_http::BufferType m_currentFrame;
+    nx::network::http::BufferType m_currentFrame;
     StringType m_boundary;
     StringType m_startBoundaryLine;
     StringType m_endBoundaryLine;
@@ -71,7 +73,7 @@ private:
     unsigned int m_contentLength;
     ChunkParseState m_chunkParseState;
     nx::Buffer m_supposedBoundary;
-    nx_http::HttpHeaders m_currentFrameHeaders;
+    nx::network::http::HttpHeaders m_currentFrameHeaders;
     bool m_forceParseAsBinary = false;
 
     bool processLine(const ConstBufferRefType& lineBuffer);
@@ -80,4 +82,6 @@ private:
         size_t* const offset);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

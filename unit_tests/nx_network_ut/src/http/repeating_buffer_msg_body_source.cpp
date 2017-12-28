@@ -1,7 +1,7 @@
 #include "repeating_buffer_msg_body_source.h"
 
 RepeatingBufferMsgBodySource::RepeatingBufferMsgBodySource(
-    const nx_http::StringType& mimeType,
+    const nx::network::http::StringType& mimeType,
     nx::Buffer buffer)
     :
     m_mimeType(mimeType),
@@ -18,7 +18,7 @@ void RepeatingBufferMsgBodySource::stopWhileInAioThread()
 {
 }
 
-nx_http::StringType RepeatingBufferMsgBodySource::mimeType() const
+nx::network::http::StringType RepeatingBufferMsgBodySource::mimeType() const
 {
     return m_mimeType;
 }
@@ -30,7 +30,7 @@ boost::optional<uint64_t> RepeatingBufferMsgBodySource::contentLength() const
 
 void RepeatingBufferMsgBodySource::readAsync(
     nx::utils::MoveOnlyFunc<
-    void(SystemError::ErrorCode, nx_http::BufferType)
+    void(SystemError::ErrorCode, nx::network::http::BufferType)
     > completionHandler)
 {
     completionHandler(SystemError::noError, m_buffer);

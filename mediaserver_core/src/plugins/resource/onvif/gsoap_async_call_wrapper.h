@@ -183,7 +183,7 @@ public:
         }
 
         m_socket->connectAsync(
-            SocketAddress(endpoint.host(), endpoint.port(nx_http::DEFAULT_HTTP_PORT)),
+            SocketAddress(endpoint.host(), endpoint.port(nx::network::http::DEFAULT_HTTP_PORT)),
             std::bind(&GSoapAsyncCallWrapper::onConnectCompleted, this, _1));
     }
 
@@ -302,7 +302,7 @@ private:
         bool parseResult = m_httpStreamReader.parseBytes(
             QnByteArrayConstRef(m_responseBuffer, m_totalBytesRead, bytesRead));
 
-        bool stateIsOk = m_httpStreamReader.state() != nx_http::HttpStreamReader::parseError;
+        bool stateIsOk = m_httpStreamReader.state() != nx::network::http::HttpStreamReader::parseError;
         m_totalBytesRead += bytesRead;
 
         if (!parseResult || !stateIsOk)
@@ -312,10 +312,10 @@ private:
             return;
         }
 
-        if (m_httpStreamReader.state() == nx_http::HttpStreamReader::messageDone)
+        if (m_httpStreamReader.state() == nx::network::http::HttpStreamReader::messageDone)
         {
             m_state = done;
-            if (m_httpStreamReader.message().type != nx_http::MessageType::response)
+            if (m_httpStreamReader.message().type != nx::network::http::MessageType::response)
                 m_resultHandler(SOAP_FAULT);
 
             auto resultCode = deserializeResponse();
@@ -398,7 +398,7 @@ private:
     std::function<void(int)> m_resultHandler;
     bool* m_terminatedFlagPtr;
     mutable QnMutex m_mutex;
-    nx_http::HttpStreamReader m_httpStreamReader;
+    nx::network::http::HttpStreamReader m_httpStreamReader;
     std::size_t m_totalBytesRead;
     bool m_useHttpReader;
 

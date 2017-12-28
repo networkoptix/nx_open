@@ -24,7 +24,7 @@ void QnDesktopCameraRegistrator::run()
     Q_D(QnTCPConnectionProcessor);
 
     parseRequest();
-    sendResponse(nx_http::StatusCode::ok, QByteArray());
+    sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
     const auto userName = getHeaderValue(d->request.headers, "user-name");
     auto uniqueId = getHeaderValue(d->request.headers, "unique-id");

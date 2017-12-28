@@ -34,7 +34,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         useSsl),
     m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false),
-    m_httpModManager(new nx_http::HttpModManager())
+    m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
@@ -210,12 +210,12 @@ void QnUniversalTcpListener::updateCloudConnectState(
     }
 }
 
-void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
+void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* request)
 {
     m_httpModManager->apply(request);
 }
 
-bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& request)
+bool QnUniversalTcpListener::isAuthentificationRequired(nx::network::http::Request& request)
 {
     const auto targetHeader = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
     if (targetHeader == request.headers.end())
@@ -294,7 +294,7 @@ std::vector<std::unique_ptr<AbstractStreamServerSocket>>
     return sockets;
 }
 
-nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const
+nx::network::http::HttpModManager* QnUniversalTcpListener::httpModManager() const
 {
     return m_httpModManager.get();
 }

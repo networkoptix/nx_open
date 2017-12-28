@@ -55,7 +55,7 @@ private:
         void readUntilError();
 
         const ModuleConnector* const m_parent;
-        nx_http::AsyncHttpClientPtr m_httpClient;
+        nx::network::http::AsyncHttpClientPtr m_httpClient;
         SocketAddress m_endpoint;
         nx::Buffer m_buffer;
         std::unique_ptr<AbstractStreamSocket> m_socket;

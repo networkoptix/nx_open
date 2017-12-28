@@ -163,7 +163,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     QAuthenticator auth( authOriginal );
 
     QString host = url.host();
-    int port = url.port( nx_http::DEFAULT_HTTP_PORT );
+    int port = url.port( nx::network::http::DEFAULT_HTTP_PORT );
     if (host.isEmpty())
         host = url.toString();
 
@@ -322,7 +322,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         smac += responseData[macpos + i];
     }
 
-    quint16 port = nx_http::DEFAULT_HTTP_PORT;
+    quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
 
     if (packet.fromDatagram(responseData))
@@ -530,7 +530,7 @@ bool QnPlISDResourceSearcher::testCredentials(const nx::utils::Url &url, const Q
 {
 
     const auto host = url.host();
-    const auto port = url.port(nx_http::DEFAULT_HTTP_PORT);
+    const auto port = url.port(nx::network::http::DEFAULT_HTTP_PORT);
 
     if (host.isEmpty())
         return false;

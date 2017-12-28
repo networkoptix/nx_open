@@ -17,9 +17,9 @@ const QString kTransmitTwoWayAudioUrlTemplate = lit("%1/audioData");
 const std::chrono::milliseconds kHttpHelperTimeout(4000);
 const std::chrono::milliseconds kTransmissionTimeout(4000);
 
-bool responseIsOk(const nx_http::Response* const response)
+bool responseIsOk(const nx::network::http::Response* const response)
 {
-    return response->statusLine.statusCode == nx_http::StatusCode::ok;
+    return response->statusLine.statusCode == nx::network::http::StatusCode::ok;
 }
 
 } // namespace
@@ -55,20 +55,20 @@ bool HikvisionAudioTransmitter::sendData(const QnAbstractMediaDataPtr& data)
     return sendBuffer(m_socket.get(), data->data(), data->dataSize());
 }
 
-void HikvisionAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
+void HikvisionAudioTransmitter::prepareHttpClient(const nx::network::http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
 
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
     httpClient->setDisablePrecalculatedAuthorization(false);
-    httpClient->setAuthType(nx_http::AuthType::authBasic);
+    httpClient->setAuthType(nx::network::http::AuthType::authBasic);
 
     openChannelIfNeeded();
 }
 
 bool HikvisionAudioTransmitter::isReadyForTransmission(
-    nx_http::AsyncHttpClientPtr /*httpClient*/,
+    nx::network::http::AsyncHttpClientPtr /*httpClient*/,
     bool /*isRetryAfterUnauthorizedResponse*/) const
 {
     return true;
@@ -87,9 +87,9 @@ std::chrono::milliseconds HikvisionAudioTransmitter::transmissionTimeout() const
     return kTransmissionTimeout;
 }
 
-nx_http::StringType HikvisionAudioTransmitter::contentType() const
+nx::network::http::StringType HikvisionAudioTransmitter::contentType() const
 {
-    return nx_http::StringType("application/binary");
+    return nx::network::http::StringType("application/binary");
 }
 
 bool HikvisionAudioTransmitter::openChannelIfNeeded()
@@ -108,7 +108,7 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
     if (!result)
         return false;
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpHelper->eof())
         messageBody.append(httpHelper->fetchMessageBodyBuffer());
 
@@ -130,8 +130,8 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
     url.setPath(channelOpenPath);
     result = httpHelper->doPut(
         url,
-        nx_http::StringType(),
-        nx_http::StringType());
+        nx::network::http::StringType(),
+        nx::network::http::StringType());
 
     if (!result)
         return false;
@@ -160,13 +160,13 @@ bool HikvisionAudioTransmitter::closeChannel()
 
     auto result = httpHelper->doPut(
         url,
-        nx_http::StringType(),
-        nx_http::StringType());
+        nx::network::http::StringType(),
+        nx::network::http::StringType());
 
     if (!result || !responseIsOk(httpHelper->response()))
         return false;
 
-    nx_http::StringType messageBody;
+    nx::network::http::StringType messageBody;
     while (!httpHelper->eof())
         messageBody.append(httpHelper->fetchMessageBodyBuffer());
 
@@ -180,11 +180,11 @@ bool HikvisionAudioTransmitter::closeChannel()
     return true;
 }
 
-std::unique_ptr<nx_http::HttpClient> HikvisionAudioTransmitter::createHttpHelper()
+std::unique_ptr<nx::network::http::HttpClient> HikvisionAudioTransmitter::createHttpHelper()
 {
     auto auth = m_resource->getAuth();
 
-    auto httpHelper = std::make_unique<nx_http::HttpClient>();
+    auto httpHelper = std::make_unique<nx::network::http::HttpClient>();
     httpHelper->setUserName(auth.user());
     httpHelper->setUserPassword(auth.password());
     httpHelper->setResponseReadTimeoutMs(kHttpHelperTimeout.count());

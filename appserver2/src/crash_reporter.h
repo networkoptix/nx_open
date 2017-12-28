@@ -43,7 +43,7 @@ private:
 
     QnMutex m_mutex;
     nx::utils::concurrent::Future<bool> m_activeCollection;
-    nx_http::AsyncHttpClientPtr m_activeHttpClient;
+    nx::network::http::AsyncHttpClientPtr m_activeHttpClient;
     bool m_terminated;
     boost::optional<qint64> m_timerId;
 };
@@ -56,10 +56,10 @@ public:
     ReportData(const QFileInfo& crashFile, QSettings* settings,
                CrashReporter& host, QObject* parent = 0);
 
-    nx_http::HttpHeaders makeHttpHeaders() const;
+    nx::network::http::HttpHeaders makeHttpHeaders() const;
 
 public slots:
-    void finishReport(nx_http::AsyncHttpClientPtr httpClient);
+    void finishReport(nx::network::http::AsyncHttpClientPtr httpClient);
 
 private:
     const QFileInfo m_crashFile;

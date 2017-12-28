@@ -54,7 +54,7 @@ public:
         ConnectionType::Type connectionType,
         const ApiPeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         std::function<void()> ttFinishCallback,
         const Qn::UserAccessData &userAccessData);
@@ -68,12 +68,12 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         const ApiPeerData &remotePeer,
         qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestBuf);
     //!Process transaction received via standard HTTP server interface
     bool gotTransactionFromRemotePeer(
         const QnUuid& connectionGuid,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestMsgBody);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
     void waitForNewTransactionsReady(const QnUuid& connectionGuid);

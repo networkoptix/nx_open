@@ -1,7 +1,7 @@
 #include "async_http_client_reply.h"
 
 QnAsyncHttpClientReply::QnAsyncHttpClientReply(
-    const nx_http::AsyncHttpClientPtr& client,
+    const nx::network::http::AsyncHttpClientPtr& client,
     QObject* parent)
     :
     QObject(parent),
@@ -10,13 +10,13 @@ QnAsyncHttpClientReply::QnAsyncHttpClientReply(
     if (m_client)
     {
         connect(
-            m_client.get(), &nx_http::AsyncHttpClient::done,
+            m_client.get(), &nx::network::http::AsyncHttpClient::done,
             this, &QnAsyncHttpClientReply::at_client_done,
             Qt::DirectConnection);
     }
 }
 
-nx_http::AsyncHttpClientPtr QnAsyncHttpClientReply::asyncHttpClient() const
+nx::network::http::AsyncHttpClientPtr QnAsyncHttpClientReply::asyncHttpClient() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_client;
@@ -46,13 +46,13 @@ QByteArray QnAsyncHttpClientReply::data()
     return m_data;
 }
 
-nx_http::Response QnAsyncHttpClientReply::response()
+nx::network::http::Response QnAsyncHttpClientReply::response()
 {
     QnMutexLocker lock(&m_mutex);
     return m_response;
 }
 
-void QnAsyncHttpClientReply::at_client_done(const nx_http::AsyncHttpClientPtr &client)
+void QnAsyncHttpClientReply::at_client_done(const nx::network::http::AsyncHttpClientPtr &client)
 {
     QnMutexLocker lock(&m_mutex);
 

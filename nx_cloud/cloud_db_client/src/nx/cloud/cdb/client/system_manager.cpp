@@ -173,8 +173,8 @@ void SystemManager::startMerge(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        nx_http::Method::post,
-        nx_http::rest::substituteParameters(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(
             kSystemsMergedToASpecificSystem, {idOfSystemToMergeTo}).c_str(),
         api::SystemId(idOfSystemBeingMerged),
         completionHandler,

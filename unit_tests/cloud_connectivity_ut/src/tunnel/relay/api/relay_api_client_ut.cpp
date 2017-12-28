@@ -130,7 +130,7 @@ private:
 
         m_httpServer = std::make_unique<TestHttpServer>();
 
-        const auto realPath = nx_http::rest::substituteParameters(
+        const auto realPath = nx::network::http::rest::substituteParameters(
             kServerClientSessionsPath,
             {"some_server_name"});
 
@@ -162,11 +162,11 @@ private:
     }
 
     void beginListeningHandler(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_expectedBeginListeningResponse.preemptiveConnectionCount =
             nx::utils::random::number<int>(1, 99);
@@ -183,7 +183,7 @@ private:
 
         serializeToHeaders(&response->headers, m_expectedBeginListeningResponse);
 
-        completionHandler(nx_http::StatusCode::switchingProtocols);
+        completionHandler(nx::network::http::StatusCode::switchingProtocols);
     }
 };
 

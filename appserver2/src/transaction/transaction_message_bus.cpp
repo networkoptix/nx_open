@@ -1384,7 +1384,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     ConnectionType::Type connectionType,
     const ApiPeerData& remotePeer,
     qint64 remoteSystemIdentityTime,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& contentEncoding,
     std::function<void()> ttFinishCallback,
     const Qn::UserAccessData &userAccessData)
@@ -1451,7 +1451,7 @@ void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
     QSharedPointer<AbstractStreamSocket> socket,
     const ApiPeerData &/*remotePeer*/,
     qint64 /*remoteSystemIdentityTime*/,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& requestBuf)
 {
     if (!m_db)
@@ -1479,7 +1479,7 @@ void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
 
 bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
     const QnUuid& connectionGuid,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& requestMsgBody)
 {
     if (!m_db)

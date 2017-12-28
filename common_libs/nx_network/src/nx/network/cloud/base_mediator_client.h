@@ -32,8 +32,8 @@ protected:
         RequestData requestData,
         CompletionHandlerType completionHandler)
     {
-        nx::stun::Message request(
-            nx::stun::Header(
+        nx::network::stun::Message request(
+            nx::network::stun::Header(
                 stun::MessageClass::request,
                 RequestData::kMethod));
         requestData.serialize(&request);
@@ -47,12 +47,12 @@ protected:
 
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
+        nx::network::stun::Message request,
         utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
-        const nx::stun::extension::methods::Value method =
-            static_cast<nx::stun::extension::methods::Value>(request.header.method);
+        const nx::network::stun::extension::methods::Value method =
+            static_cast<nx::network::stun::extension::methods::Value>(request.header.method);
         NX_ASSERT(method == ResponseData::kMethod, "Request and response methods mismatch");
 
         this->sendRequest(
@@ -75,7 +75,7 @@ protected:
 
             api::ResultCode resultCode = api::ResultCode::ok;
             const auto* resultCodeHeader =
-                message.getAttribute<nx::stun::extension::attrs::ResultCode>();
+                message.getAttribute<nx::network::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
@@ -93,7 +93,7 @@ protected:
             if (!responseData.parse(message))
             {
                 NX_LOGX(lm("Failed to parse %1 response: %2").
-                    arg(nx::stun::extension::methods::toString(method)).
+                    arg(nx::network::stun::extension::methods::toString(method)).
                     arg(responseData.errorText()), cl_logDEBUG1);
                 return completionHandler(
                     std::move(message.transportHeader),
@@ -110,7 +110,7 @@ protected:
 
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
+        nx::network::stun::Message request,
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         sendRequestAndReceiveResponse<ResponseData>(
@@ -126,19 +126,19 @@ protected:
     }
 
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
+        nx::network::stun::Message request,
         utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode)> completionHandler)
     {
         using namespace nx::hpm::api;
 
-        const nx::stun::extension::methods::Value method =
-            static_cast<nx::stun::extension::methods::Value>(request.header.method);
+        const nx::network::stun::extension::methods::Value method =
+            static_cast<nx::network::stun::extension::methods::Value>(request.header.method);
 
         this->sendRequest(
             std::move(request),
             [this, method, completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode code,
-                nx::stun::Message message) mutable
+                nx::network::stun::Message message) mutable
         {
             if (code != SystemError::noError)
             {
@@ -150,7 +150,7 @@ protected:
 
             api::ResultCode resultCode = api::ResultCode::ok;
             const auto* resultCodeHeader =
-                message.getAttribute<nx::stun::extension::attrs::ResultCode>();
+                message.getAttribute<nx::network::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
@@ -168,7 +168,7 @@ protected:
     }
 
     void sendRequestAndReceiveResponse(
-        nx::stun::Message request,
+        nx::network::stun::Message request,
         utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         sendRequestAndReceiveResponse(

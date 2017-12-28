@@ -13,7 +13,7 @@ class QnHttpLiveStreamingProcessorHttpResponse:
     public ::testing::Test
 {
 public:
-    QnHttpLiveStreamingProcessorHttpResponse(nx_http::MimeProtoVersion httpVersion):
+    QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::MimeProtoVersion httpVersion):
         m_commonModule(/*clientMode*/ false, nx::core::access::Mode::direct),
         m_tcpListener(&m_commonModule),
         m_hlsRequestProcessor(QSharedPointer<AbstractStreamSocket>(), &m_tcpListener)
@@ -37,7 +37,7 @@ public:
     void havingPreparedResponse()
     {
         m_response.statusLine.version = m_request.requestLine.version;
-        m_response.statusLine.statusCode = nx_http::StatusCode::ok;
+        m_response.statusLine.statusCode = nx::network::http::StatusCode::ok;
         m_hlsRequestProcessor.prepareResponse(m_request, &m_response);
     }
 
@@ -60,7 +60,7 @@ public:
 
     void expectChunkedTransferEncodingInResponse()
     {
-        ASSERT_EQ(nx_http::getHeaderValue(m_response.headers, "Transfer-Encoding"), "chunked");
+        ASSERT_EQ(nx::network::http::getHeaderValue(m_response.headers, "Transfer-Encoding"), "chunked");
     }
 
     void expectEndOfFileSignalledByConnectionClosure()
@@ -72,7 +72,7 @@ public:
             return;
         }
 
-        if (m_response.statusLine.version == nx_http::http_1_0)
+        if (m_response.statusLine.version == nx::network::http::http_1_0)
         {
             // In HTTP/1.0 connection is NOT persistent by default.
             return;
@@ -88,8 +88,8 @@ private:
     QnCommonModule m_commonModule;
     TcpListenerStub m_tcpListener;
     QnHttpLiveStreamingProcessor m_hlsRequestProcessor;
-    nx_http::Request m_request;
-    nx_http::Response m_response;
+    nx::network::http::Request m_request;
+    nx::network::http::Response m_response;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ class QnHttpLiveStreamingProcessorHttp11Response:
 {
 public:
     QnHttpLiveStreamingProcessorHttp11Response():
-        QnHttpLiveStreamingProcessorHttpResponse(nx_http::http_1_1)
+        QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::http_1_1)
     {
     }
 };
@@ -131,7 +131,7 @@ class QnHttpLiveStreamingProcessorHttp10Response:
 {
 public:
     QnHttpLiveStreamingProcessorHttp10Response():
-        QnHttpLiveStreamingProcessorHttpResponse(nx_http::http_1_0)
+        QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::http_1_0)
     {
     }
 };

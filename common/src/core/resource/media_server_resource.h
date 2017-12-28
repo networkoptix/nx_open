@@ -12,10 +12,20 @@
 
 #include "api/server_rest_connection_fwd.h"
 
-namespace nx_http { class AsyncHttpClientPtr; }
-namespace nx { namespace api { struct AnalyticsDriverManifest; } }
+namespace nx {
+namespace network {
 
 class SocketAddress;
+
+namespace http {
+
+class AsyncHttpClientPtr;
+
+} // namespace nx
+} // namespace network
+} // namespace http
+
+namespace nx { namespace api { struct AnalyticsDriverManifest; } }
 
 class QnMediaServerResource:
     public QnResource,
@@ -166,7 +176,7 @@ private:
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
-    QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
+    QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
 

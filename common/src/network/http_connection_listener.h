@@ -70,7 +70,7 @@ public:
         doAddHandler(protocol, path, (InstanceFunc) handlerInstance<T>);
     }
 
-    typedef std::function<bool(QnCommonModule* commonModule, const nx_http::Request&)> ProxyCond;
+    typedef std::function<bool(QnCommonModule* commonModule, const nx::network::http::Request&)> ProxyCond;
 
     struct ProxyInfo
     {
@@ -94,7 +94,7 @@ public:
         m_proxyInfo.proxyCond = cond;
     }
 
-    InstanceFunc findHandler(const QByteArray& protocol, const nx_http::Request& request);
+    InstanceFunc findHandler(const QByteArray& protocol, const nx::network::http::Request& request);
 
     // Proxy support functions.
 
@@ -108,7 +108,7 @@ public:
 
     void disableAuth();
 
-    bool isProxy(const nx_http::Request& request);
+    bool isProxy(const nx::network::http::Request& request);
     bool needAuth() const;
 
     QnRestProcessorPool* processorPool() { return &m_processorPool; }

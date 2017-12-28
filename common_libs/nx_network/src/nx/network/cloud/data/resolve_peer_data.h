@@ -23,8 +23,8 @@ public:
     nx::String hostName;
 
     ResolvePeerRequest(nx::String _hostName = {});
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 class NX_NETWORK_API ResolvePeerResponse:
@@ -38,8 +38,8 @@ public:
     ConnectionMethods connectionMethods;
 
     ResolvePeerResponse();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

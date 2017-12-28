@@ -34,7 +34,7 @@ int QnMergeLdapUsersRestHandler::executePost(
     if (ldapResult != Qn::Ldap_NoError)
 	{
         result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     ec2::AbstractUserManagerPtr userManager = owner->commonModule()->ec2Connection()->getUserManager(owner->accessRights());
@@ -88,5 +88,5 @@ int QnMergeLdapUsersRestHandler::executePost(
         }
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

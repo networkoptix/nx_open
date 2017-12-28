@@ -46,8 +46,8 @@ public:
 private:
     bool m_terminated;
     QStringList m_openedIPs;
-    // TODO: #ak Replace with nx_http::AsyncClient.
-    std::set<nx_http::AsyncHttpClientPtr> m_socketsBeingScanned;
+    // TODO: #ak Replace with nx::network::http::AsyncClient.
+    std::set<nx::network::http::AsyncHttpClientPtr> m_socketsBeingScanned;
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_portToScan;
@@ -58,5 +58,5 @@ private:
     bool launchHostCheck();
 
 private slots:
-    void onDone(nx_http::AsyncHttpClientPtr);
+    void onDone(nx::network::http::AsyncHttpClientPtr);
 };

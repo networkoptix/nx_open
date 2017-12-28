@@ -234,7 +234,7 @@ int QnPtzRestHandler::executePost(
         return CODE_OK;
 
     if (!checkUserAccess(processor->accessRights(), camera, command))
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
 
     switch (command)
     {

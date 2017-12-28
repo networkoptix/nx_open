@@ -19,13 +19,13 @@ public:
 
     virtual ~QnUniversalRequestProcessor();
 
-    static void setUnauthorizedPageBody(const QByteArray& value, nx_http::AuthMethod::Values methods);
+    static void setUnauthorizedPageBody(const QByteArray& value, nx::network::http::AuthMethod::Values methods);
     static QByteArray unauthorizedPageBody();
 
-    static bool isProxy(QnCommonModule* commonModule, const nx_http::Request& request);
-    static bool isProxyForCamera(QnCommonModule* commonModule, const nx_http::Request& request);
-    static bool isCloudRequest(const nx_http::Request& request);
-    static bool needStandardProxy(QnCommonModule* commonModule, const nx_http::Request& request);
+    static bool isProxy(QnCommonModule* commonModule, const nx::network::http::Request& request);
+    static bool isProxyForCamera(QnCommonModule* commonModule, const nx::network::http::Request& request);
+    static bool isCloudRequest(const nx::network::http::Request& request);
+    static bool needStandardProxy(QnCommonModule* commonModule, const nx::network::http::Request& request);
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;

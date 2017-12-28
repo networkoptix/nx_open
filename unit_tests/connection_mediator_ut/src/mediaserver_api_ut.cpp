@@ -11,7 +11,7 @@ namespace test {
 
 TEST( MediaserverEndpointTester, DISABLED_Hardcode )
 {
-    nx::stun::MessageDispatcher dispatcher;
+    nx::network::stun::MessageDispatcher dispatcher;
     CloudDataProviderMock cloud;
     MediaserverEndpointTester api( &cloud, &dispatcher );
     nx::utils::TestSyncMultiQueue< SocketAddress, bool > results;

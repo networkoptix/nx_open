@@ -32,7 +32,7 @@ RandomOnlineEndpointSelector::~RandomOnlineEndpointSelector()
 void RandomOnlineEndpointSelector::selectBestEndpont(
     const QString& /*moduleName*/,
     std::vector<SocketAddress> endpoints,
-    std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+    std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> handler)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -63,7 +63,7 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
     //failed to start at least one connection. Reporting error...
     auto localHandler = std::move(m_handler);
     lk.unlock();
-    localHandler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
+    localHandler(nx::network::http::StatusCode::serviceUnavailable, SocketAddress());
 }
 
 void RandomOnlineEndpointSelector::done(
@@ -92,9 +92,9 @@ void RandomOnlineEndpointSelector::done(
     lk.unlock();
 
     if (osErrorCode == SystemError::noError)
-        localHandler(nx_http::StatusCode::ok, std::move(endpoint));
+        localHandler(nx::network::http::StatusCode::ok, std::move(endpoint));
     else
-        localHandler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
+        localHandler(nx::network::http::StatusCode::serviceUnavailable, SocketAddress());
 }
 
 } // namespace cloud

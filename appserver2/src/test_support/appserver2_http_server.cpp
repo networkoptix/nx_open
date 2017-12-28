@@ -59,7 +59,7 @@ QnTCPConnectionProcessor* QnSimpleHttpConnectionListener::createRequestProcessor
     return new Ec2ConnectionProcessor(clientSocket, this);
 }
 
-bool QnSimpleHttpConnectionListener::needAuth(const nx_http::Request& request) const
+bool QnSimpleHttpConnectionListener::needAuth(const nx::network::http::Request& request) const
 {
     auto path = request.requestLine.url.path();
     for (const auto& value : m_disableAuthPrefixes)

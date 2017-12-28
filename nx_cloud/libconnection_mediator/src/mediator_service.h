@@ -10,12 +10,16 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/stoppable.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class HttpStreamSocketServer;
 class MessageDispatcher;
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 namespace hpm {

@@ -108,7 +108,7 @@ private:
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
 
-    nx::stun::Message prepareConnectionRequestedIndication(
+    nx::network::stun::Message prepareConnectionRequestedIndication(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
 

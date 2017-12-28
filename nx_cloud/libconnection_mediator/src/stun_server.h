@@ -24,14 +24,14 @@ public:
     void stopAcceptingNewRequests();
 
     const std::vector<SocketAddress>& endpoints() const;
-    nx::stun::MessageDispatcher& dispatcher();
+    nx::network::stun::MessageDispatcher& dispatcher();
 
     void initializeHttpTunnelling(http::Server* httpServer);
 
 private:
     const conf::Settings& m_settings;
-    nx::stun::MessageDispatcher m_stunMessageDispatcher;
-    nx::stun::StunOverHttpServer m_stunOverHttpServer;
+    nx::network::stun::MessageDispatcher m_stunMessageDispatcher;
+    nx::network::stun::StunOverHttpServer m_stunOverHttpServer;
     std::unique_ptr<nx::network::server::MultiAddressServer<stun::SocketServer>> m_tcpStunServer;
     std::unique_ptr<nx::network::server::MultiAddressServer<stun::UdpServer>> m_udpStunServer;
     std::vector<SocketAddress> m_endpoints;

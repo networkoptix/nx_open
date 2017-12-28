@@ -50,7 +50,7 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     if (!processor->commonModule()->resourceAccessManager()->hasPermission(
         processor->accessRights(), request.camera, requiredPermission))
     {
-        return makeError(nx_http::StatusCode::forbidden,
+        return makeError(nx::network::http::StatusCode::forbidden,
             lit("Access denied: Insufficent access rights"),
             &result, &contentType, request.format, request.extraFormatting);
     }
@@ -69,7 +69,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     if (request.camera && !request.camera->hasVideo(nullptr))
     {
         return makeError(
-            nx_http::StatusCode::badRequest
+            nx::network::http::StatusCode::badRequest
             , lit("Camera has no video")
             , &result
             , &contentType
@@ -80,7 +80,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     if (const auto error = request.getError())
     {
         return makeError(
-            nx_http::StatusCode::badRequest
+            nx::network::http::StatusCode::badRequest
             , lit("Invalid request: ") + *error
             , &result
             , &contentType
@@ -130,7 +130,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     {
         result = QByteArray();
         contentType = QByteArray();
-        return nx_http::StatusCode::noContent;
+        return nx::network::http::StatusCode::noContent;
     }
 
     QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
@@ -161,7 +161,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
             .arg(outFrame->height));
 
         return makeError(
-            nx_http::StatusCode::unsupportedMediaType
+            nx::network::http::StatusCode::unsupportedMediaType
             , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
             , &result
             , &contentType
@@ -170,13 +170,13 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     }
 
     contentType = QByteArray("image/") + imageFormat;
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 struct DownloadResult
 {
     SystemError::ErrorCode osStatus = SystemError::notImplemented;
-    nx_http::StatusCode::Value httpStatus = nx_http::StatusCode::internalServerError;
+    nx::network::http::StatusCode::Value httpStatus = nx::network::http::StatusCode::internalServerError;
     QByteArray body;
 };
 
@@ -197,10 +197,10 @@ static DownloadResult downloadImage(
 
     DownloadResult result;
     auto requestCompletionFunc =
-        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType body)
+        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx::network::http::BufferType body)
         {
             result.osStatus = osStatus;
-            result.httpStatus = (nx_http::StatusCode::Value) httpStatus;
+            result.httpStatus = (nx::network::http::StatusCode::Value) httpStatus;
             result.body = std::move(body);
             context.executeGuarded([&context]() { context.requestProcessed(); });
         };
@@ -226,22 +226,22 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     const auto response = downloadImage(server, request, ownerPort);
     if (response.osStatus != SystemError::noError)
     {
-        return makeError(nx_http::StatusCode::internalServerError,
+        return makeError(nx::network::http::StatusCode::internalServerError,
             lit("Internal error: ") + SystemError::toString(response.osStatus),
             &result, &contentType, request.format, request.extraFormatting);
     }
 
-    if (response.httpStatus == nx_http::StatusCode::unauthorized)
+    if (response.httpStatus == nx::network::http::StatusCode::unauthorized)
     {
-        return makeError(nx_http::StatusCode::internalServerError,
-            lit("Internal error: ") + nx_http::StatusCode::toString(response.httpStatus),
+        return makeError(nx::network::http::StatusCode::internalServerError,
+            lit("Internal error: ") + nx::network::http::StatusCode::toString(response.httpStatus),
             &result, &contentType, request.format, request.extraFormatting);
     }
 
     if (!response.body.isEmpty())
     {
         result = std::move(response.body);
-        contentType = (response.httpStatus == nx_http::StatusCode::ok)
+        contentType = (response.httpStatus == nx::network::http::StatusCode::ok)
             ? QByteArray("image/") + QnLexical::serialized(request.imageFormat).toUtf8()
             : QByteArray("application/json"); //< TODO: Provide content type from response.
     }

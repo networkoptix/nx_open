@@ -25,14 +25,14 @@ Ec2ConnectionProcessor::~Ec2ConnectionProcessor()
     stop();
 }
 
-void Ec2ConnectionProcessor::addAuthHeader(nx_http::Response& response)
+void Ec2ConnectionProcessor::addAuthHeader(nx::network::http::Response& response)
 {
     const QString auth =
         lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
         .arg(nx::network::AppInfo::realm())
         .arg(QDateTime::currentDateTime().toMSecsSinceEpoch());
 
-    nx_http::insertOrReplaceHeader(&response.headers, nx_http::HttpHeader(
+    nx::network::http::insertOrReplaceHeader(&response.headers, nx::network::http::HttpHeader(
         "WWW-Authenticate",
         auth.toLatin1()));
 }
@@ -45,8 +45,8 @@ bool Ec2ConnectionProcessor::authenticate()
     if (!owner->needAuth(d->request))
         return true;
 
-    const nx_http::StringType& authorization =
-        nx_http::getHeaderValue(d->request.headers, "Authorization");
+    const nx::network::http::StringType& authorization =
+        nx::network::http::getHeaderValue(d->request.headers, "Authorization");
     if (authorization.isEmpty())
     {
         addAuthHeader(
@@ -66,7 +66,7 @@ bool Ec2ConnectionProcessor::authenticate()
             return QnUserResourcePtr();
         };
 
-    nx_http::header::Authorization authorizationHeader;
+    nx::network::http::header::Authorization authorizationHeader;
     if (authorizationHeader.parse(authorization))
     {
         const QByteArray userName = authorizationHeader.userid();
@@ -101,7 +101,7 @@ void Ec2ConnectionProcessor::run()
 
             if (!authenticate())
             {
-                sendUnauthorizedResponse(nx_http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
                 ready = readRequest();
                 ++authenticateTries;
                 continue;
@@ -117,7 +117,7 @@ void Ec2ConnectionProcessor::run()
             if (!processRequest(noAuth))
             {
                 QByteArray contentType;
-                sendResponse(nx_http::StatusCode::badRequest, contentType);
+                sendResponse(nx::network::http::StatusCode::badRequest, contentType);
             }
         }
 

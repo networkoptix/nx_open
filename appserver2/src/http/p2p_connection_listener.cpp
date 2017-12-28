@@ -174,7 +174,7 @@ void ConnectionProcessor::run()
     ec2::ApiPeerDataEx remotePeer = deserializeFromRequest(d->request);
     if (!isPeerCompatible(remotePeer))
     {
-        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
         return;
     }
 
@@ -184,8 +184,8 @@ void ConnectionProcessor::run()
     if (!messageBus)
     {
         sendResponse(
-            nx_http::StatusCode::forbidden,
-            nx_http::StringType());
+            nx::network::http::StatusCode::forbidden,
+            nx::network::http::StringType());
         return;
     }
     ec2::ConnectionLockGuard connectionLockGuard(
@@ -200,13 +200,13 @@ void ConnectionProcessor::run()
         // 1-st stage
         bool lockOK = connectionLockGuard.tryAcquireConnecting();
 
-        d->response.headers.insert(nx_http::HttpHeader(
+        d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_CONNECT_STAGE_1,
-            nx_http::StringType()));
+            nx::network::http::StringType()));
 
         sendResponse(
-            lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
-            nx_http::StringType());
+            lockOK ? nx::network::http::StatusCode::noContent : nx::network::http::StatusCode::forbidden,
+            nx::network::http::StringType());
         if (!lockOK)
             return;
 
@@ -220,7 +220,7 @@ void ConnectionProcessor::run()
         remotePeer.id == commonModule->moduleGUID() || //< can't connect to itself
         isDisabledPeer(remotePeer)) //< allowed peers are strict
     {
-        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
         return;
     }
 
@@ -236,8 +236,8 @@ void ConnectionProcessor::run()
     serializeToResponse(&d->response, localPeer(), remotePeer.dataFormat);
 
     sendResponse(
-        nx_http::StatusCode::switchingProtocols,
-        nx_http::StringType());
+        nx::network::http::StatusCode::switchingProtocols,
+        nx::network::http::StringType());
 
 
     std::function<void()> onConnectionClosedCallback;

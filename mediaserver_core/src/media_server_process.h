@@ -116,7 +116,7 @@ public:
 
     MSSettings* serverSettings() const { return m_settings.get(); }
 
-    static void configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions);
+    static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
 signals:
     void started();

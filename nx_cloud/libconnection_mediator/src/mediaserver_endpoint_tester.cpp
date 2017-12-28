@@ -31,7 +31,7 @@ struct PingCollector
 
 MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
     AbstractCloudDataProvider* cloudData,
-    nx::stun::MessageDispatcher* dispatcher)
+    nx::network::stun::MessageDispatcher* dispatcher)
     :
     RequestProcessor(cloudData)
 {
@@ -117,7 +117,7 @@ void MediaserverEndpointTesterBase::ping(
 
 MediaserverEndpointTester::MediaserverEndpointTester(
     AbstractCloudDataProvider* cloudData,
-    nx::stun::MessageDispatcher* dispatcher)
+    nx::network::stun::MessageDispatcher* dispatcher)
     :
     MediaserverEndpointTesterBase(cloudData, dispatcher)
 {
@@ -146,10 +146,10 @@ void MediaserverEndpointTester::pingServer(
     const String& expectedId,
     std::function<void(SocketAddress, bool)> onPinged)
 {
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     QObject::connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
-        [=](nx_http::AsyncHttpClientPtr httpClient)
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
+        [=](nx::network::http::AsyncHttpClientPtr httpClient)
         {
             {
                 QnMutexLocker lk(&m_mutex);

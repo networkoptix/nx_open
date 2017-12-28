@@ -61,7 +61,7 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
     bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
 
     httpClient.setSendTimeoutMs(kDeviceInfoRequestTimeout.count());
     httpClient.setResponseReadTimeoutMs(kDeviceInfoResponseTimeout.count());
@@ -77,10 +77,10 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
 
     auto response = httpClient.response();
 
-    if (response->statusLine.statusCode != nx_http::StatusCode::Value::ok)
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::Value::ok)
         return QList<QnResourcePtr>();
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
@@ -93,7 +93,7 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
     QUrl deviceUrl;
     deviceUrl.setScheme(lit("http"));
     deviceUrl.setHost(url.host());
-    deviceUrl.setPort(url.port(nx_http::DEFAULT_HTTP_PORT));
+    deviceUrl.setPort(url.port(nx::network::http::DEFAULT_HTTP_PORT));
     deviceInfo->url = deviceUrl;
 
     auto resource = makeResource(deviceInfo.get(), auth);
@@ -201,14 +201,14 @@ void FcResourceSearcher::initListenerUnsafe()
     doNextReceiveUnsafe();
 }
 
-nx_http::AsyncHttpClientPtr FcResourceSearcher::createHttpClient() const
+nx::network::http::AsyncHttpClientPtr FcResourceSearcher::createHttpClient() const
 {
-    nx_http::AuthInfo authInfo;
+    nx::network::http::AuthInfo authInfo;
 
     authInfo.user.username = kFlirDefaultUsername;
     authInfo.user.authToken.setPassword(kFlirDefaultPassword.toUtf8());
 
-    auto httpClientPtr = nx_http::AsyncHttpClient::create();
+    auto httpClientPtr = nx::network::http::AsyncHttpClient::create();
     httpClientPtr->setSendTimeoutMs(kDeviceInfoRequestTimeout.count());
     httpClientPtr->setResponseReadTimeoutMs(kDeviceInfoResponseTimeout.count());
     httpClientPtr->setAuth(authInfo);
@@ -254,13 +254,13 @@ void FcResourceSearcher::receiveFromCallback(
     }
 
     auto url = nx::utils::Url(lit("http://%1").arg(senderAddress.toString()));
-    url.setPort(nx_http::DEFAULT_HTTP_PORT);
+    url.setPort(nx::network::http::DEFAULT_HTTP_PORT);
     url.setPath(kDeviceInfoUrlPath);
 
     if (m_requestsInProgress.find(senderAddress) == m_requestsInProgress.end())
     {
         auto onResponseReceived =
-            [this, senderAddress](nx_http::AsyncHttpClientPtr httpClient)
+            [this, senderAddress](nx::network::http::AsyncHttpClientPtr httpClient)
         {
             QnMutexLocker lock(&m_mutex);
             handleDeviceInfoResponseUnsafe(senderAddress, httpClient);
@@ -304,19 +304,19 @@ void FcResourceSearcher::cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint
 
 void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
     const SocketAddress& senderAddress,
-    nx_http::AsyncHttpClientPtr httpClient)
+    nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (m_terminated)
         return;
 
-    if (httpClient->state() != nx_http::AsyncClient::State::sDone)
+    if (httpClient->state() != nx::network::http::AsyncClient::State::sDone)
     {
         cleanUpEndpointInfoUnsafe(senderAddress);
         return;
     }
 
     auto response = httpClient->response();
-    if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         cleanUpEndpointInfoUnsafe(senderAddress);
         return;
@@ -332,7 +332,7 @@ void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
     }
 
     auto url = QUrl(lit("http://%1").arg(senderAddress.toString()));
-    url.setPort(nx_http::DEFAULT_HTTP_PORT);
+    url.setPort(nx::network::http::DEFAULT_HTTP_PORT);
     deviceInfo->url = url;
 
     TimestampedDeviceInfo tsDeviceInfo;

@@ -1,13 +1,15 @@
 #include "auth_restriction_list.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 const unsigned int AuthMethodRestrictionList::kDefaults =
     AuthMethod::cookie | AuthMethod::http |
     AuthMethod::videowall | AuthMethod::urlQueryParam;
 
 unsigned int AuthMethodRestrictionList::getAllowedAuthMethods(
-    const nx_http::Request& request) const
+    const nx::network::http::Request& request) const
 {
     QString path = request.requestLine.url.path();
     unsigned int allowed = kDefaults;
@@ -50,4 +52,6 @@ void AuthMethodRestrictionList::deny(
     m_denied.emplace(pathMask, Rule(pathMask, method));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -24,7 +24,15 @@
 
 class QnCommandLineParser;
 
-namespace nx_http { class MessageDispatcher; }
+namespace nx {
+namespace network {
+namespace http {
+
+class MessageDispatcher;
+
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 

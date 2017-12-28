@@ -120,13 +120,13 @@ QByteArray QnProxySenderConnection::makeProxyRequest(
 
     const auto time = qnSyncTime->currentUSecsSinceEpoch();
 
-    nx_http::header::WWWAuthenticate authHeader;
-    authHeader.authScheme = nx_http::header::AuthScheme::digest;
+    nx::network::http::header::WWWAuthenticate authHeader;
+    authHeader.authScheme = nx::network::http::header::AuthScheme::digest;
     authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
     authHeader.params["realm"] = nx::network::AppInfo::realm().toLatin1();
 
-    nx_http::header::DigestAuthorization digestHeader;
-    if (!nx_http::calcDigestResponse(
+    nx::network::http::header::DigestAuthorization digestHeader;
+    if (!nx::network::http::calcDigestResponse(
         H_METHOD,
         server->getId().toByteArray(),
         server->getAuthKey().toUtf8(),

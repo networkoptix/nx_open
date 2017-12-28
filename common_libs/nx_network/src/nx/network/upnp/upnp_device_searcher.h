@@ -119,7 +119,7 @@ private:
         QByteArray xmlDevInfo;
     };
 
-    typedef std::map<nx_http::AsyncHttpClientPtr, DiscoveredDeviceInfo> HttpClientsDict;
+    typedef std::map<nx::network::http::AsyncHttpClientPtr, DiscoveredDeviceInfo> HttpClientsDict;
 
     class UPNPDescriptionCacheItem
     {
@@ -191,7 +191,7 @@ private:
     void processPacket(DiscoveredDeviceInfo info);
 
 private slots:
-    void onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr httpClient);
+    void onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient);
 };
 
 } // namespace nx_upnp

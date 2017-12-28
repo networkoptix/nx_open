@@ -38,11 +38,11 @@
 
 struct JsonRestResponse
 {
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     QnJsonRestResult json;
     bool isUndefinedContentLength = false;
 
-    JsonRestResponse(nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined,
+    JsonRestResponse(nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
         QnJsonRestResult json = {}, bool isUndefinedContentLength = false);
 
     RestResponse toRest(bool extraFormatting) const;

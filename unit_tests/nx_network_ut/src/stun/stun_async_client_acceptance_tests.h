@@ -25,8 +25,8 @@ public:
     virtual bool bind(const SocketAddress&) = 0;
     virtual bool listen() = 0;
     virtual nx::utils::Url getServerUrl() const = 0;
-    virtual void sendIndicationThroughEveryConnection(nx::stun::Message) = 0;
-    virtual nx::stun::MessageDispatcher& dispatcher() = 0;
+    virtual void sendIndicationThroughEveryConnection(nx::network::stun::Message) = 0;
+    virtual nx::network::stun::MessageDispatcher& dispatcher() = 0;
     virtual std::size_t connectionCount() const = 0;
 };
 
@@ -50,7 +50,7 @@ private:
 
 /**
  * @param AsyncClientTestTypes It is a struct with following nested types:
- * - ClientType Type that inherits nx::stun::AbstractAsyncClient.
+ * - ClientType Type that inherits nx::network::stun::AbstractAsyncClient.
  * - ServerType Class that implements AbstractStunServer interface.
  */
 template<typename AsyncClientTestTypes>
@@ -66,7 +66,7 @@ public:
 protected:
     void subscribeToEveryIndication()
     {
-        m_indictionMethodToSubscribeTo = nx::stun::kEveryIndicationMethod;
+        m_indictionMethodToSubscribeTo = nx::network::stun::kEveryIndicationMethod;
     }
 
     template<typename Func>
@@ -241,7 +241,7 @@ private:
     nx::utils::Url m_serverUrl;
     nx::utils::SyncQueue<int /*dummy*/> m_reconnectEvents;
     nx::utils::SyncQueue<RequestResult> m_requestResult;
-    nx::utils::SyncQueue<nx::stun::Message> m_indicationsReceived;
+    nx::utils::SyncQueue<nx::network::stun::Message> m_indicationsReceived;
     RequestResult m_prevRequestResult;
     const int m_testMethodNumber = stun::MethodType::userMethod + 1;
     int m_indictionMethodToSubscribeTo = stun::MethodType::userMethod + 1;
@@ -289,9 +289,9 @@ private:
 
     void sendResponse(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message request)
+        nx::network::stun::Message request)
     {
-        nx::stun::Message response(
+        nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
                 request.header.method,
@@ -310,7 +310,7 @@ private:
     {
         return m_client.setIndicationHandler(
             m_testMethodNumber + 1,
-            [](nx::stun::Message) {},
+            [](nx::network::stun::Message) {},
             this);
     }
 
@@ -319,7 +319,7 @@ private:
         m_reconnectEvents.push(0);
     }
 
-    void saveIndication(nx::stun::Message indication)
+    void saveIndication(nx::network::stun::Message indication)
     {
         m_indicationsReceived.push(std::move(indication));
     }

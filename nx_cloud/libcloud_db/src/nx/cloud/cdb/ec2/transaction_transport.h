@@ -49,7 +49,7 @@ public:
         const nx::String& systemId,
         const ::ec2::ApiPeerData& localPeer,
         const SocketAddress& remotePeerEndpoint,
-        const nx_http::Request& request);
+        const nx::network::http::Request& request);
     virtual ~TransactionTransport();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -65,7 +65,7 @@ public:
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
     void receivedTransaction(
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         const QnByteArrayConstRef& tranData);
 
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);

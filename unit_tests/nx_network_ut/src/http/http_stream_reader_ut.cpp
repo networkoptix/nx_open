@@ -38,7 +38,7 @@ TEST(HttpStreamReader, parsingRequest)
 
     for (int dataStep = 1; dataStep < 16 * 1024; dataStep <<= 1)
     {
-        nx_http::HttpStreamReader streamReader;
+        nx::network::http::HttpStreamReader streamReader;
         for (int pos = 0; pos < sourceDataStream.size(); )
         {
             size_t bytesProcessed = 0;
@@ -52,19 +52,19 @@ TEST(HttpStreamReader, parsingRequest)
         }
 
         //TODO #ak validate parsed request
-        ASSERT_EQ(streamReader.state(), nx_http::HttpStreamReader::messageDone);
-        ASSERT_EQ(streamReader.message().type, nx_http::MessageType::request);
+        ASSERT_EQ(streamReader.state(), nx::network::http::HttpStreamReader::messageDone);
+        ASSERT_EQ(streamReader.message().type, nx::network::http::MessageType::request);
         ASSERT_TRUE(streamReader.message().request->messageBody.isEmpty());
     }
 
-    //nx_http::HttpStreamReader streamReader;
+    //nx::network::http::HttpStreamReader streamReader;
     //size_t bytesProcessed = 0;
     //ASSERT_TRUE( streamReader.parseBytes(
     //    QByteArray::fromRawData(requestStr, sizeof(requestStr)-1),
     //    &bytesProcessed ) );
 
     //ASSERT_EQ( bytesProcessed, sizeof(requestStr)-1 );
-    //ASSERT_EQ( streamReader.state(), nx_http::HttpStreamReader::messageDone );
+    //ASSERT_EQ( streamReader.state(), nx::network::http::HttpStreamReader::messageDone );
 }
 
 TEST(HttpStreamReader, MultipleMessages)
@@ -318,7 +318,7 @@ TEST(HttpStreamReader, MultipleMessages)
     int requestNumber = 0;
     for (TestResponseData& msgData : messagesToParse)
     {
-        sourceDataStream += "HTTP/1.1 " + nx::Buffer::number(msgData.statusCode) + " " + nx_http::StatusCode::toString(msgData.statusCode) + "\r\n";
+        sourceDataStream += "HTTP/1.1 " + nx::Buffer::number(msgData.statusCode) + " " + nx::network::http::StatusCode::toString(msgData.statusCode) + "\r\n";
         sourceDataStream += msgData.headers;
         sourceDataStream += "Test-Request-Number: " + nx::Buffer::number(requestNumber++) + "\r\n";
         msgData.chunked = msgData.headers.indexOf("Transfer-Encoding: chunked") != -1;
@@ -330,7 +330,7 @@ TEST(HttpStreamReader, MultipleMessages)
 
     for (int dataStep = 1; dataStep < 16 * 1024; dataStep <<= 1)
     {
-        nx_http::HttpStreamReader streamReader;
+        nx::network::http::HttpStreamReader streamReader;
         int messageNumber = 0;
         for (int pos = 0; pos < sourceDataStream.size(); )
         {
@@ -342,14 +342,14 @@ TEST(HttpStreamReader, MultipleMessages)
             //ASSERT_TRUE( bytesProcessed > 0 );
             pos += bytesProcessed;
             ASSERT_EQ(streamReader.currentMessageNumber(), messageNumber);
-            ASSERT_FALSE(streamReader.state() == nx_http::HttpStreamReader::parseError);
-            if (streamReader.state() == nx_http::HttpStreamReader::readingMessageBody)
+            ASSERT_FALSE(streamReader.state() == nx::network::http::HttpStreamReader::parseError);
+            if (streamReader.state() == nx::network::http::HttpStreamReader::readingMessageBody)
             {
-                ASSERT_EQ(streamReader.message().type, nx_http::MessageType::response);
+                ASSERT_EQ(streamReader.message().type, nx::network::http::MessageType::response);
             }
-            if (streamReader.state() != nx_http::HttpStreamReader::messageDone)
+            if (streamReader.state() != nx::network::http::HttpStreamReader::messageDone)
                 continue;
-            ASSERT_EQ(streamReader.message().type, nx_http::MessageType::response);
+            ASSERT_EQ(streamReader.message().type, nx::network::http::MessageType::response);
             ASSERT_TRUE(streamReader.message().response != nullptr);
             ASSERT_EQ(streamReader.message().response->statusLine.statusCode, messagesToParse[messageNumber].statusCode);
             const QByteArray msgBody = streamReader.fetchMessageBody();
@@ -357,7 +357,7 @@ TEST(HttpStreamReader, MultipleMessages)
             {
                 ASSERT_EQ(
                     messagesToParse[messageNumber].msgBody.size(),
-                    nx_http::getHeaderValue(streamReader.message().response->headers, "Content-Length").toInt());
+                    nx::network::http::getHeaderValue(streamReader.message().response->headers, "Content-Length").toInt());
                 ASSERT_TRUE(msgBody == messagesToParse[messageNumber].msgBody);
             }
             else
@@ -374,13 +374,13 @@ TEST(HttpStreamReader, MultipleMessages)
 class TestRequestData
 {
 public:
-    nx_http::StringType method;
+    nx::network::http::StringType method;
     nx::Buffer headers;
     nx::Buffer msgBody;
     bool chunked;
 
     TestRequestData(
-        nx_http::StringType _method,
+        nx::network::http::StringType _method,
         nx::Buffer _headers,
         nx::Buffer _msgBody)
         :
@@ -398,7 +398,7 @@ TEST(HttpStreamReader, MultipleRequests)
     std::vector<TestRequestData> messagesToParse;
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n",
@@ -416,7 +416,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n"
@@ -426,7 +426,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n",
@@ -439,7 +439,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n"
@@ -449,7 +449,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Date: Wed, 15 Nov 1995 06:25:24 GMT\r\n"
         "Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT\r\n"
         "Content-Type: application/text\r\n",
@@ -461,7 +461,7 @@ TEST(HttpStreamReader, MultipleRequests)
 
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -475,7 +475,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -504,7 +504,7 @@ TEST(HttpStreamReader, MultipleRequests)
 
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Content-Type: text/html\r\n"
         "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2a378\"\r\n"
@@ -540,7 +540,7 @@ TEST(HttpStreamReader, MultipleRequests)
 
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Content-Type: text/html\r\n"
         "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2b700\"\r\n"
@@ -574,7 +574,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "Content-Type: text/html\r\n"
         "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2ca88\"\r\n"
@@ -608,7 +608,7 @@ TEST(HttpStreamReader, MultipleRequests)
     ));
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -622,7 +622,7 @@ TEST(HttpStreamReader, MultipleRequests)
 
 
     messagesToParse.push_back(TestRequestData(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
         "Content-Type: application/octet-stream\r\n"
         "runtime-guid: {cff70ae1-01af-4e84-ab4d-ed8a28fab3bb}\r\n"
@@ -666,7 +666,7 @@ TEST(HttpStreamReader, MultipleRequests)
     for (int dataStep = 1; dataStep < (sourceDataStream.size() * 2); dataStep <<= 1)
         //for( int dataStep = 1; dataStep < sourceDataStream.size(); ++dataStep )
     {
-        nx_http::HttpStreamReader streamReader;
+        nx::network::http::HttpStreamReader streamReader;
         int messageNumber = 0;
         for (int pos = 0; pos < sourceDataStream.size(); )
         {
@@ -678,14 +678,14 @@ TEST(HttpStreamReader, MultipleRequests)
             //ASSERT_TRUE( bytesProcessed > 0 );
             pos += bytesProcessed;
             ASSERT_EQ(streamReader.currentMessageNumber(), messageNumber);
-            ASSERT_FALSE(streamReader.state() == nx_http::HttpStreamReader::parseError);
-            if (streamReader.state() == nx_http::HttpStreamReader::readingMessageBody)
+            ASSERT_FALSE(streamReader.state() == nx::network::http::HttpStreamReader::parseError);
+            if (streamReader.state() == nx::network::http::HttpStreamReader::readingMessageBody)
             {
-                ASSERT_EQ(streamReader.message().type, nx_http::MessageType::request);
+                ASSERT_EQ(streamReader.message().type, nx::network::http::MessageType::request);
             }
-            if (streamReader.state() != nx_http::HttpStreamReader::messageDone)
+            if (streamReader.state() != nx::network::http::HttpStreamReader::messageDone)
                 continue;
-            ASSERT_EQ(streamReader.message().type, nx_http::MessageType::request);
+            ASSERT_EQ(streamReader.message().type, nx::network::http::MessageType::request);
             ASSERT_TRUE(streamReader.message().request != nullptr);
             ASSERT_EQ(streamReader.message().request->requestLine.method, messagesToParse[messageNumber].method);
             const QByteArray msgBody = streamReader.fetchMessageBody();
@@ -693,7 +693,7 @@ TEST(HttpStreamReader, MultipleRequests)
             {
                 ASSERT_EQ(
                     messagesToParse[messageNumber].msgBody.size(),
-                    nx_http::getHeaderValue(streamReader.message().request->headers, "Content-Length").toInt());
+                    nx::network::http::getHeaderValue(streamReader.message().request->headers, "Content-Length").toInt());
                 ASSERT_TRUE(msgBody == messagesToParse[messageNumber].msgBody);
             }
             else

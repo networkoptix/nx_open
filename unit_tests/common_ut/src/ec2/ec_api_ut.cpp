@@ -43,14 +43,14 @@ public:
         m_maxSimultaneousRequestsCount = maxSimultaneousRequestsCount;
     }
 
-    void startAnotherClient( nx_http::AsyncHttpClientPtr httpClient )
+    void startAnotherClient( nx::network::http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 
         if( m_requestsStarted < maxRequestsToPerform() )
         {
-            nx_http::AsyncHttpClientPtr newClient = nx_http::AsyncHttpClient::create();
-            connect( newClient.get(), &nx_http::AsyncHttpClient::done, 
+            nx::network::http::AsyncHttpClientPtr newClient = nx::network::http::AsyncHttpClient::create();
+            connect( newClient.get(), &nx::network::http::AsyncHttpClient::done, 
                      this, &RequestsGenerator::startAnotherClient,
                      Qt::DirectConnection );
             newClient->setResponseReadTimeoutMs( 60*1000 );
@@ -75,7 +75,7 @@ public:
     {
         NX_ASSERT( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
         for( int i = 0; i < m_maxSimultaneousRequestsCount; ++i )
-            startAnotherClient( nx_http::AsyncHttpClientPtr() );
+            startAnotherClient( nx::network::http::AsyncHttpClientPtr() );
     }
 
     void wait()
@@ -133,7 +133,7 @@ private:
     int m_maxRequestsToPerform;
     std::mutex m_mutex;
     std::condition_variable m_cond;
-    std::list<nx_http::AsyncHttpClientPtr> m_runningRequests;
+    std::list<nx::network::http::AsyncHttpClientPtr> m_runningRequests;
 
     Request getRequestToPerform() const
     {
@@ -224,12 +224,12 @@ TEST_F( Ec2APITest, removeResource )
 
     for( int i = 0; i < 1; ++i )
     {
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         if( !httpClient.doPost( url, "application/json", data ) )
             return 1;
 
         int statusCode = httpClient.response()->statusLine.statusCode;
-        if( statusCode != nx_http::StatusCode::ok )
+        if( statusCode != nx::network::http::StatusCode::ok )
             int x = 0;
     }
 

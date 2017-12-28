@@ -3,6 +3,7 @@
 #include "udp_server.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 UDPMessageResponseSender::UDPMessageResponseSender(
@@ -15,7 +16,7 @@ UDPMessageResponseSender::UDPMessageResponseSender(
 }
 
 void UDPMessageResponseSender::sendMessage(
-    nx::stun::Message message,
+    nx::network::stun::Message message,
     std::function<void(SystemError::ErrorCode)> handler)
 {
     m_udpServer->sendMessage(
@@ -62,4 +63,5 @@ void UDPMessageResponseSender::setInactivityTimeout(
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -26,7 +26,7 @@ public:
      */
     void enableDbBackup(const QString& dataDirectory);
 
-    nx_http::StatusCode::Value merge(
+    nx::network::http::StatusCode::Value merge(
         Qn::UserAccessData accessRights,
         const QnAuthSession& authSession,
         MergeSystemData data,
@@ -52,11 +52,11 @@ private:
 
     void saveBackupOfSomeLocalData();
 
-    nx_http::StatusCode::Value checkWhetherMergeIsPossible(
+    nx::network::http::StatusCode::Value checkWhetherMergeIsPossible(
         const MergeSystemData& data,
         QnJsonRestResult* result);
 
-    nx_http::StatusCode::Value mergeSystems(
+    nx::network::http::StatusCode::Value mergeSystems(
         Qn::UserAccessData accessRights,
         MergeSystemData data,
         QnJsonRestResult* result);
@@ -82,9 +82,9 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
-    bool isResponseOK(const nx_http::HttpClient& client);
+    bool isResponseOK(const nx::network::http::HttpClient& client);
 
-    nx_http::StatusCode::Value getClientResponse(const nx_http::HttpClient& client);
+    nx::network::http::StatusCode::Value getClientResponse(const nx::network::http::HttpClient& client);
 
     template <class ResultDataType>
     bool executeRequest(
@@ -95,7 +95,7 @@ private:
 
     void addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey);
 
-    nx_http::StatusCode::Value fetchModuleInformation(
+    nx::network::http::StatusCode::Value fetchModuleInformation(
         const nx::utils::Url &url,
         const QString& authenticationKey,
         QnModuleInformationWithAddresses* moduleInformation);

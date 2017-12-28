@@ -2,7 +2,9 @@
 
 #include "auth_tools.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 bool AuthInfoCache::addAuthorizationHeader(
     const nx::utils::Url& url,
@@ -35,9 +37,9 @@ bool AuthInfoCache::addAuthorizationHeader(
         authzData.url == url)
     {
         // Using already-known Authorization header.
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &request->headers,
-            nx_http::HttpHeader(
+            nx::network::http::HttpHeader(
                 header::Authorization::NAME,
                 authzData.authorizationHeader->serialized()));
         return true;
@@ -92,4 +94,6 @@ AuthInfoCache::AuthorizationCacheItem AuthInfoCache::getCachedAuthentication(
     return authzItem;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

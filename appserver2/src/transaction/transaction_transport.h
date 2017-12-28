@@ -22,7 +22,7 @@ public:
         const ApiPeerData& remotePeer,
         QSharedPointer<AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
@@ -137,7 +137,7 @@ public:
     }
 protected:
     virtual void fillAuthInfo(
-        const nx_http::AsyncHttpClientPtr& httpClient,
+        const nx::network::http::AsyncHttpClientPtr& httpClient,
         bool authByKey) override;
 
 private:

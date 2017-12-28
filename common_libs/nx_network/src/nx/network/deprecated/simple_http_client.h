@@ -32,7 +32,7 @@ QString NX_NETWORK_API toString( CLHttpStatus status );
 typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
 /**
- * This class is deprecated. Please, use nx_http::HttpClient or nx_http::AsyncHttpClient.
+ * This class is deprecated. Please, use nx::network::http::HttpClient or nx::network::http::AsyncHttpClient.
  */
 class NX_NETWORK_API CLSimpleHTTPClient
 {

@@ -186,31 +186,31 @@ ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult)
     }
 }
 
-nx_http::StatusCode::Value toHttpStatusCode(ResultCode resultCode)
+nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode)
 {
     switch (resultCode)
     {
         case ResultCode::ok:
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         case ResultCode::retryLater:
-            return nx_http::StatusCode::serviceUnavailable;
+            return nx::network::http::StatusCode::serviceUnavailable;
         case ResultCode::error:
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
         default:
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
     }
 }
 
-ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode)
+ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode)
 {
-    if (nx_http::StatusCode::isSuccessCode(statusCode))
+    if (nx::network::http::StatusCode::isSuccessCode(statusCode))
         return ResultCode::ok;
 
     switch (statusCode)
     {
-        case nx_http::StatusCode::serviceUnavailable:
+        case nx::network::http::StatusCode::serviceUnavailable:
             return ResultCode::retryLater;
-        case nx_http::StatusCode::internalServerError:
+        case nx::network::http::StatusCode::internalServerError:
             return ResultCode::error;
         default:
             return ResultCode::error;

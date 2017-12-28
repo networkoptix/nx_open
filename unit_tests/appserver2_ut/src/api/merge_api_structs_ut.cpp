@@ -217,7 +217,7 @@ public:
             &m_restConnectionProcessor);
 
         ASSERT_EQ("application/json", contentType);
-        ASSERT_EQ(nx_http::StatusCode::ok, httpStatusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, httpStatusCode);
 
         bool success = false;
         ApiIdData apiIdData = QJson::deserialized(resultBody, ApiIdData(), &success);
@@ -260,7 +260,7 @@ public:
             &m_restConnectionProcessor);
 
         ASSERT_EQ("application/json", contentType);
-        ASSERT_EQ(nx_http::StatusCode::ok, httpStatusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, httpStatusCode);
         ASSERT_FALSE(resultBody.isEmpty());
         ASSERT_FALSE(m_wasHandleQueryCalled);
         ASSERT_FALSE(m_wasHandleUpdateCalled);

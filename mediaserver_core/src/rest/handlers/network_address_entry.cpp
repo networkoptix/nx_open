@@ -24,12 +24,12 @@ static bool readExtraFields(QnNetworkAddressEntryList& entryList, bool addFromCo
     }
     const QByteArray data = netSettings.readAll();
 
-    nx_http::LineSplitter lineSplitter;
+    nx::network::http::LineSplitter lineSplitter;
     QnByteArrayConstRef line;
     size_t bytesRead = 0;
     size_t dataOffset = 0;
     QnNetworkAddressEntry* currentEntry = nullptr;
-    while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
+    while( lineSplitter.parseByLines( nx::network::http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
     {
         dataOffset += bytesRead;
 

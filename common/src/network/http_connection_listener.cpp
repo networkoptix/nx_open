@@ -27,7 +27,7 @@ QnHttpConnectionListener::~QnHttpConnectionListener()
     stop();
 }
 
-bool QnHttpConnectionListener::isProxy(const nx_http::Request& request)
+bool QnHttpConnectionListener::isProxy(const nx::network::http::Request& request)
 {
     return m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(commonModule(), request);
 }
@@ -38,7 +38,7 @@ bool QnHttpConnectionListener::needAuth() const
 }
 
 QnHttpConnectionListener::InstanceFunc QnHttpConnectionListener::findHandler(
-    const QByteArray& protocol, const nx_http::Request& request)
+    const QByteArray& protocol, const nx::network::http::Request& request)
 {
     if (isProxy(request))
         return m_proxyInfo.proxyHandler;

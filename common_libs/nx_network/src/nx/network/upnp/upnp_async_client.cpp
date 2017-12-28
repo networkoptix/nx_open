@@ -124,7 +124,7 @@ public:
 
 AsyncClient::~AsyncClient()
 {
-    std::set<nx_http::AsyncHttpClientPtr> httpClients;
+    std::set<nx::network::http::AsyncHttpClientPtr> httpClients;
     {
         QnMutexLocker lk(&m_mutex);
         std::swap(httpClients, m_httpClients);
@@ -169,7 +169,7 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
     const auto request = SOAP_REQUEST.arg(message.action).arg(service)
         .arg(params.join(lit("")));
 
-    auto complete = [this, url, callback](const nx_http::AsyncHttpClientPtr& ptr)
+    auto complete = [this, url, callback](const nx::network::http::AsyncHttpClientPtr& ptr)
     {
         {
             QnMutexLocker lk(&m_mutex);
@@ -205,10 +205,10 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
         callback(Message());
     };
 
-    const auto httpClient = nx_http::AsyncHttpClient::create();
+    const auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->addAdditionalHeader("SOAPAction", action.toUtf8());
     httpClient->setMessageBodyReadTimeoutMs(MESSAGE_BODY_READ_TIMEOUT_MS);
-    QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
+    QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         httpClient.get(), std::move(complete), Qt::DirectConnection);
 
     QnMutexLocker lk(&m_mutex);

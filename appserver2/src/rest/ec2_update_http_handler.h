@@ -75,7 +75,7 @@ public:
         QByteArray& /*contentType*/,
         const QnRestConnectionProcessor* /*owner*/) override
     {
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     }
 
     virtual int executePost(
@@ -89,7 +89,7 @@ public:
     {
         const ApiCommand::Value command = extractCommandFromPath(path);
         if (command == ApiCommand::NotDefined)
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
 
         const QByteArray requestContentType = srcBodyContentType.split(';')[0];
 
@@ -103,18 +103,18 @@ public:
         switch (processUpdateAsync(command, requestData, owner))
         {
             case ErrorCode::ok:
-                return nx_http::StatusCode::ok;
+                return nx::network::http::StatusCode::ok;
             case ErrorCode::forbidden:
                 resultBody.clear();
-                return nx_http::StatusCode::forbidden;
+                return nx::network::http::StatusCode::forbidden;
             default:
                 resultBody.clear();
-                return nx_http::StatusCode::internalServerError;
+                return nx::network::http::StatusCode::internalServerError;
         }
     }
 
 private:
-    nx_http::StatusCode::Value buildRequestData(
+    nx::network::http::StatusCode::Value buildRequestData(
         RequestData* requestData,
         const QByteArray& requestContentType,
         const QByteArray& body,
@@ -145,22 +145,22 @@ private:
                 *requestData = QnUbjson::deserialized<RequestData>(
                     body, RequestData(), outSuccess);
                 if (!*outSuccess) //< Ubjson deserialization error.
-                    return nx_http::StatusCode::invalidParameter;
+                    return nx::network::http::StatusCode::invalidParameter;
                 break;
             }
 
             default:
                 QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::InvalidParameter,
                     lit("Unsupported Content Type: \"%1\".").arg(QString(requestContentType)));
-                return nx_http::StatusCode::unsupportedMediaType;
+                return nx::network::http::StatusCode::unsupportedMediaType;
         }
 
         update_http_handler_detail::fixRequestDataIfNeeded(requestData);
 
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    nx_http::StatusCode::Value buildRequestDataFromJson(
+    nx::network::http::StatusCode::Value buildRequestDataFromJson(
         RequestData* requestData,
         const QByteArray& body,
         QByteArray* outResultBody,
@@ -174,7 +174,7 @@ private:
         {
             QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::InvalidParameter,
                 "Can't deserialize input Json data to destination object.");
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
 
         if (incompleteJsonValue)
@@ -230,7 +230,7 @@ private:
      * @return HTTP OK (200), having set outSuccess to true.
      */
     template<typename T = RequestData>
-    static nx_http::StatusCode::Value makeSuccess(
+    static nx::network::http::StatusCode::Value makeSuccess(
         const RequestData* requestData,
         QByteArray* outResultBody,
         bool* outSuccess)
@@ -243,7 +243,7 @@ private:
      * Sfinae: Called when RequestData provides getIdForMerging().
      */
     template<typename T = RequestData>
-    static nx_http::StatusCode::Value makeSuccessSfinae(
+    static nx::network::http::StatusCode::Value makeSuccessSfinae(
         const RequestData* requestData,
         QByteArray* outResultBody,
         bool* outSuccess,
@@ -252,14 +252,14 @@ private:
         ApiIdData apiIdData(requestData->getIdForMerging());
         QJson::serialize(apiIdData, outResultBody);
         *outSuccess = true;
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     /**
      * Sfinae: Called when RequestData does not provide getIdForMerging().
      */
     template<typename T = RequestData>
-    static nx_http::StatusCode::Value makeSuccessSfinae(
+    static nx::network::http::StatusCode::Value makeSuccessSfinae(
         const RequestData* /*requestData*/,
         QByteArray* outResultBody,
         bool* outSuccess,
@@ -267,14 +267,14 @@ private:
     {
         *outResultBody = "{}";
         *outSuccess = true;
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     /**
      * Sfinae wrapper.
      */
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
+    nx::network::http::StatusCode::Value buildRequestDataMergingIfNeeded(
         RequestData* requestData,
         const QJsonValue& incompleteJsonValue,
         QByteArray* outResultBody,
@@ -291,7 +291,7 @@ private:
      * merging for API parameters of exact type ApiIdData has no sence) - do not perform the merge.
      */
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
+    nx::network::http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
         RequestData* requestData,
         const QJsonValue& /*incompleteJsonValue*/,
         QByteArray* outResultBody,
@@ -309,7 +309,7 @@ private:
      * @param requestData In: potentially incomplete data. Out: merge result.
      */
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
+    nx::network::http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
         RequestData* requestData,
         const QJsonValue& incompleteJsonValue,
         QByteArray* outResultBody,
@@ -340,14 +340,14 @@ private:
             {
                 QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::Forbidden,
                     "Unable to retrieve existing object to merge with.");
-                return nx_http::StatusCode::forbidden;
+                return nx::network::http::StatusCode::forbidden;
             }
 
             default:
             {
                 QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::CantProcessRequest,
                     "Unable to retrieve existing object to merge with.");
-                return nx_http::StatusCode::internalServerError;
+                return nx::network::http::StatusCode::internalServerError;
             }
         }
 
@@ -359,7 +359,7 @@ private:
         {
             QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::CantProcessRequest,
                 "Unable to deserialize merged Json data to destination object.");
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
         }
 
         return makeSuccess(requestData, outResultBody, outSuccess);

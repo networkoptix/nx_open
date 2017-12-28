@@ -10,14 +10,14 @@ ListenRequest::ListenRequest():
 {
 }
 
-void ListenRequest::serializeAttributes(nx::stun::Message* const message)
+void ListenRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
     message->newAttribute<stun::extension::attrs::SystemId>(systemId);
     message->newAttribute<stun::extension::attrs::ServerId>(serverId);
     message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
-bool ListenRequest::parseAttributes(const nx::stun::Message& message)
+bool ListenRequest::parseAttributes(const nx::network::stun::Message& message)
 {
     if (!readEnumAttributeValue(
             message,
@@ -43,7 +43,7 @@ ListenResponse::ListenResponse():
 using TcpKeepAlive =
     stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive>;
 
-void ListenResponse::serializeAttributes(nx::stun::Message* const message)
+void ListenResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
     using namespace stun::extension;
 
@@ -54,11 +54,11 @@ void ListenResponse::serializeAttributes(nx::stun::Message* const message)
     if (trafficRelayUrl)
         message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
     message->newAttribute<attrs::StringList>(
-        nx::stun::extension::attrs::trafficRelayUrlList,
+        nx::network::stun::extension::attrs::trafficRelayUrlList,
         std::move(trafficRelayUrls));
 }
 
-bool ListenResponse::parseAttributes(const nx::stun::Message& message)
+bool ListenResponse::parseAttributes(const nx::network::stun::Message& message)
 {
     using namespace stun::extension;
 

@@ -32,10 +32,10 @@ public:
     ~QnUniversalTcpListener();
 
     void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
-    nx_http::HttpModManager* httpModManager() const;
-    virtual void applyModToRequest(nx_http::Request* request) override;
+    nx::network::http::HttpModManager* httpModManager() const;
+    virtual void applyModToRequest(nx::network::http::Request* request) override;
 
-    bool isAuthentificationRequired(nx_http::Request& request);
+    bool isAuthentificationRequired(nx::network::http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
 
     void setPreparedTcpSockets(std::vector<std::unique_ptr<AbstractStreamServerSocket>> sockets);
@@ -58,7 +58,7 @@ private:
     QnMutex m_mutex;
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
-    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
+    std::unique_ptr<nx::network::http::HttpModManager> m_httpModManager;
     //#define LISTEN_ON_UDT_SOCKET
 #if defined(LISTEN_ON_UDT_SOCKET)
     std::atomic<int> m_cloudSocketIndex{1};

@@ -32,7 +32,7 @@ protected:
 
     void parse()
     {
-        nx_http::Message message(nx_http::MessageType::request);
+        nx::network::http::Message message(nx::network::http::MessageType::request);
         ASSERT_TRUE(message.request->parse(m_serialized));
         ASSERT_TRUE(m_parsed.parse(message));
     }

@@ -1,5 +1,4 @@
-#ifndef cl_net_tools_1232
-#define cl_net_tools_1232
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QUdpSocket>
@@ -7,6 +6,8 @@
 
 #include <nx/network/socket_common.h>
 
+namespace nx {
+namespace network {
 
 static const int ping_timeout = 300;
 
@@ -124,4 +125,5 @@ QString NX_NETWORK_API getMacFromPrimaryIF();
 
 QSet<QString> NX_NETWORK_API getLocalIpV4AddressList();
 
-#endif //cl_net_tools_1232
+} // namespace network
+} // namespace nx

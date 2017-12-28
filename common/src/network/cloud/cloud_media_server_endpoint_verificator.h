@@ -31,11 +31,11 @@ private:
     const nx::String m_connectSessionId;
     SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;
     boost::optional<std::chrono::milliseconds> m_timeout;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     SocketAddress m_endpointToVerify;
     nx::network::AddressEntry m_targetHostAddress;
     nx::utils::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
 
     void onHttpRequestDone();
-    bool verifyHostResponse(nx_http::AsyncHttpClientPtr httpClient);
+    bool verifyHostResponse(nx::network::http::AsyncHttpClientPtr httpClient);
 };

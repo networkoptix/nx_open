@@ -180,7 +180,7 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraCon
         case CL_HTTP_AUTH_REQUIRED:
             return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
         default:
-            return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatus)));
+            return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)httpStatus)));
     }
 }
 

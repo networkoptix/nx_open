@@ -111,7 +111,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
     {
         network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder()
-                .setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
+                .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
         network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
@@ -227,20 +227,20 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     return systemServers;
 }
 
-std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
+std::tuple<nx::network::http::StatusCode::Value, data::ListeningPeers>
     MediatorFunctionalTest::getListeningPeers() const
 {
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     const auto urlStr =
         lm("http://%1%2").arg(httpEndpoint().toString())
         .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
     if (!httpClient.doGet(nx::utils::Url(urlStr)))
         return std::make_tuple(
-            nx_http::StatusCode::serviceUnavailable,
+            nx::network::http::StatusCode::serviceUnavailable,
             data::ListeningPeers());
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return std::make_tuple(
-            static_cast<nx_http::StatusCode::Value>(
+            static_cast<nx::network::http::StatusCode::Value>(
                 httpClient.response()->statusLine.statusCode),
             data::ListeningPeers());
 
@@ -249,7 +249,7 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
         responseBody += httpClient.fetchMessageBodyBuffer();
 
     return std::make_tuple(
-        nx_http::StatusCode::ok,
+        nx::network::http::StatusCode::ok,
         QJson::deserialized<data::ListeningPeers>(responseBody));
 }
 

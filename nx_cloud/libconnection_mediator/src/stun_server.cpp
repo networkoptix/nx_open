@@ -55,7 +55,7 @@ const std::vector<SocketAddress>& StunServer::endpoints() const
     return m_endpoints;
 }
 
-nx::stun::MessageDispatcher& StunServer::dispatcher()
+nx::network::stun::MessageDispatcher& StunServer::dispatcher()
 {
     return m_stunMessageDispatcher;
 }

@@ -113,14 +113,14 @@ protected:
         stun::UdpClient* client,
         int requestCount)
     {
-        std::list<nx::stun::Message> requestsToSend;
+        std::list<nx::network::stun::Message> requestsToSend;
 
         for (int i = 0; i < requestCount; ++i)
         {
-            nx::stun::Message requestMessage(
+            nx::network::stun::Message requestMessage(
                 stun::Header(
-                    nx::stun::MessageClass::request,
-                    nx::stun::bindingMethod));
+                    nx::network::stun::MessageClass::request,
+                    nx::network::stun::bindingMethod));
             m_expectedTransactionIDs.insert(requestMessage.header.transactionId);
             requestsToSend.push_back(std::move(requestMessage));
         }
@@ -171,10 +171,10 @@ private:
             return;
         }
 
-        nx::stun::Message response(
+        nx::network::stun::Message response(
             stun::Header(
-                nx::stun::MessageClass::successResponse,
-                nx::stun::bindingMethod,
+                nx::network::stun::MessageClass::successResponse,
+                nx::network::stun::bindingMethod,
                 message.header.transactionId));
         response.newAttribute<stun::attrs::Nonce>(kServerResponseNonce);
         connection->sendMessage(std::move(response), nullptr);
@@ -206,13 +206,13 @@ TEST_F(UdpClient, client_test_sync)
 
     for (int i = 0; i < REQUESTS_TO_SEND; ++i)
     {
-        nx::stun::Message requestMessage(
+        nx::network::stun::Message requestMessage(
             stun::Header(
-                nx::stun::MessageClass::request,
-                nx::stun::bindingMethod));
+                nx::network::stun::MessageClass::request,
+                nx::network::stun::bindingMethod));
 
         SystemError::ErrorCode errorCode = SystemError::noError;
-        nx::stun::Message response;
+        nx::network::stun::Message response;
         std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
             std::bind(
                 &stun::UdpClient::sendRequestTo,
@@ -254,13 +254,13 @@ TEST_F(UdpClient, client_retransmits_general)
     stun::UdpClient client;
     auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
-    nx::stun::Message requestMessage(
+    nx::network::stun::Message requestMessage(
         stun::Header(
-            nx::stun::MessageClass::request,
-            nx::stun::bindingMethod));
+            nx::network::stun::MessageClass::request,
+            nx::network::stun::bindingMethod));
 
     SystemError::ErrorCode errorCode = SystemError::noError;
-    nx::stun::Message response;
+    nx::network::stun::Message response;
     std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
         std::bind(
             &stun::UdpClient::sendRequestTo,
@@ -291,13 +291,13 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
 
     client.setRetransmissionTimeOut(std::chrono::milliseconds(100));
     client.setMaxRetransmissions(MAX_RETRANSMISSIONS);
-    nx::stun::Message requestMessage(
+    nx::network::stun::Message requestMessage(
         stun::Header(
-            nx::stun::MessageClass::request,
-            nx::stun::bindingMethod));
+            nx::network::stun::MessageClass::request,
+            nx::network::stun::bindingMethod));
 
     SystemError::ErrorCode errorCode = SystemError::noError;
-    nx::stun::Message response;
+    nx::network::stun::Message response;
     std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
         std::bind(
             &stun::UdpClient::sendRequestTo,
@@ -320,10 +320,10 @@ TEST_F(UdpClient, client_cancellation)
     auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::seconds(100));
-    nx::stun::Message requestMessage(
+    nx::network::stun::Message requestMessage(
         stun::Header(
-            nx::stun::MessageClass::request,
-            nx::stun::bindingMethod));
+            nx::network::stun::MessageClass::request,
+            nx::network::stun::bindingMethod));
 
     ignoreNextMessage(REQUESTS_TO_SEND);
 
@@ -331,7 +331,7 @@ TEST_F(UdpClient, client_cancellation)
     auto completionHandler =
         [&errorsReported](
             SystemError::ErrorCode errorCode,
-            nx::stun::Message /*response*/)
+            nx::network::stun::Message /*response*/)
         {
             NX_ASSERT(errorCode == SystemError::interrupted);
             ++errorsReported;
@@ -356,10 +356,10 @@ TEST_F(UdpClient, client_response_injection)
 
     const auto serverEndpoint = anyServerEndpoint();
 
-    nx::stun::Message requestMessage(
+    nx::network::stun::Message requestMessage(
         stun::Header(
-            nx::stun::MessageClass::request,
-            nx::stun::bindingMethod));
+            nx::network::stun::MessageClass::request,
+            nx::network::stun::bindingMethod));
 
     //ignoring messages so that UDP client uses retransmits
     ignoreNextMessage(3);
@@ -403,10 +403,10 @@ TEST_F(UdpClient, client_response_injection)
     {
         if ((i == 0) || (nx::utils::random::number(0, 4) == 0))
         {
-            nx::stun::Message injectedResponseMessage(
+            nx::network::stun::Message injectedResponseMessage(
                 stun::Header(
-                    nx::stun::MessageClass::successResponse,
-                    nx::stun::bindingMethod,
+                    nx::network::stun::MessageClass::successResponse,
+                    nx::network::stun::bindingMethod,
                     requestMessage.header.transactionId));
             injectedResponseMessage.newAttribute<stun::attrs::Nonce>("bad");
             const auto serializedMessage = MessageSerializer::serialized(injectedResponseMessage);

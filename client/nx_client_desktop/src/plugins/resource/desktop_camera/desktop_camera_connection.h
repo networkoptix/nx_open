@@ -35,14 +35,14 @@ protected:
 private:
     void terminatedSleep(int sleep);
     QSharedPointer<AbstractStreamSocket> takeSocketFromHttpClient(
-        std::unique_ptr<nx_http::HttpClient>& httpClient);
+        std::unique_ptr<nx::network::http::HttpClient>& httpClient);
 private:
     QnDesktopResource* m_owner;
     QnMediaServerResourcePtr m_server;
     QnUuid m_userId;
     std::shared_ptr<QnDesktopCameraConnectionProcessor> processor;
     QSharedPointer<AbstractStreamSocket> tcpSocket;
-    std::unique_ptr<nx_http::HttpClient> httpClient;
+    std::unique_ptr<nx::network::http::HttpClient> httpClient;
     QnMutex m_mutex;
 };
 

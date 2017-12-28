@@ -20,7 +20,7 @@ class MediaserverEndpointTesterBase:
 public:
     MediaserverEndpointTesterBase(
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher);
+        nx::network::stun::MessageDispatcher* dispatcher);
 
     void ping(const ConnectionStrongRef& connection, stun::Message message);
 
@@ -43,7 +43,7 @@ class MediaserverEndpointTester:
 public:
     MediaserverEndpointTester(
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher);
+        nx::network::stun::MessageDispatcher* dispatcher);
 
     virtual void pingServer(
         const SocketAddress& address,
@@ -52,7 +52,7 @@ public:
 
 private:
     QnMutex m_mutex;
-    std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
+    std::set<nx::network::http::AsyncHttpClientPtr> m_httpClients;
 };
 
 } // namespace hpm

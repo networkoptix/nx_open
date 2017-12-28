@@ -95,12 +95,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     if (resData.contains(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME))
     {
-        auto authScheme = nx_http::header::AuthScheme::fromString(
+        auto authScheme = nx::network::http::header::AuthScheme::fromString(
             resData.value<QString>(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME)
                 .toLatin1()
                 .constData());
 
-        if (authScheme != nx_http::header::AuthScheme::none)
+        if (authScheme != nx::network::http::header::AuthScheme::none)
             m_multiCodec.setPrefferedAuthScheme(authScheme);
     }
 
@@ -316,7 +316,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 
     CLSimpleHTTPClient http(
         m_onvifRes->getHostAddress(),
-        QUrl(m_onvifRes->getUrl()).port(nx_http::DEFAULT_HTTP_PORT),
+        QUrl(m_onvifRes->getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT),
         3000, //<  TODO: #dmishin move to constant
         m_onvifRes->getAuth());
 

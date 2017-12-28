@@ -48,13 +48,13 @@ public:
 
     //!Authenticates request on server side
     Qn::AuthResult authenticate(
-        const nx_http::Request& request,
-        nx_http::Response& response,
+        const nx::network::http::Request& request,
+        nx::network::http::Response& response,
         bool isProxy = false,
         Qn::UserAccessData* accessRights = 0,
-        nx_http::AuthMethod::Value* usedAuthMethod = 0);
+        nx::network::http::AuthMethod::Value* usedAuthMethod = 0);
 
-    nx_http::AuthMethodRestrictionList* restrictionList();
+    nx::network::http::AuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
     /*!
@@ -70,7 +70,7 @@ public:
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
-    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, Qn::UserAccessData* accessRights);
+    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx::network::http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
     /*!
     \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
@@ -78,7 +78,7 @@ public:
     Qn::AuthResult authenticateByUrl(
         const QByteArray& authRecord,
         const QByteArray& method,
-        nx_http::Response& response,
+        nx::network::http::Response& response,
         Qn::UserAccessData* accessRights = nullptr) const;
 
     bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
@@ -120,12 +120,12 @@ private:
     class UserDigestData
     {
     public:
-        nx_http::StringType ha1Digest;
-        nx_http::StringType realm;
-        nx_http::StringType cryptSha512Hash;
-        nx_http::StringType nxUserName;
+        nx::network::http::StringType ha1Digest;
+        nx::network::http::StringType realm;
+        nx::network::http::StringType cryptSha512Hash;
+        nx::network::http::StringType nxUserName;
 
-        void parse( const nx_http::Request& request );
+        void parse( const nx::network::http::Request& request );
         bool empty() const;
     };
 
@@ -134,24 +134,24 @@ private:
         \param userRes Can be NULL
     */
     void addAuthHeader(
-        nx_http::Response& responseHeaders,
+        nx::network::http::Response& responseHeaders,
         const QnUserResourcePtr& userRes,
         bool isProxy,
         bool isDigest = true);
     Qn::AuthResult doDigestAuth(
-        const nx_http::RequestLine& requestLine,
-        const nx_http::header::Authorization& authorization,
-        nx_http::Response& responseHeaders,
+        const nx::network::http::RequestLine& requestLine,
+        const nx::network::http::header::Authorization& authorization,
+        nx::network::http::Response& responseHeaders,
         bool isProxy,
         Qn::UserAccessData* accessRights);
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
-        const nx_http::header::Authorization& authorization,
-        nx_http::Response& responseHeaders,
+        const nx::network::http::header::Authorization& authorization,
+        nx::network::http::Response& responseHeaders,
         Qn::UserAccessData* accessRights);
 
     mutable QnMutex m_mutex;
-    nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
+    nx::network::http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
     nx::vms::auth::AbstractNonceProvider* m_timeBasedNonceProvider;
     nx::vms::auth::AbstractNonceProvider* m_nonceProvider;

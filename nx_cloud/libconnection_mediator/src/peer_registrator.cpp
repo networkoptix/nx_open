@@ -16,7 +16,7 @@ namespace hpm {
 PeerRegistrator::PeerRegistrator(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
-    nx::stun::MessageDispatcher* dispatcher,
+    nx::network::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool,
     AbstractRelayClusterClient* const relayClusterClient)
 :
@@ -130,7 +130,7 @@ void PeerRegistrator::bind(
             "Only tcp is allowed for bind request");
 
     auto serverConnection =
-        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+        std::dynamic_pointer_cast<nx::network::stun::ServerConnection>(connection);
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -175,7 +175,7 @@ void PeerRegistrator::listen(
         return completionHandler(api::ResultCode::badTransport, {});    //Only tcp is allowed for listen request
 
     auto serverConnection =
-        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+        std::dynamic_pointer_cast<nx::network::stun::ServerConnection>(connection);
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -338,7 +338,7 @@ void PeerRegistrator::clientBind(
         return reject(api::ResultCode::badRequest);
 
     auto peerId = std::move(requestData.originatingPeerID);
-    nx::stun::Message indication;
+    nx::network::stun::Message indication;
     std::vector<ConnectionWeakRef> listeningPeerConnections;
     {
         QnMutexLocker lk(&m_mutex);
@@ -393,7 +393,7 @@ void PeerRegistrator::sendListenResponse(
 void PeerRegistrator::sendClientBindIndications(
     const ConnectionStrongRef& connection)
 {
-    std::vector<nx::stun::Message> clientBindIndications;
+    std::vector<nx::network::stun::Message> clientBindIndications;
     {
         QnMutexLocker lk(&m_mutex);
         for (const auto& client: m_boundClients)
@@ -404,7 +404,7 @@ void PeerRegistrator::sendClientBindIndications(
         connection->sendMessage(std::move(indication));
 }
 
-nx::stun::Message PeerRegistrator::makeIndication(
+nx::network::stun::Message PeerRegistrator::makeIndication(
     const String& id,
     const ClientBindInfo& info) const
 {
@@ -415,7 +415,7 @@ nx::stun::Message PeerRegistrator::makeIndication(
     event.params = m_settings.connectionParameters();
     event.isPersistent = true;
 
-    nx::stun::Message indication(stun::Header(stun::MessageClass::indication, event.kMethod));
+    nx::network::stun::Message indication(stun::Header(stun::MessageClass::indication, event.kMethod));
     event.serialize(&indication);
     return indication;
 }

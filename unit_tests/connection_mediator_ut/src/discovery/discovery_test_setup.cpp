@@ -52,7 +52,7 @@ void DiscoveryTestSetup::onWebSocketAccepted(
 nx::utils::Url DiscoveryTestSetup::getUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(nx_http::kUrlSchemeName)
+        .setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_httpServer->serverAddress())
         .setPath(kTestPath);
 }
@@ -67,15 +67,15 @@ void DiscoveryTestSetup::stopHttpServer()
     m_httpServer.reset();
 }
 
-void DiscoveryTestSetup::registerWebSocketAcceptHandlerAt(const nx_http::StringType path)
+void DiscoveryTestSetup::registerWebSocketAcceptHandlerAt(const nx::network::http::StringType path)
 {
     using namespace std::placeholders;
 
-    m_httpServer->registerRequestProcessor<nx_http::server::handler::CreateTunnelHandler>(
+    m_httpServer->registerRequestProcessor<nx::network::http::server::handler::CreateTunnelHandler>(
         path,
         [this]()
         {
-            return std::make_unique<nx_http::server::handler::CreateTunnelHandler>(
+            return std::make_unique<nx::network::http::server::handler::CreateTunnelHandler>(
                 nx::network::websocket::kWebsocketProtocolName,
                 std::bind(&DiscoveryTestSetup::onUpgradedConnectionAccepted, this, _1));
         });

@@ -8,7 +8,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaCgiParameters::HanwhaCgiParameters(nx_http::StatusCode::Value statusCode):
+HanwhaCgiParameters::HanwhaCgiParameters(nx::network::http::StatusCode::Value statusCode):
     m_statusCode(statusCode)
 {
 
@@ -16,7 +16,7 @@ HanwhaCgiParameters::HanwhaCgiParameters(nx_http::StatusCode::Value statusCode):
 
 HanwhaCgiParameters::HanwhaCgiParameters(
     const nx::Buffer& rawBuffer,
-    nx_http::StatusCode::Value statusCode)
+    nx::network::http::StatusCode::Value statusCode)
     :
     m_statusCode(statusCode)
 
@@ -63,10 +63,10 @@ boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString
 
 bool HanwhaCgiParameters::isValid() const
 {
-    return m_isValid && nx_http::StatusCode::isSuccessCode(m_statusCode);
+    return m_isValid && nx::network::http::StatusCode::isSuccessCode(m_statusCode);
 }
 
-nx_http::StatusCode::Value HanwhaCgiParameters::statusCode() const
+nx::network::http::StatusCode::Value HanwhaCgiParameters::statusCode() const
 {
     return m_statusCode;
 }

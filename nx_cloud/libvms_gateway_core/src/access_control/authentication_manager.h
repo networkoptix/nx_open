@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -12,9 +7,15 @@
 
 #include <nx/utils/stree/stree_manager.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
+
 class AuthMethodRestrictionList;
-} // namespace nx_http
+
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 namespace cloud {
@@ -29,29 +30,29 @@ class StreeManager;
     \note Listens to user data change events
  */
 class AuthenticationManager:
-    public nx_http::server::AbstractAuthenticationManager
+    public nx::network::http::server::AbstractAuthenticationManager
 {
 public:
     AuthenticationManager(
-        const nx_http::AuthMethodRestrictionList& authRestrictionList,
+        const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         const nx::utils::stree::StreeManager& stree);
 
     virtual void authenticate(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
-        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
+        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
     static nx::String realm(); 
 
 private:
-    const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
+    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     const nx::utils::stree::StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
 
-    bool validateNonce(const nx_http::StringType& nonce);
+    bool validateNonce(const nx::network::http::StringType& nonce);
     void addWWWAuthenticateHeader(
-        boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
+        boost::optional<nx::network::http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();
 };
 

@@ -367,15 +367,15 @@ void Settings::loadConnectionParameters()
     m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kSend).toString(),
-            nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+            nx::network::http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
     m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kRead).toString(),
-            nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+            nx::network::http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
     m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
         nx::utils::parseTimerDuration(settings().value(
             tcp_reverse_http_timeouts::kBody).toString(),
-            nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+            nx::network::http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
 
     m_connectionParameters.connectionAckAwaitTimeout =
         nx::utils::parseTimerDuration(

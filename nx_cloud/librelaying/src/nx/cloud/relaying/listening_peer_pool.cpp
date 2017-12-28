@@ -276,7 +276,7 @@ void ListeningPeerPool::giveAwayConnection(
     notification.setClientEndpoint(clientInfo.endpoint);
     notification.setClientPeerName(clientInfo.peerName.c_str());
     auto openTunnelNotificationBuffer =
-        std::make_shared<nx_http::StringType>(notification.toHttpMessage().toString());
+        std::make_shared<nx::network::http::StringType>(notification.toHttpMessage().toString());
     auto connectionPtr = connectionContext->connection.get();
 
     auto context = std::make_shared<Context>();

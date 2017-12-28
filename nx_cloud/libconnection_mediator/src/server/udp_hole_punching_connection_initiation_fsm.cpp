@@ -183,7 +183,7 @@ bool UDPHolePunchingConnectionInitiationFsm::notifyListeningPeerAboutConnectRequ
     return true;
 }
 
-nx::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionRequestedIndication(
+nx::network::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionRequestedIndication(
     const ConnectionStrongRef& originatingPeerConnection,
     const api::ConnectRequest& connectRequest)
 {
@@ -209,7 +209,7 @@ nx::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionReque
     connectionRequestedEvent.connectionMethods =
         api::ConnectionMethod::udpHolePunching;
     connectionRequestedEvent.params = m_settings.connectionParameters();
-    nx::stun::Message indication(
+    nx::network::stun::Message indication(
         stun::Header(
             stun::MessageClass::indication,
             stun::extension::indications::connectionRequested));

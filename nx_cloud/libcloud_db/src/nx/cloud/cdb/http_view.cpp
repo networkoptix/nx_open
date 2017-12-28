@@ -48,7 +48,7 @@ HttpView::HttpView(
     if (settings.http().connectionInactivityPeriod > std::chrono::milliseconds::zero())
     {
         m_multiAddressHttpServer.forEachListener(
-            [&settings](nx_http::HttpStreamSocketServer* server)
+            [&settings](nx::network::http::HttpStreamSocketServer* server)
             {
                 server->setConnectionInactivityTimeout(
                     settings.http().connectionInactivityPeriod);
@@ -60,7 +60,7 @@ HttpView::~HttpView()
 {
     // First of all, cancelling accepting new requests.
     m_multiAddressHttpServer.forEachListener(
-        [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
+        [](nx::network::http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
 
     NX_INFO(this, lm("Http server stopped"));
 }
@@ -201,12 +201,12 @@ void HttpView::registerApiHandlers(
     //---------------------------------------------------------------------------------------------
     // SystemMergeManager
     registerWriteOnlyRestHandler<data::SystemId>(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         kSystemsMergedToASpecificSystem,
         EntityType::system, DataActionType::insert,
         [this](
             const AuthorizationInfo& authzInfo,
-            const std::vector<nx_http::StringType>& restPathParams,
+            const std::vector<nx::network::http::StringType>& restPathParams,
             data::SystemId inputData,
             std::function<void(api::ResultCode)> completionHandler)
         {
@@ -243,14 +243,14 @@ void HttpView::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
-        nx_http::Method::get,
+        nx::network::http::Method::get,
         kEstablishEc2P2pTransactionConnectionPath,
         &ec2::ConnectionManager::createWebsocketTransactionConnection,
         ec2ConnectionManager);
 
     registerHttpHandler(
         //api::kPushEc2TransactionPath,
-        nx_http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
+        nx::network::http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
@@ -372,7 +372,7 @@ void HttpView::registerHttpHandler(
 
 template<typename ManagerType>
 void HttpView::registerHttpHandler(
-    nx_http::Method::ValueType method,
+    nx::network::http::Method::ValueType method,
     const char* handlerPath,
     typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
     ManagerType* manager)
@@ -399,7 +399,7 @@ class WriteOnlyRestHandler:
 public:
     //using HandlerFunc =
     //    void(const AuthorizationInfo& authzInfo,
-    //        const std::vector<nx_http::StringType>& restPathParams,
+    //        const std::vector<nx::network::http::StringType>& restPathParams,
     //        Input inputData,
     //        std::function<void(api::ResultCode)> completionHandler);
 
@@ -435,7 +435,7 @@ private:
 
 template<typename InputData, typename HandlerType>
 void HttpView::registerWriteOnlyRestHandler(
-    nx_http::Method::ValueType method,
+    nx::network::http::Method::ValueType method,
     const char* handlerPath,
     EntityType entityType,
     DataActionType dataActionType,

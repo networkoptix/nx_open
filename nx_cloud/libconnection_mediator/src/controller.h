@@ -22,7 +22,7 @@ class Controller
 public:
     Controller(
         const conf::Settings& settings,
-        nx::stun::MessageDispatcher* stunMessageDispatcher);
+        nx::network::stun::MessageDispatcher* stunMessageDispatcher);
 
     PeerRegistrator& listeningPeerRegistrator();
     const PeerRegistrator& listeningPeerRegistrator() const;

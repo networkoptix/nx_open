@@ -53,12 +53,12 @@ QString QnTcpListenerPrivate::pathIgnorePrefix;
 // QnTcpListener
 
 bool QnTcpListener::authenticate(
-    const nx_http::Request& request, nx_http::Response& response) const
+    const nx::network::http::Request& request, nx::network::http::Response& response) const
 {
     Q_D(const QnTcpListener);
     if (d->authDigest.isEmpty())
         return true;
-    nx_http::HttpHeaders::const_iterator authorizationIter = request.headers.find("Authorization");
+    nx::network::http::HttpHeaders::const_iterator authorizationIter = request.headers.find("Authorization");
     if(authorizationIter == request.headers.end())
         return false;
 
@@ -68,8 +68,8 @@ bool QnTcpListener::authenticate(
         rez = data[1] == d->authDigest;
     if (!rez)
     {
-        nx_http::insertOrReplaceHeader(&response.headers,
-            nx_http::HttpHeader("WWW-Authenticate", "Basic realm=\"Secure Area\""));
+        nx::network::http::insertOrReplaceHeader(&response.headers,
+            nx::network::http::HttpHeader("WWW-Authenticate", "Basic realm=\"Secure Area\""));
     }
     return rez;
 }

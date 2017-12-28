@@ -18,8 +18,8 @@ public:
     void setClientEndpoint(SocketAddress endpoint);
     const SocketAddress& clientEndpoint() const;
 
-    nx_http::Message toHttpMessage() const;
-    bool parse(const nx_http::Message& message);
+    nx::network::http::Message toHttpMessage() const;
+    bool parse(const nx::network::http::Message& message);
 
 private:
     nx::String m_clientPeerName;

@@ -59,7 +59,7 @@ private:
         nx::analytics::storage::Filter* filter,
         Qn::SerializationFormat* outputFormat);
 
-    nx_http::StatusCode::Value execute(
+    nx::network::http::StatusCode::Value execute(
         const nx::analytics::storage::Filter& filter,
         Qn::SerializationFormat outputFormat,
         QByteArray* body,

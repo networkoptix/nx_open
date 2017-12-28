@@ -22,8 +22,8 @@ class QnTCPConnectionProcessor;
 namespace ec2 {
 
 using ProcessorHandler = std::function<
-    nx_http::StatusCode::Value(
-        const nx_http::Request&,
+    nx::network::http::StatusCode::Value(
+        const nx::network::http::Request&,
         QnHttpConnectionListener* owner,
         QnJsonRestResult* result)>;
 
@@ -57,7 +57,7 @@ public:
 
     ~QnSimpleHttpConnectionListener();
 
-    bool needAuth(const nx_http::Request& request) const;
+    bool needAuth(const nx::network::http::Request& request) const;
     void disableAuthForPath(const QString& path);
 
 protected:

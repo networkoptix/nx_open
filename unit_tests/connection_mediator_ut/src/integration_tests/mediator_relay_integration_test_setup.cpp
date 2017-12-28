@@ -97,9 +97,9 @@ void MediatorRelayIntegrationTestSetup::SetUp()
     m_systemCredentials.key = system.authKey;
     m_systemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
 
-    m_stunClient = std::make_shared<nx::stun::AsyncClient>();
+    m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
     m_stunClient->connect(
-        nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName)
+        nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
         .setEndpoint(stunEndpoint()));
     m_serverConnection =
         std::make_unique<api::MediatorServerTcpConnection>(m_stunClient, this);

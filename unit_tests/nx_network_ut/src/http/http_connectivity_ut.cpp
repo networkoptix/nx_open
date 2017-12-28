@@ -13,7 +13,9 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/thread.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 static const nx::Buffer kPlayMessage("PLAY\r\n");
 static const nx::Buffer kTeardownMessage("TEARDOWN\r\n");
@@ -99,7 +101,7 @@ private:
 };
 
 class TakingSocketRestHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     TakingSocketRestHandler(ThreadStorage* threadStorage):
@@ -108,15 +110,15 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler) override
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        nx_http::ConnectionEvents events;
+        nx::network::http::ConnectionEvents events;
         events.onResponseHasBeenSent =
-            [threadStorage = m_threadStorage](nx_http::HttpServerConnection* connection)
+            [threadStorage = m_threadStorage](nx::network::http::HttpServerConnection* connection)
             {
                 threadStorage->add(std::make_unique<ResumableThread>(
                     [sock = connection->takeSocket()]() mutable
@@ -129,8 +131,8 @@ public:
             };
 
         completionHandler(
-            nx_http::RequestResult(
-                nx_http::StatusCode::ok,
+            nx::network::http::RequestResult(
+                nx::network::http::StatusCode::ok,
                 nullptr,
                 std::move(events)));
     }
@@ -149,7 +151,7 @@ protected:
     }
 
     std::unique_ptr<nx::network::BufferedStreamSocket> takeSocketFromHttpClient(
-        std::unique_ptr<nx_http::HttpClient>& httpClient)
+        std::unique_ptr<nx::network::http::HttpClient>& httpClient)
     {
         auto socket = std::make_unique<nx::network::BufferedStreamSocket>(httpClient->takeSocket());
         auto buffer = httpClient->fetchMessageBodyBuffer();
@@ -216,7 +218,7 @@ protected:
         ASSERT_TRUE(httpServer->bindAndListen())
             << "Failed to start test http server";
 
-        auto httpClient = std::make_unique<nx_http::HttpClient>();
+        auto httpClient = std::make_unique<nx::network::http::HttpClient>();
 
         const nx::utils::Url url(lit("%1://%2%3")
             .arg(scheme)
@@ -227,7 +229,7 @@ protected:
 
         std::unique_ptr<AbstractStreamSocket> tcpSocket;
         {
-            std::unique_ptr<nx_http::HttpClient> localHttpClient;
+            std::unique_ptr<nx::network::http::HttpClient> localHttpClient;
             tcpSocket = takeSocketFromHttpClient(httpClient);
             std::swap(httpClient, localHttpClient);
         }
@@ -307,12 +309,14 @@ private:
 
 TEST_F(TakingHttpSocketTest, SslSocket)
 {
-    launchTest(nx_http::kSecureUrlSchemeName);
+    launchTest(nx::network::http::kSecureUrlSchemeName);
 }
 
 TEST_F(TakingHttpSocketTest, TcpSocket)
 {
-    launchTest(nx_http::kUrlSchemeName);
+    launchTest(nx::network::http::kUrlSchemeName);
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

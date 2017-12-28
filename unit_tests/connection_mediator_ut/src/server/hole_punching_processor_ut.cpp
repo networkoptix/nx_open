@@ -438,7 +438,7 @@ protected:
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
             m_connectRequest,
-            nx::stun::Message(),
+            nx::network::stun::Message(),
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
@@ -452,7 +452,7 @@ protected:
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
             m_connectRequest,
-            nx::stun::Message(),
+            nx::network::stun::Message(),
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
@@ -472,7 +472,7 @@ private:
 
     conf::Settings m_settings;
     TestCloudDataProvider m_cloudData;
-    nx::stun::MessageDispatcher m_dispatcher;
+    nx::network::stun::MessageDispatcher m_dispatcher;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
     RelayClusterClient m_relayClusterClient;

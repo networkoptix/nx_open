@@ -13,7 +13,7 @@ namespace http {
 
 class GetListeningPeerListHandler
 :
-    public nx_http::AbstractFusionRequestHandler<void, data::ListeningPeers>
+    public nx::network::http::AbstractFusionRequestHandler<void, data::ListeningPeers>
 {
 public:
     static const char* kHandlerPath;
@@ -21,8 +21,8 @@ public:
     GetListeningPeerListHandler(const PeerRegistrator& registrator);
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo) override;
 
 private:

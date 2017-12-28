@@ -83,7 +83,7 @@ void LicenseWatcher::startUpdate()
         return; //< Nothing to update.
 
     stopHttpClient();
-    m_httpClient = std::make_unique<nx_http::AsyncClient>();
+    m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
 
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server)
@@ -96,7 +96,7 @@ void LicenseWatcher::startUpdate()
 
     auto requestBody = QJson::serialized(data);
     m_httpClient->setRequestBody(
-        std::make_unique<nx_http::BufferSource>(
+        std::make_unique<nx::network::http::BufferSource>(
             serializationFormatToHttpContentType(Qn::JsonFormat),
             std::move(requestBody)));
 
@@ -107,8 +107,8 @@ void LicenseWatcher::startUpdate()
             NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");
             const auto scopeGuard = makeScopeGuard([this](){ stopHttpClient(); });
 
-            nx_http::AsyncClient::State state = m_httpClient->state();
-            if (state == nx_http::AsyncClient::State::sFailed)
+            nx::network::http::AsyncClient::State state = m_httpClient->state();
+            if (state == nx::network::http::AsyncClient::State::sFailed)
             {
                 NX_WARNING(this,
                     lm("Can't update license list. HTTP request to the license server failed: %1")
@@ -117,7 +117,7 @@ void LicenseWatcher::startUpdate()
             }
 
             const int statusCode = m_httpClient->response()->statusLine.statusCode;
-            if (statusCode != nx_http::StatusCode::ok)
+            if (statusCode != nx::network::http::StatusCode::ok)
             {
                 NX_WARNING(this, lm("Can't read response from the license server. Http error code %1")
                     .arg(statusCode));

@@ -54,10 +54,10 @@ namespace nx_hls
         virtual ~QnHttpLiveStreamingProcessor();
 
         /** Processes request, generates and sends response asynchronously. */
-        void processRequest(const nx_http::Request& request);
+        void processRequest(const nx::network::http::Request& request);
         void prepareResponse(
-            const nx_http::Request& request,
-            nx_http::Response* const response);
+            const nx::network::http::Request& request,
+            nx::network::http::Response* const response);
 
         static void setMinPlayListSizeToStartStreaming(size_t value);
 
@@ -91,43 +91,43 @@ namespace nx_hls
         /*!
             In case of success, adds Content-Type, Content-Length headers to \a response
         */
-        nx_http::StatusCode::Value getRequestedFile( const nx_http::Request& request, nx_http::Response* const response );
-        void sendResponse( const nx_http::Response& response );
+        nx::network::http::StatusCode::Value getRequestedFile( const nx::network::http::Request& request, nx::network::http::Response* const response );
+        void sendResponse( const nx::network::http::Response& response );
         /*!
             \return false, if no more data to send (reached end of file)
         */
         bool prepareDataToSend();
-        nx_http::StatusCode::Value getPlaylist(
-            const nx_http::Request& request,
+        nx::network::http::StatusCode::Value getPlaylist(
+            const nx::network::http::Request& request,
             const QString& requestFileExtension,
             const QnSecurityCamResourcePtr& camResource,
             const Qn::UserAccessData& accessRights,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            nx::network::http::Response* const response );
         //!Generates variant playlist (containing references to other playlists providing different qualities)
-        nx_http::StatusCode::Value getVariantPlaylist(
+        nx::network::http::StatusCode::Value getVariantPlaylist(
             HLSSession* session,
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
             QByteArray* serializedPlaylist );
         //!Generates playlist with chunks inside
-        nx_http::StatusCode::Value getChunkedPlaylist(
+        nx::network::http::StatusCode::Value getChunkedPlaylist(
             HLSSession* const session,
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             QByteArray* serializedPlaylist );
-        nx_http::StatusCode::Value getResourceChunk(
-            const nx_http::Request& request,
+        nx::network::http::StatusCode::Value getResourceChunk(
+            const nx::network::http::Request& request,
             const QStringRef& uniqueResourceID,
             const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            nx::network::http::Response* const response );
 
-        nx_http::StatusCode::Value createSession(
+        nx::network::http::StatusCode::Value createSession(
             const Qn::UserAccessData& accessRight,
             const QString& requestedPlaylistPath,
             const QString& sessionID,

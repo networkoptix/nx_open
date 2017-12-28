@@ -50,7 +50,7 @@ private:
         const QAuthenticator& auth);
 
     void initListenerUnsafe();
-    nx_http::AsyncHttpClientPtr createHttpClient() const;
+    nx::network::http::AsyncHttpClientPtr createHttpClient() const;
 
     void doNextReceiveUnsafe();
     void receiveFromCallback(
@@ -62,7 +62,7 @@ private:
     bool isDeviceSupported(const DeviceInfo& deviceInfo) const;
     void handleDeviceInfoResponseUnsafe(
         const SocketAddress& senderAddress,
-        nx_http::AsyncHttpClientPtr httpClient);
+        nx::network::http::AsyncHttpClientPtr httpClient);
 
     void cleanUpEndpointInfoUnsafe(const SocketAddress& endpoint);
 
@@ -72,7 +72,7 @@ private:
     std::unique_ptr<nx::network::UDPSocket> m_receiveSocket;
     nx::Buffer m_receiveBuffer;
 
-    std::unordered_map<SocketAddress, nx_http::AsyncHttpClientPtr> m_httpClients;
+    std::unordered_map<SocketAddress, nx::network::http::AsyncHttpClientPtr> m_httpClients;
     std::unordered_map<SocketAddress, TimestampedDeviceInfo> m_deviceInfoCache;
     std::set<SocketAddress> m_requestsInProgress;
     bool m_terminated;

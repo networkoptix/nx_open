@@ -43,7 +43,7 @@ public:
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
-    virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) override;
+    virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
 protected:

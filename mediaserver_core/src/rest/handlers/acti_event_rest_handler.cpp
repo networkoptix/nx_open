@@ -29,25 +29,25 @@ int QnActiEventRestHandler::executeGet(
 
     QStringList pathParts = path.split('/');
     if( pathParts.size() < 4 )
-        return nx_http::StatusCode::badRequest; //missing resource id
+        return nx::network::http::StatusCode::badRequest; //missing resource id
     QnUuid resourceID(pathParts[3]);
 
     QnResourcePtr res = owner->resourcePool()->getResourceById(resourceID);
     if( !res )
-        return nx_http::StatusCode::notFound;
+        return nx::network::http::StatusCode::notFound;
 
     QnActiResourcePtr actiRes = res.dynamicCast<QnActiResource>();
     if( !actiRes )
-        return nx_http::StatusCode::notImplemented;
+        return nx::network::http::StatusCode::notImplemented;
 
     actiRes->cameraMessageReceived( path, params );
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnActiEventRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray& /*srcBodyContentType*/, QByteArray &, QByteArray &, const QnRestConnectionProcessor*)
 {
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 #endif // #ifdef ENABLE_ACTI

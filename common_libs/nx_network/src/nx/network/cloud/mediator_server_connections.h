@@ -120,6 +120,8 @@ protected:
         RequestData requestData,
         CompletionHandlerType completionHandler)
     {
+        using namespace nx::network;
+
         stun::Message request(stun::Header(stun::MessageClass::request, RequestData::kMethod));
         requestData.serialize(&request);
 
@@ -139,14 +141,14 @@ private:
     AbstractCloudSystemCredentialsProvider* m_connector;
 };
 
-typedef MediatorServerConnection<stun::UdpClient> MediatorServerUdpConnection;
+typedef MediatorServerConnection<network::stun::UdpClient> MediatorServerUdpConnection;
 
 class NX_NETWORK_API MediatorServerTcpConnection:
-    public MediatorServerConnection<stun::AsyncClientUser>
+    public MediatorServerConnection<network::stun::AsyncClientUser>
 {
 public:
     MediatorServerTcpConnection(
-        std::shared_ptr<nx::stun::AbstractAsyncClient> stunClient,
+        std::shared_ptr<nx::network::stun::AbstractAsyncClient> stunClient,
         AbstractCloudSystemCredentialsProvider* connector);
 
     virtual ~MediatorServerTcpConnection() override;

@@ -46,13 +46,13 @@ public:
     virtual QnResourcePtr findResByName(const QByteArray& nxUserName) const override;
     virtual Qn::AuthResult authorize(
         const QnResourcePtr& res,
-        const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader,
-        nx_http::HttpHeaders* const responseHeaders) override;
+        const nx::network::http::Method::ValueType& method,
+        const nx::network::http::header::Authorization& authorizationHeader,
+        nx::network::http::HttpHeaders* const responseHeaders) override;
     virtual std::tuple<Qn::AuthResult, QnResourcePtr> authorize(
-        const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader,
-        nx_http::HttpHeaders* const responseHeaders) override;
+        const nx::network::http::Method::ValueType& method,
+        const nx::network::http::header::Authorization& authorizationHeader,
+        nx::network::http::HttpHeaders* const responseHeaders) override;
 
     void clear();
 
@@ -72,27 +72,27 @@ private:
     mutable QnWaitCondition m_cond;
     /** map<pair<username, nonce>, auth_data>. */
     std::map<
-        std::pair<nx_http::StringType, nx_http::BufferType>,
+        std::pair<nx::network::http::StringType, nx::network::http::BufferType>,
         CloudAuthenticationData> m_authorizationCache;
     QElapsedTimer m_monotonicClock;
     /** set<pair<username, nonce>, auth_data>. */
-    std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
+    std::set<std::pair<nx::network::http::StringType, nx::network::http::BufferType>> m_requestInProgress;
 
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
-        const nx_http::StringType& userName) const;
+        const nx::network::http::StringType& userName) const;
     void fetchAuthorizationFromCloud(
         QnMutexLockerBase* const lk,
-        const nx_http::StringType& userid,
-        const nx_http::StringType& cloudNonce);
+        const nx::network::http::StringType& userid,
+        const nx::network::http::StringType& cloudNonce);
     std::tuple<Qn::AuthResult, QnResourcePtr> authorizeWithCacheItem(
         QnMutexLockerBase* const lock,
         const CloudAuthenticationData& cacheItem,
-        const nx_http::StringType& cloudNonce,
-        const nx_http::StringType& nonceTrailer,
-        nx_http::HttpHeaders* const responseHeaders,
-        const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader) const;
+        const nx::network::http::StringType& cloudNonce,
+        const nx::network::http::StringType& nonceTrailer,
+        nx::network::http::HttpHeaders* const responseHeaders,
+        const nx::network::http::Method::ValueType& method,
+        const nx::network::http::header::Authorization& authorizationHeader) const;
 
     void cloudBindingStatusChanged(bool boundToCloud);
 };

@@ -6,19 +6,19 @@
  * Sends specified buffer forever.
  */
 class RepeatingBufferSender:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
-    RepeatingBufferSender(const nx_http::StringType& mimeType, nx::Buffer buffer);
+    RepeatingBufferSender(const nx::network::http::StringType& mimeType, nx::Buffer buffer);
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler) override;
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
-    const nx_http::StringType m_mimeType;
+    const nx::network::http::StringType m_mimeType;
     nx::Buffer m_buffer;
 };

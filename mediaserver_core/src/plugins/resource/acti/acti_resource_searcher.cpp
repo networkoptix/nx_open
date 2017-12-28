@@ -126,10 +126,10 @@ QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const nx::utils::Url& url)
     {
         if (!m_httpInProgress.contains(url.host()))
         {
-            auto request = nx_http::AsyncHttpClient::create();
+            auto request = nx::network::http::AsyncHttpClient::create();
 
             connect(
-                request.get(), &nx_http::AsyncHttpClient::done,
+                request.get(), &nx::network::http::AsyncHttpClient::done,
                 this, &QnActiResourceSearcher::at_httpConnectionDone,
                 Qt::DirectConnection );
 
@@ -184,7 +184,7 @@ void QnActiResourceSearcher::processDeviceXml(
         result);
 }
 
-void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply)
+void QnActiResourceSearcher::at_httpConnectionDone(nx::network::http::AsyncHttpClientPtr reply)
 {
     QnMutexLocker lock( &m_mutex );
 
@@ -235,7 +235,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
     nx::utils::Url urlCopy(
         lit("http://%1:%2")
             .arg(url.host())
-            .arg(url.port(nx_http::DEFAULT_HTTP_PORT)));
+            .arg(url.port(nx::network::http::DEFAULT_HTTP_PORT)));
 
     actiRes->setUrl(urlCopy.toString());
     actiRes->setDefaultAuth(auth);

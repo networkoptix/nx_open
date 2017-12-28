@@ -20,11 +20,11 @@ ConnectHandler::ConnectHandler(const conf::Settings& settings):
 }
 
 void ConnectHandler::processRequest(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer authInfo,
-    nx_http::Request request,
-    nx_http::Response* const response,
-    nx_http::RequestProcessedHandler completionHandler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler completionHandler)
 {
     static_cast<void>(authInfo);
     static_cast<void>(response);
@@ -35,7 +35,7 @@ void ConnectHandler::processRequest(
     {
         // No cloud address means direct IP
         if (!m_settings.cloudConnect().allowIpTarget)
-            return completionHandler(nx_http::StatusCode::forbidden);
+            return completionHandler(nx::network::http::StatusCode::forbidden);
 
         if (targetAddress.port == 0)
             targetAddress.port = m_settings.http().proxyTargetPort;
@@ -50,7 +50,7 @@ void ConnectHandler::processRequest(
         NX_LOGX(lm("Failed to set socket options. %1")
             .arg(SystemError::getLastOSErrorText()), cl_logINFO);
 
-        return completionHandler(nx_http::StatusCode::internalServerError);
+        return completionHandler(nx::network::http::StatusCode::internalServerError);
     }
 
     m_request = std::move(request);
@@ -61,7 +61,7 @@ void ConnectHandler::processRequest(
 
 void ConnectHandler::closeConnection(
     SystemError::ErrorCode /*closeReason*/,
-    nx_http::deprecated::AsyncMessagePipeline* /*connection*/)
+    nx::network::http::deprecated::AsyncMessagePipeline* /*connection*/)
 {
     m_connectionSocket.reset();
     m_targetSocket.reset();
@@ -115,7 +115,7 @@ void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
         .arg(socket).arg(SystemError::toString(error)), cl_logDEBUG1);
 
     const auto handler = std::move(m_completionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable);
+    handler(nx::network::http::StatusCode::serviceUnavailable);
 }
 
 void ConnectHandler::stream(Socket* source, Socket* target, Buffer* buffer)

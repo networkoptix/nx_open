@@ -23,7 +23,7 @@ namespace relay {
 
 template<typename ResultType>
 class GetHandler:
-    public nx_http::AbstractFusionRequestHandler<void, ResultType>
+    public nx::network::http::AbstractFusionRequestHandler<void, ResultType>
 {
 public:
     using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
@@ -37,12 +37,12 @@ private:
     FunctorType m_func;
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        const nx_http::Request& /*request*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        const nx::network::http::Request& /*request*/,
         nx::utils::stree::ResourceContainer /*authInfo*/) override
     {
         auto data = m_func();
-        this->requestCompleted(nx_http::FusionRequestResult(), std::move(data));
+        this->requestCompleted(nx::network::http::FusionRequestResult(), std::move(data));
     }
 };
 
@@ -64,7 +64,7 @@ View::View(
 View::~View()
 {
     m_multiAddressHttpServer->forEachListener(
-        [](nx_http::HttpStreamSocketServer* listener)
+        [](nx::network::http::HttpStreamSocketServer* listener)
         {
             listener->pleaseStopSync();
         });
@@ -77,14 +77,14 @@ void View::registerStatisticsApiHandlers(
 
     registerApiHandler<GetAllStatisticsHandler>(
         api::kRelayStatisticsMetricsPath,
-        nx_http::Method::get,
+        nx::network::http::Method::get,
         std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider));
 }
 
 void View::start()
 {
     m_multiAddressHttpServer->forEachListener(
-        &nx_http::HttpStreamSocketServer::setConnectionInactivityTimeout,
+        &nx::network::http::HttpStreamSocketServer::setConnectionInactivityTimeout,
         m_settings.http().connectionInactivityTimeout);
 
     if (!m_multiAddressHttpServer->listen(m_settings.http().tcpBacklogSize))
@@ -110,13 +110,13 @@ const View::MultiHttpServer& View::httpServer() const
 void View::registerApiHandlers()
 {
     registerApiHandler<relaying::BeginListeningHandler>(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         &m_controller->listeningPeerManager());
     registerApiHandler<view::CreateClientSessionHandler>(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         &m_controller->connectSessionManager());
     registerApiHandler<view::ConnectToPeerHandler>(
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta. Remove after 3.1 release.
@@ -126,16 +126,16 @@ void View::registerApiHandlers()
 void View::registerCompatibilityHandlers()
 {
     registerApiHandler<relaying::BeginListeningHandler>(
-        nx_http::Method::options,
+        nx::network::http::Method::options,
         &m_controller->listeningPeerManager());
     registerApiHandler<view::ConnectToPeerHandler>(
-        nx_http::Method::options,
+        nx::network::http::Method::options,
         &m_controller->connectSessionManager());
 }
 
 template<typename Handler, typename Arg>
 void View::registerApiHandler(
-    const nx_http::StringType& method,
+    const nx::network::http::StringType& method,
     Arg arg)
 {
     registerApiHandler<Handler, Arg>(Handler::kPath, method, std::move(arg));
@@ -144,7 +144,7 @@ void View::registerApiHandler(
 template<typename Handler, typename Arg>
 void View::registerApiHandler(
     const char* path,
-    const nx_http::StringType& method,
+    const nx::network::http::StringType& method,
     Arg arg)
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
@@ -166,7 +166,7 @@ void View::startAcceptor()
     }
 
     m_multiAddressHttpServer =
-        std::make_unique<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+        std::make_unique<nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>>(
             &m_authenticationManager,
             &m_httpMessageDispatcher,
             false,

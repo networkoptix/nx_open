@@ -5,7 +5,9 @@
 
 #include "m3u_playlist_converter.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace proxy {
 
@@ -53,8 +55,8 @@ std::unique_ptr<AbstractMessageBodyConverter>
         const nx::String& targetHost,
         const nx::String& contentType)
 {
-    if (contentType == nx_http::kApplicationMpegUrlMimeType ||
-        contentType == nx_http::kAudioMpegUrlMimeType)
+    if (contentType == nx::network::http::kApplicationMpegUrlMimeType ||
+        contentType == nx::network::http::kAudioMpegUrlMimeType)
     {
         return std::make_unique<M3uPlaylistConverter>(
             *m_urlConverter, proxyHost, targetHost);
@@ -65,4 +67,6 @@ std::unique_ptr<AbstractMessageBodyConverter>
 
 } // namespace proxy
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

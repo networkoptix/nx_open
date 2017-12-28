@@ -6,7 +6,9 @@
 
 #include "../http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace rest {
 
 namespace detail {
@@ -85,4 +87,6 @@ std::string substituteParameters(
 }
 
 } // namespace rest
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

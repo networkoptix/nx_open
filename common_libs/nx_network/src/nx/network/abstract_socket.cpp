@@ -5,6 +5,9 @@
 
 #include "aio/pollable.h"
 
+namespace nx {
+namespace network {
+
 //-------------------------------------------------------------------------------------------------
 // class AbstractSocket.
 
@@ -144,3 +147,6 @@ bool AbstractDatagramSocket::sendTo(
 {
     return sendTo(buf.constData(), buf.size(), foreignAddress);
 }
+
+} // namespace network
+} // namespace nx

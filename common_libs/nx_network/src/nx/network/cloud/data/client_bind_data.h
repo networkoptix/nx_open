@@ -19,8 +19,8 @@ public:
     std::list<SocketAddress> tcpReverseEndpoints;
 
     ClientBindRequest();
-    void serializeAttributes(nx::stun::Message* const message) override;
-    bool parseAttributes(const nx::stun::Message& message) override;
+    void serializeAttributes(nx::network::stun::Message* const message) override;
+    bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 class NX_NETWORK_API ClientBindResponse:
@@ -33,8 +33,8 @@ public:
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
 
     ClientBindResponse();
-    void serializeAttributes(nx::stun::Message* const message) override;
-    bool parseAttributes(const nx::stun::Message& message) override;
+    void serializeAttributes(nx::network::stun::Message* const message) override;
+    bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

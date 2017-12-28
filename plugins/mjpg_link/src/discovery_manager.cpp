@@ -74,7 +74,7 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
     if( url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME )
         return 0;
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     if( login )
         httpClient.setUserName( QLatin1String(login) );
     if( password )
@@ -83,8 +83,8 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
         return 0;
 
     //checking content-type
-    nx_http::MultipartContentParser multipartContentParser;
-    if( nx_http::strcasecmp(httpClient.contentType(), "image/jpeg") != 0 && //not a motion jpeg
+    nx::network::http::MultipartContentParser multipartContentParser;
+    if( nx::network::http::strcasecmp(httpClient.contentType(), "image/jpeg") != 0 && //not a motion jpeg
         !multipartContentParser.setContentType(httpClient.contentType()) )  //not a single jpeg
     {
         //inappropriate content-type

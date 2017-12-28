@@ -52,7 +52,7 @@ private:
     QMap<QString, CacheInfo> m_cachedXml;
     QMap<QString, CachedDevInfo> m_cachedDevInfo;
 
-    QMap<QString, nx_http::AsyncHttpClientPtr > m_httpInProgress;
+    QMap<QString, nx::network::http::AsyncHttpClientPtr > m_httpInProgress;
     QnMutex m_mutex;
 
     nx_upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
@@ -88,7 +88,7 @@ private:
     QString retreiveModel(const QString& model, const QString& serialNumber) const;
 
 private slots:
-    void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
+    void at_httpConnectionDone(nx::network::http::AsyncHttpClientPtr reply);
 
 private:
     QnUuid m_resTypeId;

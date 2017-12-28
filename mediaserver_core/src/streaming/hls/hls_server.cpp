@@ -98,15 +98,15 @@ namespace nx_hls
             //this should be done automatically by cache: should mark archive chunks as "uncachable"
     }
 
-    void QnHttpLiveStreamingProcessor::processRequest(const nx_http::Request& request)
+    void QnHttpLiveStreamingProcessor::processRequest(const nx::network::http::Request& request)
     {
-        nx_http::Response response;
+        nx::network::http::Response response;
         response.statusLine.version = request.requestLine.version;
 
         response.statusLine.statusCode = getRequestedFile(request, &response);
-        if (response.statusLine.statusCode == nx_http::StatusCode::forbidden)
+        if (response.statusLine.statusCode == nx::network::http::StatusCode::forbidden)
         {
-            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             m_state = sDone;
             return;
         }
@@ -117,8 +117,8 @@ namespace nx_hls
     }
 
     void QnHttpLiveStreamingProcessor::prepareResponse(
-        const nx_http::Request& request,
-        nx_http::Response* const response)
+        const nx::network::http::Request& request,
+        nx::network::http::Response* const response)
     {
         if (response->statusLine.reasonPhrase.isEmpty())
         {
@@ -132,12 +132,12 @@ namespace nx_hls
                 lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1();
 
         response->headers.emplace("Date", currentTimeInHttpFormat);
-        response->headers.emplace(nx_http::header::Server::NAME, nx_http::serverString());
+        response->headers.emplace(nx::network::http::header::Server::NAME, nx::network::http::serverString());
         response->headers.emplace("Cache-Control", "no-cache");
 
-        if (request.requestLine.version == nx_http::http_1_1)
+        if (request.requestLine.version == nx::network::http::http_1_1)
         {
-            if (nx_http::StatusCode::isSuccessCode(response->statusLine.statusCode) &&
+            if (nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode) &&
                 (response->headers.find("Transfer-Encoding") == response->headers.end()) &&
                 (response->headers.find("Content-Length") == response->headers.end()))
             {
@@ -145,8 +145,8 @@ namespace nx_hls
             }
             response->headers.emplace("Connection", "close");
         }
-        if (response->statusLine.statusCode == nx_http::StatusCode::notFound)
-            nx_http::insertOrReplaceHeader(&response->headers, nx_http::HttpHeader("Content-Length", "0"));
+        if (response->statusLine.statusCode == nx::network::http::StatusCode::notFound)
+            nx::network::http::insertOrReplaceHeader(&response->headers, nx::network::http::HttpHeader("Content-Length", "0"));
     }
 
     void QnHttpLiveStreamingProcessor::run()
@@ -235,9 +235,9 @@ namespace nx_hls
 
     } // namespace
 
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
-        const nx_http::Request& request,
-        nx_http::Response* const response )
+    nx::network::http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
+        const nx::network::http::Request& request,
+        nx::network::http::Response* const response )
     {
         //retreiving requested file name
         const QString& path = request.requestLine.url.path();
@@ -283,7 +283,7 @@ namespace nx_hls
         if (!resource)
         {
             NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
         }
 
         //parsing request parameters
@@ -303,7 +303,7 @@ namespace nx_hls
         {
             NX_LOG( lit("HLS. Requested resource %1 is not a camera").
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
         }
 
         //checking resource stream type. Only h.264 is OK for HLS
@@ -311,7 +311,7 @@ namespace nx_hls
         if( !camera )
         {
             NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
         QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame(
@@ -322,7 +322,7 @@ namespace nx_hls
             //video is not in h.264 format
             NX_LOG( lit("Error. HLS request to resource %1 with codec %2").
                 arg(camResource->getUniqueId()).arg(QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)), cl_logWARNING );
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
         if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
@@ -375,10 +375,10 @@ namespace nx_hls
         return StatusCode::notFound;
     }
 
-    void QnHttpLiveStreamingProcessor::sendResponse( const nx_http::Response& response )
+    void QnHttpLiveStreamingProcessor::sendResponse( const nx::network::http::Response& response )
     {
         //serializing response to internal buffer
-        nx_http::HttpHeaders::const_iterator it = response.headers.find( "Transfer-Encoding" );
+        nx::network::http::HttpHeaders::const_iterator it = response.headers.find( "Transfer-Encoding" );
         if( it != response.headers.end() && it->second == "chunked" )
             m_switchToChunkedTransfer = true;
         m_writeBuffer.clear();
@@ -426,21 +426,21 @@ namespace nx_hls
     const char* QnHttpLiveStreamingProcessor::mimeTypeByExtension(const QString& extension) const
     {
         if (extension.toLower() == lit("m3u8"))
-            return nx_http::kApplicationMpegUrlMimeType;
+            return nx::network::http::kApplicationMpegUrlMimeType;
 
-        return nx_http::kAudioMpegUrlMimeType;
+        return nx::network::http::kAudioMpegUrlMimeType;
     }
 
     typedef std::multimap<QString, QString> RequestParamsType;
 
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
-        const nx_http::Request& request,
+    nx::network::http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
+        const nx::network::http::Request& request,
         const QString& requestFileExtension,
         const QnSecurityCamResourcePtr& camResource,
         const Qn::UserAccessData& accessRights,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
-        nx_http::Response* const response)
+        nx::network::http::Response* const response)
     {
         std::multimap<QString, QString>::const_iterator chunkedParamIter = requestParams.find(StreamingParams::CHUNKED_PARAM_NAME);
 
@@ -482,7 +482,7 @@ namespace nx_hls
                 if (streamQuality == MEDIA_Quality_Low)
                 {
                     NX_LOG(lit("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1);
-                    return nx_http::StatusCode::notFound;
+                    return nx::network::http::StatusCode::notFound;
                 }
                 else if (streamQuality == MEDIA_Quality_Auto)
                 {
@@ -490,7 +490,7 @@ namespace nx_hls
                 }
             }
 
-            const nx_http::StatusCode::Value result = createSession(
+            const nx::network::http::StatusCode::Value result = createSession(
                 accessRights,
                 request.requestLine.url.path(),
                 sessionID,
@@ -499,7 +499,7 @@ namespace nx_hls
                 videoCamera,
                 streamQuality,
                 &session);
-            if (result != nx_http::StatusCode::ok)
+            if (result != nx::network::http::StatusCode::ok)
                 return result;
             if (!HLSSessionPool::instance()->add(session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS))
             {
@@ -510,7 +510,7 @@ namespace nx_hls
         auto requiredPermission = session->isLive()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
         if (!commonModule()->resourceAccessManager()->hasPermission(accessRights, camResource, requiredPermission))
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
 
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
@@ -526,19 +526,19 @@ namespace nx_hls
                 session, request, camResource, requestParams, &serializedPlaylist);
         }
 
-        if (response->statusLine.statusCode != nx_http::StatusCode::ok)
-            return static_cast<nx_http::StatusCode::Value>(response->statusLine.statusCode);
+        if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
+            return static_cast<nx::network::http::StatusCode::Value>(response->statusLine.statusCode);
 
         response->messageBody = serializedPlaylist;
         response->headers.emplace("Content-Type", mimeTypeByExtension(requestFileExtension));
         response->headers.insert(make_pair("Content-Length", QByteArray::number(response->messageBody.size())));
 
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getVariantPlaylist(
+    nx::network::http::StatusCode::Value QnHttpLiveStreamingProcessor::getVariantPlaylist(
         HLSSession* session,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& /*requestParams*/,
@@ -552,12 +552,12 @@ namespace nx_hls
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
         //if needed, adding proxy information to playlist url
-        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        nx::network::http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
         if( viaIter != request.headers.end() )
         {
-            nx_http::header::Via via;
+            nx::network::http::header::Via via;
             if( !via.parse( viaIter->second ) )
-                return nx_http::StatusCode::badRequest;
+                return nx::network::http::StatusCode::badRequest;
         }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
@@ -605,15 +605,15 @@ namespace nx_hls
         }
 
         if( playlist.playlists.empty() )
-            return nx_http::StatusCode::noContent;
+            return nx::network::http::StatusCode::noContent;
 
         *serializedPlaylist = playlist.toString();
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getChunkedPlaylist(
+    nx::network::http::StatusCode::Value QnHttpLiveStreamingProcessor::getChunkedPlaylist(
         HLSSession* const session,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& requestParams,
         QByteArray* serializedPlaylist)
@@ -633,14 +633,14 @@ namespace nx_hls
         {
             NX_LOG( lit("Got request to not available %1 quality of camera %2").
                 arg(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo")).arg(camResource->getUniqueId()), cl_logWARNING );
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
         }
 
         const size_t chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
         if( chunkList.empty() )   //no chunks generated
         {
             NX_LOG( lit("Failed to get chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
-            return nx_http::StatusCode::noContent;
+            return nx::network::http::StatusCode::noContent;
         }
 
         NX_LOG( lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
@@ -671,12 +671,12 @@ namespace nx_hls
         baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
 
         //if needed, adding proxy information to playlist url
-        nx_http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
+        nx::network::http::HttpHeaders::const_iterator viaIter = request.headers.find( "Via" );
         if( viaIter != request.headers.end() )
         {
-            nx_http::header::Via via;
+            nx::network::http::header::Via via;
             if( !via.parse( viaIter->second ) )
-                return nx_http::StatusCode::badRequest;
+                return nx::network::http::StatusCode::badRequest;
         }
 
         const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();
@@ -715,15 +715,15 @@ namespace nx_hls
         //playlist.allowCache = !session->isLive(); // TODO: #ak uncomment when done
 
         *serializedPlaylist = playlist.toString();
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
-        const nx_http::Request& request,
+    nx::network::http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
+        const nx::network::http::Request& request,
         const QStringRef& uniqueResourceID,
         const QnSecurityCamResourcePtr& /*camResource*/,
         const std::multimap<QString, QString>& requestParams,
-        nx_http::Response* const response )
+        nx::network::http::Response* const response )
     {
         HlsRequestParams params = readRequestParams(requestParams);
 
@@ -767,7 +767,7 @@ namespace nx_hls
         auto requiredPermission = currentChunkKey.live()
             ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
         if (!commonModule()->resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, requiredPermission))
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
 
 
         //streaming chunk
@@ -786,15 +786,15 @@ namespace nx_hls
             NX_LOG(lm("Could not get chunk %1 of resource %2 requested by %3")
                 .arg(request.requestLine.url.query()).arg(uniqueResourceID.toString())
                 .arg(remoteHostAddress().toString()), cl_logDEBUG1);
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
         }
         m_currentChunk = chunk;
 
         //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
         const auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
-        nx_http::header::AcceptEncodingHeader acceptEncoding(
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding(
             acceptEncodingHeaderIter == request.headers.end()
-            ? nx_http::StringType()
+            ? nx::network::http::StringType()
             : acceptEncodingHeaderIter->second);
 
         //in case of hls enabling caching of full chunk since it may be required by hls client
@@ -804,11 +804,11 @@ namespace nx_hls
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
         if( acceptEncoding.encodingIsAllowed("chunked")
             || (acceptEncodingHeaderIter == request.headers.end()
-                && request.requestLine.version == nx_http::http_1_1) )  //if no Accept-Encoding then it is supported by HTTP/1.1
+                && request.requestLine.version == nx::network::http::http_1_1) )  //if no Accept-Encoding then it is supported by HTTP/1.1
         {
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
-            response->statusLine.version = nx_http::http_1_1;
-            return nx_http::StatusCode::ok;
+            response->statusLine.version = nx::network::http::http_1_1;
+            return nx::network::http::StatusCode::ok;
         }
         else if( acceptEncoding.encodingIsAllowed("identity") )
         {
@@ -830,7 +830,7 @@ namespace nx_hls
                 {
                     response->headers.insert( make_pair(
                         "Content-Length",
-                        nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
+                        nx::network::http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
                 }
                 else
                 {
@@ -838,20 +838,20 @@ namespace nx_hls
                     response->headers.insert(make_pair("Transfer-Encoding", "identity"));
                 }
                 response->statusLine.version = request.requestLine.version; //do not require HTTP/1.1 here
-                return nx_http::StatusCode::ok;
+                return nx::network::http::StatusCode::ok;
             }
 
             //partial content request
-            response->statusLine.version = nx_http::http_1_1;   //Range is supported by HTTP/1.1
-            nx_http::header::Range range;
-            nx_http::header::ContentRange contentRange;
+            response->statusLine.version = nx::network::http::http_1_1;   //Range is supported by HTTP/1.1
+            nx::network::http::header::Range range;
+            nx::network::http::header::ContentRange contentRange;
             contentRange.instanceLength = (quint64)m_currentChunk->sizeInBytes();
             if( !range.parse( rangeIter->second ) || !range.validateByContentSize(m_currentChunk->sizeInBytes()) )
             {
                 response->headers.insert( make_pair( "Content-Range", contentRange.toString() ) );
-                response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(contentRange.rangeLength()) ) );
+                response->headers.insert( make_pair( "Content-Length", nx::network::http::StringType::number(contentRange.rangeLength()) ) );
                 m_chunkInputStream.reset();
-                return nx_http::StatusCode::rangeNotSatisfiable;
+                return nx::network::http::StatusCode::rangeNotSatisfiable;
             }
 
             //range is satisfiable
@@ -859,19 +859,19 @@ namespace nx_hls
                 contentRange.rangeSpec = range.rangeSpecList.front();
 
             response->headers.insert( make_pair( "Content-Range", contentRange.toString() ) );
-            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(contentRange.rangeLength()) ) );
+            response->headers.insert( make_pair( "Content-Length", nx::network::http::StringType::number(contentRange.rangeLength()) ) );
 
             static_cast<StreamingChunkInputStream*>(m_chunkInputStream.get())->setByteRange( contentRange );
-            return nx_http::StatusCode::partialContent;
+            return nx::network::http::StatusCode::partialContent;
         }
         else
         {
             m_chunkInputStream.reset();
-            return nx_http::StatusCode::notAcceptable;
+            return nx::network::http::StatusCode::notAcceptable;
         }
     }
 
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
+    nx::network::http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
         const Qn::UserAccessData& accessRights,
         const QString& requestedPlaylistPath,
         const QString& sessionID,
@@ -912,7 +912,7 @@ namespace nx_hls
                 if( !videoCamera->ensureLiveCacheStarted(quality, newHlsSession->targetDurationMS() * USEC_IN_MSEC) )
                 {
                     NX_LOG( lit("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                    return nx_http::StatusCode::noContent;
+                    return nx::network::http::StatusCode::noContent;
                 }
                 NX_ASSERT( videoCamera->hlsLivePlaylistManager(quality) );
                 newHlsSession->setPlaylistManager(
@@ -938,7 +938,7 @@ namespace nx_hls
                 {
                     NX_LOG( lit("QnHttpLiveStreamingProcessor::getPlaylist. Failed to initialize archive playlist for camera %1").
                         arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                    return nx_http::StatusCode::internalServerError;
+                    return nx::network::http::StatusCode::internalServerError;
                 }
 
                 newHlsSession->setPlaylistManager( quality, archivePlaylistManager );
@@ -958,7 +958,7 @@ namespace nx_hls
         newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
 
         *session = newHlsSession.release();
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     int QnHttpLiveStreamingProcessor::estimateStreamBitrate(

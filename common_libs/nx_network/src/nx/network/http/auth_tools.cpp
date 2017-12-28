@@ -4,7 +4,9 @@
 
 #include <QtCore/QCryptographicHash>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 void AuthToken::setPassword(const nx::String& password)
 {
@@ -70,9 +72,9 @@ bool addAuthorization(
         header::BasicAuthorization basicAuthorization(
             credentials.username.toUtf8(),
             credentials.authToken.value);
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &request->headers,
-            nx_http::HttpHeader(
+            nx::network::http::HttpHeader(
                 header::Authorization::NAME,
                 basicAuthorization.serialized()));
         return true;
@@ -91,7 +93,7 @@ bool addAuthorization(
         }
         insertOrReplaceHeader(
             &request->headers,
-            nx_http::HttpHeader(
+            nx::network::http::HttpHeader(
                 header::Authorization::NAME,
                 digestAuthorizationHeader.serialized()));
         return true;
@@ -388,4 +390,6 @@ BufferType calcResponseFromIntermediate(
     return response.toHex();
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

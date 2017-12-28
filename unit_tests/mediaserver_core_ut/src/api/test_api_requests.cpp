@@ -38,18 +38,18 @@ static QByteArray jsonMapToStr(const QMap<QString, QVariant>& jsonMap)
     return QJsonDocument::fromVariant(QVariant(jsonMap)).toJson();
 }
 
-// TODO: Consider moving to nx_http::HttpClient.
-nx_http::BufferType readResponseBody(nx_http::HttpClient* httpClient)
+// TODO: Consider moving to nx::network::http::HttpClient.
+nx::network::http::BufferType readResponseBody(nx::network::http::HttpClient* httpClient)
 {
-    nx_http::BufferType response;
+    nx::network::http::BufferType response;
     while (!httpClient->eof())
         response.append(httpClient->fetchMessageBodyBuffer());
     return response;
 }
 
-std::unique_ptr<nx_http::HttpClient> createHttpClient()
+std::unique_ptr<nx::network::http::HttpClient> createHttpClient()
 {
-    auto httpClient = std::make_unique<nx_http::HttpClient>();
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");
     return httpClient;
@@ -90,7 +90,7 @@ void doExecutePost(
 void doExecuteGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
-    nx_http::BufferType* outResponse,
+    nx::network::http::BufferType* outResponse,
     int httpStatus)
 {
     auto httpClient = createHttpClient();

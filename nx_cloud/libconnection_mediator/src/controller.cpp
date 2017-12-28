@@ -7,7 +7,7 @@ namespace hpm {
 
 Controller::Controller(
     const conf::Settings& settings,
-    nx::stun::MessageDispatcher* stunMessageDispatcher)
+    nx::network::stun::MessageDispatcher* stunMessageDispatcher)
 :
     m_statsManager(settings),
     m_cloudDataProvider(

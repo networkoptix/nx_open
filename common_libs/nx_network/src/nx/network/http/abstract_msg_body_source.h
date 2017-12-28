@@ -10,7 +10,9 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * If AbstractMsgBodySource::contentLength returns existing value then exactly
@@ -45,4 +47,6 @@ public:
         > completionHandler) = 0;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

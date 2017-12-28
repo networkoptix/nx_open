@@ -110,15 +110,15 @@ std::unique_ptr<MediaServerClient> MediaServerCloudIntegrationTest::prepareMedia
     auto mediaServerClient = allocateMediaServerClient();
     if (!m_ownerCredentials.first.isEmpty())
     {
-        mediaServerClient->setUserCredentials(nx_http::Credentials(
+        mediaServerClient->setUserCredentials(nx::network::http::Credentials(
             m_ownerCredentials.first,
-            nx_http::PasswordAuthToken(m_ownerCredentials.second)));
+            nx::network::http::PasswordAuthToken(m_ownerCredentials.second)));
     }
     else
     {
-        mediaServerClient->setUserCredentials(nx_http::Credentials(
+        mediaServerClient->setUserCredentials(nx::network::http::Credentials(
             m_defaultOwnerCredentials.first,
-            nx_http::PasswordAuthToken(m_defaultOwnerCredentials.second)));
+            nx::network::http::PasswordAuthToken(m_defaultOwnerCredentials.second)));
     }
     return mediaServerClient;
 }
@@ -127,9 +127,9 @@ std::unique_ptr<MediaServerClient>
     MediaServerCloudIntegrationTest::prepareMediaServerClientFromCloudOwner()
 {
     auto mediaServerClient = allocateMediaServerClient();
-    mediaServerClient->setUserCredentials(nx_http::Credentials(
+    mediaServerClient->setUserCredentials(nx::network::http::Credentials(
         m_ownerAccount.email.c_str(),
-        nx_http::PasswordAuthToken(m_ownerAccount.password.c_str())));
+        nx::network::http::PasswordAuthToken(m_ownerAccount.password.c_str())));
     return mediaServerClient;
 }
 
@@ -171,7 +171,7 @@ void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
     const auto newPassword = nx::utils::generateRandomName(7).toStdString();
 
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         m_ownerAccount.email.c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
         newPassword.c_str()).constData();
@@ -270,7 +270,7 @@ std::unique_ptr<MediaServerClient> MediaServerCloudIntegrationTest::allocateMedi
     constexpr std::chrono::hours kRequestTimeout = std::chrono::hours(1);
 
     auto mediaServerClient = std::make_unique<MediaServerClient>(
-        nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+        nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(mediaServerEndpoint()));
     mediaServerClient->setRequestTimeout(kRequestTimeout);
     return mediaServerClient;

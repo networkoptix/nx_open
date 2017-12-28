@@ -4,6 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace attrs {
 
@@ -267,4 +268,5 @@ int IntAttribute::value() const
 
 } // namespace attrs
 } // namespace stun
+} // namespace network
 } // namespace nx

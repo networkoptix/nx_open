@@ -33,7 +33,7 @@ private:
     bool isLastCheckInCycleUnsafe();
     QAuthenticator getNextAuthToCheckUnsafe();
 
-    void handleSystemInfoResponse(nx_http::AsyncHttpClientPtr httpClient);
+    void handleSystemInfoResponse(nx::network::http::AsyncHttpClientPtr httpClient);
     void handleFail();
 
 private:
@@ -49,7 +49,7 @@ private:
     QElapsedTimer m_cacheExpirationTimer;
     std::chrono::seconds m_cacheExpirationInterval;
 
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     bool m_failed;
     bool m_cycleIsInProgress;
     bool m_terminated;

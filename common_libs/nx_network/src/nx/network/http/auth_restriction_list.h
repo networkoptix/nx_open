@@ -8,7 +8,9 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 namespace AuthMethod {
 
@@ -54,7 +56,7 @@ public:
     /**
      * @return Bit mask of auth methods (AuthMethod::Value enumeration).
      */
-    unsigned int getAllowedAuthMethods(const nx_http::Request& request) const;
+    unsigned int getAllowedAuthMethods(const nx::network::http::Request& request) const;
 
     /**
      * @param pathMask Wildcard-mask of path.
@@ -78,4 +80,6 @@ private:
     std::map<QString, Rule> m_denied;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

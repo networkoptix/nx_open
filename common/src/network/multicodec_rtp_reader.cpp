@@ -84,7 +84,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_role(Qn::CR_Default),
     m_gotData(false),
     m_rtpStarted(false),
-    m_prefferedAuthScheme(nx_http::header::AuthScheme::digest)
+    m_prefferedAuthScheme(nx::network::http::header::AuthScheme::digest)
 {
     const auto& globalSettings = res->commonModule()->globalSettings();
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
@@ -717,7 +717,7 @@ void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
     m_role = role;
 }
 
-void QnMulticodecRtpReader::setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme){
+void QnMulticodecRtpReader::setPrefferedAuthScheme(const nx::network::http::header::AuthScheme::Value scheme){
     m_prefferedAuthScheme = scheme;
 }
 
@@ -800,7 +800,7 @@ void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
 
 void QnMulticodecRtpReader::addRequestHeader(
     const QString& requestName,
-    const nx_http::HttpHeader& header)
+    const nx::network::http::HttpHeader& header)
 {
     m_RtpSession.addRequestHeader(requestName, header);
 }

@@ -49,7 +49,7 @@ PeerWrapper::PeerWrapper(const QString& dataDir):
     m_dataDir(dataDir)
 {
     m_ownerCredentials.username = "admin";
-    m_ownerCredentials.authToken = nx_http::PasswordAuthToken("admin");
+    m_ownerCredentials.authToken = nx::network::http::PasswordAuthToken("admin");
 }
 
 void PeerWrapper::addSetting(const std::string& name, const std::string& value)
@@ -80,7 +80,7 @@ bool PeerWrapper::configureAsLocalSystem()
         return false;
     }
 
-    m_ownerCredentials.authToken = nx_http::PasswordAuthToken(password);
+    m_ownerCredentials.authToken = nx::network::http::PasswordAuthToken(password);
     return true;
 }
 
@@ -121,18 +121,18 @@ QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
 
     authKey.calcResponse(
         m_ownerCredentials.authToken,
-        nx_http::Method::get,
+        nx::network::http::Method::get,
         "/api/mergeSystems");
     mergeSystemData.getKey = authKey.toString();
 
     authKey.calcResponse(
         m_ownerCredentials.authToken,
-        nx_http::Method::post,
+        nx::network::http::Method::post,
         "/api/mergeSystems");
     mergeSystemData.postKey = authKey.toString();
 
     mergeSystemData.url = nx::network::url::Builder()
-        .setScheme(nx_http::kUrlSchemeName)
+        .setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(remotePeer.endpoint()).toString();
 
     auto mediaServerClient = prepareMediaServerClient();
@@ -248,7 +248,7 @@ bool PeerWrapper::arePeersInterconnected(
 std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() const
 {
     auto mediaServerClient = std::make_unique<MediaServerClientEx>(
-        nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+        nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_process.moduleInstance()->endpoint()));
     mediaServerClient->setUserCredentials(m_ownerCredentials);
     mediaServerClient->setRequestTimeout(std::chrono::minutes(1));

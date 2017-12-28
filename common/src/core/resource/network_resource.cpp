@@ -26,7 +26,7 @@ QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
-    m_httpPort(nx_http::DEFAULT_HTTP_PORT),
+    m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
     m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
@@ -275,7 +275,7 @@ bool QnNetworkResource::ping()
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     return sock->connect(
         getHostAddress(),
-        QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT),
+        QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT),
         nx::network::deprecated::kDefaultConnectTimeout);
 }
 

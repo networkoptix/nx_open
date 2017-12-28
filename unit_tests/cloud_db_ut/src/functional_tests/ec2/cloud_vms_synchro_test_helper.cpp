@@ -752,10 +752,10 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     const nx::utils::Url& url,
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     if (!httpClient.doGet(url))
         return api::ResultCode::networkError;
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return api::ResultCode::notAuthorized;
 
     nx::Buffer msgBody;

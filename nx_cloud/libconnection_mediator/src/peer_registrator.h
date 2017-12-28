@@ -35,7 +35,7 @@ public:
     PeerRegistrator(
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher,
+        nx::network::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool,
         AbstractRelayClusterClient* const relayClusterClient);
     virtual ~PeerRegistrator() override;
@@ -100,7 +100,7 @@ private:
         boost::optional<QUrl> trafficRelayInstanceUrl,
         std::function<void(api::ResultCode, api::ListenResponse)> responseSender);
     void sendClientBindIndications(const ConnectionStrongRef& connection);
-    nx::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
+    nx::network::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
 };
 
 } // namespace hpm

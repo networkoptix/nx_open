@@ -34,7 +34,7 @@ public:
             return (bool)m_videoConfig;
 
         nx::plugins::utils::XmlRequestHelper requestHelper(
-            m_resource->getUrl(), m_resource->getAuth(), nx_http::AuthType::authBasic);
+            m_resource->getUrl(), m_resource->getAuth(), nx::network::http::AuthType::authBasic);
 
         if (requestHelper.post(lit("GetVideoStreamConfig")))
             m_videoConfig = requestHelper.readRawBody();
@@ -122,7 +122,7 @@ public:
             .args(isPrimary, value, m_resource->getUrl()));
 
         nx::plugins::utils::XmlRequestHelper requestHelper(
-            m_resource->getUrl(), m_resource->getAuth(), nx_http::AuthType::authBasic);
+            m_resource->getUrl(), m_resource->getAuth(), nx::network::http::AuthType::authBasic);
 
         m_videoConfig->replace(type->first, type->second, value.toUtf8());
         return requestHelper.post("SetVideoStreamConfig", *m_videoConfig);

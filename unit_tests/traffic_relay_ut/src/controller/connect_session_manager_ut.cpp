@@ -272,7 +272,7 @@ protected:
     void thenStartRelayingNotificationIsSentToTheListeningPeer()
     {
         const QByteArray buffer = m_lastListeningPeerConnection->read();
-        nx_http::Message message(nx_http::MessageType::request);
+        nx::network::http::Message message(nx::network::http::MessageType::request);
         ASSERT_TRUE(message.request->parse(buffer));
 
         api::OpenTunnelNotification openTunnelNotification;
@@ -426,13 +426,13 @@ private:
     void onBeginListeningCompletion(
         api::ResultCode resultCode,
         api::BeginListeningResponse /*response*/,
-        nx_http::ConnectionEvents connectionEvents)
+        nx::network::http::ConnectionEvents connectionEvents)
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             m_lastListeningPeerConnection = tcpConnection.get();
-            auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
+            auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
                 nullptr,
@@ -445,14 +445,14 @@ private:
 
     void onConnectCompletion(
         api::ResultCode resultCode,
-        nx_http::ConnectionEvents connectionEvents)
+        nx::network::http::ConnectionEvents connectionEvents)
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             tcpConnection->setForeignAddress(m_clientEndpoint);
             m_lastClientConnection = tcpConnection.get();
-            auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
+            auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
                 nullptr,
@@ -571,7 +571,7 @@ protected:
                 nx::utils::promise<api::ResultCode> completed;
                 connectSessionManager().connectToPeer(
                     request,
-                    [&completed](api::ResultCode resultCode, nx_http::ConnectionEvents)
+                    [&completed](api::ResultCode resultCode, nx::network::http::ConnectionEvents)
                     {
                         completed.set_value(resultCode);
                     });

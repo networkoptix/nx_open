@@ -288,7 +288,7 @@ public:
     * Client will use any AuthScheme corresponding to server requirements (authenticate server request)
     * defaultAuthScheme is used for first client request only
     */
-    void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
+    void setAuth(const QAuthenticator& auth, nx::network::http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
 
     nx::utils::Url getUrl() const;
@@ -345,7 +345,7 @@ public:
 
     void setDateTimeFormat(const DateTimeFormat& format);
     void setScaleHeaderEnabled(bool value);
-    void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
+    void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
 
     bool processTcpRtcpData(const quint8* data, int size);
 
@@ -353,18 +353,18 @@ public:
 signals:
     void gotTextResponse(QByteArray text);
 private:
-    void addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos );
+    void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     //int readRAWData();
-    nx_http::Request createDescribeRequest();
+    nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
     bool sendSetup();
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
-    void addAuth( nx_http::Request* const request );
+    void addAuth( nx::network::http::Request* const request );
 
 
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
@@ -372,7 +372,7 @@ private:
 
     void parseSDP();
     void updateTrackNum();
-    void addAdditionAttrs( nx_http::Request* const request );
+    void addAdditionAttrs( nx::network::http::Request* const request );
     void updateResponseStatus(const QByteArray& response);
 
     void usePredefinedTracks();
@@ -380,11 +380,11 @@ private:
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
     QByteArray calcDefaultNonce() const;
-    nx_http::Request createPlayRequest( qint64 startPos, qint64 endPos );
+    nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
-    bool sendRequestInternal(nx_http::Request&& request);
-    void addCommonHeaders(nx_http::HttpHeaders& headers);
-    void addAdditionalHeaders(const QString& requestName, nx_http::HttpHeaders* outHeaders);
+    bool sendRequestInternal(nx::network::http::Request&& request);
+    void addCommonHeaders(nx::network::http::HttpHeaders& headers);
+    void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
 
     QByteArray nptPosToString(qint64 posUsec) const;
 private:
@@ -445,13 +445,13 @@ private:
     std::ofstream m_inStreamFile;
     std::ofstream m_outStreamFile;
 #endif
-    nx_http::header::AuthScheme::Value m_defaultAuthScheme;
+    nx::network::http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
     DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
     bool m_scaleHeaderEnabled = true;
     using RequestName = QString;
-    QMap<RequestName, nx_http::HttpHeaders> m_additionalHeaders;
+    QMap<RequestName, nx::network::http::HttpHeaders> m_additionalHeaders;
     QElapsedTimer m_lastReceivedDataTimer;
 
     /*!
@@ -464,5 +464,5 @@ private:
         Updates \a m_responseCode member.
         \return error description
     */
-    bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
+    bool sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responce );
 };

@@ -69,7 +69,7 @@ protected:
     {
         nx::utils::promise<SystemError::ErrorCode> done;
         m_client.connect(
-            network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
+            network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
             [&done](SystemError::ErrorCode sysErrorCode)
             {
                 done.set_value(sysErrorCode);
@@ -87,7 +87,7 @@ protected:
         auto response = m_responses.pop();
         ASSERT_EQ(SystemError::noError, std::get<0>(response));
         ASSERT_EQ(
-            nx::stun::MessageClass::successResponse,
+            nx::network::stun::MessageClass::successResponse,
             std::get<1>(response).header.messageClass);
     }
 
@@ -98,12 +98,12 @@ protected:
 
 private:
     stun::AsyncClientWithHttpTunneling m_client;
-    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::stun::Message>> m_responses;
-    nx::stun::SocketServer m_stunServer;
+    nx::utils::SyncQueue<std::tuple<SystemError::ErrorCode, nx::network::stun::Message>> m_responses;
+    nx::network::stun::SocketServer m_stunServer;
 
     void onResponseReceived(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message response)
+        nx::network::stun::Message response)
     {
         m_responses.push(std::make_tuple(sysErrorCode, std::move(response)));
     }

@@ -8,6 +8,7 @@
 #include "stun_types.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 AsyncClient::AsyncClient(Settings timeouts):
@@ -48,7 +49,7 @@ void AsyncClient::connect(
     const nx::utils::Url& url,
     ConnectHandler completionHandler)
 {
-    if (url.scheme() != nx::stun::kUrlSchemeName && url.scheme() != nx::stun::kSecureUrlSchemeName)
+    if (url.scheme() != nx::network::stun::kUrlSchemeName && url.scheme() != nx::network::stun::kSecureUrlSchemeName)
     {
         return post(
             [completionHandler = std::move(completionHandler)]()
@@ -61,7 +62,7 @@ void AsyncClient::connect(
 
     QnMutexLocker lock(&m_mutex);
     m_endpoint = std::move(endpoint);
-    m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
+    m_useSsl = url.scheme() == nx::network::stun::kSecureUrlSchemeName;
     NX_ASSERT(!m_connectCompletionHandler);
     m_connectCompletionHandler = std::move(completionHandler);
     openConnectionImpl(&lock);
@@ -523,4 +524,5 @@ const char* AsyncClient::toString(State state) const
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -117,7 +117,7 @@ void ConnectSessionManager::connectToPeer(
         NX_LOGX(lm("Session %1 is not found").arg(request.sessionId), cl_logDEBUG1);
         return completionHandler(
             api::ResultCode::notFound,
-            nx_http::ConnectionEvents());
+            nx::network::http::ConnectionEvents());
     }
 
     relaying::ClientInfo clientInfo;
@@ -156,7 +156,7 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
             .arg(connectSessionId).arg(listeningPeerName)
             .arg(QnLexical::serialized(resultCode)),
             cl_logDEBUG1);
-        return completionHandler(resultCode, nx_http::ConnectionEvents());
+        return completionHandler(resultCode, nx::network::http::ConnectionEvents());
     }
 
     NX_LOGX(lm("Session %1. Got listening peer %2 connection")
@@ -164,11 +164,11 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
 
     NX_ASSERT(listeningPeerConnection);
 
-    nx_http::ConnectionEvents connectionEvents;
+    nx::network::http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
         [this, connectSessionId, listeningPeerName,
             listeningPeerConnection = std::move(listeningPeerConnection)](
-                nx_http::HttpServerConnection* httpConnection) mutable
+                nx::network::http::HttpServerConnection* httpConnection) mutable
         {
             startRelaying(
                 connectSessionId,
@@ -183,7 +183,7 @@ void ConnectSessionManager::startRelaying(
     const std::string& connectSessionId,
     const std::string& listeningPeerName,
     std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
-    nx_http::HttpServerConnection* httpConnection)
+    nx::network::http::HttpServerConnection* httpConnection)
 {
     QnMutexLocker lock(&m_mutex);
 

@@ -17,5 +17,5 @@ int QnActiveConnectionsRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     result.setReply(m_messageBus->connectionsInfo());
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

@@ -139,7 +139,7 @@ protected:
     QString responseText;
     SmtpReplyCode responseCode;
 
-    nx_http::LineSplitter m_lineSpliter;
+    nx::network::http::LineSplitter m_lineSpliter;
 
     class ResponseTimeoutException {};
     class SendMessageTimeoutException {};

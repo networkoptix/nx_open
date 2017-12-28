@@ -33,7 +33,7 @@ void ConnectSessionManagerMock::connectToPeer(
 
     completionHandler(
         api::ResultCode::ok,
-        nx_http::ConnectionEvents());
+        nx::network::http::ConnectionEvents());
 }
 
 } // namespace test

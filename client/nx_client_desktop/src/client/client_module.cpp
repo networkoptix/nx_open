@@ -526,7 +526,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     //TODO #ak get rid of this class!
     commonModule->store(new ec2::DummyHandler());
-    commonModule->store(new nx_http::HttpModManager());
+    commonModule->store(new nx::network::http::HttpModManager());
     if (!startupParams.enforceSocketType.isEmpty())
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 

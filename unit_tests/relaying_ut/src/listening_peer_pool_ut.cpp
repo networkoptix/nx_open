@@ -228,7 +228,7 @@ protected:
 
         const auto buffer = streamSocketStub->read();
 
-        nx_http::Message message(nx_http::MessageType::request);
+        nx::network::http::Message message(nx::network::http::MessageType::request);
         ASSERT_TRUE(message.request->parse(buffer));
 
         relay::api::OpenTunnelNotification openTunnelNotification;

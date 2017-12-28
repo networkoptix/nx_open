@@ -79,7 +79,7 @@ TEST_F( StunCustomTest, Ping )
     auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
 
     stun::Message request( Header( MessageClass::request, stun::extension::methods::ping ) );
     request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
@@ -118,7 +118,7 @@ TEST_F( StunCustomTest, BindResolve )
     auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     {
         stun::Message request( Header( MessageClass::request, stun::extension::methods::bind ) );
         request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
@@ -141,7 +141,7 @@ TEST_F( StunCustomTest, BindResolve )
     auto connectClientGuard = makeScopeGuard([&connectClient]() { connectClient.pleaseStopSync(); });
 
     connectClient.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     {
         stun::Message request( Header(
             MessageClass::request, stun::extension::methods::resolveDomain ) );
@@ -238,7 +238,7 @@ IndicatinonQueue listenForClientBind(
     request.systemId = SYSTEM_ID;
     request.serverId = serverId;
 
-    nx::stun::Message message(stun::Header(stun::MessageClass::request, request.kMethod));
+    nx::network::stun::Message message(stun::Header(stun::MessageClass::request, request.kMethod));
     request.serialize(&message);
     message.insertIntegrity(SYSTEM_ID, AUTH_KEY);
 
@@ -272,7 +272,7 @@ void bindClientSync(AsyncClient* client, const String& id, const SocketAddress& 
     request.originatingPeerID = id;
     request.tcpReverseEndpoints.push_back(address);
 
-    nx::stun::Message message(stun::Header(stun::MessageClass::request, request.kMethod));
+    nx::network::stun::Message message(stun::Header(stun::MessageClass::request, request.kMethod));
     request.serialize(&message);
 
     nx::utils::TestSyncMultiQueue<SystemError::ErrorCode, Message> waiter;
@@ -288,28 +288,28 @@ TEST_F(StunCustomTest, ClientBind)
     typedef std::chrono::seconds s;
     auto& params = const_cast<conf::ConnectionParameters&>(settings.connectionParameters());
     params.tcpReverseRetryPolicy = nx::network::RetryPolicy(3, s(1), 2, s(7));
-    params.tcpReverseHttpTimeouts = nx_http::AsyncHttpClient::Timeouts(s(1), s(2), s(3));
+    params.tcpReverseHttpTimeouts = nx::network::http::AsyncHttpClient::Timeouts(s(1), s(2), s(3));
     cloudData.expect_getSystem(SYSTEM_ID, AUTH_KEY, 3);
 
     AsyncClient msClient;
     auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     const auto msIndications = listenForClientBind(&msClient, SERVER_ID, settings);
 
     AsyncClient bindClient;
     auto bindClientGuard = makeScopeGuard([&bindClient]() { bindClient.pleaseStopSync(); });
 
     bindClient.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     bindClientSync(&bindClient, "VmsGateway", GOOD_ADDRESS);
 
     AsyncClient msClient2;
     auto msClient2Guard = makeScopeGuard([&msClient2]() { msClient2.pleaseStopSync(); });
 
     msClient2.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     const auto msIndications2 = listenForClientBind(&msClient2, SERVER_ID2, settings);
 
     // Both servers get just one indication:
@@ -320,7 +320,7 @@ TEST_F(StunCustomTest, ClientBind)
 
     auto bindClient2 = std::make_unique<AsyncClient>();
     bindClient2->connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     bindClientSync(bindClient2.get(), "VmsGateway2", GOOD_ADDRESS);
 
     // Both servers get just one indication:
@@ -336,7 +336,7 @@ TEST_F(StunCustomTest, ClientBind)
     auto msClient3Guard = makeScopeGuard([&msClient3]() { msClient3.pleaseStopSync(); });
 
     msClient3.connect(nx::network::url::Builder()
-        .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
+        .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     const auto msIndications3 = listenForClientBind(&msClient3, SERVER_ID, settings);
     expectIndicationForEach({msIndications3.get()}, "VmsGateway", BAD_ADDRESS);
 }

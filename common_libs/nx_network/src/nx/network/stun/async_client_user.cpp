@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
@@ -134,4 +135,5 @@ void AsyncClientUser::disconnectFromClient()
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -17,5 +17,5 @@ int QnRecordingStatsRestHandler::executeGet(const QString &path, const QnRequest
     // TODO: #akulikov #backup storages. Alter this for two storage managers
     auto normalStatistics = qnNormalStorageMan->getChunkStatistics(bitrateAnalizePeriodMs);
     result.setReply(normalStatistics);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

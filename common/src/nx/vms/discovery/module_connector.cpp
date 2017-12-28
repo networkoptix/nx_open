@@ -118,7 +118,7 @@ void ModuleConnector::stopWhileInAioThread()
 
 ModuleConnector::InformationReader::InformationReader(const ModuleConnector* parent):
     m_parent(parent),
-    m_httpClient(nx_http::AsyncHttpClient::create())
+    m_httpClient(nx::network::http::AsyncHttpClient::create())
 {
     m_httpClient->bindToAioThread(parent->getAioThread());
 }
@@ -138,7 +138,7 @@ void ModuleConnector::InformationReader::setHandler(
 void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
 {
     const auto handler =
-        [this](nx_http::AsyncHttpClientPtr client) mutable
+        [this](nx::network::http::AsyncHttpClientPtr client) mutable
         {
             NX_ASSERT(m_httpClient, client);
             const auto clientGuard = makeScopeGuard([client](){ client->pleaseStopSync(); });
@@ -155,8 +155,8 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
             readUntilError();
         };
 
-    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, handler);
-    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, handler);
+    QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived, handler);
+    QObject::connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, handler);
     m_httpClient->doGet(nx::network::url::Builder(kUrl).setEndpoint(endpoint));
 }
 

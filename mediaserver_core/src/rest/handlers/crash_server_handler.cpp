@@ -20,7 +20,7 @@ int QnCrashServerHandler::executeGet(
     qWarning() << "Received dev-mode-key request";
 
     if( !params.contains(lit("razrazraz")) )
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
 
 #ifdef _WIN32
     const bool createFullCrashDump = params.contains(lit("full"));

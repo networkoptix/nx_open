@@ -117,8 +117,8 @@ public:
     virtual void clear() override;
 
     Qn::AuthResult authenticate(
-        const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authHeader) const;
+        const nx::network::http::Method::ValueType& method,
+        const nx::network::http::header::Authorization& authHeader) const;
 
 private:
     virtual void userInfoChanged(

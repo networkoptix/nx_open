@@ -58,7 +58,7 @@ static int checkPermissions(
             *outBody, *outContentType, request.format, request.extraFormatting);
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 static const QString kInvalidParamsMessage =
@@ -77,7 +77,7 @@ static int performAddOrUpdate(
         QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
-        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
             kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
@@ -89,7 +89,7 @@ static int performAddOrUpdate(
         : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(commonModule, context);
     if (!ok)
     {
-        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
             lit("Can't %1 bookmark").arg(
                 (op == QnBookmarkOperation::Add) ? lit("add") : lit("update")),
             outBody, outContentType, request.format, request.extraFormatting,
@@ -98,7 +98,7 @@ static int performAddOrUpdate(
     QnRestResult execResult;
     QnFusionRestHandlerDetail::serialize(
         execResult, *outBody, *outContentType, request.format, request.extraFormatting);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 static int performDelete(
@@ -112,7 +112,7 @@ static int performDelete(
         QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
-        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
             kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
@@ -121,12 +121,12 @@ static int performDelete(
     QnDeleteBookmarkRequestContext context(request, ownerPort);
     if (!QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(commonModule, context))
     {
-        return QnFusionRestHandler::makeError(nx_http::StatusCode::internalServerError,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::internalServerError,
             lit("Can't delete bookmark"),
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::CantProcessRequest);
     }
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 static int performGetTags(
@@ -140,7 +140,7 @@ static int performGetTags(
         QnGetBookmarkTagsRequestData::fromParams<QnGetBookmarkTagsRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
-        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
             kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
@@ -151,7 +151,7 @@ static int performGetTags(
         QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(commonModule, context);
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 static int performGet(
@@ -165,7 +165,7 @@ static int performGet(
         QnMultiserverRequestData::fromParams<QnGetBookmarksRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
-        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
             kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
@@ -176,7 +176,7 @@ static int performGet(
         QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(commonModule, context);
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 } // namespace
@@ -199,7 +199,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     QnBookmarkOperation op = QnMultiserverBookmarksRestHandlerPrivate::getOperation(action);
 
     const int status = checkPermissions(op, params, &result, &contentType, processor);
-    if (status != nx_http::StatusCode::ok)
+    if (status != nx::network::http::StatusCode::ok)
         return status;
 
     const auto ownerPort = processor->owner()->getPort();

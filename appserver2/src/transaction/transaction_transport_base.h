@@ -87,8 +87,8 @@ public:
     static const char* const TUNNEL_CONTENT_TYPE;
 
     //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
-    typedef std::function<void(QnTransactionTransportBase*, const nx_http::HttpHeaders&)> HttpChunkExtensonHandler;
-    typedef std::function<void(QnTransactionTransportBase*, nx_http::HttpHeaders*)> BeforeSendingChunkHandler;
+    typedef std::function<void(QnTransactionTransportBase*, const nx::network::http::HttpHeaders&)> HttpChunkExtensonHandler;
+    typedef std::function<void(QnTransactionTransportBase*, nx::network::http::HttpHeaders*)> BeforeSendingChunkHandler;
 
     enum State {
         NotDefined,
@@ -110,7 +110,7 @@ public:
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
         ConnectionType::Type connectionType,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
@@ -162,7 +162,7 @@ public:
     SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
 
-    virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -193,7 +193,7 @@ public:
     bool hasUnsendData() const;
 
     void receivedTransaction(
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         const QnByteArrayConstRef& tranData );
 
     void transactionProcessed();
@@ -201,7 +201,7 @@ public:
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
         QSharedPointer<AbstractCommunicatingSocket> socket,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
@@ -221,7 +221,7 @@ signals:
     void onSomeDataReceivedFromRemotePeer();
 
 protected:
-    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& /*httpClient*/, bool /*authByKey*/) {};
+    virtual void fillAuthInfo(const nx::network::http::AsyncHttpClientPtr& /*httpClient*/, bool /*authByKey*/) {};
 
 private:
     struct DataToSend
@@ -264,7 +264,7 @@ private:
     mutable QnMutex m_mutex;
     QSharedPointer<AbstractCommunicatingSocket> m_incomingDataSocket;
     QSharedPointer<AbstractCommunicatingSocket> m_outgoingDataSocket;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     nx::Buffer m_readBuffer;
     //!Holds raw data. It is serialized to http chunk just before sending to socket
@@ -282,8 +282,8 @@ private:
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
-    nx_http::HttpStreamReader m_httpStreamReader;
-    std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
+    nx::network::http::HttpStreamReader m_httpStreamReader;
+    std::shared_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
     ConnectionType::Type m_connectionType;
     const PeerRole m_peerRole;
     QByteArray m_contentEncoding;
@@ -293,14 +293,14 @@ private:
     QnUuid m_connectionGuid;
     ConnectionGuardSharedState* const m_connectionGuardSharedState;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
-    nx_http::AsyncHttpClientPtr m_outgoingTranClient;
+    nx::network::http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     nx::utils::Url m_postTranBaseUrl;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
-    std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
+    std::vector<nx::network::http::HttpHeader> m_outgoingClientHeaders;
     size_t m_sentTranSequence;
-    nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
+    nx::network::http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     //!Number of threads waiting on \a QnTransactionTransportBase::waitForNewTransactionsReady
     int m_waiterCount;
     QnWaitCondition m_cond;
@@ -329,8 +329,8 @@ private:
     void setStateNoLock(State state);
     void cancelConnecting();
     static void connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator);
-    void addHttpChunkExtensions( nx_http::HttpHeaders* const transactionHeaders );
-    void processChunkExtensions( const nx_http::HttpHeaders& httpChunkHeader );
+    void addHttpChunkExtensions( nx::network::http::HttpHeaders* const transactionHeaders );
+    void processChunkExtensions( const nx::network::http::HttpHeaders& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
@@ -355,10 +355,10 @@ private:
     void waitForNewTransactionsReady();
 
 private slots:
-    void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
-    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
+    void at_responseReceived( const nx::network::http::AsyncHttpClientPtr& );
+    void at_httpClientDone( const nx::network::http::AsyncHttpClientPtr& );
     void repeatDoGet();
-    void postTransactionDone( const nx_http::AsyncHttpClientPtr& );
+    void postTransactionDone( const nx::network::http::AsyncHttpClientPtr& );
 };
 
 }

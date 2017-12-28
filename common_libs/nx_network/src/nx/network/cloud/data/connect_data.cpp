@@ -6,6 +6,8 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+using namespace network::stun::extension;
+
 ConnectRequest::ConnectRequest():
     StunRequestData(kMethod),
     connectionMethods(0),
@@ -14,10 +16,8 @@ ConnectRequest::ConnectRequest():
 {
 }
 
-void ConnectRequest::serializeAttributes(nx::stun::Message* const message)
+void ConnectRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
-    using namespace stun::extension;
-
     message->newAttribute<attrs::HostName>(std::move(destinationHostName));
     message->newAttribute<attrs::PeerId>(std::move(originatingPeerId));
     message->newAttribute<attrs::ConnectionId>(connectSessionId);
@@ -27,10 +27,8 @@ void ConnectRequest::serializeAttributes(nx::stun::Message* const message)
     message->addAttribute(attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
-bool ConnectRequest::parseAttributes(const nx::stun::Message& message)
+bool ConnectRequest::parseAttributes(const nx::network::stun::Message& message)
 {
-    using namespace stun::extension;
-
     if (!readEnumAttributeValue(message, attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
@@ -52,10 +50,8 @@ ConnectResponse::ConnectResponse():
 {
 }
 
-void ConnectResponse::serializeAttributes(nx::stun::Message* const message)
+void ConnectResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    using namespace stun::extension;
-
     message->newAttribute< attrs::PublicEndpointList >(std::move(forwardedTcpEndpointList));
     message->newAttribute< attrs::UdtHpEndpointList >(std::move(udpEndpointList));
     if (trafficRelayUrl)
@@ -65,10 +61,8 @@ void ConnectResponse::serializeAttributes(nx::stun::Message* const message)
     message->addAttribute(attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
-bool ConnectResponse::parseAttributes(const nx::stun::Message& message)
+bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
 {
-    using namespace stun::extension;
-
     if (!readEnumAttributeValue(message, attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 

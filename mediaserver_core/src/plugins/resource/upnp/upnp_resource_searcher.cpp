@@ -158,7 +158,7 @@ QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidSt
     if (m_deviceXmlCache.contains(uuidStr))
         return m_deviceXmlCache.value(uuidStr);
 
-    CLSimpleHTTPClient http( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator() );
+    CLSimpleHTTPClient http( url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator() );
     CLHttpStatus status = http.doGET( url.path() );
     QByteArray result;
     if (status == CL_HTTP_SUCCESS) {
@@ -233,14 +233,14 @@ void QnUpnpResourceSearcher::processSocket(AbstractDatagramSocket* socket, QSet<
             buffer[readed] = 0;
         QByteArray reply = QByteArray::fromRawData(buffer, readed);
 
-        nx_http::Request foundDeviceReply;
+        nx::network::http::Request foundDeviceReply;
         if( !foundDeviceReply.parse( reply ) )
             continue;
-        nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
+        nx::network::http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
         if( locationHeader == foundDeviceReply.headers.end() )
             continue;
 
-        nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
+        nx::network::http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
         if( uuidHeader == foundDeviceReply.headers.end() )
             continue;
 

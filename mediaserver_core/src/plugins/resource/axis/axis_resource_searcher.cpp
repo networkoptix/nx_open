@@ -77,7 +77,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
 
 
     if (port < 0)
-        port = nx_http::DEFAULT_HTTP_PORT;
+        port = nx::network::http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
     //QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
@@ -245,7 +245,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setModel(name);
     resource->setMAC(QnMacAddress(smac));
 
-    quint16 port = nx_http::DEFAULT_HTTP_PORT;
+    quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
     if (packet.fromDatagram(responseData))
     {
@@ -284,7 +284,7 @@ bool QnPlAxisResourceSearcher::testCredentials(
     const QAuthenticator& auth) const
 {
     auto host = url.host();
-    auto port = url.port(nx_http::DEFAULT_HTTP_PORT);
+    auto port = url.port(nx::network::http::DEFAULT_HTTP_PORT);
 
     CLHttpStatus status;
     auto response = downloadFile(status, kTestCredentialsUrl, host, port, kDefaultAxisTimeout, auth);

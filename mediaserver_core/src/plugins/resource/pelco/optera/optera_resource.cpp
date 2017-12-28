@@ -105,7 +105,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
 
     CLSimpleHTTPClient http(
         url.host(),
-        url.port(nx_http::DEFAULT_HTTP_PORT),
+        url.port(nx::network::http::DEFAULT_HTTP_PORT),
         kChangeCameraModeTimeout,
         auth);
 

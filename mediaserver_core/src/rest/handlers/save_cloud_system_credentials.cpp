@@ -45,7 +45,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
 
     m_commonModule = owner->commonModule();
 
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     if (!authorize(owner->accessRights(), &result, &statusCode))
         return statusCode;
 
@@ -59,7 +59,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
 bool QnSaveCloudSystemCredentialsHandler::authorize(
     const Qn::UserAccessData& accessRights,
     QnJsonRestResult* result,
-    nx_http::StatusCode::Value* const authorizationStatusCode)
+    nx::network::http::StatusCode::Value* const authorizationStatusCode)
 {
     using namespace nx_http;
 

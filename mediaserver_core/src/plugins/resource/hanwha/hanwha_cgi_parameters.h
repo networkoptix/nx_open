@@ -21,10 +21,10 @@ class HanwhaCgiParameters
 {
 public:
     HanwhaCgiParameters() = default;
-    explicit HanwhaCgiParameters(nx_http::StatusCode::Value statusCode);
+    explicit HanwhaCgiParameters(nx::network::http::StatusCode::Value statusCode);
     explicit HanwhaCgiParameters(
         const nx::Buffer& rawBuffer,
-        nx_http::StatusCode::Value statusCode);
+        nx::network::http::StatusCode::Value statusCode);
 
     boost::optional<HanwhaCgiParameter> parameter(
         const QString& cgi,
@@ -36,7 +36,7 @@ public:
 
     bool isValid() const;
 
-    nx_http::StatusCode::Value statusCode() const;
+    nx::network::http::StatusCode::Value statusCode() const;
 
 private:
     bool parseXml(const nx::Buffer& rawBuffer);
@@ -73,7 +73,7 @@ private:
 
     bool m_isValid = false;
     CgiMap m_parameters;
-    nx_http::StatusCode::Value m_statusCode;
+    nx::network::http::StatusCode::Value m_statusCode;
 };
 
 } // namespace plugins

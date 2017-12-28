@@ -34,7 +34,7 @@ signals:
     void found(const QHostAddress& address);
 
 private:
-    void handleReply(const nx_http::AsyncHttpClientPtr& httpClient);
+    void handleReply(const nx::network::http::AsyncHttpClientPtr& httpClient);
     void sendRequest(const QString &url);
     void nextStage();
 
@@ -53,7 +53,7 @@ private:
     QStringList m_primaryUrls;
     QStringList m_secondaryUrls;
     QnMutex m_mutex;
-    std::set<nx_http::AsyncHttpClientPtr> m_httpRequests;
+    std::set<nx::network::http::AsyncHttpClientPtr> m_httpRequests;
 
     virtual void stopWhileInAioThread() override;
 

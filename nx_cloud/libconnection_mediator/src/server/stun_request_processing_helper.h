@@ -16,8 +16,8 @@
 namespace nx {
 namespace hpm {
 
-typedef std::shared_ptr< nx::stun::AbstractServerConnection > ConnectionStrongRef;
-typedef std::weak_ptr< nx::stun::AbstractServerConnection > ConnectionWeakRef;
+typedef std::shared_ptr< nx::network::stun::AbstractServerConnection > ConnectionStrongRef;
+typedef std::weak_ptr< nx::network::stun::AbstractServerConnection > ConnectionWeakRef;
 
 /** Send success responce without attributes */
 template<typename ConnectionPtr>
@@ -78,7 +78,7 @@ template<
     typename ConnectionStrongRef,
     typename OutputData>
 void fillAndSendResponse(
-    nx::stun::Header requestHeader,
+    nx::network::stun::Header requestHeader,
     const ConnectionStrongRef& connection,
     api::ResultCode resultCode,
     OutputData* outputData = nullptr)
@@ -117,7 +117,7 @@ void processRequestWithNoOutput(
     void (ProcessorType::*processingFunc)(
         const ConnectionStrongRef&,
         InputData,
-        nx::stun::Message,
+        nx::network::stun::Message,
         std::function<void(api::ResultCode)>),
     ProcessorType* processor,
     const ConnectionStrongRef& connection,
@@ -129,7 +129,7 @@ void processRequestWithNoOutput(
             connection,
             std::move(request.header),
             api::ResultCode::badRequest,
-            nx::stun::error::badRequest,
+            nx::network::stun::error::badRequest,
             input.errorText());
 
     auto requestHeader = request.header;
@@ -178,7 +178,7 @@ void processRequestWithOutput(
     void (ProcessorType::*processingFunc)(
         const ConnectionStrongRef&,
         InputData,
-        nx::stun::Message,
+        nx::network::stun::Message,
         std::function<void(api::ResultCode, OutputData)>),
     ProcessorType* processor,
     const ConnectionStrongRef& connection,
@@ -190,7 +190,7 @@ void processRequestWithOutput(
             connection,
             std::move(request.header),
             api::ResultCode::badRequest,
-            nx::stun::error::badRequest,
+            nx::network::stun::error::badRequest,
             input.errorText());
 
     auto requestHeader = request.header;

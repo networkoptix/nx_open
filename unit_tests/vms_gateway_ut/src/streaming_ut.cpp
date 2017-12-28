@@ -57,7 +57,7 @@ protected:
 
 private:
     TestHttpServer m_httpServer;
-    nx_http::HttpClient m_httpClient;
+    nx::network::http::HttpClient m_httpClient;
     nx::Buffer m_fixedResource;
 
     virtual void SetUp() override
@@ -86,14 +86,14 @@ private:
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
-    std::unique_ptr<nx_http::AbstractMsgBodySource> createStreamContentProvider()
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> createStreamContentProvider()
     {
         return std::make_unique<RandomDataSource>("video/mp2t");
     }
 
-    std::unique_ptr<nx_http::AbstractMsgBodySource> createFixedContentProvider()
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> createFixedContentProvider()
     {
-        return std::make_unique<nx_http::BufferSource>("video/mp2t", m_fixedResource);
+        return std::make_unique<nx::network::http::BufferSource>("video/mp2t", m_fixedResource);
     }
 
     nx::utils::Url streamUrl() const

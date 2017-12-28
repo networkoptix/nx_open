@@ -1,6 +1,8 @@
 #include "http_parser.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 MessageParser::MessageParser()
 {
@@ -123,4 +125,6 @@ void MessageParser::reset()
 
 } // namespace deprecated
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

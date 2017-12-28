@@ -40,7 +40,7 @@ const std::chrono::milliseconds kDefaultTcpSendTimeout = std::chrono::seconds(17
 
 //http
 const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
-const int kDefaultHttpProxyTargetPort = nx_http::DEFAULT_HTTP_PORT;
+const int kDefaultHttpProxyTargetPort = nx::network::http::DEFAULT_HTTP_PORT;
 
 const QLatin1String kHttpConnectSupport("http/connectSupport");
 const int kDefaultHttpConnectSupport = 0;

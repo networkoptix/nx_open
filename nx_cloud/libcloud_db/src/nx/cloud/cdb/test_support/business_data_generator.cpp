@@ -31,11 +31,11 @@ AccountWithPassword BusinessDataGenerator::generateRandomAccount()
     account.statusCode = api::AccountStatus::activated;
 
     account.password = QnUuid::createUuid().toSimpleString().toStdString();
-    account.passwordHa1 = nx_http::calcHa1(
+    account.passwordHa1 = nx::network::http::calcHa1(
         QUrl::fromPercentEncoding(QByteArray(account.email.c_str())).toStdString().c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
         account.password.c_str()).constData();
-    account.passwordHa1Sha256 = nx_http::calcHa1(
+    account.passwordHa1Sha256 = nx::network::http::calcHa1(
         QUrl::fromPercentEncoding(QByteArray(account.email.c_str())).toStdString().c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
         account.password.c_str(),

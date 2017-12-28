@@ -114,7 +114,7 @@ protected:
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
-    void sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody);
+    void sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody);
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

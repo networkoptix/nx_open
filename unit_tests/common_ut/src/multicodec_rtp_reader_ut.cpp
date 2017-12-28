@@ -99,7 +99,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
     QnRtspClient rtspClient(true);
-    rtspClient.setAuth( auth, nx_http::header::AuthScheme::basic );
+    rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
     ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
@@ -128,7 +128,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
     QnRtspClient rtspClient(true);
-    rtspClient.setAuth( auth, nx_http::header::AuthScheme::basic );
+    rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
     ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
@@ -187,7 +187,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
 
 TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP )
 {
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     ASSERT_TRUE( client.doGet( nx::utils::Url("http://192.168.0.1/valgrind-arm-linaro-multilib-2013.09.tar.gz") ) );
     qint64 totalBytesRead = 0;
     size_t readsCount = 0;
@@ -236,7 +236,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
     QnRtspClient rtspClient(true);
-    rtspClient.setAuth( auth, nx_http::header::AuthScheme::basic );
+    rtspClient.setAuth( auth, nx::network::http::header::AuthScheme::basic );
 
     rtspClient.setTransport( "tcp" );
     ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
@@ -416,7 +416,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
     for( auto& rtspClient: RtspClients )
     {
         rtspClient.reset( new QnRtspClient(true) );
-        rtspClient->setAuth( auth, nx_http::header::AuthScheme::basic );
+        rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
         rtspClient->setTransport( "tcp" );
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
         rtspClient->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
@@ -464,7 +464,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
     for( auto& rtspClient: RtspClients )
     {
         rtspClient.reset( new QnRtspClient(true) );
-        rtspClient->setAuth( auth, nx_http::header::AuthScheme::basic );
+        rtspClient->setAuth( auth, nx::network::http::header::AuthScheme::basic );
         rtspClient->setTransport( "tcp" );
         ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
         rtspClient->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );

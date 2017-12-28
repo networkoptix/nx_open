@@ -28,12 +28,12 @@ static void loadRemoteDataAsync(
 {
     auto requestCompletionFunc =
         [context, &outputData, server]
-        (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody)
         {
             bool success = false;
             ApiServerHardwareIdsData remoteData;
             QStringList serverData;
-            if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+            if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
             {
                 QnJsonRestResult jsonReply;
                 success = QJson::deserialize(msgBody, &jsonReply)
@@ -93,5 +93,5 @@ int QnMultiserverGetHardwareIdsRestHandler::executeGet(
     QnFusionRestHandlerDetail::serializeRestReply(
         outputData, params, result, contentType, restResult);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

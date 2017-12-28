@@ -29,8 +29,8 @@ public:
     CloudConnectVersion cloudConnectVersion;
 
     ListenRequest();
-    void serializeAttributes(nx::stun::Message* const message);
-    bool parseAttributes(const nx::stun::Message& message);
+    void serializeAttributes(nx::network::stun::Message* const message);
+    bool parseAttributes(const nx::network::stun::Message& message);
 };
 
 class NX_NETWORK_API ListenResponse:
@@ -49,8 +49,8 @@ public:
     std::vector<nx::String> trafficRelayUrls;
 
     ListenResponse();
-    void serializeAttributes(nx::stun::Message* const message);
-    bool parseAttributes(const nx::stun::Message& message);
+    void serializeAttributes(nx::network::stun::Message* const message);
+    bool parseAttributes(const nx::network::stun::Message& message);
 };
 
 } // namespace api

@@ -52,20 +52,20 @@ protected:
         userInfoPool(std::unique_ptr<nx::vms::cloud_integration::AbstractCloudUserInfoPoolSupplier>(supplier))
     {}
 
-    nx_http::header::Authorization generateAuthHeader(
+    nx::network::http::header::Authorization generateAuthHeader(
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce,
         const nx::Buffer& password = kTestPassword)
     {
-        nx_http::header::WWWAuthenticate authServerHeader;
-        authServerHeader.authScheme = nx_http::header::AuthScheme::digest;
+        nx::network::http::header::WWWAuthenticate authServerHeader;
+        authServerHeader.authScheme = nx::network::http::header::AuthScheme::digest;
         authServerHeader.params["nonce"] = cloudNonce + nx::vms::cloud_integration::CdbNonceFetcher::generateNonceTrailer();
         authServerHeader.params["realm"] = kTestRealm;
         authServerHeader.params["algorithm"] = kTestAlgorithm;
 
-        nx_http::header::DigestAuthorization authClientResponseHeader;
+        nx::network::http::header::DigestAuthorization authClientResponseHeader;
         authClientResponseHeader.digest->userid = userName;
-        nx_http::calcDigestResponse(
+        nx::network::http::calcDigestResponse(
             "GET",
             userName,
             password,
@@ -79,8 +79,8 @@ protected:
 
     nx::Buffer generateIntermediateResponse(const nx::Buffer& userName, const nx::Buffer& nonce)
     {
-        const auto ha1 = nx_http::calcHa1(userName, kTestRealm, kTestPassword, kTestAlgorithm);
-        return nx_http::calcIntermediateResponse(ha1, nonce);
+        const auto ha1 = nx::network::http::calcHa1(userName, kTestRealm, kTestPassword, kTestAlgorithm);
+        return nx::network::http::calcIntermediateResponse(ha1, nonce);
     }
     void given2UsersInfosWithCommonFirstNonce()
     {
@@ -201,7 +201,7 @@ protected:
 
     TestSupplier* supplier;
     TestCloudUserInfoPool userInfoPool;
-    std::map<nx::Buffer, nx_http::header::Authorization> userToAuthHeader;
+    std::map<nx::Buffer, nx::network::http::header::Authorization> userToAuthHeader;
 };
 
 TEST_F(CloudUserInfoPool, commonNonce_twoUsers_onlyFirstNonceIsCommon)

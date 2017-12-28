@@ -39,7 +39,7 @@ int QnLogLevelRestHandler::executeGet(
                 Qn::GlobalPermission::GlobalAdminPermission))
         {
             result.setError(QnJsonRestResult::Forbidden);
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
         QString level = *setValue;

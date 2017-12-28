@@ -12,12 +12,12 @@ ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName):
 {
 }
 
-void ResolvePeerRequest::serializeAttributes(nx::stun::Message* const message)
+void ResolvePeerRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
     message->newAttribute<stun::extension::attrs::HostName>(hostName);
 }
 
-bool ResolvePeerRequest::parseAttributes(const nx::stun::Message& message)
+bool ResolvePeerRequest::parseAttributes(const nx::network::stun::Message& message)
 {
     return readStringAttributeValue<stun::extension::attrs::HostName>(message, &hostName);
 }
@@ -28,14 +28,14 @@ ResolvePeerResponse::ResolvePeerResponse():
 {
 }
 
-void ResolvePeerResponse::serializeAttributes(nx::stun::Message* const message)
+void ResolvePeerResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
     message->newAttribute< stun::extension::attrs::PublicEndpointList >(std::move(endpoints));
     message->newAttribute< stun::extension::attrs::ConnectionMethods >(
         nx::String::number(static_cast<qulonglong>(connectionMethods)));
 }
 
-bool ResolvePeerResponse::parseAttributes(const nx::stun::Message& message)
+bool ResolvePeerResponse::parseAttributes(const nx::network::stun::Message& message)
 {
     if (!readAttributeValue<stun::extension::attrs::PublicEndpointList>(message, &endpoints))
         return false;

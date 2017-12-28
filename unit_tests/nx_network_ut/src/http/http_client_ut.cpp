@@ -16,7 +16,9 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/thread.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class HttpClientServerTest:
     public ::testing::Test
@@ -44,13 +46,13 @@ TEST_F(HttpClientServerTest, SimpleTest)
         "application/text"));
     ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     const nx::utils::Url url(lit("http://127.0.0.1:%1/test")
         .arg(testHttpServer()->serverAddress().port));
 
     ASSERT_TRUE(client.doGet(url));
     ASSERT_TRUE(client.response());
-    ASSERT_EQ(client.response()->statusLine.statusCode, nx_http::StatusCode::ok);
+    ASSERT_EQ(client.response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
     ASSERT_EQ(client.fetchMessageBodyBuffer(), "SimpleTest");
 }
 
@@ -109,18 +111,18 @@ TEST_F(HttpClientServerTest, FileDownload)
 
     const nx::utils::Url url(lit("http://127.0.0.1:%1/test.jpg")
         .arg(testHttpServer()->serverAddress().port));
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     client.setMessageBodyReadTimeoutMs(3000);
 
     for (int i = 0; i<77; ++i)
     {
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
-        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, client.response()->statusLine.statusCode);
         //emulating error response from server
         if (nx::utils::random::number(0, 2) == 0)
             continue;
-        nx_http::BufferType msgBody;
+        nx::network::http::BufferType msgBody;
         while (!client.eof())
             msgBody += client.fetchMessageBodyBuffer();
 
@@ -154,14 +156,14 @@ TEST_F(HttpClientServerTest, KeepAlive)
     const nx::utils::Url url(lit("http://127.0.0.1:%1/test.jpg")
         .arg(testHttpServer()->serverAddress().port));
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
 
     nx::Buffer msgBody;
     for (int i = 0; i < TEST_RUNS; ++i)
     {
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response());
-        ASSERT_EQ(client.response()->statusLine.statusCode, nx_http::StatusCode::ok);
+        ASSERT_EQ(client.response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
         nx::Buffer newMsgBody;
         while (!client.eof())
             newMsgBody += client.fetchMessageBodyBuffer();
@@ -184,10 +186,10 @@ TEST(HttpClientTest, DISABLED_KeepAlive2)
     nx::Buffer msgBody;
     for (int i = 0; i < TEST_RUNS; ++i)
     {
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response());
-        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, client.response()->statusLine.statusCode);
         nx::Buffer newMsgBody;
         while (!client.eof())
             newMsgBody += client.fetchMessageBodyBuffer();
@@ -208,11 +210,11 @@ TEST(HttpClientTest, DISABLED_KeepAlive3)
     nx::Buffer msgBody;
     for (int i = 0; i < TEST_RUNS; ++i)
     {
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         client.addAdditionalHeader("NX-EC-SYSTEM-NAME", "ak_ec_2.3");
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response());
-        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, client.response()->statusLine.statusCode);
         nx::Buffer newMsgBody;
         while (!client.eof())
             newMsgBody += client.fetchMessageBodyBuffer();
@@ -231,12 +233,12 @@ TEST(HttpClientTest, DISABLED_mjpgRetrieval)
     static const int TEST_RUNS = 100;
 
     nx::Buffer msgBody;
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     for (int i = 0; i < TEST_RUNS; ++i)
     {
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response());
-        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, client.response()->statusLine.statusCode);
         nx::Buffer newMsgBody;
         const int readsCount = nx::utils::random::number(10, 20);
         for (int i = 0; i < readsCount; ++i)
@@ -252,7 +254,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
     static const std::chrono::seconds TEST_DURATION(15);
 
     std::vector<nx::utils::thread> threads;
-    std::vector<std::pair<bool, std::shared_ptr<nx_http::HttpClient>>> clients;
+    std::vector<std::pair<bool, std::shared_ptr<nx::network::http::HttpClient>>> clients;
     std::mutex mtx;
     std::atomic<bool> isTerminated(false);
 
@@ -274,7 +276,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
             if ((nx::utils::random::number(0, 2) != 0) && !client->eof() && (client->response() != nullptr))
             {
                 const auto statusCode = client->response()->statusLine.statusCode;
-                ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
+                ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
                 nx::Buffer newMsgBody;
                 while (!client->eof())
                     newMsgBody += client->fetchMessageBodyBuffer();
@@ -287,7 +289,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
     };
 
     for (int i = 0; i < THREADS; ++i)
-        clients.emplace_back(false, std::make_shared<nx_http::HttpClient>());
+        clients.emplace_back(false, std::make_shared<nx::network::http::HttpClient>());
 
     for (int i = 0; i < THREADS; ++i)
         threads.emplace_back(nx::utils::thread(threadFunc));
@@ -304,7 +306,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
         client.reset();
 
         lk.lock();
-        clients[pos].second = std::make_shared<nx_http::HttpClient>();
+        clients[pos].second = std::make_shared<nx::network::http::HttpClient>();
         clients[pos].first = false;
         lk.unlock();
 
@@ -317,4 +319,6 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
         threads[i].join();
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -62,10 +62,10 @@ protected:
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
         network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_address));
+            nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_address));
     }
 
-    nx::stun::MessageDispatcher stunMessageDispatcher;
+    nx::network::stun::MessageDispatcher stunMessageDispatcher;
 
     CloudDataProviderMock cloud;
     conf::Settings settings;
@@ -100,7 +100,7 @@ TEST_F( ConnectTest, BindConnect )
 
     msClient.connect(
         nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address()));
+            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address()));
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::extension::methods::bind ) );
@@ -124,7 +124,7 @@ TEST_F( ConnectTest, BindConnect )
     const auto address = lit("http://%1.%2/test")
         .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID));
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     ASSERT_FALSE( client.doGet(address) );
 }
 

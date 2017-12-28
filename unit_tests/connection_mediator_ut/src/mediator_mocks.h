@@ -39,7 +39,7 @@ public:
                                     std::function< void( SocketAddress, bool ) > ) );
 
     MediaserverEndpointTesterMock( AbstractCloudDataProvider* cloudData,
-                        nx::stun::MessageDispatcher* dispatcher )
+                        nx::network::stun::MessageDispatcher* dispatcher )
         : MediaserverEndpointTesterBase( cloudData, dispatcher ) {}
 
     inline

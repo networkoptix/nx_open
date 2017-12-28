@@ -24,14 +24,14 @@ enum class ResultCode
 };
 
 NX_NETWORK_API hpm::api::NatTraversalResultCode toNatTraversalResultCode(ResultCode);
-NX_NETWORK_API nx_http::StatusCode::Value toHttpStatusCode(ResultCode);
-NX_NETWORK_API ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode);
+NX_NETWORK_API nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode);
+NX_NETWORK_API ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode);
 NX_NETWORK_API SystemError::ErrorCode toSystemError(ResultCode resultCode);
 
-NX_NETWORK_API nx_http::FusionRequestResult resultCodeToFusionRequestResult(
+NX_NETWORK_API nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(
     api::ResultCode resultCode);
 NX_NETWORK_API api::ResultCode fusionRequestResultToResultCode(
-    nx_http::FusionRequestResult result);
+    nx::network::http::FusionRequestResult result);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 

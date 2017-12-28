@@ -58,9 +58,9 @@ QnResourcePtr CloudUserAuthenticator::findResByName(const QByteArray& nxUserName
 
 Qn::AuthResult CloudUserAuthenticator::authorize(
     const QnResourcePtr& res,
-    const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader,
-    nx_http::HttpHeaders* const responseHeaders)
+    const nx::network::http::Method::ValueType& method,
+    const nx::network::http::header::Authorization& authorizationHeader,
+    nx::network::http::HttpHeaders* const responseHeaders)
 {
     QnResourcePtr authResource;
     Qn::AuthResult authResult = Qn::Auth_OK;
@@ -83,9 +83,9 @@ Qn::AuthResult CloudUserAuthenticator::authorize(
 }
 
 std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
-    const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader,
-    nx_http::HttpHeaders* const responseHeaders)
+    const nx::network::http::Method::ValueType& method,
+    const nx::network::http::header::Authorization& authorizationHeader,
+    nx::network::http::HttpHeaders* const responseHeaders)
 {
     const auto& commonModule = m_cloudConnectionManager->commonModule();
 
@@ -100,7 +100,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         });
     const bool isCloudUser = !cloudUsers.isEmpty();
 
-    if (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest)
+    if (authorizationHeader.authScheme != nx::network::http::header::AuthScheme::digest)
     {
         // Supporting only digest authentication for cloud-based authentication.
 
@@ -276,7 +276,7 @@ void CloudUserAuthenticator::removeExpiredRecordsFromCache(QnMutexLockerBase* co
 }
 
 QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
-    const nx_http::StringType& userName) const
+    const nx::network::http::StringType& userName) const
 {
     const auto userNameQString = QString::fromUtf8(userName);
     const auto& commonModule = m_cloudConnectionManager->commonModule();
@@ -296,8 +296,8 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
 
 void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     QnMutexLockerBase* const lk,
-    const nx_http::StringType& userid,
-    const nx_http::StringType& cloudNonce)
+    const nx::network::http::StringType& userid,
+    const nx::network::http::StringType& cloudNonce)
 {
     NX_LOGX(lm("Auth data for username %1, cloudNonce %2 not found in cache. Quering cloud...")
         .arg(userid).arg(cloudNonce), cl_logDEBUG2);
@@ -382,16 +382,16 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithCacheItem(
     QnMutexLockerBase* const /*lock*/,
     const CloudAuthenticationData& cacheItem,
-    const nx_http::StringType& cloudNonce,
-    const nx_http::StringType& nonceTrailer,
-    nx_http::HttpHeaders* const responseHeaders,
-    const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader) const
+    const nx::network::http::StringType& cloudNonce,
+    const nx::network::http::StringType& nonceTrailer,
+    nx::network::http::HttpHeaders* const responseHeaders,
+    const nx::network::http::Method::ValueType& method,
+    const nx::network::http::header::Authorization& authorizationHeader) const
 {
     NX_LOGX(lm("Authenticating cloud user %1, cloudNonce %2").
         arg(authorizationHeader.userid()).arg(cloudNonce), cl_logDEBUG2);
 
-    const auto ha2 = nx_http::calcHa2(method, authorizationHeader.digest->params["uri"]);
+    const auto ha2 = nx::network::http::calcHa2(method, authorizationHeader.digest->params["uri"]);
 
     if (!cacheItem.authorized)
     {
@@ -410,7 +410,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
         return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
     }
 
-    const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
+    const auto calculatedResponse = nx::network::http::calcResponseFromIntermediate(
         cacheItem.data.intermediateResponse.c_str(),
         cloudNonce.size(),
         nonceTrailer,

@@ -87,7 +87,7 @@ CrashReporter::~CrashReporter()
     m_activeCollection.waitForFinished();
 
     // cancel async IO
-    nx_http::AsyncHttpClientPtr httpClient;
+    nx::network::http::AsyncHttpClientPtr httpClient;
     {
         QnMutexLocker lock(&m_mutex);
         std::swap(httpClient, m_activeHttpClient);
@@ -207,9 +207,9 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
         return false;
     }
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     auto report = new ReportData(crash, settings, *this, httpClient.get());
-    QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
+    QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
                     report, &ReportData::finishReport, Qt::DirectConnection);
 
     httpClient->setUserName(Ec2StaticticsReporter::AUTH_USER);
@@ -239,7 +239,7 @@ ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,
 {
 }
 
-void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
+void ReportData::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (!httpClient->hasRequestSucceeded())
     {
@@ -266,7 +266,7 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     m_host.m_activeHttpClient.reset();
 }
 
-nx_http::HttpHeaders ReportData::makeHttpHeaders() const
+nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
 {
     const auto fileName = m_crashFile.fileName();
 
@@ -288,7 +288,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
     QCryptographicHash uuidHash(QCryptographicHash::Sha1);
     uuidHash.addData(m_host.commonModule()->moduleGUID().toByteArray());
 
-    nx_http::HttpHeaders headers;
+    nx::network::http::HttpHeaders headers;
     headers.insert(std::make_pair("Nx-Binary", binName.toUtf8()));
     headers.insert(std::make_pair("Nx-Uuid-Hash", uuidHash.result().toHex()));
     headers.insert(std::make_pair("Nx-Version", version.toUtf8()));

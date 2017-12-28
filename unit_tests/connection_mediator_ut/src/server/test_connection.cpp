@@ -18,7 +18,7 @@ TestTcpConnection::TestTcpConnection():
 }
 
 void TestTcpConnection::sendMessage(
-    nx::stun::Message /*message*/,
+    nx::network::stun::Message /*message*/,
     std::function<void(SystemError::ErrorCode)> /*handler*/)
 {
 }

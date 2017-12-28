@@ -137,7 +137,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
     ConnectionType::Type connectionType,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& contentEncoding,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
@@ -157,7 +157,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
         std::move(connectionLockGuard));
 
-    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
+    nx::network::http::HttpHeaders::const_iterator ec2ProtoVersionIter =
         request.headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
 
     m_remotePeerEcProtoVersion =
@@ -166,14 +166,14 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         : ec2ProtoVersionIter->second.toInt();
 
     //TODO #ak use binary filter stream for serializing transactions
-    m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
+    m_base64EncodeOutgoingTransactions = nx::network::http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
 
     auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
     if (keepAliveHeaderIter != request.headers.end())
     {
         m_remotePeerSupportsKeepAlive = true;
-        nx_http::header::KeepAlive keepAliveHeader;
+        nx::network::http::header::KeepAlive keepAliveHeader;
         if (keepAliveHeader.parse(keepAliveHeaderIter->second))
             m_tcpKeepAliveTimeout = std::max(
                 std::chrono::duration_cast<std::chrono::seconds>(m_tcpKeepAliveTimeout),
@@ -190,8 +190,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         m_compressResponseMsgBody = true;
 
     //creating parser sequence: http_msg_stream_parser -> ext_headers_processor -> transaction handler
-    auto incomingTransactionsRequestsParser = std::make_shared<nx_http::HttpMessageStreamParser>();
-    std::weak_ptr<nx_http::HttpMessageStreamParser> incomingTransactionsRequestsParserWeak(
+    auto incomingTransactionsRequestsParser = std::make_shared<nx::network::http::HttpMessageStreamParser>();
+    std::weak_ptr<nx::network::http::HttpMessageStreamParser> incomingTransactionsRequestsParserWeak(
         incomingTransactionsRequestsParser );
 
     auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( //this filter receives single HTTP message
@@ -244,8 +244,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     NX_LOGX(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
-    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
-    std::weak_ptr<nx_http::MultipartContentParser> multipartContentParserWeak( m_multipartContentParser );
+    m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
+    std::weak_ptr<nx::network::http::MultipartContentParser> multipartContentParserWeak( m_multipartContentParser );
     auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( //this filter receives single multipart message
         [this, multipartContentParserWeak]() {
             if( auto multipartContentParser = multipartContentParserWeak.lock() )
@@ -472,7 +472,7 @@ int QnTransactionTransportBase::remotePeerProtocolVersion() const
     return m_remotePeerEcProtoVersion;
 }
 
-nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authData() const
+nx::network::http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authData() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_httpAuthCacheItem;
@@ -518,16 +518,16 @@ void QnTransactionTransportBase::doOutgoingConnect(const nx::utils::Url& remoteP
 
     setState(ConnectingStage1);
 
-    m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient = nx::network::http::AsyncHttpClient::create();
     m_httpClient->bindToAioThread(getAioThread());
     m_httpClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
     m_httpClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
     connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
         this, &QnTransactionTransportBase::at_responseReceived,
         Qt::DirectConnection);
     connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnTransactionTransportBase::at_httpClientDone,
         Qt::DirectConnection);
 
@@ -552,7 +552,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const nx::utils::Url& remoteP
             "true");
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
-        nx_http::header::KeepAlive(
+        nx::network::http::header::KeepAlive(
             std::chrono::duration_cast<std::chrono::seconds>(
                 m_tcpKeepAliveTimeout)).toString());
 
@@ -759,7 +759,7 @@ bool QnTransactionTransportBase::hasUnsendData() const
 }
 
 void QnTransactionTransportBase::receivedTransaction(
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData )
 {
     emit onSomeDataReceivedFromRemotePeer();
@@ -768,7 +768,7 @@ void QnTransactionTransportBase::receivedTransaction(
 
     processChunkExtensions( headers );
 
-    if( nx_http::getHeaderValue(
+    if( nx::network::http::getHeaderValue(
             headers,
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
     {
@@ -827,7 +827,7 @@ QnUuid QnTransactionTransportBase::connectionGuid() const
 
 void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
     QSharedPointer<AbstractCommunicatingSocket> socket,
-    const nx_http::Request& /*request*/,
+    const nx::network::http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
     QnMutexLocker lk( &m_mutex );
@@ -1025,18 +1025,18 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         if( m_peerRole == prAccepting )
         {
             //sending transactions as a response to GET request
-            nx_http::HttpHeaders headers;
+            nx::network::http::HttpHeaders headers;
             headers.emplace(
                 "Content-Type",
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"
                     : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
-            headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+            headers.emplace( "Content-Length", nx::network::http::BufferType::number((int)(dataCtx.sourceData.size())) );
             addHttpChunkExtensions( &headers );
 
             dataCtx.encodedSourceData.clear();
             dataCtx.encodedSourceData += QByteArray("\r\n--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
-            nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
+            nx::network::http::serializeHeaders( headers, &dataCtx.encodedSourceData );
             dataCtx.encodedSourceData += "\r\n";
             dataCtx.encodedSourceData += dataCtx.sourceData;
 
@@ -1071,7 +1071,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         if( !m_outgoingTranClient )
         {
             using namespace std::chrono;
-            m_outgoingTranClient = nx_http::AsyncHttpClient::create();
+            m_outgoingTranClient = nx::network::http::AsyncHttpClient::create();
             m_outgoingTranClient->bindToAioThread(getAioThread());
             m_outgoingTranClient->setSendTimeoutMs(
                 duration_cast<milliseconds>(kSocketSendTimeout).count());   //it can take a long time to send large transactions
@@ -1087,7 +1087,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
                     Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
                     "true" );
             connect(
-                m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
+                m_outgoingTranClient.get(), &nx::network::http::AsyncHttpClient::done,
                 this, &QnTransactionTransportBase::postTransactionDone,
                 Qt::DirectConnection );
 
@@ -1109,7 +1109,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             m_postTranBaseUrl.setQuery( QString() );
         }
 
-        nx_http::HttpHeaders additionalHeaders;
+        nx::network::http::HttpHeaders additionalHeaders;
         addHttpChunkExtensions( &additionalHeaders );
         for( const auto& header: additionalHeaders )
         {
@@ -1147,14 +1147,14 @@ void QnTransactionTransportBase::onDataSent( SystemError::ErrorCode errorCode, s
     serializeAndSendNextDataBuffer();
 }
 
-void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
+void QnTransactionTransportBase::at_responseReceived(const nx::network::http::AsyncHttpClientPtr& client)
 {
     const int statusCode = client->response()->statusLine.statusCode;
 
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_responseReceived. statusCode = %1").
         arg(statusCode), cl_logDEBUG2 );
 
-    if (statusCode == nx_http::StatusCode::unauthorized)
+    if (statusCode == nx::network::http::StatusCode::unauthorized)
     {
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
         if (m_credentialsSource < CredentialsSource::none)
@@ -1164,7 +1164,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         }
         else
         {
-            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
+            QnUuid guid(nx::network::http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull())
             {
                 {
@@ -1189,15 +1189,15 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     }
 
     //saving credentials we used to authorize request
-    if (client->request().headers.find(nx_http::header::Authorization::NAME) !=
+    if (client->request().headers.find(nx::network::http::header::Authorization::NAME) !=
         client->request().headers.end())
     {
         m_httpAuthCacheItem = client->authCacheItem();
     }
 
-    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
+    nx::network::http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
+    nx::network::http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    nx::network::http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
     if (itrSystemIdentityTime != client->response()->headers.end())
         setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
@@ -1207,10 +1207,10 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         return;
     }
 
-    nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
+    nx::network::http::HttpHeaders::const_iterator ec2CloudHostItr =
         client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
 
-    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
+    nx::network::http::HttpHeaders::const_iterator ec2ProtoVersionIter =
         client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
 
     m_remotePeerEcProtoVersion =
@@ -1283,13 +1283,13 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             ConnectionLockGuard::Direction::Outgoing);
     }
 
-    if( !nx_http::StatusCode::isSuccessCode(statusCode) ) //checking that statusCode is 2xx
+    if( !nx::network::http::StatusCode::isSuccessCode(statusCode) ) //checking that statusCode is 2xx
     {
         cancelConnecting();
         return;
     }
 
-    if (client->authCacheItem().userCredentials.authToken.type == nx_http::AuthTokenType::password)
+    if (client->authCacheItem().userCredentials.authToken.type == nx::network::http::AuthTokenType::password)
     {
         m_remotePeerCredentials.setUser(client->authCacheItem().userCredentials.username);
         m_remotePeerCredentials.setPassword(
@@ -1300,7 +1300,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         return;
     }
 
-    nx_http::HttpHeaders::const_iterator contentTypeIter = client->response()->headers.find("Content-Type");
+    nx::network::http::HttpHeaders::const_iterator contentTypeIter = client->response()->headers.find("Content-Type");
     if( contentTypeIter == client->response()->headers.end() )
     {
         NX_LOG( lm("Remote transaction server (%1) did not specify Content-Type in response. Aborting connection...")
@@ -1358,7 +1358,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         repeatDoGet();
     }
     else {
-        if( nx_http::getHeaderValue(
+        if( nx::network::http::getHeaderValue(
                 m_httpClient->response()->headers,
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
@@ -1382,7 +1382,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             m_remotePeerEcProtoVersion >= kMinServerVersionWithClientKeepAlive)
         {
             m_remotePeerSupportsKeepAlive = true;
-            nx_http::header::KeepAlive keepAliveHeader;
+            nx::network::http::header::KeepAlive keepAliveHeader;
             if (keepAliveHeader.parse(keepAliveHeaderIter->second))
                 m_tcpKeepAliveTimeout = std::max(
                     std::chrono::duration_cast<std::chrono::seconds>(m_tcpKeepAliveTimeout),
@@ -1411,13 +1411,13 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     }
 }
 
-void QnTransactionTransportBase::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
+void QnTransactionTransportBase::at_httpClientDone( const nx::network::http::AsyncHttpClientPtr& client )
 {
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)client->state()), cl_logDEBUG2 );
 
-    nx_http::AsyncClient::State state = client->state();
-    if( state == nx_http::AsyncClient::State::sFailed ) {
+    nx::network::http::AsyncClient::State state = client->state();
+    if( state == nx::network::http::AsyncClient::State::sFailed ) {
         cancelConnecting();
     }
 }
@@ -1480,13 +1480,13 @@ QString QnTransactionTransportBase::toString( State state )
     }
 }
 
-void QnTransactionTransportBase::addHttpChunkExtensions( nx_http::HttpHeaders* const headers )
+void QnTransactionTransportBase::addHttpChunkExtensions( nx::network::http::HttpHeaders* const headers )
 {
     for( auto val: m_beforeSendingChunkHandlers )
         val.second( this, headers );
 }
 
-void QnTransactionTransportBase::processChunkExtensions( const nx_http::HttpHeaders& headers )
+void QnTransactionTransportBase::processChunkExtensions( const nx::network::http::HttpHeaders& headers )
 {
     if( headers.empty() )
         return;
@@ -1552,7 +1552,7 @@ void QnTransactionTransportBase::startListeningNonSafe()
         });
 }
 
-void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )
+void QnTransactionTransportBase::postTransactionDone( const nx::network::http::AsyncHttpClientPtr& client )
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -1571,7 +1571,7 @@ void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpCl
 
     DataToSend& dataCtx = m_dataToSend.front();
 
-    if( client->response()->statusLine.statusCode == nx_http::StatusCode::unauthorized &&
+    if( client->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized &&
         m_authOutgoingConnectionByServerKey )
     {
         NX_LOG(
@@ -1589,7 +1589,7 @@ void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpCl
         return;
     }
 
-    if( client->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    if( client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok )
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("Server %1 returned %2 (%3) response while posting transaction").
             arg(m_postTranBaseUrl.toString()).arg(client->response()->statusLine.statusCode).

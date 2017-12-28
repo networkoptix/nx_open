@@ -33,7 +33,7 @@ class TestConnection:
 {
 public:
     virtual void sendMessage(
-        nx::stun::Message /*message*/,
+        nx::network::stun::Message /*message*/,
         std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override
     {
     }
@@ -101,7 +101,7 @@ public:
     TestTcpConnection();
 
     virtual void sendMessage(
-        nx::stun::Message /*message*/,
+        nx::network::stun::Message /*message*/,
         std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override;
 
     virtual SocketAddress getSourceAddress() const override;

@@ -93,7 +93,7 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
 
 BasicTestFixture::~BasicTestFixture()
 {
-    std::list<std::unique_ptr<nx_http::AsyncClient>> httpClients;
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
     {
         QnMutexLocker lock(&m_mutex);
         httpClients.swap(m_httpClients);
@@ -238,7 +238,7 @@ void BasicTestFixture::startExchangingFixedData()
 {
     QnMutexLocker lock(&m_mutex);
 
-    m_httpClients.push_back(std::make_unique<nx_http::AsyncClient>());
+    m_httpClients.push_back(std::make_unique<nx::network::http::AsyncClient>());
     m_httpClients.back()->setSendTimeout(std::chrono::seconds::zero());
     m_httpClients.back()->setResponseReadTimeout(std::chrono::seconds::zero());
 
@@ -255,7 +255,7 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
     while (m_unfinishedRequestsLeft > 0)
     {
         const auto result = m_httpRequestResults.pop();
-        ASSERT_EQ(nx_http::StatusCode::ok, result.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, result.statusCode);
         ASSERT_EQ(m_expectedMsgBody, result.msgBody);
         --m_unfinishedRequestsLeft;
     }
@@ -386,7 +386,7 @@ void BasicTestFixture::startHttpServer()
 }
 
 void BasicTestFixture::onHttpRequestDone(
-    std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter)
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>>::iterator clientIter)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -400,7 +400,7 @@ void BasicTestFixture::onHttpRequestDone(
     if (httpClient->response())
     {
         result.statusCode =
-            (nx_http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
+            (nx::network::http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
         result.msgBody = httpClient->fetchMessageBodyBuffer();
     }
 

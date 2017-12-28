@@ -72,9 +72,9 @@ protected:
 
     void whenReceivedHlsPlaylistViaProxy()
     {
-        nx_http::BufferType msgBody;
-        nx_http::StringType contentType;
-        ASSERT_TRUE(nx_http::HttpClient::fetchResource(
+        nx::network::http::BufferType msgBody;
+        nx::network::http::StringType contentType;
+        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
             playlistProxyUrl(), &msgBody, &contentType));
         ASSERT_TRUE(m_receivedPlaylist.parse(msgBody));
     }
@@ -95,9 +95,9 @@ protected:
             chunkUrl.setScheme("http");
         }
 
-        nx_http::BufferType msgBody;
-        nx_http::StringType contentType;
-        ASSERT_TRUE(nx_http::HttpClient::fetchResource(
+        nx::network::http::BufferType msgBody;
+        nx::network::http::StringType contentType;
+        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
             chunkUrl, &msgBody, &contentType));
 
         ASSERT_EQ(kHlsChunkContents, msgBody);
@@ -168,7 +168,7 @@ private:
         m_hlsServer.registerStaticProcessor(
             kHlsPlaylistPath,
             playlist.toString(),
-            nx_http::kAudioMpegUrlMimeType);
+            nx::network::http::kAudioMpegUrlMimeType);
     }
 
     nx::utils::Url playlistProxyUrl() const

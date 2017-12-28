@@ -34,7 +34,7 @@ public:
     HolePunchingProcessor(
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher,
+        nx::network::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* listeningPeerPool,
         AbstractRelayClusterClient* relayClusterClient,
         stats::AbstractCollector* statisticsCollector);

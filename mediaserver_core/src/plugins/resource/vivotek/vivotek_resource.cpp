@@ -177,7 +177,7 @@ bool VivotekResource::parseStreamCodecCapabilities(
     return true;
 }
 
-void VivotekResource::tuneHttpClient(nx_http::HttpClient& httpClient) const
+void VivotekResource::tuneHttpClient(nx::network::http::HttpClient& httpClient) const
 {
     auto auth = getAuth();
     httpClient.setSendTimeoutMs(kHttpTimeout.count());
@@ -210,7 +210,7 @@ bool VivotekResource::doVivotekRequest(
     QString* outParameterName,
     QString* outParameterValue) const
 {
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     tuneHttpClient(httpClient);
 
     if (!httpClient.doGet(url))

@@ -132,7 +132,7 @@ private:
 
 private:
 
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     State m_state = State::initial;
     nx::Buffer m_unfinishedLine;
 

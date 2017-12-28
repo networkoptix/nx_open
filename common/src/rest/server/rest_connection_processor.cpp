@@ -125,54 +125,54 @@ void QnRestConnectionProcessor::run()
             QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
-                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
             if (!resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
             {
-                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
         }
 
-        const auto requestContentType = nx_http::getHeaderValue(d->request.headers, "Content-Type");
+        const auto requestContentType = nx::network::http::getHeaderValue(d->request.headers, "Content-Type");
         const auto method = d->request.requestLine.method.toUpper();
-        if (method == nx_http::Method::get)
+        if (method == nx::network::http::Method::get)
         {
             response = handler->executeGet(request);
         }
         else
-        if (method == nx_http::Method::post)
+        if (method == nx::network::http::Method::post)
         {
             response = handler->executePost(request, {requestContentType, d->requestBody});
         }
         else
-        if (method == nx_http::Method::put)
+        if (method == nx::network::http::Method::put)
         {
             response = handler->executePut(request, {requestContentType, d->requestBody});
         }
         else
-        if (method == nx_http::Method::delete_)
+        if (method == nx::network::http::Method::delete_)
         {
             response = handler->executeDelete(request);
         }
         else
         {
             NX_WARNING(this, lm("Unknown REST method %1").arg(method));
-            response.statusCode = nx_http::StatusCode::notFound;
+            response.statusCode = nx::network::http::StatusCode::notFound;
             response.content.type = "text/plain";
             response.content.body = "Invalid HTTP method";
         }
     }
     else
     {
-        response.statusCode = (nx_http::StatusCode::Value)
+        response.statusCode = (nx::network::http::StatusCode::Value)
             redirectTo(QnTcpListener::defaultPage(), response.content.type);
     }
 
     QByteArray contentEncoding;
-    if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip")
-        && !response.content.body.isEmpty() && response.statusCode == nx_http::StatusCode::ok
+    if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip")
+        && !response.content.body.isEmpty() && response.statusCode == nx::network::http::StatusCode::ok
         && !response.content.type.contains("image"))
     {
             d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(response.content.body);
@@ -183,9 +183,9 @@ void QnRestConnectionProcessor::run()
         d->response.messageBody = response.content.body;
     }
 
-    nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
-    nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
-    nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
+    nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
+    nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
+    nx::network::http::insertHeader(&d->response.headers, nx::network::http::HttpHeader("Pragma", "no-cache"));
 
     sendResponse(response.statusCode, response.content.type, contentEncoding,
         /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
@@ -212,15 +212,15 @@ void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
     m_noAuth = noAuth;
 }
 
-const nx_http::Request& QnRestConnectionProcessor::request() const
+const nx::network::http::Request& QnRestConnectionProcessor::request() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->request;
 }
 
-nx_http::Response* QnRestConnectionProcessor::response() const
+nx::network::http::Response* QnRestConnectionProcessor::response() const
 {
     Q_D(const QnTCPConnectionProcessor);
     //TODO #ak remove following const_cast in 2.3.1 (requires change in QnRestRequestHandler API)
-    return const_cast<nx_http::Response*>(&d->response);
+    return const_cast<nx::network::http::Response*>(&d->response);
 }

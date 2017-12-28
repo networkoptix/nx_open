@@ -32,7 +32,7 @@ int QnTimeSyncRestHandler::executeGet(
 {
     auto peerGuid = connection->request().headers.find( Qn::PEER_GUID_HEADER_NAME );
     if( peerGuid == connection->request().headers.end() )
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     auto timeSyncHeaderIter = connection->request().headers.find( TIME_SYNC_HEADER_NAME );
     if (timeSyncHeaderIter != connection->request().headers.end())
     {
@@ -61,7 +61,7 @@ int QnTimeSyncRestHandler::executeGet(
         Qn::PEER_GUID_HEADER_NAME,
         m_appServerConnection->commonModule()->moduleGUID().toByteArray() );
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnTimeSyncRestHandler::executePost(

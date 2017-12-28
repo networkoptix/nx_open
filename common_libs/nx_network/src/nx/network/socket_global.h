@@ -30,7 +30,7 @@ public:
     {
         DebugIni(): IniConfig("nx_network_debug.ini") { reload(); }
 
-        NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
+        NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
 
         // TODO: Should be moved to a different flag config, because module finders live in common.
         // This flag resides here just because there are no other flag configs for logging.

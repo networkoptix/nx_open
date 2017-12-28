@@ -35,7 +35,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         return false;
     }
 
-    nx_http::HttpClient client;
+    nx::network::http::HttpClient client;
     client.setUserName(server->getId().toString());
     client.setUserPassword(server->getAuthKey());
     auto user = owner->resourcePool()->getResourceById<QnUserResource>(owner->accessRights().userId);
@@ -53,7 +53,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         return false;
     }
 
-    nx_http::BufferType msgBody;
+    nx::network::http::BufferType msgBody;
     while (!client.eof())
         msgBody.append(client.fetchMessageBodyBuffer());
 

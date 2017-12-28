@@ -20,7 +20,7 @@ QnTransactionTransport::QnTransactionTransport(
     const ApiPeerData& remotePeer,
     QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& contentEncoding,
     const Qn::UserAccessData &userAccessData)
 :
@@ -76,7 +76,7 @@ void QnTransactionTransport::close()
     markAsNotSynchronized();
 }
 
-void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
+void QnTransactionTransport::fillAuthInfo(const nx::network::http::AsyncHttpClientPtr& httpClient, bool authByKey)
 {
     if (!m_bus->commonModule()->videowallGuid().isNull())
     {
@@ -105,7 +105,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
-                httpClient->setUserAuthToken(nx_http::Ha1AuthToken(adminUser->getDigest()));
+                httpClient->setUserAuthToken(nx::network::http::Ha1AuthToken(adminUser->getDigest()));
         }
         else
         {

@@ -156,7 +156,7 @@ public:
     void forceTimeResync();
     void processTimeSyncInfoHeader(
         const QnUuid& peerID,
-        const nx_http::StringType& serializedTimeSync,
+        const nx::network::http::StringType& serializedTimeSync,
         boost::optional<qint64> requestRttMillis);
     void resyncTimeWithPeer(const QnUuid& peerId);
 
@@ -187,15 +187,15 @@ private:
     struct PeerContext
     {
         SocketAddress peerAddress;
-        nx_http::AuthInfoCache::AuthorizationCacheItem authData;
+        nx::network::http::AuthInfoCache::AuthorizationCacheItem authData;
         nx::utils::TimerManager::TimerGuard syncTimerID;
-        nx_http::AsyncHttpClientPtr httpClient;
+        nx::network::http::AsyncHttpClientPtr httpClient;
         /** Request round-trip time. */
         boost::optional<qint64> rttMillis;
 
         PeerContext(
             SocketAddress _peerAddress,
-            nx_http::AuthInfoCache::AuthorizationCacheItem _authData )
+            nx::network::http::AuthInfoCache::AuthorizationCacheItem _authData )
         :
             peerAddress( std::move( _peerAddress ) ),
             authData( std::move(_authData) )
@@ -280,21 +280,21 @@ private:
     void startSynchronizingTimeWithPeer(
         const QnUuid& peerID,
         SocketAddress peerAddress,
-        nx_http::AuthInfoCache::AuthorizationCacheItem authData );
+        nx::network::http::AuthInfoCache::AuthorizationCacheItem authData );
     void stopSynchronizingTimeWithPeer( const QnUuid& peerID );
     void synchronizeWithPeer( const QnUuid& peerID );
     void timeSyncRequestDone(
         const QnUuid& peerID,
-        nx_http::AsyncHttpClientPtr clientPtr,
+        nx::network::http::AsyncHttpClientPtr clientPtr,
         qint64 requestRttMillis);
     TimeSyncInfo getTimeSyncInfoNonSafe() const;
     void syncTimeWithAllKnownServers(const QnMutexLockerBase& /*lock*/);
     void onBeforeSendingTransaction(
         QnTransactionTransportBase* transport,
-        nx_http::HttpHeaders* const headers);
+        nx::network::http::HttpHeaders* const headers);
     void onTransactionReceived(
         QnTransactionTransportBase* transport,
-        const nx_http::HttpHeaders& headers);
+        const nx::network::http::HttpHeaders& headers);
     void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
     void switchBackToLocalTime(QnMutexLockerBase* const /*lock*/);
     void checkSystemTimeForChange();

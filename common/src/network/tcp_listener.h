@@ -24,7 +24,7 @@ class QnTcpListener: public QnLongRunnable, public QnCommonModuleAware
 public:
     static const int DEFAULT_MAX_CONNECTIONS = 2000;
 
-    bool authenticate(const nx_http::Request& headers, nx_http::Response& responseHeaders) const;
+    bool authenticate(const nx::network::http::Request& headers, nx::network::http::Response& responseHeaders) const;
 
     void setAuth(const QByteArray& userName, const QByteArray& password);
 
@@ -68,7 +68,7 @@ public:
     /** Norlimize url path. cut off web prefix and '/' chars */
     static QString normalizedPath(const QString& path);
 
-    virtual void applyModToRequest(nx_http::Request* /*request*/) {}
+    virtual void applyModToRequest(nx::network::http::Request* /*request*/) {}
 
 signals:
     void portChanged();

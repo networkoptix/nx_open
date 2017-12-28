@@ -25,7 +25,7 @@ namespace detail {
 class NX_NETWORK_API ReverseConnection:
     public aio::BasicPollable,
     public AbstractAcceptableReverseConnection,
-    public nx_http::StreamConnectionHolder
+    public nx::network::http::StreamConnectionHolder
 {
     using base_type = aio::BasicPollable;
 
@@ -49,21 +49,21 @@ private:
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
     const nx::String m_peerName;
     ReverseConnectionCompletionHandler m_connectHandler;
-    std::unique_ptr<nx_http::AsyncMessagePipeline> m_httpPipeline;
+    std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
     ReverseConnectionCompletionHandler m_onConnectionActivated;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::cloud::relay::api::BeginListeningResponse m_beginListeningResponse;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* connection) override;
+        nx::network::http::AsyncMessagePipeline* connection) override;
 
     void onConnectDone(
         nx::cloud::relay::api::ResultCode resultCode,
         nx::cloud::relay::api::BeginListeningResponse response,
         std::unique_ptr<AbstractStreamSocket> streamSocket);
 
-    void relayNotificationReceived(nx_http::Message message);
+    void relayNotificationReceived(nx::network::http::Message message);
 };
 
 } // namespace detail

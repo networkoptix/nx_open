@@ -45,7 +45,7 @@ private:
     HanwhaSharedResourceContext* m_resourceConext = nullptr;
     QMetaObject::Connection m_syncTymeConnection;
     network::aio::Timer m_timer;
-    nx_http::AsyncClient m_httpClient;
+    nx::network::http::AsyncClient m_httpClient;
 
     std::list<utils::promise<void>*> m_startPromises;
     TimeZoneShiftHandler m_timeZoneHandler;

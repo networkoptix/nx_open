@@ -27,7 +27,7 @@ void ReverseConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_httpClient.bindToAioThread(aioThread);
 }
 
-void ReverseConnector::setHttpTimeouts(nx_http::AsyncClient::Timeouts timeouts)
+void ReverseConnector::setHttpTimeouts(nx::network::http::AsyncClient::Timeouts timeouts)
 {
     m_httpClient.setSendTimeout(timeouts.sendTimeout);
     m_httpClient.setResponseReadTimeout(timeouts.responseReadTimeout);
@@ -50,7 +50,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
                 return handler(SystemError::connectionRefused);
 
             if (m_httpClient.response()->statusLine.statusCode !=
-                    nx_http::StatusCode::switchingProtocols)
+                    nx::network::http::StatusCode::switchingProtocols)
             {
                 NX_LOG(lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient.response()->statusLine.statusCode)
@@ -62,7 +62,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             handler(processHeaders(m_httpClient.response()->headers));
         };
 
-    auto url = url::Builder().setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint).toUrl();
+    auto url = url::Builder().setScheme(nx::network::http::kUrlSchemeName).setEndpoint(endpoint).toUrl();
     m_httpClient.doUpgrade(url, kNxRc, std::move(onHttpDone));
 }
 
@@ -108,7 +108,7 @@ void ReverseConnector::stopWhileInAioThread()
 }
 
 SystemError::ErrorCode ReverseConnector::processHeaders(
-    const nx_http::HttpHeaders& headers)
+    const nx::network::http::HttpHeaders& headers)
 {
     const auto upgrade = headers.find(kUpgrade);
     if (upgrade == headers.end() || !upgrade->second.startsWith(kNxRc))

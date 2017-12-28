@@ -266,51 +266,51 @@ void Appserver2Process::registerHttpHandlers(
     commonModule()->setModuleInformation(selfInformation);
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformation",
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(owner->commonModule()->moduleInformation());
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         });
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformationAuthenticated",
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(owner->commonModule()->moduleInformation());
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         });
 
-    auto getNonce = [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult* result)
+    auto getNonce = [](const nx::network::http::Request&, QnHttpConnectionListener*, QnJsonRestResult* result)
     {
         QnGetNonceReply reply;
         reply.nonce = QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 16);
         reply.realm = nx::network::AppInfo::realm();
         result->setReply(reply);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     };
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/getNonce", getNonce);
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "web/api/getNonce", getNonce);
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/ping",
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(rest::helper::PingRestHelper::data(owner->commonModule()));
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", rest::helper::P2pStatistics::kUrlPath,
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(rest::helper::P2pStatistics::data(owner->commonModule()));
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/backupDatabase",
-        [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult*)
+        [](const nx::network::http::Request&, QnHttpConnectionListener*, QnJsonRestResult*)
         {
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/configure",
-        [](const nx_http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             QnConfigureReply reply;
             reply.restartNeeded = false;
@@ -321,19 +321,19 @@ void Appserver2Process::registerHttpHandlers(
                 data.localSystemId != owner->globalSettings()->localSystemId())
             {
                 result->setError(QnJsonRestResult::CantProcessRequest, lit("UNSUPPORTED"));
-                return nx_http::StatusCode::badRequest;
+                return nx::network::http::StatusCode::badRequest;
             }
             if (data.rewriteLocalSettings)
             {
                 owner->commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
                 owner->globalSettings()->resynchronizeNowSync();
             }
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
         [this](
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
@@ -344,7 +344,7 @@ void Appserver2Process::registerHttpHandlers(
                 QnAuthSession(),
                 data,
                 result);
-            if (nx_http::StatusCode::isSuccessCode(statusCode))
+            if (nx::network::http::StatusCode::isSuccessCode(statusCode))
             {
                 m_ecConnection.load()->addRemotePeer(
                     systemMergeProcessor.remoteModuleInformation().id,
@@ -356,7 +356,7 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",
         [this](
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
@@ -370,7 +370,7 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupCloudSystem",
         [this](
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
@@ -386,7 +386,7 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/saveCloudSystemCredentials",
         [this](
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
@@ -399,7 +399,7 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromCloud",
         [this](
-            const nx_http::Request& request,
+            const nx::network::http::Request& request,
             QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
@@ -410,7 +410,7 @@ void Appserver2Process::registerHttpHandlers(
             DetachFromCloudReply reply;
             const auto resultCode = vmsCloudConnectionProcessor.detachFromCloud(data, &reply);
             result->setReply(reply);
-            if (resultCode != nx_http::StatusCode::ok)
+            if (resultCode != nx::network::http::StatusCode::ok)
                 result->setError(QnRestResult::CantProcessRequest);
             return resultCode;
         });

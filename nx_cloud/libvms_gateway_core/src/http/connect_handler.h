@@ -14,25 +14,25 @@ class Settings;
 } // namespace conf
 
 class ConnectHandler:
-    public nx_http::AbstractHttpRequestHandler,
-    public network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>
+    public nx::network::http::AbstractHttpRequestHandler,
+    public network::server::StreamConnectionHolder<nx::network::http::deprecated::AsyncMessagePipeline>
 {
     using base_type = 
-        network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>;
+        network::server::StreamConnectionHolder<nx::network::http::deprecated::AsyncMessagePipeline>;
 
 public:
     ConnectHandler(const conf::Settings& settings);
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler) override;
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::deprecated::AsyncMessagePipeline* connection) override;
+        nx::network::http::deprecated::AsyncMessagePipeline* connection) override;
 
 private:
     typedef AbstractCommunicatingSocket Socket;
@@ -42,9 +42,9 @@ private:
 
     const conf::Settings& m_settings;
 
-    nx_http::Request m_request;
-    nx_http::HttpServerConnection* m_connection;
-    nx_http::RequestProcessedHandler m_completionHandler;
+    nx::network::http::Request m_request;
+    nx::network::http::HttpServerConnection* m_connection;
+    nx::network::http::RequestProcessedHandler m_completionHandler;
 
     Buffer m_connectionBuffer;
     std::unique_ptr<AbstractCommunicatingSocket> m_connectionSocket;

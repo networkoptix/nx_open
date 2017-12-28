@@ -26,7 +26,7 @@ public:
         QnHttpConnectionListener* owner);
 
 
-    static void cleanupProxyInfo(nx_http::Request* request);
+    static void cleanupProxyInfo(nx::network::http::Request* request);
 
     virtual ~QnProxyConnectionProcessor();
 protected:

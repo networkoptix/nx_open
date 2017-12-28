@@ -29,11 +29,11 @@ bool BeginListeningResponse::operator==(const BeginListeningResponse& right) con
         && keepAliveOptions == right.keepAliveOptions;
 }
 
-bool serializeToHeaders(nx_http::HttpHeaders* where, const BeginListeningResponse& what)
+bool serializeToHeaders(nx::network::http::HttpHeaders* where, const BeginListeningResponse& what)
 {
     where->emplace(
         kPreemptiveConnectionCountHeaderName,
-        nx_http::StringType::number(what.preemptiveConnectionCount));
+        nx::network::http::StringType::number(what.preemptiveConnectionCount));
 
     if (what.keepAliveOptions)
         where->emplace(kTcpKeepAliveHeaderName, what.keepAliveOptions->toString().toUtf8());
@@ -41,13 +41,13 @@ bool serializeToHeaders(nx_http::HttpHeaders* where, const BeginListeningRespons
     return true;
 }
 
-bool serializeToHeaders(nx_http::HttpHeaders* where, const CreateClientSessionResponse& what)
+bool serializeToHeaders(nx::network::http::HttpHeaders* where, const CreateClientSessionResponse& what)
 {
     where->emplace("Location", what.actualRelayUrl.c_str());
     return true;
 }
 
-bool deserializeFromHeaders(const nx_http::HttpHeaders& from, BeginListeningResponse* what)
+bool deserializeFromHeaders(const nx::network::http::HttpHeaders& from, BeginListeningResponse* what)
 {
     auto it = from.find(kPreemptiveConnectionCountHeaderName);
     if (it != from.end())

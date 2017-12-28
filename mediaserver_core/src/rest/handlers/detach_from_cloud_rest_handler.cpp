@@ -70,7 +70,7 @@ int QnDetachFromCloudRestHandler::execute(
         m_cloudManagerGroup);
     DetachFromCloudReply reply;
     const auto resultCode = vmsCloudConnectionProcessor.detachFromCloud(data, &reply);
-    if (resultCode != nx_http::StatusCode::ok)
+    if (resultCode != nx::network::http::StatusCode::ok)
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,

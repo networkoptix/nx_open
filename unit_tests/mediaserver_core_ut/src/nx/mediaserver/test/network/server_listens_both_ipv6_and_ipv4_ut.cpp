@@ -36,7 +36,7 @@ TEST(ServerListensBothIpv6AndIpv4, main)
     bool ipv4AddressPresent = false;
     bool ipv6AddressPresent = false;
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     nx::utils::Url testUrl("http://host:111/static/index.html");
     testUrl.setPort(mediaServerLauncher->port());
 

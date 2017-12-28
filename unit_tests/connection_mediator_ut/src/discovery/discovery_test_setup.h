@@ -50,7 +50,7 @@ protected:
     TestHttpServer& httpServer();
     void stopHttpServer();
 
-    void registerWebSocketAcceptHandlerAt(const nx_http::StringType path);
+    void registerWebSocketAcceptHandlerAt(const nx::network::http::StringType path);
 
 private:
     std::unique_ptr<TestHttpServer> m_httpServer;

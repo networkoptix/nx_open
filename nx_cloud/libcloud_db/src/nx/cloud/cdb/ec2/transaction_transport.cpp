@@ -22,7 +22,7 @@ TransactionTransport::TransactionTransport(
     const nx::String& systemId,
     const ::ec2::ApiPeerData& localPeer,
     const SocketAddress& remotePeerEndpoint,
-    const nx_http::Request& request)
+    const nx::network::http::Request& request)
 :
     m_baseTransactionTransport(
         QnUuid(), //< localSystemId. Not used here
@@ -184,7 +184,7 @@ void TransactionTransport::sendTransaction(
 }
 
 void TransactionTransport::receivedTransaction(
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData)
 {
     m_baseTransactionTransport.receivedTransaction(headers, tranData);

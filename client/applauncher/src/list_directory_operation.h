@@ -80,14 +80,14 @@ namespace detail
 
     private:
         const QString m_localTargetDirPath;
-        nx_http::AsyncHttpClientPtr m_httpClient;
+        nx::network::http::AsyncHttpClientPtr m_httpClient;
         int64_t m_totalsize;
         std::list<detail::RDirEntry> m_entries;
         nx::utils::Url m_downloadUrl;
 
     private slots:
-        void onResponseReceived( nx_http::AsyncHttpClientPtr );
-        void onHttpDone( nx_http::AsyncHttpClientPtr );
+        void onResponseReceived( nx::network::http::AsyncHttpClientPtr );
+        void onHttpDone( nx::network::http::AsyncHttpClientPtr );
     };
 }
 

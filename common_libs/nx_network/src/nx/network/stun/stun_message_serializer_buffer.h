@@ -3,6 +3,7 @@
 #include <nx/network/buffer.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class NX_NETWORK_API MessageSerializerBuffer
@@ -33,4 +34,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

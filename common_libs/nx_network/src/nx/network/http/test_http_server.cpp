@@ -10,7 +10,7 @@
 //-------------------------------------------------------------------------------------------------
 
 TestAuthenticationManager::TestAuthenticationManager(
-    nx_http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
+    nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
     :
     BaseType(authenticationDataProvider),
     m_authenticationEnabled(false)
@@ -18,9 +18,9 @@ TestAuthenticationManager::TestAuthenticationManager(
 }
 
 void TestAuthenticationManager::authenticate(
-    const nx_http::HttpServerConnection& connection,
-    const nx_http::Request& request,
-    nx_http::server::AuthenticationCompletionHandler completionHandler)
+    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::Request& request,
+    nx::network::http::server::AuthenticationCompletionHandler completionHandler)
 {
     if (m_authenticationEnabled)
     {
@@ -28,11 +28,11 @@ void TestAuthenticationManager::authenticate(
     }
     else
     {
-        completionHandler(nx_http::server::AuthenticationResult(
+        completionHandler(nx::network::http::server::AuthenticationResult(
             true,
             nx::utils::stree::ResourceContainer(),
             boost::none,
-            nx_http::HttpHeaders(),
+            nx::network::http::HttpHeaders(),
             nullptr));
     }
 }
@@ -95,13 +95,13 @@ void TestHttpServer::registerUserCredentials(
 bool TestHttpServer::registerStaticProcessor(
     const QString& path,
     QByteArray msgBody,
-    const nx_http::StringType& mimeType,
-    nx_http::StringType method)
+    const nx::network::http::StringType& mimeType,
+    nx::network::http::StringType method)
 {
-    return registerRequestProcessor<nx_http::server::handler::StaticData>(
-        path, [=]() -> std::unique_ptr<nx_http::server::handler::StaticData>
+    return registerRequestProcessor<nx::network::http::server::handler::StaticData>(
+        path, [=]() -> std::unique_ptr<nx::network::http::server::handler::StaticData>
         {
-            return std::make_unique<nx_http::server::handler::StaticData>(
+            return std::make_unique<nx::network::http::server::handler::StaticData>(
                 mimeType,
                 std::move(msgBody));
         },
@@ -111,8 +111,8 @@ bool TestHttpServer::registerStaticProcessor(
 bool TestHttpServer::registerFileProvider(
     const QString& httpPath,
     const QString& filePath,
-    const nx_http::StringType& mimeType,
-    nx_http::StringType method)
+    const nx::network::http::StringType& mimeType,
+    nx::network::http::StringType method)
 {
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly))
@@ -135,36 +135,36 @@ bool TestHttpServer::registerContentProvider(
     return registerRequestProcessorFunc(
         httpPath,
         [contentProviderFactoryShared](
-            nx_http::HttpServerConnection* const /*connection*/,
+            nx::network::http::HttpServerConnection* const /*connection*/,
             nx::utils::stree::ResourceContainer /*authInfo*/,
-            nx_http::Request /*request*/,
-            nx_http::Response* const /*response*/,
-            nx_http::RequestProcessedHandler completionHandler)
+            nx::network::http::Request /*request*/,
+            nx::network::http::Response* const /*response*/,
+            nx::network::http::RequestProcessedHandler completionHandler)
         {
             auto msgBody = (*contentProviderFactoryShared)();
             if (msgBody)
             {
                 completionHandler(
-                    nx_http::RequestResult(nx_http::StatusCode::ok, std::move(msgBody)));
+                    nx::network::http::RequestResult(nx::network::http::StatusCode::ok, std::move(msgBody)));
             }
             else
             {
-                completionHandler(nx_http::StatusCode::internalServerError);
+                completionHandler(nx::network::http::StatusCode::internalServerError);
             }
         },
-        nx_http::Method::get);
+        nx::network::http::Method::get);
 }
 
 bool TestHttpServer::registerRedirectHandler(
     const QString& resourcePath,
     const nx::utils::Url& location,
-    nx_http::StringType method)
+    nx::network::http::StringType method)
 {
-    return registerRequestProcessor<nx_http::server::handler::Redirect>(
+    return registerRequestProcessor<nx::network::http::server::handler::Redirect>(
         resourcePath,
-        [location]() -> std::unique_ptr<nx_http::server::handler::Redirect>
+        [location]() -> std::unique_ptr<nx::network::http::server::handler::Redirect>
         {
-            return std::make_unique<nx_http::server::handler::Redirect>(location);
+            return std::make_unique<nx::network::http::server::handler::Redirect>(location);
         },
         method);
 }
@@ -190,7 +190,7 @@ void RandomlyFailingHttpConnection::setResponseBuffer(const QByteArray& buf)
     m_responseBuffer = buf;
 }
 
-void RandomlyFailingHttpConnection::processMessage(nx_http::Message /*request*/)
+void RandomlyFailingHttpConnection::processMessage(nx::network::http::Message /*request*/)
 {
     using namespace std::placeholders;
 

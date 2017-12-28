@@ -34,7 +34,7 @@ private:
 private:
     QTimer m_timer;
     QnMutex m_mutex;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
 };
 
 } // namespace mediaserverm_previousData

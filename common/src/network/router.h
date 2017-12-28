@@ -36,7 +36,7 @@ public:
 
     // todo: new routing functions below. We have to delete above functions
     QnRoute routeTo(const QnUuid &id);
-    void updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id);
+    void updateRequest(QUrl& url, nx::network::http::HttpHeaders& headers, const QnUuid &id);
 
 private:
     const nx::vms::discovery::Manager* m_moduleManager;

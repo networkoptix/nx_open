@@ -78,8 +78,8 @@ public:
 
 private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
-    nx_http::MessageDispatcher m_httpMessageDispatcher;
-    std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
+    nx::network::http::MessageDispatcher m_httpMessageDispatcher;
+    std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
     std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> m_serverClient;
@@ -104,7 +104,7 @@ private:
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> acceptedSocket);
-    void onMessageReceived(nx::stun::Message message);
+    void onMessageReceived(nx::network::stun::Message message);
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,

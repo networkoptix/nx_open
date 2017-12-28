@@ -35,7 +35,7 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    nx_http::AsyncHttpClientPtr m_checkInputPortsRequest;
+    nx::network::http::AsyncHttpClientPtr m_checkInputPortsRequest;
     mutable QnMutex m_ioPortMutex;
     nx::utils::Url m_checkInputUrl;
     bool m_inputMonitored;
@@ -46,7 +46,7 @@ private:
     void checkInputPortState( qint64 timerID );
 
 private slots:
-    void onCheckPortRequestDone( nx_http::AsyncHttpClientPtr httpClient );
+    void onCheckPortRequestDone( nx::network::http::AsyncHttpClientPtr httpClient );
 };
 
 #endif  //ENABLE_ONVIF

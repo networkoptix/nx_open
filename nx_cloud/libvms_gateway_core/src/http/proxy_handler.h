@@ -17,8 +17,8 @@ class RunTimeOptions;
 } // namespace conf
 
 class ProxyHandler:
-    public nx_http::AbstractHttpRequestHandler,
-    public nx_http::server::proxy::AbstractResponseSender
+    public nx::network::http::AbstractHttpRequestHandler,
+    public nx::network::http::server::proxy::AbstractResponseSender
 {
 public:
     ProxyHandler(
@@ -27,44 +27,44 @@ public:
         relaying::AbstractListeningPeerPool* listeningPeerPool);
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler) override;
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override;
 
     virtual void sendResponse(
-        nx_http::RequestResult requestResult,
-        boost::optional<nx_http::Response> response) override;
+        nx::network::http::RequestResult requestResult,
+        boost::optional<nx::network::http::Response> response) override;
 
 private:
     struct TargetHost
     {
-        nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
+        nx::network::http::StatusCode::Value status = nx::network::http::StatusCode::notImplemented;
         SocketAddress target;
         conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
 
         TargetHost() = default;
-        TargetHost(nx_http::StatusCode::Value status, SocketAddress target = {});
+        TargetHost(nx::network::http::StatusCode::Value status, SocketAddress target = {});
     };
 
     const conf::Settings& m_settings;
     const conf::RunTimeOptions& m_runTimeOptions;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
 
-    nx_http::Request m_request;
-    nx_http::RequestProcessedHandler m_requestCompletionHandler;
-    std::unique_ptr<nx_http::server::proxy::ProxyWorker> m_requestProxyWorker;
+    nx::network::http::Request m_request;
+    nx::network::http::RequestProcessedHandler m_requestCompletionHandler;
+    std::unique_ptr<nx::network::http::server::proxy::ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
     bool m_sslConnectionRequired = false;
     std::unique_ptr<TargetPeerConnector> m_targetPeerConnector;
 
     TargetHost cutTargetFromRequest(
-        const nx_http::HttpServerConnection& connection,
-        nx_http::Request* const request);
+        const nx::network::http::HttpServerConnection& connection,
+        nx::network::http::Request* const request);
 
-    TargetHost cutTargetFromUrl(nx_http::Request* const request);
-    TargetHost cutTargetFromPath(nx_http::Request* const request);
+    TargetHost cutTargetFromUrl(nx::network::http::Request* const request);
+    TargetHost cutTargetFromPath(nx::network::http::Request* const request);
 
     void onConnected(
         const SocketAddress& targetAddress,

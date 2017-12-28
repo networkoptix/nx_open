@@ -12,7 +12,7 @@ AsyncRequestsExecutor::AsyncRequestsExecutor(
     m_cdbEndPointFetcher(
         std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
             cdbEndPointFetcher)),
-    m_requestTimeout(nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout)
+    m_requestTimeout(nx::network::http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout)
 {
 }
 

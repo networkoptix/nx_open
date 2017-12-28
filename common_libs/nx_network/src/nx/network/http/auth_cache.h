@@ -15,7 +15,9 @@
 #include "auth_tools.h"
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 struct AuthInfo
 {
@@ -116,4 +118,6 @@ private:
     AuthInfoCache& operator=(const AuthInfoCache&);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

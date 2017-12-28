@@ -5,10 +5,12 @@
 #include "../buffer.h"
 #include "../connection_server/base_protocol_message_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
- * This class is just a wrapper on top of nx_http::HttpStreamReader
+ * This class is just a wrapper on top of nx::network::http::HttpStreamReader
  * for use with nx::network::server::BaseStreamProtocolConnection class.
  */
 class NX_NETWORK_API MessageParser:
@@ -71,4 +73,7 @@ private:
 };
 
 } // namespace deprecated
-} // namespace nx_http
+
+} // namespace nx
+} // namespace network
+} // namespace http

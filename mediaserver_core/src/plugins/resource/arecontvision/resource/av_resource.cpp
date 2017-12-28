@@ -162,24 +162,24 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     url.setUserName( auth.user() );
     url.setPassword( auth.password() );
 
-    nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClientCaptured = nx::network::http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
 
     const QnMacAddress cameraMAC = getMAC();
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
-        ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
+        ( const nx::network::http::AsyncHttpClientPtr& httpClient ) mutable
     {
         httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
         httpClientCaptured.reset();
 
         auto completionHandlerLocal = std::move( completionHandler );
         if( (httpClient->failed()) ||
-            (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) )
+            (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok) )
         {
             completionHandlerLocal( false );
             return;
         }
-        nx_http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
+        nx::network::http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
         const int sepIndex = msgBody.indexOf('=');
         if( sepIndex == -1 )
         {
@@ -189,7 +189,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
         const QByteArray& mac = msgBody.mid( sepIndex+1 );
         completionHandlerLocal( cameraMAC == QnMacAddress(mac) );
     };
-    connect( httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+    connect( httpClientCaptured.get(), &nx::network::http::AsyncHttpClient::done,
              this, httpReqCompletionHandler,
              Qt::DirectConnection );
 
@@ -306,7 +306,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     nx::utils::Url url;
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
-    url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    url.setPort(QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/set"));
     url.setQuery(lit("auxout=%1").arg(activate ? lit("on") : lit("off")));
 
@@ -319,10 +319,10 @@ bool QnPlAreconVisionResource::setRelayOutputState(
         [autoResetTimeoutMS, url](
             SystemError::ErrorCode errorCode,
             int statusCode,
-            nx_http::BufferType)
+            nx::network::http::BufferType)
         {
             if (errorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+                statusCode != nx::network::http::StatusCode::ok)
             {
                 return;
             }
@@ -333,19 +333,19 @@ bool QnPlAreconVisionResource::setRelayOutputState(
                     auto resetOutputUrl = url;
                     resetOutputUrl.setPath(lit("/set"));
                     resetOutputUrl.setQuery(lit("auxout=off"));
-                    nx_http::downloadFileAsync(
+                    nx::network::http::downloadFileAsync(
                         resetOutputUrl,
-                        [](SystemError::ErrorCode, int, nx_http::BufferType){});
+                        [](SystemError::ErrorCode, int, nx::network::http::BufferType){});
                 },
                 std::chrono::milliseconds(autoResetTimeoutMS));
         };
 
-    const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
+    const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx::network::http::BufferType) {};
 
     if (activate && (autoResetTimeoutMS > 0))
-        nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
+        nx::network::http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
     else
-        nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+        nx::network::http::downloadFileAsync(url, emptyOutputDoneHandler);
     return true;
 }
 
@@ -679,7 +679,7 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     nx::utils::Url url;
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
-    url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    url.setPort(QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/get"));
     url.setQuery(lit("auxin"));
 
@@ -688,14 +688,14 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setUserName(auth.user());
     url.setPassword(auth.password());
 
-    m_relayInputClient = nx_http::AsyncHttpClient::create();
-    connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
+    m_relayInputClient = nx::network::http::AsyncHttpClient::create();
+    connect(m_relayInputClient.get(), &nx::network::http::AsyncHttpClient::done,
             this,
-            [this, completionHandler](nx_http::AsyncHttpClientPtr client) {
+            [this, completionHandler](nx::network::http::AsyncHttpClientPtr client) {
                 if (completionHandler)
                     completionHandler(
                         client->response() &&
-                        client->response()->statusLine.statusCode == nx_http::StatusCode::ok);
+                        client->response()->statusLine.statusCode == nx::network::http::StatusCode::ok);
                 inputPortStateRequestDone(std::move(client));
             },
             Qt::DirectConnection);
@@ -708,14 +708,14 @@ void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
     m_relayInputClient.reset();
 }
 
-void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client)
+void QnPlAreconVisionResource::inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client)
 {
     static const unsigned int INPUT_PORT_STATE_CHECK_TIMEOUT_MS = 1000;
 
     bool portEnabled = false;
     if (client->failed() ||
         client->response() == nullptr ||
-        client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         portEnabled = false;
     }

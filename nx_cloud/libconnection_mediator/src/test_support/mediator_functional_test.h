@@ -70,7 +70,7 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
 
-    std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
+    std::tuple<nx::network::http::StatusCode::Value, data::ListeningPeers>
         getListeningPeers() const;
 
 protected:
