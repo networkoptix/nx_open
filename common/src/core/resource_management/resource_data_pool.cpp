@@ -26,10 +26,11 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPool
 }
 
 
-QnResourceDataPool::QnResourceDataPool(QObject *parent): 
-    QObject(parent) 
+QnResourceDataPool::QnResourceDataPool(QObject *parent):
+    QObject(parent)
 {
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
+    m_shortVendorByName.insert(lit("digital_watchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
     m_shortVendorByName.insert(lit("ipnc"), lit("dw"));
     m_shortVendorByName.insert(lit("acti corporation"), lit("acti"));
@@ -66,7 +67,7 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
         keyList.append(vendorAndModelKey + lit("|") + firmware.toLower());
 
     QnResourceData result;
-    
+
     {
         QnMutexLocker lock(&m_cachedDataMtx);
 
@@ -88,7 +89,7 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
         }
     }
 
-    return result;    
+    return result;
 }
 
 bool QnResourceDataPool::load(const QString &fileName) {
