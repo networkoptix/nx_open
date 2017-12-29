@@ -119,6 +119,7 @@ namespace nx_ms_conf
     static const QLatin1String ALLOW_REMOVABLE_STORAGES("allowRemovableStorages");
 
     static const QLatin1String CHECK_FOR_UPDATE_REFRESH_TIMEOUT("checkForUpdateRefreshTimeout");
+    static const QLatin1String CHECK_FOR_UPDATE_URL("checkForUpdateUrl");
 }
 
 /**

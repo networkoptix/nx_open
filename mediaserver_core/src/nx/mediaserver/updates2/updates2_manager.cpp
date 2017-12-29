@@ -101,8 +101,9 @@ void Updates2Manager::checkForUpdateUnsafe()
     if (qnSyncTime->currentMSecsSinceEpoch() - m_currentStatus.lastRefreshTime < refreshTimeout())
         return;
 
-    const update::info::AbstractUpdateRegistryPtr updateRegistry = update::info::checkSync();
-    QnSoftwareVersion version;
+    auto updateUrl= qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
+    updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
+    const update::info::AbstractUpdateRegistryPtr updateRegistry = update::info::checkSync(updateUrl);
     if (updateRegistry == nullptr)
     {
         m_currentStatus = api::Updates2StatusData(
@@ -112,6 +113,7 @@ void Updates2Manager::checkForUpdateUnsafe()
         return;
     }
 
+    QnSoftwareVersion version;
     const auto resultCode = updateRegistry->latestUpdate(
         detail::UpdateRequestDataFactory::create(),
         &version);

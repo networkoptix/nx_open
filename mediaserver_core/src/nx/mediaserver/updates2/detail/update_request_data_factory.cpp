@@ -15,9 +15,9 @@ update::info::UpdateRequestData UpdateRequestDataFactory::create()
         return s_factoryFunc();
 
     return update::info::UpdateRequestData(
-        /*nx::network::AppInfo::defaultCloudHost()*/"nxvms.com",
-        /*QnAppInfo::customizationName()*/"default",
-        /*QnSoftwareVersion(QnAppInfo::applicationVersion())*/QnSoftwareVersion(2, 0, 0, 1));
+        nx::network::AppInfo::defaultCloudHost(),
+        QnAppInfo::customizationName(),
+        QnSoftwareVersion(QnAppInfo::applicationVersion()));
 }
 
 void UpdateRequestDataFactory::setFactoryFunc(UpdateRequestDataFactory::FactoryFunc factoryFunc)
