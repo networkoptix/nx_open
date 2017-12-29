@@ -113,14 +113,11 @@ if(withMediaServer)
         mediaserver
         genericrtspplugin
         mjpg_link
-        generic_multicast_plugin)
+        generic_multicast_plugin
+		hikvision_metadata_plugin)
 
     if(TARGET hanwha_metadata_plugin)
         add_dependencies(wixsetup hanwha_metadata_plugin)
-    endif()
-    
-    if(TARGET hikvision_metadata_plugin)
-        add_dependencies(wixsetup hikvision_metadata_plugin)
     endif()
 
     if(withTrayTool)
@@ -163,6 +160,7 @@ if(withMediaServer)
             generic_multicast_plugin
             image_library_plugin
             mjpg_link
+			hikvision_metadata_plugin
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_mediaserver_debug_package.py
             "--config" ${config_file}
@@ -170,9 +168,6 @@ if(withMediaServer)
     )
     if(TARGET hanwha_metadata_plugin)
         add_dependencies(generate_mediaserver_debug_package hanwha_metadata_plugin)
-    endif()
-    if(TARGET hikvision_metadata_plugin)
-        add_dependencies(generate_mediaserver_debug_package hikvision_metadata_plugin)
     endif()
 endif()
 
