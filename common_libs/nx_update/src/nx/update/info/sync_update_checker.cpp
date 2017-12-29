@@ -33,15 +33,14 @@ private:
 
     void onUpdateDone(ResultCode resultCode, AbstractUpdateRegistryPtr abstractUpdateRegistryPtr)
     {
-        if (resultCode != ResultCode::ok)
-        {
-            NX_WARNING(this, lm("Failed to get updates info: %1").args(toString(resultCode)));
-            return;
-        }
-
         QnMutexLocker lock(&m_mutex);
+
+        if (resultCode != ResultCode::ok)
+            NX_WARNING(this, lm("Failed to get updates info: %1").args(toString(resultCode)));
+        else
+            m_abstractUpdateRegistryPtr = std::move(abstractUpdateRegistryPtr);
+
         m_done = true;
-        m_abstractUpdateRegistryPtr = std::move(abstractUpdateRegistryPtr);
         m_waitCondition.wakeOne();
     }
 };
