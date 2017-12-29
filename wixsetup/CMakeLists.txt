@@ -119,7 +119,9 @@ if(withMediaServer)
         add_dependencies(wixsetup hanwha_metadata_plugin)
     endif()
     
-    add_dependencies(wixsetup hikvision_metadata_plugin)
+    if(TARGET hikvision_metadata_plugin)
+        add_dependencies(wixsetup hikvision_metadata_plugin)
+    endif()
 
     if(withTrayTool)
         add_dependencies(wixsetup traytool)
