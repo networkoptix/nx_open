@@ -6,6 +6,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/mediaserver/updates2/updates2_manager.h>
+#include <rest/helpers/request_helpers.h>
+#include <rest/helpers/request_context.h>
+#include <api/helpers/empty_request_data.h>
+#include <network/tcp_listener.h>
 
 
 namespace nx {
@@ -20,21 +24,44 @@ static const QString kUpdates2StatusAllPath = kUpdates2StatusPath + "/all";
 
 JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
 {
-    nx_http::HttpClient httpClient;
     const auto resourcePool = owner->commonModule()->resourcePool();
     QList<api::Updates2StatusData> updates2StatusDataList;
+    QnEmptyRequestData request;
+    QnMultiserverRequestContext<QnEmptyRequestData> context(request, owner->owner()->getPort());
+
     for (const auto& server: resourcePool->getAllServers(Qn::ResourceStatus::Online))
     {
+        if (server->getId() == qnServerModule->commonModule()->moduleGUID())
+            continue;
+
         const auto requestUrl = utils::Url(server->getApiUrl().toString() + kUpdates2StatusPath);
-        const bool getResult = httpClient.doGet(requestUrl);
-        boost::optional<QByteArray> body;
-        api::Updates2StatusData updates2StatusData;
-        if (getResult && ((body = httpClient.fetchEntireMessageBody())))
-            QJson::deserialize(*body, &updates2StatusData);
-        updates2StatusDataList.append(updates2StatusData);
+        runMultiserverDownloadRequest(
+            qnServerModule->commonModule()->router(),
+            requestUrl,
+            server,
+            [&context, &updates2StatusDataList, serverId = server->getId()](
+                SystemError::ErrorCode osErrorCode,
+                int statusCode,
+                nx_http::BufferType msgBody)
+            {
+                api::Updates2StatusData updates2StatusData(
+                    serverId,
+                    api::Updates2StatusData::StatusCode::error,
+                    "Multi request failed");
+                if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+                    QJson::deserialize(msgBody, &updates2StatusData);
+
+                context.executeGuarded(
+                    [&context, &updates2StatusData, &updates2StatusDataList]()
+                    {
+                        updates2StatusDataList.append(updates2StatusData);
+                        context.requestProcessed();
+                    });
+            },
+            &context);
     }
 
-    for (const auto& server: resourcePool->getAllServers(Qn::ResourceStatus::Offline))
+    for (const auto& server : resourcePool->getAllServers(Qn::ResourceStatus::Offline))
     {
         updates2StatusDataList.append(
             api::Updates2StatusData(
@@ -42,6 +69,8 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
                 api::Updates2StatusData::StatusCode::error,
                 "Server is offline"));
     }
+
+    updates2StatusDataList.append(qnServerModule->updates2Manager()->status());
 
     JsonRestResponse result(nx_http::StatusCode::ok);
     result.json.setReply(updates2StatusDataList);
