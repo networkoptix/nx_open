@@ -1,3 +1,4 @@
+#include <nx/utils/std/cpp14.h>
 #include "by_platform_peer_selector.h"
 
 namespace nx {

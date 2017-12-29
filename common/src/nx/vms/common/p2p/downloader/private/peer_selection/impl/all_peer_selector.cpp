@@ -1,5 +1,4 @@
-#pragma once
-
+#include <nx/utils/std/cpp14.h>
 #include "all_peer_selector.h"
 
 namespace nx {

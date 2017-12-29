@@ -1,3 +1,4 @@
+#include <nx/utils/std/cpp14.h>
 #include "update_registry_factory.h"
 #include "common_update_registry.h"
 
