@@ -11,6 +11,7 @@
 #include <QtCore/QString>
 #include <QtCore/QtDebug>
 #include <QtCore/QUrl>
+#include <QtCore/QUuid>
 #include <QtNetwork/QHostAddress>
 
 namespace nx {
