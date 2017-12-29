@@ -111,8 +111,8 @@ private:
         BeginListeningResponse response,
         std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
     {
-        m_requestResultQueue.push(resultCode);
         m_prevBeginListeningResponse = std::move(response);
+        m_requestResultQueue.push(resultCode);
     }
 
     void initializeHttpServerIfNeeded()
