@@ -1,8 +1,9 @@
 #include "attributes_parser.h"
+#include "string_helper.h"
+
+#include <array>
 
 #include <nx/utils/literal.h>
-#include <array>
-#include "string_helper.h"
 #include <nx/utils/log/log_main.h>
 
 namespace nx {
@@ -12,7 +13,7 @@ namespace hikvision {
 
 namespace {
 
-QString normalizeInternalName(const QString& rawInternalName)
+static QString normalizeInternalName(const QString& rawInternalName)
 {
 
     static const std::array<QString, 2> kIgnoredPostfixes = { "TriggerCap", "Cap" };
@@ -65,7 +66,7 @@ HikvisionEvent AttributesParser::parseEventXml(
         return result; //< Read root element.
     while (reader.readNextStartElement())
     {
-        auto name = reader.name().toString().toLower().trimmed();
+        const auto name = reader.name().toString().toLower().trimmed();
         if (name == "channelid")
         {
             result.channel = reader.readElementText().toInt() - 1; //< Convert to range [0..x].
@@ -80,7 +81,7 @@ HikvisionEvent AttributesParser::parseEventXml(
         }
         else if (name == "eventtype")
         {
-            auto internalName = normalizeInternalName(reader.readElementText());
+            const auto internalName = normalizeInternalName(reader.readElementText());
             result.typeId = manifest.eventTypeByInternalName(internalName);
             if (result.typeId.isNull())
                 NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));

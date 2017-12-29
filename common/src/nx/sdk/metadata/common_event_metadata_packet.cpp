@@ -62,7 +62,7 @@ void CommonEventMetadataPacket::resetEvents()
 
 CommonEventMetadataPacket::~CommonEventMetadataPacket()
 {
-    NX_VERBOSE(this, "DESTROYING PACKET!!!!");
+    NX_VERBOSE(this, "DESTROYING PACKET");
 }
 
 } // namespace metadata

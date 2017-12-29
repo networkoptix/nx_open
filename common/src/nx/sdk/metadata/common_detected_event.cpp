@@ -84,7 +84,7 @@ void CommonDetectedEvent::setIsActive(bool isActive)
 
 CommonDetectedEvent::~CommonDetectedEvent()
 {
-    NX_VERBOSE(this, "DESTROYING ITEM!!!!");
+    NX_VERBOSE(this, "DESTROYING ITEM");
 }
 
 } // namespace metadata
