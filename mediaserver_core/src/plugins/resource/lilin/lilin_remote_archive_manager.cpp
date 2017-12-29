@@ -117,14 +117,14 @@ bool LilinRemoteArchiveManager::removeArchiveEntries(const std::vector<QString>&
     return response && response.get() == kDeleteOkResponse;
 }
 
-std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient() const
+std::unique_ptr<nx::network::http::HttpClient> LilinRemoteArchiveManager::initHttpClient() const
 {
-    auto httpClient = std::make_unique<nx_http::HttpClient>();
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     auto auth = m_resource->getAuth();
 
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
-    httpClient->setAuthType(nx_http::AuthType::authBasic);
+    httpClient->setAuthType(nx::network::http::AuthType::authBasic);
     httpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
     httpClient->setSendTimeoutMs(kHttpTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
@@ -132,7 +132,7 @@ std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient()
     return httpClient;
 }
 
-boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(
+boost::optional<nx::network::http::BufferType> LilinRemoteArchiveManager::doRequest(
     const QString& requestPath,
     bool expectOnlyBody /*= false*/)
 {
@@ -144,14 +144,14 @@ boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(
     auto requestUrl = nx::utils::Url(
         lit("http://%1:%2%3")
             .arg(deviceUrl.host())
-            .arg(deviceUrl.port(nx_http::DEFAULT_HTTP_PORT))
+            .arg(deviceUrl.port(nx::network::http::DEFAULT_HTTP_PORT))
             .arg(requestPath));
 
     bool success = httpClient->doGet(requestUrl);
     if (!success)
         return boost::none;
 
-    nx_http::BufferType response;
+    nx::network::http::BufferType response;
     while (!httpClient->eof())
         response.append(httpClient->fetchMessageBodyBuffer());
 

@@ -25,7 +25,7 @@ public:
     virtual void selectBestEndpont(
         const QString& moduleName,
         std::vector<SocketAddress> endpoints,
-        std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler) override;
+        std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> handler) override;
 
 private:
     void done(
@@ -33,7 +33,7 @@ private:
         SystemError::ErrorCode errorCode,
         SocketAddress endpoint);
 
-    std::function<void(nx_http::StatusCode::Value, SocketAddress)> m_handler;
+    std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> m_handler;
     bool m_endpointResolved;
     std::map<AbstractStreamSocket*, std::unique_ptr<AbstractStreamSocket>> m_sockets;
     size_t m_socketsStillConnecting;

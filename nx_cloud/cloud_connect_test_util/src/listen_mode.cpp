@@ -38,7 +38,7 @@ void printListenOptions(std::ostream* const outStream)
 class CloudServerSocketGenerator
 {
 public:
-    std::unique_ptr<AbstractStreamServerSocket> make(
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> make(
         String systemId, String authKey, String serverId)
     {
         socketContexts.push_back(SocketContext(
@@ -151,7 +151,7 @@ public:
     }
 
     std::vector<SocketContext> socketContexts;
-    boost::optional<SocketAddress> forwardedAddress;
+    boost::optional<network::SocketAddress> forwardedAddress;
     boost::optional<hpm::api::ConnectionMethods> connectionMethonds;
 };
 
@@ -189,9 +189,9 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::none, 0, transmissionMode, true);
 
-    SocketAddress localAddress(HostAddress::localhost);
+    network::SocketAddress localAddress(network::HostAddress::localhost);
     if (const auto address = args.get("local-address"))
-        localAddress = SocketAddress(*address);
+        localAddress = network::SocketAddress(*address);
 
     {
         std::unique_ptr<AbstractStreamServerSocket> localServer;
@@ -219,7 +219,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         // cloudServerSocketGenerator.connectionMethonds = hpm::api::ConnectionMethod::none;
 
         cloudServerSocketGenerator.forwardedAddress =
-            address->isEmpty() ? localAddress : SocketAddress(*address);
+            address->isEmpty() ? localAddress : network::SocketAddress(*address);
 
         std::cout << "Mediator address forwarding: "
             << cloudServerSocketGenerator.forwardedAddress->toString().toStdString() << std::endl;
@@ -368,7 +368,7 @@ int printStatsAndWaitForCompletion(
         dynamicStatistics.addValue(statToDisplay);
 
         prevStatistics = data;
-        const auto statToDisplayStr = 
+        const auto statToDisplayStr =
             toString(statToDisplay).toStdString() + " " + dynamicStatistics.toStdString();
 
         std::cout << '\r';

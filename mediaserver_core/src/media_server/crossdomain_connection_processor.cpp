@@ -21,7 +21,7 @@ class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorP
 };
 
 QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(
@@ -55,7 +55,7 @@ void QnCrossdomainConnectionProcessor::run()
     QFile file(":/static/crossdomain.xml");
     if (!mServer || !file.open(QFile::ReadOnly))
     {
-        sendResponse(nx_http::StatusCode::notFound, kContentType, QByteArray());
+        sendResponse(nx::network::http::StatusCode::notFound, kContentType, QByteArray());
         return;
     }
 
@@ -83,5 +83,5 @@ void QnCrossdomainConnectionProcessor::run()
     }
 
     d->response.messageBody = lines.join('\n');
-    sendResponse(nx_http::StatusCode::ok, kContentType, QByteArray());
+    sendResponse(nx::network::http::StatusCode::ok, kContentType, QByteArray());
 }

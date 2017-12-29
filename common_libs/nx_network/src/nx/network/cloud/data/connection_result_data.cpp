@@ -6,7 +6,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-using namespace stun::extension;
+using namespace network::stun::extension;
 
 SystemError::ErrorCode toSystemErrorCode(NatTraversalResultCode resultCode)
 {
@@ -47,7 +47,7 @@ ConnectionResultRequest::ConnectionResultRequest():
 {
 }
 
-void ConnectionResultRequest::serializeAttributes(nx::stun::Message* const message)
+void ConnectionResultRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
     message->newAttribute<attrs::ConnectionId>(connectSessionId);
     message->newAttribute<attrs::UdpHolePunchingResultCodeAttr>(
@@ -55,7 +55,7 @@ void ConnectionResultRequest::serializeAttributes(nx::stun::Message* const messa
     message->newAttribute<attrs::SystemErrorCodeAttr>(sysErrorCode);
 }
 
-bool ConnectionResultRequest::parseAttributes(const nx::stun::Message& message)
+bool ConnectionResultRequest::parseAttributes(const nx::network::stun::Message& message)
 {
     return
         readEnumAttributeValue<attrs::UdpHolePunchingResultCodeAttr>(

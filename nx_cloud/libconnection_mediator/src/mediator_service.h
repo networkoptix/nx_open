@@ -10,12 +10,16 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/stoppable.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class HttpStreamSocketServer;
 class MessageDispatcher;
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace nx {
 namespace hpm {
@@ -37,8 +41,8 @@ class MediatorProcess:
 public:
     MediatorProcess(int argc, char **argv);
 
-    std::vector<SocketAddress> httpEndpoints() const;
-    std::vector<SocketAddress> stunEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> stunEndpoints() const;
     ListeningPeerPool* listeningPeerPool() const;
 
     Controller& controller();

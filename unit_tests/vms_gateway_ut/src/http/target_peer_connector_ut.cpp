@@ -37,7 +37,7 @@ public:
     }
 
     virtual void connectAsync(
-        const SocketAddress& /*addr*/,
+        const nx::network::SocketAddress& /*addr*/,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         if (m_connectFailureType == ConnectFailureType::reportError)
@@ -56,7 +56,7 @@ class ListeningPeerPoolStub:
 public:
     virtual void addConnection(
         const std::string& /*peerName*/,
-        std::unique_ptr<AbstractStreamSocket> /*connection*/) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/) override
     {
     }
 
@@ -110,7 +110,7 @@ public:
             m_targetPeerConnector->pleaseStopSync();
 
         if (m_streamSocketFactoryBak)
-            SocketFactory::setCreateStreamSocketFunc(std::move(*m_streamSocketFactoryBak));
+            nx::network::SocketFactory::setCreateStreamSocketFunc(std::move(*m_streamSocketFactoryBak));
     }
 
 protected:
@@ -122,13 +122,13 @@ protected:
     void givenRegisteredListeningPeer()
     {
         auto connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(connection->connect(m_testServer.serverAddress()));
+        ASSERT_TRUE(connection->connect(m_testServer.serverAddress(), nx::network::kNoTimeout));
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         m_serverConnection = connection.get();
 
         m_listeningPeerPool->addConnection(m_peerName, std::move(connection));
 
-        m_targetEndpoint = SocketAddress(m_peerName.c_str(), 0);
+        m_targetEndpoint = nx::network::SocketAddress(m_peerName.c_str(), 0);
     }
 
     void whenConnect()
@@ -187,10 +187,10 @@ protected:
 
     void switchToStreamSocketThatNeverReportsConnectResult()
     {
-        m_streamSocketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
+        m_streamSocketFactoryBak = nx::network::SocketFactory::setCreateStreamSocketFunc(
             [](bool /*sslRequired*/,
                 nx::network::NatTraversalSupport /*natTraversalRequired*/,
-                boost::optional<int> /*ipVersion*/) -> std::unique_ptr<AbstractStreamSocket>
+                boost::optional<int> /*ipVersion*/) -> std::unique_ptr<nx::network::AbstractStreamSocket>
             {
                 return std::make_unique<StreamSocketThatCannotConnect>(
                     StreamSocketThatCannotConnect::ConnectFailureType::doNotReportResult);
@@ -199,10 +199,10 @@ protected:
 
     void switchToStreamSocketThatAlwaysFailsToConnect()
     {
-        m_streamSocketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
+        m_streamSocketFactoryBak = nx::network::SocketFactory::setCreateStreamSocketFunc(
             [](bool /*sslRequired*/,
                 nx::network::NatTraversalSupport /*natTraversalRequired*/,
-                boost::optional<int> /*ipVersion*/) -> std::unique_ptr<AbstractStreamSocket>
+                boost::optional<int> /*ipVersion*/) -> std::unique_ptr<nx::network::AbstractStreamSocket>
             {
                 return std::make_unique<StreamSocketThatCannotConnect>(
                     StreamSocketThatCannotConnect::ConnectFailureType::reportError);
@@ -223,20 +223,20 @@ private:
     struct ConnectResult
     {
         SystemError::ErrorCode systemErrorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
     };
 
-    TestHttpServer m_testServer;
+    nx::network::http::TestHttpServer m_testServer;
     std::string m_peerName;
     std::unique_ptr<gateway::TargetPeerConnector> m_targetPeerConnector;
     nx::utils::SyncQueue<ConnectResult> m_connectResultQueue;
-    SocketAddress m_targetEndpoint;
-    boost::optional<SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
+    nx::network::SocketAddress m_targetEndpoint;
+    boost::optional<nx::network::SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
     relaying::Settings m_listeningPeerPoolSettings;
     std::unique_ptr<relaying::AbstractListeningPeerPool> m_listeningPeerPool;
     ConnectResult m_prevResult;
-    AbstractStreamSocket* m_serverConnection = nullptr;
+    nx::network::AbstractStreamSocket* m_serverConnection = nullptr;
 
     virtual void SetUp() override
     {
@@ -245,7 +245,7 @@ private:
 
     void saveConnectionResult(
         SystemError::ErrorCode systemErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
         m_connectResultQueue.push({systemErrorCode, std::move(connection)});
     }

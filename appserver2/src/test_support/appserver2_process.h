@@ -43,7 +43,7 @@ public:
 
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
-    SocketAddress endpoint() const;
+    nx::network::SocketAddress endpoint() const;
 
 private:
     int m_argc;
@@ -79,7 +79,7 @@ public:
 
     const Appserver2Process* impl() const;
     ec2::AbstractECConnection* ecConnection();
-    SocketAddress endpoint() const;
+    nx::network::SocketAddress endpoint() const;
     QnCommonModule* commonModule() const;
 
 private:

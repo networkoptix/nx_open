@@ -41,7 +41,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Invalid value of %1 parameter").arg(kTypeParam));
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     }
 
     QString notFoundCameraId = QString::null;
@@ -53,13 +53,13 @@ int QnCameraDiagnosticsRestHandler::executeGet(
         {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Camera %1 not found").arg(notFoundCameraId));
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
         }
         else
         {
             result.setError(QnJsonRestResult::MissingParameter,
                 lit("Parameter %1 is missing or invalid").arg(kCameraIdParam));
-            return nx_http::StatusCode::badRequest;
+            return nx::network::http::StatusCode::badRequest;
         }
     }
 
@@ -68,7 +68,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
             lit("Camera %1 is not a video camera").arg(camera->getId().toString()));
-        return nx_http::StatusCode::notFound;
+        return nx::network::http::StatusCode::notFound;
     }
 
     QnCameraDiagnosticsReply reply;
@@ -91,7 +91,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
             result.setError(QnJsonRestResult::CantProcessRequest,
                 lit("Diagnostics step %1 is not implemented").arg(
                     CameraDiagnostics::Step::toString(diagnosticsType)));
-            return nx_http::StatusCode::notImplemented;
+            return nx::network::http::StatusCode::notImplemented;
     }
 
     reply.errorCode = checkResult.errorCode;
@@ -100,7 +100,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     // Serializing reply.
     result.setReply(reply);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability(

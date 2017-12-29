@@ -71,7 +71,7 @@ namespace detail
             sFinished
         };
 
-        nx_http::AsyncHttpClientPtr m_httpClient;
+        nx::network::http::AsyncHttpClientPtr m_httpClient;
         State m_state;
         const QString m_localDirPath;
         const QString m_hashTypeName;
@@ -105,9 +105,9 @@ namespace detail
         void onSomeMessageBodyAvailableNonSafe();
 
     private slots:
-        void onResponseReceived( nx_http::AsyncHttpClientPtr );
-        void onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
-        void onHttpDone( nx_http::AsyncHttpClientPtr );
+        void onResponseReceived( nx::network::http::AsyncHttpClientPtr );
+        void onSomeMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr );
+        void onHttpDone( nx::network::http::AsyncHttpClientPtr );
     };
 }
 

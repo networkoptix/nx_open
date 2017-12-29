@@ -6,7 +6,7 @@
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, 0),
+    m_serverEndpoint(nx::network::HostAddress::localhost, 0),
     m_firstStartup(true)
 {
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
@@ -20,9 +20,9 @@ MediaServerLauncher::~MediaServerLauncher()
     stop();
 }
 
-SocketAddress MediaServerLauncher::endpoint() const
+nx::network::SocketAddress MediaServerLauncher::endpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_mediaServerProcess->getTcpPort());
+    return nx::network::SocketAddress(nx::network::HostAddress::localhost, m_mediaServerProcess->getTcpPort());
 }
 
 int MediaServerLauncher::port() const

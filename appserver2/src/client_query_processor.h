@@ -77,7 +77,7 @@ namespace ec2
             QnMutexLocker lk(&m_mutex);
             while (!m_runningHttpRequests.empty())
             {
-                nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
+                nx::network::http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
                 lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
                 httpClient->pleaseStopSync(checkForLocks);
                 //it is garanteed that no http event handler is running currently and no handler will be called
@@ -94,7 +94,7 @@ namespace ec2
             void processUpdateAsync( const nx::utils::Url& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             nx::utils::Url requestUrl( ecBaseUrl );
-            nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+            nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
@@ -118,7 +118,7 @@ namespace ec2
                 NX_ASSERT(false);
             }
 
-            connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
+            connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QnMutexLocker lk( &m_mutex );
             httpClient->doPost(
@@ -137,7 +137,7 @@ namespace ec2
             void processQueryAsync( const nx::utils::Url& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             nx::utils::Url requestUrl( ecBaseUrl );
-            nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+            nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
@@ -156,7 +156,7 @@ namespace ec2
             query.addQueryItem("format", QnLexical::serialized(format));
             requestUrl.setQuery(query);
 
-            connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
+            connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QnMutexLocker lk( &m_mutex );
             httpClient->doGet( requestUrl );
@@ -165,7 +165,7 @@ namespace ec2
         }
 
     public slots:
-        void onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
+        void onHttpDone( nx::network::http::AsyncHttpClientPtr httpClient )
         {
             std::function<void()> handler;
             {
@@ -182,19 +182,19 @@ namespace ec2
 
     private:
         QnMutex m_mutex;
-        std::map<nx_http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
+        std::map<nx::network::http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>
-            void processHttpGetResponse( nx_http::AsyncHttpClientPtr httpClient, HandlerType handler )
+            void processHttpGetResponse( nx::network::http::AsyncHttpClientPtr httpClient, HandlerType handler )
         {
             if( httpClient->failed() || !httpClient->response() )
                 return handler( ErrorCode::ioError, OutputData() );
             switch( httpClient->response()->statusLine.statusCode )
             {
-                case nx_http::StatusCode::ok:
+                case nx::network::http::StatusCode::ok:
                     break;
-                case nx_http::StatusCode::unauthorized: {
-                    QString authResultStr = nx_http::getHeaderValue(httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+                case nx::network::http::StatusCode::unauthorized: {
+                    QString authResultStr = nx::network::http::getHeaderValue(httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
                     if (!authResultStr.isEmpty()) {
                         Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
                         if (authResult == Qn::Auth_LDAPConnectError)
@@ -206,9 +206,9 @@ namespace ec2
                     }
                     return handler( ErrorCode::unauthorized, OutputData() );
                 }
-                case nx_http::StatusCode::notImplemented:
+                case nx::network::http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported, OutputData() );
-                case nx_http::StatusCode::forbidden:
+                case nx::network::http::StatusCode::forbidden:
                     return handler(ErrorCode::forbidden, OutputData());
                 default:
                     return handler( ErrorCode::serverError, OutputData() );
@@ -247,26 +247,26 @@ namespace ec2
         }
 
         template<class HandlerType>
-            void processHttpPostResponse( nx_http::AsyncHttpClientPtr httpClient, HandlerType handler )
+            void processHttpPostResponse( nx::network::http::AsyncHttpClientPtr httpClient, HandlerType handler )
         {
             if( httpClient->failed() || !httpClient->response() )
                 return handler( ErrorCode::ioError );
             switch( httpClient->response()->statusLine.statusCode )
             {
-                case nx_http::StatusCode::ok:
+                case nx::network::http::StatusCode::ok:
                     return handler( ErrorCode::ok );
-                case nx_http::StatusCode::unauthorized:
+                case nx::network::http::StatusCode::unauthorized:
                     return handler( ErrorCode::unauthorized );
-                case nx_http::StatusCode::forbidden:
+                case nx::network::http::StatusCode::forbidden:
                     return handler(ErrorCode::forbidden);
-                case nx_http::StatusCode::notImplemented:
+                case nx::network::http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported );
                 default:
                     return handler( ErrorCode::serverError );
             }
         }
     private:
-        void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
+        void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient)
         {
             if (!commonModule()->videowallGuid().isNull())
                 httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());

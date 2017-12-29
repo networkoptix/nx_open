@@ -31,7 +31,7 @@ public:
     bool registerCloudSystem();
     bool saveCloudCredentialsToMediaServer();
 
-    SocketAddress mediaServerEndpoint() const;
+    nx::network::SocketAddress mediaServerEndpoint() const;
     nx::cdb::CdbLauncher* cdb();
     MediaServerLauncher& mediaServer();
 

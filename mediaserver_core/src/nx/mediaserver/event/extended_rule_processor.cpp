@@ -418,13 +418,13 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
     const nx::vms::event::ActionParameters& actionParameters=action->getParams();
 
     nx::utils::Url url(action->getParams().url);
-    if ((actionParameters.requestType == nx_http::Method::get) ||
+    if ((actionParameters.requestType == nx::network::http::Method::get) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType messageBody)
         {
             if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+                statusCode != nx::network::http::StatusCode::ok)
             {
                 qWarning() << "Failed to execute HTTP action for url "
                     << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
@@ -434,10 +434,10 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             }
         };
 
-        nx_http::downloadFileAsync(
+        nx::network::http::downloadFileAsync(
             url,
             callback,
-            nx_http::HttpHeaders(),
+            nx::network::http::HttpHeaders(),
             actionParameters.authType);
         return true;
     }
@@ -446,7 +446,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
         {
             if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+                statusCode != nx::network::http::StatusCode::ok)
             {
                 qWarning() << "Failed to execute HTTP action for url "
                            << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
@@ -459,10 +459,10 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         if (contentType.isEmpty())
             contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
 
-        nx_http::uploadDataAsync(url,
+        nx::network::http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             contentType,
-            nx_http::HttpHeaders(),
+            nx::network::http::HttpHeaders(),
             callback,
             actionParameters.authType);
         return true;
@@ -574,7 +574,7 @@ QByteArray ExtendedRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qi
     QByteArray frame;
     QByteArray contentType;
     auto result = handler.getScreenshot(commonModule(), request, frame, contentType, server->getPort());
-    if (result != nx_http::StatusCode::ok)
+    if (result != nx::network::http::StatusCode::ok)
         return QByteArray();
     return frame;
 

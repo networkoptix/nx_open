@@ -39,7 +39,7 @@ class M3uPlaylistConverter:
 public:
     M3uPlaylistConverter()
     {
-        m_converter = std::make_unique<nx_http::server::proxy::M3uPlaylistConverter>(
+        m_converter = std::make_unique<nx::network::http::server::proxy::M3uPlaylistConverter>(
             m_urlRewriter,
             kProxyHost,
             kServerHostName);
@@ -58,8 +58,8 @@ protected:
 
 private:
     UrlRewriter m_urlRewriter;
-    std::unique_ptr<nx_http::server::proxy::M3uPlaylistConverter> m_converter;
-    nx_http::BufferType m_resultingPlaylist;
+    std::unique_ptr<nx::network::http::server::proxy::M3uPlaylistConverter> m_converter;
+    nx::network::http::BufferType m_resultingPlaylist;
 };
 
 TEST_F(M3uPlaylistConverter, target_host_address_is_inserted)

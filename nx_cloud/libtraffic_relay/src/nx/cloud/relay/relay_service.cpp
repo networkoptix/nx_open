@@ -16,7 +16,7 @@ RelayService::RelayService(int argc, char **argv):
 {
 }
 
-std::vector<SocketAddress> RelayService::httpEndpoints() const
+std::vector<network::SocketAddress> RelayService::httpEndpoints() const
 {
     return m_view->httpEndpoints();
 }

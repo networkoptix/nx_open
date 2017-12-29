@@ -168,16 +168,16 @@ namespace detail
             _dirPath,
             _handler ),
         m_localTargetDirPath( localTargetDirPath ),
-        m_httpClient( nx_http::AsyncHttpClient::create() ),
+        m_httpClient( nx::network::http::AsyncHttpClient::create() ),
         m_totalsize( -1 )
     {
         connect(
-            m_httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),
-            this, SLOT(onResponseReceived(nx_http::AsyncHttpClientPtr)),
+            m_httpClient.get(), SIGNAL(responseReceived(nx::network::http::AsyncHttpClientPtr)),
+            this, SLOT(onResponseReceived(nx::network::http::AsyncHttpClientPtr)),
             Qt::DirectConnection );
         connect(
-            m_httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
-            this, SLOT(onHttpDone(nx_http::AsyncHttpClientPtr)),
+            m_httpClient.get(), SIGNAL(done(nx::network::http::AsyncHttpClientPtr)),
+            this, SLOT(onHttpDone(nx::network::http::AsyncHttpClientPtr)),
             Qt::DirectConnection );
     }
 
@@ -215,9 +215,9 @@ namespace detail
         return m_totalsize;
     }
 
-    void ListDirectoryOperation::onResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
+    void ListDirectoryOperation::onResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
     {
-        if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+        if( httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok )
         {
             setResult( ResultCode::downloadFailure );
             setErrorText( httpClient->response()->statusLine.reasonPhrase );
@@ -228,14 +228,14 @@ namespace detail
         }
     }
 
-    void ListDirectoryOperation::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
+    void ListDirectoryOperation::onHttpDone( nx::network::http::AsyncHttpClientPtr httpClient )
     {
         //check message body download result
         if( httpClient->failed() )
         {
             //downloading has been interrupted unexpectedly
             setResult( ResultCode::downloadFailure );
-            const nx_http::Response *response = httpClient->response();
+            const nx::network::http::Response *response = httpClient->response();
             if (response)
                 setErrorText(response->statusLine.reasonPhrase);
             m_httpClient->pleaseStopSync();
@@ -244,7 +244,7 @@ namespace detail
             return;
         }
 
-        nx_http::BufferType contentsXml = httpClient->fetchMessageBodyBuffer();
+        nx::network::http::BufferType contentsXml = httpClient->fetchMessageBodyBuffer();
         m_httpClient->pleaseStopSync();
         m_httpClient.reset();
 

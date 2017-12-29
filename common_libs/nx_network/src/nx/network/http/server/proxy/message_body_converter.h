@@ -7,7 +7,9 @@
 
 #include "../../http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace proxy {
 
@@ -16,7 +18,7 @@ class NX_NETWORK_API AbstractMessageBodyConverter
 public:
     virtual ~AbstractMessageBodyConverter() = default;
 
-    virtual nx_http::BufferType convert(nx_http::BufferType originalBody) = 0;
+    virtual nx::network::http::BufferType convert(nx::network::http::BufferType originalBody) = 0;
 };
 
 class NX_NETWORK_API AbstractUrlRewriter
@@ -64,4 +66,6 @@ private:
 
 } // namespace proxy
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

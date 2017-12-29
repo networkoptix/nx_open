@@ -97,7 +97,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<TestHttpServer> m_httpServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     std::unique_ptr<ClientImpl> m_client;
     nx::utils::Url m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
@@ -109,7 +109,7 @@ private:
     void saveBeginListeningCompletionResult(
         ResultCode resultCode,
         BeginListeningResponse response,
-        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
     {
         m_requestResultQueue.push(resultCode);
         m_prevBeginListeningResponse = std::move(response);
@@ -128,9 +128,9 @@ private:
         if (baseUrlPath.isEmpty())
             baseUrlPath = "/";
 
-        m_httpServer = std::make_unique<TestHttpServer>();
+        m_httpServer = std::make_unique<nx::network::http::TestHttpServer>();
 
-        const auto realPath = nx_http::rest::substituteParameters(
+        const auto realPath = nx::network::http::rest::substituteParameters(
             kServerClientSessionsPath,
             {"some_server_name"});
 
@@ -162,17 +162,17 @@ private:
     }
 
     void beginListeningHandler(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_expectedBeginListeningResponse.preemptiveConnectionCount =
             nx::utils::random::number<int>(1, 99);
         if (nx::utils::random::number<int>(0, 1) > 0)
         {
-            m_expectedBeginListeningResponse.keepAliveOptions = KeepAliveOptions();
+            m_expectedBeginListeningResponse.keepAliveOptions = nx::network::KeepAliveOptions();
             m_expectedBeginListeningResponse.keepAliveOptions->probeCount =
                 nx::utils::random::number<int>(1, 99);
             m_expectedBeginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
@@ -183,7 +183,7 @@ private:
 
         serializeToHeaders(&response->headers, m_expectedBeginListeningResponse);
 
-        completionHandler(nx_http::StatusCode::switchingProtocols);
+        completionHandler(nx::network::http::StatusCode::switchingProtocols);
     }
 };
 

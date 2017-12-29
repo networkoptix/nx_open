@@ -26,10 +26,10 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     if (time - m_lastReadSocketTime > READ_IF_TIMEOUT)
     {
         m_socketList.clear();
-        QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
+        QList<nx::network::QnInterfaceAndAddr> ipaddrs = nx::network::getAllIPv4Interfaces();
         for (int i = 0; i < ipaddrs.size();++i)
         {
-            QSharedPointer<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket().release());
+            QSharedPointer<nx::network::AbstractDatagramSocket> sock(nx::network::SocketFactory::createDatagramSocket().release());
             if (sock->bind(ipaddrs.at(i).address.toString(), androidRecvPort))
                 m_socketList << sock;
             m_lastReadSocketTime = time;
@@ -41,9 +41,9 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         while (m_socketList[i]->hasData())
         {
             QByteArray responseData;
-            responseData.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
+            responseData.resize( nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            SocketAddress senderEndpoint;
+            nx::network::SocketAddress senderEndpoint;
             int readed = m_socketList[i]->recvFrom(responseData.data(), responseData.size(), &senderEndpoint);
             if (readed < 1)
                 continue;
@@ -86,7 +86,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 
             resource->setTypeId(rt);
             resource->setName(QLatin1String("DroidLive"));
-            resource->setMAC(QnMacAddress(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper()));
+            resource->setMAC(nx::network::QnMacAddress(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper()));
 
             resource->setUrl(QLatin1String("raw://") + data[1]);
 

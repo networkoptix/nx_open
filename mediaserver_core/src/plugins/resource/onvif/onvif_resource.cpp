@@ -487,7 +487,7 @@ void QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)> completion
         std::move(soapWrapper),
         &DeviceSoapWrapper::getNetworkInterfaces );
 
-    const QnMacAddress resourceMAC = getMAC();
+    const nx::network::QnMacAddress resourceMAC = getMAC();
     auto onvifCallCompletionFunc =
         [asyncWrapper, deviceUrl, resourceMAC, completionHandler]( int soapResultCode )
         {
@@ -1099,7 +1099,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
         if (getFirmware().isEmpty())
             setFirmware(extInfo.firmware);
         if (getMAC().isNull())
-            setMAC(QnMacAddress(extInfo.mac));
+            setMAC(nx::network::QnMacAddress(extInfo.mac));
         if (getVendor() == lit("ONVIF") && !extInfo.vendor.isNull())
             setVendor(extInfo.vendor); // update default vendor
         if (getPhysicalId().isEmpty()) {
@@ -1883,8 +1883,10 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     QString localAddress;
 
     // TODO: #ak should read local address only once
-    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(nx_http::DEFAULT_HTTP_PORT) ) )
+    std::unique_ptr<nx::network::AbstractStreamSocket> sock( nx::network::SocketFactory::createStreamSocket() );
+    if( !sock->connect(
+            eventServiceURL.host(), eventServiceURL.port(nx::network::http::DEFAULT_HTTP_PORT),
+            nx::network::deprecated::kDefaultConnectTimeout) )
     {
         NX_LOGX( lit("Failed to connect to %1:%2 to determine local address. %3").
             arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );

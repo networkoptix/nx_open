@@ -38,7 +38,7 @@ protected:
         mediator().stop();
 
         // TODO: #ak We cannot rely on that mediator will be able to start on the same port.
-        // Must hold port busy somehow. 
+        // Must hold port busy somehow.
         // E.g., could introduce simple tcp forwarder based on AsyncChannelBridge class.
 
         whenStartGateway();
@@ -64,7 +64,7 @@ protected:
 
     void thenGatewayReconnectedToMediator()
     {
-        // TODO: #ak Probably, it is better to check that gateway 
+        // TODO: #ak Probably, it is better to check that gateway
         // endpoint is in mediator connection_requested event.
 
         for (;;)

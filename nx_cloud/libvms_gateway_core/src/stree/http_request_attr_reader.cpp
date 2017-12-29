@@ -12,7 +12,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-HttpRequestResourceReader::HttpRequestResourceReader(const nx_http::Request& request)
+HttpRequestResourceReader::HttpRequestResourceReader(const nx::network::http::Request& request)
 :
     m_request(request)
 {

@@ -20,7 +20,9 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 enum class AuthType
 {
@@ -29,7 +31,7 @@ enum class AuthType
     authBasic,
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::AuthType)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::network::http::AuthType)
 
 /**
  * HTTP client. All operations are done asynchronously.
@@ -37,8 +39,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::AuthType)
  * All events (setOn...) are delivered within object's aio thread.
  * State is changed just before delivering event.
  * This class methods are not thread-safe.
- * NOTE: This class is a replacement for nx_http::AsyncHttpClient.
- *   As soon as it becomes ready, nx_http::AsyncHttpClient will be declared as deprecated.
+ * NOTE: This class is a replacement for nx::network::http::AsyncHttpClient.
+ *   As soon as it becomes ready, nx::network::http::AsyncHttpClient will be declared as deprecated.
  * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
  *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
  *   to avoid internal message body buffer to consume too much memory.
@@ -67,12 +69,12 @@ public:
     class NX_NETWORK_API Timeouts
     {
     public:
-        constexpr static const std::chrono::seconds kDefaultSendTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultResponseReadTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultMessageBodyReadTimeout =
-            std::chrono::seconds::zero();  //no timeout
+        constexpr static const std::chrono::milliseconds kDefaultSendTimeout =
+            std::chrono::milliseconds(3001);
+        constexpr static const std::chrono::milliseconds kDefaultResponseReadTimeout =
+            std::chrono::milliseconds(3002);
+        constexpr static const std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
+            std::chrono::milliseconds::zero();  //no timeout
 
         std::chrono::milliseconds sendTimeout;
         std::chrono::milliseconds responseReadTimeout;
@@ -176,18 +178,18 @@ public:
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doUpgrade(
         const nx::utils::Url& url,
-        nx_http::Method::ValueType method,
+        nx::network::http::Method::ValueType method,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doRequest(nx_http::Method::ValueType method,
+    void doRequest(nx::network::http::Method::ValueType method,
         const nx::utils::Url &url);
     void doRequest(
-        nx_http::Method::ValueType method,
+        nx::network::http::Method::ValueType method,
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    const nx_http::Request& request() const;
+    const nx::network::http::Request& request() const;
 
     /**
      * Response is valid only after signal responseReceived() has been emitted.
@@ -341,14 +343,14 @@ private:
     size_t parseReceivedBytes(size_t bytesRead);
     void processReceivedBytes(std::size_t bytesParsed);
     Result processResponseHeadersBytes(bool* const continueReceiving);
-    bool isMalformed(const nx_http::Response& response) const;
+    bool isMalformed(const nx::network::http::Response& response) const;
     bool repeatRequestIfNeeded(const Response& response);
     Result startReadingMessageBody(bool* const continueReceiving);
     bool sendRequestToNewLocation(const Response& response);
     Result processResponseMessageBodyBytes(std::size_t bytesRead, bool* const continueReceiving);
-    void composeRequest(const nx_http::StringType& httpMethod);
-    void prepareRequestLine(bool useHttp11, const nx_http::StringType& httpMethod);
-    void prepareRequestHeaders(bool useHttp11, const nx_http::StringType& httpMethod);
+    void composeRequest(const nx::network::http::StringType& httpMethod);
+    void prepareRequestLine(bool useHttp11, const nx::network::http::StringType& httpMethod);
+    void prepareRequestHeaders(bool useHttp11, const nx::network::http::StringType& httpMethod);
     void addAppropriateAuthenticationInformation();
     void addBodyToRequest();
     void serializeRequest();
@@ -358,10 +360,10 @@ private:
     bool reconnectIfAppropriate();
     /** Composes request with authorization header based on response. */
     bool resendRequestWithAuthorization(
-        const nx_http::Response& response,
+        const nx::network::http::Response& response,
         bool isProxy = false);
     void doSomeCustomLogic(
-        const nx_http::Response& response,
+        const nx::network::http::Response& response,
         Request* const request);
 
     Result emitDone();
@@ -377,6 +379,8 @@ private:
     static const char* toString(State state);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http
 
-QN_FUSION_DECLARE_FUNCTIONS(nx_http::AuthType, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::AuthType, (lexical), NX_NETWORK_API)

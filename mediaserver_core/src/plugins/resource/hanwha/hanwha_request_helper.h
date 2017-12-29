@@ -92,7 +92,7 @@ private:
         const utils::Url& url,
         const QAuthenticator& auth,
         nx::Buffer* outBuffer,
-        nx_http::StatusCode::Value* outStatusCode);
+        nx::network::http::StatusCode::Value* outStatusCode);
 
     HanwhaResponse splitAndDoRequest(
         const QString& action,

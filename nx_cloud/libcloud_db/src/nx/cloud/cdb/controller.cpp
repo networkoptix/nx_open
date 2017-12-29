@@ -187,13 +187,13 @@ void Controller::generateUserAuthRecords(nx::utils::db::QueryContext* queryConte
 void Controller::initializeSecurity()
 {
     // TODO: #ak Move following to stree xml.
-    m_authRestrictionList = std::make_unique<nx_http::AuthMethodRestrictionList>();
-    m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kAccountRegisterPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kAccountActivatePath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kAccountReactivatePath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList = std::make_unique<nx::network::http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountRegisterPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
 
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
     authDataProviders.push_back(&m_accountManager);

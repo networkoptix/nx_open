@@ -234,7 +234,7 @@ public:
     void cancelRequest(const Handle& requestId);
 
 private slots:
-    void onHttpClientDone(int requestId, nx_http::AsyncHttpClientPtr httpClient);
+    void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 private:
     template <typename ResultType> Handle executeGet(
         const QString& path,
@@ -245,16 +245,16 @@ private:
     template <typename ResultType> Handle executePost(
         const QString& path,
         const QnRequestParamList& params,
-        const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePut(
         const QString& path,
         const QnRequestParamList& params,
-        const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody,
+        const nx::network::http::StringType& contentType,
+        const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
@@ -265,28 +265,28 @@ private:
         QThread* targetThread);
 
     template <typename ResultType>
-    Handle executeRequest(const nx_http::ClientPool::Request& request,
+    Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<ResultType> callback,
         QThread* targetThread);
 
-    Handle executeRequest(const nx_http::ClientPool::Request& request,
+    Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<QByteArray> callback,
         QThread* targetThread);
 
-    Handle executeRequest(const nx_http::ClientPool::Request& request,
+    Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<EmptyResponseType> callback,
         QThread* targetThread);
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 
-    nx_http::ClientPool::Request prepareRequest(
-        nx_http::Method::ValueType method,
+    nx::network::http::ClientPool::Request prepareRequest(
+        nx::network::http::Method::ValueType method,
         const QUrl& url,
-        const nx_http::StringType& contentType = nx_http::StringType(),
-        const nx_http::StringType& messageBody = nx_http::StringType());
+        const nx::network::http::StringType& contentType = nx::network::http::StringType(),
+        const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
-    typedef std::function<void (Handle, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
-    Handle sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+    typedef std::function<void (Handle, SystemError::ErrorCode, int, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)> HttpCompletionFunc;
+    Handle sendRequest(const nx::network::http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 

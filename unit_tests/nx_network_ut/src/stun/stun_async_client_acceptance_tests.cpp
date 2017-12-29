@@ -3,6 +3,7 @@
 #include <nx/network/system_socket.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -51,4 +52,5 @@ BasicStunAsyncClientAcceptanceTest::createUnconnectableStreamSocket(
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

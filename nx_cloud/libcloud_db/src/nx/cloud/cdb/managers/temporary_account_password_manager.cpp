@@ -44,7 +44,7 @@ TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 }
 
 void TemporaryAccountPasswordManager::authenticateByName(
-    const nx_http::StringType& username,
+    const nx::network::http::StringType& username,
     std::function<bool(const nx::Buffer&)> checkPasswordHash,
     const nx::utils::stree::AbstractResourceReader& authSearchInputData,
     nx::utils::stree::ResourceContainer* const authProperties,
@@ -112,7 +112,7 @@ void TemporaryAccountPasswordManager::addRandomCredentials(
         data->login = generateRandomPassword();
 
     data->password = generateRandomPassword();
-    data->passwordHa1 = nx_http::calcHa1(
+    data->passwordHa1 = nx::network::http::calcHa1(
         data->login.c_str(),
         data->realm.c_str(),
         data->password.c_str()).constData();

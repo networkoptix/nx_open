@@ -36,9 +36,9 @@ VmsGatewayFunctionalTest::VmsGatewayFunctionalTest(int flags):
     //starting clean test
     if ((flags & doNotReinitialiseSocketGlobals) == 0)
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
-    m_testHttpServer = std::make_unique<TestHttpServer>();
+    m_testHttpServer = std::make_unique<nx::network::http::TestHttpServer>();
 
-    m_tmpDir = 
+    m_tmpDir =
         (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath(): sTemporaryDirectoryPath) +
         "/vms_gateway_ut.data";
     QDir(m_tmpDir).removeRecursively();
@@ -97,12 +97,12 @@ bool VmsGatewayFunctionalTest::startAndWaitUntilStarted(
     return true;
 }
 
-SocketAddress VmsGatewayFunctionalTest::endpoint() const
+network::SocketAddress VmsGatewayFunctionalTest::endpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_httpPort);
+    return network::SocketAddress(network::HostAddress::localhost, m_httpPort);
 }
 
-const std::unique_ptr<TestHttpServer>& VmsGatewayFunctionalTest::testHttpServer() const
+const std::unique_ptr<nx::network::http::TestHttpServer>& VmsGatewayFunctionalTest::testHttpServer() const
 {
     return m_testHttpServer;
 }

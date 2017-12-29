@@ -50,7 +50,7 @@ private:
     struct ConnectionContext
     {
         SocketAddress endpoint;
-        nx_http::AsyncHttpClientPtr httpClient;
+        nx::network::http::AsyncHttpClientPtr httpClient;
     };
 
     using Verificators = std::list<std::unique_ptr<AbstractEndpointVerificator>>;

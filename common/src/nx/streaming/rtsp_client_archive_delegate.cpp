@@ -738,7 +738,7 @@ namespace {
 /**
  * @return Zero version if serverString is invalid.
  */
-nx::utils::SoftwareVersion extractServerVersion(const nx_http::StringType& serverString)
+nx::utils::SoftwareVersion extractServerVersion(const nx::network::http::StringType& serverString)
 {
     int versionStartPos = serverString.indexOf("/") + 1;
     int versionEndPos = serverString.indexOf(" ", versionStartPos);
@@ -760,7 +760,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     {
         auto parser = new QnNxRtpParser(
             lm("%1-%2").args(m_camera->getUserDefinedName(), channelNum));
-        // TODO: Use nx_http::header::Server here
+        // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
         if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
@@ -927,7 +927,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);
-    session->setAuth(auth, nx_http::header::AuthScheme::digest);
+    session->setAuth(auth, nx::network::http::header::AuthScheme::digest);
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());

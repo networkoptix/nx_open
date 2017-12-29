@@ -36,7 +36,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
         result.setError(
             QnJsonRestResult::InvalidParameter,
             lit("Invalid Json object provided"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QString missedField;
@@ -51,7 +51,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
         result.setError(
             QnJsonRestResult::InvalidParameter,
             lit("Missing required field '%1'").arg(missedField));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     auto requestedCamera = nx::camera_id_helper::findCameraByFlexibleId(
@@ -61,13 +61,13 @@ int QnChangeCameraPasswordRestHandler::executePost(
         result.setError(
             QnJsonRestResult::InvalidParameter,
             lit("Camera '%1' not found").arg(data.cameraId));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (requestedCamera->getParentId() != owner->commonModule()->moduleGUID())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This server is not a resource owner."));
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     QAuthenticator auth;
@@ -77,7 +77,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
     if (!requestedCamera->setCameraCredentialsSync(auth, &errorString))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errorString);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     for (auto camera: allCamerasInGroup(requestedCamera))
@@ -86,9 +86,9 @@ int QnChangeCameraPasswordRestHandler::executePost(
         if (!camera->saveParams())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error");
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
         camera->reinitAsync();
     }
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

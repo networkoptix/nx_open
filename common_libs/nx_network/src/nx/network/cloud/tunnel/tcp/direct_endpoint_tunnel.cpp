@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-static const KeepAliveOptions kControlConnectionKeepAlive(
+static const nx::network::KeepAliveOptions kControlConnectionKeepAlive(
     std::chrono::minutes(1), std::chrono::seconds(10), 3);
 
 namespace nx {

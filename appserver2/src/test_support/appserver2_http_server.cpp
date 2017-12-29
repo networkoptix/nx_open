@@ -16,7 +16,7 @@ namespace ec2 {
 
 JsonConnectionProcessor::JsonConnectionProcessor(
     ProcessorHandler handler,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
     :
     QnTCPConnectionProcessor(socket, owner),
@@ -54,12 +54,12 @@ QnSimpleHttpConnectionListener::~QnSimpleHttpConnectionListener()
 }
 
 QnTCPConnectionProcessor* QnSimpleHttpConnectionListener::createRequestProcessor(
-    QSharedPointer<AbstractStreamSocket> clientSocket)
+    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
     return new Ec2ConnectionProcessor(clientSocket, this);
 }
 
-bool QnSimpleHttpConnectionListener::needAuth(const nx_http::Request& request) const
+bool QnSimpleHttpConnectionListener::needAuth(const nx::network::http::Request& request) const
 {
     auto path = request.requestLine.url.path();
     for (const auto& value : m_disableAuthPrefixes)

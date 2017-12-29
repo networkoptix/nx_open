@@ -1424,7 +1424,7 @@ bool SslSocket::getConnectionStatistics(StreamSocketInfo* info)
 
 bool SslSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
     if (!initializeUnderlyingSocketIfNeeded())
         return false;
@@ -1438,7 +1438,7 @@ bool SslSocket::connect(
             return false;
     }
 
-    const auto result = d->wrappedSocket->connect(remoteAddress, timeoutMillis);
+    const auto result = d->wrappedSocket->connect(remoteAddress, timeout);
 
     if (!d->nonBlockingMode && result)
     {

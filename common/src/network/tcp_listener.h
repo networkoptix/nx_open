@@ -24,7 +24,7 @@ class QnTcpListener: public QnLongRunnable, public QnCommonModuleAware
 public:
     static const int DEFAULT_MAX_CONNECTIONS = 2000;
 
-    bool authenticate(const nx_http::Request& headers, nx_http::Response& responseHeaders) const;
+    bool authenticate(const nx::network::http::Request& headers, nx::network::http::Response& responseHeaders) const;
 
     void setAuth(const QByteArray& userName, const QByteArray& password);
 
@@ -46,7 +46,7 @@ public:
     void waitForPortUpdated();
 
     int getPort() const;
-    SocketAddress getLocalEndpoint() const;
+    nx::network::SocketAddress getLocalEndpoint() const;
 
     /** Remove ownership from connection.*/
     void removeOwnership(QnLongRunnable* processor);
@@ -68,7 +68,7 @@ public:
     /** Norlimize url path. cut off web prefix and '/' chars */
     static QString normalizedPath(const QString& path);
 
-    virtual void applyModToRequest(nx_http::Request* /*request*/) {}
+    virtual void applyModToRequest(nx::network::http::Request* /*request*/) {}
 
 signals:
     void portChanged();
@@ -78,16 +78,16 @@ public slots:
 
 protected:
     virtual void run();
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket) = 0;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) = 0;
     virtual void doPeriodicTasks();
     /** Called to create server socket.
         This method is supposed to bind socket to \a localAddress and call \a listen
         \note If \a nullptr has been returned, system error code is set to proper error
     */
-    virtual AbstractStreamServerSocket* createAndPrepareSocket(
+    virtual nx::network::AbstractStreamServerSocket* createAndPrepareSocket(
         bool sslNeeded,
-        const SocketAddress& localAddress);
-    virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
+        const nx::network::SocketAddress& localAddress);
+    virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket);
 
     void setLastError(SystemError::ErrorCode error);
 private:

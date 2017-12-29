@@ -5,7 +5,9 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace proxy {
 namespace test {
@@ -47,7 +49,7 @@ protected:
         while (!m_proxiedResponse)
             std::this_thread::yield();
 
-        ASSERT_EQ(nx_http::StatusCode::noContent, m_proxiedResponse->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::noContent, m_proxiedResponse->statusLine.statusCode);
         ASSERT_TRUE(
             m_proxiedResponse->headers.find("Content-Type") ==
             m_proxiedResponse->headers.end());
@@ -59,8 +61,8 @@ private:
     TestHttpServer m_httpServer;
     nx::Buffer m_staticResource;
     nx::utils::promise<void> m_messageBodyEndReported;
-    std::unique_ptr<nx_http::AbstractMsgBodySource> m_messageBodySource;
-    boost::optional<nx_http::Response> m_proxiedResponse;
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_messageBodySource;
+    boost::optional<nx::network::http::Response> m_proxiedResponse;
 
     virtual void SetUp() override
     {
@@ -82,8 +84,8 @@ private:
     }
 
     virtual void sendResponse(
-        nx_http::RequestResult requestResult,
-        boost::optional<nx_http::Response> response) override
+        nx::network::http::RequestResult requestResult,
+        boost::optional<nx::network::http::Response> response) override
     {
         m_proxiedResponse = response;
 
@@ -96,13 +98,13 @@ private:
 
     void initializeProxyWorker(const nx::String& path)
     {
-        nx_http::Request translatedRequest;
-        translatedRequest.requestLine.method = nx_http::Method::get;
+        nx::network::http::Request translatedRequest;
+        translatedRequest.requestLine.method = nx::network::http::Method::get;
         translatedRequest.requestLine.url = path;
-        translatedRequest.requestLine.version = nx_http::http_1_1;
+        translatedRequest.requestLine.version = nx::network::http::http_1_1;
 
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(tcpSocket->connect(m_httpServer.serverAddress()))
+        ASSERT_TRUE(tcpSocket->connect(m_httpServer.serverAddress(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
 
@@ -136,13 +138,13 @@ private:
     }
 
     void returnEmptyHttpResponse(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
-        completionHandler(nx_http::StatusCode::noContent);
+        completionHandler(nx::network::http::StatusCode::noContent);
     }
 };
 
@@ -161,4 +163,6 @@ TEST_F(ProxyWorker, proxying_request_without_message_body)
 } // namespace test
 } // namespace proxy
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

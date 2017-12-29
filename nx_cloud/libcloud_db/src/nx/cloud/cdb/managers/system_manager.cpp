@@ -122,7 +122,7 @@ SystemManager::~SystemManager()
 }
 
 void SystemManager::authenticateByName(
-    const nx_http::StringType& username,
+    const nx::network::http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const nx::utils::stree::AbstractResourceReader& /*authSearchInputData*/,
     nx::utils::stree::ResourceContainer* const authProperties,
@@ -151,7 +151,7 @@ void SystemManager::authenticateByName(
     }
 
     if (!validateHa1Func(
-            nx_http::calcHa1(
+            nx::network::http::calcHa1(
                 username,
                 AuthenticationManager::realm(),
                 nx::String(systemIter->authKey.c_str()))))

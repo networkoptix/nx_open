@@ -255,17 +255,17 @@ void Settings::setDbConnectionOptions(
     m_dbConnectionOptions = options;
 }
 
-std::list<SocketAddress> Settings::endpointsToListen() const
+std::list<network::SocketAddress> Settings::endpointsToListen() const
 {
     const QStringList& httpAddrToListenStrList = settings().value(
         kEndpointsToListen,
         kDefaultEndpointsToListen ).toString().split( ',' );
-    std::list<SocketAddress> httpAddrToListenList;
+    std::list<network::SocketAddress> httpAddrToListenList;
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter( httpAddrToListenList ),
-        []( const QString& str ) { return SocketAddress( str ); } );
+        []( const QString& str ) { return network::SocketAddress( str ); } );
 
     return httpAddrToListenList;
 }

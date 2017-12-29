@@ -37,7 +37,7 @@ bool operator==(const PeerInformation& left, const PeerInformation& right)
 
 void DiscoveryTestSetup::SetUp()
 {
-    m_httpServer = std::make_unique<TestHttpServer>();
+    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>();
     registerWebSocketAcceptHandlerAt(kTestPath);
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
@@ -52,12 +52,12 @@ void DiscoveryTestSetup::onWebSocketAccepted(
 nx::utils::Url DiscoveryTestSetup::getUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(nx_http::kUrlSchemeName)
+        .setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_httpServer->serverAddress())
         .setPath(kTestPath);
 }
 
-TestHttpServer& DiscoveryTestSetup::httpServer()
+nx::network::http::TestHttpServer& DiscoveryTestSetup::httpServer()
 {
     return *m_httpServer;
 }
@@ -67,22 +67,22 @@ void DiscoveryTestSetup::stopHttpServer()
     m_httpServer.reset();
 }
 
-void DiscoveryTestSetup::registerWebSocketAcceptHandlerAt(const nx_http::StringType path)
+void DiscoveryTestSetup::registerWebSocketAcceptHandlerAt(const nx::network::http::StringType path)
 {
     using namespace std::placeholders;
 
-    m_httpServer->registerRequestProcessor<nx_http::server::handler::CreateTunnelHandler>(
+    m_httpServer->registerRequestProcessor<nx::network::http::server::handler::CreateTunnelHandler>(
         path,
         [this]()
         {
-            return std::make_unique<nx_http::server::handler::CreateTunnelHandler>(
+            return std::make_unique<nx::network::http::server::handler::CreateTunnelHandler>(
                 nx::network::websocket::kWebsocketProtocolName,
                 std::bind(&DiscoveryTestSetup::onUpgradedConnectionAccepted, this, _1));
         });
 }
 
 void DiscoveryTestSetup::onUpgradedConnectionAccepted(
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
     auto webSocket = std::make_unique<nx::network::WebSocket>(
         std::move(connection));

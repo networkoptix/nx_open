@@ -158,7 +158,7 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
         dst->addFlags(Qn::desktop_camera);
 
     dst->setPhysicalId(src.physicalId);
-    dst->setMAC(QnMacAddress(src.mac));
+    dst->setMAC(nx::network::QnMacAddress(src.mac));
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);
@@ -548,11 +548,11 @@ void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
     }
 }
 
-void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target, int defaultPort)
+void deserializeNetAddrList(const QString& source, QList<nx::network::SocketAddress>& target, int defaultPort)
 {
     for (const auto& part: source.split(L';', QString::SkipEmptyParts))
     {
-        SocketAddress endpoint(part);
+        nx::network::SocketAddress endpoint(part);
         if (endpoint.port == 0)
             endpoint.port = (uint16_t) defaultPort;
 
@@ -560,7 +560,7 @@ void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target,
     }
 }
 
-static QString serializeNetAddrList(const QList<SocketAddress>& netAddrList)
+static QString serializeNetAddrList(const QList<nx::network::SocketAddress>& netAddrList)
 {
     QStringList result;
     for (const auto& addr : netAddrList)
@@ -613,7 +613,7 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
 {
     fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
 
-    QList<SocketAddress> resNetAddrList;
+    QList<nx::network::SocketAddress> resNetAddrList;
     deserializeNetAddrList(src.networkAddresses, resNetAddrList, QUrl(src.url).port());
 
     dst->setNetAddrList(resNetAddrList);

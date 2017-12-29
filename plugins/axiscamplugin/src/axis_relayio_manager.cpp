@@ -342,7 +342,7 @@ void AxisRelayIOManager::readAxisRelayPortNotification( const QByteArray& notifi
         return; //Error parsing notification: event type not found
 
     const char eventType = notification[sepPos+1];
-    //size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
+    //size_t portTypePos = nx::network::http::find_first_not_of( notification, "0123456789" );
     //if( portTypePos == nx::utils::BufferNpos )
     //    return; //Error parsing notification: port type not found
 

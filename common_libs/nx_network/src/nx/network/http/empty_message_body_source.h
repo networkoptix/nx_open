@@ -2,7 +2,9 @@
 
 #include "abstract_msg_body_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Should be used when HTTP request handler wishes to set Content-Length
@@ -33,4 +35,6 @@ private:
     boost::optional<uint64_t> m_contentLength;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

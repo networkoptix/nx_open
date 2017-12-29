@@ -135,7 +135,7 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
-void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
+void CloudConnectionManager::setProxyVia(const nx::network::SocketAddress& proxyEndpoint)
 {
     QnMutexLocker lock(&m_mutex);
 

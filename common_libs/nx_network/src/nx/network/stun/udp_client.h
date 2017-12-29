@@ -14,6 +14,7 @@
 #include "unreliable_message_pipeline.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 typedef nx::network::UnreliableMessagePipeline<
@@ -155,4 +156,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -309,7 +309,7 @@ private:
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
     std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
-    TestHttpServer m_httpProxy;
+    nx::network::http::TestHttpServer m_httpProxy;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 
@@ -327,7 +327,7 @@ private:
 
         m_systemMergeFixture.addSetting(
             "-cloudIntegration/cloudDbUrl",
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_cdb.endpoint()).toString().toStdString());
 
         m_systemMergeFixture.addSetting(
@@ -350,7 +350,7 @@ private:
 
         if (!m_httpProxy.registerRedirectHandler(
                 lm("/%1/api/mergeSystems").args(system.id),
-                nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                     .setEndpoint(peerWrapper.endpoint()).setPath("/api/mergeSystems")))
         {
             return false;

@@ -80,7 +80,7 @@ DWORD GetTcpRow(
 
 DWORD readTcpStat(
     PMIB_TCPROW row,
-    StreamSocketInfo* const sockInfo)
+    nx::network::StreamSocketInfo* const sockInfo)
 {
     //dynamically resolving functions that require win >= vista we want to use here
     typedef decltype(&GetPerTcpConnectionEStats) GetPerTcpConnectionEStatsType;

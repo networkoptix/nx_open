@@ -16,7 +16,7 @@
 #include "request_processor.h"
 #include "settings.h"
 
-namespace nx { namespace stun { class MessageDispatcher; } }
+namespace nx { namespace network { namespace stun { class MessageDispatcher; } } }
 namespace nx { namespace hpm { namespace data { struct ListeningPeers; } } }
 
 namespace nx {
@@ -35,7 +35,7 @@ public:
     PeerRegistrator(
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher,
+        nx::network::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool,
         AbstractRelayClusterClient* const relayClusterClient);
     virtual ~PeerRegistrator() override;
@@ -45,45 +45,45 @@ public:
 private:
     void bind(
         const ConnectionStrongRef& connection,
-        stun::Message requestMessage);
+        network::stun::Message requestMessage);
 
     void listen(
         const ConnectionStrongRef& connection,
         api::ListenRequest requestData,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ListenResponse)> completionHandler);
 
     void checkOwnState(
         const ConnectionStrongRef& connection,
         api::GetConnectionStateRequest requestData,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler);
 
     void resolveDomain(
         const ConnectionStrongRef& connection,
         api::ResolveDomainRequest requestData,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(
             api::ResultCode, api::ResolveDomainResponse)> completionHandler);
 
     void resolvePeer(
         const ConnectionStrongRef& connection,
         api::ResolvePeerRequest requestData,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(
             api::ResultCode, api::ResolvePeerResponse)> completionHandler);
 
     void clientBind(
         const ConnectionStrongRef& connection,
         api::ClientBindRequest requestData,
-        stun::Message requestMessage,
+        network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler);
 
 private:
     struct ClientBindInfo
     {
         ConnectionWeakRef connection;
-        std::list<SocketAddress> tcpReverseEndpoints;
+        std::list<network::SocketAddress> tcpReverseEndpoints;
     };
 
     using BoundClients = std::map<nx::String, ClientBindInfo>;
@@ -100,7 +100,7 @@ private:
         boost::optional<QUrl> trafficRelayInstanceUrl,
         std::function<void(api::ResultCode, api::ListenResponse)> responseSender);
     void sendClientBindIndications(const ConnectionStrongRef& connection);
-    nx::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
+    nx::network::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
 };
 
 } // namespace hpm

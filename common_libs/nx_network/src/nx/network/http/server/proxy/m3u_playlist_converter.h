@@ -4,7 +4,9 @@
 
 #include "message_body_converter.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace proxy {
 
@@ -17,7 +19,7 @@ public:
         const SocketAddress& proxyEndpoint,
         const nx::String& targetHost);
 
-    virtual nx_http::BufferType convert(nx_http::BufferType originalBody) override;
+    virtual nx::network::http::BufferType convert(nx::network::http::BufferType originalBody) override;
 
 private:
     const AbstractUrlRewriter& m_urlRewriter;
@@ -27,4 +29,6 @@ private:
 
 } // namespace proxy
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

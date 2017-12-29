@@ -270,7 +270,7 @@ void OutgoingTunnelConnection::closeConnection(
 }
 
 void OutgoingTunnelConnection::onStunMessageReceived(
-    nx::stun::Message message)
+    nx::network::stun::Message message)
 {
     hpm::api::UdpHolePunchingSynResponse synAck;
     if (synAck.parse(message))

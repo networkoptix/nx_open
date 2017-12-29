@@ -11,7 +11,7 @@ static const QByteArray kJsonContetnType("application/json");
 } // namespace
 
 JsonRestResponse::JsonRestResponse(
-    nx_http::StatusCode::Value statusCode, QnJsonRestResult json, bool isUndefinedContentLength)
+    nx::network::http::StatusCode::Value statusCode, QnJsonRestResult json, bool isUndefinedContentLength)
 :
     statusCode(statusCode), json(std::move(json)),
     isUndefinedContentLength(isUndefinedContentLength)
@@ -19,7 +19,7 @@ JsonRestResponse::JsonRestResponse(
 }
 
 JsonRestResponse::JsonRestResponse(
-    nx_http::StatusCode::Value status, QnJsonRestResult::Error error)
+    nx::network::http::StatusCode::Value status, QnJsonRestResult::Error error)
 :
     statusCode(statusCode)
 {
@@ -51,7 +51,7 @@ JsonRestResponse QnJsonRestHandler::executeGet(const JsonRestRequest& request)
 {
     JsonRestResponse response;
     QByteArray contentType;
-    response.statusCode = (nx_http::StatusCode::Value) executeGet(
+    response.statusCode = (nx::network::http::StatusCode::Value) executeGet(
         request.path, request.params, response.json, request.owner);
 
     return response;
@@ -60,7 +60,7 @@ JsonRestResponse QnJsonRestHandler::executeGet(const JsonRestRequest& request)
 JsonRestResponse QnJsonRestHandler::executeDelete(const JsonRestRequest& request)
 {
     JsonRestResponse response;
-    response.statusCode = (nx_http::StatusCode::Value) executeDelete(
+    response.statusCode = (nx::network::http::StatusCode::Value) executeDelete(
         request.path, request.params, response.json, request.owner);
 
     return response;
@@ -69,7 +69,7 @@ JsonRestResponse QnJsonRestHandler::executeDelete(const JsonRestRequest& request
 JsonRestResponse QnJsonRestHandler::executePost(const JsonRestRequest& request, const QByteArray& body)
 {
     JsonRestResponse response;
-    response.statusCode = (nx_http::StatusCode::Value) executePost(
+    response.statusCode = (nx::network::http::StatusCode::Value) executePost(
         request.path, request.params, body, response.json, request.owner);
 
     return response;
@@ -78,7 +78,7 @@ JsonRestResponse QnJsonRestHandler::executePost(const JsonRestRequest& request, 
 JsonRestResponse QnJsonRestHandler::executePut(const JsonRestRequest& request, const QByteArray& body)
 {
     JsonRestResponse response;
-    response.statusCode = (nx_http::StatusCode::Value) executePut(
+    response.statusCode = (nx::network::http::StatusCode::Value) executePut(
         request.path, request.params, body, response.json, request.owner);
 
     return response;
@@ -97,7 +97,7 @@ int QnJsonRestHandler::executeDelete(
     const QString& /*path*/, const QnRequestParams& /*params*/, QnJsonRestResult& /*result*/,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executePost(
@@ -150,7 +150,7 @@ int QnJsonRestHandler::executeGet(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executeDelete(
@@ -161,7 +161,7 @@ int QnJsonRestHandler::executeDelete(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executePost(
@@ -174,7 +174,7 @@ int QnJsonRestHandler::executePost(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 int QnJsonRestHandler::executePut(
@@ -187,7 +187,7 @@ int QnJsonRestHandler::executePut(
     const QnRestConnectionProcessor* /*owner*/)
 {
     NX_ASSERT(false, "Is not supposed to be called");
-    return (int) nx_http::StatusCode::notImplemented;
+    return (int) nx::network::http::StatusCode::notImplemented;
 }
 
 QnRequestParams QnJsonRestHandler::processParams(const QnRequestParamList& params) const

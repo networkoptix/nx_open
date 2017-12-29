@@ -17,8 +17,8 @@ class HanwhaAttributes
     static const int kNoChannel = -1;
 public:
     HanwhaAttributes() = default;
-    explicit HanwhaAttributes(nx_http::StatusCode::Value statusCode);
-    explicit HanwhaAttributes(const QString& attributesXml, nx_http::StatusCode::Value statusCode);
+    explicit HanwhaAttributes(nx::network::http::StatusCode::Value statusCode);
+    explicit HanwhaAttributes(const QString& attributesXml, nx::network::http::StatusCode::Value statusCode);
 
     template<typename T>
     boost::optional<T> attribute(
@@ -58,7 +58,7 @@ public:
 
     bool isValid() const;
 
-    nx_http::StatusCode::Value statusCode() const;
+    nx::network::http::StatusCode::Value statusCode() const;
 
 private:
 
@@ -81,7 +81,7 @@ private:
 
 private:
     bool m_isValid = false;
-    nx_http::StatusCode::Value m_statusCode;
+    nx::network::http::StatusCode::Value m_statusCode;
 };
 
 template<>

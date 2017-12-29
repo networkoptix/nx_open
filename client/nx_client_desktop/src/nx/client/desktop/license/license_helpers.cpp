@@ -114,7 +114,7 @@ private:
         const LicenseErrorHash& errors = LicenseErrorHash());
 
 private:
-    const nx_http::AsyncHttpClientPtr m_httpClient;
+    const nx::network::http::AsyncHttpClientPtr m_httpClient;
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
@@ -124,7 +124,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     QObject* parent)
     :
     base_type(parent),
-    m_httpClient(nx_http::AsyncHttpClient::create())
+    m_httpClient(nx::network::http::AsyncHttpClient::create())
 {
     const auto finalize =
         [this, handler](Result result, const LicenseErrorHash& errors = LicenseErrorHash())
@@ -160,13 +160,13 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
 
             switch(response->statusLine.statusCode)
             {
-                case nx_http::StatusCode::ok:
+                case nx::network::http::StatusCode::ok:
                     finalize(Result::Success);
                     break;
-                case nx_http::StatusCode::internalServerError:
+                case nx::network::http::StatusCode::internalServerError:
                     finalize(Result::ServerError);
                     break;
-                case nx_http::StatusCode::badRequest:
+                case nx::network::http::StatusCode::badRequest:
                 {
                     finalize(Result::DeactivationError,
                         extractErrors(m_httpClient->fetchMessageBodyBuffer()));
@@ -183,13 +183,13 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
       * becase of strong recoomendation in http client header
       */
     const auto threadSafeHandler =
-        [this, guard, handler, postHandler](nx_http::AsyncHttpClientPtr /*client*/)
+        [this, guard, handler, postHandler](nx::network::http::AsyncHttpClientPtr /*client*/)
         {
             if (guard && handler)
                 executeDelayed(postHandler, 0, guard->thread());
         };
 
-    connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, threadSafeHandler,
+    connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, threadSafeHandler,
         Qt::DirectConnection);
 
     detail::Request request;

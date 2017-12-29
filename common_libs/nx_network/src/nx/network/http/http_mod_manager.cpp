@@ -1,6 +1,8 @@
 #include "http_mod_manager.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 HttpModManager::HttpModManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -31,4 +33,6 @@ void HttpModManager::addCustomRequestMod(std::function<void(Request*)> requestMo
     m_requestModifiers.emplace_back(std::move(requestMod));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

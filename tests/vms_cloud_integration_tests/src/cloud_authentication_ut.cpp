@@ -46,19 +46,19 @@ protected:
                 accountEmail(), accountPassword(),
                 temporaryCredentialsParams, &temporaryCredentials));
 
-        m_customCredentials = 
+        m_customCredentials =
             std::make_pair(temporaryCredentials.login, temporaryCredentials.password);
     }
 
     void whenIssuedHttpRequestSignedWithThatNonce()
     {
-        nx_http::Message requestMsg = prepareRequest(lit("/ec2/getUsers"), m_cloudNonceData);
+        nx::network::http::Message requestMsg = prepareRequest(lit("/ec2/getUsers"), m_cloudNonceData);
 
         //issuing request to mediaserver using that nonce
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
-        ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), 3000));
+        ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), nx::network::kNoTimeout));
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
-        auto httpMsgPipeline = std::make_unique<nx_http::deprecated::AsyncMessagePipeline>(
+        auto httpMsgPipeline = std::make_unique<nx::network::http::deprecated::AsyncMessagePipeline>(
             nullptr,
             std::move(tcpSocket));
         httpMsgPipeline->startReadingConnection();
@@ -66,9 +66,9 @@ protected:
         auto httpMsgPipelineGuard = makeScopeGuard(
             [&httpMsgPipeline]() { httpMsgPipeline->pleaseStopSync(); });
 
-        nx::utils::promise<nx_http::Message> responseReceivedPromise;
+        nx::utils::promise<nx::network::http::Message> responseReceivedPromise;
         httpMsgPipeline->setMessageHandler(
-            [&responseReceivedPromise](nx_http::Message msg)
+            [&responseReceivedPromise](nx::network::http::Message msg)
             {
                 responseReceivedPromise.set_value(std::move(msg));
             });
@@ -80,8 +80,8 @@ protected:
 
     void thenRequestShouldBeFulfilled()
     {
-        ASSERT_EQ(nx_http::MessageType::response, m_responseMessage.type);
-        ASSERT_EQ(nx_http::StatusCode::ok, m_responseMessage.response->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::MessageType::response, m_responseMessage.type);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, m_responseMessage.response->statusLine.statusCode);
     }
 
     void assertServerAuthorizesCloudUserCredentials()
@@ -95,21 +95,21 @@ protected:
 
     bool userRequestIsAuthorizedByServer(std::string userName, std::string password)
     {
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         httpClient.setUserName(QString::fromStdString(userName).toLower());
         httpClient.setUserPassword(QString::fromStdString(password));
         if (!httpClient.doGet(lit("http://%1/ec2/getUsers").arg(mediaServerEndpoint().toString())))
             return false;
         if (httpClient.response() == nullptr)
             return false;
-        if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
             return false;
         return true;
     }
 
 private:
     api::NonceData m_cloudNonceData;
-    nx_http::Message m_responseMessage;
+    nx::network::http::Message m_responseMessage;
     boost::optional<std::pair<std::string, std::string>> m_customCredentials;
 
     void getCloudNonce(api::NonceData* nonceData)
@@ -132,14 +132,14 @@ private:
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
 
-    nx_http::Message prepareRequest(
+    nx::network::http::Message prepareRequest(
         const QString& requestPath,
         const api::NonceData& nonceData)
     {
-        nx_http::Message requestMsg(nx_http::MessageType::request);
+        nx::network::http::Message requestMsg(nx::network::http::MessageType::request);
         requestMsg.request->requestLine.url = requestPath;
-        requestMsg.request->requestLine.method = nx_http::Method::get;
-        requestMsg.request->requestLine.version = nx_http::http_1_1;
+        requestMsg.request->requestLine.method = nx::network::http::Method::get;
+        requestMsg.request->requestLine.version = nx::network::http::http_1_1;
 
         addAuthorizationHeader(nonceData, requestMsg.request);
         return requestMsg;
@@ -147,26 +147,26 @@ private:
 
     void addAuthorizationHeader(
         const api::NonceData& nonceData,
-        nx_http::Request* const request)
+        nx::network::http::Request* const request)
     {
-        nx_http::header::WWWAuthenticate wwwAuthenticate;
-        wwwAuthenticate.authScheme = nx_http::header::AuthScheme::digest;
+        nx::network::http::header::WWWAuthenticate wwwAuthenticate;
+        wwwAuthenticate.authScheme = nx::network::http::header::AuthScheme::digest;
         wwwAuthenticate.params.insert("nonce", nonceData.nonce.c_str());
         wwwAuthenticate.params.insert("realm", "VMS");
 
-        nx_http::header::DigestAuthorization digestAuthorization;
+        nx::network::http::header::DigestAuthorization digestAuthorization;
 
-        nx_http::calcDigestResponse(
+        nx::network::http::calcDigestResponse(
             request->requestLine.method,
             accountEmail().c_str(),
-            nx_http::StringType(accountPassword().c_str()),
+            nx::network::http::StringType(accountPassword().c_str()),
             boost::none,
             request->requestLine.url.toString().toUtf8(),
             wwwAuthenticate,
             &digestAuthorization);
 
         request->headers.emplace(
-            nx_http::header::Authorization::NAME,
+            nx::network::http::header::Authorization::NAME,
             digestAuthorization.serialized());
     }
 };

@@ -11,7 +11,7 @@ class QnIOMonitorConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
-    QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnIOMonitorConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnIOMonitorConnectionProcessor();
 protected:
     virtual void run() override;
@@ -24,7 +24,7 @@ private slots:
         qint64 timestamp );
     void at_cameraInitDone(const QnResourcePtr &resource);
 private:
-    void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onSomeBytesReadAsync(nx::network::AbstractStreamSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead);
     void onDataSent(SystemError::ErrorCode errorCode, size_t bytesSent);
     void addData(QnIOStateDataList&& value);
     void addData(QnIOStateData&& value);

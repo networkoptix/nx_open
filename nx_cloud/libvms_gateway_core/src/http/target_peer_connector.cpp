@@ -10,7 +10,7 @@ namespace gateway {
 
 TargetPeerConnector::TargetPeerConnector(
     relaying::AbstractListeningPeerPool* listeningPeerPool,
-    const SocketAddress& targetEndpoint)
+    const network::SocketAddress& targetEndpoint)
     :
     m_listeningPeerPool(listeningPeerPool),
     m_targetEndpoint(targetEndpoint)
@@ -74,7 +74,7 @@ void TargetPeerConnector::takeConnectionFromListeningPeerPool()
 
 void TargetPeerConnector::processTakeConnectionResult(
     cloud::relay::api::ResultCode resultCode,
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     dispatch(
         [this, resultCode, connection = std::move(connection)]() mutable
@@ -96,7 +96,7 @@ void TargetPeerConnector::initiateDirectConnection()
 {
     using namespace std::placeholders;
 
-    m_targetPeerSocket = SocketFactory::createStreamSocket(false);
+    m_targetPeerSocket = nx::network::SocketFactory::createStreamSocket(false);
     m_targetPeerSocket->bindToAioThread(getAioThread());
 
     bool setSocketOptionsResult = m_targetPeerSocket->setNonBlockingMode(true);
@@ -129,7 +129,7 @@ void TargetPeerConnector::processDirectConnectionResult(
 
 void TargetPeerConnector::processConnectionResult(
     SystemError::ErrorCode systemErrorCode,
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     m_timer.pleaseStopSync();
     nx::utils::swapAndCall(

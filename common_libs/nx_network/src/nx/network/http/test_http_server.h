@@ -13,21 +13,23 @@
 #include "server/handler/http_server_handler_custom.h"
 #include "server/rest/http_server_rest_message_dispatcher.h"
 
-//-------------------------------------------------------------------------------------------------
+namespace nx {
+namespace network {
+namespace http {
 
 class NX_NETWORK_API TestAuthenticationManager:
-    public nx_http::server::BaseAuthenticationManager
+    public nx::network::http::server::BaseAuthenticationManager
 {
-    typedef nx_http::server::BaseAuthenticationManager BaseType;
+    typedef nx::network::http::server::BaseAuthenticationManager BaseType;
 
 public:
     TestAuthenticationManager(
-        nx_http::server::AbstractAuthenticationDataProvider* authenticationDataProvider);
+        nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider);
 
     virtual void authenticate(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
-        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
+        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
     void setAuthenticationEnabled(bool value);
 
@@ -38,17 +40,17 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using ContentProviderFactoryFunction =
-    nx::utils::MoveOnlyFunc<std::unique_ptr<nx_http::AbstractMsgBodySource>()>;
+    nx::utils::MoveOnlyFunc<std::unique_ptr<nx::network::http::AbstractMsgBodySource>()>;
 
 class NX_NETWORK_API TestHttpServer
 {
 public:
     using ProcessHttpRequestFunc = nx::utils::MoveOnlyFunc<void(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler /*completionHandler*/)>;
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler /*completionHandler*/)>;
 
     TestHttpServer():
         TestHttpServer(
@@ -64,7 +66,7 @@ public:
         m_authenticationManager.setAuthenticationEnabled(false);
 
         m_httpServer.reset(
-            new nx_http::HttpStreamSocketServer(
+            new nx::network::http::HttpStreamSocketServer(
                 &m_authenticationManager,
                 &m_httpMessageDispatcher,
                 std::move(args)...));
@@ -79,7 +81,7 @@ public:
     bool registerRequestProcessor(
         const QString& path,
         std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc,
-        nx_http::StringType method = nx_http::kAnyMethod)
+        nx::network::http::StringType method = nx::network::http::kAnyMethod)
     {
         return m_httpMessageDispatcher.registerRequestProcessor(
             path,
@@ -90,7 +92,7 @@ public:
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
         const QString& path,
-        nx_http::StringType method = nx_http::kAnyMethod)
+        nx::network::http::StringType method = nx::network::http::kAnyMethod)
     {
         return m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
             path,
@@ -105,9 +107,9 @@ public:
     bool registerRequestProcessorFunc(
         const QString& path,
         Func func,
-        nx_http::StringType method = nx_http::kAnyMethod)
+        nx::network::http::StringType method = nx::network::http::kAnyMethod)
     {
-        using RequestHandlerType = nx_http::server::handler::CustomRequestHandler<const Func&>;
+        using RequestHandlerType = nx::network::http::server::handler::CustomRequestHandler<const Func&>;
 
         return m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
             path,
@@ -121,14 +123,14 @@ public:
     bool registerStaticProcessor(
         const QString& path,
         QByteArray msgBody,
-        const nx_http::StringType& mimeType,
-        nx_http::StringType method = nx_http::kAnyMethod);
+        const nx::network::http::StringType& mimeType,
+        nx::network::http::StringType method = nx::network::http::kAnyMethod);
 
     bool registerFileProvider(
         const QString& httpPath,
         const QString& filePath,
-        const nx_http::StringType& mimeType,
-        nx_http::StringType method = nx_http::kAnyMethod);
+        const nx::network::http::StringType& mimeType,
+        nx::network::http::StringType method = nx::network::http::kAnyMethod);
 
     bool registerContentProvider(
         const QString& httpPath,
@@ -137,7 +139,7 @@ public:
     bool registerRedirectHandler(
         const QString& resourcePath,
         const nx::utils::Url& location,
-        nx_http::StringType method = nx_http::kAnyMethod);
+        nx::network::http::StringType method = nx::network::http::kAnyMethod);
 
     // used for test purpose
     void setPersistentConnectionEnabled(bool value);
@@ -146,27 +148,27 @@ public:
     void setAuthenticationEnabled(bool value);
     void registerUserCredentials(const nx::String& userName, const nx::String& password);
 
-    nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
-    const nx_http::HttpStreamSocketServer& server() const { return *m_httpServer; }
-    nx_http::server::rest::MessageDispatcher& httpMessageDispatcher()
+    nx::network::http::HttpStreamSocketServer& server() { return *m_httpServer; }
+    const nx::network::http::HttpStreamSocketServer& server() const { return *m_httpServer; }
+    nx::network::http::server::rest::MessageDispatcher& httpMessageDispatcher()
         { return m_httpMessageDispatcher; }
 
 private:
-    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
-    nx_http::server::PlainTextCredentialsProvider m_credentialsProvider;
+    nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::server::PlainTextCredentialsProvider m_credentialsProvider;
     TestAuthenticationManager m_authenticationManager;
-    std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
+    std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
 };
 
 //-------------------------------------------------------------------------------------------------
 // class RandomlyFailingHttpConnection
 
 class NX_NETWORK_API RandomlyFailingHttpConnection:
-    public nx_http::BaseConnection<RandomlyFailingHttpConnection>,
+    public nx::network::http::BaseConnection<RandomlyFailingHttpConnection>,
     public std::enable_shared_from_this<RandomlyFailingHttpConnection>
 {
 public:
-    using BaseType = nx_http::BaseConnection<RandomlyFailingHttpConnection>;
+    using BaseType = nx::network::http::BaseConnection<RandomlyFailingHttpConnection>;
 
     RandomlyFailingHttpConnection(
         nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
@@ -176,7 +178,7 @@ public:
     void setResponseBuffer(const QByteArray& buf);
 
 protected:
-    virtual void processMessage(nx_http::Message request) override;
+    virtual void processMessage(nx::network::http::Message request) override;
 
 private:
     QByteArray m_responseBuffer;
@@ -205,3 +207,7 @@ private:
     virtual std::shared_ptr<RandomlyFailingHttpConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 };
+
+} // namespace http
+} // namespace network
+} // namespace nx

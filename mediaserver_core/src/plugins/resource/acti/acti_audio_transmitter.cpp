@@ -94,7 +94,7 @@ bool ActiAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     return true;
 }
 
-void ActiAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
+void ActiAudioTransmitter::prepareHttpClient(const nx::network::http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
 
@@ -106,11 +106,11 @@ void ActiAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& 
     // if we don't add authorization info to the first request all subsequent 
     // requests will fail with "401 Unauthorized", so we have to add authorization 
     // to the first request.
-    httpClient->setAuthType(nx_http::AuthType::authBasic);
+    httpClient->setAuthType(nx::network::http::AuthType::authBasic);
 }
 
 bool ActiAudioTransmitter::isReadyForTransmission(
-    nx_http::AsyncHttpClientPtr /*httpClient*/,
+    nx::network::http::AsyncHttpClientPtr /*httpClient*/,
     bool /*isRetryAfterUnauthorizedResponse*/) const
 {
     return true;
@@ -130,9 +130,9 @@ std::chrono::milliseconds ActiAudioTransmitter::transmissionTimeout() const
     return kTransmissionTimeout;
 }
 
-nx_http::StringType ActiAudioTransmitter::contentType() const
+nx::network::http::StringType ActiAudioTransmitter::contentType() const
 {
-    nx_http::StringType contentType;
+    nx::network::http::StringType contentType;
     contentType.append(kAudioTransmissionRequestMimeType);
     contentType.append(lit(";boundary=%1").arg(kMultipartBoundary));
 

@@ -187,9 +187,9 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override
+        std::chrono::milliseconds timeout) override
     {
-        return this->m_target->connect(remoteSocketAddress, timeoutMillis);
+        return this->m_target->connect(remoteSocketAddress, timeout);
     }
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override

@@ -62,7 +62,7 @@ void ClientImpl::beginListening(
 
     issueUpgradeRequest<
         BeginListeningRequest, nx::String, BeginListeningHandler, BeginListeningResponse>(
-            nx_http::Method::post,
+            nx::network::http::Method::post,
             kRelayProtocolName,
             std::move(request),
             kServerIncomingConnectionsPath,
@@ -81,7 +81,7 @@ void ClientImpl::startSession(
     request.desiredSessionId = desiredSessionId.toStdString();
     request.targetPeerName = targetPeerName.toStdString();
 
-    const auto requestPath = nx_http::rest::substituteParameters(
+    const auto requestPath = nx::network::http::rest::substituteParameters(
         kServerClientSessionsPath, {targetPeerName});
 
     issueRequest<CreateClientSessionRequest, CreateClientSessionResponse>(
@@ -119,7 +119,7 @@ void ClientImpl::openConnectionToTheTargetHost(
 
     issueUpgradeRequest<
         ConnectToPeerRequest, nx::String, OpenRelayConnectionHandler>(
-            nx_http::Method::post,
+            nx::network::http::Method::post,
             kRelayProtocolName,
             std::move(request),
             kClientSessionConnectionsPath,
@@ -149,8 +149,8 @@ template<
     typename ... Response
 >
 void ClientImpl::issueUpgradeRequest(
-    nx_http::Method::ValueType httpMethod,
-    const nx_http::StringType& protocolToUpgradeTo,
+    nx::network::http::Method::ValueType httpMethod,
+    const nx::network::http::StringType& protocolToUpgradeTo,
     Request request,
     const char* requestPathTemplate,
     std::initializer_list<RequestPathArgument> requestPathArguments,
@@ -204,7 +204,7 @@ void ClientImpl::issueRequest(
 }
 
 template<typename Request, typename Response, typename RequestPathArgument>
-std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
+std::unique_ptr<nx::network::http::FusionDataHttpClient<Request, Response>>
     ClientImpl::prepareHttpRequest(
         Request request,
         const char* requestPathTemplate,
@@ -213,11 +213,11 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
     nx::utils::Url requestUrl = m_baseUrl;
     requestUrl.setPath(network::url::normalizePath(
         requestUrl.path() +
-        nx_http::rest::substituteParameters(
+        nx::network::http::rest::substituteParameters(
             requestPathTemplate, std::move(requestPathArguments)).c_str()));
 
     auto httpClient = std::make_unique<
-        nx_http::FusionDataHttpClient<Request, Response>>(
+        nx::network::http::FusionDataHttpClient<Request, Response>>(
             requestUrl,
             m_authInfo,
             std::move(request));
@@ -227,8 +227,8 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
 
 template<typename HttpClient, typename CompletionHandler, typename ... Response>
 void ClientImpl::executeUpgradeRequest(
-    nx_http::Method::ValueType httpMethod,
-    const nx_http::StringType& protocolToUpgradeTo,
+    nx::network::http::Method::ValueType httpMethod,
+    const nx::network::http::StringType& protocolToUpgradeTo,
     HttpClient httpClient,
     CompletionHandler completionHandler)
 {
@@ -241,7 +241,7 @@ void ClientImpl::executeUpgradeRequest(
             httpClientIter = std::prev(m_activeRequests.end()),
             completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode sysErrorCode,
-                const nx_http::Response* httpResponse,
+                const nx::network::http::Response* httpResponse,
                 Response ... response) mutable
         {
             auto connection = httpClientPtr->takeSocket();
@@ -268,7 +268,7 @@ void ClientImpl::executeRequest(
             httpClientIter = std::prev(m_activeRequests.end()),
             completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode sysErrorCode,
-                const nx_http::Response* httpResponse,
+                const nx::network::http::Response* httpResponse,
                 Response response) mutable
         {
             auto contentLocationUrl =
@@ -282,12 +282,12 @@ void ClientImpl::executeRequest(
 
 ResultCode ClientImpl::toUpgradeResultCode(
     SystemError::ErrorCode sysErrorCode,
-    const nx_http::Response* httpResponse)
+    const nx::network::http::Response* httpResponse)
 {
     if (sysErrorCode != SystemError::noError || !httpResponse)
         return ResultCode::networkError;
 
-    if (httpResponse->statusLine.statusCode == nx_http::StatusCode::switchingProtocols)
+    if (httpResponse->statusLine.statusCode == nx::network::http::StatusCode::switchingProtocols)
         return ResultCode::ok;
 
     const auto resultCode = toResultCode(sysErrorCode, httpResponse);
@@ -301,7 +301,7 @@ ResultCode ClientImpl::toUpgradeResultCode(
 
 ResultCode ClientImpl::toResultCode(
     SystemError::ErrorCode sysErrorCode,
-    const nx_http::Response* httpResponse)
+    const nx::network::http::Response* httpResponse)
 {
     if (sysErrorCode != SystemError::noError || !httpResponse)
         return ResultCode::networkError;
@@ -316,7 +316,7 @@ ResultCode ClientImpl::toResultCode(
     }
 
     return fromHttpStatusCode(
-        static_cast<nx_http::StatusCode::Value>(
+        static_cast<nx::network::http::StatusCode::Value>(
             httpResponse->statusLine.statusCode));
 }
 

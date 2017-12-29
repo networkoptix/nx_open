@@ -1087,14 +1087,14 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         emit peerLost(aliveData.peer.id, aliveData.peer.peerType);
 }
 
-static SocketAddress getUrlAddr(const nx::utils::Url& url) { return SocketAddress(url.host(), url.port()); }
+static nx::network::SocketAddress getUrlAddr(const nx::utils::Url& url) { return nx::network::SocketAddress(url.host(), url.port()); }
 
 bool QnTransactionMessageBus::isPeerUsing(const nx::utils::Url& url)
 {
-    const SocketAddress& addr1 = getUrlAddr(url);
+    const nx::network::SocketAddress& addr1 = getUrlAddr(url);
     for (int i = 0; i < m_connectingConnections.size(); ++i)
     {
-        const SocketAddress& addr2 = m_connectingConnections[i]->remoteSocketAddr();
+        const nx::network::SocketAddress& addr2 = m_connectingConnections[i]->remoteSocketAddr();
         if (addr2 == addr1)
             return true;
     }
@@ -1380,11 +1380,11 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const ApiPeerData& remotePeer,
     qint64 remoteSystemIdentityTime,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& contentEncoding,
     std::function<void()> ttFinishCallback,
     const Qn::UserAccessData &userAccessData)
@@ -1448,10 +1448,10 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& co
 
 void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     const ApiPeerData &/*remotePeer*/,
     qint64 /*remoteSystemIdentityTime*/,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& requestBuf)
 {
     if (!m_db)
@@ -1479,7 +1479,7 @@ void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
 
 bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
     const QnUuid& connectionGuid,
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QByteArray& requestMsgBody)
 {
     if (!m_db)
@@ -1542,7 +1542,7 @@ void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
         if (info.id == id)
         {
             nx::utils::Url url = itr.key();
-            const SocketAddress& urlStr = getUrlAddr(url);
+            const nx::network::SocketAddress& urlStr = getUrlAddr(url);
             for (QnTransactionTransport* transport : m_connections.values())
             {
                 if (transport->remoteSocketAddr() == urlStr)

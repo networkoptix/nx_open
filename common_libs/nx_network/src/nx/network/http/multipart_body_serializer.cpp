@@ -1,6 +1,8 @@
 #include "multipart_body_serializer.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 MultipartBodySerializer::MultipartBodySerializer(
     StringType boundary,
@@ -21,7 +23,7 @@ StringType MultipartBodySerializer::contentType() const
 
 void MultipartBodySerializer::beginPart(
     const StringType& contentType,
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     BufferType data)
 {
     startBodyPartInternal(
@@ -39,7 +41,7 @@ void MultipartBodySerializer::writeData(BufferType data)
 
 void MultipartBodySerializer::writeBodyPart(
     const StringType& contentType,
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     BufferType data)
 {
     auto contentLength = data.size();
@@ -65,7 +67,7 @@ bool MultipartBodySerializer::eof() const
 
 void MultipartBodySerializer::startBodyPartInternal(
     const StringType& contentType,
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     BufferType data,
     boost::optional<std::uint64_t> contentLength)
 {
@@ -87,4 +89,6 @@ void MultipartBodySerializer::startBodyPartInternal(
     m_outputStream->processData(std::move(serializedData));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

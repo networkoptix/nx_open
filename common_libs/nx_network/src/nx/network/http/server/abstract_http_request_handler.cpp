@@ -3,7 +3,9 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 //-------------------------------------------------------------------------------------------------
 // RequestResult
@@ -14,8 +16,8 @@ RequestResult::RequestResult(StatusCode::Value statusCode):
 }
 
 RequestResult::RequestResult(
-    nx_http::StatusCode::Value statusCode,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
+    nx::network::http::StatusCode::Value statusCode,
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource)
     :
     statusCode(statusCode),
     dataSource(std::move(dataSource))
@@ -24,8 +26,8 @@ RequestResult::RequestResult(
 
 
 RequestResult::RequestResult(
-    nx_http::StatusCode::Value statusCode,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+    nx::network::http::StatusCode::Value statusCode,
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource,
     ConnectionEvents connectionEvents)
     :
     statusCode(statusCode),
@@ -42,12 +44,12 @@ AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
 }
 
 bool AbstractHttpRequestHandler::processRequest(
-    nx_http::HttpServerConnection* const connection,
-    nx_http::Message&& requestMsg,
+    nx::network::http::HttpServerConnection* const connection,
+    nx::network::http::Message&& requestMsg,
     nx::utils::stree::ResourceContainer&& authInfo,
     ResponseIsReadyHandler completionHandler)
 {
-    NX_ASSERT(requestMsg.type == nx_http::MessageType::request);
+    NX_ASSERT(requestMsg.type == nx::network::http::MessageType::request);
 
     // Creating response here to support pipelining.
     Message responseMsg(MessageType::response);
@@ -83,7 +85,7 @@ const std::vector<StringType>& AbstractHttpRequestHandler::requestPathParams() c
     return m_requestPathParams;
 }
 
-nx_http::Response* AbstractHttpRequestHandler::response()
+nx::network::http::Response* AbstractHttpRequestHandler::response()
 {
     return m_responseMsg.response;
 }
@@ -107,4 +109,6 @@ void AbstractHttpRequestHandler::requestDone(RequestResult requestResult)
         std::move(requestResult.connectionEvents));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

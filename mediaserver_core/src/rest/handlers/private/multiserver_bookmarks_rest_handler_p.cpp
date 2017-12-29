@@ -49,7 +49,7 @@ namespace
         nx::utils::Url url,
         Context *ctx)
     {
-        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
+        auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) {
             QN_UNUSED(osErrorCode, statusCode, msgBody);
             ctx->executeGuarded([ctx]()
             {
@@ -65,11 +65,11 @@ namespace
         QnMultiServerCameraBookmarkList& outputData,
         const QnMediaServerResourcePtr &server, QnGetBookmarksRequestContext* ctx)
     {
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody )
         {
             QnCameraBookmarkList remoteData;
             bool success = false;
-            if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
+            if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
                 NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
             }
@@ -111,11 +111,11 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnGetBookmarkTagsRequestContext* ctx)
     {
-        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+        auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody )
         {
             QnCameraBookmarkTagList remoteData;
             bool success = false;
-            if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
+            if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
                 NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
             }

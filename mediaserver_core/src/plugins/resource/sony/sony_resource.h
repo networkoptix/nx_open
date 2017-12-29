@@ -39,15 +39,15 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    nx_http::AsyncHttpClientPtr m_inputMonitorHttpClient;
+    nx::network::http::AsyncHttpClientPtr m_inputMonitorHttpClient;
     mutable QnMutex m_inputPortMutex;
-    nx_http::LineSplitter m_lineSplitter;
+    nx::network::http::LineSplitter m_lineSplitter;
     std::map<int, bool> m_relayInputStates;
 
 private slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx::network::http::AsyncHttpClientPtr httpClient );
 };
 
 //typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;

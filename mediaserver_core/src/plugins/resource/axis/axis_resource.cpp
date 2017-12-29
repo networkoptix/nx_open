@@ -140,7 +140,7 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
     nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
 
     QAuthenticator auth = getAuth();
 
@@ -151,10 +151,10 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx_http::StatusCode::ok )
+            statusCode != nx::network::http::StatusCode::ok )
         {
             return completionHandler( false );
         }
@@ -167,7 +167,7 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
 
-    nx_http::downloadFileAsync(
+    nx::network::http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -246,17 +246,17 @@ bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
     requestQuery += portList;
     requestUrl.setQuery(requestQuery);
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->bindToAioThread(m_timer.getAioThread());
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnPlAxisResource::onMonitorResponseReceived, Qt::DirectConnection );
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnPlAxisResource::onMonitorMessageBodyAvailable, Qt::DirectConnection );
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnPlAxisResource::onMonitorConnectionClosed, Qt::DirectConnection );
-    httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
+    connect( httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived, this, &QnPlAxisResource::onMonitorResponseReceived, Qt::DirectConnection );
+    connect( httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable, this, &QnPlAxisResource::onMonitorMessageBodyAvailable, Qt::DirectConnection );
+    connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, &QnPlAxisResource::onMonitorConnectionClosed, Qt::DirectConnection );
+    httpClient->setTotalReconnectTries( nx::network::http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
     httpClient->setUserName( auth.user() );
     httpClient->setUserPassword( auth.password() );
     httpClient->setMessageBodyReadTimeoutMs(AXIS_IO_KEEP_ALIVE_TIME * 2);
 
-    ioMonitor.contentParser = std::make_shared<nx_http::MultipartContentParser>();
+    ioMonitor.contentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     ioMonitor.contentParser->setNextFilter(std::make_shared<AxisIOMessageBodyParser>(this));
 
     httpClient->doGet(requestUrl);
@@ -957,7 +957,7 @@ bool QnPlAxisResource::initializeAudio(CLSimpleHTTPClient * const http)
     return true;
 }
 
-void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
+void QnPlAxisResource::onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
 
@@ -965,7 +965,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     if (!ioMonitor)
         return;
 
-    if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         NX_LOG( lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
             arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
@@ -984,7 +984,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     }
 }
 
-void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
+void QnPlAxisResource::onCurrentIOStateResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
 
@@ -992,7 +992,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
     {
         NX_LOG( lit("Axis camera %1. Failed to read current IO state. No HTTP response").arg(getUrl()), cl_logWARNING );
     }
-    else if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         NX_LOG( lit("Axis camera %1. Failed to read current IO state. %2").
             arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
@@ -1015,7 +1015,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
     m_inputPortStateReader.reset();
 }
 
-QnPlAxisResource::IOMonitor* QnPlAxisResource::ioMonitorByHttpClient(nx_http::AsyncHttpClientPtr httpClient)
+QnPlAxisResource::IOMonitor* QnPlAxisResource::ioMonitorByHttpClient(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (m_inputIoMonitor.httpClient == httpClient)
         return &m_inputIoMonitor;
@@ -1025,7 +1025,7 @@ QnPlAxisResource::IOMonitor* QnPlAxisResource::ioMonitorByHttpClient(nx_http::As
         return nullptr;
 }
 
-void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
+void QnPlAxisResource::onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
 
@@ -1033,11 +1033,11 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
     if (!ioMonitor)
         return;
 
-    const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
+    const nx::network::http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
     ioMonitor->contentParser->processData(msgBodyBuf);
 }
 
-void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
+void QnPlAxisResource::onMonitorConnectionClosed( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     if (getParentId() != commonModule()->moduleGUID() || !isInitialized())
         return;
@@ -1308,7 +1308,7 @@ QnIOStateDataList QnPlAxisResource::ioStates() const
     return m_ioStates;
 }
 
-void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& notification )
+void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBufferRefType& notification )
 {
     //1I:H, 1I:L, 1I:/, "1I:\"
     if (notification.isEmpty())
@@ -1414,13 +1414,13 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     requestQuery += portList;
     requestUrl.setQuery(requestQuery);
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->bindToAioThread(m_timer.getAioThread());
     connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnPlAxisResource::onCurrentIOStateResponseReceived,
         Qt::DirectConnection );
-    httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
+    httpClient->setTotalReconnectTries( nx::network::http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
     httpClient->setUserName( auth.user() );
     httpClient->setUserPassword( auth.password() );
 

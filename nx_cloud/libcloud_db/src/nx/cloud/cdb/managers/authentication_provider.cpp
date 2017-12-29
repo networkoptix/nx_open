@@ -262,7 +262,7 @@ api::AuthResponse AuthenticationProvider::prepareResponse(
     response.nonce = std::move(nonce);
     response.authenticatedAccountData = std::move(systemSharing);
     response.accessRole = response.authenticatedAccountData.accessRole;
-    const auto intermediateResponse = nx_http::calcIntermediateResponse(
+    const auto intermediateResponse = nx::network::http::calcIntermediateResponse(
         passwordHa1.c_str(),
         response.nonce.c_str());
     response.intermediateResponse.assign(
@@ -312,7 +312,7 @@ api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
 {
     api::AuthInfoRecord authInfo;
     authInfo.nonce = nonce;
-    authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
+    authInfo.intermediateResponse = nx::network::http::calcIntermediateResponse(
         account.passwordHa1.c_str(), nonce.c_str()).toStdString();
     authInfo.expirationTime =
         nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod;

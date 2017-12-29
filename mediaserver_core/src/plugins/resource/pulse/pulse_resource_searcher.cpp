@@ -40,7 +40,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         res->setName(r.name);
         if (cameraRes)
             cameraRes->setModel(r.name);
-        res->setMAC(QnMacAddress(r.mac));
+        res->setMAC(nx::network::QnMacAddress(r.mac));
         res->setHostAddress(r.ip);
 
         result.push_back(res);

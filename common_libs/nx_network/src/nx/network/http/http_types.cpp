@@ -14,7 +14,9 @@ static int strcasecmp(const char * str1, const char * str2) { return strcmpi(str
 static int strncasecmp(const char * str1, const char * str2, size_t n) { return strnicmp(str1, str2, n); }
 #endif
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 const char* const kUrlSchemeName = "http";
 const char* const kSecureUrlSchemeName = "https";
@@ -581,7 +583,7 @@ StringType Request::toString() const
 
 BufferType Request::getCookieValue(const BufferType& name) const
 {
-    nx_http::HttpHeaders::const_iterator cookieIter = headers.find("cookie");
+    nx::network::http::HttpHeaders::const_iterator cookieIter = headers.find("cookie");
     if (cookieIter == headers.end())
         return BufferType();
 
@@ -1146,21 +1148,21 @@ BufferType WWWAuthenticate::serialized() const
 //-------------------------------------------------------------------------------------------------
 // Accept-Encoding.
 
-//const nx_http::StringType IDENTITY_CODING( "identity" );
-//const nx_http::StringType ANY_CODING( "*" );
+//const nx::network::http::StringType IDENTITY_CODING( "identity" );
+//const nx::network::http::StringType ANY_CODING( "*" );
 
-AcceptEncodingHeader::AcceptEncodingHeader(const nx_http::StringType& strValue)
+AcceptEncodingHeader::AcceptEncodingHeader(const nx::network::http::StringType& strValue)
 {
     parse(strValue);
 }
 
-void AcceptEncodingHeader::parse(const nx_http::StringType& str)
+void AcceptEncodingHeader::parse(const nx::network::http::StringType& str)
 {
     m_anyCodingQValue.reset();
 
     //TODO #ak this function is very slow. Introduce some parsing without allocations and copyings..
     auto codingsStr = str.split(',');
-    for (const nx_http::StringType& contentCodingStr : codingsStr)
+    for (const nx::network::http::StringType& contentCodingStr : codingsStr)
     {
         auto tokens = contentCodingStr.split(';');
         if (tokens.isEmpty())
@@ -1168,12 +1170,12 @@ void AcceptEncodingHeader::parse(const nx_http::StringType& str)
         double qValue = 1.0;
         if (tokens.size() > 1)
         {
-            const nx_http::StringType& qValueStr = tokens[1].trimmed();
+            const nx::network::http::StringType& qValueStr = tokens[1].trimmed();
             if (!qValueStr.startsWith("q="))
                 continue;   //bad token, ignoring...
             qValue = qValueStr.mid(2).toDouble();
         }
-        const nx_http::StringType& contentCoding = tokens.front().trimmed();
+        const nx::network::http::StringType& contentCoding = tokens.front().trimmed();
         if (contentCoding == ANY_CODING)
             m_anyCodingQValue = qValue;
         else
@@ -1182,7 +1184,7 @@ void AcceptEncodingHeader::parse(const nx_http::StringType& str)
 }
 
 bool AcceptEncodingHeader::encodingIsAllowed(
-    const nx_http::StringType& encodingName,
+    const nx::network::http::StringType& encodingName,
     double* q) const
 {
     auto codingIter = m_codings.find(encodingName);
@@ -1212,7 +1214,7 @@ Range::Range()
 {
 }
 
-bool Range::parse(const nx_http::StringType& strValue)
+bool Range::parse(const nx::network::http::StringType& strValue)
 {
     auto simpleRangeList = strValue.split(',');
     rangeSpecList.reserve(simpleRangeList.size());
@@ -1366,7 +1368,7 @@ StringType ContentRange::toString() const
 //-------------------------------------------------------------------------------------------------
 // Via.
 
-bool Via::parse(const nx_http::StringType& strValue)
+bool Via::parse(const nx::network::http::StringType& strValue)
 {
     if (strValue.isEmpty())
         return true;
@@ -1472,7 +1474,7 @@ KeepAlive::KeepAlive(
 {
 }
 
-bool KeepAlive::parse(const nx_http::StringType& strValue)
+bool KeepAlive::parse(const nx::network::http::StringType& strValue)
 {
     max.reset();
 
@@ -1569,7 +1571,7 @@ bool Server::operator==(const Server& right) const
     return products == right.products;
 }
 
-bool Server::parse(const nx_http::StringType& serverString)
+bool Server::parse(const nx::network::http::StringType& serverString)
 {
     // "Nx/1.0 Mozilla/5.0 (Windows NT 6.1; WOW64)"
 
@@ -1600,7 +1602,7 @@ StringType Server::toString() const
     return result + COMPATIBILITY_SERVER_STRING;
 }
 
-nx_http::StringType Server::toString(const Server::Product& product) const
+nx::network::http::StringType Server::toString(const Server::Product& product) const
 {
     StringType result;
     result += product.name;
@@ -1682,7 +1684,7 @@ bool StrictTransportSecurity::operator==(const StrictTransportSecurity& rhs) con
         && preload == rhs.preload;
 }
 
-bool StrictTransportSecurity::parse(const nx_http::StringType& strValue)
+bool StrictTransportSecurity::parse(const nx::network::http::StringType& strValue)
 {
     const auto nameValueDictionary = nx::utils::parseNameValuePairs(strValue, ';');
     const auto maxAgeIter = nameValueDictionary.find("max-age");
@@ -1898,4 +1900,6 @@ QByteArray formatDateTime(const QDateTime& value)
     return QByteArray(strDateBuf);
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

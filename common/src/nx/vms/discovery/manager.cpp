@@ -45,7 +45,7 @@ void Manager::setMulticastInterval(std::chrono::milliseconds value)
     m_multicastFinder->setSendInterval(value);
 }
 
-ModuleEndpoint::ModuleEndpoint(QnModuleInformation old, SocketAddress endpoint):
+ModuleEndpoint::ModuleEndpoint(QnModuleInformation old, nx::network::SocketAddress endpoint):
     QnModuleInformation(std::move(old)),
     endpoint(std::move(endpoint))
 {
@@ -89,7 +89,7 @@ std::list<ModuleEndpoint> Manager::getAll() const
     return list;
 }
 
-boost::optional<SocketAddress> Manager::getEndpoint(const QnUuid& id) const
+boost::optional<nx::network::SocketAddress> Manager::getEndpoint(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_modules.find(id);
@@ -109,7 +109,7 @@ boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
     return it->second;
 }
 
-void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
+void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId)
 {
     NX_EXPECT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
         lm("Invalid endpoint: %1").arg(endpoint));
@@ -123,14 +123,14 @@ void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
 
 void Manager::checkEndpoint(const nx::utils::Url& url, QnUuid expectedId)
 {
-    checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()), std::move(expectedId));
+    checkEndpoint(nx::network::SocketAddress(url.host(), (uint16_t) url.port()), std::move(expectedId));
 }
 
 void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
     m_moduleConnector->setConnectHandler(
-        [this](QnModuleInformation information, SocketAddress endpoint, HostAddress ip)
+        [this](QnModuleInformation information, nx::network::SocketAddress endpoint, nx::network::HostAddress ip)
         {
             if (!commonModule())
                 return;
@@ -182,7 +182,7 @@ void Manager::initializeConnector()
                 resolver.removeFixedAddress(oldCloudHost);
 
             if (!newCloudHost.isEmpty() && ip.isIpAddress())
-                resolver.addFixedAddress(newCloudHost, SocketAddress(ip.toString(), endpoint.port));
+                resolver.addFixedAddress(newCloudHost, nx::network::SocketAddress(ip.toString(), endpoint.port));
         });
 
     m_moduleConnector->setDisconnectHandler(
@@ -209,7 +209,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
 {
     m_multicastFinder = std::make_unique<UdpMulticastFinder>(m_moduleConnector->getAioThread());
     m_multicastFinder->listen(
-        [this](QnModuleInformationWithAddresses module, SocketAddress /*endpoint*/)
+        [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress /*endpoint*/)
         {
             m_moduleConnector->newEndpoints(module.endpoints(), module.id);
         });
@@ -243,9 +243,9 @@ void Manager::initializeMulticastFinders(bool clientMode)
     m_legacyMulticastFinder = new DeprecatedMulticastFinder(this, options);
     connect(m_legacyMulticastFinder, &DeprecatedMulticastFinder::responseReceived,
         [this](const QnModuleInformation &module,
-            const SocketAddress &endpoint, const HostAddress& ip)
+            const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip)
         {
-            m_moduleConnector->newEndpoints({SocketAddress(ip, endpoint.port)}, module.id);
+            m_moduleConnector->newEndpoints({nx::network::SocketAddress(ip, endpoint.port)}, module.id);
         });
 }
 
@@ -285,7 +285,7 @@ void Manager::updateEndpoints(const QnMediaServerResource* server)
     if (port == 0)
         return;
 
-    std::set<SocketAddress> allowedEndpoints;
+    std::set<nx::network::SocketAddress> allowedEndpoints;
     for (const auto& endpoint: server->getNetAddrList())
         allowedEndpoints.emplace(endpoint.address, endpoint.port ? endpoint.port : port);
 
@@ -295,7 +295,7 @@ void Manager::updateEndpoints(const QnMediaServerResource* server)
     if (auto address = server->getCloudAddress())
         allowedEndpoints.emplace(std::move(*address));
 
-    std::set<SocketAddress> forbiddenEndpoints;
+    std::set<nx::network::SocketAddress> forbiddenEndpoints;
     for (const auto& url: server->getIgnoredUrls())
         forbiddenEndpoints.emplace(url.host(), (uint16_t) url.port(port));
 

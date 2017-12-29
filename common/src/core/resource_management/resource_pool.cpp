@@ -366,7 +366,7 @@ QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QStri
 
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac) const
 {
-    QnMacAddress macAddress(mac);
+    nx::network::QnMacAddress macAddress(mac);
     QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();

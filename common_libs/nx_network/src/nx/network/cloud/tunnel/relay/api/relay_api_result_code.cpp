@@ -27,46 +27,46 @@ hpm::api::NatTraversalResultCode toNatTraversalResultCode(
     }
 }
 
-nx_http::StatusCode::Value toHttpStatusCode(ResultCode resultCode)
+nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode)
 {
     switch (resultCode)
     {
         case ResultCode::ok:
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
 
         case ResultCode::notFound:
-            return nx_http::StatusCode::notFound;
+            return nx::network::http::StatusCode::notFound;
 
         case ResultCode::timedOut:
         case ResultCode::networkError:
-            return nx_http::StatusCode::serviceUnavailable;
+            return nx::network::http::StatusCode::serviceUnavailable;
 
         case ResultCode::preemptiveConnectionCountAtMaximum:
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
 
         default:
-            return nx_http::StatusCode::badRequest;
+            return nx::network::http::StatusCode::badRequest;
     }
 }
 
-ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode)
+ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode)
 {
     switch (statusCode)
     {
-        case nx_http::StatusCode::ok:
+        case nx::network::http::StatusCode::ok:
             return ResultCode::ok;
 
-        case nx_http::StatusCode::notFound:
+        case nx::network::http::StatusCode::notFound:
             return ResultCode::notFound;
 
-        case nx_http::StatusCode::serviceUnavailable:
+        case nx::network::http::StatusCode::serviceUnavailable:
             return ResultCode::networkError;
 
-        case nx_http::StatusCode::badRequest:
+        case nx::network::http::StatusCode::badRequest:
             return ResultCode::networkError;
 
-        case nx_http::StatusCode::forbidden:
-        case nx_http::StatusCode::unauthorized:
+        case nx::network::http::StatusCode::forbidden:
+        case nx::network::http::StatusCode::unauthorized:
             return ResultCode::notAuthorized;
 
         default:
@@ -93,45 +93,45 @@ SystemError::ErrorCode toSystemError(ResultCode resultCode)
 }
 
 //-------------------------------------------------------------------------------------------------
-// Support of nx_http::FusionRequestResult
+// Support of nx::network::http::FusionRequestResult
 
-nx_http::FusionRequestResult resultCodeToFusionRequestResult(api::ResultCode resultCode)
+nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(api::ResultCode resultCode)
 {
     if (resultCode == ResultCode::ok || resultCode == ResultCode::needRedirect)
-        return nx_http::FusionRequestResult();
+        return nx::network::http::FusionRequestResult();
 
-    nx_http::FusionRequestErrorClass requestResultCode = nx_http::FusionRequestErrorClass::noError;
+    nx::network::http::FusionRequestErrorClass requestResultCode = nx::network::http::FusionRequestErrorClass::noError;
     switch (resultCode)
     {
         case ResultCode::notAuthorized:
-            requestResultCode = nx_http::FusionRequestErrorClass::unauthorized;
+            requestResultCode = nx::network::http::FusionRequestErrorClass::unauthorized;
             break;
 
         case ResultCode::notFound:
         case ResultCode::preemptiveConnectionCountAtMaximum:
-            requestResultCode = nx_http::FusionRequestErrorClass::logicError;
+            requestResultCode = nx::network::http::FusionRequestErrorClass::logicError;
             break;
 
         case ResultCode::timedOut:
         case ResultCode::networkError:
-            requestResultCode = nx_http::FusionRequestErrorClass::ioError;
+            requestResultCode = nx::network::http::FusionRequestErrorClass::ioError;
             break;
 
         default:
-            requestResultCode = nx_http::FusionRequestErrorClass::internalError;
+            requestResultCode = nx::network::http::FusionRequestErrorClass::internalError;
             break;
     }
 
-    return nx_http::FusionRequestResult(
+    return nx::network::http::FusionRequestResult(
         requestResultCode,
         QnLexical::serialized(resultCode),
         static_cast<int>(resultCode),
         QnLexical::serialized(resultCode));
 }
 
-api::ResultCode fusionRequestResultToResultCode(nx_http::FusionRequestResult result)
+api::ResultCode fusionRequestResultToResultCode(nx::network::http::FusionRequestResult result)
 {
-    if (result.errorClass == nx_http::FusionRequestErrorClass::noError)
+    if (result.errorClass == nx::network::http::FusionRequestErrorClass::noError)
         return ResultCode::ok;
 
     return static_cast<api::ResultCode>(result.errorDetail);

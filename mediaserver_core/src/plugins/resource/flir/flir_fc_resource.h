@@ -50,9 +50,9 @@ public:
     virtual bool  hasDualStreaming() const override;
 
 private:
-    bool doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const nx::utils::Url& url);
-    boost::optional<fc_private::ServerStatus> getNexusServerStatus(nx_http::HttpClient& httpClient);
-    bool tryToEnableNexusServer(nx_http::HttpClient& httpClient);
+    bool doGetRequestAndCheckResponse(nx::network::http::HttpClient& httpClient, const nx::utils::Url& url);
+    boost::optional<fc_private::ServerStatus> getNexusServerStatus(nx::network::http::HttpClient& httpClient);
+    bool tryToEnableNexusServer(nx::network::http::HttpClient& httpClient);
 
 private:
     nexus::WebSocketIoManager* m_ioManager;

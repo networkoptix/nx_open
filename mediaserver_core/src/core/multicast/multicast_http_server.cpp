@@ -26,7 +26,7 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         urlStr = urlStr.mid(1);
     QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(m_tcpListener->getPort()).arg(urlStr));
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     for (const auto& header: request.headers) {
         if (header.first == QLatin1String("User-Agent"))
             httpClient->setUserAgent(header.second);
@@ -35,7 +35,7 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
     }
     httpClient->addAdditionalHeader("Connection", "Close");
 
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, [httpClient, requestId, clientId, this](nx_http::AsyncHttpClientPtr)  mutable 
+    connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, [httpClient, requestId, clientId, this](nx::network::http::AsyncHttpClientPtr)  mutable 
     {
         if (httpClient->response())
             m_transport->addResponse(requestId, clientId, httpClient->response()->toString() + httpClient->fetchMessageBodyBuffer());
@@ -43,11 +43,11 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         httpClient.reset();
     }, Qt::DirectConnection);
 
-    if (request.method == nx_http::Method::get)
+    if (request.method == nx::network::http::Method::get)
     {
         httpClient->doGet(url);
     }
-    else if (request.method == nx_http::Method::post)
+    else if (request.method == nx::network::http::Method::post)
     {
         httpClient->doPost(url, request.contentType, request.messageBody);
     }

@@ -28,7 +28,7 @@ class TestConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     TestConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner)
     :
         QnTCPConnectionProcessor(socket, owner)
@@ -69,7 +69,7 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override
+        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override
     {
         return new TestConnectionProcessor(clientSocket, this);
     }
@@ -91,9 +91,11 @@ TEST( TcpConnectionProcessor, sendAsyncData )
     while (!timer.hasExpired(kTcpServerStartTimeoutMs) && tcpListener.getPort() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    auto clientSocket = SocketFactory::createStreamSocket(false);
-    clientSocket->setRecvTimeout(kDataTransferTimeout);
-    clientSocket->connect(QLatin1String("127.0.0.1"), tcpListener.getPort());
+    auto clientSocket = nx::network::SocketFactory::createStreamSocket(false);
+    ASSERT_TRUE(clientSocket->setRecvTimeout(kDataTransferTimeout));
+    ASSERT_TRUE(clientSocket->connect(
+        nx::network::SocketAddress(nx::network::HostAddress::localhost, tcpListener.getPort()),
+        nx::network::kNoTimeout));
 
     char buffer[kTotalTestBytes / 128];
     int gotBytes = 0;

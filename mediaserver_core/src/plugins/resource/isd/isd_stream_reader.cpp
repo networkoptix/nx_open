@@ -60,7 +60,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 
-    int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
+    int port = QUrl(res->getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT);
     CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
     QSize resolution;

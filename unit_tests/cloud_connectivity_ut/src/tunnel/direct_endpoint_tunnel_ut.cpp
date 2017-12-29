@@ -43,8 +43,11 @@ public:
         aio::AbstractAioThread* aioThread, String sessionId)
     {
         auto socket = std::make_unique<TCPSocket>(AF_INET);
-        if (!socket->connect(m_testServer->serverAddress()) || !socket->setNonBlockingMode(true))
+        if (!socket->connect(m_testServer->serverAddress(), nx::network::deprecated::kDefaultConnectTimeout) ||
+            !socket->setNonBlockingMode(true))
+        {
             return nullptr;
+        }
 
         return std::make_unique<DirectTcpEndpointTunnel>(
             aioThread, sessionId, m_testServer->serverAddress(), std::move(socket));
@@ -62,18 +65,18 @@ public:
         m_tunnel->start();
         expectingTunnelFunctionsSuccessfully();
     }
-    
+
     void whenRemotePeerHasDisappeared()
     {
         m_testServer.reset();
     }
-    
+
     void expectingTunnelFunctionsSuccessfully()
     {
         openNewConnection(
             [](
                 SystemError::ErrorCode resultCode,
-                std::unique_ptr<AbstractStreamSocket> socket,
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket,
                 bool stillValid)
             {
                 ASSERT_EQ(SystemError::noError, resultCode);
@@ -88,19 +91,19 @@ public:
     }
 
 protected:
-    TestHttpServer& testServer()
+    nx::network::http::TestHttpServer& testServer()
     {
         return *m_testServer;
     }
 
 private:
-    std::unique_ptr<TestHttpServer> m_testServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_testServer;
     std::unique_ptr<DirectTcpEndpointTunnel> m_tunnel;
     utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
 
     void init()
     {
-        m_testServer = std::make_unique<TestHttpServer>();
+        m_testServer = std::make_unique<nx::network::http::TestHttpServer>();
         ASSERT_TRUE(m_testServer->bindAndListen());
     }
 
@@ -116,7 +119,7 @@ private:
             std::move(socketAttributes),
             [&connectedPromise, onConnectedHandler = std::move(onConnectedHandler)](
                 SystemError::ErrorCode resultCode,
-                std::unique_ptr<AbstractStreamSocket> socket,
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket,
                 bool stillValid)
             {
                 onConnectedHandler(resultCode, std::move(socket), stillValid);
@@ -136,13 +139,13 @@ TEST_F(TcpTunnel, cancellation)
         for (int j = 0; j < 3; ++j)
         {
             SocketAttributes socketAttributes;
-            socketAttributes.aioThread = 
+            socketAttributes.aioThread =
                 nx::network::SocketGlobals::aioService().getRandomAioThread();
             tunnel->establishNewConnection(
                 defaultConnectTimeout,
                 std::move(socketAttributes),
                 [](SystemError::ErrorCode /*sysErrorCode*/,
-                   std::unique_ptr<AbstractStreamSocket>,
+                   std::unique_ptr<nx::network::AbstractStreamSocket>,
                    bool /*stillValid*/)
                 {
                 });

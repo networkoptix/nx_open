@@ -64,5 +64,5 @@ int QnGetTimeZonesRestHandler::executeGet(
         }();
 
     result.setReply(outputData);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

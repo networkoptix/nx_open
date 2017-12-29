@@ -17,7 +17,7 @@ class NX_RELAYING_API RelayEngine
 public:
     RelayEngine(
         const Settings& settings,
-        nx_http::server::rest::MessageDispatcher* httpMessageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher);
 
     ListeningPeerPool& listeningPeerPool();
 
@@ -26,7 +26,7 @@ private:
     std::unique_ptr<AbstractListeningPeerManager> m_listeningPeerManager;
 
     void registerApiHandlers(
-        nx_http::server::rest::MessageDispatcher* httpMessageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher);
 };
 
 } // namespace relaying

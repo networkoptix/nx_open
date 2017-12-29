@@ -22,9 +22,9 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 {
     QMap<QString, WSResult> result;
 
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
-        std::unique_ptr<AbstractDatagramSocket> socket( SocketFactory::createDatagramSocket() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> socket( nx::network::SocketFactory::createDatagramSocket() );
 
         if( !socket->bind( iface.address.toString(), 0 ) )
             continue;
@@ -47,9 +47,9 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         while(socket->hasData())
         {
             QByteArray reply;
-            reply.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
+            reply.resize( nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            SocketAddress senderEndpoint;
+            nx::network::SocketAddress senderEndpoint;
             int readed = socket->recvFrom(reply.data(), reply.size(), &senderEndpoint);
             if (readed < 1)
                 continue;
@@ -97,7 +97,7 @@ QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(const QByt
 
     unsigned char* macChar = (unsigned char*)datagram.data() + mac_index;
 
-    QnMacAddress mac(macChar);
+    nx::network::QnMacAddress mac(macChar);
 
     result.mac = mac.toString();
 

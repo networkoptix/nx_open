@@ -55,7 +55,7 @@ int QnSystemSettingsHandler::executeGet(
         result,
         owner->accessRights(),
         owner->authSession());
-    return status ? nx_http::StatusCode::ok : nx_http::StatusCode::forbidden;
+    return status ? nx::network::http::StatusCode::ok : nx::network::http::StatusCode::forbidden;
 }
 
 bool QnSystemSettingsHandler::updateSettings(
@@ -67,5 +67,5 @@ bool QnSystemSettingsHandler::updateSettings(
 {
     SystemSettingsProcessor systemSettingsProcessor(commonModule, authSession);
     return systemSettingsProcessor.updateSettings(accessRights, authSession, params, &result) ==
-        nx_http::StatusCode::ok;
+        nx::network::http::StatusCode::ok;
 }

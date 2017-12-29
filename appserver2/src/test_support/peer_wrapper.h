@@ -58,7 +58,7 @@ public:
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;
 
-    SocketAddress endpoint() const;
+    nx::network::SocketAddress endpoint() const;
 
     ec2::AbstractECConnection* ecConnection();
 
@@ -80,7 +80,7 @@ private:
     QString m_dataDir;
     nx::utils::test::ModuleLauncher<Appserver2ProcessPublic> m_process;
     QString m_systemName;
-    nx_http::Credentials m_ownerCredentials;
+    nx::network::http::Credentials m_ownerCredentials;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
 
     std::unique_ptr<MediaServerClientEx> prepareMediaServerClient() const;

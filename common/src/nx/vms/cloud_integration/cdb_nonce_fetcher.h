@@ -54,9 +54,9 @@ public:
     nx::cdb::api::ResultCode initializeConnectionToCloudSync();
 
     static bool parseCloudNonce(
-        const nx_http::BufferType& nonce,
-        nx_http::BufferType* const cloudNonce,
-        nx_http::BufferType* const nonceTrailer);
+        const nx::network::http::BufferType& nonce,
+        nx::network::http::BufferType* const cloudNonce,
+        nx::network::http::BufferType* const nonceTrailer);
 
     static nx::Buffer generateNonceTrailer();
 

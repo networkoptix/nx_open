@@ -4,7 +4,9 @@
 
 #include "multipart_body_serializer.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Used to generate and stream HTTP multipart message body.
@@ -41,4 +43,6 @@ private:
     void onSomeDataAvailable(const QnByteArrayConstRef& data);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

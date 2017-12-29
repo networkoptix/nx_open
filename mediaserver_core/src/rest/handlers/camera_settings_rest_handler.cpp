@@ -70,7 +70,7 @@ int QnCameraSettingsRestHandler::executeGet(
         camera,
         Qn::Permission::ReadPermission))
     {
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     // Clean params that are not keys.

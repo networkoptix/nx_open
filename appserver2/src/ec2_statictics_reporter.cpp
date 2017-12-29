@@ -264,8 +264,8 @@ namespace ec2
             return res;
         }
 
-        m_httpClient = nx_http::AsyncHttpClient::create();
-        connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
+        connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 
         m_httpClient->setUserName(AUTH_USER);
@@ -286,7 +286,7 @@ namespace ec2
         return ErrorCode::ok;
     }
 
-    void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)
+    void Ec2StaticticsReporter::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
     {
         const auto& settings = m_ec2Connection->commonModule()->globalSettings();
 

@@ -10,14 +10,14 @@ public:
     nx::String response;
 
     void calcResponse(
-        const nx_http::AuthToken& authToken,
-        nx_http::Method::ValueType httpMethod,
+        const nx::network::http::AuthToken& authToken,
+        nx::network::http::Method::ValueType httpMethod,
         const nx::String& url);
     nx::String toString() const;
 
     bool parse(const nx::String& str);
     bool verify(
-        const nx_http::AuthToken& authToken,
-        nx_http::Method::ValueType httpMethod,
+        const nx::network::http::AuthToken& authToken,
+        nx::network::http::Method::ValueType httpMethod,
         const nx::String& url);
 };

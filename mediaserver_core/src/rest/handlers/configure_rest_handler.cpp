@@ -85,7 +85,7 @@ int QnConfigureRestHandler::execute(
     {
         NX_LOG(lit("QnConfigureRestHandler: invalid password provided"), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     // Configure request must support systemName changes to maintain compatibility with NxTool
@@ -103,14 +103,14 @@ int QnConfigureRestHandler::execute(
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: database backup error"), cl_logWARNING);
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
 
         if (!configureLocalSystem(data, m_messageBus))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: can't change local system Id"), cl_logWARNING);
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
         if (data.wholeSystem)
         {
@@ -174,7 +174,7 @@ int QnConfigureRestHandler::execute(
         owner->owner()->waitForPortUpdated();
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, int port)

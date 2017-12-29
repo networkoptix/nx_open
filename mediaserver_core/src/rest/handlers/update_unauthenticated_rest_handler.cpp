@@ -29,7 +29,7 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
     if (updateId.isEmpty() || !nx::utils::file_system::isRelativePathSafe(updateId))
     {
         result.setError(QnJsonRestResult::InvalidParameter, lit("updateId"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QnUploadUpdateReply reply;
@@ -44,5 +44,5 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
         : ec2::AbstractUpdatesManager::UnknownError;
     result.setReply(reply);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

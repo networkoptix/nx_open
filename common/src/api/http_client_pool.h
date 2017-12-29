@@ -1,11 +1,14 @@
 #pragma once
+
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <QtCore/QElapsedTimer>
 #include <nx/utils/timer_manager.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class ClientPool: public QObject, public Singleton<ClientPool>
 {
@@ -15,7 +18,7 @@ public:
     struct Request
     {
         Request():
-            authType(nx_http::AuthType::authBasicAndDigest)
+            authType(nx::network::http::AuthType::authBasicAndDigest)
         {
         }
 
@@ -26,22 +29,22 @@ public:
 
         Method::ValueType method;
         nx::utils::Url url;
-        nx_http::HttpHeaders headers;
-        nx_http::StringType contentType;
-        nx_http::StringType messageBody;
-        nx_http::AuthType authType;
+        nx::network::http::HttpHeaders headers;
+        nx::network::http::StringType contentType;
+        nx::network::http::StringType messageBody;
+        nx::network::http::AuthType authType;
     };
 
     ClientPool(QObject *parent = nullptr);
     virtual ~ClientPool();
 
-    int doGet(const nx::utils::Url& url, nx_http::HttpHeaders headers = nx_http::HttpHeaders());
+    int doGet(const nx::utils::Url& url, nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders());
 
     int doPost(
         const nx::utils::Url& url,
         const QByteArray& contentType,
         const QByteArray& msgBody,
-        nx_http::HttpHeaders headers = nx_http::HttpHeaders());
+        nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders());
 
     int sendRequest(const Request& request);
 
@@ -85,4 +88,6 @@ private:
     int m_requestId;
 };
 
-} // nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -6,7 +6,9 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 namespace test {
 
 /**
@@ -73,4 +75,6 @@ public:
 };
 
 } // namespace test
-} // namespace nx_upnp
+} // namespace upnp
+} // namespace network
+} // namespace nx

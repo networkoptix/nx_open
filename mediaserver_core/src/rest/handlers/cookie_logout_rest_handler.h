@@ -5,7 +5,7 @@
 class QnCookieHelper
 {
 public:
-    static void addLogoutHeaders(nx_http::HttpHeaders* outHeaders);
+    static void addLogoutHeaders(nx::network::http::HttpHeaders* outHeaders);
 };
 
 class QnCookieLogoutRestHandler : public QnJsonRestHandler

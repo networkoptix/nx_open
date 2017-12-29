@@ -164,7 +164,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 		}
 		else
 		{
-			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
 		}
     }
 }

@@ -38,7 +38,7 @@ QString extractHost(const QString& url)
     return url.mid(startPos, endPos - startPos);
 }
 
-bool hostIsValid(const SocketAddress& address)
+bool hostIsValid(const nx::network::SocketAddress& address)
 {
     QString host = address.address.toString();
 
@@ -52,7 +52,7 @@ bool hostIsValid(const SocketAddress& address)
     return true;
 };
 
-SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
+nx::network::SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
 {
     /* We should not display localhost or cloud addresses to user. */
     NX_ASSERT(server);

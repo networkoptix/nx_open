@@ -10,11 +10,11 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode);
-ResultCode httpStatusCodeToResultCode(nx_http::StatusCode::Value statusCode);
+nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode);
+ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statusCode);
 
-nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCode);
-ResultCode fusionRequestResultToResultCode(nx_http::FusionRequestResult result);
+nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCode);
+ResultCode fusionRequestResultToResultCode(nx::network::http::FusionRequestResult result);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ResultCode), (lexical))

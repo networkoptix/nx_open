@@ -16,7 +16,9 @@
 #include "../fusion_request_result.h"
 #include "../../buffer_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace detail {
 
 /**
@@ -29,7 +31,7 @@ inline bool loadFromUrlQuery(const QUrlQuery&, ...)
 }
 
 template<typename T>
-bool serializeToHeaders(nx_http::HttpHeaders* /*where*/, const T& /*what*/)
+bool serializeToHeaders(nx::network::http::HttpHeaders* /*where*/, const T& /*what*/)
 {
     NX_ASSERT(false);
     return false;
@@ -44,7 +46,7 @@ public:
 protected:
     RequestProcessedHandler m_completionHandler;
     Qn::SerializationFormat m_outputDataFormat;
-    nx_http::Method::ValueType m_requestMethod;
+    nx::network::http::Method::ValueType m_requestMethod;
 
     void requestCompleted(FusionRequestResult result);
 
@@ -52,11 +54,11 @@ protected:
      * Call this method after request has been processed.
      */
     void requestCompleted(
-        nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody = nullptr);
+        nx::network::http::StatusCode::Value statusCode,
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody = nullptr);
 
     bool getDataFormat(
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         Qn::SerializationFormat* inputDataFormat,
         FusionRequestResult* errorDescription);
 
@@ -113,10 +115,10 @@ protected:
     }
 
     bool isFormatSupported(Qn::SerializationFormat dataFormat) const;
-    void setConnectionEvents(nx_http::ConnectionEvents connectionEvents);
+    void setConnectionEvents(nx::network::http::ConnectionEvents connectionEvents);
 
 private:
-    boost::optional<nx_http::ConnectionEvents> m_connectionEvents;
+    boost::optional<nx::network::http::ConnectionEvents> m_connectionEvents;
 };
 
 
@@ -133,7 +135,7 @@ public:
         FusionRequestResult result,
         Output outputData = Output())
     {
-        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody;
 
         if (result.errorClass == FusionRequestErrorClass::noError)
         {
@@ -146,9 +148,9 @@ public:
         }
 
         if (result.errorClass != FusionRequestErrorClass::noError &&
-            nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+            nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
         {
-            outputMsgBody = std::make_unique<nx_http::BufferSource>(
+            outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
                 QJson::serialized(result));
         }
@@ -162,9 +164,9 @@ private:
     bool serializeOutputToResponse(
         const FusionRequestResult& result,
         const Output& output,
-        std::unique_ptr<nx_http::AbstractMsgBodySource>* outputMsgBody)
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource>* outputMsgBody)
     {
-        if (nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+        if (nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
             return serializeOutputAsMessageBody(output, outputMsgBody);
         else
             return serializeToHeaders(&response()->headers, output);
@@ -172,13 +174,13 @@ private:
 
     bool serializeOutputAsMessageBody(
         const Output& output,
-        std::unique_ptr<nx_http::AbstractMsgBodySource>* outputMsgBody)
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource>* outputMsgBody)
     {
         nx::Buffer serializedData;
         if (!serializeToAnyFusionFormat(output, m_outputDataFormat, &serializedData))
             return false;
 
-        *outputMsgBody = std::make_unique<nx_http::BufferSource>(
+        *outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
             Qn::serializationFormatToHttpContentType(m_outputDataFormat),
             std::move(serializedData));
         return true;
@@ -202,10 +204,10 @@ class BaseFusionRequestHandlerWithInput:
 {
 private:
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
         RequestProcessedHandler completionHandler) override
     {
         this->m_completionHandler = std::move(completionHandler);
@@ -223,7 +225,7 @@ private:
         Input inputData;
         if (!this->template parseAnyFusionFormat<Input>(
                 inputDataFormat,
-                request.requestLine.method == nx_http::Method::get
+                request.requestLine.method == nx::network::http::Method::get
                     ? request.requestLine.url.query().toUtf8()
                     : request.messageBody,
                 &inputData))
@@ -247,4 +249,6 @@ private:
 };
 
 } // namespace detail
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

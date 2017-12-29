@@ -78,11 +78,11 @@ public:
     virtual QnIOStateDataList ioStates() const override;
 
 public slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx::network::http::AsyncHttpClientPtr httpClient );
 
-    void onCurrentIOStateResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+    void onCurrentIOStateResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient );
 
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 protected:
@@ -126,19 +126,19 @@ private:
         IOMonitor(Qn::IOPortType portType): portType(portType) {}
 
         Qn::IOPortType portType;
-        nx_http::AsyncHttpClientPtr httpClient;
-        std::shared_ptr<nx_http::MultipartContentParser> contentParser;
+        nx::network::http::AsyncHttpClientPtr httpClient;
+        std::shared_ptr<nx::network::http::MultipartContentParser> contentParser;
     };
 
     IOMonitor m_inputIoMonitor;
     IOMonitor m_outputIoMonitor;
     nx::network::aio::Timer m_timer;
-    nx_http::AsyncHttpClientPtr m_inputPortStateReader;
+    nx::network::http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
 
 
-    nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
-    nx_http::BufferType m_currentMonitorData;
+    nx::network::http::AsyncHttpClientPtr m_inputPortHttpMonitor;
+    nx::network::http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
@@ -165,14 +165,14 @@ private:
 
     bool initializeAudio(CLSimpleHTTPClient* const http);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
-    void notificationReceived( const nx_http::ConstBufferRefType& notification );
+    void notificationReceived( const nx::network::http::ConstBufferRefType& notification );
     bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts);
     bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
     bool startIOMonitorInternal(IOMonitor& ioMonitor);
-    IOMonitor* ioMonitorByHttpClient(nx_http::AsyncHttpClientPtr httpClient);
+    IOMonitor* ioMonitorByHttpClient(nx::network::http::AsyncHttpClientPtr httpClient);
 
     /*!
         Convert port number to ID

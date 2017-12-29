@@ -12,7 +12,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-SocketResourceReader::SocketResourceReader(const AbstractCommunicatingSocket& sock)
+SocketResourceReader::SocketResourceReader(const network::AbstractCommunicatingSocket& sock)
 :
     m_socket(sock)
 {

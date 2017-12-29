@@ -41,11 +41,11 @@ struct RestContent
 
 struct RestResponse
 {
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     RestContent content;
     bool isUndefinedContentLength = false;
 
-    RestResponse(nx_http::StatusCode::Value statusCode= nx_http::StatusCode::undefined,
+    RestResponse(nx::network::http::StatusCode::Value statusCode= nx::network::http::StatusCode::undefined,
         RestContent content = {}, bool isUndefinedContentLength = false);
 };
 

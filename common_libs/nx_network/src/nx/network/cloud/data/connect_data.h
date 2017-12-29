@@ -23,8 +23,8 @@ class NX_NETWORK_API ConnectRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::connect;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::connect;
 
     //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
@@ -32,7 +32,7 @@ public:
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
     /** If port is zero then mediator uses source port */
-    std::list<SocketAddress> udpEndpointList;
+    std::list<network::SocketAddress> udpEndpointList;
     /** if true, mediator does not report Connect request source address to the server peer.
         Only addresses found in udpEndpointList are reported
     */
@@ -40,19 +40,19 @@ public:
     CloudConnectVersion cloudConnectVersion;
 
     ConnectRequest();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 class NX_NETWORK_API ConnectResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::connect;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::connect;
 
-    std::list<SocketAddress> forwardedTcpEndpointList;
-    std::list<SocketAddress> udpEndpointList;
+    std::list<network::SocketAddress> forwardedTcpEndpointList;
+    std::list<network::SocketAddress> udpEndpointList;
     /** Optional for backward compatibility. */
     boost::optional<nx::String> trafficRelayUrl;
     /**
@@ -64,8 +64,8 @@ public:
     CloudConnectVersion cloudConnectVersion;
 
     ConnectResponse();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

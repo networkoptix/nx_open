@@ -15,18 +15,18 @@ static const QString testPath("/test");
 static const QString testQuery("testQuery");
 static const QString testPathAndQuery(lit("%1?%2").arg(testPath).arg(testQuery));
 static const QString checkuedTestPathAndQuery(lit("%1?%2&chunked").arg(testPath).arg(testQuery));
-static const nx_http::BufferType testMsgBody("bla-bla-bla");
-static const nx_http::BufferType testMsgContentType("text/plain");
+static const nx::network::http::BufferType testMsgBody("bla-bla-bla");
+static const nx::network::http::BufferType testMsgContentType("text/plain");
 
-class UndefinedContentLengthBufferSource: public nx_http::BufferSource
+class UndefinedContentLengthBufferSource: public nx::network::http::BufferSource
 {
 public:
-    UndefinedContentLengthBufferSource(): nx_http::BufferSource(testMsgContentType, testMsgBody) {}
+    UndefinedContentLengthBufferSource(): nx::network::http::BufferSource(testMsgContentType, testMsgBody) {}
     virtual boost::optional<uint64_t> contentLength() const override { return boost::none; }
 };
 
 class VmsGatewayProxyTestHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     VmsGatewayProxyTestHandler(boost::optional<bool> securityExpectation):
@@ -35,11 +35,11 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler )
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler )
     {
         if (m_securityExpectation)
         {
@@ -51,12 +51,12 @@ public:
         if (request.requestLine.url.path() == testPath &&
             requestQuery.hasQueryItem(testQuery))
         {
-            std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource;
+            std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource;
             if (requestQuery.hasQueryItem("chunked"))
             {
                 response->headers.emplace("Transfer-Encoding", "chunked");
-                bodySource = std::make_unique<nx_http::BufferSource>(testMsgContentType,
-                    nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
+                bodySource = std::make_unique<nx::network::http::BufferSource>(testMsgContentType,
+                    nx::network::http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
             }
             else if (requestQuery.hasQueryItem("undefinedContentLength"))
             {
@@ -64,15 +64,15 @@ public:
             }
             else
             {
-                bodySource = std::make_unique<nx_http::BufferSource>(testMsgContentType, testMsgBody);
+                bodySource = std::make_unique<nx::network::http::BufferSource>(testMsgContentType, testMsgBody);
             }
 
-            completionHandler(nx_http::RequestResult(
-                nx_http::StatusCode::ok, std::move(bodySource)));
+            completionHandler(nx::network::http::RequestResult(
+                nx::network::http::StatusCode::ok, std::move(bodySource)));
         }
         else
         {
-            completionHandler(nx_http::StatusCode::badRequest);
+            completionHandler(nx::network::http::StatusCode::badRequest);
         }
     }
 
@@ -98,24 +98,24 @@ public:
 
     void testProxyUrl(
         const nx::utils::Url& url,
-        nx_http::StatusCode::Value expectedReponseStatusCode)
+        nx::network::http::StatusCode::Value expectedReponseStatusCode)
     {
         testProxyUrl(url, {{expectedReponseStatusCode}});
     }
 
     void testProxyUrl(
         const nx::utils::Url& url,
-        std::vector<nx_http::StatusCode::Value> expectedReponseStatusCodes
-            = {nx_http::StatusCode::ok})
+        std::vector<nx::network::http::StatusCode::Value> expectedReponseStatusCodes
+            = {nx::network::http::StatusCode::ok})
     {
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         testProxyUrl(&httpClient, url, std::move(expectedReponseStatusCodes));
     }
 
     void testProxyUrl(
-        nx_http::HttpClient* const httpClient,
+        nx::network::http::HttpClient* const httpClient,
         const nx::utils::Url& url,
-        std::vector<nx_http::StatusCode::Value> expectedReponseStatusCodes)
+        std::vector<nx::network::http::StatusCode::Value> expectedReponseStatusCodes)
     {
         NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
         httpClient->setResponseReadTimeoutMs(1000*1000);
@@ -127,14 +127,14 @@ public:
                 httpClient->response()->statusLine.statusCode) != expectedReponseStatusCodes.end())
             << "Actual: " << httpClient->response()->statusLine.statusCode;
 
-        if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
             return;
 
         ASSERT_EQ(
             testMsgContentType,
-            nx_http::getHeaderValue(httpClient->response()->headers, "Content-Type"));
+            nx::network::http::getHeaderValue(httpClient->response()->headers, "Content-Type"));
 
-        nx_http::BufferType msgBody;
+        nx::network::http::BufferType msgBody;
         while (!httpClient->eof())
             msgBody += httpClient->fetchMessageBodyBuffer();
 
@@ -164,7 +164,7 @@ TEST_F(Proxy, IpSpecified)
             .arg(endpoint().toString())
             .arg(testHttpServer()->serverAddress().address.toString())
             .arg(testPathAndQuery)),
-        {nx_http::StatusCode::ok});
+        {nx::network::http::StatusCode::ok});
 
     // Specified
     testProxyUrl(
@@ -172,14 +172,14 @@ TEST_F(Proxy, IpSpecified)
             .arg(endpoint().toString())
             .arg(testHttpServer()->serverAddress().toString())
             .arg(testPathAndQuery)),
-        {nx_http::StatusCode::ok});
+        {nx::network::http::StatusCode::ok});
 
     // Wrong path
     testProxyUrl(
         nx::utils::Url(lit("http://%1/%2")
             .arg(endpoint().toString())
             .arg(testHttpServer()->serverAddress().toString())),
-        {nx_http::StatusCode::notFound});
+        {nx::network::http::StatusCode::notFound});
 }
 
 TEST_F(Proxy, failure_is_returned_when_unreachable_target_endpoint_is_specified)
@@ -191,7 +191,7 @@ TEST_F(Proxy, failure_is_returned_when_unreachable_target_endpoint_is_specified)
             .arg(endpoint().toString())
             .arg(testHttpServer()->serverAddress().address.toString())
             .arg(testPathAndQuery)),
-        {nx_http::StatusCode::serviceUnavailable, nx_http::StatusCode::internalServerError});
+        {nx::network::http::StatusCode::serviceUnavailable, nx::network::http::StatusCode::internalServerError});
 }
 
 TEST_F(Proxy, SslEnabled)
@@ -326,13 +326,13 @@ TEST_F(Proxy, SslForbidden)
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)),
-        nx_http::StatusCode::forbidden);
+        nx::network::http::StatusCode::forbidden);
 
     testProxyUrl(nx::utils::Url(lit("http://%1/https:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)),
-        nx_http::StatusCode::forbidden);
+        nx::network::http::StatusCode::forbidden);
 }
 
 TEST_F(Proxy, IpForbidden)
@@ -344,7 +344,7 @@ TEST_F(Proxy, IpForbidden)
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().address.toString())
         .arg(testPathAndQuery)),
-        nx_http::StatusCode::forbidden);
+        nx::network::http::StatusCode::forbidden);
 }
 
 //testing proxying in case of request line like "GET http://192.168.0.1:2343/some/path HTTP/1.1"
@@ -357,9 +357,9 @@ TEST_F(Proxy, proxyByRequestUrl)
     const nx::utils::Url targetUrl =
         lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(testPathAndQuery);
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
+    testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
 TEST_F(Proxy, proxyingChunkedBody)
@@ -371,9 +371,9 @@ TEST_F(Proxy, proxyingChunkedBody)
     const nx::utils::Url targetUrl =
        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(checkuedTestPathAndQuery);
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
+    testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
 TEST_F(Proxy, proxyingUndefinedContentLength)
@@ -386,9 +386,9 @@ TEST_F(Proxy, proxyingUndefinedContentLength)
         lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
         .arg(lit("%1?%2&undefinedContentLength").arg(testPath).arg(testQuery));
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
+    testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
 TEST_F(Proxy, ModRewrite)
@@ -425,12 +425,12 @@ protected:
 
     void thenEmptyResponseIsDelivered()
     {
-        ASSERT_EQ(nx_http::StatusCode::noContent, m_response->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::noContent, m_response->statusLine.statusCode);
         ASSERT_TRUE(m_msgBody.isEmpty());
     }
 
 private:
-    boost::optional<nx_http::Response> m_response;
+    boost::optional<nx::network::http::Response> m_response;
     nx::Buffer m_msgBody;
 
     virtual void SetUp() override
@@ -447,19 +447,19 @@ private:
     }
 
     void returnEmptyHttpResponse(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
-        completionHandler(nx_http::StatusCode::noContent);
+        completionHandler(nx::network::http::StatusCode::noContent);
     }
 
     void fetchResource(const char* path)
     {
         const nx::utils::Url url(lm("http://%1/%2%3").arg(endpoint()).arg(testHttpServer()->serverAddress()).arg(path));
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         ASSERT_TRUE(httpClient.doGet(url));
         ASSERT_NE(nullptr, httpClient.response());
 

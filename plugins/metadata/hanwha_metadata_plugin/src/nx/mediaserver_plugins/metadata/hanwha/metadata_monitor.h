@@ -25,7 +25,7 @@ class MetadataMonitor: public QObject
     Q_OBJECT;
     using MetadataType = QString;
     using MetadataValue = QString;
-    using MultipartContentParserPtr = std::unique_ptr<nx_http::MultipartContentParser>;
+    using MultipartContentParserPtr = std::unique_ptr<nx::network::http::MultipartContentParser>;
 
 public:
     using Handler = std::function<void(const EventList&)>;
@@ -49,9 +49,9 @@ private:
     void initMonitorUnsafe();
 
 private:
-    void at_responseReceived(nx_http::AsyncHttpClientPtr httpClient);
-    void at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient);
-    void at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient);
+    void at_responseReceived(nx::network::http::AsyncHttpClientPtr httpClient);
+    void at_someBytesAvailable(nx::network::http::AsyncHttpClientPtr httpClient);
+    void at_connectionClosed(nx::network::http::AsyncHttpClientPtr httpClient);
 
 private:
     const Hanwha::DriverManifest& m_manifest;
@@ -59,7 +59,7 @@ private:
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
     QElapsedTimer m_timeSinceLastOpen;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx::network::http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
 
     mutable QnMutex m_mutex;

@@ -9,7 +9,9 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 enum class AuthTokenType
 {
@@ -141,7 +143,7 @@ BufferType NX_NETWORK_API calcIntermediateResponse(
 /**
  * Calculates MD5(ha1:nonce:ha2).
  * nonce is concatenation of nonceBase and nonceTrailer.
- * intermediateResponse is result of nx_http::calcIntermediateResponse.
+ * intermediateResponse is result of nx::network::http::calcIntermediateResponse.
  * @param intermediateResponse Calculated with calcIntermediateResponse.
  * @param intermediateResponseNonceLen Length of nonce (bytes) used to generate intermediateResponse.
  */
@@ -151,4 +153,6 @@ BufferType NX_NETWORK_API calcResponseFromIntermediate(
     const BufferType& nonceTrailer,
     const BufferType& ha2);
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

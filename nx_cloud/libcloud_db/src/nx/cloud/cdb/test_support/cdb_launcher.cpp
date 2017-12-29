@@ -130,9 +130,9 @@ bool CdbLauncher::waitUntilStarted()
     return false;
 }
 
-SocketAddress CdbLauncher::endpoint() const
+network::SocketAddress CdbLauncher::endpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_port);
+    return network::SocketAddress(network::HostAddress::localhost, m_port);
 }
 
 nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()
@@ -174,12 +174,12 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->fullName.empty())
         accountData->fullName = "Account " + accountData->email + " full name";
     if (accountData->passwordHa1.empty())
-        accountData->passwordHa1 = nx_http::calcHa1(
+        accountData->passwordHa1 = nx::network::http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
     if (accountData->passwordHa1Sha256.empty())
-        accountData->passwordHa1Sha256 = nx_http::calcHa1(
+        accountData->passwordHa1Sha256 = nx::network::http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
             moduleInfo().realm.c_str(),
             password->c_str(),
@@ -931,18 +931,18 @@ api::ResultCode CdbLauncher::getTransactionLog(
     ::ec2::ApiTransactionDataList* const transactions)
 {
     const auto requestUrl = nx::network::url::Builder()
-        .setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint())
+        .setScheme(nx::network::http::kUrlSchemeName).setEndpoint(endpoint())
         .setUserName(accountEmail.c_str()).setPassword(accountPassword.c_str())
         .setPath(kMaintenanceGetTransactionLog).setQuery(lm("systemId=%1").args(systemId));
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     if (!httpClient.doGet(requestUrl))
         return api::ResultCode::networkError;
 
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         return api::httpStatusCodeToResultCode(
-            static_cast<nx_http::StatusCode::Value>(
+            static_cast<nx::network::http::StatusCode::Value>(
                 httpClient.response()->statusLine.statusCode));
     }
 

@@ -34,5 +34,5 @@ int QnEventLog2RestHandler::executeGet(
     QnFusionRestHandlerDetail::serializeRestReply(
         outputData, params, contentBody, contentType, restResult);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

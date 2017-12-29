@@ -25,19 +25,19 @@ int QnCurrentUserRestHandler::executeGet(
     if (accessRights.isNull())
     {
         QnAuthHelper::instance()->doCookieAuthorization(
-            "GET", nx_http::getHeaderValue(owner->request().headers, "Cookie"),
+            "GET", nx::network::http::getHeaderValue(owner->request().headers, "Cookie"),
             *owner->response(), &accessRights);
     }
     if (accessRights.isNull())
     {
-        nx_http::Response response;
+        nx::network::http::Response response;
         QnAuthHelper::instance()->authenticateByUrl(
             params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(), "GET", response, &accessRights);
     }
     if (accessRights.isNull())
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Auth did not pass"));
-        return nx_http::StatusCode::unauthorized;
+        return nx::network::http::StatusCode::unauthorized;
     }
 
     ec2::AbstractECConnectionPtr ec2Connection = owner->commonModule()->ec2Connection();
@@ -50,14 +50,14 @@ int QnCurrentUserRestHandler::executeGet(
             result.setError(
                 QnJsonRestResult::Forbidden,
                 lit("Forbidden"));
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
         else
         {
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Internal server error. Can't execute query 'getUsers'"));
-            return nx_http::StatusCode::internalServerError;
+            return nx::network::http::StatusCode::internalServerError;
         }
     }
 
@@ -69,9 +69,9 @@ int QnCurrentUserRestHandler::executeGet(
     if (iter == users.cend())
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't determine current user"));
-        return nx_http::StatusCode::unauthorized;
+        return nx::network::http::StatusCode::unauthorized;
     }
 
     result.setReply(*iter);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

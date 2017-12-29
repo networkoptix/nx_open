@@ -101,12 +101,12 @@ private:
                 nx::hpm::api::NatTraversalResultCode::mediatorReportedError;
             rec.sessionId = QnUuid::createUuid().toSimpleByteArray();
             rec.originatingHostEndpoint =
-                SocketAddress(
+                nx::network::SocketAddress(
                     QnUuid::createUuid().toSimpleString(),
                     nx::utils::random::number<int>(1, 10000)).toString().toUtf8();
             rec.originatingHostName = QnUuid::createUuid().toSimpleByteArray();
             rec.destinationHostEndpoint =
-                SocketAddress(
+                nx::network::SocketAddress(
                     QnUuid::createUuid().toSimpleString(),
                     nx::utils::random::number<int>(1, 10000)).toString().toUtf8();
             rec.destinationHostName = QnUuid::createUuid().toSimpleByteArray();

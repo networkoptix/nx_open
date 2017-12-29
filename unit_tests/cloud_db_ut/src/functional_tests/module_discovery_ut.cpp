@@ -27,7 +27,7 @@ protected:
         using namespace std::placeholders;
 
         m_urlFetcher.setModulesXmlUrl(nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName)
+            .setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(endpoint())
             .setPath(kDiscoveryCloudModuleXmlPath));
 
@@ -37,20 +37,20 @@ protected:
     void thenXmlIsProvided()
     {
         m_prevResult = m_results.pop();
-        ASSERT_EQ(nx_http::StatusCode::ok, m_prevResult.resultCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, m_prevResult.resultCode);
     }
 
     void andXmlContainsMultipleMediatorPorts()
     {
         ASSERT_NE(m_prevResult.tcpUrl, m_prevResult.udpUrl);
-        ASSERT_EQ(nx_http::kUrlSchemeName, m_prevResult.tcpUrl.scheme());
-        ASSERT_EQ(nx::stun::kUrlSchemeName, m_prevResult.udpUrl.scheme());
+        ASSERT_EQ(nx::network::http::kUrlSchemeName, m_prevResult.tcpUrl.scheme());
+        ASSERT_EQ(nx::network::stun::kUrlSchemeName, m_prevResult.udpUrl.scheme());
     }
 
 private:
     struct Result
     {
-        nx_http::StatusCode::Value resultCode = nx_http::StatusCode::ok;
+        nx::network::http::StatusCode::Value resultCode = nx::network::http::StatusCode::ok;
         nx::utils::Url tcpUrl;
         nx::utils::Url udpUrl;
     };
@@ -60,7 +60,7 @@ private:
     Result m_prevResult;
 
     void saveMediatorUrls(
-        nx_http::StatusCode::Value resultCode,
+        nx::network::http::StatusCode::Value resultCode,
         nx::utils::Url tcpUrl,
         nx::utils::Url udpUrl)
     {

@@ -20,19 +20,19 @@ const nx::String& OpenTunnelNotification::clientPeerName() const
     return m_clientPeerName;
 }
 
-void OpenTunnelNotification::setClientEndpoint(SocketAddress endpoint)
+void OpenTunnelNotification::setClientEndpoint(network::SocketAddress endpoint)
 {
     m_clientEndpoint = std::move(endpoint);
 }
 
-const SocketAddress& OpenTunnelNotification::clientEndpoint() const
+const network::SocketAddress& OpenTunnelNotification::clientEndpoint() const
 {
     return m_clientEndpoint;
 }
 
-nx_http::Message OpenTunnelNotification::toHttpMessage() const
+nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
 {
-    nx_http::Message message(nx_http::MessageType::request);
+    nx::network::http::Message message(nx::network::http::MessageType::request);
     message.request->requestLine.method = "OPEN_TUNNEL";
     message.request->requestLine.version.protocol = "NXRELAY";
     message.request->requestLine.version.version = "0.1";
@@ -43,9 +43,9 @@ nx_http::Message OpenTunnelNotification::toHttpMessage() const
     return message;
 }
 
-bool OpenTunnelNotification::parse(const nx_http::Message& message)
+bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
 {
-    if (message.type != nx_http::MessageType::request)
+    if (message.type != nx::network::http::MessageType::request)
         return false;
 
     auto path = message.request->requestLine.url.path().toUtf8();
@@ -57,7 +57,7 @@ bool OpenTunnelNotification::parse(const nx_http::Message& message)
     auto clientEndpointIter = message.request->headers.find(kClientEndpoint);
     if (clientEndpointIter == message.request->headers.end())
         return false;
-    m_clientEndpoint = SocketAddress(clientEndpointIter->second);
+    m_clientEndpoint = network::SocketAddress(clientEndpointIter->second);
 
     return true;
 }

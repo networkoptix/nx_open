@@ -3,7 +3,9 @@
 #include <nx/utils/byte_stream/buffer_output_stream.h>
 #include <nx/network/http/multipart_body_serializer.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 TEST(HttpMultipartBodySerializer, general)
 {
@@ -37,11 +39,11 @@ TEST(HttpMultipartBodySerializer, general)
         if (closeMultipartBody)
             testData += "\r\n--boundary--"; //terminating multipart body
 
-        serializer.beginPart("application/json", nx_http::HttpHeaders(), BufferType());
+        serializer.beginPart("application/json", nx::network::http::HttpHeaders(), BufferType());
         serializer.writeData("1xxxxxxxxxxxxx2");
-        serializer.beginPart("application/text", nx_http::HttpHeaders(), "3xxxxxx!");
+        serializer.beginPart("application/text", nx::network::http::HttpHeaders(), "3xxxxxx!");
         serializer.writeData("!xxxxxxx4");
-        serializer.writeBodyPart("text/html", nx_http::HttpHeaders(), "5xxxxxxxxxxxx6");
+        serializer.writeBodyPart("text/html", nx::network::http::HttpHeaders(), "5xxxxxxxxxxxx6");
 
         if (closeMultipartBody)
             serializer.writeEpilogue();
@@ -65,4 +67,6 @@ TEST(HttpMultipartBodySerializer, onlyEpilogue)
     ASSERT_EQ(testData, bufferOutputStream->buffer());
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

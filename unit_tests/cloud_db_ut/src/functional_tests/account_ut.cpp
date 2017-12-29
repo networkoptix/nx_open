@@ -321,7 +321,7 @@ TEST_F(Account, bad_registration)
     ASSERT_EQ(result, api::ResultCode::alreadyExists);
 
     //checking correct error message
-    auto client = nx_http::AsyncHttpClient::create();
+    auto client = nx::network::http::AsyncHttpClient::create();
     nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
@@ -330,24 +330,24 @@ TEST_F(Account, bad_registration)
     nx::utils::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(
-        client.get(), &nx_http::AsyncHttpClient::done,
+        client.get(), &nx::network::http::AsyncHttpClient::done,
         client.get(),
-        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); },
+        [&donePromise](nx::network::http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); },
         Qt::DirectConnection);
     client->doPost(url, "application/json", QJson::serialized(account1));
 
     doneFuture.wait();
     ASSERT_TRUE(client->response() != nullptr);
-    ASSERT_EQ(nx_http::StatusCode::notFound, client->response()->statusLine.statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::notFound, client->response()->statusLine.statusCode);
 
     bool success = false;
-    nx_http::FusionRequestResult requestResult =
-        QJson::deserialized<nx_http::FusionRequestResult>(
+    nx::network::http::FusionRequestResult requestResult =
+        QJson::deserialized<nx::network::http::FusionRequestResult>(
             client->fetchMessageBodyBuffer(),
-            nx_http::FusionRequestResult(),
+            nx::network::http::FusionRequestResult(),
             &success);
     ASSERT_TRUE(success);
-    ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.errorClass);
+    ASSERT_NE(nx::network::http::FusionRequestErrorClass::noError, requestResult.errorClass);
 }
 
 TEST_F(Account, request_query_decode)
@@ -361,19 +361,19 @@ TEST_F(Account, request_query_decode)
     api::AccountData account1;
     account1.email = "test%40yandex.ru";
     account1.fullName = "Test Test";
-    account1.passwordHa1 = nx_http::calcHa1(
+    account1.passwordHa1 = nx::network::http::calcHa1(
         "test@yandex.ru",
         moduleInfo().realm.c_str(),
         account1Password.c_str()).constData();
     account1.customization = nx::utils::AppInfo::customizationName().toStdString();
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     nx::utils::Url url(
         lm("http://127.0.0.1:%1/cdb/account/register?email=%2&fullName=%3&passwordHa1=%4&customization=%5")
         .arg(endpoint().port).arg(account1.email).arg(account1.fullName)
         .arg(account1.passwordHa1).arg(nx::utils::AppInfo::customizationName().toStdString()));
     ASSERT_TRUE(httpClient.doGet(url));
-    ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
     QByteArray responseBody;
     while (!httpClient.eof())
         responseBody += httpClient.fetchMessageBodyBuffer();
@@ -414,11 +414,11 @@ TEST_F(Account, update)
     //changing password
     std::string account1NewPassword = account1.password + "new";
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
-    update.passwordHa1Sha256 = nx_http::calcHa1(
+    update.passwordHa1Sha256 = nx::network::http::calcHa1(
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str(),
@@ -501,7 +501,7 @@ TEST_F(Account, reset_password_general)
         std::string account1NewPassword = "new_password";
 
         api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
+        update.passwordHa1 = nx::network::http::calcHa1(
             account1.email.c_str(),
             moduleInfo().realm.c_str(),
             account1NewPassword.c_str()).constData();
@@ -571,7 +571,7 @@ TEST_F(Account, reset_password_expiration)
         }
 
         api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
+        update.passwordHa1 = nx::network::http::calcHa1(
             account1.email.c_str(),
             moduleInfo().realm.c_str(),
             account1NewPassword.c_str()).constData();
@@ -619,7 +619,7 @@ TEST_F(Account, reset_password_links_expiration_after_changing_password)
         account1.password = "new_password";
 
         api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
+        update.passwordHa1 = nx::network::http::calcHa1(
             account1.email.c_str(),
             moduleInfo().realm.c_str(),
             account1.password.c_str()).constData();
@@ -722,7 +722,7 @@ TEST_F(Account, reset_password_authorization)
     std::string account1NewPassword = "new_password";
 
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
@@ -771,7 +771,7 @@ TEST_F(Account, reset_password_activates_account)
     std::string account1NewPassword = "new_password";
 
     api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
+    update.passwordHa1 = nx::network::http::calcHa1(
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();

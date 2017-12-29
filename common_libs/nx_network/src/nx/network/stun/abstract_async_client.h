@@ -7,6 +7,7 @@
 #include <nx/utils/url.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 constexpr int kEveryIndicationMethod = 0;
@@ -120,4 +121,5 @@ public:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

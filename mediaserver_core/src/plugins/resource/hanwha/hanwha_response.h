@@ -37,12 +37,12 @@ public:
     HanwhaResponse() {}
 
     explicit HanwhaResponse(
-        nx_http::StatusCode::Value statusCode,
+        nx::network::http::StatusCode::Value statusCode,
         const QString& requestUrl);
 
     explicit HanwhaResponse(
         const nx::Buffer& rawBuffer,
-        nx_http::StatusCode::Value statusCode,
+        nx::network::http::StatusCode::Value statusCode,
         const QString& requestUrl,
         const QString& groupBy = QString(),
         bool isListMode = false);
@@ -51,7 +51,7 @@ public:
     int errorCode() const;
     QString errorString() const;
     std::map<QString, QString> response() const;
-    nx_http::StatusCode::Value statusCode() const;
+    nx::network::http::StatusCode::Value statusCode() const;
     QString requestUrl() const;
     
     template<typename T>
@@ -84,7 +84,7 @@ private:
     int m_errorCode = HanwhaError::kNoError;
     QString m_errorString;
     std::map<QString, QString> m_response;
-    nx_http::StatusCode::Value m_statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value m_statusCode = nx::network::http::StatusCode::undefined;
     QString m_groupBy;
     QString m_requestUrl;
 };

@@ -42,11 +42,11 @@ QnAbstractConnection::~QnAbstractConnection() {
     return;
 }
 
-const nx_http::HttpHeaders& QnAbstractConnection::extraHeaders() const {
+const nx::network::http::HttpHeaders& QnAbstractConnection::extraHeaders() const {
     return m_extraHeaders;
 }
 
-void QnAbstractConnection::setExtraHeaders(nx_http::HttpHeaders extraHeaders) {
+void QnAbstractConnection::setExtraHeaders(nx::network::http::HttpHeaders extraHeaders) {
     m_extraHeaders = std::move(extraHeaders);
 }
 
@@ -83,9 +83,9 @@ QString QnAbstractConnection::objectName(int object) const {
 }
 
 int QnAbstractConnection::sendAsyncRequest(
-    nx_http::Method::ValueType method,
+    nx::network::http::Method::ValueType method,
     int object,
-    nx_http::HttpHeaders headers,
+    nx::network::http::HttpHeaders headers,
     const QnRequestParamList &params,
     QByteArray msgBody,
     const char *replyTypeName,
@@ -114,7 +114,7 @@ int QnAbstractConnection::sendAsyncRequest(
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }
 
-    nx_http::HttpHeaders actualHeaders = std::move(headers);
+    nx::network::http::HttpHeaders actualHeaders = std::move(headers);
     if (!m_extraHeaders.empty())
         std::copy(
             m_extraHeaders.begin(),
@@ -138,9 +138,9 @@ int QnAbstractConnection::sendAsyncRequest(
         "processReply");
 }
 
-int QnAbstractConnection::sendAsyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
+int QnAbstractConnection::sendAsyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
     return sendAsyncRequest(
-        nx_http::Method::get,
+        nx::network::http::Method::get,
         object,
         std::move(headers),
         params,
@@ -151,18 +151,18 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, nx_http::HttpHeaders h
 }
 
 int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(object, nx_http::HttpHeaders(), params, replyTypeName, target, slot);
+    return sendAsyncGetRequest(object, nx::network::http::HttpHeaders(), params, replyTypeName, target, slot);
 }
 
-int QnAbstractConnection::sendAsyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncRequest(nx_http::Method::post, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
+int QnAbstractConnection::sendAsyncPostRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
+    return sendAsyncRequest(nx::network::http::Method::post, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
 }
 
 int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncPostRequest(object, nx_http::HttpHeaders(), params, std::move(msgBody), replyTypeName, target, slot);
+    return sendAsyncPostRequest(object, nx::network::http::HttpHeaders(), params, std::move(msgBody), replyTypeName, target, slot);
 }
 
-int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders actualHeaders, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
+int QnAbstractConnection::sendSyncRequest(nx::network::http::Method::ValueType method, int object, nx::network::http::HttpHeaders actualHeaders, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
     NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!commonModule())
         return -1;
@@ -195,20 +195,20 @@ int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int
     return processor->status();
 }
 
-int QnAbstractConnection::sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply) {
-    return sendSyncRequest(nx_http::Method::get, object, std::move(headers), params, QByteArray(), reply);
+int QnAbstractConnection::sendSyncGetRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply) {
+    return sendSyncRequest(nx::network::http::Method::get, object, std::move(headers), params, QByteArray(), reply);
 }
 
 int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply) {
-    return sendSyncGetRequest(object, nx_http::HttpHeaders(), params, reply);
+    return sendSyncGetRequest(object, nx::network::http::HttpHeaders(), params, reply);
 }
 
-int QnAbstractConnection::sendSyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    return sendSyncRequest(nx_http::Method::post, object, std::move(headers), params, std::move(msgBody), reply);
+int QnAbstractConnection::sendSyncPostRequest(int object, nx::network::http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
+    return sendSyncRequest(nx::network::http::Method::post, object, std::move(headers), params, std::move(msgBody), reply);
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    return sendSyncPostRequest(object, nx_http::HttpHeaders(), params, std::move(msgBody), reply);
+    return sendSyncPostRequest(object, nx::network::http::HttpHeaders(), params, std::move(msgBody), reply);
 }
 
 QnResourcePtr QnAbstractConnection::targetResource() const

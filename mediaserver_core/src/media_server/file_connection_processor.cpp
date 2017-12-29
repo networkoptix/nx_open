@@ -99,7 +99,7 @@ public:
 };
 
 QnFileConnectionProcessor::QnFileConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+    QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
 :
     QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {
@@ -148,7 +148,7 @@ QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& cont
 {
     Q_D(QnFileConnectionProcessor);
 #ifndef EDGE_SERVER
-    if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
+    if (nx::network::http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
     {
         if (!contentType.contains("image")) {
             d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
@@ -176,29 +176,29 @@ void QnFileConnectionProcessor::run()
 
     if (path.contains(".."))
     {
-        sendResponse(nx_http::StatusCode::forbidden, contentType, QByteArray());
+        sendResponse(nx::network::http::StatusCode::forbidden, contentType, QByteArray());
         return;
     }
 
     QDateTime lastModified;
     if (!loadFile(path, &lastModified, &d->response.messageBody))
     {
-        sendResponse(nx_http::StatusCode::notFound, contentType, QByteArray());
+        sendResponse(nx::network::http::StatusCode::notFound, contentType, QByteArray());
         return;
     }
 
-    nx_http::HttpHeader modifiedHeader("Last-Modified", nx_http::formatDateTime(lastModified));
+    nx::network::http::HttpHeader modifiedHeader("Last-Modified", nx::network::http::formatDateTime(lastModified));
     d->response.headers.insert(modifiedHeader);
-    QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
+    QString modifiedSinceStr = nx::network::http::getHeaderValue(d->request.headers, "If-Modified-Since");
     if (!modifiedSinceStr.isEmpty())
     {
         QDateTime modifiedSince = QDateTime::fromString(modifiedSinceStr, Qt::RFC2822Date);
         if (lastModified <= modifiedSince)
         {
-            sendResponse(nx_http::StatusCode::notModified, contentType, QByteArray());
+            sendResponse(nx::network::http::StatusCode::notModified, contentType, QByteArray());
             return;
         }
     }
 
-    sendResponse(nx_http::StatusCode::ok, contentType, compressMessageBody(contentType));
+    sendResponse(nx::network::http::StatusCode::ok, contentType, compressMessageBody(contentType));
 }

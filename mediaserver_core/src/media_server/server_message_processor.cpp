@@ -203,7 +203,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
         m_mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (m_mServer)
     {
-        HostAddress hostAddr(addr);
+        nx::network::HostAddress hostAddr(addr);
         for(const auto& serverAddr: m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr.address)

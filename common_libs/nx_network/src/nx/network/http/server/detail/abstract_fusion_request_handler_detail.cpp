@@ -1,6 +1,8 @@
 #include "abstract_fusion_request_handler_detail.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace detail {
 
 BaseFusionRequestHandler::BaseFusionRequestHandler():
@@ -10,11 +12,11 @@ BaseFusionRequestHandler::BaseFusionRequestHandler():
 
 void BaseFusionRequestHandler::requestCompleted(FusionRequestResult result)
 {
-    std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody;
 
-    if (nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+    if (nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
     {
-        outputMsgBody = std::make_unique<nx_http::BufferSource>(
+        outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
             QJson::serialized(result));
     }
@@ -25,11 +27,11 @@ void BaseFusionRequestHandler::requestCompleted(FusionRequestResult result)
 }
 
 void BaseFusionRequestHandler::requestCompleted(
-    nx_http::StatusCode::Value statusCode,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody)
+    nx::network::http::StatusCode::Value statusCode,
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody)
 {
     auto completionHandler = std::move(m_completionHandler);
-    nx_http::RequestResult requestResult(
+    nx::network::http::RequestResult requestResult(
         statusCode,
         std::move(outputMsgBody));
     if (m_connectionEvents)
@@ -38,13 +40,13 @@ void BaseFusionRequestHandler::requestCompleted(
 }
 
 bool BaseFusionRequestHandler::getDataFormat(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     Qn::SerializationFormat* inputDataFormat,
     FusionRequestResult* errorDescription)
 {
     // Input/output formats can differ. E.g., GET request can specify input data in url query only.
     // TODO: #ak Fetching m_outputDataFormat from url query.
-    if (!nx_http::Method::isMessageBodyAllowed(request.requestLine.method))
+    if (!nx::network::http::Method::isMessageBodyAllowed(request.requestLine.method))
     {
         if (inputDataFormat)
         {
@@ -57,7 +59,7 @@ bool BaseFusionRequestHandler::getDataFormat(
         const auto contentTypeIter = request.headers.find("Content-Type");
         if (contentTypeIter != request.headers.cend())
         {
-            // TODO: #ak Add Content-Type header parser to nx_http.
+            // TODO: #ak Add Content-Type header parser to nx::network::http.
             const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
             m_outputDataFormat = Qn::serializationFormatFromHttpContentType(dataFormatStr);
         }
@@ -98,10 +100,12 @@ bool BaseFusionRequestHandler::isFormatSupported(Qn::SerializationFormat dataFor
     return dataFormat == Qn::JsonFormat || dataFormat == Qn::UrlQueryFormat;
 }
 
-void BaseFusionRequestHandler::setConnectionEvents(nx_http::ConnectionEvents connectionEvents)
+void BaseFusionRequestHandler::setConnectionEvents(nx::network::http::ConnectionEvents connectionEvents)
 {
     m_connectionEvents = std::move(connectionEvents);
 }
 
 } // namespace detail
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

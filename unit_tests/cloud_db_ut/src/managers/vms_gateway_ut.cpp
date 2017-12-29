@@ -70,14 +70,14 @@ protected:
         ASSERT_FALSE(mergeRequestData.ignoreIncompatible);
         assertAuthKeyIsValid(
             mergeRequestData.getKey.toUtf8(),
-            nx_http::Method::get,
+            nx::network::http::Method::get,
             "/api/mergeSystems");
         assertAuthKeyIsValid(
             mergeRequestData.postKey.toUtf8(),
-            nx_http::Method::post,
+            nx::network::http::Method::post,
             "/api/mergeSystems");
         QUrl remoteSystemUrl(mergeRequestData.url);
-        ASSERT_EQ(nx_http::kSecureUrlSchemeName, remoteSystemUrl.scheme());
+        ASSERT_EQ(nx::network::http::kSecureUrlSchemeName, remoteSystemUrl.scheme());
         ASSERT_EQ(m_idOfSystemToMergeTo, remoteSystemUrl.host().toStdString());
     }
 
@@ -95,16 +95,16 @@ protected:
     {
         auto vmsApiRequest = m_vmsApiRequests.pop();
 
-        const auto authorizationHeaderStr = nx_http::getHeaderValue(
-            vmsApiRequest.headers, nx_http::header::Authorization::NAME);
+        const auto authorizationHeaderStr = nx::network::http::getHeaderValue(
+            vmsApiRequest.headers, nx::network::http::header::Authorization::NAME);
         ASSERT_FALSE(authorizationHeaderStr.isEmpty());
-        nx_http::header::Authorization authorization;
+        nx::network::http::header::Authorization authorization;
         ASSERT_TRUE(authorization.parse(authorizationHeaderStr));
         ASSERT_EQ(m_ownerAccount.email, authorization.userid().toStdString());
     }
 
     void assertVmsResponseResultsIn(
-        nx_http::StatusCode::Value vmsHttpResponseStatusCode,
+        nx::network::http::StatusCode::Value vmsHttpResponseStatusCode,
         VmsResultCode expectedCode)
     {
         forceVmsApiResponseStatus(vmsHttpResponseStatusCode);
@@ -114,15 +114,15 @@ protected:
 
 private:
     AccountManagerStub m_accountManagerStub;
-    std::unique_ptr<TestHttpServer> m_mediaserverEmulator;
-    nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
-    boost::optional<nx_http::Request> m_prevReceivedVmsApiRequest;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_mediaserverEmulator;
+    nx::utils::SyncQueue<nx::network::http::Request> m_vmsApiRequests;
+    boost::optional<nx::network::http::Request> m_prevReceivedVmsApiRequest;
     nx::utils::SyncQueue<VmsRequestResult> m_vmsRequestResults;
     conf::Settings m_settings;
     std::unique_ptr<cdb::VmsGateway> m_vmsGateway;
     std::string m_systemId;
     std::string m_idOfSystemToMergeTo;
-    boost::optional<nx_http::StatusCode::Value> m_forcedHttpResponseStatus;
+    boost::optional<nx::network::http::StatusCode::Value> m_forcedHttpResponseStatus;
     AccountWithPassword m_ownerAccount;
 
     virtual void SetUp() override
@@ -132,7 +132,7 @@ private:
         m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
         m_accountManagerStub.addAccount(m_ownerAccount);
 
-        m_mediaserverEmulator = std::make_unique<TestHttpServer>();
+        m_mediaserverEmulator = std::make_unique<nx::network::http::TestHttpServer>();
         m_mediaserverEmulator->registerRequestProcessorFunc(
             "/gateway/{systemId}/api/mergeSystems",
             std::bind(&VmsGateway::vmsApiRequestStub, this, _1, _2, _3, _4, _5));
@@ -149,11 +149,11 @@ private:
     }
 
     void vmsApiRequestStub(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_vmsApiRequests.push(std::move(request));
 
@@ -163,8 +163,8 @@ private:
         QnJsonRestResult response;
         response.error = QnRestResult::Error::NoError;
 
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
-        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
+        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
             QJson::serialized(response));
 
@@ -176,14 +176,14 @@ private:
         m_vmsRequestResults.push(std::move(vmsRequestResult));
     }
 
-    void forceVmsApiResponseStatus(nx_http::StatusCode::Value httpStatusCode)
+    void forceVmsApiResponseStatus(nx::network::http::StatusCode::Value httpStatusCode)
     {
         m_forcedHttpResponseStatus = httpStatusCode;
     }
 
     void assertAuthKeyIsValid(
         const nx::String& authKeyStr,
-        nx_http::Method::ValueType httpMethod,
+        nx::network::http::Method::ValueType httpMethod,
         const nx::String& apiRequest)
     {
         AuthKey authKey;
@@ -192,7 +192,7 @@ private:
         ASSERT_TRUE(api::isNonceValidForSystem(
             authKey.nonce.toStdString(), m_idOfSystemToMergeTo));
         ASSERT_TRUE(authKey.verify(
-            nx_http::PasswordAuthToken(m_ownerAccount.password.c_str()),
+            nx::network::http::PasswordAuthToken(m_ownerAccount.password.c_str()),
             httpMethod,
             apiRequest));
     }
@@ -234,23 +234,23 @@ TEST_F(VmsGateway, proper_error_is_reported_when_vms_is_unreachable)
 TEST_F(VmsGateway, proper_error_is_reported_when_vms_rejects_request)
 {
     assertVmsResponseResultsIn(
-        nx_http::StatusCode::serviceUnavailable,
+        nx::network::http::StatusCode::serviceUnavailable,
         VmsResultCode::unreachable);
 
     assertVmsResponseResultsIn(
-        nx_http::StatusCode::notFound,
+        nx::network::http::StatusCode::notFound,
         VmsResultCode::unreachable);
 
     assertVmsResponseResultsIn(
-        nx_http::StatusCode::badRequest,
+        nx::network::http::StatusCode::badRequest,
         VmsResultCode::invalidData);
 
     assertVmsResponseResultsIn(
-        nx_http::StatusCode::unauthorized,
+        nx::network::http::StatusCode::unauthorized,
         VmsResultCode::forbidden);
 
     assertVmsResponseResultsIn(
-        nx_http::StatusCode::forbidden,
+        nx::network::http::StatusCode::forbidden,
         VmsResultCode::forbidden);
 }
 

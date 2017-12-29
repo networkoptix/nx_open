@@ -7,7 +7,7 @@
 
 namespace nx {
 
-namespace stun { class MessageDispatcher; }
+namespace network { namespace stun { class MessageDispatcher; } }
 
 namespace hpm {
 
@@ -20,17 +20,17 @@ class MediaserverEndpointTesterBase:
 public:
     MediaserverEndpointTesterBase(
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher);
+        nx::network::stun::MessageDispatcher* dispatcher);
 
-    void ping(const ConnectionStrongRef& connection, stun::Message message);
+    void ping(const ConnectionStrongRef& connection, network::stun::Message message);
 
     /**
      * Ping address to verify there is a mediaserver with expected id listening.
      */
     virtual void pingServer(
-        const SocketAddress& address,
+        const network::SocketAddress& address,
         const String& expectedId,
-        std::function<void(SocketAddress, bool)> onPinged) = 0;
+        std::function<void(network::SocketAddress, bool)> onPinged) = 0;
 };
 
 /**
@@ -43,16 +43,16 @@ class MediaserverEndpointTester:
 public:
     MediaserverEndpointTester(
         AbstractCloudDataProvider* cloudData,
-        nx::stun::MessageDispatcher* dispatcher);
+        nx::network::stun::MessageDispatcher* dispatcher);
 
     virtual void pingServer(
-        const SocketAddress& address,
+        const network::SocketAddress& address,
         const String& expectedId,
-        std::function<void(SocketAddress, bool)> onPinged) override;
+        std::function<void(network::SocketAddress, bool)> onPinged) override;
 
 private:
     QnMutex m_mutex;
-    std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
+    std::set<nx::network::http::AsyncHttpClientPtr> m_httpClients;
 };
 
 } // namespace hpm

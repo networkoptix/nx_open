@@ -185,7 +185,7 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     QnMutexLocker locker(&m_mutex);
 
     if (!m_digest.isEmpty())
-        return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
+        return nx::network::http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm

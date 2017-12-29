@@ -64,14 +64,14 @@ public:
         return true;
     }
 
-    virtual SocketAddress localAddress() const override
+    virtual nx::network::SocketAddress localAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
-    virtual SocketAddress remoteAddress() const override
+    virtual nx::network::SocketAddress remoteAddress() const override
     {
-        return SocketAddress();
+        return nx::network::SocketAddress();
     }
 
     virtual void closeConnection(SystemError::ErrorCode /*errorCode*/) override
@@ -150,7 +150,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        std::list<SocketAddress> addresses{ SocketAddress::anyPrivateAddress };
+        std::list<nx::network::SocketAddress> addresses{ nx::network::SocketAddress::anyPrivateAddress };
         for (int i = 0; i < requestCount; ++i)
         {
             m_publisher->updateAddresses(

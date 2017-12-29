@@ -27,7 +27,7 @@
 #ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */
 static_assert(
-    boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
+    boost::is_same<nx::network::AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
     "Invalid socket type is used in AbstractSocket.");
 typedef char raw_type;       // Type used for raw data on this platform
 #else
@@ -553,10 +553,11 @@ CommunicatingSocket<SocketInterfaceToImplement>::~CommunicatingSocket()
 
 template<typename SocketInterfaceToImplement>
 bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
-    const SocketAddress& remoteAddress, unsigned int timeoutMs)
+    const SocketAddress& remoteAddress,
+    std::chrono::milliseconds timeout)
 {
     if (remoteAddress.address.isIpAddress())
-        return connectToIp(remoteAddress, timeoutMs);
+        return connectToIp(remoteAddress, timeout);
 
     std::deque<HostAddress> resolvedAddresses;
     const SystemError::ErrorCode resultCode =
@@ -572,7 +573,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
     {
         auto ip = std::move(resolvedAddresses.front());
         resolvedAddresses.pop_front();
-        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeout))
             return true;
     }
 
@@ -811,20 +812,22 @@ void CommunicatingSocket<SocketInterfaceToImplement>::sendAsync(
 
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::registerTimer(
-    std::chrono::milliseconds timeoutMs,
+    std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
     //NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
-    if (timeoutMs == std::chrono::milliseconds(0))
-        timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
-    return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
+    if (timeout == std::chrono::milliseconds::zero())
+        timeout = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
+    return m_aioHelper->registerTimer(timeout, std::move(handler));
 }
 
 template<typename SocketInterfaceToImplement>
 bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
-    const SocketAddress& remoteAddress, unsigned int timeoutMs)
+    const SocketAddress& remoteAddress,
+    std::chrono::milliseconds timeout)
 {
+    int timeoutMs = timeout == nx::network::kNoTimeout ? -1 : timeout.count();
     // Get the address of the requested host.
     m_connected = false;
 
@@ -912,7 +915,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
             if (errno == EINTR)
             {
                 //modifying timeout for time we've already spent in select
-                if (timeoutMs == 0 ||  //no timeout
+                if (timeoutMs < 0 ||  //no timeout
                     !waitStartTimeActual)
                 {
                     //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)

@@ -28,7 +28,7 @@ public:
     std::deque<QByteArray> messagesToSend;
 };
 
-QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner)
 {
     QN_UNUSED(owner);
@@ -111,7 +111,10 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &reso
     }
 }
 
-void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
+void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync(
+    nx::network::AbstractStreamSocket* sock,
+    SystemError::ErrorCode errorCode,
+    size_t bytesRead)
 {
     QN_UNUSED(sock, bytesRead);
 
@@ -121,7 +124,11 @@ void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync( AbstractSocket* sock,
     using namespace std::placeholders;
     d->requestBuffer.resize(0);
     if(errorCode == SystemError::timedOut)
-        d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+    {
+        d->socket->readSomeAsync(
+            &d->requestBuffer,
+            std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+    }
     d->waitCond.wakeAll();
 }
 

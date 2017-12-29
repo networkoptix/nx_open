@@ -26,7 +26,7 @@ bool QnAxisAudioTransmitter::sendData(
     return base_type::sendBuffer(m_socket.get(), data->data(), data->dataSize());
 }
 
-void QnAxisAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
+void QnAxisAudioTransmitter::prepareHttpClient(const nx::network::http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
     m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();
@@ -37,7 +37,7 @@ void QnAxisAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr
 }
 
 bool QnAxisAudioTransmitter::isReadyForTransmission(
-    nx_http::AsyncHttpClientPtr /*httpClient*/,
+    nx::network::http::AsyncHttpClientPtr /*httpClient*/,
     bool isRetryAfterUnauthorizedResponse) const
 {
     return isRetryAfterUnauthorizedResponse || m_noAuth;
@@ -61,7 +61,7 @@ std::chrono::milliseconds QnAxisAudioTransmitter::transmissionTimeout() const
     return kTransmissionTimeout;
 }
 
-nx_http::StringType QnAxisAudioTransmitter::contentType() const
+nx::network::http::StringType QnAxisAudioTransmitter::contentType() const
 {
     if (m_outputFormat.codec() == "MULAW")
     {

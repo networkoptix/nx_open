@@ -16,6 +16,6 @@ DWORD NX_NETWORK_API GetTcpRow(
  */
 DWORD NX_NETWORK_API readTcpStat(
     PMIB_TCPROW row,
-    StreamSocketInfo* const sockInfo );
+    nx::network::StreamSocketInfo* const sockInfo );
 
 #endif // _WIN32

@@ -36,7 +36,7 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
     }
 }
 
-void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
+void QnAutoRequestForwarder::processRequest(nx::network::http::Request* const request)
 {
     // Help decluttering logs of /api/moduleInformation when debugging this class.
     if (ini().ignoreApiModuleInformationInAutoRequestForwarder
@@ -130,7 +130,7 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
 }
 
 bool QnAutoRequestForwarder::addProxyToRequest(
-    nx_http::Request* const request,
+    nx::network::http::Request* const request,
     const QnMediaServerResourcePtr& server)
 {
     if (!server)
@@ -156,7 +156,7 @@ void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
     NX_VERBOSE(this) << lm("Added path wildcard mask to ignore: [%1]").arg(pathWildcardMask);
 }
 
-bool QnAutoRequestForwarder::isPathIgnored(const nx_http::Request* request)
+bool QnAutoRequestForwarder::isPathIgnored(const nx::network::http::Request* request)
 {
     for (const auto& mask: m_ignoredPathWildcardMarks)
     {
@@ -205,7 +205,7 @@ void QnAutoRequestForwarder::addCameraIdUrlParams(
 }
 
 bool QnAutoRequestForwarder::findCamera(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QUrlQuery& urlQuery,
     QnResourcePtr* const outCamera)
 {
@@ -227,7 +227,7 @@ bool QnAutoRequestForwarder::findCamera(
 }
 
 QnUuid QnAutoRequestForwarder::findCameraIdAsCameraGuidHeader(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QUrlQuery& urlQuery)
 {
     QnUuid cameraId;
@@ -263,7 +263,7 @@ QnUuid QnAutoRequestForwarder::findCameraIdAsCameraGuidHeader(
 }
 
 bool QnAutoRequestForwarder::findCameraInUrlPath(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QUrlQuery& /*urlQuery*/,
     QnResourcePtr* const outCamera)
 {
@@ -305,7 +305,7 @@ bool QnAutoRequestForwarder::findCameraInUrlPath(
 }
 
 bool QnAutoRequestForwarder::findCameraInUrlQuery(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QUrlQuery& urlQuery,
     QnResourcePtr* const outCamera)
 {
@@ -337,7 +337,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
 }
 
 qint64 QnAutoRequestForwarder::fetchTimestamp(
-    const nx_http::Request& request,
+    const nx::network::http::Request& request,
     const QUrlQuery& urlQuery)
 {
     if (urlQuery.hasQueryItem(lit("time"))) // In /api/image.

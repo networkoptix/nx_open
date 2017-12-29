@@ -65,10 +65,10 @@ int QnMergeSystemsRestHandler::execute(
         owner->authSession(),
         data,
         &result);
-    if (resultCode != nx_http::StatusCode::ok)
+    if (resultCode != nx::network::http::StatusCode::ok)
     {
         NX_DEBUG(this, lm("Merge with %1 failed with result %2")
-            .args(data.url, nx_http::StatusCode::toString(resultCode)));
+            .args(data.url, nx::network::http::StatusCode::toString(resultCode)));
         return resultCode;
     }
 
@@ -82,7 +82,7 @@ int QnMergeSystemsRestHandler::execute(
     qnAuditManager->addAuditRecord(
         qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge));
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(

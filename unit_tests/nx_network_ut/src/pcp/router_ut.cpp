@@ -4,6 +4,10 @@
 
 #include "data_stream_helpers.h"
 
+namespace nx {
+namespace network {
+namespace pcp {
+
 class TestRouter : protected pcp::Router
 {
 public:
@@ -44,3 +48,7 @@ TEST(PcpRouter, DISABLED_RealMap)
 
     EXPECT_GT(mapping.lifeTime, 0U);
 }
+
+} // namespace pcp
+} // namespace network
+} // namespace nx

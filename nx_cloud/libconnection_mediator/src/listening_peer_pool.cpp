@@ -120,7 +120,7 @@ ListeningPeerPool::~ListeningPeerPool()
 }
 
 ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
-    const std::shared_ptr<nx::stun::ServerConnection>& connection,
+    const std::shared_ptr<nx::network::stun::ServerConnection>& connection,
     const MediaserverData& peerData)
 {
     QnMutexLocker lock(&m_mutex);
@@ -244,7 +244,7 @@ std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
 
 void ListeningPeerPool::onListeningPeerConnectionClosed(
     const MediaserverData& peerData,
-    nx::stun::AbstractServerConnection* connection)
+    nx::network::stun::AbstractServerConnection* connection)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -259,7 +259,7 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
 }
 
 void ListeningPeerPool::closeConnectionAsync(
-    std::shared_ptr<nx::stun::ServerConnection> peerConnection)
+    std::shared_ptr<nx::network::stun::ServerConnection> peerConnection)
 {
     auto peerConnectionPtr = peerConnection.get();
     peerConnectionPtr->pleaseStop(

@@ -20,7 +20,7 @@ class ModuleConnector:
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        QnModuleInformation, SocketAddress /*endpoint*/, HostAddress /*ip*/)> ConnectedHandler;
+        QnModuleInformation, nx::network::SocketAddress /*endpoint*/, nx::network::HostAddress /*ip*/)> ConnectedHandler;
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
@@ -31,8 +31,8 @@ public:
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
 
-    void newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id = QnUuid());
-    void setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id);
+    void newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id = QnUuid());
+    void setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id);
 
     void activate();
     void deactivate();
@@ -48,17 +48,17 @@ private:
         ~InformationReader();
 
         void setHandler(std::function<void(boost::optional<QnModuleInformation>, QString)> handler);
-        void start(const SocketAddress& endpoint);
-        HostAddress ip() const { return m_socket->getForeignAddress().address; }
+        void start(const nx::network::SocketAddress& endpoint);
+        nx::network::HostAddress ip() const { return m_socket->getForeignAddress().address; }
 
     private:
         void readUntilError();
 
         const ModuleConnector* const m_parent;
-        nx_http::AsyncHttpClientPtr m_httpClient;
-        SocketAddress m_endpoint;
+        nx::network::http::AsyncHttpClientPtr m_httpClient;
+        nx::network::SocketAddress m_endpoint;
         nx::Buffer m_buffer;
-        std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
         std::function<void(boost::optional<QnModuleInformation>, QString)> m_handler;
         nx::utils::ObjectDestructionFlag m_destructionFlag;
     };
@@ -69,27 +69,27 @@ private:
         Module(ModuleConnector* parent, const QnUuid& id);
         ~Module();
 
-        void addEndpoints(std::set<SocketAddress> endpoints);
+        void addEndpoints(std::set<nx::network::SocketAddress> endpoints);
         void ensureConnection();
-        void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
+        void setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints);
         QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
         enum Priority { kDefault, kOther, kLocalHost, kLocalNetwork, kIp, kCloud };
-        typedef std::map<Priority, std::set<SocketAddress>> Endpoints;
+        typedef std::map<Priority, std::set<nx::network::SocketAddress>> Endpoints;
 
-        Priority hostPriority(const HostAddress& host) const;
-        boost::optional<Endpoints::iterator> saveEndpoint(SocketAddress endpoint);
+        Priority hostPriority(const nx::network::HostAddress& host) const;
+        boost::optional<Endpoints::iterator> saveEndpoint(nx::network::SocketAddress endpoint);
         void connectToGroup(Endpoints::iterator endpointsGroup);
-        void connectToEndpoint(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
-        bool saveConnection(SocketAddress endpoint, std::unique_ptr<InformationReader> reader,
+        void connectToEndpoint(const nx::network::SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
+        bool saveConnection(nx::network::SocketAddress endpoint, std::unique_ptr<InformationReader> reader,
             const QnModuleInformation& information);
 
     private:
         ModuleConnector* const m_parent;
         const QnUuid m_id;
         Endpoints m_endpoints;
-        std::set<SocketAddress> m_forbiddenEndpoints;
+        std::set<nx::network::SocketAddress> m_forbiddenEndpoints;
         network::RetryTimer m_reconnectTimer;
         std::list<std::unique_ptr<InformationReader>> m_attemptingReaders;
         std::unique_ptr<InformationReader> m_connectedReader;

@@ -10,7 +10,7 @@ class QnFileConnectionProcessor: public QnTCPConnectionProcessor {
     Q_OBJECT
 
 public:
-    QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnFileConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnFileConnectionProcessor();
 
     static QByteArray readStaticFile(const QString& path);

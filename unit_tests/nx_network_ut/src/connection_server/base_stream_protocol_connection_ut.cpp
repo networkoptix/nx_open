@@ -112,7 +112,7 @@ static const HttpMessageWithoutBody kHttpMessageWithoutBody;
 
 //-------------------------------------------------------------------------------------------------
 
-using TestHttpConnection = nx_http::AsyncMessagePipeline;
+using TestHttpConnection = nx::network::http::AsyncMessagePipeline;
 
 } // namespace
 
@@ -214,9 +214,9 @@ protected:
         }
     }
 
-    virtual void saveMessage(nx_http::Message message)
+    virtual void saveMessage(nx::network::http::Message message)
     {
-        auto messageToSave = std::make_unique<nx_http::Message>(std::move(message));
+        auto messageToSave = std::make_unique<nx::network::http::Message>(std::move(message));
         m_prevMessageReceived = messageToSave.get();
         m_receivedMessageQueue.push(std::move(messageToSave));
     }
@@ -235,11 +235,11 @@ private:
     nx::utils::bstream::Pipe m_input;
     aio::test::AsyncChannel m_asyncChannel;
     std::unique_ptr<TestHttpConnection> m_connection;
-    nx::utils::SyncQueue<std::unique_ptr<nx_http::Message>> m_receivedMessageQueue;
+    nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Message>> m_receivedMessageQueue;
     nx::utils::bstream::test::NotifyingOutput m_receivedMsgBody;
     nx::Buffer m_expectedBody;
     std::vector<HttpMessageTestData> m_messagesSent;
-    nx_http::Message* m_prevMessageReceived = nullptr;
+    nx::network::http::Message* m_prevMessageReceived = nullptr;
     QnMutex m_mutex;
 
     virtual void closeConnection(
@@ -343,7 +343,7 @@ protected:
         m_done.get_future().wait();
     }
 
-    virtual void saveMessage(nx_http::Message message)
+    virtual void saveMessage(nx::network::http::Message message)
     {
         base_type::saveMessage(message);
 

@@ -4,7 +4,9 @@
 
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 namespace test {
 
 TEST(Upnp, Urn)
@@ -51,4 +53,6 @@ TEST(UpnpDeviceSearcher, DISABLED_General)
 }
 
 } // namespace test
-} // namespace nx_upnp
+} // namespace upnp
+} // namespace network
+} // namespace nx

@@ -3,7 +3,9 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace header {
 
 void PrintTo(const Via& val, ::std::ostream* os)
@@ -24,15 +26,12 @@ bool operator==(const Via& left, const Via& right)
     return left.entries == right.entries;
 }
 
-} // namespace header
-} // namespace nx_http
-
 //-------------------------------------------------------------------------------------------------
 // Range header tests.
 
 TEST(HttpHeaderTest, RangeHeader_parse)
 {
-    nx_http::header::Range range;
+    nx::network::http::header::Range range;
     range.parse("650-");
     ASSERT_EQ(range.rangeSpecList.size(), 1U);
     ASSERT_EQ(range.rangeSpecList[0].start, 650U);
@@ -56,7 +55,7 @@ TEST(HttpHeaderTest, RangeHeader_parse)
 
 TEST(HttpHeaderTest, RangeHeader_validateByContentSize)
 {
-    nx_http::header::Range range;
+    nx::network::http::header::Range range;
     range.parse("650-");
     EXPECT_FALSE(range.empty());
     EXPECT_TRUE(range.validateByContentSize(1000));
@@ -86,7 +85,7 @@ TEST(HttpHeaderTest, RangeHeader_validateByContentSize)
 
 TEST(HttpHeaderTest, RangeHeader_full)
 {
-    nx_http::header::Range range;
+    nx::network::http::header::Range range;
     range.parse("650-");
     EXPECT_FALSE(range.empty());
     EXPECT_FALSE(range.full(1000));
@@ -114,7 +113,7 @@ TEST(HttpHeaderTest, RangeHeader_full)
 
 TEST(HttpHeaderTest, RangeHeader_totalRangeLength)
 {
-    nx_http::header::Range range;
+    nx::network::http::header::Range range;
     range.parse("650-");
     EXPECT_EQ(range.totalRangeLength(1000), 350U);
     EXPECT_EQ(range.totalRangeLength(650), 0U);
@@ -149,7 +148,7 @@ TEST(HttpHeaderTest, RangeHeader_totalRangeLength)
 TEST(HttpHeaderTest, ContentRange_toString)
 {
     {
-        nx_http::header::ContentRange contentRange;
+        nx::network::http::header::ContentRange contentRange;
         EXPECT_EQ(contentRange.toString(), "bytes 0-0/*");
         EXPECT_EQ(contentRange.rangeLength(), 1U);
 
@@ -163,7 +162,7 @@ TEST(HttpHeaderTest, ContentRange_toString)
     }
 
     {
-        nx_http::header::ContentRange contentRange;
+        nx::network::http::header::ContentRange contentRange;
         contentRange.rangeSpec.start = 100;
         contentRange.rangeSpec.end = 249;
         EXPECT_EQ(contentRange.toString(), "bytes 100-249/*");
@@ -171,7 +170,7 @@ TEST(HttpHeaderTest, ContentRange_toString)
     }
 
     {
-        nx_http::header::ContentRange contentRange;
+        nx::network::http::header::ContentRange contentRange;
         contentRange.rangeSpec.start = 100;
         contentRange.rangeSpec.end = 249;
         contentRange.instanceLength = 500;
@@ -180,14 +179,14 @@ TEST(HttpHeaderTest, ContentRange_toString)
     }
 
     {
-        nx_http::header::ContentRange contentRange;
+        nx::network::http::header::ContentRange contentRange;
         contentRange.rangeSpec.start = 100;
         EXPECT_EQ(contentRange.toString(), "bytes 100-100/*");
         EXPECT_EQ(contentRange.rangeLength(), 1U);
     }
 
     {
-        nx_http::header::ContentRange contentRange;
+        nx::network::http::header::ContentRange contentRange;
         contentRange.rangeSpec.start = 100;
         contentRange.rangeSpec.end = 100;
         EXPECT_EQ(contentRange.toString(), "bytes 100-100/*");
@@ -200,7 +199,7 @@ TEST(HttpHeaderTest, ContentRange_toString)
 
 TEST(HttpHeaderTest, Via_parse)
 {
-    nx_http::header::Via via;
+    nx::network::http::header::Via via;
     EXPECT_TRUE(via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1)"));
     EXPECT_EQ(via.entries.size(), 2U);
     EXPECT_FALSE(via.entries[0].protoName);
@@ -308,8 +307,8 @@ TEST(HttpHeaderTest, Via_parse)
 
 TEST(HttpHeaderTest, Via_toString)
 {
-    nx_http::header::Via via;
-    nx_http::header::Via::ProxyEntry entry;
+    nx::network::http::header::Via via;
+    nx::network::http::header::Via::ProxyEntry entry;
     entry.protoVersion = "1.0";
     entry.receivedBy = "{bla-bla-bla}";
     via.entries.push_back(entry);
@@ -327,7 +326,7 @@ TEST(HttpHeaderTest, Via_toString)
 
     EXPECT_EQ(via.toString(), QByteArray("1.0 {bla-bla-bla}, HTTP/1.0 {bla-bla-bla-bla}, HTTP/1.1 {blya-blya-blya-blya} qweasd123"));
 
-    nx_http::header::Via via2;
+    nx::network::http::header::Via via2;
     EXPECT_TRUE(via2.parse(via.toString()));
     EXPECT_EQ(via, via2);
 }
@@ -338,7 +337,7 @@ TEST(HttpHeaderTest, Via_toString)
 TEST(HttpHeaderTest, AcceptEncoding_parse)
 {
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("gzip, deflate, sdch");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("gzip, deflate, sdch");
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("deflate"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("sdch"));
@@ -347,7 +346,7 @@ TEST(HttpHeaderTest, AcceptEncoding_parse)
     }
 
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("gzip, deflate, sdch, identity;q=0");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("gzip, deflate, sdch, identity;q=0");
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("deflate"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("sdch"));
@@ -356,13 +355,13 @@ TEST(HttpHeaderTest, AcceptEncoding_parse)
     }
 
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("");
         ASSERT_FALSE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("identity"));
     }
 
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("gzip;q=0, deflate;q=0.5, sdch");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("gzip;q=0, deflate;q=0.5, sdch");
         ASSERT_FALSE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("deflate"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("sdch"));
@@ -370,7 +369,7 @@ TEST(HttpHeaderTest, AcceptEncoding_parse)
     }
 
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("gzip;q=0, deflate;q=0.5, sdch,*");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("gzip;q=0, deflate;q=0.5, sdch,*");
         ASSERT_FALSE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("deflate"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("sdch"));
@@ -379,7 +378,7 @@ TEST(HttpHeaderTest, AcceptEncoding_parse)
     }
 
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("gzip;q=0, deflate;q=0.5, sdch,*;q=0.0");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("gzip;q=0, deflate;q=0.5, sdch,*;q=0.0");
         ASSERT_FALSE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("deflate"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("sdch"));
@@ -388,7 +387,7 @@ TEST(HttpHeaderTest, AcceptEncoding_parse)
     }
 
     {
-        nx_http::header::AcceptEncodingHeader acceptEncoding("gzip;q=1.0, identity;q=0.5, *;q=0");
+        nx::network::http::header::AcceptEncodingHeader acceptEncoding("gzip;q=1.0, identity;q=0.5, *;q=0");
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("gzip"));
         ASSERT_FALSE(acceptEncoding.encodingIsAllowed("deflate"));
         ASSERT_TRUE(acceptEncoding.encodingIsAllowed("identity"));
@@ -397,35 +396,35 @@ TEST(HttpHeaderTest, AcceptEncoding_parse)
 }
 
 //-------------------------------------------------------------------------------------------------
-// nx_http::RequestLine.
+// nx::network::http::RequestLine.
 
 TEST(HttpRequestTest, RequestLine_parse)
 {
     {
-        nx_http::RequestLine requestLine;
-        ASSERT_TRUE(requestLine.parse(nx_http::BufferType("GET /hren/hren/hren?hren=hren&hren HTTP/1.0")));
-        ASSERT_EQ(requestLine.method, nx_http::BufferType("GET"));
+        nx::network::http::RequestLine requestLine;
+        ASSERT_TRUE(requestLine.parse(nx::network::http::BufferType("GET /hren/hren/hren?hren=hren&hren HTTP/1.0")));
+        ASSERT_EQ(requestLine.method, nx::network::http::BufferType("GET"));
         ASSERT_EQ(requestLine.url, nx::utils::Url("/hren/hren/hren?hren=hren&hren"));
-        ASSERT_EQ(requestLine.version, nx_http::http_1_0);
+        ASSERT_EQ(requestLine.version, nx::network::http::http_1_0);
     }
 
     {
-        nx_http::RequestLine requestLine;
-        ASSERT_TRUE(requestLine.parse(nx_http::BufferType("  PUT   /abc?def=ghi&jkl   HTTP/1.1")));
-        ASSERT_EQ(requestLine.method, nx_http::BufferType("PUT"));
+        nx::network::http::RequestLine requestLine;
+        ASSERT_TRUE(requestLine.parse(nx::network::http::BufferType("  PUT   /abc?def=ghi&jkl   HTTP/1.1")));
+        ASSERT_EQ(requestLine.method, nx::network::http::BufferType("PUT"));
         ASSERT_EQ(requestLine.url, nx::utils::Url("/abc?def=ghi&jkl"));
-        ASSERT_EQ(requestLine.version, nx_http::http_1_1);
+        ASSERT_EQ(requestLine.version, nx::network::http::http_1_1);
     }
 
     {
-        nx_http::RequestLine requestLine;
-        ASSERT_FALSE(requestLine.parse(nx_http::BufferType("GET    HTTP/1.1")));
-        ASSERT_FALSE(requestLine.parse(nx_http::BufferType()));
+        nx::network::http::RequestLine requestLine;
+        ASSERT_FALSE(requestLine.parse(nx::network::http::BufferType("GET    HTTP/1.1")));
+        ASSERT_FALSE(requestLine.parse(nx::network::http::BufferType()));
     }
 }
 
 //-------------------------------------------------------------------------------------------------
-// nx_http::Request.
+// nx::network::http::Request.
 
 static const nx::Buffer HTTP_REQUEST(
     "PLAY rtsp://192.168.0.25:7001/00-1A-07-0A-3A-88 RTSP/1.0\r\n"
@@ -444,9 +443,9 @@ static const nx::Buffer HTTP_REQUEST(
 
 TEST(HttpRequestTest, Request_parse)
 {
-    nx_http::Request request;
+    nx::network::http::Request request;
     ASSERT_TRUE(request.parse(HTTP_REQUEST));
-    ASSERT_EQ(nx_http::getHeaderValue(request.headers, "x-media-step").toLongLong(), 9693025000LL);
+    ASSERT_EQ(nx::network::http::getHeaderValue(request.headers, "x-media-step").toLongLong(), 9693025000LL);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -457,9 +456,9 @@ TEST(HttpHeaderTest, WWWAuthenticate_parse)
     {
         static const char testData[] = "Digest realm=\"AXIS_ACCC8E338EDF\", nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=\"auth\"";
 
-        nx_http::header::WWWAuthenticate auth;
+        nx::network::http::header::WWWAuthenticate auth;
         ASSERT_TRUE(auth.parse(QByteArray::fromRawData(testData, sizeof(testData) - 1)));
-        ASSERT_EQ(auth.authScheme, nx_http::header::AuthScheme::digest);
+        ASSERT_EQ(auth.authScheme, nx::network::http::header::AuthScheme::digest);
         ASSERT_EQ(auth.params.size(), 4);
         ASSERT_EQ(auth.params["realm"], "AXIS_ACCC8E338EDF");
         ASSERT_EQ(auth.params["algorithm"], "MD5");
@@ -470,9 +469,9 @@ TEST(HttpHeaderTest, WWWAuthenticate_parse)
     {
         static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=auth";
 
-        nx_http::header::WWWAuthenticate auth;
+        nx::network::http::header::WWWAuthenticate auth;
         ASSERT_TRUE(auth.parse(QByteArray::fromRawData(testData, sizeof(testData) - 1)));
-        ASSERT_EQ(auth.authScheme, nx_http::header::AuthScheme::digest);
+        ASSERT_EQ(auth.authScheme, nx::network::http::header::AuthScheme::digest);
         ASSERT_EQ(auth.params.size(), 4);
         ASSERT_EQ(auth.params["realm"], "AXIS_ACCC8E338EDF");
         ASSERT_EQ(auth.params["algorithm"], "MD5");
@@ -484,7 +483,7 @@ TEST(HttpHeaderTest, WWWAuthenticate_parse)
     //{
     //    static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad, algorithm=MD5, qop=auth";
 
-    //    nx_http::header::WWWAuthenticate auth;
+    //    nx::network::http::header::WWWAuthenticate auth;
     //    ASSERT_FALSE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
     //}
 }
@@ -502,9 +501,9 @@ TEST(HttpHeaderTest, Authorization_parse)
             "cnonce=\"0a4f113b\","
             "response=\"6629fae49393a05397450978507c4ef1\","
             "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
-        nx_http::header::Authorization auth;
+        nx::network::http::header::Authorization auth;
         ASSERT_TRUE(auth.parse(QByteArray::fromRawData(testData, sizeof(testData) - 1)));
-        ASSERT_EQ(auth.authScheme, nx_http::header::AuthScheme::digest);
+        ASSERT_EQ(auth.authScheme, nx::network::http::header::AuthScheme::digest);
         ASSERT_EQ(auth.userid(), "Mufasa");
         ASSERT_EQ(auth.digest->params["username"], "Mufasa");
         ASSERT_EQ(auth.digest->params["realm"], "testrealm@host.com");
@@ -520,9 +519,9 @@ TEST(HttpHeaderTest, Authorization_parse)
     {
         static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=auth";
 
-        nx_http::header::Authorization auth;
+        nx::network::http::header::Authorization auth;
         ASSERT_TRUE(auth.parse(QByteArray::fromRawData(testData, sizeof(testData) - 1)));
-        ASSERT_EQ(auth.authScheme, nx_http::header::AuthScheme::digest);
+        ASSERT_EQ(auth.authScheme, nx::network::http::header::AuthScheme::digest);
         ASSERT_EQ(auth.digest->params.size(), 4);
         ASSERT_EQ(auth.digest->params["realm"], "AXIS_ACCC8E338EDF");
         ASSERT_EQ(auth.digest->params["algorithm"], "MD5");
@@ -533,9 +532,9 @@ TEST(HttpHeaderTest, Authorization_parse)
     {
         static const char testData[] = "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
 
-        nx_http::header::Authorization auth;
+        nx::network::http::header::Authorization auth;
         ASSERT_TRUE(auth.parse(QByteArray::fromRawData(testData, sizeof(testData) - 1)));
-        ASSERT_EQ(auth.authScheme, nx_http::header::AuthScheme::basic);
+        ASSERT_EQ(auth.authScheme, nx::network::http::header::AuthScheme::basic);
         ASSERT_EQ(auth.basic->userid, "Aladdin");
         ASSERT_EQ(auth.basic->password, "open sesame");
     }
@@ -550,7 +549,7 @@ TEST(HttpHeaderTest, parseDigestAuthParams)
             "realm=networkoptix; auth=YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D; "
             "auth_rtsp=YWRtaW46NTFkMWMzZTUxZDc1MDo3M2I1MDVhYTMzNjcyNDZmNDEzYWQ2ZThkZjg1MDRkZQ%3D%3D; "
             "response=6b09bbab1f0f8417fb5ff0772da42bc4; username=admin";
-        QMap<nx_http::BufferType, nx_http::BufferType> params;
+        QMap<nx::network::http::BufferType, nx::network::http::BufferType> params;
         nx::utils::parseNameValuePairs(
             QByteArray::fromRawData(testData, sizeof(testData) - 1),
             ';',
@@ -564,7 +563,7 @@ TEST(HttpHeaderTest, KeepAlive_parse)
     {
         static const char testData[] = "timeout=60, max=100";
 
-        nx_http::header::KeepAlive keepAlive;
+        nx::network::http::header::KeepAlive keepAlive;
         ASSERT_TRUE(keepAlive.parse(testData));
         ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
         ASSERT_TRUE(static_cast<bool>(keepAlive.max));
@@ -574,7 +573,7 @@ TEST(HttpHeaderTest, KeepAlive_parse)
     {
         static const char testData[] = "  timeout=60 ";
 
-        nx_http::header::KeepAlive keepAlive;
+        nx::network::http::header::KeepAlive keepAlive;
         ASSERT_TRUE(keepAlive.parse(testData));
         ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
         ASSERT_FALSE(static_cast<bool>(keepAlive.max));
@@ -583,7 +582,7 @@ TEST(HttpHeaderTest, KeepAlive_parse)
     {
         static const char testData[] = "  timeout=60  , max=100  ";
 
-        nx_http::header::KeepAlive keepAlive;
+        nx::network::http::header::KeepAlive keepAlive;
         ASSERT_TRUE(keepAlive.parse(testData));
         ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
         ASSERT_TRUE(static_cast<bool>(keepAlive.max));
@@ -593,7 +592,7 @@ TEST(HttpHeaderTest, KeepAlive_parse)
     {
         static const char testData[] = " max=100  ";
 
-        nx_http::header::KeepAlive keepAlive;
+        nx::network::http::header::KeepAlive keepAlive;
         ASSERT_FALSE(keepAlive.parse(testData));
     }
 }
@@ -607,8 +606,8 @@ class HttpHeaderServer:
 protected:
     void test(
         bool isValid,
-        const nx_http::header::Server& serverHeader,
-        nx_http::StringType serializedValue)
+        const nx::network::http::header::Server& serverHeader,
+        nx::network::http::StringType serializedValue)
     {
         if (isValid)
             testSerialization(serverHeader, serializedValue);
@@ -618,10 +617,10 @@ protected:
 
     void testParsing(
         bool isValid,
-        const nx_http::header::Server& serverHeader,
-        nx_http::StringType serializedValue)
+        const nx::network::http::header::Server& serverHeader,
+        nx::network::http::StringType serializedValue)
     {
-        using namespace nx_http::header;
+        using namespace nx::network::http::header;
 
         Server headerToParse;
         ASSERT_EQ(isValid, headerToParse.parse(serializedValue));
@@ -632,8 +631,8 @@ protected:
     }
 
     void testSerialization(
-        const nx_http::header::Server& serverHeader,
-        nx_http::StringType expectedSerializedValue)
+        const nx::network::http::header::Server& serverHeader,
+        nx::network::http::StringType expectedSerializedValue)
     {
         const auto result = serverHeader.toString();
         ASSERT_TRUE(result.startsWith(expectedSerializedValue));
@@ -642,73 +641,78 @@ protected:
 
 TEST_F(HttpHeaderServer, single_product_without_comment)
 {
-    nx_http::header::Server serverHeader;
+    nx::network::http::header::Server serverHeader;
     serverHeader.products.clear();
     serverHeader.products.push_back(
-        nx_http::header::Server::Product{
+        nx::network::http::header::Server::Product{
         "ProductName", nx::utils::SoftwareVersion("1.2.3.4"), "" });
     test(true, serverHeader, "ProductName/1.2.3.4");
 }
 
 TEST_F(HttpHeaderServer, single_product_without_version)
 {
-    nx_http::header::Server serverHeader;
+    nx::network::http::header::Server serverHeader;
     serverHeader.products.clear();
     serverHeader.products.push_back(
-        nx_http::header::Server::Product{ "ProductName", boost::none, "" });
+        nx::network::http::header::Server::Product{ "ProductName", boost::none, "" });
     test(true, serverHeader, "ProductName");
 }
 
 TEST_F(HttpHeaderServer, multile_products)
 {
-    nx_http::header::Server serverHeader;
+    nx::network::http::header::Server serverHeader;
     serverHeader.products.clear();
     serverHeader.products.push_back(
-        nx_http::header::Server::Product{
+        nx::network::http::header::Server::Product{
         "Product1", nx::utils::SoftwareVersion("1.2.3.4"), "" });
     serverHeader.products.push_back(
-        nx_http::header::Server::Product{
+        nx::network::http::header::Server::Product{
         "Product2", nx::utils::SoftwareVersion("5.6.7.8"), "comment2" });
     test(true, serverHeader, "Product1/1.2.3.4 Product2/5.6.7.8 (comment2)");
 }
 
 TEST_F(HttpHeaderServer, empty_string)
 {
-    nx_http::header::Server serverHeader;
+    nx::network::http::header::Server serverHeader;
     serverHeader.products.clear();
     test(false, serverHeader, "");
 }
 
 TEST_F(HttpHeaderServer, empty_product_first)
 {
-    nx_http::header::Server serverHeader;
+    nx::network::http::header::Server serverHeader;
     test(false, serverHeader, "/1.2.3.4");
 }
 
 TEST_F(HttpHeaderServer, empty_product_not_first)
 {
-    nx_http::header::Server serverHeader;
+    nx::network::http::header::Server serverHeader;
     test(false, serverHeader, "Product1/1.2.3.4 /5.6.7.8 (comment2)");
 }
 
 TEST(Http_readHeader, int_value)
 {
-    nx_http::HttpHeaders headers;
+    nx::network::http::HttpHeaders headers;
     headers.emplace("Header1", "str");
     headers.emplace("Header2", "777");
 
     int value = 0;
 
-    ASSERT_TRUE(nx_http::readHeader(headers, "Header2", &value));
+    ASSERT_TRUE(nx::network::http::readHeader(headers, "Header2", &value));
     ASSERT_EQ(777, value);
 
-    ASSERT_TRUE(nx_http::readHeader(headers, "Header1", &value));
+    ASSERT_TRUE(nx::network::http::readHeader(headers, "Header1", &value));
     ASSERT_EQ(0, value);
 }
 
 TEST(Http_readHeader, missing_header)
 {
-    nx_http::HttpHeaders headers;
+    nx::network::http::HttpHeaders headers;
     int value = 0;
-    ASSERT_FALSE(nx_http::readHeader(headers, "Header3", &value));
+    ASSERT_FALSE(nx::network::http::readHeader(headers, "Header3", &value));
 }
+
+} // namespace header
+} // namespace nx
+} // namespace network
+} // namespace http

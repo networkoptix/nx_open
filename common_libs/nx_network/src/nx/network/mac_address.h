@@ -7,6 +7,9 @@
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
 
+namespace nx {
+namespace network {
+
 class NX_NETWORK_API QnMacAddress:
     public boost::equality_comparable<QnMacAddress,
         boost::less_than_comparable<QnMacAddress>>
@@ -48,5 +51,8 @@ private:
     } m_data;
 };
 
-Q_DECLARE_TYPEINFO(QnMacAddress, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(QnMacAddress)
+} // namespace network
+} // namespace nx
+
+Q_DECLARE_TYPEINFO(nx::network::QnMacAddress, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(nx::network::QnMacAddress)
