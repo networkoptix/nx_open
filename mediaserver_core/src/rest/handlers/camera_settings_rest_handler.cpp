@@ -49,7 +49,7 @@ int QnCameraSettingsRestHandler::executeGet(
     const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    NX_LOG(lit("QnCameraSettingsRestHandler: received request %1").arg(path), cl_logDEBUG1);
+    NX_LOG(this, lm("Received request %1").arg(path), cl_logDEBUG1);
 
     QString notFoundCameraId = QString::null;
     auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
@@ -59,6 +59,7 @@ int QnCameraSettingsRestHandler::executeGet(
         {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
+        NX_LOG(this, lm("Camera not found"), cl_logDEBUG1);
         if (notFoundCameraId.isNull())
             return CODE_BAD_REQUEST;
         else
@@ -70,6 +71,7 @@ int QnCameraSettingsRestHandler::executeGet(
         camera,
         Qn::Permission::ReadPermission))
     {
+        NX_LOG(this, lm("No Permissions to execute request %1").arg(path), cl_logWARNING);
         return nx_http::StatusCode::forbidden;
     }
 
@@ -94,8 +96,7 @@ int QnCameraSettingsRestHandler::executeGet(
     // TODO: It would be nice to fill reasonPhrase too.
     if (locParams.empty())
     {
-        NX_LOG(lit("QnCameraSettingsHandler. No valid param names in request %1").arg(path),
-            cl_logWARNING);
+        NX_LOG(this, lm("No valid param names in request %1").arg(path), cl_logWARNING);
         return CODE_BAD_REQUEST;
     }
 
@@ -117,7 +118,7 @@ int QnCameraSettingsRestHandler::executeGet(
     }
     else
     {
-        NX_LOG(lit("QnCameraSettingsHandler. Unknown command %1 in request %2. Ignoring...")
+        NX_LOG(this, lm("Unknown command %1 in request %2. Ignoring...")
             .arg(action).arg(path), cl_logWARNING);
         return CODE_NOT_FOUND;
     }
@@ -166,7 +167,7 @@ int QnCameraSettingsRestHandler::executeGet(
     QnCameraAdvancedParamValueList reply = awaitedParams.result;
     result.setReply(reply);
 
-    NX_LOG(lit("QnCameraSettingsHandler. Request %1 processed successfully for camera %2")
+    NX_LOG(this, lm("Request %1 processed successfully for camera %2")
         .arg(path).arg(camera->getId().toString()),
         cl_logDEBUG1);
     return CODE_OK;
