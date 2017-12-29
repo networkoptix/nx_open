@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="NxToolQml">
+            <Directory Id="dir9C8773571D896EA344563E5ACF12A753" Name="Qt">
+                <Directory Id="dir5AF2E3C0A775F24AF8D5F9B68B675EAC" Name="labs">
+                    <Directory Id="dir43991D9009BF3356F068ABF59161EAAB" Name="folderlistmodel">
+                        <Component Id="cmp7D49716E02A3B8D5A56B142A5E727137" Guid="*">
+                            <File Id="filE4EAB71347B191B9CC15BA04FDF6FC07" KeyPath="yes" Source="$(var.NxToolQmlDir)\Qt\labs\folderlistmodel\plugins.qmltypes" />
+                        </Component>
+                        <Component Id="cmpAF0EAD9428E60675884C650463FAD2C8" Guid="*">
+                            <File Id="fil892AD2DC0734A3AF54EA4292BF182099" KeyPath="yes" Source="$(var.NxToolQmlDir)\Qt\labs\folderlistmodel\qmldir" />
+                        </Component>
+                        <Component Id="cmpB00453FEE7D26303A662A7F3E9CD4AFA" Guid="*">
+                            <File Id="fil4685CEADB21550B2A37E38569BA3701D" KeyPath="yes" Source="$(var.NxToolQmlDir)\Qt\labs\folderlistmodel\qmlfolderlistmodelplugin.dll" />
+                        </Component>
+                    </Directory>
+                    <Directory Id="dirE633FC7CD7A043BE5B1508F75141C841" Name="settings">
+                        <Component Id="cmpC55785AEFF29C915BEA0CA07F4EFC1EC" Guid="*">
+                            <File Id="fil114E1731A705B7D9D852637E1B46A50F" KeyPath="yes" Source="$(var.NxToolQmlDir)\Qt\labs\settings\plugins.qmltypes" />
+                        </Component>
+                        <Component Id="cmp2FEC10322B34E30182D9ACE2F0320C3C" Guid="*">
+                            <File Id="fil9DD8C1A274E43BFE0E498295D0928400" KeyPath="yes" Source="$(var.NxToolQmlDir)\Qt\labs\settings\qmldir" />
+                        </Component>
+                        <Component Id="cmp06F0F9389D22EEB1F1033575605B7497" Guid="*">
+                            <File Id="fil50ACDF9713FD0E103956B0CCD8886383" KeyPath="yes" Source="$(var.NxToolQmlDir)\Qt\labs\settings\qmlsettingsplugin.dll" />
+                        </Component>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id="dir9DDBBBF981422962C3E36F59D6439AAC" Name="QtGraphicalEffects">
+                <Component Id="cmpA58F5A345697CB8FE13D29BAA34AE45F" Guid="*">
+                    <File Id="filB7953BF46E19C7B91288DF990FFF6579" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\Blend.qml" />
+                </Component>
+                <Component Id="cmp1FCC54EE6A07707DDFC868F981BADDCD" Guid="*">
+                    <File Id="fil7036EBD931CA8FCB7A4393D7EB3C20C7" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\BrightnessContrast.qml" />
+                </Component>
+                <Component Id="cmp3D34ADA72E9FC0D2C010D18416D26920" Guid="*">
+                    <File Id="fil656C675AF67E99B4E674D4396012C666" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\Colorize.qml" />
+                </Component>
+                <Component Id="cmp98BE8CCB2DE79B9F8B229F5329822EB1" Guid="*">
+                    <File Id="fil0329CBF0A978ABC71CAB30E02A092997" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\ColorOverlay.qml" />
+                </Component>
+                <Component Id="cmp71C116DD84889D190C0346046BEBBBD1" Guid="*">
+                    <File Id="filE46D083C2DA99DC7FCA3AC8C05E8D334" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\ConicalGradient.qml" />
+                </Component>
+                <Component Id="cmpC2B01FC097928C6C5FDE03ECDF3123F1" Guid="*">
+                    <File Id="filDDACA35C42E0B26FE1E4122846CBAB51" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\Desaturate.qml" />
+                </Component>
+                <Component Id="cmp9D45FAFFD55BB01C88CE76B93B3A9AC3" Guid="*">
+                    <File Id="fil814AEBF32611C644B8A6288563B152B5" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\DirectionalBlur.qml" />
+                </Component>
+                <Component Id="cmp277818AA15702B40AAF80E17EC826364" Guid="*">
+                    <File Id="filC5BDBD0C354A9092DC1C84D94AEADD9A" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\Displace.qml" />
+                </Component>
+                <Component Id="cmp3C66C019B77E1A2B2982600B505C7982" Guid="*">
+                    <File Id="fil2B95D0D9C295A6E2075F99C239EDF650" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\DropShadow.qml" />
+                </Component>
+                <Component Id="cmpF1E135E792D2994432C99F455B221C30" Guid="*">
+                    <File Id="fil55645154296491B37630ECAD9930BA59" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\FastBlur.qml" />
+                </Component>
+                <Component Id="cmp0085554A59ED731B75D0057D4C5C0956" Guid="*">
+                    <File Id="fil648114095D10577FC1248F1D39A516C5" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\GammaAdjust.qml" />
+                </Component>
+                <Component Id="cmp0F07C3E5980EB3AA8437F96DE68364CD" Guid="*">
+                    <File Id="filCAE4A6D819F32B8F4D35251440EB4B6B" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\GaussianBlur.qml" />
+                </Component>
+                <Component Id="cmp406624646099E8F8E00603C84F173580" Guid="*">
+                    <File Id="fil73457DC7403D2AFEAE6E971162498A07" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\Glow.qml" />
+                </Component>
+                <Component Id="cmpB259F041B68FC6D874A0DB8F88F6D943" Guid="*">
+                    <File Id="filF579DDEC5B33F80581A50AB917541F98" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\HueSaturation.qml" />
+                </Component>
+                <Component Id="cmpE608B2B4C7B1F6A8B4AA97C31DC4820C" Guid="*">
+                    <File Id="fil94846D17F8F57AFA2F8AC7FE16EC70E2" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\InnerShadow.qml" />
+                </Component>
+                <Component Id="cmp8646FE026F2CFDD1389902DECBFD6758" Guid="*">
+                    <File Id="filD12F2F55347A98201DA5374637F26008" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\LevelAdjust.qml" />
+                </Component>
+                <Component Id="cmp6067FDED1FD91F305C95556551B165A2" Guid="*">
+                    <File Id="fil76C205A588B2B90A3104EA4A60F90089" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\LinearGradient.qml" />
+                </Component>
+                <Component Id="cmp886B68E62ED31E51A353CA1095D5FA57" Guid="*">
+                    <File Id="fil2429F5F779A01E6A3959612D61CB3BBC" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\MaskedBlur.qml" />
+                </Component>
+                <Component Id="cmp05E97D264884BE36A43B7B2CF32651B0" Guid="*">
+                    <File Id="fil95114A8D6906AAB03482FC8F5428C757" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\OpacityMask.qml" />
+                </Component>
+                <Component Id="cmp35B35BEA21AB102DD592B1B02B4756CC" Guid="*">
+                    <File Id="filB1E32D0F8D592CBC86D9DE7698E1A35B" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\qmldir" />
+                </Component>
+                <Component Id="cmp32DDE03570B0DABF1ECCBD467A97B2B1" Guid="*">
+                    <File Id="filC23E374A45E5024A5C56D5889586405E" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\RadialBlur.qml" />
+                </Component>
+                <Component Id="cmp691B8029AE5702E0E070F09992870BB8" Guid="*">
+                    <File Id="fil96B86B5FAA229E4B00B48B7949F27072" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\RadialGradient.qml" />
+                </Component>
+                <Component Id="cmpB7DB855126BF3A6F56BE841149B6A706" Guid="*">
+                    <File Id="filA4FCC62114340687A5A637628344F450" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\RectangularGlow.qml" />
+                </Component>
+                <Component Id="cmpB6CE456BE8EDE172E5CC673FCFC29D67" Guid="*">
+                    <File Id="filE8428AA849002844B5AF24B79709050E" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\RecursiveBlur.qml" />
+                </Component>
+                <Component Id="cmpFCE4063353F8BBACA704D038C74C728B" Guid="*">
+                    <File Id="fil38AC0B63D3D65B2F0EC7C45E8CF53152" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\ThresholdMask.qml" />
+                </Component>
+                <Component Id="cmpCFC08B7E932A5B3447E98D49E31A61BB" Guid="*">
+                    <File Id="fil26403D1A47B26AF47883920B816A2BC9" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\ZoomBlur.qml" />
+                </Component>
+                <Directory Id="dir0FC12E1D24CE103657F08FA87B765C2D" Name="private">
+                    <Component Id="cmp940FCB4D78A1CFF8FF2A98E73C2C4120" Guid="*">
+                        <File Id="filE0FEE97709B3163151D38E6F99520A14" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\DropShadowBase.qml" />
+                    </Component>
+                    <Component Id="cmp30FBE0A928BCDC0D9B3AC7AC879E72EE" Guid="*">
+                        <File Id="filD681E8371BB9C62C39F8CCEB7EE82C04" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\FastGlow.qml" />
+                    </Component>
+                    <Component Id="cmp63A4A55F7B8E3947F78FA88014193A04" Guid="*">
+                        <File Id="fil45CD1F83B3E53653ED2447311D776B24" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\FastInnerShadow.qml" />
+                    </Component>
+                    <Component Id="cmpAABB8D317131CD2C2BBDCE0BDB29AE2C" Guid="*">
+                        <File Id="fil8F3044608B0A1E916C1F9ECDBC57EEBB" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\FastMaskedBlur.qml" />
+                    </Component>
+                    <Component Id="cmp0905707403B53F2F9D89EAFA98518920" Guid="*">
+                        <File Id="filF65F6B28723FA7B11E810E6E7F5986B0" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\GaussianDirectionalBlur.qml" />
+                    </Component>
+                    <Component Id="cmpDFD4E680AF436C85C4487A9BA294DFFC" Guid="*">
+                        <File Id="fil8B2C5EA72EAD8E9E9BEBAECE3AB1797F" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\GaussianGlow.qml" />
+                    </Component>
+                    <Component Id="cmp861E2940B4ED32AB02E3AC8B41926ED4" Guid="*">
+                        <File Id="fil8C2650436459C4450F287ED9B4E14D47" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\GaussianInnerShadow.qml" />
+                    </Component>
+                    <Component Id="cmp957CDC73FE275B5E97179709C8108EB6" Guid="*">
+                        <File Id="fil17DA64D6D34C83454A875C5F51156DC2" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\GaussianMaskedBlur.qml" />
+                    </Component>
+                    <Component Id="cmpE6273D024AD1EE1800AA58599193461D" Guid="*">
+                        <File Id="filD536F44B55FCE250411686829AEA421D" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\qmldir" />
+                    </Component>
+                    <Component Id="cmp2C3C7DC7C5917643FDEE25476B62F098" Guid="*">
+                        <File Id="filA18289B1254CF0DFBFAA0D1F0DCA2446" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtGraphicalEffects\private\qtgraphicaleffectsprivate.dll" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="dir3A6910F660DEA32FE2B46EF953F115E4" Name="QtQml">
+                <Directory Id="dir299A1CDD18C43E87EC02527431446E4E" Name="Models.2">
+                    <Component Id="cmp79C42BEF5AC5C4A004D45E2D5C7ACF11" Guid="*">
+                        <File Id="filC54BDCD992EC32FB53DA0E6A732E4C63" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQml\Models.2\modelsplugin.dll" />
+                    </Component>
+                    <Component Id="cmp60FAC9A0E5FD94D77EDE07D5B04B5E27" Guid="*">
+                        <File Id="filFA947B93E2A7343495513A25537D0ECE" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQml\Models.2\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmp8384F43CF4751C42B94E0D51AF07307A" Guid="*">
+                        <File Id="fil54D7E5EF0E774C30FB65C516C5EAA4AC" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQml\Models.2\qmldir" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="dirFF670C90CBA578EB7348E9D3C56D94FB" Name="QtQuick">
+                <Directory Id="dir7F0F300F6F0F7F4CD5EDC24B35B44341" Name="Controls">
+                    <Component Id="cmpF8E46AD53E8E4EC14DCC0DD45499C34C" Guid="*">
+                        <File Id="fil32957949D5E8AD976BFCAFB4BCBC6DB5" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Controls\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmpB21A9C8BC74B536C22729EEEC1F838A3" Guid="*">
+                        <File Id="fil768C476870B6117C1C512DA864B7C789" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Controls\qmldir" />
+                    </Component>
+                    <Component Id="cmp057430396F59F0AD5A2642E8C65B1E2B" Guid="*">
+                        <File Id="fil7203F328FC9200BD9CF5FB888DBCEDF1" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Controls\qtquickcontrolsplugin.dll" />
+                    </Component>
+                    <Directory Id="dir4D1D821C859F664F486515D3EB3B70FB" Name="Styles">
+                        <Component Id="cmpB70019A299121D7E734B58EB175BEDDD" Guid="*">
+                            <File Id="filCF4929E3A9BBB37FD0B07BFC7C021BA9" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Controls\Styles\qmldir" />
+                        </Component>
+                        <Directory Id="dir09F20926F6FF49AEDACE47191EC55E9A" Name="Flat">
+                            <Component Id="cmp615C88B9EC770F611EBB7E555AD582E1" Guid="*">
+                                <File Id="filDF71B721B25840018DBB6F900D08E99E" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Controls\Styles\Flat\qmldir" />
+                            </Component>
+                            <Component Id="cmp5F4E9A5998FD50C9E2673AAEB9199780" Guid="*">
+                                <File Id="fil4F1DF6BBA5FCADF8DC7D53455F0E5677" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Controls\Styles\Flat\qtquickextrasflatplugin.dll" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                </Directory>
+                <Directory Id="dirBD858956A4DCAC5B81FC85B71403AFCD" Name="Dialogs">
+                    <Component Id="cmp351F1BE5AB85EE36E21E8DC5CB623C8B" Guid="*">
+                        <File Id="filAB3FC49EB466CBB137A2DAE1A413E43F" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Dialogs\dialogplugin.dll" />
+                    </Component>
+                    <Component Id="cmpF357DAA123AEBE6546D655D73D13C549" Guid="*">
+                        <File Id="fil60DABCF4807CC392F7139FF9C6313EA1" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Dialogs\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmp2305A57C513F86F620480AF1C7E6128A" Guid="*">
+                        <File Id="filCFEE2B5FBADBFA955513A82173023B6A" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Dialogs\qmldir" />
+                    </Component>
+                    <Directory Id="dirD5B13229F6B567A43AF18BA616E180E2" Name="Private">
+                        <Component Id="cmp1091AC55E2EE0CAC2B70F644DE653884" Guid="*">
+                            <File Id="filF640F4CA270488CFCB0C36AA8424098A" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Dialogs\Private\dialogsprivateplugin.dll" />
+                        </Component>
+                        <Component Id="cmp0BE1BE2F2494AD8B6799427EDA91177D" Guid="*">
+                            <File Id="fil22402905FBC1B1CACE6E12D847CDDB02" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Dialogs\Private\plugins.qmltypes" />
+                        </Component>
+                        <Component Id="cmpF48A6702FF4CE03BE0D03E9C5D9FC991" Guid="*">
+                            <File Id="fil4DFB889E8FC5D65187A8A0C0AECC9000" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Dialogs\Private\qmldir" />
+                        </Component>
+                    </Directory>
+                </Directory>
+                <Directory Id="dir9C05B348071AA49279D0F4E4688213FA" Name="Extras">
+                    <Component Id="cmp6C6A7418E707115CBD3211AACB3F3C36" Guid="*">
+                        <File Id="filB867C1DC17D49754310B5477673844A8" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Extras\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmpC52C82415E8BC30E9E797BEE7B770924" Guid="*">
+                        <File Id="fil57E17D8092794B3AB9E3205E961B9DEF" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Extras\qmldir" />
+                    </Component>
+                    <Component Id="cmp2086062FB13A22FAC21FA259C76BD8B8" Guid="*">
+                        <File Id="fil3BEC44EF9BDE5C4F4D143E15559023DA" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Extras\qtquickextrasplugin.dll" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir0DDD126DC2FEFC693379D1BCE319DE25" Name="Layouts">
+                    <Component Id="cmpE7575DBB8915F41B0BA7154A18E8BEC8" Guid="*">
+                        <File Id="filB8B104A98421B8310F4CB28FCEE44A68" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Layouts\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmp5C5787F46A5A20081B57CDDB705D02B3" Guid="*">
+                        <File Id="fil1DF3EAE0FD390EB19DA4B6D80D7D3A9D" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Layouts\qmldir" />
+                    </Component>
+                    <Component Id="cmpFEAE296DEA465283F0E764FA914C918E" Guid="*">
+                        <File Id="fil6717ACD97238B34B1B61E6C0817DBB72" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Layouts\qquicklayoutsplugin.dll" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir940573B3BEE9AD402EC042DE57C41162" Name="PrivateWidgets">
+                    <Component Id="cmpBD6995A9F406167CEE538C975CA5991E" Guid="*">
+                        <File Id="filE8807575475F46908FE65D605DCFFEC9" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\PrivateWidgets\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmp4DB64AC45FA577551CDC3ABA1A743222" Guid="*">
+                        <File Id="fil61D0E46A6EC3EE821F560A5D4B0B5406" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\PrivateWidgets\qmldir" />
+                    </Component>
+                    <Component Id="cmp0BC4E53D2C76903738342FDD71671345" Guid="*">
+                        <File Id="filE8C16EB1D1D2AA44306F9136CB2660B7" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\PrivateWidgets\widgetsplugin.dll" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir5FCF6121B11790282F6C470296B44B2C" Name="Window.2">
+                    <Component Id="cmpA16125E3D6FE79384234BE108C50DD0F" Guid="*">
+                        <File Id="fil43B2BCC63676A7A53D89E4EC613BB936" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Window.2\plugins.qmltypes" />
+                    </Component>
+                    <Component Id="cmp893349A55A23DC4619BAF81F424CF305" Guid="*">
+                        <File Id="fil3C4501D4C1E3CE7E707A77C79A8851B4" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Window.2\qmldir" />
+                    </Component>
+                    <Component Id="cmp2CC39AA80FFF30D100C8222E5EEE6776" Guid="*">
+                        <File Id="fil0E386D4D622788E0B8078214F6774DD0" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick\Window.2\windowplugin.dll" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="dir84A1AABFA94E2C579B660118C9584657" Name="QtQuick.2">
+                <Component Id="cmp8AE4C674BD6071C7216AF63D102282C1" Guid="*">
+                    <File Id="filCCE3C7C4C4CAEDFB152D3FC960BEAB09" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick.2\plugins.qmltypes" />
+                </Component>
+                <Component Id="cmp861D5280FA2D395CDE85AD7A0EA563D8" Guid="*">
+                    <File Id="fil72E4F6F93371A55A360EF2847F3BC09D" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick.2\qmldir" />
+                </Component>
+                <Component Id="cmpB6C85B902D55823CBF569EE886EDD49B" Guid="*">
+                    <File Id="fil8CBC9C648DFDBE70DDED51B5FCFBBAB8" KeyPath="yes" Source="$(var.NxToolQmlDir)\QtQuick.2\qtquick2plugin.dll" />
+                </Component>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="NxToolQmlComponent">
+            <ComponentRef Id="cmp7D49716E02A3B8D5A56B142A5E727137" />
+            <ComponentRef Id="cmpAF0EAD9428E60675884C650463FAD2C8" />
+            <ComponentRef Id="cmpB00453FEE7D26303A662A7F3E9CD4AFA" />
+            <ComponentRef Id="cmpC55785AEFF29C915BEA0CA07F4EFC1EC" />
+            <ComponentRef Id="cmp2FEC10322B34E30182D9ACE2F0320C3C" />
+            <ComponentRef Id="cmp06F0F9389D22EEB1F1033575605B7497" />
+            <ComponentRef Id="cmpA58F5A345697CB8FE13D29BAA34AE45F" />
+            <ComponentRef Id="cmp1FCC54EE6A07707DDFC868F981BADDCD" />
+            <ComponentRef Id="cmp3D34ADA72E9FC0D2C010D18416D26920" />
+            <ComponentRef Id="cmp98BE8CCB2DE79B9F8B229F5329822EB1" />
+            <ComponentRef Id="cmp71C116DD84889D190C0346046BEBBBD1" />
+            <ComponentRef Id="cmpC2B01FC097928C6C5FDE03ECDF3123F1" />
+            <ComponentRef Id="cmp9D45FAFFD55BB01C88CE76B93B3A9AC3" />
+            <ComponentRef Id="cmp277818AA15702B40AAF80E17EC826364" />
+            <ComponentRef Id="cmp3C66C019B77E1A2B2982600B505C7982" />
+            <ComponentRef Id="cmpF1E135E792D2994432C99F455B221C30" />
+            <ComponentRef Id="cmp0085554A59ED731B75D0057D4C5C0956" />
+            <ComponentRef Id="cmp0F07C3E5980EB3AA8437F96DE68364CD" />
+            <ComponentRef Id="cmp406624646099E8F8E00603C84F173580" />
+            <ComponentRef Id="cmpB259F041B68FC6D874A0DB8F88F6D943" />
+            <ComponentRef Id="cmpE608B2B4C7B1F6A8B4AA97C31DC4820C" />
+            <ComponentRef Id="cmp8646FE026F2CFDD1389902DECBFD6758" />
+            <ComponentRef Id="cmp6067FDED1FD91F305C95556551B165A2" />
+            <ComponentRef Id="cmp886B68E62ED31E51A353CA1095D5FA57" />
+            <ComponentRef Id="cmp05E97D264884BE36A43B7B2CF32651B0" />
+            <ComponentRef Id="cmp35B35BEA21AB102DD592B1B02B4756CC" />
+            <ComponentRef Id="cmp32DDE03570B0DABF1ECCBD467A97B2B1" />
+            <ComponentRef Id="cmp691B8029AE5702E0E070F09992870BB8" />
+            <ComponentRef Id="cmpB7DB855126BF3A6F56BE841149B6A706" />
+            <ComponentRef Id="cmpB6CE456BE8EDE172E5CC673FCFC29D67" />
+            <ComponentRef Id="cmpFCE4063353F8BBACA704D038C74C728B" />
+            <ComponentRef Id="cmpCFC08B7E932A5B3447E98D49E31A61BB" />
+            <ComponentRef Id="cmp940FCB4D78A1CFF8FF2A98E73C2C4120" />
+            <ComponentRef Id="cmp30FBE0A928BCDC0D9B3AC7AC879E72EE" />
+            <ComponentRef Id="cmp63A4A55F7B8E3947F78FA88014193A04" />
+            <ComponentRef Id="cmpAABB8D317131CD2C2BBDCE0BDB29AE2C" />
+            <ComponentRef Id="cmp0905707403B53F2F9D89EAFA98518920" />
+            <ComponentRef Id="cmpDFD4E680AF436C85C4487A9BA294DFFC" />
+            <ComponentRef Id="cmp861E2940B4ED32AB02E3AC8B41926ED4" />
+            <ComponentRef Id="cmp957CDC73FE275B5E97179709C8108EB6" />
+            <ComponentRef Id="cmpE6273D024AD1EE1800AA58599193461D" />
+            <ComponentRef Id="cmp2C3C7DC7C5917643FDEE25476B62F098" />
+            <ComponentRef Id="cmp79C42BEF5AC5C4A004D45E2D5C7ACF11" />
+            <ComponentRef Id="cmp60FAC9A0E5FD94D77EDE07D5B04B5E27" />
+            <ComponentRef Id="cmp8384F43CF4751C42B94E0D51AF07307A" />
+            <ComponentRef Id="cmpF8E46AD53E8E4EC14DCC0DD45499C34C" />
+            <ComponentRef Id="cmpB21A9C8BC74B536C22729EEEC1F838A3" />
+            <ComponentRef Id="cmp057430396F59F0AD5A2642E8C65B1E2B" />
+            <ComponentRef Id="cmpB70019A299121D7E734B58EB175BEDDD" />
+            <ComponentRef Id="cmp615C88B9EC770F611EBB7E555AD582E1" />
+            <ComponentRef Id="cmp5F4E9A5998FD50C9E2673AAEB9199780" />
+            <ComponentRef Id="cmp351F1BE5AB85EE36E21E8DC5CB623C8B" />
+            <ComponentRef Id="cmpF357DAA123AEBE6546D655D73D13C549" />
+            <ComponentRef Id="cmp2305A57C513F86F620480AF1C7E6128A" />
+            <ComponentRef Id="cmp1091AC55E2EE0CAC2B70F644DE653884" />
+            <ComponentRef Id="cmp0BE1BE2F2494AD8B6799427EDA91177D" />
+            <ComponentRef Id="cmpF48A6702FF4CE03BE0D03E9C5D9FC991" />
+            <ComponentRef Id="cmp6C6A7418E707115CBD3211AACB3F3C36" />
+            <ComponentRef Id="cmpC52C82415E8BC30E9E797BEE7B770924" />
+            <ComponentRef Id="cmp2086062FB13A22FAC21FA259C76BD8B8" />
+            <ComponentRef Id="cmpE7575DBB8915F41B0BA7154A18E8BEC8" />
+            <ComponentRef Id="cmp5C5787F46A5A20081B57CDDB705D02B3" />
+            <ComponentRef Id="cmpFEAE296DEA465283F0E764FA914C918E" />
+            <ComponentRef Id="cmpBD6995A9F406167CEE538C975CA5991E" />
+            <ComponentRef Id="cmp4DB64AC45FA577551CDC3ABA1A743222" />
+            <ComponentRef Id="cmp0BC4E53D2C76903738342FDD71671345" />
+            <ComponentRef Id="cmpA16125E3D6FE79384234BE108C50DD0F" />
+            <ComponentRef Id="cmp893349A55A23DC4619BAF81F424CF305" />
+            <ComponentRef Id="cmp2CC39AA80FFF30D100C8222E5EEE6776" />
+            <ComponentRef Id="cmp8AE4C674BD6071C7216AF63D102282C1" />
+            <ComponentRef Id="cmp861D5280FA2D395CDE85AD7A0EA563D8" />
+            <ComponentRef Id="cmpB6C85B902D55823CBF569EE886EDD49B" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>

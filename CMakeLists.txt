@@ -156,10 +156,13 @@ endif()
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
-add_subdirectory(common_libs)
-add_subdirectory(common)
-add_subdirectory(appserver2)
-add_subdirectory(nx_cloud)
+
+if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
+    add_subdirectory(common_libs)
+    add_subdirectory(common)
+    add_subdirectory(appserver2)
+    add_subdirectory(nx_cloud)
+endif()
 
 if(withMediaServer)
     add_subdirectory(mediaserver_core)

@@ -11,7 +11,6 @@ engine_tmp_folder = 'obj'
 # TODO: #GDM Remove filtered variables
 
 sign_binaries_option = '${windows.skip.sign}' != 'true'
-build_nxtool_option = '${nxtool}' == 'true'
 build_paxton_option = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
 installer_target_dir = '${installer.target.dir}'
@@ -73,16 +72,6 @@ server_components = [
     'UpgradeDlg',
     'SelectionWarning',
     'Product-server-only']
-
-nxtool_components = [
-    'NxtoolDlg',
-    'Nxtool',
-    'NxtoolQuickControls',
-    'NxtoolVcrt14',
-    'MyExitDialog',
-    'UpgradeDlg',
-    'SelectionWarning',
-    'Product-nxtool']
 
 paxton_components = [
     'AxClient',
@@ -188,26 +177,6 @@ def build_bundle():
         'bundle-exe',
         bundle_exe_file,
         full_exe_components,
-        candle_exe_variables)
-
-
-def build_nxtool():
-    candle_msi_variables = {
-        'NxtoolVcrt14DstDir': '${customization}NxtoolDir',
-        'NxtoolQuickControlsDir': '${NxtoolQuickControlsDir}',
-        'NxtoolQmlDir': '${project.build.directory}/nxtoolqml'
-    }
-    build_msi('nxtool-msi', nxtool_msi_file, nxtool_components, candle_msi_variables)
-
-    candle_exe_variables = {
-        'InstallerTargetDir': installer_target_dir,
-        'NxtoolMsiName': nxtool_msi_name,
-        'NxToolMsiFile': nxtool_msi_file
-    }
-    build_exe(
-        'nxtool-exe',
-        nxtool_exe_file,
-        nxtool_exe_components,
         candle_exe_variables)
 
 
