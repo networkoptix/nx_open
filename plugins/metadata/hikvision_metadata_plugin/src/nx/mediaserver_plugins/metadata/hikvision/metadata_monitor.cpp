@@ -123,7 +123,7 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
     m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, handler));
 
     m_httpClient = std::move(httpClient);
-    httpClient->doGet(m_url);
+    m_httpClient->doGet(m_url);
 }
 
 void HikvisionMetadataMonitor::at_responseReceived()
