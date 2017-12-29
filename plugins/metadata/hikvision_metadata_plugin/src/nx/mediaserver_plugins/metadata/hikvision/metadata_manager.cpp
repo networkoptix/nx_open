@@ -1,8 +1,5 @@
-#if defined(ENABLE_HANWHA)
-
-#include "hanwha_common.h"
-#include "hanwha_metadata_manager.h"
-#include "hanwha_attributes_parser.h"
+#include "common.h"
+#include "metadata_manager.h"
 
 #include <QtCore/QUrl>
 
@@ -10,26 +7,28 @@
 
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <plugins/plugin_internal_tools.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
 namespace plugins {
+namespace hikvision {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-HanwhaMetadataManager::HanwhaMetadataManager(HanwhaMetadataPlugin* plugin):
+MetadataManager::MetadataManager(MetadataPlugin* plugin):
     m_plugin(plugin)
 {
 }
 
-HanwhaMetadataManager::~HanwhaMetadataManager()
+MetadataManager::~MetadataManager()
 {
     stopFetchingMetadata();
-    m_plugin->managerIsAboutToBeDestroyed(m_sharedId);
 }
 
-void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataManager)
     {
@@ -45,35 +44,33 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error HanwhaMetadataManager::startFetchingMetadata(
+Error MetadataManager::startFetchingMetadata(
     AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
+    nxpl::NX_GUID* eventTypeList,
+    int eventTypeListSize)
 {
     auto monitorHandler =
-        [this](const HanwhaEventList& events)
+        [this](const HikvisionEventList& events)
         {
             using namespace std::chrono;
             auto packet = new CommonEventMetadataPacket();
 
-            for (const auto& hanwhaEvent : events)
+            for (const auto& hikvisionEvent : events)
             {
-                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
+                if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
                     return;
 
                 auto event = new CommonDetectedEvent();
-                std::cout
-                    << "---------------- (Metadata manager handler) Got event: "
-                    << hanwhaEvent.caption.toStdString() << " "
-                    << hanwhaEvent.description.toStdString() << " "
-                    << "Channel " << m_channel << std::endl;
+                NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
+                    .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
-                event->setEventTypeId(hanwhaEvent.typeId);
-                event->setCaption(hanwhaEvent.caption.toStdString());
-                event->setDescription(hanwhaEvent.caption.toStdString());
-                event->setIsActive(hanwhaEvent.isActive);
+                event->setEventTypeId(
+                    nxpt::NxGuidHelper::fromRawData(hikvisionEvent.typeId.toRfc4122()));
+                event->setCaption(hikvisionEvent.caption.toStdString());
+                event->setDescription(hikvisionEvent.caption.toStdString());
+                event->setIsActive(hikvisionEvent.isActive);
                 event->setConfidence(1.0);
-                event->setAuxilaryData(hanwhaEvent.fullEventName.toStdString());
+                //event->setAuxilaryData(hikvisionEvent.fullEventName.toStdString());
 
                 packet->setTimestampUsec(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -82,14 +79,15 @@ Error HanwhaMetadataManager::startFetchingMetadata(
                 packet->addEvent(event);
             }
 
-            std::cout << std::endl << std::endl;
             m_handler->handleMetadata(Error::noError, packet);
         };
 
     NX_ASSERT(m_plugin);
-    m_monitor = m_plugin->monitor(m_sharedId, m_url, m_auth);
-    if (!m_monitor)
-        return Error::unknownError;
+    std::vector<QnUuid> eventTypes;
+    for (int i = 0; i < eventTypeListSize; ++i)
+        eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(eventTypeList[i]));
+    m_monitor =
+        std::make_unique<HikvisionMetadataMonitor>(m_plugin->driverManifest(), m_url, m_auth, eventTypes);
 
     m_handler = handler;
 
@@ -99,14 +97,12 @@ Error HanwhaMetadataManager::startFetchingMetadata(
     return Error::noError;
 }
 
-Error HanwhaMetadataManager::stopFetchingMetadata()
+Error MetadataManager::stopFetchingMetadata()
 {
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
 
     NX_ASSERT(m_plugin);
-    if (m_plugin)
-        m_plugin->managerStoppedToUseMonitor(m_sharedId);
 
     m_monitor = nullptr;
     m_handler = nullptr;
@@ -114,7 +110,7 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
     return Error::noError;
 }
 
-const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
+const char* MetadataManager::capabilitiesManifest(Error* error) const
 {
     if (m_deviceManifest.isEmpty())
     {
@@ -126,7 +122,7 @@ const char* HanwhaMetadataManager::capabilitiesManifest(Error* error) const
     return m_deviceManifest.constData();
 }
 
-void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
+void MetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
 {
     m_url = resourceInfo.url;
     m_model = resourceInfo.model;
@@ -138,23 +134,17 @@ void HanwhaMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourc
     m_channel = resourceInfo.channel;
 }
 
-void HanwhaMetadataManager::setDeviceManifest(const QByteArray& manifest)
+void MetadataManager::setDeviceManifest(const QByteArray& manifest)
 {
     m_deviceManifest = manifest;
 }
 
-void HanwhaMetadataManager::setDriverManifest(const Hanwha::DriverManifest& manifest)
+void MetadataManager::setDriverManifest(const Hikvision::DriverManifest& manifest)
 {
     m_driverManifest = manifest;
 }
 
-void HanwhaMetadataManager::setMonitor(HanwhaMetadataMonitor* monitor)
-{
-    m_monitor = monitor;
-}
-
+} // namespace hikvision
 } // namespace plugins
 } // namespace mediaserver
 } // namespace nx
-
-#endif // defined(ENABLE_HANWHA)
