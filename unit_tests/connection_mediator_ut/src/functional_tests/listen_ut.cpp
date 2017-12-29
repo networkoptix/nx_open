@@ -66,13 +66,13 @@ protected:
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
         data::ListeningPeers listeningPeers;
 
         for (;;)
         {
             std::tie(statusCode, listeningPeers) = getListeningPeers();
-            ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
+            ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
             if (listeningPeers.systems.find(m_system.id) == listeningPeers.systems.end())
                 break;
 
@@ -110,8 +110,8 @@ private:
     nx::hpm::AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
     nx::String m_serverId;
-    std::vector<std::shared_ptr<nx::stun::AsyncClient>> m_serverConnections;
-    nx::utils::SyncQueue<nx::stun::AsyncClient*> m_closeConnectionEvents;
+    std::vector<std::shared_ptr<nx::network::stun::AsyncClient>> m_serverConnections;
+    nx::utils::SyncQueue<nx::network::stun::AsyncClient*> m_closeConnectionEvents;
 
     virtual void SetUp() override
     {
@@ -129,9 +129,9 @@ private:
     {
         using namespace std::placeholders;
 
-        auto stunClient = std::make_shared<nx::stun::AsyncClient>();
+        auto stunClient = std::make_shared<nx::network::stun::AsyncClient>();
         stunClient->connect(nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
+            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
         stunClient->setOnConnectionClosedHandler(
             std::bind(&ListeningPeer::saveConnectionClosedEvent, this, stunClient.get(), _1));
         auto connection = std::make_unique<nx::hpm::api::MediatorServerTcpConnection>(
@@ -160,7 +160,7 @@ private:
     }
 
     void saveConnectionClosedEvent(
-        nx::stun::AsyncClient* stunClient,
+        nx::network::stun::AsyncClient* stunClient,
         SystemError::ErrorCode /*systemErrorCode*/)
     {
         m_closeConnectionEvents.push(stunClient);
@@ -213,10 +213,10 @@ TEST_F(ListeningPeer, peer_disconnect)
 {
     using namespace nx::hpm;
 
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     data::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
-    ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
     ASSERT_EQ(1U, listeningPeers.systems.size());
 
     whenStopServer();

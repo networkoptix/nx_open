@@ -7,6 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
@@ -155,7 +156,7 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
             decltype(m_activeRequests) activeRequests;
             activeRequests.swap(m_activeRequests);
             for (auto& requestContext: activeRequests)
-                requestContext.second.handler(reason, nx::stun::Message());
+                requestContext.second.handler(reason, nx::network::stun::Message());
         });
 }
 
@@ -216,13 +217,13 @@ void AsyncClientWithHttpTunneling::connectInternal(
             handler(sysErrorCode);
         };
 
-    if (m_url.scheme() == nx_http::kUrlSchemeName ||
-        m_url.scheme() == nx_http::kSecureUrlSchemeName)
+    if (m_url.scheme() == nx::network::http::kUrlSchemeName ||
+        m_url.scheme() == nx::network::http::kSecureUrlSchemeName)
     {
         openHttpTunnel(lock, m_url, std::move(onConnected));
     }
-    else if (m_url.scheme() == nx::stun::kUrlSchemeName ||
-        m_url.scheme() == nx::stun::kSecureUrlSchemeName)
+    else if (m_url.scheme() == nx::network::stun::kUrlSchemeName ||
+        m_url.scheme() == nx::network::stun::kSecureUrlSchemeName)
     {
         createStunClient(lock, nullptr);
         m_stunClient->connect(m_url, std::move(onConnected));
@@ -257,7 +258,7 @@ void AsyncClientWithHttpTunneling::createStunClient(
     m_stunClient->setOnConnectionClosedHandler(
         std::bind(&AsyncClientWithHttpTunneling::onConnectionClosed, this, _1));
     m_stunClient->setIndicationHandler(
-        nx::stun::kEveryIndicationMethod,
+        nx::network::stun::kEveryIndicationMethod,
         std::bind(&AsyncClientWithHttpTunneling::dispatchIndication, this, _1),
         this);
 }
@@ -276,7 +277,7 @@ void AsyncClientWithHttpTunneling::sendPendingRequests()
 }
 
 void AsyncClientWithHttpTunneling::dispatchIndication(
-    nx::stun::Message indication)
+    nx::network::stun::Message indication)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -285,7 +286,7 @@ void AsyncClientWithHttpTunneling::dispatchIndication(
 
     auto it = m_indicationHandlers.find(indication.header.method);
     if (it == m_indicationHandlers.end())
-        it = m_indicationHandlers.find(nx::stun::kEveryIndicationMethod);
+        it = m_indicationHandlers.find(nx::network::stun::kEveryIndicationMethod);
 
     if (it == m_indicationHandlers.end())
     {
@@ -305,17 +306,17 @@ void AsyncClientWithHttpTunneling::openHttpTunnel(
     ConnectHandler handler)
 {
     m_connectHandler = std::move(handler);
-    m_httpClient = std::make_unique<nx_http::AsyncClient>();
+    m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_httpClient->bindToAioThread(getAioThread());
     m_httpClient->doUpgrade(
         url,
-        nx::stun::StunOverHttpServer::kStunProtocolName,
+        nx::network::stun::StunOverHttpServer::kStunProtocolName,
         std::bind(&AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone, this));
 }
 
 void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 {
-    std::unique_ptr<nx_http::AsyncClient> httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> httpClient;
     httpClient.swap(m_httpClient);
 
     if (httpClient->failed())
@@ -326,11 +327,11 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
         return;
     }
 
-    if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::switchingProtocols)
+    if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::switchingProtocols)
     {
         NX_DEBUG(this, lm("Connection to %1 failed with HTTP status %2")
             .arg(m_url)
-            .arg(nx_http::StatusCode::toString(httpClient->response()->statusLine.statusCode)));
+            .arg(nx::network::http::StatusCode::toString(httpClient->response()->statusLine.statusCode)));
         closeConnection(SystemError::connectionRefused);
         return;
     }
@@ -357,7 +358,7 @@ void AsyncClientWithHttpTunneling::onHttpConnectionUpgradeDone()
 
 void AsyncClientWithHttpTunneling::onRequestCompleted(
     SystemError::ErrorCode sysErrorCode,
-    nx::stun::Message response,
+    nx::network::stun::Message response,
     int requestId)
 {
     NX_ASSERT(isInSelfAioThread());
@@ -432,4 +433,5 @@ void AsyncClientWithHttpTunneling::onReconnectDone(SystemError::ErrorCode sysErr
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

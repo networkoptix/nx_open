@@ -105,7 +105,7 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
     m_offlineFreq = offlineFreq;
 }
 
-int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int size) {
+int QnTestCamera::sendAll(nx::network::AbstractStreamSocket* socket, const void* data, int size) {
     int sent = 0, sentTotal = 0;
     while (sentTotal < size) {
         sent = socket->send(static_cast<const quint8*>(data) + sentTotal, size - sentTotal);
@@ -126,7 +126,7 @@ int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int si
 }
 
 bool QnTestCamera::doStreamingFile(
-    const QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps)
+    const QList<QnCompressedVideoDataPtr> data, nx::network::AbstractStreamSocket* socket, int fps)
 {
     double streamingTime = 0;
     QTime timer;
@@ -204,7 +204,7 @@ bool QnTestCamera::doStreamingFile(
     return true;
 }
 
-void QnTestCamera::startStreaming(AbstractStreamSocket* socket, bool isSecondary, int fps)
+void QnTestCamera::startStreaming(nx::network::AbstractStreamSocket* socket, bool isSecondary, int fps)
 {
     int fileIndex = 0;
     QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;

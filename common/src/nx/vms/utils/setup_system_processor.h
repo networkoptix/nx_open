@@ -28,7 +28,7 @@ public:
     void setSystemSettingsProcessor(
         nx::vms::utils::SystemSettingsProcessor* systemSettingsProcessor);
 
-    nx_http::StatusCode::Value setupLocalSystem(
+    nx::network::http::StatusCode::Value setupLocalSystem(
         const QnAuthSession& authSession,
         const SetupLocalSystemData& data,
         QnJsonRestResult* result);

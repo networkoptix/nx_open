@@ -440,7 +440,7 @@ bool HanwhaChunkLoader::handleHttpError()
             scheduleNextRequest(kResendRequestIfFail);
         });
 
-    if (m_httpClient->state() == nx_http::AsyncClient::State::sFailed)
+    if (m_httpClient->state() == nx::network::http::AsyncClient::State::sFailed)
     {
         NX_WARNING(
             this,
@@ -453,7 +453,7 @@ bool HanwhaChunkLoader::handleHttpError()
     }
 
     const auto statusCode = m_httpClient->response()->statusLine.statusCode;
-    if (statusCode != nx_http::StatusCode::ok)
+    if (statusCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(
             this,
@@ -624,7 +624,7 @@ void HanwhaChunkLoader::parseOverlappedIdListData(const nx::Buffer& data)
 void HanwhaChunkLoader::prepareHttpClient()
 {
     const auto authenticator = m_resourceContext->authenticator();
-    m_httpClient = std::make_unique<nx_http::AsyncClient>();
+    m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_httpClient->setUserName(authenticator.user());
     m_httpClient->setUserPassword(authenticator.password());
     m_httpClient->setSendTimeout(kHttpTimeout);

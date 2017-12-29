@@ -28,5 +28,5 @@ int QnRuntimeInfoRestHandler::executeGet(
     }
 
     result.setReply(items);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

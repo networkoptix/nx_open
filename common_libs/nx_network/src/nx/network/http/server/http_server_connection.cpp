@@ -7,13 +7,15 @@
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 HttpServerConnection::HttpServerConnection(
     nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
-    nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-    nx_http::AbstractMessageDispatcher* const httpMessageDispatcher)
+    nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
+    nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher)
     :
     base_type(socketServer, std::move(sock)),
     m_authenticationManager(authenticationManager),
@@ -28,7 +30,7 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
     m_persistentConnectionEnabled = value;
 }
 
-void HttpServerConnection::processMessage(nx_http::Message requestMessage)
+void HttpServerConnection::processMessage(nx::network::http::Message requestMessage)
 {
     // TODO: #ak Incoming message body. Use AbstractMsgBodySource.
 
@@ -41,7 +43,7 @@ void HttpServerConnection::processMessage(nx_http::Message requestMessage)
     if (!m_authenticationManager)
     {
         onAuthenticationDone(
-            nx_http::server::SuccessfulAuthenticationResult(),
+            nx::network::http::server::SuccessfulAuthenticationResult(),
             std::move(requestMessage));
         return;
     }
@@ -49,16 +51,16 @@ void HttpServerConnection::processMessage(nx_http::Message requestMessage)
     authenticate(std::move(requestMessage));
 }
 
-void HttpServerConnection::authenticate(nx_http::Message requestMessage)
+void HttpServerConnection::authenticate(nx::network::http::Message requestMessage)
 {
-    const nx_http::Request& request = *requestMessage.request;
+    const nx::network::http::Request& request = *requestMessage.request;
     auto strongRef = shared_from_this();
     std::weak_ptr<HttpServerConnection> weakThis = strongRef;
     m_authenticationManager->authenticate(
         *this,
         request,
         [this, weakThis = std::move(weakThis), requestMessage = std::move(requestMessage)](
-            nx_http::server::AuthenticationResult authenticationResult) mutable
+            nx::network::http::server::AuthenticationResult authenticationResult) mutable
         {
             auto strongThis = weakThis.lock();
             if (!strongThis)
@@ -89,8 +91,8 @@ void HttpServerConnection::stopWhileInAioThread()
 }
 
 void HttpServerConnection::onAuthenticationDone(
-    nx_http::server::AuthenticationResult authenticationResult,
-    nx_http::Message requestMessage)
+    nx::network::http::server::AuthenticationResult authenticationResult,
+    nx::network::http::Message requestMessage)
 {
     RequestProcessingContext processingContext =
         prepareRequestProcessingContext(*requestMessage.request);
@@ -111,25 +113,25 @@ void HttpServerConnection::onAuthenticationDone(
 
 HttpServerConnection::RequestProcessingContext
     HttpServerConnection::prepareRequestProcessingContext(
-        const nx_http::Request& request)
+        const nx::network::http::Request& request)
 {
     RequestProcessingContext processingContext;
     processingContext.httpVersion = request.requestLine.version;
     processingContext.protocolToUpgradeTo =
-        nx_http::getHeaderValue(request.headers, "Upgrade");
+        nx::network::http::getHeaderValue(request.headers, "Upgrade");
     return processingContext;
 }
 
 void HttpServerConnection::sendUnauthorizedResponse(
     RequestProcessingContext processingContext,
-    nx_http::server::AuthenticationResult authenticationResult)
+    nx::network::http::server::AuthenticationResult authenticationResult)
 {
-    nx_http::Message response(nx_http::MessageType::response);
+    nx::network::http::Message response(nx::network::http::MessageType::response);
     std::move(
         authenticationResult.responseHeaders.begin(),
         authenticationResult.responseHeaders.end(),
         std::inserter(response.response->headers, response.response->headers.end()));
-    response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
+    response.response->statusLine.statusCode = nx::network::http::StatusCode::unauthorized;
     if (authenticationResult.wwwAuthenticate)
     {
         response.response->headers.emplace(
@@ -147,16 +149,16 @@ void HttpServerConnection::sendUnauthorizedResponse(
 
 void HttpServerConnection::dispatchRequest(
     RequestProcessingContext processingContext,
-    nx_http::server::AuthenticationResult authenticationResult,
-    nx_http::Message requestMessage)
+    nx::network::http::server::AuthenticationResult authenticationResult,
+    nx::network::http::Message requestMessage)
 {
     auto strongRef = shared_from_this();
     std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
     auto sendResponseFunc =
         [this, weakThis, processingContext](
-            nx_http::Message response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+            nx::network::http::Message response,
+            std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody,
             ConnectionEvents connectionEvents) mutable
         {
             auto strongThis = weakThis.lock();
@@ -179,8 +181,8 @@ void HttpServerConnection::dispatchRequest(
             std::move(authenticationResult.authInfo),
             std::move(sendResponseFunc)))
     {
-        nx_http::Message response(nx_http::MessageType::response);
-        response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
+        nx::network::http::Message response(nx::network::http::MessageType::response);
+        response.response->statusLine.statusCode = nx::network::http::StatusCode::notFound;
         return prepareAndSendResponse(
             std::move(processingContext),
             ResponseMessageContext(std::move(response), nullptr, ConnectionEvents()));
@@ -200,7 +202,7 @@ void HttpServerConnection::processResponse(
 
     NX_ASSERT(
         !responseMessageContext.msgBody ||
-        nx_http::StatusCode::isMessageBodyAllowed(
+        nx::network::http::StatusCode::isMessageBodyAllowed(
             responseMessageContext.msg.response->statusLine.statusCode));
 
     strongThis->post(
@@ -221,7 +223,7 @@ void HttpServerConnection::prepareAndSendResponse(
     responseMessageContext.msg.response->statusLine.version =
         std::move(processingContext.httpVersion);
     responseMessageContext.msg.response->statusLine.reasonPhrase =
-        nx_http::StatusCode::toString(
+        nx::network::http::StatusCode::toString(
             responseMessageContext.msg.response->statusLine.statusCode);
 
     if (responseMessageContext.msgBody)
@@ -247,64 +249,64 @@ void HttpServerConnection::prepareAndSendResponse(
 
 void HttpServerConnection::addResponseHeaders(
     const RequestProcessingContext& processingContext,
-    nx_http::Response* response,
-    nx_http::AbstractMsgBodySource* responseMsgBody)
+    nx::network::http::Response* response,
+    nx::network::http::AbstractMsgBodySource* responseMsgBody)
 {
     static const auto kYear = std::chrono::hours(24) * 365;
 
-    nx_http::insertOrReplaceHeader(
+    nx::network::http::insertOrReplaceHeader(
         &response->headers,
-        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
-    nx_http::insertOrReplaceHeader(
+        nx::network::http::HttpHeader(nx::network::http::header::Server::NAME, nx::network::http::serverString()));
+    nx::network::http::insertOrReplaceHeader(
         &response->headers,
-        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
+        nx::network::http::HttpHeader("Date", nx::network::http::formatDateTime(QDateTime::currentDateTime())));
 
     const auto sslSocket = dynamic_cast<AbstractEncryptedStreamSocket*>(socket().get());
     if (sslSocket && sslSocket->isEncryptionEnabled())
     {
-        nx_http::header::StrictTransportSecurity strictTransportSecurity;
+        nx::network::http::header::StrictTransportSecurity strictTransportSecurity;
         strictTransportSecurity.maxAge = kYear;
-        nx_http::insertOrReplaceHeader(&response->headers, strictTransportSecurity);
+        nx::network::http::insertOrReplaceHeader(&response->headers, strictTransportSecurity);
     }
 
     addMessageBodyHeaders(response, responseMsgBody);
 
-    if (response->statusLine.statusCode == nx_http::StatusCode::switchingProtocols)
+    if (response->statusLine.statusCode == nx::network::http::StatusCode::switchingProtocols)
     {
         if (response->headers.find("Upgrade") == response->headers.end())
             response->headers.emplace("Upgrade", processingContext.protocolToUpgradeTo);
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &response->headers,
             HttpHeader("Connection", "Upgrade"));
     }
 }
 
 void HttpServerConnection::addMessageBodyHeaders(
-    nx_http::Response* response,
-    nx_http::AbstractMsgBodySource* responseMsgBody)
+    nx::network::http::Response* response,
+    nx::network::http::AbstractMsgBodySource* responseMsgBody)
 {
     if (responseMsgBody)
     {
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &response->headers,
-            nx_http::HttpHeader("Content-Type", responseMsgBody->mimeType()));
+            nx::network::http::HttpHeader("Content-Type", responseMsgBody->mimeType()));
 
         const auto contentLength = responseMsgBody->contentLength();
         if (contentLength)
         {
-            nx_http::insertOrReplaceHeader(
+            nx::network::http::insertOrReplaceHeader(
                 &response->headers,
-                nx_http::HttpHeader(
+                nx::network::http::HttpHeader(
                     "Content-Length",
-                    nx_http::StringType::number(
+                    nx::network::http::StringType::number(
                         static_cast<qulonglong>(contentLength.get()))));
         }
     }
-    else if (nx_http::StatusCode::isMessageBodyAllowed(response->statusLine.statusCode))
+    else if (nx::network::http::StatusCode::isMessageBodyAllowed(response->statusLine.statusCode))
     {
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &response->headers,
-            nx_http::HttpHeader("Content-Length", "0"));
+            nx::network::http::HttpHeader("Content-Length", "0"));
     }
 }
 
@@ -399,7 +401,7 @@ void HttpServerConnection::fullMessageHasBeenSent()
 
 void HttpServerConnection::checkForConnectionPersistency(const Message& msg)
 {
-    if (msg.type != nx_http::MessageType::request)
+    if (msg.type != nx::network::http::MessageType::request)
         return;
 
     const auto& request = *msg.request;
@@ -407,11 +409,13 @@ void HttpServerConnection::checkForConnectionPersistency(const Message& msg)
     m_isPersistent = false;
     if (m_persistentConnectionEnabled)
     {
-        if (request.requestLine.version == nx_http::http_1_1)
-            m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() != "close";
-        else if (request.requestLine.version == nx_http::http_1_0)
-            m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() == "keep-alive";
+        if (request.requestLine.version == nx::network::http::http_1_1)
+            m_isPersistent = nx::network::http::getHeaderValue(request.headers, "Connection").toLower() != "close";
+        else if (request.requestLine.version == nx::network::http::http_1_0)
+            m_isPersistent = nx::network::http::getHeaderValue(request.headers, "Connection").toLower() == "keep-alive";
     }
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

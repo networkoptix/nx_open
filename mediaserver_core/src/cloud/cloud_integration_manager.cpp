@@ -26,8 +26,8 @@ CloudIntegrationManager::CloudIntegrationManager(
     if (!cdbEndpoint.isEmpty())
     {
         m_cloudManagerGroup.setCloudDbUrl(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
-                .setEndpoint(SocketAddress(cdbEndpoint)));
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(nx::network::SocketAddress(cdbEndpoint)));
     }
 
     connect(

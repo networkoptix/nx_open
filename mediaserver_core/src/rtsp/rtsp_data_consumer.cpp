@@ -729,7 +729,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         else
         {
             NX_ASSERT(m_sendBuffer.size() < 16384);
-            AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
+            nx::network::AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
             m_sendBuffer.clear();
         }

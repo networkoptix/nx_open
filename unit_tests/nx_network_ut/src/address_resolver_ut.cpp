@@ -42,7 +42,7 @@ protected:
         m_connections.push_back(std::move(connection));
         ASSERT_TRUE(connectionPtr->setNonBlockingMode(true));
         connectionPtr->connectAsync(
-            SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
+            SocketAddress(QString::fromLatin1("ya.ru"), nx::network::http::DEFAULT_HTTP_PORT),
             std::bind(&AddressResolver::onConnectionComplete, this, connectionPtr, std::placeholders::_1));
     }
 
@@ -224,7 +224,7 @@ TEST_F(AddressResolver, HostNameResolveCancellation)
         HostAddress resolvedAddress;
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         connection->connectAsync(
-            SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
+            SocketAddress(QString::fromLatin1("ya.ru"), nx::network::http::DEFAULT_HTTP_PORT),
             [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](
                 SystemError::ErrorCode errorCode) mutable
             {
@@ -247,7 +247,7 @@ TEST_F(AddressResolver, BadHostNameResolve)
         int iBak = i;
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         connection->connectAsync(
-            SocketAddress(QString::fromLatin1("hx.hz"), nx_http::DEFAULT_HTTP_PORT),
+            SocketAddress(QString::fromLatin1("hx.hz"), nx::network::http::DEFAULT_HTTP_PORT),
             [&i, iBak](SystemError::ErrorCode /*errorCode*/) mutable
             {
                 ASSERT_EQ(i, iBak);

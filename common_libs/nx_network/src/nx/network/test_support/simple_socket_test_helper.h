@@ -238,13 +238,10 @@ void socketTransferSync(
             for (size_t i = 0; i != clientCount; ++i)
             {
                 auto client = clientMaker();
-                EXPECT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()))
+                ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout))
                     << i << ": " << SystemError::getLastOSErrorText().toStdString();
 
-                ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
-                ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
-
-                EXPECT_EQ(
+                ASSERT_EQ(
                     testMessage.size(),
                     client->send(testMessage.constData(), testMessage.size())) << SystemError::getLastOSErrorText().toStdString();
 
@@ -288,7 +285,7 @@ void socketTransferSyncFlags(
         auto acceptThreadGuard = makeScopeGuard([&acceptThread]() { acceptThread.join(); });
 
         auto client = clientMaker();
-        ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
+        ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size())
             << SystemError::getLastOSErrorText().toStdString();
         acceptThreadGuard.fire();
@@ -363,7 +360,6 @@ void socketTransferAsync(
 
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    //ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(server->listen((int)testClientCount())) << SystemError::getLastOSErrorText().toStdString();
 
@@ -384,9 +380,7 @@ void socketTransferAsync(
 
             acceptedClients.emplace_back(std::move(socket));
             auto& client = acceptedClients.back();
-            if (/*!client->setSendTimeout(kTestTimeout) ||
-                !client->setSendTimeout(kTestTimeout) ||*/
-                !client->setNonBlockingMode(true))
+            if (!client->setNonBlockingMode(true))
             {
                 EXPECT_TRUE(false) << SystemError::getLastOSErrorText().toStdString();
                 return serverResults.push(SystemError::notImplemented);
@@ -434,8 +428,6 @@ void socketTransferAsync(
         const auto testClient = clientMaker();
         const auto clientGuard = makeScopeGuard([&](){ testClient->pleaseStopSync(); });
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
-        //ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
-        //ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
@@ -656,7 +648,7 @@ void socketTransferFragmentation(
         endpointToConnectTo = std::move(serverAddress);
 
     auto client = clientMaker();
-    ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
+    ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
     ASSERT_TRUE(client->setNonBlockingMode(true));
     const auto clientGuard = makeScopeGuard([&](){ client->pleaseStopSync(); });
 
@@ -827,7 +819,7 @@ void socketShutdown(
                 }
                 else
                 {
-                    client->connect(*endpointToConnectTo, kTestTimeout.count());
+                    client->connect(*endpointToConnectTo, kTestTimeout);
                 }
 
                 nx::Buffer readBuffer;
@@ -927,7 +919,7 @@ void acceptedSocketOptionsInheritance(
     auto serverAddress = server->getLocalAddress();
 
     auto client = clientMaker();
-    ASSERT_TRUE(client->connect(serverAddress, 3000));
+    ASSERT_TRUE(client->connect(serverAddress, nx::network::kNoTimeout));
 
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
     ASSERT_TRUE((bool)accepted);
@@ -1105,7 +1097,7 @@ void socketIsUsefulAfterCancelIo(
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
-    ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
+    ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
     ASSERT_TRUE(server->setRecvTimeout(0));

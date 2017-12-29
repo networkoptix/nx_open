@@ -30,16 +30,16 @@ public:
     void setSystemSettingsProcessor(
         nx::vms::utils::SystemSettingsProcessor* systemSettingsProcessor);
 
-    nx_http::StatusCode::Value bindSystemToCloud(
+    nx::network::http::StatusCode::Value bindSystemToCloud(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
 
-    nx_http::StatusCode::Value setupCloudSystem(
+    nx::network::http::StatusCode::Value setupCloudSystem(
         const QnAuthSession& authSession,
         const SetupCloudSystemData& data,
         QnJsonRestResult* result);
 
-    nx_http::StatusCode::Value detachFromCloud(
+    nx::network::http::StatusCode::Value detachFromCloud(
         const DetachFromCloudData& data,
         DetachFromCloudReply* result);
 

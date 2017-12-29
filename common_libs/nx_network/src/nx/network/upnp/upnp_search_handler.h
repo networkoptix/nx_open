@@ -7,7 +7,9 @@
 
 #include "upnp_device_description.h"
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 /**
  * Receives discovered devices info.
@@ -40,4 +42,6 @@ public:
     virtual ~SearchAutoHandler() override;
 };
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

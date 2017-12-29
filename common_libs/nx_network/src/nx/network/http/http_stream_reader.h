@@ -11,7 +11,9 @@
 #include "http_types.h"
 #include "line_splitter.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Parses stream of bytes as http messages.
@@ -172,8 +174,10 @@ private:
      * Returns nullptr if encodingName is unknown.
      */
     std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> createContentDecoder(
-        const nx_http::StringType& encodingName);
+        const nx::network::http::StringType& encodingName);
     void resetStateInternal();
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

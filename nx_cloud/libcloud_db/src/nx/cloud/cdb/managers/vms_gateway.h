@@ -85,7 +85,7 @@ private:
         VmsRequestCompletionHandler completionHandler);
 
     MergeSystemData prepareMergeRequestParameters(
-        const nx_http::Credentials& userCredentials,
+        const nx::network::http::Credentials& userCredentials,
         const std::string& systemIdToMergeTo);
 
     void reportRequestResult(

@@ -8,7 +8,8 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
 
-using namespace nx::network;
+namespace nx {
+namespace network {
 
 namespace {
 
@@ -286,3 +287,6 @@ std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSo
             return nullptr;
     };
 }
+
+} // namespace network
+} // namespace nx

@@ -65,7 +65,7 @@ protected:
         constexpr int kMaxPacketSize = 2*1024;
 
         nx::network::UDPSocket udpSocket(AF_INET);
-        ASSERT_TRUE(udpSocket.connect(stunEndpoint()));
+        ASSERT_TRUE(udpSocket.connect(stunEndpoint(), nx::network::kNoTimeout));
         for (int i = 0; i < kRequestToSendCount; ++i)
         {
             nx::Buffer packet = nx::utils::random::generate(kMaxPacketSize);
@@ -94,7 +94,7 @@ protected:
 private:
     struct Result
     {
-        stun::TransportHeader transportHeader;
+        nx::network::stun::TransportHeader transportHeader;
         api::ResultCode resultCode = api::ResultCode::networkError;
         api::ConnectResponse response;
     };
@@ -122,7 +122,7 @@ private:
     }
 
     void onConnectResponse(
-        stun::TransportHeader transportHeader,
+        nx::network::stun::TransportHeader transportHeader,
         api::ResultCode resultCode,
         api::ConnectResponse response)
     {

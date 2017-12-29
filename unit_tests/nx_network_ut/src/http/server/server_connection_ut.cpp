@@ -16,7 +16,9 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 namespace {
 
@@ -34,23 +36,23 @@ protected:
 };
 
 class DelayingRequestHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     static const QString PATH;
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_timer.start(
             std::chrono::seconds(5),
             [completionHandler = std::move(completionHandler)]
             {
-                completionHandler(nx_http::StatusCode::ok);
+                completionHandler(nx::network::http::StatusCode::ok);
             });
     }
 
@@ -76,7 +78,7 @@ TEST_F(HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProce
     const nx::utils::Url url(QString("http://127.0.0.1:%1%2").
         arg(m_testHttpServer->serverAddress().port).arg(DelayingRequestHandler::PATH));
 
-    auto client = nx_http::AsyncHttpClient::create();
+    auto client = nx::network::http::AsyncHttpClient::create();
     client->doGet(url);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     client.reset();
@@ -87,25 +89,25 @@ TEST_F(HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProce
 namespace {
 
 class PipeliningTestHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     static const nx::String PATH;
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         response->headers.emplace(
             "Seq",
-            nx_http::getHeaderValue(request.headers, "Seq"));
+            nx::network::http::getHeaderValue(request.headers, "Seq"));
         completionHandler(
-            nx_http::RequestResult(
-                nx_http::StatusCode::ok,
-                std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla")));
+            nx::network::http::RequestResult(
+                nx::network::http::StatusCode::ok,
+                std::make_unique<nx::network::http::BufferSource>("text/plain", "bla-bla-bla")));
     }
 };
 
@@ -127,29 +129,30 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //opening connection and sending multiple requests
-    nx_http::Request request;
-    request.requestLine.method = nx_http::Method::get;
-    request.requestLine.version = nx_http::http_1_1;
+    nx::network::http::Request request;
+    request.requestLine.method = nx::network::http::Method::get;
+    request.requestLine.version = nx::network::http::http_1_1;
     request.requestLine.url = PipeliningTestHandler::PATH;
 
     auto sock = SocketFactory::createStreamSocket();
     ASSERT_TRUE(sock->connect(SocketAddress(
         HostAddress::localhost,
-        m_testHttpServer->serverAddress().port)));
+        m_testHttpServer->serverAddress().port),
+        nx::network::kNoTimeout));
 
     int msgCounter = 0;
     for (; msgCounter < REQUESTS_TO_SEND; ++msgCounter)
     {
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &request.headers,
-            nx_http::HttpHeader("Seq", nx::String::number(msgCounter)));
+            nx::network::http::HttpHeader("Seq", nx::String::number(msgCounter)));
         //sending request
         auto serializedMessage = request.serialized();
         ASSERT_EQ(sock->send(serializedMessage), serializedMessage.size());
     }
 
     //reading responses out of socket
-    nx_http::HttpStreamReader httpMsgReader;
+    nx::network::http::HttpStreamReader httpMsgReader;
 
     nx::Buffer readBuf;
     readBuf.resize(4 * 1024 * 1024);
@@ -173,7 +176,7 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
                 &bytesParsed));
         readBuf.remove(0, bytesParsed);
         dataSize -= bytesParsed;
-        if (httpMsgReader.state() == nx_http::HttpStreamReader::messageDone)
+        if (httpMsgReader.state() == nx::network::http::HttpStreamReader::messageDone)
         {
             ASSERT_TRUE(httpMsgReader.message().response != nullptr);
             auto seqIter = httpMsgReader.message().response->headers.find("Seq");
@@ -224,7 +227,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
     const auto socket = std::make_unique<nx::network::TCPSocket>(
         SocketFactory::tcpServerIpVersion());
 
-    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress(), nx::network::kNoTimeout));
     ASSERT_EQ((int)sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
 }
 
@@ -243,7 +246,7 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     const auto socket = std::make_unique<nx::network::TCPSocket>(
         SocketFactory::tcpServerIpVersion());
 
-    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress(), nx::network::kNoTimeout));
     ASSERT_EQ(kQuery.size(), socket->send(kQuery.data(), kQuery.size()));
 
     nx::Buffer buffer(1024, Qt::Uninitialized);
@@ -264,7 +267,7 @@ class HttpAsyncServerConnectionUpgrade:
 {
 protected:
     static const QString kTestPath;
-    static const nx_http::StringType kProtocolToUpgradeTo;
+    static const nx::network::http::StringType kProtocolToUpgradeTo;
 
     virtual void SetUp() override
     {
@@ -284,11 +287,11 @@ protected:
 
     void issueUpgradeRequest()
     {
-        nx::utils::promise<nx_http::Response> response;
+        nx::utils::promise<nx::network::http::Response> response;
 
-        nx_http::AsyncClient httpClient;
+        nx::network::http::AsyncClient httpClient;
         httpClient.doUpgrade(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setHost("127.0.0.1")
                 .setPort(m_testHttpServer->serverAddress().port)
                 .setPath(kTestPath),
@@ -304,14 +307,14 @@ protected:
     void assertThatResponseIsValid()
     {
         ASSERT_EQ(
-            nx_http::StatusCode::switchingProtocols,
+            nx::network::http::StatusCode::switchingProtocols,
             m_httpResponse.statusLine.statusCode);
         ASSERT_EQ(
             "Upgrade",
-            nx_http::getHeaderValue(m_httpResponse.headers, "Connection"));
+            nx::network::http::getHeaderValue(m_httpResponse.headers, "Connection"));
         ASSERT_EQ(
             kProtocolToUpgradeTo,
-            nx_http::getHeaderValue(m_httpResponse.headers, "Upgrade"));
+            nx::network::http::getHeaderValue(m_httpResponse.headers, "Upgrade"));
     }
 
     void assertNoMessageBodyHeadersPresent()
@@ -321,21 +324,21 @@ protected:
     }
 
 private:
-    nx_http::Response m_httpResponse;
+    nx::network::http::Response m_httpResponse;
 
     void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
-        completionHandler(nx_http::StatusCode::switchingProtocols);
+        completionHandler(nx::network::http::StatusCode::switchingProtocols);
     }
 };
 
 const QString HttpAsyncServerConnectionUpgrade::kTestPath("/HttpAsyncServerConnectionUpgrade");
-const nx_http::StringType HttpAsyncServerConnectionUpgrade::kProtocolToUpgradeTo("TEST/1.0");
+const nx::network::http::StringType HttpAsyncServerConnectionUpgrade::kProtocolToUpgradeTo("TEST/1.0");
 
 } // namespace
 
@@ -351,4 +354,6 @@ TEST_F(HttpAsyncServerConnectionUpgrade, response_with_1xx_status_does_not_conta
     assertNoMessageBodyHeadersPresent();
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

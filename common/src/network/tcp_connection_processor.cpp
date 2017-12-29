@@ -30,7 +30,7 @@
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
@@ -43,7 +43,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
@@ -56,7 +56,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnCommonModule* commonModule)
 :
     QnCommonModuleAware(commonModule),
@@ -142,7 +142,7 @@ void QnTCPConnectionProcessor::parseRequest()
 //    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
 //    qDebug() << d->clientRequest;
 
-    d->request = nx_http::Request();
+    d->request = nx::network::http::Request();
     if( !d->request.parse( d->clientRequest ) )
     {
         qWarning() << Q_FUNC_INFO << "Invalid request format.";
@@ -250,39 +250,39 @@ QByteArray QnTCPConnectionProcessor::createResponse(
     Q_D(QnTCPConnectionProcessor);
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = httpStatusCode;
-    d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
+    d->response.statusLine.reasonPhrase = nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)httpStatusCode);
 
     if (d->response.headers.find("Connection") == d->response.headers.end() &&  //response does not contain
         isConnectionCanBePersistent())
     {
-        d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
+        d->response.headers.insert(nx::network::http::HttpHeader("Connection", "Keep-Alive"));
         if (d->response.headers.find("Keep-Alive") == d->response.headers.end())
-            d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
+            d->response.headers.insert(nx::network::http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
     }
 
     if (d->authenticatedOnce)
     {
         //revealing Server name to authenticated entity only
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
+            nx::network::http::HttpHeader(nx::network::http::header::Server::NAME, nx::network::http::serverString() ) );
     }
-    nx_http::insertOrReplaceHeader(
+    nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())) );
+        nx::network::http::HttpHeader("Date", nx::network::http::formatDateTime(QDateTime::currentDateTime())) );
 
     // this header required to perform new HTTP requests if server port has been on the fly changed
-    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
+    nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
 
     if (d->chunkedMode)
-        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
+        nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
     if (!contentEncoding.isEmpty() && contentEncoding != "identity")
-        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
+        nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
-        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
+        nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Content-Type", contentType ) );
     if (!isUndefinedContentLength &&!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
-        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->response.messageBody.length()) ) );
+        nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Content-Length", QByteArray::number(d->response.messageBody.length()) ) );
 
     QByteArray response = !multipartBoundary.isEmpty() ? d->response.toMultipartString(multipartBoundary) : d->response.toString();
 
@@ -356,7 +356,7 @@ void QnTCPConnectionProcessor::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
+QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket;
@@ -379,8 +379,8 @@ bool QnTCPConnectionProcessor::readRequest()
     Q_D(QnTCPConnectionProcessor);
 
     //QElapsedTimer globalTimeout;
-    d->request = nx_http::Request();
-    d->response = nx_http::Response();
+    d->request = nx::network::http::Request();
+    d->response = nx::network::http::Response();
     d->clientRequest.clear();
     d->requestBody.clear();
 
@@ -426,8 +426,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 {
     Q_D(QnTCPConnectionProcessor);
 
-    d->request = nx_http::Request();
-    d->response = nx_http::Response();
+    d->request = nx::network::http::Request();
+    d->response = nx::network::http::Response();
     d->requestBody.clear();
     d->currentRequestSize = 0;
     d->prevSocketError = SystemError::noError;
@@ -465,7 +465,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
         if( !d->httpStreamReader.parseBytes(
                 QnByteArrayConstRef( d->interleavedMessageData, d->interleavedMessageDataPos ),
                 &bytesParsed ) ||
-            (d->httpStreamReader.state() == nx_http::HttpStreamReader::parseError) )
+            (d->httpStreamReader.state() == nx::network::http::HttpStreamReader::parseError) )
         {
             //parse error
             return false;
@@ -480,9 +480,9 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             return false;
         }
 
-        if( d->httpStreamReader.state() == nx_http::HttpStreamReader::messageDone )
+        if( d->httpStreamReader.state() == nx::network::http::HttpStreamReader::messageDone )
         {
-            if( d->httpStreamReader.message().type != nx_http::MessageType::request )
+            if( d->httpStreamReader.message().type != nx::network::http::MessageType::request )
                 return false;
             //TODO #ak we have parsed message in d->httpStreamReader: should use it, not copy!
             d->request = *d->httpStreamReader.message().request;
@@ -527,10 +527,10 @@ void QnTCPConnectionProcessor::execute(QnMutex& mutex)
     mutex.lock();
 }
 
-SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
+nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket ? d->socket->getForeignAddress() : SocketAddress();
+    return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
 bool QnTCPConnectionProcessor::isSocketTaken() const
@@ -539,7 +539,7 @@ bool QnTCPConnectionProcessor::isSocketTaken() const
     return d->isSocketTaken;
 }
 
-QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
 {
     Q_D(QnTCPConnectionProcessor);
     d->isSocketTaken = true;
@@ -560,7 +560,7 @@ int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& con
     Q_D(QnTCPConnectionProcessor);
     contentType = "text/html; charset=utf-8";
     d->response.messageBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
-    d->response.headers.insert(nx_http::HttpHeader("Location", page));
+    d->response.headers.insert(nx::network::http::HttpHeader("Location", page));
     return CODE_MOVED_PERMANENTLY;
 }
 
@@ -576,10 +576,10 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
 {
     Q_D(const QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.version == nx_http::http_1_1 )
-        return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
-    else if( d->request.requestLine.version == nx_http::http_1_0 )
-        return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+    if( d->request.requestLine.version == nx::network::http::http_1_1 )
+        return nx::network::http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
+    else if( d->request.requestLine.version == nx::network::http::http_1_0 )
+        return nx::network::http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
     else    //e.g., RTSP
         return false;
 }
@@ -589,17 +589,17 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     Q_D(const QnTCPConnectionProcessor);
     QnAuthSession result;
 
-    QByteArray existSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
+    QByteArray existSession = nx::network::http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
     if (!existSession.isEmpty()) {
         result.fromByteArray(existSession);
         return result;
     }
     if (const auto& userRes = resourcePool()->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
-    else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
+    else if (!nx::network::http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
 
-    result.id = QnUuid::fromStringSafe(nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME));
+    result.id = QnUuid::fromStringSafe(nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     if (result.id.isNull())
         result.id = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     const QUrlQuery query(d->request.requestLine.url.query());
@@ -618,12 +618,12 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
 
-    result.userHost = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_HOST_HEADER_NAME));
+    result.userHost = QString::fromUtf8(nx::network::http::getHeaderValue(d->request.headers, Qn::USER_HOST_HEADER_NAME));
     if (result.userHost.isEmpty())
         result.userHost = d->socket->getForeignAddress().address.toString();
     result.userAgent = query.queryItemValue(QLatin1String(Qn::USER_AGENT_HEADER_NAME));
     if (result.userAgent.isEmpty())
-        result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_AGENT_HEADER_NAME));
+        result.userAgent = QString::fromUtf8(nx::network::http::getHeaderValue(d->request.headers, Qn::USER_AGENT_HEADER_NAME));
 
     int trimmedPos = result.userAgent.indexOf(lit("/"));
     if (trimmedPos != -1) {
@@ -634,23 +634,23 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     return result;
 }
 
-void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody)
+void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.method == nx_http::Method::get ||
-        d->request.requestLine.method == nx_http::Method::head )
+    if( d->request.requestLine.method == nx::network::http::Method::get ||
+        d->request.requestLine.method == nx::network::http::Method::head )
     {
         d->response.messageBody = messageBody;
     }
-    if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
-        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
+    if (nx::network::http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
+        d->response.headers.insert(nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;
     if( acceptEncodingHeaderIter != d->request.headers.end() )
     {
-        nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
+        nx::network::http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
         if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
         {
             contentEncoding = "identity";

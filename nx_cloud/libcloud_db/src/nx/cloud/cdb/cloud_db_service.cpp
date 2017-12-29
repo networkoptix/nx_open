@@ -39,7 +39,7 @@ CloudDbService::CloudDbService(int argc, char **argv):
     registerQtResources();
 }
 
-std::vector<SocketAddress> CloudDbService::httpEndpoints() const
+std::vector<network::SocketAddress> CloudDbService::httpEndpoints() const
 {
     return m_view->endpoints();
 }

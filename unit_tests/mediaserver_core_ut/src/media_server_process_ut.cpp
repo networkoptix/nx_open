@@ -7,7 +7,7 @@ namespace test {
 
 TEST(MediaServerProcess, ApiRestrictions)
 {
-    using namespace nx_http;
+    using namespace nx::network::http;
     static const std::map<const char*, unsigned int> kExpectedAuthMethods =
     {
         {"/ec2/getCurrentTime", AuthMethod::NotDefined},

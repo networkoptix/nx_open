@@ -23,7 +23,7 @@ namespace detail {
 
 template<typename Input = void, typename Output = void>
 class BaseFiniteMsgBodyHttpHandler:
-    public nx_http::AbstractFusionRequestHandler<Input, Output>
+    public nx::network::http::AbstractFusionRequestHandler<Input, Output>
 {
 public:
     BaseFiniteMsgBodyHttpHandler(
@@ -43,8 +43,8 @@ protected:
     const AuthorizationManager& m_authorizationManager;
 
     bool authorize(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         const nx::utils::stree::AbstractResourceReader& authenticationData,
         const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
         nx::utils::stree::ResourceContainer* const authzInfo)
@@ -73,8 +73,8 @@ protected:
                     api::ResultCode::unknownError);
             }
 
-            nx_http::FusionRequestResult result(
-                nx_http::FusionRequestErrorClass::unauthorized,
+            nx::network::http::FusionRequestResult result(
+                nx::network::http::FusionRequestErrorClass::unauthorized,
                 QnLexical::serialized(resultCode),
                 static_cast<int>(resultCode),
                 QString());
@@ -112,8 +112,8 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo,
         Input inputData) override
     {
@@ -214,8 +214,8 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo) override
     {
         if (!this->authorize(
@@ -291,11 +291,11 @@ class AbstractFreeMsgBodyHttpHandler:
 
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         const AuthorizationInfo& authzInfo,
         InputData... inputData,
         nx::utils::MoveOnlyFunc<
-        void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)>
+        void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)>
             completionHandler)> ExecuteRequestFunc;
 
     AbstractFreeMsgBodyHttpHandler(
@@ -313,8 +313,8 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo,
         InputData... inputData) override
     {
@@ -332,7 +332,7 @@ public:
             std::move(inputData)...,
             [this](
                 api::ResultCode resultCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody)
+                std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
@@ -341,7 +341,7 @@ public:
                 if (resultCode == api::ResultCode::ok)
                 {
                     this->requestCompleted(
-                        nx_http::StatusCode::ok,
+                        nx::network::http::StatusCode::ok,
                         std::move(responseMsgBody));
                 }
                 else

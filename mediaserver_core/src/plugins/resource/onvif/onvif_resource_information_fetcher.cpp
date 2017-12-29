@@ -253,7 +253,7 @@ void OnvifResourceInformationFetcher::findResources(
     if (model.isEmpty() || manufacturer.isEmpty() ||
         // Optional fields are to be updated only if the camera is authorized, to prevent brute force
         // attacks for unauthorized cameras (Hikvision blocks after several attempts).
-        (isAuthorized && (firmware.isEmpty() || QnMacAddress(mac).isNull())))
+        (isAuthorized && (firmware.isEmpty() || nx::network::QnMacAddress(mac).isNull())))
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -377,7 +377,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setName(model);
     else
         resource->setName(manufacturer + model);
-    QnMacAddress macAddr(mac);
+    nx::network::QnMacAddress macAddr(mac);
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 

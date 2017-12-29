@@ -53,7 +53,7 @@ void EventConnection::setProxyVia(
     const std::string& proxyHost,
     std::uint16_t proxyPort)
 {
-    m_auth.proxyEndpoint = SocketAddress(proxyHost.c_str(), proxyPort);
+    m_auth.proxyEndpoint = nx::network::SocketAddress(proxyHost.c_str(), proxyPort);
 }
 
 EventConnection::~EventConnection()
@@ -83,10 +83,10 @@ void EventConnection::start(
 }
 
 void EventConnection::cdbEndpointResolved(
-    nx_http::StatusCode::Value resCode,
+    nx::network::http::StatusCode::Value resCode,
     nx::utils::Url url)
 {
-    if (resCode != nx_http::StatusCode::ok)
+    if (resCode != nx::network::http::StatusCode::ok)
     {
         connectionAttemptHasFailed(api::httpStatusCodeToResultCode(resCode));
         return;
@@ -100,19 +100,19 @@ void EventConnection::initiateConnection()
 {
     if (!m_httpClient)
     {
-        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
         m_httpClient->bindToAioThread(m_reconnectTimer.getAioThread());
 
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
             this, &EventConnection::onHttpResponseReceived,
             Qt::DirectConnection);
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
             this, &EventConnection::onSomeMessageBodyAvailable,
             Qt::DirectConnection);
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
             this, &EventConnection::onHttpClientDone,
             Qt::DirectConnection);
     }
@@ -170,16 +170,16 @@ void EventConnection::retryToConnect()
     }
 }
 
-void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpClient)
+void EventConnection::onHttpResponseReceived(nx::network::http::AsyncHttpClientPtr httpClient)
 {
-    const nx_http::StatusCode::Value responseStatusCode =
-        static_cast<nx_http::StatusCode::Value>(
+    const nx::network::http::StatusCode::Value responseStatusCode =
+        static_cast<nx::network::http::StatusCode::Value>(
             httpClient->response()->statusLine.statusCode);
-    if (!nx_http::StatusCode::isSuccessCode(responseStatusCode))
+    if (!nx::network::http::StatusCode::isSuccessCode(responseStatusCode))
     {
         NX_LOGX(lm("Received error response from %1: %2")
             .arg(httpClient->url().toString())
-            .arg(nx_http::StatusCode::toString(responseStatusCode)),
+            .arg(nx::network::http::StatusCode::toString(responseStatusCode)),
             cl_logDEBUG1);
         return connectionAttemptHasFailed(
             api::httpStatusCodeToResultCode(responseStatusCode));
@@ -204,15 +204,15 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
         return connectionAttemptHasFailed(cdbResultCode);
     }
 
-    const auto contentType = nx_http::getHeaderValue(
+    const auto contentType = nx::network::http::getHeaderValue(
         httpClient->response()->headers, "Content-Type");
     NX_LOGX(lm("Received success response (%1) from %2. Content-Type %3")
-        .arg(nx_http::StatusCode::toString(responseStatusCode))
+        .arg(nx::network::http::StatusCode::toString(responseStatusCode))
         .arg(httpClient->url().toString())
-        .arg(nx_http::getHeaderValue(httpClient->response()->headers, "Content-Type")),
+        .arg(nx::network::http::getHeaderValue(httpClient->response()->headers, "Content-Type")),
         cl_logDEBUG2);
 
-    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
+    m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(
         nx::utils::bstream::makeCustomOutputStream(
             std::bind(
@@ -240,12 +240,12 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
     return handler(api::ResultCode::ok);
 }
 
-void EventConnection::onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr httpClient)
+void EventConnection::onSomeMessageBodyAvailable(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     m_multipartContentParser->processData(httpClient->fetchMessageBodyBuffer());
 }
 
-void EventConnection::onHttpClientDone(nx_http::AsyncHttpClientPtr httpClient)
+void EventConnection::onHttpClientDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (httpClient->failed())
     {
@@ -263,7 +263,7 @@ void EventConnection::onHttpClientDone(nx_http::AsyncHttpClientPtr httpClient)
 
 void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
 {
-    const auto dataContentType = nx_http::getHeaderValue(
+    const auto dataContentType = nx::network::http::getHeaderValue(
         m_multipartContentParser->prevFrameHeaders(), "Content-Type");
 
     if (m_multipartContentParser->eof())

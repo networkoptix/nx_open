@@ -31,7 +31,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     Filter filter;
     Qn::SerializationFormat outputFormat = Qn::JsonFormat;
     if (!deserializeRequest(params, &filter, &outputFormat))
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     return execute(filter, outputFormat, &result, &contentType);
 }
@@ -50,7 +50,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
     Filter filter;
     Qn::SerializationFormat outputFormat = Qn::JsonFormat;
     if (!deserializeRequest(params, body, srcBodyContentType, &filter, &outputFormat))
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     return execute(filter, outputFormat, &result, &resultContentType);
 }
@@ -122,7 +122,7 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     }
 }
 
-nx_http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
+nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
     const nx::analytics::storage::Filter& filter,
     Qn::SerializationFormat outputFormat,
     QByteArray* body,
@@ -153,7 +153,7 @@ nx_http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
 
     *body = serializeOutputData(outputData, outputFormat);
     *contentType = Qn::serializationFormatToHttpContentType(outputFormat);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 template<typename T>

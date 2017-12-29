@@ -50,7 +50,7 @@ bool Controller::discoverPublicAddress()
     if (!(bool) publicHostAddress)
         return false;
 
-    SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
+    network::SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
     m_model->remoteRelayPeerPool().setNodeId(publicSocketAddress.toStdString());
 
     nx::utils::SubscriptionId subscriptionId;

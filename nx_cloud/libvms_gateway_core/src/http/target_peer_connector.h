@@ -28,11 +28,11 @@ class NX_VMS_GATEWAY_API TargetPeerConnector:
 public:
     using ConnectHandler = nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode /*systemErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> /*connectionToTheTargetPeer*/)>;
+        std::unique_ptr<network::AbstractStreamSocket> /*connectionToTheTargetPeer*/)>;
 
     TargetPeerConnector(
         relaying::AbstractListeningPeerPool* listeningPeerPool,
-        const SocketAddress& targetEndpoint);
+        const network::SocketAddress& targetEndpoint);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -41,10 +41,10 @@ public:
 
 private:
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
-    const SocketAddress m_targetEndpoint;
+    const network::SocketAddress m_targetEndpoint;
     boost::optional<std::chrono::milliseconds> m_timeout;
     ConnectHandler m_completionHandler;
-    std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
+    std::unique_ptr<network::AbstractStreamSocket> m_targetPeerSocket;
     nx::network::aio::Timer m_timer;
 
     virtual void stopWhileInAioThread() override;
@@ -52,13 +52,13 @@ private:
     void takeConnectionFromListeningPeerPool();
     void processTakeConnectionResult(
         cloud::relay::api::ResultCode resultCode,
-        std::unique_ptr<AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection);
 
     void initiateDirectConnection();
     void processDirectConnectionResult(SystemError::ErrorCode systemErrorCode);
     void processConnectionResult(
         SystemError::ErrorCode systemErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection);
     void interruptByTimeout();
 };
 

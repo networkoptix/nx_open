@@ -2,7 +2,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace test {
 
@@ -12,15 +14,15 @@ static constexpr const char* testHeaderName = "Test-Serializable-dummyInt";
 
 } // namespace
 
-bool serializeToHeaders(nx_http::HttpHeaders* where, const Serializable& what)
+bool serializeToHeaders(nx::network::http::HttpHeaders* where, const Serializable& what)
 {
     where->emplace(
         testHeaderName,
-        nx_http::StringType::number(what.dummyInt));
+        nx::network::http::StringType::number(what.dummyInt));
     return true;
 }
 
-bool deserializeFromHeaders(const nx_http::HttpHeaders& from, Serializable* what)
+bool deserializeFromHeaders(const nx::network::http::HttpHeaders& from, Serializable* what)
 {
     auto it = from.find(testHeaderName);
     if (it == from.end())
@@ -37,4 +39,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 } // namespace test
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

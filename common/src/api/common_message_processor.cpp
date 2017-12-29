@@ -236,12 +236,12 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
         return;
     }
 
-    QList<SocketAddress> addresses = server->getNetAddrList();
+    QList<nx::network::SocketAddress> addresses = server->getNetAddrList();
     QList<nx::utils::Url> additionalUrls = server->getAdditionalUrls();
     QList<nx::utils::Url> ignoredUrls = server->getIgnoredUrls();
 
     if (addInformation) {
-        if (!additionalUrls.contains(url) && !addresses.contains(SocketAddress(url.host(), url.port())))
+        if (!additionalUrls.contains(url) && !addresses.contains(nx::network::SocketAddress(url.host(), url.port())))
             additionalUrls.append(url);
 
         if (data.ignore) {

@@ -6,6 +6,7 @@
 #include <boost/crc.hpp>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 using namespace attrs;
@@ -406,4 +407,5 @@ nx::Buffer MessageSerializer::serialized(const Message& message)
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

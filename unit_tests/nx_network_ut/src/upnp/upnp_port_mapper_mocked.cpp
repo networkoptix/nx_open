@@ -1,6 +1,8 @@
 #include "upnp_port_mapper_mocked.h"
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 namespace test {
 
 AsyncClientMock::AsyncClientMock():
@@ -156,4 +158,6 @@ AsyncClientMock& PortMapperMocked::clientMock()
 }
 
 } // namespace test
-} // namespace nx_upnp
+} // namespace upnp
+} // namespace network
+} // namespace nx

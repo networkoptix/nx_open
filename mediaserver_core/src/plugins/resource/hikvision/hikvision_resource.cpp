@@ -105,7 +105,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
     return fetchChannelCount();
 }
 
-std::unique_ptr<nx_http::HttpClient> HikvisionResource::getHttpClient()
+std::unique_ptr<nx::network::http::HttpClient> HikvisionResource::getHttpClient()
 {
     return makeHttpClient(getAuth());
 }
@@ -119,10 +119,10 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
         buildChannelNumber(role, getChannel())));
 
     nx::Buffer response;
-    nx_http::StatusCode::Value statusCode;
+    nx::network::http::StatusCode::Value statusCode;
     if (!doGetRequest(url, getAuth(), &response, &statusCode))
     {
-        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+        if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
         return CameraDiagnostics::RequestFailedResult(
@@ -147,7 +147,7 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
     nx::utils::Url requestUrl(getUrl());
     requestUrl.setPath(lit("/ISAPI/System/TwoWayAudio/channels"));
     requestUrl.setHost(getHostAddress());
-    requestUrl.setPort(nx::utils::Url(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    requestUrl.setPort(nx::utils::Url(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT));
 
     if (!httpClient->doGet(requestUrl) || !isResponseOK(httpClient.get()))
     {
@@ -195,7 +195,7 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
         if (hikTransmitter)
         {
             hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::put);
+            hikTransmitter->setAudioUploadHttpMethod(nx::network::http::Method::put);
         }
 
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);

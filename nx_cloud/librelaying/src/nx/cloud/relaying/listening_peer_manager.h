@@ -18,7 +18,7 @@ class NX_RELAYING_API AbstractListeningPeerManager
 public:
     using BeginListeningHandler =
         nx::utils::MoveOnlyFunc<void(
-            relay::api::ResultCode, relay::api::BeginListeningResponse, nx_http::ConnectionEvents)>;
+            relay::api::ResultCode, relay::api::BeginListeningResponse, nx::network::http::ConnectionEvents)>;
 
     virtual ~AbstractListeningPeerManager() = default;
 
@@ -47,7 +47,7 @@ private:
 
     void saveServerConnection(
         const std::string& peerName,
-        nx_http::HttpServerConnection* httpConnection);
+        nx::network::http::HttpServerConnection* httpConnection);
 };
 
 //-------------------------------------------------------------------------------------------------

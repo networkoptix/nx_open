@@ -5,6 +5,7 @@
 #include <nx/network/buffer.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 // This message parser buffer add a simple workaround with the original partial data buffer.
@@ -36,4 +37,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

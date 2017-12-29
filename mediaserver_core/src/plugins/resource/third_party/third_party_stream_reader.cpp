@@ -332,8 +332,8 @@ int ThirdPartyStreamReader::getLastResponseCode() const
 {
     QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader
-        ? nx_http::StatusCode::ok
-        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx_http::StatusCode::ok);
+        ? nx::network::http::StatusCode::ok
+        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx::network::http::StatusCode::ok);
 }
 
 //bool ThirdPartyStreamReader::needMetaData() const

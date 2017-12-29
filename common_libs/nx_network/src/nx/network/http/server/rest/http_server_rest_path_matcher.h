@@ -11,7 +11,9 @@
 
 #include "../../http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace rest {
 
@@ -28,7 +30,7 @@ template<typename Mapped>
 class PathMatcher
 {
 public:
-    bool add(const nx_http::StringType& pathTemplate, Mapped mapped)
+    bool add(const nx::network::http::StringType& pathTemplate, Mapped mapped)
     {
         MatchContext matchContext;
         matchContext.regex = convertToRegex(QString::fromUtf8(pathTemplate));
@@ -40,8 +42,8 @@ public:
     }
 
     boost::optional<const Mapped&> match(
-        const nx_http::StringType& path,
-        std::vector<nx_http::StringType>* pathParams) const
+        const nx::network::http::StringType& path,
+        std::vector<nx::network::http::StringType>* pathParams) const
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -67,7 +69,7 @@ private:
     };
 
     /** REST path template, context */
-    std::map<nx_http::StringType, MatchContext> m_restPathToMatchContext;
+    std::map<nx::network::http::StringType, MatchContext> m_restPathToMatchContext;
     mutable QnMutex m_mutex;
 
     QRegExp convertToRegex(const QString& pathTemplate)
@@ -87,4 +89,6 @@ private:
 
 } // namespace rest
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

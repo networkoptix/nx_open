@@ -20,7 +20,9 @@ static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512 * 1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5 * 60 * 1000;
 static const unsigned int READ_BUF_CAPACITY = 64 * 1024 + 1;    //max UDP packet size
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 int DeviceSearcherDefaultSettings::cacheTimeout() const
 {
@@ -275,7 +277,7 @@ void DeviceSearcher::onSomeBytesRead(
     std::unique_ptr<DeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD(this, SCOPED_GUARD_FUNC);
 
     HostAddress remoteHost;
-    nx_http::Request foundDeviceReply;
+    nx::network::http::Request foundDeviceReply;
     {
         AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(sock);
         //reading socket and parsing UPnP response packet
@@ -284,11 +286,11 @@ void DeviceSearcher::onSomeBytesRead(
             return;
     }
 
-    nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find("LOCATION");
+    nx::network::http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find("LOCATION");
     if (locationHeader == foundDeviceReply.headers.end())
         return;
 
-    nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find("USN");
+    nx::network::http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find("USN");
     if (uuidHeader == foundDeviceReply.headers.end())
         return;
 
@@ -442,7 +444,7 @@ void DeviceSearcher::startFetchDeviceXml(
     info.uuid = uuidStr;
     info.descriptionUrl = descriptionUrl;
 
-    nx_http::AsyncHttpClientPtr httpClient;
+    nx::network::http::AsyncHttpClientPtr httpClient;
     //checking, whether new http request is needed
     {
         QnMutexLocker lk(&m_mutex);
@@ -469,12 +471,12 @@ void DeviceSearcher::startFetchDeviceXml(
                 return; //if there is unfinished request to url descriptionUrl or to device with id uuidStr, then return
         }
 
-        httpClient = nx_http::AsyncHttpClient::create();
+        httpClient = nx::network::http::AsyncHttpClient::create();
         m_httpClients[httpClient] = std::move(info);
     }
 
     QObject::connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &DeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection);
     httpClient->doGet(descriptionUrl);
@@ -571,7 +573,7 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
         });
 }
 
-void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr httpClient)
+void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     DiscoveredDeviceInfo* ctx = NULL;
     {
@@ -582,11 +584,11 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientP
         ctx = &it->second;
     }
 
-    if (httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok)
+    if (httpClient->response() && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
         // TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
-        const nx_http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
+        const nx::network::http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
         processDeviceXml(*ctx, msgBody);
     }
 
@@ -597,4 +599,6 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientP
     m_httpClients.erase(httpClient);
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

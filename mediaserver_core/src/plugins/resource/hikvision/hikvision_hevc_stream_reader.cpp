@@ -226,10 +226,10 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
         buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
 
     nx::Buffer response;
-    nx_http::StatusCode::Value statusCode;
+    nx::network::http::StatusCode::Value statusCode;
     if (!doGetRequest(url, m_hikvisionResource->getAuth(), &response, &statusCode))
     {
-        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+        if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
         return CameraDiagnostics::RequestFailedResult(
@@ -257,12 +257,12 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
         buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
 
     nx::Buffer responseBuffer;
-    nx_http::StatusCode::Value statusCode;
+    nx::network::http::StatusCode::Value statusCode;
     bool result = doGetRequest(url, m_hikvisionResource->getAuth(), &responseBuffer, &statusCode);
 
     if (!result)
     {
-        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+        if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
         return CameraDiagnostics::RequestFailedResult(
@@ -295,7 +295,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::configureChannel(
 
     if (!result)
     {
-        if (statusCode == nx_http::StatusCode::Value::unauthorized)
+        if (statusCode == nx::network::http::StatusCode::Value::unauthorized)
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
 
         return CameraDiagnostics::RequestFailedResult(

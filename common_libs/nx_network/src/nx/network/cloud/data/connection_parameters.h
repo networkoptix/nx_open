@@ -50,7 +50,7 @@ public:
     std::chrono::seconds tunnelInactivityTimeout;
 
     nx::network::RetryPolicy tcpReverseRetryPolicy;
-    nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
+    nx::network::http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
 
     std::chrono::milliseconds udpHolePunchingStartDelay;
     std::chrono::milliseconds trafficRelayingStartDelay;
@@ -59,8 +59,8 @@ public:
     ConnectionParameters();
     bool operator==(const ConnectionParameters& rhs) const;
 
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

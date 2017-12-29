@@ -32,7 +32,7 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner, bool needAuth)
 : 
     QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
@@ -46,7 +46,7 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
     QnUniversalRequestProcessorPrivate* priv, 
-    QSharedPointer<AbstractStreamSocket> socket,
+    QSharedPointer<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner, 
     bool needAuth)
 : 
@@ -58,9 +58,9 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 }
 
 static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
-static nx_http::AuthMethod::Values m_unauthorizedPageForMethods = nx_http::AuthMethod::NotDefined;
+static nx::network::http::AuthMethod::Values m_unauthorizedPageForMethods = nx::network::http::AuthMethod::NotDefined;
 
-void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, nx_http::AuthMethod::Values methods)
+void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, nx::network::http::AuthMethod::Values methods)
 {
     m_unauthorizedPageBody = value;
     m_unauthorizedPageForMethods = methods;
@@ -84,16 +84,16 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
-        nx_http::AuthMethod::Value usedMethod = nx_http::AuthMethod::noAuth;
+        nx::network::http::AuthMethod::Value usedMethod = nx::network::http::AuthMethod::noAuth;
         Qn::AuthResult authResult;
         while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
-            nx_http::insertOrReplaceHeader(
+            nx::network::http::insertOrReplaceHeader(
                 &d->response.headers,
-                nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
+                nx::network::http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
 
             int retryThreshold = 0;
-            if (usedMethod == nx_http::AuthMethod::httpDigest)
+            if (usedMethod == nx::network::http::AuthMethod::httpDigest)
                 retryThreshold = MAX_AUTH_RETRY_COUNT;
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
@@ -108,17 +108,17 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
 
-            nx_http::StatusCode::Value httpResult;
+            nx::network::http::StatusCode::Value httpResult;
             QByteArray msgBody;
             if (isProxy)
             {
                 msgBody = STATIC_PROXY_UNAUTHORIZED_HTML;
-                httpResult = nx_http::StatusCode::proxyAuthenticationRequired;
+                httpResult = nx::network::http::StatusCode::proxyAuthenticationRequired;
             }
             else if (authResult ==  Qn::Auth_Forbidden)
             {
                 msgBody = STATIC_FORBIDDEN_HTML;
-                httpResult = nx_http::StatusCode::forbidden;
+                httpResult = nx::network::http::StatusCode::forbidden;
             }
             else
             {
@@ -126,7 +126,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                     msgBody = unauthorizedPageBody();
                 else
                     msgBody = STATIC_UNAUTHORIZED_HTML;
-                httpResult = nx_http::StatusCode::unauthorized;
+                httpResult = nx::network::http::StatusCode::unauthorized;
             }
             sendUnauthorizedResponse(httpResult, msgBody);
 
@@ -144,9 +144,9 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
                 return false; // close connection
         }
-        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & nx_http::AuthMethod::noAuth)
+        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & nx::network::http::AuthMethod::noAuth)
             *noAuth = true;
-        if (usedMethod != nx_http::AuthMethod::noAuth)
+        if (usedMethod != nx::network::http::AuthMethod::noAuth)
             d->authenticatedOnce = true;
     }
     return true;
@@ -260,9 +260,9 @@ void QnUniversalRequestProcessor::pleaseStop()
     QnTCPConnectionProcessor::pleaseStop();
 }
 
-bool QnUniversalRequestProcessor::isProxy(QnCommonModule* commonModule, const nx_http::Request& request)
+bool QnUniversalRequestProcessor::isProxy(QnCommonModule* commonModule, const nx::network::http::Request& request)
 {
-    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    nx::network::http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if( xServerGuidIter != request.headers.end() )
     {
         // is proxy to other media server
@@ -279,12 +279,12 @@ bool QnUniversalRequestProcessor::isProxy(QnCommonModule* commonModule, const nx
     return needStandardProxy(commonModule, request);
 }
 
-bool QnUniversalRequestProcessor::needStandardProxy(QnCommonModule* commonModule, const nx_http::Request& request)
+bool QnUniversalRequestProcessor::needStandardProxy(QnCommonModule* commonModule, const nx::network::http::Request& request)
 {
     return isCloudRequest(request) || isProxyForCamera(commonModule, request);
 }
 
-bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request)
+bool QnUniversalRequestProcessor::isCloudRequest(const nx::network::http::Request& request)
 {
     return request.requestLine.url.host() == nx::network::AppInfo::defaultCloudHost() ||
            request.requestLine.url.path().startsWith("/cdb") ||
@@ -294,10 +294,10 @@ bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request
 
 bool QnUniversalRequestProcessor::isProxyForCamera(
     QnCommonModule* commonModule,
-    const nx_http::Request& request)
+    const nx::network::http::Request& request)
 {
-    nx_http::BufferType desiredCameraGuid;
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
+    nx::network::http::BufferType desiredCameraGuid;
+    nx::network::http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     if( xCameraGuidIter != request.headers.end() )
     {
         desiredCameraGuid = xCameraGuidIter->second;

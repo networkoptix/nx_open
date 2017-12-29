@@ -32,12 +32,12 @@ MediatorProcess::MediatorProcess(int argc, char **argv):
 {
 }
 
-std::vector<SocketAddress> MediatorProcess::httpEndpoints() const
+std::vector<network::SocketAddress> MediatorProcess::httpEndpoints() const
 {
     return m_httpServer->httpEndpoints();
 }
 
-std::vector<SocketAddress> MediatorProcess::stunEndpoints() const
+std::vector<network::SocketAddress> MediatorProcess::stunEndpoints() const
 {
     return m_stunServer->endpoints();
 }

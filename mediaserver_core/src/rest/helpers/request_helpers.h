@@ -18,7 +18,7 @@ void runMultiserverRequest(
     const QnMediaServerResourcePtr &server,
     Context *context)
 {
-    nx_http::HttpHeaders headers;
+    nx::network::http::HttpHeaders headers;
     headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     const QnRoute route = router->routeTo(server->getId());
     if (route.reverseConnect)
@@ -50,11 +50,11 @@ void runMultiserverDownloadRequest(
     Context *context)
 {
     const auto downloadRequest = [requestCompletionFunc]
-        (const nx::utils::Url &url, const nx_http::HttpHeaders &headers, Context *context)
+        (const nx::utils::Url &url, const nx::network::http::HttpHeaders &headers, Context *context)
     {
         context->executeGuarded([url, requestCompletionFunc, headers, context]()
         {
-            nx_http::downloadFileAsync(url, requestCompletionFunc, headers);
+            nx::network::http::downloadFileAsync(url, requestCompletionFunc, headers);
             context->incRequestsCount();
         });
     };
@@ -75,12 +75,12 @@ void runMultiserverUploadRequest(
     Context *context)
 {
     const auto downloadRequest = [completionFunc, data, contentType, user, password]
-        (const nx::utils::Url &url, const nx_http::HttpHeaders &headers, Context *context)
+        (const nx::utils::Url &url, const nx::network::http::HttpHeaders &headers, Context *context)
     {
         context->executeGuarded([url, data, completionFunc, headers
             , contentType, context, user, password]()
         {
-            nx_http::uploadDataAsync(url, data, contentType, headers, completionFunc);
+            nx::network::http::uploadDataAsync(url, data, contentType, headers, completionFunc);
 
             context->incRequestsCount();
         });

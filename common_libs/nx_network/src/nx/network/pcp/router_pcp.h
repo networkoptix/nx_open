@@ -6,6 +6,8 @@
 
 #include <QMutex>
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 class NX_NETWORK_API Router
@@ -37,5 +39,7 @@ private:
 };
 
 } // namespace pcp
+} // namespace network
+} // namespace nx
 
 #endif // ROUTER_H

@@ -17,8 +17,8 @@ class AddressResolverCloudResolving:
 {
 public:
     static void emulateAddress(
-        const HostAddress& address,
-        std::list<SocketAddress> endpoints = {})
+        const nx::network::HostAddress& address,
+        std::list<nx::network::SocketAddress> endpoints = {})
     {
         if (endpoints.size())
             s_endpoints.emplace(address.toString(), std::move(endpoints));
@@ -42,7 +42,7 @@ public:
     }
 
     void resolveAndCheckState(
-        const HostAddress& address,
+        const nx::network::HostAddress& address,
         utils::MoveOnlyFunc<void(HaInfoIterator it)> checker)
     {
         NX_LOGX(lm("resolveAndCheckState %1").arg(address), cl_logDEBUG1);
@@ -70,22 +70,22 @@ public:
     }
 
     void resolveAndCheckStateWithSub(
-        const HostAddress& address,
+        const nx::network::HostAddress& address,
         const std::function<void(HaInfoIterator it, bool isSub)>& checker)
     {
         resolveAndCheckState(address, std::bind2nd(checker, false));
-        const HostAddress sub(address.toString().split('.')[1]);
+        const nx::network::HostAddress sub(address.toString().split('.')[1]);
         resolveAndCheckState(sub, std::bind2nd(checker, true));
     }
 
 private:
-    static std::map<QString, std::list<SocketAddress>> s_endpoints;
+    static std::map<QString, std::list<nx::network::SocketAddress>> s_endpoints;
 };
 
-std::map<QString, std::list<SocketAddress>> AddressResolverCloudResolving::s_endpoints;
+std::map<QString, std::list<nx::network::SocketAddress>> AddressResolverCloudResolving::s_endpoints;
 
-static const HostAddress kAddress("ya.ru");
-static const SocketAddress kResult(*HostAddress::ipV4from(lit("10.11.12.13")), 12345);
+static const nx::network::HostAddress kAddress("ya.ru");
+static const nx::network::SocketAddress kResult(*nx::network::HostAddress::ipV4from(lit("10.11.12.13")), 12345);
 
 /**
  * Usual DNS addresses like "ya.ru" shell be resolved in order:
@@ -159,10 +159,10 @@ static QString testUuid()
  */
 TEST_F(AddressResolverCloudResolving, FixedVsMediatorVsDns)
 {
-    const std::vector<HostAddress> kGoodCloudAddresses =
+    const std::vector<nx::network::HostAddress> kGoodCloudAddresses =
     {
-        HostAddress(lm("server.%1").arg(testUuid())),
-        HostAddress(lm("%1.%2").arg(testUuid()).arg(testUuid())),
+        nx::network::HostAddress(lm("server.%1").arg(testUuid())),
+        nx::network::HostAddress(lm("%1.%2").arg(testUuid()).arg(testUuid())),
     };
 
     for (const auto& host : kGoodCloudAddresses)
@@ -210,10 +210,10 @@ TEST_F(AddressResolverCloudResolving, FixedVsMediatorVsDns)
             });
     }
 
-    const std::vector<HostAddress> kBadCloudAddresses =
+    const std::vector<nx::network::HostAddress> kBadCloudAddresses =
     {
-        HostAddress(lm("server.%1").arg(testUuid())),
-        HostAddress(lm("%1.%2").arg(testUuid()).arg(testUuid())),
+        nx::network::HostAddress(lm("server.%1").arg(testUuid())),
+        nx::network::HostAddress(lm("%1.%2").arg(testUuid()).arg(testUuid())),
     };
 
     for (const auto& host : kBadCloudAddresses)
@@ -237,8 +237,8 @@ TEST_F(AddressResolverCloudResolving, FixedVsMediatorVsDns)
  */
 TEST_F(AddressResolverCloudResolving, DnsVsMediator)
 {
-    static const HostAddress kAddressGood("hren-resolve-me-1.com");
-    static const HostAddress kAddressBad("hren-resolve-me-2.com");
+    static const nx::network::HostAddress kAddressGood("hren-resolve-me-1.com");
+    static const nx::network::HostAddress kAddressBad("hren-resolve-me-2.com");
 
     emulateAddress(kAddressGood, {kResult});
     resolveAndCheckState(
@@ -268,11 +268,11 @@ TEST(AddressResolverRealTest, Cancel)
 {
     const auto doNone = [&](SystemError::ErrorCode, std::deque<AddressEntry>) {};
 
-    const std::vector<HostAddress> kTestAddresses =
+    const std::vector<nx::network::HostAddress> kTestAddresses =
     {
-        HostAddress("ya.ru"),
-        HostAddress("hren-resolve-me-1.com"),
-        HostAddress(lm("%1.%2").arg(testUuid()).arg(testUuid())),
+        nx::network::HostAddress("ya.ru"),
+        nx::network::HostAddress("hren-resolve-me-1.com"),
+        nx::network::HostAddress(lm("%1.%2").arg(testUuid()).arg(testUuid())),
     };
 
     for (size_t timeout = 0; timeout <= 5000; timeout *= 2)

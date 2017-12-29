@@ -27,14 +27,14 @@ private:
         const QnRestConnectionProcessor* /*owner*/);
 
     void updateModuleImformation();
-    void sendModuleImformation(const QSharedPointer<AbstractStreamSocket>& socket);
-    void sendKeepAliveByTimer(const QSharedPointer<AbstractStreamSocket>& socket);
+    void sendModuleImformation(const QSharedPointer<nx::network::AbstractStreamSocket>& socket);
+    void sendKeepAliveByTimer(const QSharedPointer<nx::network::AbstractStreamSocket>& socket);
 
 private:
     nx::network::aio::BasicPollable m_pollable;
-    std::set<QSharedPointer<AbstractStreamSocket>> m_socketsToKeepOpen;
+    std::set<QSharedPointer<nx::network::AbstractStreamSocket>> m_socketsToKeepOpen;
 
     QnCommonModule* m_commonModule = nullptr;
     QByteArray m_moduleInformatiom;
-    std::set<QSharedPointer<AbstractStreamSocket>> m_socketsToUpdate;
+    std::set<QSharedPointer<nx::network::AbstractStreamSocket>> m_socketsToUpdate;
 };

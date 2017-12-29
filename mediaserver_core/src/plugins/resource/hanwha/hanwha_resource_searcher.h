@@ -17,7 +17,7 @@ namespace plugins {
 
 class HanwhaResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
-    public nx_upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler
 {
 public:
     HanwhaResourceSearcher(QnCommonModule* commonModule);
@@ -40,18 +40,18 @@ public:
     //Upnp resource searcher
     virtual bool processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
     static QAuthenticator getDefaultAuth();
 private:
     void createResource(
-        const nx_upnp::DeviceInfo& devInfo,
-        const QnMacAddress& mac,
+        const nx::network::upnp::DeviceInfo& devInfo,
+        const nx::network::QnMacAddress& mac,
         QnResourceList& result );
 
-    bool isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const;
+    bool isHanwhaCamera(const nx::network::upnp::DeviceInfo& devInfo) const;
 
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
@@ -61,9 +61,9 @@ private:
     void readSunApiResponse(QnResourceList& resultResourceList);
     void updateSocketList();
 
-    struct SunApiData: public nx_upnp::DeviceInfo
+    struct SunApiData: public nx::network::upnp::DeviceInfo
     {
-        QnMacAddress macAddress;
+        nx::network::QnMacAddress macAddress;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
     bool isHostBelongsToValidSubnet(const QHostAddress& address) const;
@@ -88,8 +88,8 @@ private:
     mutable QMap<QString, SessionKeyPtr> m_sessionKeys;
 
     const std::vector<std::vector<quint8>> m_sunapiProbePackets;
-    std::vector<std::unique_ptr<AbstractDatagramSocket>> m_sunApiSocketList;
-    QList<QnInterfaceAndAddr> m_lastInterfaceList;
+    std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
+    QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
 };
 
 } // namespace plugins

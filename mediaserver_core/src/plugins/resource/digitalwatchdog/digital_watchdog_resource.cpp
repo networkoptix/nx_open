@@ -120,7 +120,7 @@ private:
     nx::plugins::utils::XmlRequestHelper makeRequestHelper()
     {
         return nx::plugins::utils::XmlRequestHelper(
-            m_resource->getUrl(), m_resource->getAuth(), nx_http::AuthType::authBasic);
+            m_resource->getUrl(), m_resource->getAuth(), nx::network::http::AuthType::authBasic);
     }
 
     int indexOfStream(bool isPrimary)
@@ -195,7 +195,7 @@ bool QnDigitalWatchdogResource::useOnvifAdvancedParameterProviders() const
 CLSimpleHTTPClient QnDigitalWatchdogResource::httpClient() const
 {
     return CLSimpleHTTPClient(
-        getHostAddress(), nx_http::DEFAULT_HTTP_PORT, getNetworkTimeout(), getAuth());
+        getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT, getNetworkTimeout(), getAuth());
 }
 
 bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
@@ -274,7 +274,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
         return true;
 
     CLSimpleHTTPClient http(
-        getHostAddress(), nx_http::DEFAULT_HTTP_PORT, getNetworkTimeout(), QAuthenticator());
+        getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT, getNetworkTimeout(), QAuthenticator());
 
     auto result = http.doGET(QString("/cgi-bin/system?User=%1&pwd=%2&RTP_B2=1")
         .arg(getAuth().user()).arg(getAuth().password()));

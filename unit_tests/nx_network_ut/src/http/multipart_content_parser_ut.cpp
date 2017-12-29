@@ -56,7 +56,7 @@ TEST( HttpMultipartContentParser, genericTest )
 
         for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
         {
-            nx_http::MultipartContentParser parser;
+            nx::network::http::MultipartContentParser parser;
             parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
 
             std::deque<QByteArray> frames;
@@ -150,7 +150,7 @@ TEST( HttpMultipartContentParser, onlySizedData )
 
         for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
         {
-            nx_http::MultipartContentParser parser;
+            nx::network::http::MultipartContentParser parser;
             parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
 
             std::deque<QByteArray> frames;
@@ -212,7 +212,7 @@ TEST( HttpMultipartContentParser, unSizedDataSimple )
     //for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
     for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
     {
-        nx_http::MultipartContentParser parser;
+        nx::network::http::MultipartContentParser parser;
         parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
 
         std::deque<QByteArray> frames;
@@ -279,7 +279,7 @@ TEST( HttpMultipartContentParser, unSizedData )
 
         for( const auto dataStep: DATA_STEPS )
         {
-            nx_http::MultipartContentParser parser;
+            nx::network::http::MultipartContentParser parser;
             parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
 
             std::deque<QByteArray> readFrames;
@@ -313,7 +313,7 @@ TEST(HttpMultipartContentParser, epilogueOnly)
 
     for (int dataStep = 1; dataStep < testData.size(); ++dataStep)
     {
-        nx_http::MultipartContentParser parser;
+        nx::network::http::MultipartContentParser parser;
         parser.setContentType("multipart/x-mixed-replace;boundary=fbdr");
 
         std::deque<QByteArray> frames;

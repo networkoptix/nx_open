@@ -42,7 +42,7 @@ void ListeningPeerManager::beginListening(
         completionHandler(
             relay::api::ResultCode::preemptiveConnectionCountAtMaximum,
             relay::api::BeginListeningResponse(),
-            nx_http::ConnectionEvents());
+            nx::network::http::ConnectionEvents());
         return;
     }
 
@@ -51,7 +51,7 @@ void ListeningPeerManager::beginListening(
         m_settings.recommendedPreemptiveConnectionCount;
     response.keepAliveOptions = m_settings.tcpKeepAlive;
 
-    nx_http::ConnectionEvents connectionEvents;
+    nx::network::http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
         std::bind(&ListeningPeerManager::saveServerConnection, this,
             request.peerName, _1);
@@ -64,7 +64,7 @@ void ListeningPeerManager::beginListening(
 
 void ListeningPeerManager::saveServerConnection(
     const std::string& peerName,
-    nx_http::HttpServerConnection* httpConnection)
+    nx::network::http::HttpServerConnection* httpConnection)
 {
     m_listeningPeerPool->addConnection(
         peerName,

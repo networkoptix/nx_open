@@ -20,7 +20,7 @@ namespace conf {
 class General
 {
 public:
-    std::list<SocketAddress> endpointsToListen;
+    std::list<network::SocketAddress> endpointsToListen;
     QString dataDir;
     QString changeUser;
     /** If empty, default address is used. */
@@ -64,7 +64,7 @@ struct TcpReverseOptions
 {
     uint16_t port = 0;
     size_t poolSize = 0;
-    boost::optional<KeepAliveOptions> keepAlive;
+    boost::optional<network::KeepAliveOptions> keepAlive;
     std::chrono::seconds startTimeout{0};
 };
 

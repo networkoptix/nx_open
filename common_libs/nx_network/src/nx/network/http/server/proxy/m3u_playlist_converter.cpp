@@ -2,7 +2,9 @@
 
 #include <nx/network/m3u/m3u_playlist.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace proxy {
 
@@ -17,14 +19,14 @@ M3uPlaylistConverter::M3uPlaylistConverter(
 {
 }
 
-nx_http::BufferType M3uPlaylistConverter::convert(
-    nx_http::BufferType originalBody)
+nx::network::http::BufferType M3uPlaylistConverter::convert(
+    nx::network::http::BufferType originalBody)
 {
     using namespace nx::network::m3u;
 
     Playlist playlist;
     if (!playlist.parse(originalBody))
-        return nx_http::BufferType();
+        return nx::network::http::BufferType();
 
     for (auto& entry: playlist.entries)
     {
@@ -41,4 +43,6 @@ nx_http::BufferType M3uPlaylistConverter::convert(
 
 } // namespace proxy
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

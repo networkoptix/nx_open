@@ -198,10 +198,10 @@ private:
     std::unique_ptr<MediaServerClient> prepareMediaServerClient()
     {
         auto mediaServerClient = std::make_unique<MediaServerClient>(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(m_mediaServerLauncher->endpoint()));
         mediaServerClient->setUserCredentials(
-            nx_http::Credentials("admin", nx_http::PasswordAuthToken("admin")));
+            nx::network::http::Credentials("admin", nx::network::http::PasswordAuthToken("admin")));
         return mediaServerClient;
     }
 

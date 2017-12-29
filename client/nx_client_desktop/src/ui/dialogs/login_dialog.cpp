@@ -739,14 +739,14 @@ void QnLoginDialog::at_deleteButton_clicked()
 void QnLoginDialog::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
 {
     auto isCloudAddress =
-        [](const HostAddress& address) -> bool
+        [](const nx::network::HostAddress& address) -> bool
         {
             return nx::network::SocketGlobals::addressResolver()
                 .isCloudHostName(address.toString());
         };
 
     auto isLoopback =
-        [](const HostAddress& address) -> bool
+        [](const nx::network::HostAddress& address) -> bool
         {
             return QHostAddress(address.toString()).isLoopback();
         };

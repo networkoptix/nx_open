@@ -84,10 +84,10 @@ struct ActionParameters
     QString contentType;
 
     //HTTP action
-    nx_http::AuthType authType;
+    nx::network::http::AuthType authType;
 
     //HTTP action (empty string means auto detection)
-    nx_http::Method::ValueType requestType;
+    nx::network::http::Method::ValueType requestType;
 
     /**
     * For "Open layout" action: resource id for layout to be opened.

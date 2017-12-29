@@ -2,7 +2,9 @@
 
 #include <algorithm>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 LineSplitter::LineSplitter():
     m_clearCurrentLineBuf(false),
@@ -128,7 +130,7 @@ boost::optional<ConstBufferRefType> StringLineIterator::next()
     QnByteArrayConstRef line;
     size_t bytesRead = 0;
     if (m_lineSplitter.parseByLines(
-            nx_http::ConstBufferRefType(m_sourceData, m_dataOffset), &line, &bytesRead))
+            nx::network::http::ConstBufferRefType(m_sourceData, m_dataOffset), &line, &bytesRead))
     {
         m_dataOffset += bytesRead;
         return line;
@@ -137,4 +139,6 @@ boost::optional<ConstBufferRefType> StringLineIterator::next()
     return boost::none;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

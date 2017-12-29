@@ -136,7 +136,7 @@ TEST_F(AccountTemporaryCredentials, verify_temporary_credentials_are_accepted_by
         //checking that account update is forbidden
         std::string account1NewPassword = account1Password + "new";
         api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
+        update.passwordHa1 = nx::network::http::calcHa1(
             account1.email.c_str(),
             moduleInfo().realm.c_str(),
             account1NewPassword.c_str()).constData();
@@ -254,7 +254,7 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_removed_on_password_ch
 
     std::string account1NewPassword = account.password + "new";
     api::AccountUpdateData accountUpdateData;
-    accountUpdateData.passwordHa1 = nx_http::calcHa1(
+    accountUpdateData.passwordHa1 = nx::network::http::calcHa1(
         account.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();

@@ -210,7 +210,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 		if (newCamRes)
 		{
-			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+			quint32 ips = nx::network::resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
 			if (ips)
 				ipsList[ips].insert(newNetRes);
 		}

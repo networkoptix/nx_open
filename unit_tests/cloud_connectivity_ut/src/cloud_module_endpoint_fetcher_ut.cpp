@@ -52,13 +52,13 @@ protected:
 
         nx::utils::promise<nx::utils::Url> urlFoundPromise;
         fetcher->get(
-            [&urlFoundPromise](nx_http::StatusCode::Value statusCode, nx::utils::Url url)
+            [&urlFoundPromise](nx::network::http::StatusCode::Value statusCode, nx::utils::Url url)
             {
-                if (statusCode != nx_http::StatusCode::ok)
+                if (statusCode != nx::network::http::StatusCode::ok)
                 {
                     urlFoundPromise.set_exception(
                         std::make_exception_ptr(std::logic_error(
-                            nx_http::StatusCode::toString(statusCode).toStdString())));
+                            nx::network::http::StatusCode::toString(statusCode).toStdString())));
                 }
                 else
                 {
@@ -70,7 +70,7 @@ protected:
     }
 
 protected:
-    TestHttpServer& httpServer()
+    nx::network::http::TestHttpServer& httpServer()
     {
         return m_server;
     }
@@ -82,7 +82,7 @@ protected:
     }
 
 private:
-    TestHttpServer m_server;
+    nx::network::http::TestHttpServer m_server;
     const QByteArray m_modulesXmlBody;
     nx::utils::Url m_modulesUrl;
 
@@ -166,10 +166,10 @@ TEST_F(CloudModuleUrlFetcherCompatibilityAutoSchemeSelection, https)
 namespace {
 
 class HanglingMsgBodySource:
-    public nx_http::AbstractMsgBodySource
+    public nx::network::http::AbstractMsgBodySource
 {
 public:
-    virtual nx_http::StringType mimeType() const override
+    virtual nx::network::http::StringType mimeType() const override
     {
         return "text/plain";
     }
@@ -181,7 +181,7 @@ public:
 
     virtual void readAsync(
         nx::utils::MoveOnlyFunc<
-            void(SystemError::ErrorCode, nx_http::BufferType)
+            void(SystemError::ErrorCode, nx::network::http::BufferType)
         > /*completionHandler*/) override
     {
     }
@@ -189,7 +189,7 @@ public:
 
 template<typename MessageBody>
 class CustomMessageBodyProvider:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     CustomMessageBodyProvider()
@@ -197,13 +197,13 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler) override
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
         requestResult.dataSource = std::make_unique<MessageBody>();
         completionHandler(std::move(requestResult));
     }
@@ -255,7 +255,7 @@ TEST_F(FtCloudModuleUrlFetcher, cancellation)
             std::string s;
             operation.get(
                 [&s](
-                    nx_http::StatusCode::Value /*resCode*/,
+                    nx::network::http::StatusCode::Value /*resCode*/,
                     nx::utils::Url endpoint)
                 {
                     //if called after destruction, will get segfault here
@@ -312,7 +312,7 @@ protected:
             kConnectionMediatorXmlPath,
             kSingleMediatorUrlXml,
             "application/xml");
-        m_expectedResult.statusCode = nx_http::StatusCode::ok;
+        m_expectedResult.statusCode = nx::network::http::StatusCode::ok;
         m_expectedResult.tcpUrl = "stun://cloud-test.hdw.mx:3345";
         m_expectedResult.udpUrl = "stun://cloud-test.hdw.mx:3345";
     }
@@ -323,7 +323,7 @@ protected:
             kConnectionMediatorXmlPath,
             kMediatorHasDifferentAddressForTcpAndUdpXml,
             "application/xml");
-        m_expectedResult.statusCode = nx_http::StatusCode::ok;
+        m_expectedResult.statusCode = nx::network::http::StatusCode::ok;
         m_expectedResult.tcpUrl = "http://cloud-test.hdw.mx:3345";
         m_expectedResult.udpUrl = "stun://cloud-test.hdw.mx:3346";
     }
@@ -336,7 +336,7 @@ protected:
         nx::utils::promise<void> done;
         m_urlFetcher.get(
             [this, &done](
-                nx_http::StatusCode::Value statusCode, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
+                nx::network::http::StatusCode::Value statusCode, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
             {
                 m_actualResult.statusCode = statusCode;
                 m_actualResult.tcpUrl = tcpUrl;
@@ -356,7 +356,7 @@ protected:
 private:
     struct Result
     {
-        nx_http::StatusCode::Value statusCode;
+        nx::network::http::StatusCode::Value statusCode;
         nx::utils::Url tcpUrl;
         nx::utils::Url udpUrl;
     };

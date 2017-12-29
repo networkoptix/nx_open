@@ -23,7 +23,7 @@ void SystemSettingsProcessor::setOnBeforeUpdatingSettingValue(
     m_onBeforeUpdatingSettingValue = std::move(handler);
 }
 
-nx_http::StatusCode::Value SystemSettingsProcessor::updateSettings(
+nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
     const Qn::UserAccessData& accessRights,
     const QnAuthSession& authSession,
     const QnRequestParams& params,
@@ -62,7 +62,7 @@ nx_http::StatusCode::Value SystemSettingsProcessor::updateSettings(
                 continue;
 
             if (!writeAllowed)
-                return nx_http::StatusCode::forbidden;
+                return nx::network::http::StatusCode::forbidden;
 
             m_onBeforeUpdatingSettingValue(
                 setting->key(),
@@ -81,7 +81,7 @@ nx_http::StatusCode::Value SystemSettingsProcessor::updateSettings(
 
     result->setReply(std::move(reply));
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 } // namespace utils

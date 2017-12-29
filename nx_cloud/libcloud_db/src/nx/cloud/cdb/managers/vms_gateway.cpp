@@ -61,7 +61,7 @@ void VmsGateway::merge(
         return reportInvalidConfiguration(targetSystemId, std::move(completionHandler));
 
     const auto baseRequestUrl =
-        nx_http::rest::substituteParameters(urlBase, { targetSystemId });
+        nx::network::http::rest::substituteParameters(urlBase, { targetSystemId });
 
     NX_VERBOSE(this, lm("Issuing merge request to %1 on behalf of %2. Url %3")
         .args(targetSystemId, username, baseRequestUrl));
@@ -79,9 +79,9 @@ void VmsGateway::merge(
         NX_VERBOSE(this, lm("Could not find account %1").args(username));
         return reportInvalidConfiguration(targetSystemId, std::move(completionHandler));
     }
-    const nx_http::Credentials userCredentials(
+    const nx::network::http::Credentials userCredentials(
         account->email.c_str(),
-        nx_http::Ha1AuthToken(account->passwordHa1.c_str()));
+        nx::network::http::Ha1AuthToken(account->passwordHa1.c_str()));
 
     clientPtr->setUserCredentials(userCredentials);
 
@@ -112,7 +112,7 @@ void VmsGateway::reportInvalidConfiguration(
 }
 
 MergeSystemData VmsGateway::prepareMergeRequestParameters(
-    const nx_http::Credentials& userCredentials,
+    const nx::network::http::Credentials& userCredentials,
     const std::string& systemIdToMergeTo)
 {
     MergeSystemData mergeSystemData;
@@ -124,14 +124,14 @@ MergeSystemData VmsGateway::prepareMergeRequestParameters(
     authKey.username = userCredentials.username.toUtf8();
     authKey.nonce = api::generateNonce(api::generateCloudNonceBase(systemIdToMergeTo)).c_str();
 
-    authKey.calcResponse(userCredentials.authToken, nx_http::Method::get, "/api/mergeSystems");
+    authKey.calcResponse(userCredentials.authToken, nx::network::http::Method::get, "/api/mergeSystems");
     mergeSystemData.getKey = authKey.toString();
 
-    authKey.calcResponse(userCredentials.authToken, nx_http::Method::post, "/api/mergeSystems");
+    authKey.calcResponse(userCredentials.authToken, nx::network::http::Method::post, "/api/mergeSystems");
     mergeSystemData.postKey = authKey.toString();
 
     mergeSystemData.url =
-        nx::network::url::Builder().setScheme(nx_http::kSecureUrlSchemeName)
+        nx::network::url::Builder().setScheme(nx::network::http::kSecureUrlSchemeName)
             .setHost(systemIdToMergeTo.c_str()).toString();
 
     return mergeSystemData;
@@ -199,17 +199,17 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
     {
         switch (clientPtr->lastResponseHttpStatusCode())
         {
-            case nx_http::StatusCode::serviceUnavailable:
-            case nx_http::StatusCode::notFound:
+            case nx::network::http::StatusCode::serviceUnavailable:
+            case nx::network::http::StatusCode::notFound:
                 result.resultCode = VmsResultCode::unreachable;
                 break;
 
-            case nx_http::StatusCode::badRequest:
+            case nx::network::http::StatusCode::badRequest:
                 result.resultCode = VmsResultCode::invalidData;
                 break;
 
-            case nx_http::StatusCode::unauthorized:
-            case nx_http::StatusCode::forbidden:
+            case nx::network::http::StatusCode::unauthorized:
+            case nx::network::http::StatusCode::forbidden:
                 result.resultCode = VmsResultCode::forbidden;
                 break;
 

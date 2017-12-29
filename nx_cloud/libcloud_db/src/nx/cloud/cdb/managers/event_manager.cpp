@@ -35,10 +35,10 @@ public:
             DataActionType::fetch,
             authorizationManager,
             [eventManager](
-                nx_http::HttpServerConnection* connection,
+                nx::network::http::HttpServerConnection* connection,
                 const AuthorizationInfo& authzInfo,
                 nx::utils::MoveOnlyFunc<
-                    void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+                    void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)
                 > completionHandler)
             {
                 eventManager->subscribeToEvents(
@@ -68,7 +68,7 @@ EventManager::~EventManager()
 
 void EventManager::registerHttpHandlers(
     const AuthorizationManager& authorizationManager,
-    nx_http::server::rest::MessageDispatcher* const httpMessageDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* const httpMessageDispatcher)
 {
     httpMessageDispatcher->registerRequestProcessor<SubscribeToSystemEventsHandler>(
         SubscribeToSystemEventsHandler::kHandlerPath,
@@ -81,10 +81,10 @@ void EventManager::registerHttpHandlers(
 }
 
 void EventManager::subscribeToEvents(
-    nx_http::HttpServerConnection* httpConnection,
+    nx::network::http::HttpServerConnection* httpConnection,
     const AuthorizationInfo& authzInfo,
     nx::utils::MoveOnlyFunc<
-        void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+        void(api::ResultCode, std::unique_ptr<nx::network::http::AbstractMsgBodySource>)
     > completionHandler)
 {
     std::string systemId;
@@ -100,7 +100,7 @@ void EventManager::subscribeToEvents(
     NX_LOGX(lm("System %1 subscribing to events").arg(systemId), cl_logDEBUG2);
 
     auto msgBody =
-        std::make_unique<nx_http::MultipartMessageBodySource>(
+        std::make_unique<nx::network::http::MultipartMessageBodySource>(
             "nx_cloud_event_boundary");
 
     {
@@ -150,7 +150,7 @@ bool EventManager::isSystemOnline(const std::string& systemId) const
 }
 
 void EventManager::beforeMsgBodySourceDestruction(
-    nx_http::HttpServerConnection* connection)
+    nx::network::http::HttpServerConnection* connection)
 {
     //element can already be removed, but connection object is still alive
 

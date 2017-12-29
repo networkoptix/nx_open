@@ -29,7 +29,7 @@ ApiDiscoveredServerData makeServer(
     const nx::vms::discovery::ModuleEndpoint& module, const QnUuid& localSystemId)
 {
     ApiDiscoveredServerData serverData(module);
-    serverData.setEndpoints(std::vector<SocketAddress>{module.endpoint});
+    serverData.setEndpoints(std::vector<nx::network::SocketAddress>{module.endpoint});
     if (QnConnectionValidator::validateConnection(module) != Qn::SuccessConnectionResult)
     {
         serverData.status = Qn::ResourceStatus::Incompatible;

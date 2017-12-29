@@ -22,13 +22,13 @@ using BeginListeningHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode,
         BeginListeningResponse,
-        std::unique_ptr<AbstractStreamSocket>)>;
+        std::unique_ptr<network::AbstractStreamSocket>)>;
 
 using StartClientConnectSessionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
 
 using OpenRelayConnectionHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<network::AbstractStreamSocket>)>;
 
 class NX_NETWORK_API Client:
     public network::aio::BasicPollable
@@ -104,7 +104,7 @@ public:
 private:
     const nx::utils::Url m_baseUrl;
     SystemError::ErrorCode m_prevSysErrorCode;
-    nx_http::AuthInfo m_authInfo;
+    nx::network::http::AuthInfo m_authInfo;
     std::list<std::unique_ptr<network::aio::BasicPollable>> m_activeRequests;
 
     virtual void stopWhileInAioThread() override;
@@ -116,8 +116,8 @@ private:
         typename ... Response
     >
     void issueUpgradeRequest(
-        nx_http::Method::ValueType httpMethod,
-        const nx_http::StringType& protocolToUpgradeTo,
+        nx::network::http::Method::ValueType httpMethod,
+        const nx::network::http::StringType& protocolToUpgradeTo,
         Request request,
         const char* requestPathTemplate,
         std::initializer_list<RequestPathArgument> requestPathArguments,
@@ -136,7 +136,7 @@ private:
         CompletionHandler completionHandler);
 
     template<typename Request, typename Response, typename RequestPathArgument>
-    std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
+    std::unique_ptr<nx::network::http::FusionDataHttpClient<Request, Response>>
         prepareHttpRequest(
             Request request,
             const char* requestPathTemplate,
@@ -144,8 +144,8 @@ private:
 
     template<typename HttpClient, typename CompletionHandler, typename ... Response>
     void executeUpgradeRequest(
-        nx_http::Method::ValueType httpMethod,
-        const nx_http::StringType& protocolToUpgradeTo,
+        nx::network::http::Method::ValueType httpMethod,
+        const nx::network::http::StringType& protocolToUpgradeTo,
         HttpClient httpClient,
         CompletionHandler completionHandler);
 
@@ -156,11 +156,11 @@ private:
 
     ResultCode toUpgradeResultCode(
         SystemError::ErrorCode sysErrorCode,
-        const nx_http::Response* httpResponse);
+        const nx::network::http::Response* httpResponse);
 
     ResultCode toResultCode(
         SystemError::ErrorCode sysErrorCode,
-        const nx_http::Response* httpResponse);
+        const nx::network::http::Response* httpResponse);
 };
 
 } // namespace api

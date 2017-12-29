@@ -21,9 +21,9 @@ int QnTestLdapSettingsHandler::executePost(
     Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers, settings);
     if (ldapResult != Qn::Ldap_NoError) {
         result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     result.setReply(ldapUsers);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

@@ -1,8 +1,3 @@
-/**********************************************************
-* 26 dec 2014
-* a.kolesnikov
-***********************************************************/
-
 #include <condition_variable>
 #include <chrono>
 #include <memory>
@@ -29,7 +24,9 @@ namespace {
     static const int kWaitTimeoutMs = 1000 * 10;
 }
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class HttpClientPoolTest
 :
@@ -38,25 +35,25 @@ class HttpClientPoolTest
 public:
     HttpClientPoolTest()
     :
-        m_testHttpServer(std::make_unique<TestHttpServer>()),
-        m_testHttpServer2(std::make_unique<TestHttpServer>())
+        m_testHttpServer(std::make_unique<nx::network::http::TestHttpServer>()),
+        m_testHttpServer2(std::make_unique<nx::network::http::TestHttpServer>())
     {
     }
 
-    TestHttpServer* testHttpServer()
+    nx::network::http::TestHttpServer* testHttpServer()
     {
         return m_testHttpServer.get();
     }
 
-    TestHttpServer* testHttpServer2()
+    nx::network::http::TestHttpServer* testHttpServer2()
     {
         return m_testHttpServer2.get();
     }
 
 protected:
     nx::network::SocketGlobals::InitGuard m_guard;
-    std::unique_ptr<TestHttpServer> m_testHttpServer;
-    std::unique_ptr<TestHttpServer> m_testHttpServer2;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer;
+    std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer2;
 };
 
 TEST_F(HttpClientPoolTest, GeneralTest)
@@ -79,7 +76,7 @@ TEST_F(HttpClientPoolTest, GeneralTest)
         .arg(testHttpServer2()->serverAddress().port));
 
 
-    std::unique_ptr<nx_http::ClientPool> httpPool(new nx_http::ClientPool());
+    std::unique_ptr<nx::network::http::ClientPool> httpPool(new nx::network::http::ClientPool());
 
     QByteArray expectedResponse;
 
@@ -88,12 +85,12 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     int requestsFinished = 0;
 
     QObject::connect(
-        httpPool.get(), &nx_http::ClientPool::done,
+        httpPool.get(), &nx::network::http::ClientPool::done,
         httpPool.get(),
-        [&](int /*handle*/, nx_http::AsyncHttpClientPtr client)
+        [&](int /*handle*/, nx::network::http::AsyncHttpClientPtr client)
     {
         ASSERT_FALSE(client->failed());
-        ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+        ASSERT_EQ(client->response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
         QByteArray msgBody = client->fetchMessageBodyBuffer();
         ASSERT_TRUE(msgBody.startsWith("SimpleTest"));
         if (msgBody == "SimpleTest2")
@@ -130,7 +127,7 @@ TEST_F(HttpClientPoolTest, terminateTest)
     const nx::utils::Url url(lit("http://127.0.0.1:%1/test")
         .arg(testHttpServer()->serverAddress().port));
 
-    std::unique_ptr<nx_http::ClientPool> httpPool(new nx_http::ClientPool());
+    std::unique_ptr<nx::network::http::ClientPool> httpPool(new nx::network::http::ClientPool());
 
     QByteArray expectedResponse;
 
@@ -140,9 +137,9 @@ TEST_F(HttpClientPoolTest, terminateTest)
     QSet<int> requests;
 
     QObject::connect(
-        httpPool.get(), &nx_http::ClientPool::done,
+        httpPool.get(), &nx::network::http::ClientPool::done,
         httpPool.get(),
-        [&](int /*handle*/, nx_http::AsyncHttpClientPtr client)
+        [&](int /*handle*/, nx::network::http::AsyncHttpClientPtr client)
     {
         QnMutexLocker lock(&mutex);
         client->fetchMessageBodyBuffer();
@@ -177,5 +174,6 @@ TEST_F(HttpClientPoolTest, terminateTest)
     ASSERT_TRUE(httpPool->size() == 0);
 }
 
-
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

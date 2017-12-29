@@ -80,7 +80,7 @@ private:
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
-    const std::list<SocketAddress> m_serverPeerEndpoints;
+    const std::list<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     stats::ConnectSession m_sessionStatisticsInfo;
     api::ConnectResponse m_preparedConnectResponse;
@@ -108,7 +108,7 @@ private:
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
 
-    nx::stun::Message prepareConnectionRequestedIndication(
+    nx::network::stun::Message prepareConnectionRequestedIndication(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
 
@@ -127,7 +127,7 @@ private:
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
-        std::list<SocketAddress> tcpEndpoints,
+        std::list<network::SocketAddress> tcpEndpoints,
         boost::optional<QUrl> relayInstanceUrl);
 
     void sendConnectResponse(

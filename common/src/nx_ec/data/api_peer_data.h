@@ -164,9 +164,9 @@ struct ApiPeerDataEx: public ApiPeerData
 
 #define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(aliveUpdateIntervalMs)(protoVersion)
 
-ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request);
+ec2::ApiPeerDataEx deserializeFromRequest(const nx::network::http::Request& request);
 void serializeToResponse(
-    nx_http::Response* response,
+    nx::network::http::Response* response,
     ec2::ApiPeerDataEx localPeer,
     Qn::SerializationFormat dataFormat);
 

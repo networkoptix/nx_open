@@ -242,7 +242,7 @@ public:
 protected:
     void givenEstablishedConnection()
     {
-        ASSERT_TRUE(m_clientSocket.connect(m_acceptor->getLocalAddress()));
+        ASSERT_TRUE(m_clientSocket.connect(m_acceptor->getLocalAddress(), nx::network::kNoTimeout));
     }
 
     void whenSentRandomData()

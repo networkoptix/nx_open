@@ -581,7 +581,7 @@ void TimeSynchronizationManager::forceTimeResync()
 
 void TimeSynchronizationManager::processTimeSyncInfoHeader(
     const QnUuid& peerID,
-    const nx_http::StringType& serializedTimeSync,
+    const nx::network::http::StringType& serializedTimeSync,
     boost::optional<qint64> rttMillis)
 {
     TimeSyncInfo remotePeerTimeSyncInfo;
@@ -734,7 +734,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
         //saving credentials has been used to establish connection
         startSynchronizingTimeWithPeer( //starting sending time sync info to peer
             transport->remotePeer().id,
-            SocketAddress( remoteAddr.host(), remoteAddr.port() ),
+            nx::network::SocketAddress( remoteAddr.host(), remoteAddr.port() ),
             transport->authData() );
     }
 }
@@ -746,8 +746,8 @@ void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
     const QnUuid& peerID,
-    SocketAddress peerAddress,
-    nx_http::AuthInfoCache::AuthorizationCacheItem authData )
+    nx::network::SocketAddress peerAddress,
+    nx::network::http::AuthInfoCache::AuthorizationCacheItem authData )
 {
     QnMutexLocker lock( &m_mutex );
     auto iterResultPair = m_peersToSendTimeSyncTo.emplace(
@@ -767,7 +767,7 @@ void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
 void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& peerID )
 {
     nx::utils::TimerManager::TimerGuard timerID;
-    nx_http::AsyncHttpClientPtr httpClient;
+    nx::network::http::AsyncHttpClientPtr httpClient;
 
     QnMutexLocker lock( &m_mutex );
     auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
@@ -783,7 +783,7 @@ void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& pe
 void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 {
     const auto& commonModule = m_messageBus->commonModule();
-    nx_http::AsyncHttpClientPtr clientPtr;
+    nx::network::http::AsyncHttpClientPtr clientPtr;
 
     QnMutexLocker lock( &m_mutex );
     if( m_terminated )
@@ -818,13 +818,13 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     targetUrl.setPath( lit("/") + QnTimeSyncRestHandler::PATH );
 
     NX_ASSERT( !peerIter->second.httpClient );
-    clientPtr = nx_http::AsyncHttpClient::create();
+    clientPtr = nx::network::http::AsyncHttpClient::create();
     using namespace std::placeholders;
     const auto requestSendClock = m_monotonicClock.elapsed();
     connect(
-        clientPtr.get(), &nx_http::AsyncHttpClient::done,
+        clientPtr.get(), &nx::network::http::AsyncHttpClient::done,
         this,
-        [this, peerID, requestSendClock]( nx_http::AsyncHttpClientPtr clientPtr ) {
+        [this, peerID, requestSendClock]( nx::network::http::AsyncHttpClientPtr clientPtr ) {
             const qint64 rtt = m_monotonicClock.elapsed() - requestSendClock;
             {
                 //saving rtt
@@ -853,7 +853,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     {
         clientPtr->addAdditionalHeader(
             Qn::RTT_MS_HEADER_NAME,
-            nx_http::StringType::number(peerIter->second.rttMillis.get()));
+            nx::network::http::StringType::number(peerIter->second.rttMillis.get()));
     }
 
     clientPtr->setUserCredentials(peerIter->second.authData.userCredentials);
@@ -866,7 +866,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 
 void TimeSynchronizationManager::timeSyncRequestDone(
     const QnUuid& peerID,
-    nx_http::AsyncHttpClientPtr clientPtr,
+    nx::network::http::AsyncHttpClientPtr clientPtr,
     qint64 requestRttMillis)
 {
     NX_LOG(lm("TimeSynchronizationManager. Received (%1) response from peer %2")
@@ -874,7 +874,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
         .arg(peerID), cl_logDEBUG2);
 
     if( clientPtr->response() &&
-        clientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
+        clientPtr->response()->statusLine.statusCode == nx::network::http::StatusCode::ok )
     {
         //reading time sync information from remote server
         auto timeSyncHeaderIter = clientPtr->response()->headers.find( QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME );
@@ -1214,7 +1214,7 @@ void TimeSynchronizationManager::resyncTimeWithPeer(const QnUuid& peerId)
 
 void TimeSynchronizationManager::onBeforeSendingTransaction(
     QnTransactionTransportBase* /*transport*/,
-    nx_http::HttpHeaders* const headers)
+    nx::network::http::HttpHeaders* const headers)
 {
     headers->emplace(
         QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME,
@@ -1223,7 +1223,7 @@ void TimeSynchronizationManager::onBeforeSendingTransaction(
 
 void TimeSynchronizationManager::onTransactionReceived(
     QnTransactionTransportBase* /*transport*/,
-    const nx_http::HttpHeaders& headers)
+    const nx::network::http::HttpHeaders& headers)
 {
     const auto& settings = m_messageBus->commonModule()->globalSettings();
     for (auto header : headers)
@@ -1231,7 +1231,7 @@ void TimeSynchronizationManager::onTransactionReceived(
         if (header.first != QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME)
             continue;
 
-        const nx_http::StringType& serializedTimeSync = header.second;
+        const nx::network::http::StringType& serializedTimeSync = header.second;
         TimeSyncInfo remotePeerTimeSyncInfo;
         if (!remotePeerTimeSyncInfo.fromString(serializedTimeSync))
             continue;

@@ -28,7 +28,7 @@ GenericMulticastIoDevice::GenericMulticastIoDevice(const QUrl& url):
 
 GenericMulticastIoDevice::~GenericMulticastIoDevice()
 {
-    for (const auto iface : getAllIPv4Interfaces())
+    for (const auto iface : nx::network::getAllIPv4Interfaces())
         m_socket->leaveGroup(m_url.host(), iface.address.toString());
 }
 
@@ -75,12 +75,12 @@ bool GenericMulticastIoDevice::initSocket(const QUrl& url)
     result &= m_socket->setReuseAddrFlag(true);
     result &= m_socket->setRecvBufferSize(kBufferCapacity);
     result &= m_socket->setRecvTimeout(kReceiveTimeout.count());
-    result &= m_socket->bind(SocketAddress(HostAddress::anyHost, url.port()));
+    result &= m_socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, url.port()));
 
     if (!result)
         return false;
 
-    for (const auto iface : getAllIPv4Interfaces())
+    for (const auto iface : nx::network::getAllIPv4Interfaces())
         result &= m_socket->joinGroup(url.host(), iface.address.toString());
 
     return result;

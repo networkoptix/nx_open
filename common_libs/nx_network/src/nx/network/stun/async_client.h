@@ -11,6 +11,7 @@
 #include <nx/utils/url.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 using MessagePipeline = nx::network::server::BaseStreamProtocolConnectionEmbeddable<
@@ -116,4 +117,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

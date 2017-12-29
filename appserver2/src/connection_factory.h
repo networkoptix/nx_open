@@ -132,7 +132,7 @@ private:
     ErrorCode fillConnectionInfo(
         const ApiLoginData& loginInfo,
         QnConnectionInfo* const connectionInfo,
-        nx_http::Response* response = nullptr);
+        nx::network::http::Response* response = nullptr);
 
     int testDirectConnection(const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler);
     int testRemoteConnection(const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler);
@@ -161,7 +161,7 @@ private:
     void regFunctorWithResponse(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler,
+        std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
         Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
 
     template<class Function>

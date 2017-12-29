@@ -61,7 +61,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
                 requestedUrl.setQuery(request.mid(queryPos+1));
                 return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
             }
-            return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
         }
     }
 

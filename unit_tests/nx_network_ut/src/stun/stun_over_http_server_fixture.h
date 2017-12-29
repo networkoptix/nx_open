@@ -14,6 +14,7 @@
 #include "stun_async_client_acceptance_tests.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -23,17 +24,17 @@ class StunOverHttpServer:
 public:
     StunOverHttpServer();
 
-    virtual bool bind(const SocketAddress& localEndpoint) override;
+    virtual bool bind(const network::SocketAddress& localEndpoint) override;
     virtual bool listen() override;
     virtual utils::Url getServerUrl() const override;
-    virtual nx::stun::MessageDispatcher& dispatcher() override;
-    virtual void sendIndicationThroughEveryConnection(nx::stun::Message) override;
+    virtual nx::network::stun::MessageDispatcher& dispatcher() override;
+    virtual void sendIndicationThroughEveryConnection(stun::Message) override;
     virtual std::size_t connectionCount() const override;
 
 private:
-    TestHttpServer m_httpServer;
-    nx::stun::MessageDispatcher m_dispatcher;
-    nx::stun::StunOverHttpServer m_stunOverHttpServer;
+    network::http::TestHttpServer m_httpServer;
+    nx::network::stun::MessageDispatcher m_dispatcher;
+    nx::network::stun::StunOverHttpServer m_stunOverHttpServer;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -44,23 +45,24 @@ class StunOverHttpServerFixture:
 protected:
     virtual void SetUp() override;
 
-    nx::stun::MessageDispatcher& dispatcher();
+    nx::network::stun::MessageDispatcher& dispatcher();
     utils::Url tunnelUrl() const;
-    nx::stun::Message popReceivedMessage();
-    nx::stun::Message prepareRequest();
+    nx::network::stun::Message popReceivedMessage();
+    nx::network::stun::Message prepareRequest();
 
     void givenTunnelingServer();
     void assertStunClientIsAbleToPerformRequest(AbstractAsyncClient* client);
 
 private:
     StunOverHttpServer m_server;
-    nx::utils::SyncQueue<nx::stun::Message> m_messagesReceived;
+    nx::utils::SyncQueue<nx::network::stun::Message> m_messagesReceived;
 
     void processStunMessage(
-        std::shared_ptr<nx::stun::AbstractServerConnection> serverConnection,
-        nx::stun::Message message);
+        std::shared_ptr<nx::network::stun::AbstractServerConnection> serverConnection,
+        nx::network::stun::Message message);
 };
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

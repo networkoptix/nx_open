@@ -26,7 +26,7 @@ public:
     virtual void selectBestEndpont(
         const QString& moduleName,
         std::vector<SocketAddress> endpoints,
-        std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler) = 0;
+        std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> handler) = 0;
 };
 
 class NX_NETWORK_API RandomEndpointSelector:
@@ -39,7 +39,7 @@ public:
     virtual void selectBestEndpont(
         const QString& moduleName,
         std::vector<SocketAddress> endpoints,
-        std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler) override;
+        std::function<void(nx::network::http::StatusCode::Value, SocketAddress)> handler) override;
 };
 
 } // namespace cloud

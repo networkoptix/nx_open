@@ -130,15 +130,18 @@ bool CloudStreamSocket::reopen()
 
 bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
     NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
 
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
         return false;
-    if (!setSendTimeout(timeoutMillis))
-        return false;
+    if (timeout != nx::network::kNoTimeout)
+    {
+        if (!setSendTimeout(timeout.count()))
+            return false;
+    }
 
     nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {

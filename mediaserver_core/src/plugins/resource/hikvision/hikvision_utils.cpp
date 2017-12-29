@@ -88,7 +88,7 @@ QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
 }
 
 std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
-    nx_http::StringType message)
+    nx::network::http::StringType message)
 {
     QDomDocument doc;
     std::vector<ChannelStatusResponse> channels;
@@ -112,7 +112,7 @@ std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
     return channels;
 }
 
-boost::optional<ChannelStatusResponse> parseChannelStatusResponse(nx_http::StringType message)
+boost::optional<ChannelStatusResponse> parseChannelStatusResponse(nx::network::http::StringType message)
 {
     QDomDocument doc;
     
@@ -122,7 +122,7 @@ boost::optional<ChannelStatusResponse> parseChannelStatusResponse(nx_http::Strin
     return parseChannelElement(element);
 }
 
-boost::optional<OpenChannelResponse> parseOpenChannelResponse(nx_http::StringType message)
+boost::optional<OpenChannelResponse> parseOpenChannelResponse(nx::network::http::StringType message)
 {
     OpenChannelResponse response;
 
@@ -151,7 +151,7 @@ boost::optional<OpenChannelResponse> parseOpenChannelResponse(nx_http::StringTyp
     return response;
 }
 
-boost::optional<CommonResponse> parseCommonResponse(nx_http::StringType message)
+boost::optional<CommonResponse> parseCommonResponse(nx::network::http::StringType message)
 {
     CommonResponse response;
     QDomDocument doc;
@@ -363,7 +363,7 @@ bool doGetRequest(
     const nx::utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
-    nx_http::StatusCode::Value* outStatusCode)
+    nx::network::http::StatusCode::Value* outStatusCode)
 {
     NX_ASSERT(outBuffer, lit("Output buffer should be set."));
     if (!outBuffer)
@@ -372,7 +372,7 @@ bool doGetRequest(
     return doRequest(
         url,
         auth,
-        nx_http::Method::get,
+        nx::network::http::Method::get,
         /*bufferToSend*/ nullptr,
         outBuffer,
         outStatusCode);
@@ -382,12 +382,12 @@ bool doPutRequest(
     const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx::Buffer& buffer,
-    nx_http::StatusCode::Value* outStatusCode)
+    nx::network::http::StatusCode::Value* outStatusCode)
 {
     return doRequest(
         url,
         auth,
-        nx_http::Method::put,
+        nx::network::http::Method::put,
         &buffer,
         /*outResponseBuffer*/ nullptr,
         outStatusCode);
@@ -396,22 +396,22 @@ bool doPutRequest(
 bool doRequest(
     const nx::utils::Url& url,
     const QAuthenticator& auth,
-    const nx_http::Method::ValueType& method,
+    const nx::network::http::Method::ValueType& method,
     const nx::Buffer* bufferToSend,
     nx::Buffer* outResponseBuffer,
-    nx_http::StatusCode::Value* outStatusCode)
+    nx::network::http::StatusCode::Value* outStatusCode)
 {
     if (outStatusCode)
-        *outStatusCode = nx_http::StatusCode::undefined;
+        *outStatusCode = nx::network::http::StatusCode::undefined;
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     if (!tuneHttpClient(&httpClient, auth))
         return false;
 
     bool result = false;
-    if (method == nx_http::Method::get)
+    if (method == nx::network::http::Method::get)
         result = httpClient.doGet(url);
-    else if (method == nx_http::Method::put && bufferToSend)
+    else if (method == nx::network::http::Method::put && bufferToSend)
         result = httpClient.doPut(url, kContentType.toUtf8(), *bufferToSend);
     
     if (!result)
@@ -421,14 +421,14 @@ bool doRequest(
     while (!httpClient.eof())
         responseBuffer.append(httpClient.fetchMessageBodyBuffer());
 
-    nx_http::StatusCode::Value statusCode = (nx_http::StatusCode::Value)httpClient.response()
+    nx::network::http::StatusCode::Value statusCode = (nx::network::http::StatusCode::Value)httpClient.response()
         ->statusLine.statusCode;
 
     if (outStatusCode)
         *outStatusCode = statusCode;
 
-    result = nx_http::StatusCode::isSuccessCode(statusCode);
-    if (method == nx_http::Method::put && result)
+    result = nx::network::http::StatusCode::isSuccessCode(statusCode);
+    if (method == nx::network::http::Method::put && result)
         result = responseIsOk(parseCommonResponse(responseBuffer));
 
     if (result && outResponseBuffer)
@@ -437,7 +437,7 @@ bool doRequest(
     return result;
 }
 
-bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth)
+bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthenticator& auth)
 {
     NX_ASSERT(outHttpClient, lit("Output http client should be provided."));
     if (!outHttpClient)

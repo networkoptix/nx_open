@@ -6,7 +6,10 @@
 #include "abstract_socket.h"
 #include "socket_common.h"
 
-namespace nx { namespace network { class UDPSocket; } }
+namespace nx {
+namespace network {
+    
+class UDPSocket;
 
 /**
  * Contains factory methods for creating sockets.
@@ -105,3 +108,6 @@ private:
         SocketType socketType,
         boost::optional<int> _ipVersion);
 };
+
+} // namespace network
+} // namespace nx

@@ -65,9 +65,6 @@ enum InitializationFlags
 
 NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode);
 
-} // namespace network
-} // namespace nx
-
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
  * NOTE: Not using QHostAddress because QHostAddress can trigger dns name
@@ -137,8 +134,6 @@ private:
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 
-Q_DECLARE_METATYPE(HostAddress)
-
 /**
  * Represents host and port (e.g. 127.0.0.1:1234).
  */
@@ -172,19 +167,6 @@ inline uint qHash(const SocketAddress &address)
     return qHash(address.address.toString(), address.port);
 }
 
-namespace std {
-
-template <> struct hash<SocketAddress>
-{
-    size_t operator()(const SocketAddress& socketAddress) const
-    {
-        const auto stdString = socketAddress.toString().toStdString();
-        return hash<std::string>{}(stdString);
-    }
-};
-
-} // namespace std
-
 struct NX_NETWORK_API KeepAliveOptions
 {
     std::chrono::seconds inactivityPeriodBeforeFirstProbe;
@@ -211,6 +193,25 @@ struct NX_NETWORK_API KeepAliveOptions
     static boost::optional<KeepAliveOptions> fromString(const QString& string);
 };
 
+} // namespace network
+} // namespace nx
+
+Q_DECLARE_METATYPE(nx::network::HostAddress)
+Q_DECLARE_METATYPE(nx::network::SocketAddress)
+
+namespace std {
+
+template <> struct hash<nx::network::SocketAddress>
+{
+    size_t operator()(const nx::network::SocketAddress& socketAddress) const
+    {
+        const auto stdString = socketAddress.toString().toStdString();
+        return hash<std::string>{}(stdString);
+    }
+};
+
+} // namespace std
+
 inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
 inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
 
@@ -222,5 +223,3 @@ inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigE
 #ifndef ntohll
 #define ntohll qn_ntohll
 #endif
-
-Q_DECLARE_METATYPE(SocketAddress)

@@ -35,7 +35,7 @@ private:
     quint16 m_port;
     QnMutex m_mutex;
 
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     bool m_terminated;
     bool m_inProcess;
     nx::Buffer m_sendBuffer;

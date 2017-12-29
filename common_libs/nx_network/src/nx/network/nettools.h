@@ -1,5 +1,4 @@
-#ifndef cl_net_tools_1232
-#define cl_net_tools_1232
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QUdpSocket>
@@ -7,6 +6,8 @@
 
 #include <nx/network/socket_common.h>
 
+namespace nx {
+namespace network {
 
 static const int ping_timeout = 300;
 
@@ -105,6 +106,7 @@ QList<QHostAddress> NX_NETWORK_API pingableAddresses(const QHostAddress& startAd
 //QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0, QUdpSocket::BindMode mode = QUdpSocket::DefaultForPlatform);
 
 bool NX_NETWORK_API isIpv4Address(const QString& addr);
+// TODO: #ak Remove this method if favor of AddressResolver.
 QHostAddress NX_NETWORK_API resolveAddress(const QString& addr);
 
 int NX_NETWORK_API strEqualAmount(const char* str1, const char* str2);
@@ -124,4 +126,5 @@ QString NX_NETWORK_API getMacFromPrimaryIF();
 
 QSet<QString> NX_NETWORK_API getLocalIpV4AddressList();
 
-#endif //cl_net_tools_1232
+} // namespace network
+} // namespace nx

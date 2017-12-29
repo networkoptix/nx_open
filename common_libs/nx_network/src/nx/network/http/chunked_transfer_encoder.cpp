@@ -9,11 +9,13 @@
 #include <nx/network/socket.h>
 #include <nx/fusion/serialization/binary_stream.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 QByteArray QnChunkedTransferEncoder::serializeSingleChunk(
     const QByteArray& data,
-    const std::vector<nx_http::ChunkExtension>& chunkExtensions)
+    const std::vector<nx::network::http::ChunkExtension>& chunkExtensions)
 {
     QByteArray result;
     const quint32 dataSize = static_cast<quint32>(data.size());
@@ -52,4 +54,6 @@ QByteArray QnChunkedTransferEncoder::serializeSingleChunk(
     return result;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

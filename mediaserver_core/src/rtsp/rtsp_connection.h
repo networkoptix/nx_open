@@ -64,8 +64,8 @@ struct RtspServerTrackInfo
     int clientRtcpPort;
     quint16 sequence;
     qint64 firstRtpTime;
-    AbstractDatagramSocket* mediaSocket;
-    AbstractDatagramSocket* rtcpSocket;
+    nx::network::AbstractDatagramSocket* mediaSocket;
+    nx::network::AbstractDatagramSocket* rtcpSocket;
     MediaType mediaType;
 
 private:
@@ -88,7 +88,7 @@ class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);

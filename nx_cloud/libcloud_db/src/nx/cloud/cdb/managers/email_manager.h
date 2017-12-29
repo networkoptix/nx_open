@@ -59,13 +59,13 @@ private:
     bool m_terminated;
     mutable QnMutex m_mutex;
     nx::utils::Url m_notificationModuleUrl;
-    std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
+    std::set<nx::network::http::AsyncHttpClientPtr> m_ongoingRequests;
     nx::utils::Counter m_startedAsyncCallsCounter;
     std::atomic<std::uint64_t> m_notificationSequence;
 
     void onSendNotificationRequestDone(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx_http::AsyncHttpClientPtr client,
+        nx::network::http::AsyncHttpClientPtr client,
         std::uint64_t notificationIndex,
         std::function<void(bool)> completionHandler);
 };

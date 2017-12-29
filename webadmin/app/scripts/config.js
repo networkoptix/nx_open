@@ -38,7 +38,7 @@ var Config = {
     dateInternalFormat:'yyyy-MM-ddThh:mm:ss',
 
     visualLog: false,
-    allowCastMode: false, //Enables usage of chromecast
+    allowBetaMode: false, //Enables usage of beta features
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events

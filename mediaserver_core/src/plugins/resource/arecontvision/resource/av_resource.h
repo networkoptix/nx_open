@@ -100,10 +100,10 @@ private:
     int m_prevMotionChannel;
     bool m_dualsensor;
     bool m_inputPortState;
-    nx_http::AsyncHttpClientPtr m_relayInputClient;
+    nx::network::http::AsyncHttpClientPtr m_relayInputClient;
 
     bool getParamPhysical2(int channel, const QString& name, QString &val);
-    void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);
+    void inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client);
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;

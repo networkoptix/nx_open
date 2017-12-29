@@ -88,7 +88,7 @@ protected:
 
         QnJsonRestResult result;
         ASSERT_EQ(
-            nx_http::StatusCode::ok,
+            nx::network::http::StatusCode::ok,
             m_restHandler.execute(input, result, nullptr));
     }
 

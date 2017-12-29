@@ -15,8 +15,8 @@ namespace nx {
 namespace time_server {
 
 namespace {
-static const SocketAddress kTimeProtocolServerEndpoint =
-    SocketAddress(HostAddress::anyHost, network::kTimeProtocolDefaultPort);
+static const network::SocketAddress kTimeProtocolServerEndpoint =
+    network::SocketAddress(network::HostAddress::anyHost, network::kTimeProtocolDefaultPort);
 } // namespace
 
 TimeServerProcess::TimeServerProcess(int argc, char **argv):

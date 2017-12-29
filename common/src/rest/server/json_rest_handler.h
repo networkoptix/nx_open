@@ -38,11 +38,11 @@
 
 struct JsonRestResponse
 {
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
     QnJsonRestResult json;
     bool isUndefinedContentLength = false;
 
-    JsonRestResponse(nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined,
+    JsonRestResponse(nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
         QnJsonRestResult json = {}, bool isUndefinedContentLength = false);
 
     template<typename T>
@@ -51,7 +51,7 @@ struct JsonRestResponse
     template<typename T>
     JsonRestResponse(QnJsonRestResult::Error error, const T& value) { json.setError(error, value); }
 
-    JsonRestResponse(nx_http::StatusCode::Value status, QnJsonRestResult::Error error);
+    JsonRestResponse(nx::network::http::StatusCode::Value status, QnJsonRestResult::Error error);
 
     RestResponse toRest(bool extraFormatting) const;
 };

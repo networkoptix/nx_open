@@ -40,15 +40,15 @@ struct CloudDb
 
 struct Stun
 {
-    std::list<SocketAddress> addrToListenList;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    std::list<network::SocketAddress> addrToListenList;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Http
 {
-    std::list<SocketAddress> addrToListenList;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    std::list<network::SocketAddress> addrToListenList;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
@@ -123,7 +123,7 @@ private:
     void initializeWithDefaultValues();
     void readEndpointList(
         const QString& str,
-        std::list<SocketAddress>* const addrToListenList);
+        std::list<network::SocketAddress>* const addrToListenList);
     void loadConnectionParameters();
     void loadTrafficRelay();
     void loadListeningPeer();

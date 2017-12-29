@@ -4,7 +4,9 @@
 
 #include "../http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * HTTP server request handler which deserializes input/serializes output data using fusion.
@@ -30,8 +32,8 @@ public:
      * NOTE: If Output is void, then requestCompleted(FusionRequestResult).
      */
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo,
         Input inputData) = 0;
 
@@ -57,17 +59,17 @@ public:
      * On request processing completion requestCompleted(FusionRequestResult) MUST be invoked.
      */
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo ) = 0;
 
 private:
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler) override
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
         this->m_completionHandler = std::move(completionHandler);
         this->m_requestMethod = request.requestLine.method;
@@ -86,4 +88,6 @@ private:
     }
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

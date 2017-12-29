@@ -22,9 +22,9 @@ bool FileSocket::isClosed() const
 
 bool FileSocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int timeoutMillis)
+    std::chrono::milliseconds timeout)
 {
-    DummySocket::connect(remoteSocketAddress, timeoutMillis);
+    DummySocket::connect(remoteSocketAddress, timeout);
 
     if (m_file.is_open())
         m_file.close();

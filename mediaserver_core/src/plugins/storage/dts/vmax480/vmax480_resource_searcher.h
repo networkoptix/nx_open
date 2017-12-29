@@ -16,8 +16,8 @@ public:
 
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) override;
 

@@ -252,7 +252,7 @@ bool StreamingChunkInputStream::tryRead(
     return true;
 }
 
-void StreamingChunkInputStream::setByteRange(const nx_http::header::ContentRange& range)
+void StreamingChunkInputStream::setByteRange(const nx::network::http::header::ContentRange& range)
 {
     m_range = range;
 }

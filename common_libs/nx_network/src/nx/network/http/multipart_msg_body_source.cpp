@@ -2,7 +2,9 @@
 
 #include <nx/utils/byte_stream/custom_output_stream.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 MultipartMessageBodySource::MultipartMessageBodySource(StringType boundary):
     m_multipartBodySerializer(
@@ -96,4 +98,6 @@ void MultipartMessageBodySource::onSomeDataAvailable(
         });
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

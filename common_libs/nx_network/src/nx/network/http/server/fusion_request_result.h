@@ -7,7 +7,9 @@
 
 #include "../http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 enum class FusionRequestErrorClass
 {
@@ -51,19 +53,21 @@ public:
         FusionRequestErrorDetail _errorDetail,
         QString _errorText);
 
-    nx_http::StatusCode::Value httpStatusCode() const;
-    void setHttpStatusCode(nx_http::StatusCode::Value statusCode);
+    nx::network::http::StatusCode::Value httpStatusCode() const;
+    void setHttpStatusCode(nx::network::http::StatusCode::Value statusCode);
 
 private:
-    boost::optional<nx_http::StatusCode::Value> m_httpStatusCode;
+    boost::optional<nx::network::http::StatusCode::Value> m_httpStatusCode;
 
-    nx_http::StatusCode::Value calculateHttpStatusCode() const;
+    nx::network::http::StatusCode::Value calculateHttpStatusCode() const;
 };
 
 #define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)
 
-QN_FUSION_DECLARE_FUNCTIONS(nx_http::FusionRequestErrorDetail, (lexical), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx_http::FusionRequestErrorClass, (lexical), NX_NETWORK_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx_http::FusionRequestResult, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::FusionRequestErrorDetail, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::FusionRequestErrorClass, (lexical), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::FusionRequestResult, (json), NX_NETWORK_API)
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

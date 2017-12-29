@@ -45,7 +45,7 @@ private:
         const QString& codecCapabilitiesString,
         std::vector<StreamCodecCapabilities>* outCapabilities) const;
 
-    void tuneHttpClient(nx_http::HttpClient& httpClient) const;
+    void tuneHttpClient(nx::network::http::HttpClient& httpClient) const;
 
     bool parseResponse(
         const nx::Buffer& response,

@@ -66,8 +66,8 @@ private:
     float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
-    std::shared_ptr<nx_http::HttpClient> m_httpClient;
-    std::unique_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
+    std::shared_ptr<nx::network::http::HttpClient> m_httpClient;
+    std::unique_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
     std::unique_ptr<ILPVideoPacket> m_videoPacket;
     StreamType m_streamType;
     qint64 m_prevFrameClock;
@@ -78,8 +78,8 @@ private:
     std::atomic<int> m_isInGetNextData;
     nxpl::TimeProvider* const m_timeProvider;
  
-    int doRequest( nx_http::HttpClient* const httpClient );
-    void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
+    int doRequest( nx::network::http::HttpClient* const httpClient );
+    void gotJpegFrame( const nx::network::http::ConstBufferRefType& jpgFrame );
     /*!
         \return false, if has been interrupted. Otherwise \a true
     */

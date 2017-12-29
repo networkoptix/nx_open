@@ -1,6 +1,8 @@
 #include "multipart_content_parser.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 MultipartContentParser::MultipartContentParser():
     m_state(waitingBoundary),
@@ -88,7 +90,7 @@ bool MultipartContentParser::processData(const QnByteArrayConstRef& data)
     }
 
     if (m_state == eofReached)
-        return m_nextFilter->processData(nx_http::BufferType()); //< Reporting eof with empty part.
+        return m_nextFilter->processData(nx::network::http::BufferType()); //< Reporting eof with empty part.
 
     return true;
 }
@@ -106,7 +108,7 @@ size_t MultipartContentParser::flush()
             {
                 processLine(lineBuffer);
                 if (m_state == eofReached)
-                    return m_nextFilter->processData(nx_http::BufferType()); //< Reporting eof with empty part.
+                    return m_nextFilter->processData(nx::network::http::BufferType()); //< Reporting eof with empty part.
             }
             break;
         }
@@ -131,28 +133,28 @@ bool MultipartContentParser::setContentType(const StringType& contentType)
     static const char multipartContentType[] = "multipart/";
 
     // Analyzing response headers (if needed).
-    const nx_http::StringType::value_type* sepPos =
+    const nx::network::http::StringType::value_type* sepPos =
         std::find(contentType.constData(), contentType.constData() + contentType.size(), ';');
     if (sepPos == contentType.constData() + contentType.size())
         return false;   //< Unexpected content type.
 
-    if (nx_http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType) - 1)
+    if (nx::network::http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType) - 1)
         != multipartContentType)
     {
         return false; //< Unexpected content type.
     }
 
     // Searching first not-space.
-    const nx_http::StringType::value_type* boundaryStart = std::find_if(
+    const nx::network::http::StringType::value_type* boundaryStart = std::find_if(
         sepPos + 1,
         contentType.constData() + contentType.size(),
-        std::not1(std::bind1st(std::equal_to<nx_http::StringType::value_type>(), ' ')));
+        std::not1(std::bind1st(std::equal_to<nx::network::http::StringType::value_type>(), ' ')));
     if (boundaryStart == contentType.constData() + contentType.size())
     {
         // Failed to read boundary marker.
         return false;
     }
-    if (!nx_http::ConstBufferRefType(contentType, boundaryStart - contentType.constData())
+    if (!nx::network::http::ConstBufferRefType(contentType, boundaryStart - contentType.constData())
             .startsWith("boundary="))
     {
         // Failed to read boundary marker.
@@ -181,7 +183,7 @@ void MultipartContentParser::setBoundary(const StringType& boundary)
         m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF + "--";
 }
 
-const nx_http::HttpHeaders& MultipartContentParser::prevFrameHeaders() const
+const nx::network::http::HttpHeaders& MultipartContentParser::prevFrameHeaders() const
 {
     return m_currentFrameHeaders;
 }
@@ -226,8 +228,8 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
                 }
                 else
                 {
-                    const nx_http::StringType& contentType =
-                        nx_http::getHeaderValue(m_currentFrameHeaders, "Content-Type");
+                    const nx::network::http::StringType& contentType =
+                        nx::network::http::getHeaderValue(m_currentFrameHeaders, "Content-Type");
                     bool isTextData = !m_forceParseAsBinary
                         && (contentType == "application/text" || contentType == "text/plain");
 
@@ -245,7 +247,7 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
             }
             QnByteArrayConstRef headerName;
             QnByteArrayConstRef headerValue;
-            nx_http::parseHeader(&headerName, &headerValue, lineBuffer); //< Ignoring result.
+            nx::network::http::parseHeader(&headerName, &headerValue, lineBuffer); //< Ignoring result.
             m_currentFrameHeaders.emplace(headerName, headerValue);
             break;
         }
@@ -381,4 +383,6 @@ void MultipartContentParser::setForceParseAsBinary(bool force)
     m_forceParseAsBinary = force;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

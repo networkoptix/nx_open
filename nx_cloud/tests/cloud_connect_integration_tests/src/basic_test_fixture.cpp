@@ -76,7 +76,7 @@ BasicTestFixture::BasicTestFixture(
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
 {
-    auto discoverFunc = []() {return HostAddress("127.0.0.1"); };
+    auto discoverFunc = []() {return network::HostAddress("127.0.0.1"); };
     controller::PublicIpDiscoveryService::setDiscoverFunc(discoverFunc);
 }
 
@@ -93,7 +93,7 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
 
 BasicTestFixture::~BasicTestFixture()
 {
-    std::list<std::unique_ptr<nx_http::AsyncClient>> httpClients;
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
     {
         QnMutexLocker lock(&m_mutex);
         httpClients.swap(m_httpClients);
@@ -110,7 +110,7 @@ void BasicTestFixture::setInitFlags(int flags)
     m_initFlags = flags;
 }
 
-SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+network::SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
 {
     return m_relays[index]->moduleInstance()->httpEndpoints()[0];
 }
@@ -238,7 +238,7 @@ void BasicTestFixture::startExchangingFixedData()
 {
     QnMutexLocker lock(&m_mutex);
 
-    m_httpClients.push_back(std::make_unique<nx_http::AsyncClient>());
+    m_httpClients.push_back(std::make_unique<nx::network::http::AsyncClient>());
     m_httpClients.back()->setSendTimeout(std::chrono::seconds::zero());
     m_httpClients.back()->setResponseReadTimeout(std::chrono::seconds::zero());
 
@@ -255,7 +255,7 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
     while (m_unfinishedRequestsLeft > 0)
     {
         const auto result = m_httpRequestResults.pop();
-        ASSERT_EQ(nx_http::StatusCode::ok, result.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, result.statusCode);
         ASSERT_EQ(m_expectedMsgBody, result.msgBody);
         --m_unfinishedRequestsLeft;
     }
@@ -333,7 +333,7 @@ void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiPro
     m_mediatorApiProtocol = mediatorApiProtocol;
 }
 
-const std::unique_ptr<AbstractStreamSocket>& BasicTestFixture::clientSocket()
+const std::unique_ptr<network::AbstractStreamSocket>& BasicTestFixture::clientSocket()
 {
     return m_clientSocket;
 }
@@ -376,7 +376,7 @@ void BasicTestFixture::startHttpServer()
     auto cloudServerSocket = std::make_unique<CloudServerSocket>(
         &SocketGlobals::cloud().mediatorConnector());
 
-    m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
+    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
     m_staticUrl = nx::utils::Url(lm("http://%1/static").arg(serverSocketCloudAddress()));
 
@@ -386,7 +386,7 @@ void BasicTestFixture::startHttpServer()
 }
 
 void BasicTestFixture::onHttpRequestDone(
-    std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter)
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>>::iterator clientIter)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -400,7 +400,7 @@ void BasicTestFixture::onHttpRequestDone(
     if (httpClient->response())
     {
         result.statusCode =
-            (nx_http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
+            (nx::network::http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
         result.msgBody = httpClient->fetchMessageBodyBuffer();
     }
 

@@ -8,7 +8,9 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Reponsible for modifying HTTP request.
@@ -43,4 +45,6 @@ private:
     std::list<std::function<void(Request*)>> m_requestModifiers;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

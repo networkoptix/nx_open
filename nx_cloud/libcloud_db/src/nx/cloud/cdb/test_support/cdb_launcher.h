@@ -33,7 +33,7 @@ public:
 
     virtual bool waitUntilStarted() override;
 
-    SocketAddress endpoint() const;
+    network::SocketAddress endpoint() const;
 
     nx::cdb::api::ConnectionFactory* connectionFactory();
     std::unique_ptr<nx::cdb::api::Connection> connection(

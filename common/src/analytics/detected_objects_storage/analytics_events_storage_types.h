@@ -113,8 +113,8 @@ enum class ResultCode
 
 ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult);
 
-nx_http::StatusCode::Value toHttpStatusCode(ResultCode resultCode);
-ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode);
+nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode);
+ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 

@@ -36,7 +36,7 @@ int QnCookieLoginRestHandler::executePost(
     if (!success)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid json object. All fields are mandatory");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     Qn::UserAccessData accessRights;
@@ -49,29 +49,29 @@ int QnCookieLoginRestHandler::executePost(
     if (authResult == Qn::Auth_CloudConnectError)
     {
         result.setError(QnRestResult::CantProcessRequest, nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     else if (authResult == Qn::Auth_LDAPConnectError)
     {
         result.setError(QnRestResult::CantProcessRequest, "LDAP server is not accessible yet. Please try again later.");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     else if (authResult != Qn::Auth_OK)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QString cookiePostfix(lit("Path=/; HttpOnly"));
     QString authData = lit("auth=%1;%2")
         .arg(QLatin1String(cookieData.auth))
         .arg(cookiePostfix);
-    nx_http::insertHeader(&owner->response()->headers, nx_http::HttpHeader("Set-Cookie", authData.toUtf8()));
+    nx::network::http::insertHeader(&owner->response()->headers, nx::network::http::HttpHeader("Set-Cookie", authData.toUtf8()));
 
     QString clientGuid = lit("%1=%2;")
         .arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME))
         .arg(QnUuid::createUuid().toString()) + cookiePostfix;
-    nx_http::insertHeader(&owner->response()->headers, nx_http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
+    nx::network::http::insertHeader(&owner->response()->headers, nx::network::http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);

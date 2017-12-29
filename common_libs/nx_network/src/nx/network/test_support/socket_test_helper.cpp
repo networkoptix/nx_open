@@ -1001,7 +1001,8 @@ MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBin
 }
 
 bool MultipleClientSocketTester::connect(
-    const SocketAddress& address, unsigned int timeout)
+    const SocketAddress& address,
+    std::chrono::milliseconds timeout)
 {
     return TCPSocket::connect(modifyAddress(address), timeout);
 }

@@ -58,11 +58,11 @@ protected:
 
                 cc->start(nullptr /* do not wait for select in test */);
                 m_connection = std::make_unique<udp::IncomingTunnelConnection>(std::move(cc));
-                
+
                 acceptForever();
                 startedPromise.set_value();
             });
-            
+
         startedPromise.get_future().wait();
     }
 
@@ -83,7 +83,7 @@ protected:
         NX_CRITICAL(socket->setSendTimeout(kSocketTimeout.count()));
         NX_CRITICAL(socket->setRecvTimeout(kSocketTimeout.count()));
         NX_CRITICAL(socket->setNonBlockingMode(true));
-        NX_CRITICAL(socket->bind(SocketAddress(HostAddress::localhost, 0)));
+        NX_CRITICAL(socket->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)));
         return std::move(socket);
     }
 
@@ -92,7 +92,7 @@ protected:
         m_connection->accept(
             [this](
                 SystemError::ErrorCode code,
-                std::unique_ptr<AbstractStreamSocket> socket)
+                std::unique_ptr<nx::network::AbstractStreamSocket> socket)
             {
                 {
                     QnMutexLocker lock(&m_mutex);
@@ -138,13 +138,13 @@ protected:
     }
 
     QnMutex m_mutex;
-    SocketAddress m_connectionAddress;
+    nx::network::SocketAddress m_connectionAddress;
     std::unique_ptr<udp::IncomingTunnelConnection> m_connection;
     std::unique_ptr<UdtStreamSocket> m_freeSocket;
     utils::TestSyncQueue<SystemError::ErrorCode> m_acceptResults;
     utils::TestSyncQueue<SystemError::ErrorCode> m_connectResults;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> m_connectSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamSocket>> m_connectSockets;
 };
 
 TEST_F(UdpIncomingTunnelConnectionTest, Timeout)
@@ -277,7 +277,7 @@ TEST_F(UdpIncomingTunnelConnectionTest, PleaseStopOnRun)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
                     ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
-                    if (!socket->connect(m_connectionAddress))
+                    if (!socket->connect(m_connectionAddress, nx::network::deprecated::kDefaultConnectTimeout))
                         return;
                 }
             }));
@@ -353,7 +353,7 @@ protected:
     }
 
 private:
-    using AcceptResult = std::tuple<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>;
+    using AcceptResult = std::tuple<SystemError::ErrorCode, std::unique_ptr<nx::network::AbstractStreamSocket>>;
 
     nx::utils::SyncQueue<AcceptResult> m_acceptResults;
     std::unique_ptr<udp::IncomingTunnelConnection> m_tunnelConnection;
@@ -369,7 +369,7 @@ private:
 
     void saveAcceptResult(
         SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
         m_acceptResults.push(std::make_tuple(sysErrorCode, std::move(connection)));
     }

@@ -195,7 +195,7 @@ Transport::Transport(const QUuid& localGuid):
     m_mutex(QnMutex::Recursive),
     m_nextSendQueued(false)
 {
-    initSockets(getLocalIpV4AddressList());
+    initSockets(nx::network::getLocalIpV4AddressList());
 
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
@@ -269,7 +269,7 @@ void Transport::at_timer()
     // 2. check if interface list changed
     if (m_checkInterfacesTimer.hasExpired(INTERFACE_LIST_CHECK_INTERVAL))
     {
-        QSet<QString> addrList = getLocalIpV4AddressList();
+        QSet<QString> addrList = nx::network::getLocalIpV4AddressList();
         if (addrList != m_localAddressList)
             initSockets(addrList);
         m_checkInterfacesTimer.restart();

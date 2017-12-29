@@ -10,6 +10,7 @@
 #include "abstract_server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -59,4 +60,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

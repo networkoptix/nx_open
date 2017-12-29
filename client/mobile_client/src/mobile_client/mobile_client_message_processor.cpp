@@ -72,5 +72,5 @@ void QnMobileClientMessageProcessor::updateMainServerApiUrl(const QnMediaServerR
     if (!url.isValid())
         return;
 
-    server->setPrimaryAddress(SocketAddress(url.host(), url.port(0)));
+    server->setPrimaryAddress(nx::network::SocketAddress(url.host(), url.port(0)));
 }

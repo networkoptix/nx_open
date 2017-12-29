@@ -207,16 +207,16 @@ private:
         url.setHost(endpoint.address.toString());
         url.setPort(endpoint.port);
 
-        nx_http::HttpClient httpClient;
+        nx::network::http::HttpClient httpClient;
         httpClient.doGet(url);
 
         auto response = httpClient.response();
-        ASSERT_EQ(nx_http::StatusCode::unauthorized, response->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::unauthorized, response->statusLine.statusCode);
 
         auto authHeaderIt = response->headers.find("WWW-Authenticate");
         ASSERT_NE(authHeaderIt, httpClient.response()->headers.cend());
 
-        nx_http::header::DigestAuthorization auth;
+        nx::network::http::header::DigestAuthorization auth;
         ASSERT_TRUE(auth.parse(authHeaderIt->second));
 
         ASSERT_NE(auth.digest->params.find("nonce"), auth.digest->params.cend());

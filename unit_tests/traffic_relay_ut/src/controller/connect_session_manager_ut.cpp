@@ -70,18 +70,18 @@ public:
     }
 
     bool hasRelaySession(
-        AbstractStreamSocket* clientConnection,
-        AbstractStreamSocket* serverConnection,
+        nx::network::AbstractStreamSocket* clientConnection,
+        nx::network::AbstractStreamSocket* serverConnection,
         const std::string& listeningPeerName) const
     {
         using AdapterType =
             nx::network::aio::AsyncChannelAdapter<
-                std::unique_ptr<AbstractStreamSocket>>;
+                std::unique_ptr<nx::network::AbstractStreamSocket>>;
 
         for (const auto& relaySession: m_relaySessions)
         {
             // TODO: #ak Get rid of conversion to AdapterType
-            //   when AbstractStreamSocket inherits AbstractAsyncChannel.
+            //   when nx::network::AbstractStreamSocket inherits AbstractAsyncChannel.
 
             auto clientConnectionAdapter =
                 dynamic_cast<AdapterType*>(relaySession.clientConnection.connection.get());
@@ -130,7 +130,7 @@ public:
 
         m_settingsLoader.load();
 
-        m_clientEndpoint.address = HostAddress::localhost;
+        m_clientEndpoint.address = nx::network::HostAddress::localhost;
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 50000);
     }
 
@@ -272,7 +272,7 @@ protected:
     void thenStartRelayingNotificationIsSentToTheListeningPeer()
     {
         const QByteArray buffer = m_lastListeningPeerConnection->read();
-        nx_http::Message message(nx_http::MessageType::request);
+        nx::network::http::Message message(nx::network::http::MessageType::request);
         ASSERT_TRUE(message.request->parse(buffer));
 
         api::OpenTunnelNotification openTunnelNotification;
@@ -420,19 +420,19 @@ private:
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     nx::network::test::StreamSocketStub* m_lastClientConnection = nullptr;
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
-    SocketAddress m_clientEndpoint;
+    nx::network::SocketAddress m_clientEndpoint;
     nx::utils::test::SettingsLoader<conf::Settings> m_settingsLoader;
 
     void onBeginListeningCompletion(
         api::ResultCode resultCode,
         api::BeginListeningResponse /*response*/,
-        nx_http::ConnectionEvents connectionEvents)
+        nx::network::http::ConnectionEvents connectionEvents)
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             m_lastListeningPeerConnection = tcpConnection.get();
-            auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
+            auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
                 nullptr,
@@ -445,14 +445,14 @@ private:
 
     void onConnectCompletion(
         api::ResultCode resultCode,
-        nx_http::ConnectionEvents connectionEvents)
+        nx::network::http::ConnectionEvents connectionEvents)
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             tcpConnection->setForeignAddress(m_clientEndpoint);
             m_lastClientConnection = tcpConnection.get();
-            auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
+            auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
                 nullptr,
@@ -571,7 +571,7 @@ protected:
                 nx::utils::promise<api::ResultCode> completed;
                 connectSessionManager().connectToPeer(
                     request,
-                    [&completed](api::ResultCode resultCode, nx_http::ConnectionEvents)
+                    [&completed](api::ResultCode resultCode, nx::network::http::ConnectionEvents)
                     {
                         completed.set_value(resultCode);
                     });

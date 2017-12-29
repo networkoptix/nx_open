@@ -21,8 +21,8 @@ TransactionTransport::TransactionTransport(
     const ConnectionRequestAttributes& connectionRequestAttributes,
     const nx::String& systemId,
     const ::ec2::ApiPeerData& localPeer,
-    const SocketAddress& remotePeerEndpoint,
-    const nx_http::Request& request)
+    const network::SocketAddress& remotePeerEndpoint,
+    const nx::network::http::Request& request)
 :
     m_baseTransactionTransport(
         QnUuid(), //< localSystemId. Not used here
@@ -114,7 +114,7 @@ void TransactionTransport::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
-SocketAddress TransactionTransport::remoteSocketAddr() const
+network::SocketAddress TransactionTransport::remoteSocketAddr() const
 {
     return m_baseTransactionTransport.remoteSocketAddr();
 }
@@ -184,14 +184,14 @@ void TransactionTransport::sendTransaction(
 }
 
 void TransactionTransport::receivedTransaction(
-    const nx_http::HttpHeaders& headers,
+    const nx::network::http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData)
 {
     m_baseTransactionTransport.receivedTransaction(headers, tranData);
 }
 
 void TransactionTransport::setOutgoingConnection(
-    QSharedPointer<AbstractCommunicatingSocket> socket)
+    QSharedPointer<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport.setOutgoingConnection(std::move(socket));
 }

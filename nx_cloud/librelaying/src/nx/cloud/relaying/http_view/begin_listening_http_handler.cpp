@@ -18,8 +18,8 @@ BeginListeningHandler::BeginListeningHandler(
 }
 
 relay::api::BeginListeningRequest BeginListeningHandler::prepareRequestData(
-    nx_http::HttpServerConnection* const /*connection*/,
-    const nx_http::Request& /*httpRequest*/)
+    nx::network::http::HttpServerConnection* const /*connection*/,
+    const nx::network::http::Request& /*httpRequest*/)
 {
     relay::api::BeginListeningRequest inputData;
     inputData.peerName = requestPathParams()[0].toStdString();

@@ -98,27 +98,27 @@ void MetadataMonitor::clearHandlers()
 void MetadataMonitor::initMonitorUnsafe()
 {
     std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     m_timer.pleaseStopSync();
     httpClient->bindToAioThread(m_timer.getAioThread());
 
     connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
         this, &MetadataMonitor::at_responseReceived,
         Qt::DirectConnection);
 
     connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
         this, &MetadataMonitor::at_someBytesAvailable,
         Qt::DirectConnection);
 
     connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &MetadataMonitor::at_connectionClosed,
         Qt::DirectConnection);
 
     m_timeSinceLastOpen.restart();
-    httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
+    httpClient->setTotalReconnectTries(nx::network::http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
     httpClient->setMessageBodyReadTimeoutMs(
@@ -132,7 +132,7 @@ void MetadataMonitor::initMonitorUnsafe()
                 handler(events);
         };
 
-    m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
+    m_contentParser = std::make_unique<nx::network::http::MultipartContentParser>();
     m_contentParser->setForceParseAsBinary(true);
     m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, handler));
 
@@ -140,22 +140,22 @@ void MetadataMonitor::initMonitorUnsafe()
     m_httpClient = httpClient;
 }
 
-void MetadataMonitor::at_responseReceived(nx_http::AsyncHttpClientPtr httpClient)
+void MetadataMonitor::at_responseReceived(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     const auto response = httpClient->response();
-    if (response && response->statusLine.statusCode == nx_http::StatusCode::ok)
+    if (response && response->statusLine.statusCode == nx::network::http::StatusCode::ok)
         m_contentParser->setContentType(httpClient->contentType());
     else
         at_connectionClosed(httpClient);
 }
 
-void MetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient)
+void MetadataMonitor::at_someBytesAvailable(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     const auto& buffer = httpClient->fetchMessageBodyBuffer();
     m_contentParser->processData(buffer);
 }
 
-void MetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr /*httpClient*/)
+void MetadataMonitor::at_connectionClosed(nx::network::http::AsyncHttpClientPtr /*httpClient*/)
 {
     const auto elapsed = m_timeSinceLastOpen.elapsed();
     std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast

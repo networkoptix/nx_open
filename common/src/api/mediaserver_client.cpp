@@ -16,7 +16,7 @@ void MediaServerClient::bindToAioThread(nx::network::aio::AbstractAioThread* aio
         client->bindToAioThread(aioThread);
 }
 
-void MediaServerClient::setUserCredentials(const nx_http::Credentials& userCredentials)
+void MediaServerClient::setUserCredentials(const nx::network::http::Credentials& userCredentials)
 {
     m_userCredentials = userCredentials;
 }
@@ -316,7 +316,7 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
         result);
 }
 
-nx_http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
+nx::network::http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
 {
     return m_prevResponseHttpStatusCode;
 }
@@ -331,11 +331,11 @@ void MediaServerClient::stopWhileInAioThread()
 
 ec2::ErrorCode MediaServerClient::toEc2ErrorCode(
     SystemError::ErrorCode systemErrorCode,
-    nx_http::StatusCode::Value statusCode)
+    nx::network::http::StatusCode::Value statusCode)
 {
     if (systemErrorCode != SystemError::noError)
         return ec2::ErrorCode::ioError;
-    if (!nx_http::StatusCode::isSuccessCode(statusCode))
+    if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
         return ec2::ErrorCode::forbidden;
 
     return ec2::ErrorCode::ok;

@@ -27,7 +27,7 @@ int QnLogRestHandler::executeGet(
             processor->accessRights(),
             Qn::GlobalPermission::GlobalAdminPermission))
     {
-        return nx_http::StatusCode::forbidden;
+        return nx::network::http::StatusCode::forbidden;
     }
 
     qint64 linesToRead = 100;
@@ -59,7 +59,7 @@ int QnLogRestHandler::executeGet(
     if (!logFilePath)
     {
         result.append(QString("<root>Bad log file id or name</root>\n"));
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
     }
 
     if (linesToRead == 0ll)
@@ -69,7 +69,7 @@ int QnLogRestHandler::executeGet(
     if (!f.open(QFile::ReadOnly))
     {
         result.append(QString("<root>Can't open log file</root>\n"));
-        return nx_http::StatusCode::internalServerError;
+        return nx::network::http::StatusCode::internalServerError;
     }
     qint64 fileSize = f.size();
 
@@ -113,7 +113,7 @@ int QnLogRestHandler::executeGet(
     }
     contentType = "text/plain; charset=UTF-8";
     result = solidArray;
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnLogRestHandler::executePost(

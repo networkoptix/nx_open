@@ -12,7 +12,9 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace test {
 
 static const char* const kTestPath = "/HttpServerConnectionTest";
@@ -102,7 +104,7 @@ private:
     }
 
     void provideEmptyMessageBody(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
         Request /*request*/,
         Response* const /*response*/,
@@ -119,7 +121,7 @@ private:
         completionHandler(std::move(result));
     }
 
-    void onResponseSent(nx_http::HttpServerConnection* /*connection*/)
+    void onResponseSent(nx::network::http::HttpServerConnection* /*connection*/)
     {
         m_responseSentEvents.push(0);
     }
@@ -162,4 +164,6 @@ TEST_F(
 }
 
 } // namespace test
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

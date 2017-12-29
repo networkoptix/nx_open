@@ -7,6 +7,7 @@
 #include <QString>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 using namespace attrs;
@@ -567,4 +568,5 @@ nx::network::server::ParserState MessageParser::parse(const nx::Buffer& user_buf
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

@@ -27,17 +27,17 @@ static nx::Buffer makeClientKey()
     return nx::utils::random::generate(16).toBase64();
 }
 
-static Error validateRequestLine(const nx_http::RequestLine& requestLine)
+static Error validateRequestLine(const nx::network::http::RequestLine& requestLine)
 {
-    if (requestLine.method != "GET" || requestLine.version < nx_http::http_1_1)
+    if (requestLine.method != "GET" || requestLine.version < nx::network::http::http_1_1)
         return Error::handshakeError;
 
     return Error::noError;
 }
 
-static Error validateHeaders(const nx_http::HttpHeaders& headers)
+static Error validateHeaders(const nx::network::http::HttpHeaders& headers)
 {
-    nx_http::HttpHeaders::const_iterator headersIt;
+    nx::network::http::HttpHeaders::const_iterator headersIt;
 
     if (((headersIt = headers.find(kUpgrade)) == headers.cend() || headersIt->second != kWebsocketProtocolName)
         || ((headersIt = headers.find(kConnection)) == headers.cend() || headersIt->second != kUpgrade))
@@ -52,12 +52,12 @@ static Error validateHeaders(const nx_http::HttpHeaders& headers)
     return Error::noError;
 }
 
-static Error validateRequestHeaders(const nx_http::HttpHeaders& headers)
+static Error validateRequestHeaders(const nx::network::http::HttpHeaders& headers)
 {
     if (validateHeaders(headers) != Error::noError)
         return Error::handshakeError;
 
-    nx_http::HttpHeaders::const_iterator headersIt;
+    nx::network::http::HttpHeaders::const_iterator headersIt;
 
     if (headers.find(kHost) == headers.cend()
         || ((headersIt = headers.find(kKey)) == headers.cend() || headersIt->second.size() < 16)
@@ -69,12 +69,12 @@ static Error validateRequestHeaders(const nx_http::HttpHeaders& headers)
     return Error::noError;
 }
 
-static Error validateResponseHeaders(const nx_http::HttpHeaders& headers, const nx_http::Request& request)
+static Error validateResponseHeaders(const nx::network::http::HttpHeaders& headers, const nx::network::http::Request& request)
 {
     if (validateHeaders(headers) != Error::noError)
         return Error::handshakeError;
 
-    nx_http::HttpHeaders::const_iterator headersIt;
+    nx::network::http::HttpHeaders::const_iterator headersIt;
     if ((headersIt = headers.find(kAccept)) == headers.cend()
         || detail::makeAcceptKey(request.headers.find(kKey)->second) != headersIt->second)
     {
@@ -111,7 +111,7 @@ nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
 
 }
 
-Error validateRequest(const nx_http::Request& request, nx_http::Response* response)
+Error validateRequest(const nx::network::http::Request& request, nx::network::http::Response* response)
 {
     Error result = validateRequestLine(request.requestLine);
     if (result != Error::noError)
@@ -124,7 +124,7 @@ Error validateRequest(const nx_http::Request& request, nx_http::Response* respon
     if (!response)
         return Error::noError;
 
-    response->statusLine.statusCode = nx_http::StatusCode::switchingProtocols;
+    response->statusLine.statusCode = nx::network::http::StatusCode::switchingProtocols;
     response->headers.emplace(kConnection, kUpgrade);
     response->headers.emplace(kUpgrade, kWebsocketProtocolName);
     response->headers.emplace(kAccept, detail::makeAcceptKey(request.headers.find(kKey)->second));
@@ -136,7 +136,7 @@ Error validateRequest(const nx_http::Request& request, nx_http::Response* respon
     return Error::noError;
 }
 
-void addClientHeaders(nx_http::HttpHeaders* headers, const nx::Buffer& protocolName)
+void addClientHeaders(nx::network::http::HttpHeaders* headers, const nx::Buffer& protocolName)
 {
     headers->emplace(kUpgrade, kWebsocketProtocolName);
     headers->emplace(kConnection, kUpgrade);
@@ -145,16 +145,16 @@ void addClientHeaders(nx_http::HttpHeaders* headers, const nx::Buffer& protocolN
     headers->emplace(kProtocol, protocolName);
 }
 
-void addClientHeaders(nx_http::AsyncClient* request, const nx::Buffer& protocolName)
+void addClientHeaders(nx::network::http::AsyncClient* request, const nx::Buffer& protocolName)
 {
-    nx_http::HttpHeaders headers;
+    nx::network::http::HttpHeaders headers;
     addClientHeaders(&headers, protocolName);
     request->setAdditionalHeaders(std::move(headers));
 }
 
-Error validateResponse(const nx_http::Request& request, const nx_http::Response& response)
+Error validateResponse(const nx::network::http::Request& request, const nx::network::http::Response& response)
 {
-    if (response.statusLine.statusCode != nx_http::StatusCode::switchingProtocols)
+    if (response.statusLine.statusCode != nx::network::http::StatusCode::switchingProtocols)
         return Error::handshakeError;
 
     if (validateResponseHeaders(response.headers, request) != Error::noError)

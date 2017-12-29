@@ -29,7 +29,7 @@ class RelayService:
 public:
     RelayService(int argc, char **argv);
 
-    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
 
     const relaying::AbstractListeningPeerPool& listeningPeerPool() const;
 

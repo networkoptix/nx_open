@@ -11,5 +11,5 @@ int QnGetHardwareInfoHandler::executeGet(const QString &path, const QnRequestPar
 
     const QnHardwareInfo& hardwareInfo = LLUtil::getHardwareInfo();
     result.setReply(hardwareInfo);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
