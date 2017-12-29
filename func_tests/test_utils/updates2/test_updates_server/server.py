@@ -1,3 +1,12 @@
+"""
+Test updates server. Replicates functionality of updates.networkoptix.com but appends new versions and cloud host
+information and corresponding specific updates links to the existing ones. You may specify what to add in the call to
+the append_new_versions() function (see main() for example).
+If started with '--generate_data' key collects actual data from updates.networkoptix.com, makes needed amendments and
+saves result to the 'data' folder before HTTP server start. Without that key - tries to read data from the 'data'
+folder.
+"""
+
 import shutil
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from http.client import HTTPConnection
@@ -37,6 +46,7 @@ def collect_actual_data():
             try:
                 path_to_update_obj[update_path] = json.loads(content)
             except Exception as e:
+                # Some updates might be not valid jsons, we are just not interested in them
                 pass
 
     return root_obj, path_to_update_obj
@@ -53,8 +63,9 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 customization_obj['releases'][new_version[0]] = new_version[1]
                 new_update_obj = path_to_update_obj[existing_update_key_with_customization].copy()
                 new_update_obj['version'] = new_version[1]
+                new_update_obj['cloudHost'] = new_version[2]
 
-                def amend_file_name(file_info_obj, new_version):
+                def amend_file_name(file_info_obj):
                     old_file_name_splits = file_info_obj['file'].split('.')
                     new_version_splits = new_version[1].split('.')
                     new_file_name_prefix = list(old_file_name_splits[0])
@@ -67,7 +78,7 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 def amend_packages(update_obj, packages_name):
                     for os_key, os_obj in update_obj[packages_name].items():
                         for file_key, file_obj in os_obj.items():
-                            amend_file_name(file_obj, new_version)
+                            amend_file_name(file_obj)
 
                 amend_packages(new_update_obj, 'clientPackages')
                 amend_packages(new_update_obj, 'packages')
@@ -132,7 +143,7 @@ def make_handler_class(root_obj, path_to_update):
                 self._send_ok_headers()
                 self.wfile.write(bytes(json.dumps(self.path_to_update[self.path]), encoding='utf-8'))
             else:
-                self.send_response(401)
+                self.send_response(404)
                 self.end_headers()
 
     return TestHandler
@@ -142,12 +153,14 @@ def main():
     args = parse_args()
     if args.generate_data:
         print('Loading and generating data. Be patient')
-        new_root, new_path_to_update_obj = append_new_versions(*collect_actual_data(), [('4.0', '4.0.0.21200')])
+        new_root, new_path_to_update_obj = append_new_versions(*collect_actual_data(),
+                                                               [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')])
         save_data_to_files(new_root, new_path_to_update_obj)
     else:
         try:
             new_root, new_path_to_update_obj = load_data_from_files()
         except Exception as e:
+            print(e)
             print('Failed to load test data. Did you forget to generate it first?')
             return
 
