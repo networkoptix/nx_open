@@ -93,6 +93,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::mediaserver::plugins::Hikvision::EventTypeFlag)
-    (nx::mediaserver::plugins::Hikvision::EventTypeFlags)
+    (nx::mediaserver::plugins::Hikvision::EventTypeFlags),
     (metatype)(numeric)(lexical)
 )
