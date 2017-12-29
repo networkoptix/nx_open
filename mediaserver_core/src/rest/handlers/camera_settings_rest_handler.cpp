@@ -59,7 +59,7 @@ int QnCameraSettingsRestHandler::executeGet(
         {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
-        NX_LOG(this, lm("Camera not found"), cl_logDEBUG1);
+        NX_LOG(this, lm("Camera not found"), cl_logWARNING);
         if (notFoundCameraId.isNull())
             return CODE_BAD_REQUEST;
         else
