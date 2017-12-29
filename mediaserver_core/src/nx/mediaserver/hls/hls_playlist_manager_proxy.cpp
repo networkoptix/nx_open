@@ -1,21 +1,17 @@
-/**********************************************************
-* Aug 24, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "hls_playlist_manager_proxy.h"
 
+namespace nx {
+namespace mediaserver {
+namespace hls {
 
-namespace nx_hls {
-
-HlsPlayListManagerWeakRefProxy::HlsPlayListManagerWeakRefProxy(
+PlayListManagerWeakRefProxy::PlayListManagerWeakRefProxy(
     AbstractPlaylistManagerPtr target )
 :
     m_target( std::move(target) )
 {
 }
 
-size_t HlsPlayListManagerWeakRefProxy::generateChunkList(
+size_t PlayListManagerWeakRefProxy::generateChunkList(
     std::vector<ChunkData>* const chunkList,
     bool* const endOfStreamReached ) const
 {
@@ -26,7 +22,7 @@ size_t HlsPlayListManagerWeakRefProxy::generateChunkList(
     return strongTargetRef->generateChunkList( chunkList, endOfStreamReached );
 }
 
-int HlsPlayListManagerWeakRefProxy::getMaxBitrate() const
+int PlayListManagerWeakRefProxy::getMaxBitrate() const
 {
     auto strongTargetRef = m_target.lock();
     if( !strongTargetRef )
@@ -35,4 +31,6 @@ int HlsPlayListManagerWeakRefProxy::getMaxBitrate() const
     return strongTargetRef->getMaxBitrate();
 }
 
-}
+} // namespace hls
+} // namespace mediaserver
+} // namespace nx

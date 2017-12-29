@@ -7,9 +7,11 @@
 #include "camera/video_camera.h"
 #include "core/resource/resource.h"
 
-namespace nx_hls {
+namespace nx {
+namespace mediaserver {
+namespace hls {
 
-HLSSession::HLSSession(
+Session::Session(
     const QString& id,
     unsigned int targetDurationMS,
     bool _isLive,
@@ -28,13 +30,13 @@ HLSSession::HLSSession(
     // Verifying m_playlistManagers will not take much memory.
     static_assert(
         ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
-        "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type");
+        "MediaQuality enum suddenly contains too large values: consider changing Session::m_playlistManagers type");
     m_playlistManagers.resize(std::max<>(MEDIA_Quality_High, MEDIA_Quality_Low) + 1);
     if (m_live)
         videoCamera->inUse(this);
 }
 
-void HLSSession::updateAuditInfo(qint64 timeUsec)
+void Session::updateAuditInfo(qint64 timeUsec)
 {
     if (!m_auditHandle)
     {
@@ -47,7 +49,7 @@ void HLSSession::updateAuditInfo(qint64 timeUsec)
         qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
 }
 
-HLSSession::~HLSSession()
+Session::~Session()
 {
     if (m_live)
     {
@@ -62,27 +64,27 @@ HLSSession::~HLSSession()
     }
 }
 
-const QString& HLSSession::id() const
+const QString& Session::id() const
 {
     return m_id;
 }
 
-unsigned int HLSSession::targetDurationMS() const
+unsigned int Session::targetDurationMS() const
 {
     return m_targetDurationMS;
 }
 
-bool HLSSession::isLive() const
+bool Session::isLive() const
 {
     return m_live;
 }
 
-MediaQuality HLSSession::streamQuality() const
+MediaQuality Session::streamQuality() const
 {
     return m_streamQuality;
 }
 
-void HLSSession::setPlaylistManager(
+void Session::setPlaylistManager(
     MediaQuality streamQuality,
     const AbstractPlaylistManagerPtr& value)
 {
@@ -90,13 +92,13 @@ void HLSSession::setPlaylistManager(
     m_playlistManagers[streamQuality] = value;
 }
 
-const AbstractPlaylistManagerPtr& HLSSession::playlistManager(MediaQuality streamQuality) const
+const AbstractPlaylistManagerPtr& Session::playlistManager(MediaQuality streamQuality) const
 {
     NX_ASSERT(streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low);
     return m_playlistManagers[streamQuality];
 }
 
-void HLSSession::saveChunkAlias(
+void Session::saveChunkAlias(
     MediaQuality streamQuality,
     const QString& alias,
     quint64 startTimestamp,
@@ -106,7 +108,7 @@ void HLSSession::saveChunkAlias(
     m_chunksByAlias[std::make_pair(streamQuality, alias)] = std::make_pair(startTimestamp, duration);
 }
 
-bool HLSSession::getChunkByAlias(
+bool Session::getChunkByAlias(
     MediaQuality streamQuality,
     const QString& alias,
     quint64* const startTimestamp,
@@ -121,40 +123,40 @@ bool HLSSession::getChunkByAlias(
     return true;
 }
 
-void HLSSession::setPlaylistAuthenticationQueryItem(
+void Session::setPlaylistAuthenticationQueryItem(
     const QPair<QString, QString>& authenticationQueryItem)
 {
     m_playlistAuthenticationQueryItem = authenticationQueryItem;
 }
 
-QPair<QString, QString> HLSSession::playlistAuthenticationQueryItem() const
+QPair<QString, QString> Session::playlistAuthenticationQueryItem() const
 {
     return m_playlistAuthenticationQueryItem;
 }
 
-void HLSSession::setChunkAuthenticationQueryItem(
+void Session::setChunkAuthenticationQueryItem(
     const QPair<QString, QString>& authenticationQueryItem)
 {
     m_chunkAuthenticationQueryItem = authenticationQueryItem;
 }
 
-QPair<QString, QString> HLSSession::chunkAuthenticationQueryItem() const
+QPair<QString, QString> Session::chunkAuthenticationQueryItem() const
 {
     return m_chunkAuthenticationQueryItem;
 }
 
 //-------------------------------------------------------------------------------------------------
-// class HLSSessionPool.
+// class SessionPool.
 
-HLSSessionPool::HLSSessionContext::HLSSessionContext():
+SessionPool::SessionContext::SessionContext():
     session(NULL),
     keepAliveTimeoutMS(0),
     removeTaskID(0)
 {
 }
 
-HLSSessionPool::HLSSessionContext::HLSSessionContext(
-    HLSSession* const _session,
+SessionPool::SessionContext::SessionContext(
+    Session* const _session,
     unsigned int _keepAliveTimeoutMS)
     :
     session(_session),
@@ -163,19 +165,19 @@ HLSSessionPool::HLSSessionContext::HLSSessionContext(
 {
 }
 
-static HLSSessionPool* HLSSessionPool_instance = nullptr;
+static SessionPool* SessionPool_instance = nullptr;
 
-HLSSessionPool::HLSSessionPool()
+SessionPool::SessionPool()
 {
-    NX_ASSERT(HLSSessionPool_instance == nullptr);
-    HLSSessionPool_instance = this;
+    NX_ASSERT(SessionPool_instance == nullptr);
+    SessionPool_instance = this;
 }
 
-HLSSessionPool::~HLSSessionPool()
+SessionPool::~SessionPool()
 {
     while (!m_sessionByID.empty())
     {
-        HLSSessionContext sessionCtx;
+        SessionContext sessionCtx;
         {
             QnMutexLocker lk(&m_mutex);
             if (m_sessionByID.empty())
@@ -189,23 +191,23 @@ HLSSessionPool::~HLSSessionPool()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(sessionCtx.removeTaskID);
     }
 
-    HLSSessionPool_instance = nullptr;
+    SessionPool_instance = nullptr;
 }
 
-bool HLSSessionPool::add(HLSSession* session, unsigned int keepAliveTimeoutMS)
+bool SessionPool::add(Session* session, unsigned int keepAliveTimeoutMS)
 {
     QnMutexLocker lk(&m_mutex);
-    if (!m_sessionByID.emplace(session->id(), HLSSessionContext(session, keepAliveTimeoutMS)).second)
+    if (!m_sessionByID.emplace(session->id(), SessionContext(session, keepAliveTimeoutMS)).second)
         return false;
     // Session with keep-alive timeout can only be accessed under lock.
     NX_ASSERT((keepAliveTimeoutMS == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()));
     return true;
 }
 
-HLSSession* HLSSessionPool::find(const QString& id) const
+Session* SessionPool::find(const QString& id) const
 {
     QnMutexLocker lk(&m_mutex);
-    std::map<QString, HLSSessionContext>::const_iterator it = m_sessionByID.find(id);
+    std::map<QString, SessionContext>::const_iterator it = m_sessionByID.find(id);
     if (it == m_sessionByID.end())
         return NULL;
     // Session with keep-alive timeout can only be accessed under lock.
@@ -213,46 +215,46 @@ HLSSession* HLSSessionPool::find(const QString& id) const
     return it->second.session;
 }
 
-void HLSSessionPool::remove(const QString& id)
+void SessionPool::remove(const QString& id)
 {
     QnMutexLocker lk(&m_mutex);
     removeNonSafe(id);
 }
 
-HLSSessionPool* HLSSessionPool::instance()
+SessionPool* SessionPool::instance()
 {
-    return HLSSessionPool_instance;
+    return SessionPool_instance;
 }
 
 static QAtomicInt nextSessionID = 1;
 
-QString HLSSessionPool::generateUniqueID()
+QString SessionPool::generateUniqueID()
 {
     return QString::number(nextSessionID.fetchAndAddOrdered(1));
 }
 
-void HLSSessionPool::lockSessionID(const QString& id)
+void SessionPool::lockSessionID(const QString& id)
 {
     QnMutexLocker lk(&m_mutex);
     while (!m_lockedIDs.insert(id).second)
         m_cond.wait(lk.mutex());
 
     //removing session remove task (if any)
-    std::map<QString, HLSSessionContext>::iterator it = m_sessionByID.find(id);
+    std::map<QString, SessionContext>::iterator it = m_sessionByID.find(id);
     if (it == m_sessionByID.end() || it->second.removeTaskID == 0)
         return;
     m_taskToSessionID.erase(it->second.removeTaskID);
     it->second.removeTaskID = 0;
 }
 
-void HLSSessionPool::unlockSessionID(const QString& id)
+void SessionPool::unlockSessionID(const QString& id)
 {
     QnMutexLocker lk(&m_mutex);
     m_lockedIDs.erase(id);
     m_cond.wakeAll();
 
     //creating session remove task
-    std::map<QString, HLSSessionContext>::iterator it = m_sessionByID.find(id);
+    std::map<QString, SessionContext>::iterator it = m_sessionByID.find(id);
     if (it == m_sessionByID.end() || it->second.keepAliveTimeoutMS == 0)
         return;
     it->second.removeTaskID = nx::utils::TimerManager::instance()->addTimer(
@@ -260,7 +262,7 @@ void HLSSessionPool::unlockSessionID(const QString& id)
     m_taskToSessionID.insert(std::make_pair(it->second.removeTaskID, id));
 }
 
-void HLSSessionPool::onTimer(const quint64& timerID)
+void SessionPool::onTimer(const quint64& timerID)
 {
     QnMutexLocker lk(&m_mutex);
     std::map<quint64, QString>::iterator timerIter = m_taskToSessionID.find(timerID);
@@ -269,9 +271,9 @@ void HLSSessionPool::onTimer(const quint64& timerID)
     removeNonSafe(timerIter->second);    //removes timerIter also
 }
 
-void HLSSessionPool::removeNonSafe(const QString& id)
+void SessionPool::removeNonSafe(const QString& id)
 {
-    std::map<QString, HLSSessionContext>::const_iterator it = m_sessionByID.find(id);
+    std::map<QString, SessionContext>::const_iterator it = m_sessionByID.find(id);
     if (it == m_sessionByID.end())
         return;
     if (it->second.removeTaskID != 0)
@@ -280,4 +282,7 @@ void HLSSessionPool::removeNonSafe(const QString& id)
     m_sessionByID.erase(it);
 }
 
-} // namespace nx_hls
+} // namespace hls
+} // namespace mediaserver
+} // namespace nx
+

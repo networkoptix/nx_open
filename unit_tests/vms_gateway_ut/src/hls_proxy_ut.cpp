@@ -2,7 +2,7 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
-#include <nx/network/hls/hls_types.h>
+#include <nx/mediaserver/hls/hls_types.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_content_type.h>
 #include <nx/network/http/test_http_server.h>
@@ -158,11 +158,11 @@ private:
             kHlsChunkContents,
             kHlsChunkContentType);
 
-        nx_hls::Chunk hlsChunk;
+        mediaserver::hls::Chunk hlsChunk;
         hlsChunk.duration = 10;
         hlsChunk.url = lm("%1").arg(kHlsChunkPath);
 
-        nx_hls::Playlist playlist;
+        mediaserver::hls::Playlist playlist;
         playlist.closed = true;
         playlist.chunks.push_back(hlsChunk);
 

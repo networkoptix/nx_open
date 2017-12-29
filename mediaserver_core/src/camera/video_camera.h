@@ -14,7 +14,7 @@
 #include <core/resource/resource_consumer.h>
 #include <providers/live_stream_provider.h>
 #include <server/server_globals.h>
-#include <streaming/hls/hls_live_playlist_manager.h>
+#include <nx/mediaserver/hls/hls_live_playlist_manager.h>
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
@@ -73,7 +73,7 @@ public:
     /**
      * TODO: #ak Should remove it from here.
      */
-    virtual nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager(
+    virtual nx::mediaserver::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
         MediaQuality streamQuality) const = 0;
 
     /**
@@ -134,7 +134,7 @@ public:
     virtual const MediaStreamCache* liveCache( MediaQuality streamQuality ) const override;
     virtual MediaStreamCache* liveCache( MediaQuality streamQuality ) override;
     virtual bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec ) override;
-    virtual nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager(MediaQuality streamQuality) const override;
+    virtual nx::mediaserver::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(MediaQuality streamQuality) const override;
 
     virtual QnResourcePtr resource() const override;
 
@@ -157,7 +157,7 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
     //!index - is a \a MediaQuality element
-    std::vector<nx_hls::HLSLivePlaylistManagerPtr> m_hlsLivePlaylistManager;
+    std::vector<nx::mediaserver::hls::LivePlaylistManagerPtr> m_hlsLivePlaylistManager;
 
     const qint64 m_loStreamHlsInactivityPeriodMS;
     const qint64 m_hiStreamHlsInactivityPeriodMS;
