@@ -16,11 +16,10 @@ namespace hikvision {
 class AttributesParser
 {
 public:
-    static std::vector<QString> parseSupportedEventsXml(const QByteArray& content, bool* outSuccess);
-    static HikvisionEvent parseEventXml(
+    static boost::optional<std::vector<QString>> parseSupportedEventsXml(const QByteArray& content);
+    static boost::optional<HikvisionEvent> parseEventXml(
         const QByteArray& content,
-        const Hikvision::DriverManifest manifest,
-        bool* outSuccess);
+        const Hikvision::DriverManifest manifest);
 };
 
 } // namespace hikvision

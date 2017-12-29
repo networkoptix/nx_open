@@ -25,9 +25,10 @@ struct Hikvision
 public:
     enum EventTypeFlag
     {
-        stateDependent = 0x1,
-        regionDependent = 0x2,
-        itemDependent = 0x4
+        none = 0,
+        stateDependent = 1 << 0,
+        regionDependent = 1 << 1,
+        itemDependent = 1 << 2,
     };
     Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 

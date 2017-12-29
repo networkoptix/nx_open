@@ -21,7 +21,6 @@ namespace hikvision {
 class MetadataManager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
-
 {
     Q_OBJECT;
 public:
@@ -53,7 +52,7 @@ private:
     QAuthenticator m_auth;
     QString m_uniqueId;
     QString m_sharedId;
-    int m_channel;
+    int m_channel = 0;
 
     MetadataPlugin* m_plugin = nullptr;
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;

@@ -22,7 +22,7 @@ public:
     using Handler = std::function<void(const HikvisionEventList&)>;
 
     BytestreamFilter(const Hikvision::DriverManifest& manifest, Handler handler);
-    virtual ~BytestreamFilter();
+    virtual ~BytestreamFilter() = default;
     virtual bool processData(const QnByteArrayConstRef& notification) override;
 private:
     void addExpiredEvents(std::vector<HikvisionEvent>& result);

@@ -1,7 +1,7 @@
 {
-    "driverId": "{6541F47D-99B8-4049-BF55-697BD6DD1BBD}",
+    "driverId": "{55C9D815-D25E-4638-98E5-40DDBAFEB98E}",
     "driverName": {
-        "value": "Hanwha metadata driver",
+        "value": "Hikvision metadata driver",
         "localization": {
         }
     },

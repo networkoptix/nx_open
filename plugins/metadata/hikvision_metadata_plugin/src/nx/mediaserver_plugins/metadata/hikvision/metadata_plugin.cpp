@@ -82,7 +82,7 @@ const char* MetadataPlugin::name() const
     return kPluginName;
 }
 
-void MetadataPlugin::setSettings(const nxpl::Setting* settings, int count)
+void MetadataPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // Do nothing.
 }
@@ -139,12 +139,11 @@ const char* MetadataPlugin::capabilitiesManifest(Error* error) const
 
 QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 {
-    bool success = false;
     QList<QnUuid> result;
-    auto supportedEvents = hikvision::AttributesParser::parseSupportedEventsXml(data, &success);
-    if (!success)
+    auto supportedEvents = hikvision::AttributesParser::parseSupportedEventsXml(data);
+    if (!supportedEvents)
         return result;
-    for (const auto& internalName: supportedEvents)
+    for (const auto& internalName: *supportedEvents)
     {
         const QnUuid eventTypeId = m_driverManifest.eventTypeByInternalName(internalName);
         if (!eventTypeId.isNull())

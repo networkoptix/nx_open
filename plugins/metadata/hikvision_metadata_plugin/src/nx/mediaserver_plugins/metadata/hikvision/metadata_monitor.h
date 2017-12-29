@@ -9,7 +9,7 @@
 
 #include "common.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <QtCore/QElapsedTimer>
 
@@ -44,14 +44,14 @@ public:
 
 private:
     QUrl buildMonitoringUrl(
-        const QUrl& url,
+        const QUrl& resourceUrl,
         const std::vector<QnUuid>& eventTypes) const;
     void initMonitorUnsafe();
 
 private:
-    void at_responseReceived(nx_http::AsyncHttpClientPtr httpClient);
-    void at_someBytesAvailable(nx_http::AsyncHttpClientPtr httpClient);
-    void at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient);
+    void at_responseReceived();
+    void at_someBytesAvailable();
+    void at_connectionClosed();
 
 private:
     const Hikvision::DriverManifest& m_manifest;
@@ -59,7 +59,7 @@ private:
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
     QElapsedTimer m_timeSinceLastOpen;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     MultipartContentParserPtr m_contentParser;
 
     mutable QnMutex m_mutex;

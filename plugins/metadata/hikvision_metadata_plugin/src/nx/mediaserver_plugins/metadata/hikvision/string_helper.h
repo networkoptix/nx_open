@@ -15,30 +15,13 @@ namespace mediaserver {
 namespace plugins {
 namespace hikvision {
 
-class HikvisionStringHelper
-{
-public:
-    static QString buildCaption(
-        const Hikvision::DriverManifest& manifest,
-        const HikvisionEvent& event);
+QString buildCaption(
+    const Hikvision::DriverManifest& manifest,
+    const HikvisionEvent& event);
 
-    static QString buildDescription(
-        const Hikvision::DriverManifest& manifest,
-        const HikvisionEvent& event);
-
-private:
-    template<typename Key, typename Value>
-    static boost::optional<Value> findInMap(
-        const Key& key,
-        const std::unordered_map<Key, Value>& mapForSearch)
-    {
-        auto itr = mapForSearch.find(key);
-        if (itr != mapForSearch.cend())
-            return itr->second;
-
-        return boost::none;
-    }
-};
+QString buildDescription(
+    const Hikvision::DriverManifest& manifest,
+    const HikvisionEvent& event);
 
 } // namespace hikvision
 } // namespace nx

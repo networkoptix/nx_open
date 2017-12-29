@@ -27,17 +27,14 @@ static QString normalizeInternalName(const QString& rawInternalName)
 
 } // namespace
 
-std::vector<QString> AttributesParser::parseSupportedEventsXml(
-    const QByteArray& content,
-    bool* outSuccess)
+boost::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
+    const QByteArray& content)
 {
     std::vector<QString> result;
     QXmlStreamReader reader(content);
-    if (outSuccess)
-        *outSuccess = false;
 
     if (!reader.readNextStartElement())
-        return result; //< Read root element.
+        return boost::optional<std::vector<QString>>(); //< Read root element.
     while (reader.readNextStartElement())
     {
         auto eventTypeName = normalizeInternalName(reader.name().toString());
@@ -46,24 +43,21 @@ std::vector<QString> AttributesParser::parseSupportedEventsXml(
         reader.skipCurrentElement();
     }
 
-    if (outSuccess)
-        *outSuccess = (reader.error() == QXmlStreamReader::NoError);
+    if (reader.error() != QXmlStreamReader::NoError)
+        return boost::optional<std::vector<QString>>();
     return result;
 }
 
-HikvisionEvent AttributesParser::parseEventXml(
+boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     const QByteArray& content,
-    const Hikvision::DriverManifest manifest,
-    bool* outSuccess)
+    const Hikvision::DriverManifest manifest)
 {
     QString description;
     HikvisionEvent result;
     QXmlStreamReader reader(content);
-    if (outSuccess)
-        *outSuccess = false;
 
     if (!reader.readNextStartElement())
-        return result; //< Read root element.
+        return boost::optional<HikvisionEvent>(); //< Read root element.
     while (reader.readNextStartElement())
     {
         const auto name = reader.name().toString().toLower().trimmed();
@@ -101,11 +95,11 @@ HikvisionEvent AttributesParser::parseEventXml(
         }
     }
 
-    result.caption = HikvisionStringHelper::buildCaption(manifest, result);
-    result.description = HikvisionStringHelper::buildDescription(manifest, result);
+    result.caption = buildCaption(manifest, result);
+    result.description = buildDescription(manifest, result);
 
-    if (outSuccess)
-        *outSuccess = (reader.error() == QXmlStreamReader::NoError);
+    if (reader.error() != QXmlStreamReader::NoError)
+        return boost::optional<HikvisionEvent>();
     return result;
 }
 

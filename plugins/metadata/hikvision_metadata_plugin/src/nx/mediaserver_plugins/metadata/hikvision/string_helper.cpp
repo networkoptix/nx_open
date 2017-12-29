@@ -12,7 +12,7 @@ namespace mediaserver {
 namespace plugins {
 namespace hikvision {
 
-QString HikvisionStringHelper::buildCaption(
+QString buildCaption(
     const Hikvision::DriverManifest& manifest,
     const HikvisionEvent& event)
 {
@@ -20,7 +20,7 @@ QString HikvisionStringHelper::buildCaption(
     return descriptor.eventName.value;
 }
 
-QString HikvisionStringHelper::buildDescription(
+QString buildDescription(
     const Hikvision::DriverManifest& manifest,
     const HikvisionEvent& event)
 {

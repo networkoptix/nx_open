@@ -25,25 +25,19 @@ BytestreamFilter::BytestreamFilter(
 {
 }
 
-BytestreamFilter::~BytestreamFilter()
-{
-
-}
-
 bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
 {
     NX_ASSERT(m_handler, lit("No handler is set."));
     if (!m_handler)
         return false;
 
-    bool success = false;
     using namespace nx::mediaserver::plugins::hikvision;
-    auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest, &success);
-    if (!success)
+    auto hikvisionEvent = AttributesParser::parseEventXml(buffer, m_manifest);
+    if (!hikvisionEvent)
         return false;
     std::vector<HikvisionEvent> result;
-    if (!hikvisionEvent.typeId.isNull())
-        result.push_back(hikvisionEvent);
+    if (!hikvisionEvent->typeId.isNull())
+        result.push_back(*hikvisionEvent);
 
     auto getEventKey = [](const HikvisionEvent& event)
     {
@@ -55,12 +49,12 @@ bool BytestreamFilter::processData(const QnByteArrayConstRef& buffer)
         return result;
     };
 
-    auto eventDescriptor = m_manifest.eventDescriptorById(hikvisionEvent.typeId);
+    auto eventDescriptor = m_manifest.eventDescriptorById(hikvisionEvent->typeId);
     if (eventDescriptor.flags.testFlag(Hikvision::EventTypeFlag::stateDependent))
     {
-        QString key = getEventKey(hikvisionEvent);
-        if (hikvisionEvent.isActive)
-            m_startedEvents[key] = StartedEvent(hikvisionEvent);
+        QString key = getEventKey(*hikvisionEvent);
+        if (hikvisionEvent->isActive)
+            m_startedEvents[key] = StartedEvent(*hikvisionEvent);
         else
             m_startedEvents.remove(key);
     }
@@ -79,8 +73,8 @@ void BytestreamFilter::addExpiredEvents(std::vector<HikvisionEvent>& result)
         {
             auto& event = itr.value().event;
             event.isActive = false;
-            event.caption = HikvisionStringHelper::buildCaption(m_manifest, event);
-            event.description = HikvisionStringHelper::buildDescription(m_manifest, event);
+            event.caption = buildCaption(m_manifest, event);
+            event.description = buildDescription(m_manifest, event);
             result.push_back(std::move(itr.value().event));
             itr = m_startedEvents.erase(itr);
         }
