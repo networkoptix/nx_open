@@ -19,14 +19,16 @@ bool writeRectsToFile(
     if (fileExists(filename))
     {
         NX_OUTPUT << __func__ << "(): Skipping; file already exists: " << filename;
-        return true;
+        return false;
     }
+
+    NX_OUTPUT << __func__ << "(): Writing " << rectCount << " rects to file: " << filename;
 
     std::ofstream f(filename);
     if (!f.is_open())
     {
-        NX_PRINT << "ERROR: Unable to open file for writing: " << filename;
-        return false;
+        NX_PRINT << "ERROR: Unable to open Rects file for writing: " << filename;
+        return true; //< Even in case of error.
     }
 
     for (int i = 0; i < rectCount; ++i)
@@ -35,8 +37,9 @@ bool writeRectsToFile(
           << ", w " << rects[i].w << ", h " << rects[i].h << std::endl;
     }
 
-    f.close();
-    return true;
+    if (f.bad() || f.fail())
+        NX_PRINT << "ERROR: Unable to write to Rects file: " << filename;
+    return true; //< Even in case of error.
 }
 
 static bool scanFloat(
@@ -50,6 +53,7 @@ static bool scanFloat(
             << expectedLabel << "\". Line: \"" << line << "\".";
         return false;
     }
+
     s >> *outValue;
 
     // Skip trailing ", ", if any.
@@ -58,7 +62,7 @@ static bool scanFloat(
     if (!trailing.empty() && trailing != ",")
     {
         NX_PRINT << "ERROR: Invalid line in rects file - unexpected trailing after item \""
-                 << expectedLabel << "\". Line: \"" << line << "\".";
+            << expectedLabel << "\". Line: \"" << line << "\".";
         return false;
     }
 
@@ -75,18 +79,20 @@ bool readRectsFromFile(
     std::ifstream f(filename);
     if (!f.is_open())
     {
-        NX_PRINT << "ERROR: Unable to open rects file: " << filename;
+        NX_PRINT << "ERROR: Unable to open Rects file: " << filename;
         return false;
     }
 
     std::string line;
     while (std::getline(f, line))
     {
+        if (line.empty())
+            continue;
+
         ++(*outRectCount);
         if (*outRectCount > maxRectCount)
         {
-            NX_PRINT << "ERROR: Too many rects in the rects file: more than "
-                << maxRectCount << ".";
+            NX_PRINT << "ERROR: Too many rects in Rects file: more than " << maxRectCount << ".";
             return false;
         }
         std::istringstream s(line);
@@ -99,6 +105,81 @@ bool readRectsFromFile(
             return false;
         if (!scanFloat(&rect.h, s, "h", line))
             return false;
+    }
+
+    // NOTE: f.fail() is true because std::getline() returned false.
+    if (!f.eof())
+    {
+        NX_PRINT << "ERROR: Unexpected trailing in Rects file: " << filename;
+        return false;
+    }
+
+    if (f.bad())
+    {
+        NX_PRINT << "ERROR: I/O error reading Rects file: " << filename;
+        return false;
+    }
+
+    return true;
+}
+
+bool writeModulusToFile(const std::string& filename, int64_t modulus)
+{
+    if (fileExists(filename))
+        NX_PRINT << "WARNING: Modulus file already exists; rewriting.";
+
+    NX_OUTPUT << __func__ << "(): Writing " << modulus << " to file: " << filename;
+
+    std::ofstream f(filename);
+    if (!f.is_open())
+    {
+        NX_PRINT << "ERROR: Unable to open Modulus file for writing: " << filename;
+        return false;
+    }
+
+    f << modulus;
+    f << std::endl;
+
+    if (f.bad() || f.fail())
+    {
+        NX_PRINT << "ERROR: Unable to write to Modulus file: " << filename;
+        return false;
+    }
+
+    return true;
+}
+
+bool readModulusFromFile(const std::string& filename, int64_t *outModulus)
+{
+    *outModulus = -1;
+
+    std::ifstream f(filename);
+    if (!f.is_open())
+    {
+        NX_PRINT << "ERROR: Unable to open Modulus file: " << filename;
+        return false;
+    }
+
+    f >> *outModulus;
+
+    if (f.fail())
+    {
+        NX_PRINT << "ERROR: Unable to read 64-bit integer from Modulus file: " << filename;
+        return false;
+    }
+
+    std::string newline;
+    f >> newline;
+    if (!newline.empty() || !f.eof())
+    {
+        NX_PRINT << "ERROR: Unexpected trailing in Modulus file: " << filename;
+        return false;
+    }
+
+    if (f.bad())
+    {
+        NX_PRINT << "ERROR: I/O error reading Modulus file: " << filename;
+        return false;
     }
 
     return true;
