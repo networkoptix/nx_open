@@ -18,7 +18,7 @@ static const QString kMonitorUrlTemplate("http://%1:%2/ISAPI/Event/notification/
 
 static const int kDefaultHttpPort = 80;
 static const std::chrono::minutes kKeepAliveTimeout(2);
-static const std::chrono::seconds kUpdateInterval(10);
+static const std::chrono::seconds kMinReopenInterval(10);
 
 HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const Hikvision::DriverManifest& manifest,
@@ -116,6 +116,7 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
         this, &HikvisionMetadataMonitor::at_connectionClosed,
         Qt::DirectConnection);
 
+    m_timeSinceLastOpen.restart();
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
@@ -155,7 +156,10 @@ void HikvisionMetadataMonitor::at_someBytesAvailable(nx_http::AsyncHttpClientPtr
 
 void HikvisionMetadataMonitor::at_connectionClosed(nx_http::AsyncHttpClientPtr httpClient)
 {
-    m_timer.start(kUpdateInterval, [this]() { initMonitorUnsafe(); });
+    const auto elapsed = m_timeSinceLastOpen.elapsed();
+    std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
+        <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
+    m_timer.start(reopenDelay, [this]() { initMonitorUnsafe(); });
 }
 
 } // namespace hikvision

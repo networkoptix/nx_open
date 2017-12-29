@@ -11,6 +11,7 @@
 
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <QtCore/QElapsedTimer>
 
 namespace nx {
 namespace mediaserver {
@@ -57,6 +58,7 @@ private:
     const QUrl m_url;
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
+    QElapsedTimer m_timeSinceLastOpen;
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
 
