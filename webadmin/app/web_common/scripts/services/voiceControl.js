@@ -34,26 +34,39 @@ angular.module('nxCommon')
 
         recognition.onresult = function(event) {
             var last = event.results.length - 1;
-            var text = event.results[last][0].transcript.replace(/^\s+|\s+$/g, '');
+            var text = event.results[last][0].transcript;
             console.log(text);
             console.log('Confidence: ' + event.results[0][0].confidence);
-            switch(text){
+            var voicePatterns = {
+                "play": /(play|continue|start)/i,
+                "pause": /(pause|stop|end)/i,
+                "live": /live/i,
+                "open": /open details/i,
+                "close": /close details/i
+            };
+            console.log(voicePatterns);
+            var command = null;
+            for(var k in voicePatterns){
+                if(text.match(voicePatterns[k])){
+                    command = k;
+                    break;
+                }
+            }
+            console.log(command);
+            switch(command){
                 case "play":
-                case "continue":
                     self.switchPlaying(true);
                     break;
                 case "pause":
-                case "stop":
                     self.switchPlaying(false);
                     break;
                 case "live":
-                case "go to live":
                     self.switchPosition();
                     break;
-                case "open details":
+                case "open":
                     self.cameraDetails.enabled = true;
                     break;
-                case "close details":
+                case "close":
                     self.cameraDetails.enabled = false;
                     break;
                 default:
