@@ -78,10 +78,19 @@ buildDistribution()
             cp -P "$LIB" "$LIBSTAGE/"
         fi
     done
-    for LIB in "$SERVER_LIB_PLUGIN_PATH"/*.so*
+
+    # Copy mediaserver plugins.
+    local PLUGIN_FILENAME
+    local -r PLUGINS=( hikvision_metadata_plugin )
+    if [ "$COMPANY_NAME" == "hanwha" ]
+    then
+        PLUGINS+=( hanwha_metadata__plugin )
+    fi
+    for PLUGIN in "${PLUGINS[@]}"
     do
-        echo "Copying (plugin) $(basename "$LIB")"
-        cp -P "$LIB" "$LIBPLUGINSTAGE/"
+        PLUGIN_FILENAME="lib$PLUGIN.so"
+        echo "Copying (plugin) $PLUGIN_FILENAME"
+        cp "$SERVER_LIB_PLUGIN_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE/"
     done
 
     echo "Copying Festival VOX files"
