@@ -11,6 +11,7 @@ set(build.configuration ${CMAKE_BUILD_TYPE})
 set(environment.dir "$ENV{environment}")
 set(root.dir ${CMAKE_SOURCE_DIR})
 set(qt.dir ${QT_DIR})
+set(qt.version ${qt_version})
 set(customization.dir ${customization_dir})
 
 set(rdep.target ${rdep_target})

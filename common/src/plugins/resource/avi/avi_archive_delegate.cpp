@@ -2,21 +2,16 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "stdint.h"
-
-extern "C"
-{
-#include <libavformat/avformat.h>
-}
+#include <chrono>
+#include <stdint.h>
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
-#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
+#include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
 
 #include <core/resource/storage_plugin_factory.h>
-
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
@@ -30,7 +25,23 @@ extern "C"
 
 #include <motion/light_motion_archive_connection.h>
 #include <export/sign_helper.h>
-#include "utils/media/nalUnits.h"
+#include <utils/media/nalUnits.h>
+
+extern "C" {
+
+#include <libavformat/avformat.h>
+
+} // extern "C"
+
+
+namespace {
+
+// Try to reopen file if seek was faulty and seek time doesn't exceeds this constant.
+static const std::chrono::microseconds kMaxFaultySeekReopenOffset = std::chrono::seconds(15);
+static const qint64 kSeekError = -1;
+
+
+} // namespace
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -219,6 +230,19 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     av_free_packet(&packet);
                     continue; // seek is broken for audio only media streams
                 }
+
+                if (stream->codec->codec_id == AV_CODEC_ID_ADPCM_G726 &&
+                    stream->codec->bits_per_coded_sample == 16)
+                {
+                    // Workaround for ffmpeg bug. It losts 'bits_per_coded_sample' field when saves G726 to the MKV.
+                    // Valid range for this field is [2..5]. Try to restore value from field 'block_align' if possible.
+                    // Otherwise use default value 4. Value 2 can't be restored.
+                    // https://ffmpeg.org/pipermail/ffmpeg-devel/2014-January/153139.html
+                    stream->codec->bits_per_coded_sample =
+                        stream->codec->block_align > 1 ? stream->codec->block_align : 4;
+                }
+
+
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
@@ -266,21 +290,53 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     if (!findStreams())
-        return -1;
+        return kSeekError;
 
     m_eofReached = time > endTime();
     if (m_eofReached)
         return time;
 
-    qint64 relTime = qMax(time-m_startTimeUs, 0ll);
+    const auto timeToSeek = qMax(time - m_startTimeUs, 0ll) + m_playlistOffsetUs;
     if (m_hasVideo)
-        av_seek_frame(m_formatContext, -1, relTime + m_playlistOffsetUs, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
-    else {
-        // mp3 seek is bugged in current ffmpeg version
-        if (!reopen())
-            return -1;
+    {
+        const auto result = av_seek_frame(
+            m_formatContext,
+            /*stream_index*/ -1,
+            timeToSeek,
+            findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+
+        if (result < 0)
+        {
+            NX_VERBOSE(
+                this,
+                lm("Cannot seek into position %1. Resource URL: %2, av_seek_frame result: %3.")
+                    .args(timeToSeek, m_resource->getUrl(), result));
+
+            const bool canTryToReopen =
+                std::chrono::microseconds(timeToSeek) <= kMaxFaultySeekReopenOffset;
+
+            if (!canTryToReopen)
+                return kSeekError;
+
+            if (!reopen())
+            {
+                NX_VERBOSE(
+                    this,
+                    lm("Cannot reopen file after faulty seek. Resource URL: %1")
+                        .arg(m_resource->getUrl()));
+
+                return kSeekError;
+            }
+        }
     }
-    m_lastSeekTime = relTime + m_playlistOffsetUs + m_startTimeUs; // file physical time to UTC time
+    else
+    {
+        // MP3 seek is buggy in the current ffmpeg version.
+        if (!reopen())
+            return kSeekError;
+    }
+
+    m_lastSeekTime = timeToSeek + m_startTimeUs; //< File physical time to UTC time.
     return time;
 }
 

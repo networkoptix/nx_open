@@ -62,6 +62,8 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
             break;
 
         default:
+            setSampleSize(16);
+            setSampleType(QnAudioFormat::SignedInt);
             break;
     }
 

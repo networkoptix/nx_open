@@ -16,6 +16,10 @@ option(addQtPdb
     "Whether add Qt PDB files to debug libs"
     OFF)
 
+option(developerBuild
+    "Disable this option for production builds (Jenkins)"
+    ON)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
@@ -57,6 +61,7 @@ list(APPEND CMAKE_MODULE_PATH
 )
 
 include(CMakeParseArguments)
+include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
 include(utils)
@@ -126,7 +131,7 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(withDesktopClient OR withMobileClient)
+if(withDesktopClient OR withMobileClient OR withNxTool)
     find_package(Qt5
         COMPONENTS
             Qml
@@ -136,6 +141,7 @@ endif()
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
     "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
 if(ANDROID)
@@ -145,9 +151,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_subdirectory(wixsetup)
-    endif()
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
@@ -181,21 +184,40 @@ if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
 endif()
 
+if(withNxTool)
+    add_subdirectory(nxtool)
+endif()
+
 if(withTests)
     add_subdirectory(unit_tests)
     add_subdirectory(tests)
 endif()
 
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-    add_subdirectory(edge_firmware)
-endif()
+if(withDistributions)
+    if(WINDOWS)
+        add_subdirectory(wixsetup)
+    endif()
 
-if(LINUX AND box STREQUAL "none") #< Desktop Linux.
-    add_subdirectory(debsetup)
+    if(LINUX AND box STREQUAL "none") #< Desktop Linux.
+        add_subdirectory(debsetup)
+    endif()
+
+    if(MACOSX)
+        add_subdirectory(macsetup)
+    endif()
+
+    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+        add_subdirectory(edge_firmware)
+    endif()
 endif()
 
 include(fix_qt_vars)
 
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
+endif()
 nx_configure_file(
     build_variables/maven/filter-resources/build_info.txt
     ${CMAKE_CURRENT_BINARY_DIR})

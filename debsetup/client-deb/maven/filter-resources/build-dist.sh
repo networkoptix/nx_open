@@ -49,8 +49,6 @@ ICONS_PATH=@customization.dir@/icons/linux/hicolor
 CLIENT_LIB_PATH=@libdir@/lib/@build.configuration@
 BUILD_INFO_TXT=@libdir@/build_info.txt
 
-#. $CLIENT_BIN_PATH/env.sh
-
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/imageformats
@@ -62,13 +60,15 @@ mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
-mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
-mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
+cp debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
+cp debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/@installer.name@.desktop
 mv -f usr/share/applications/protocol.desktop usr/share/applications/@uri.protocol@.desktop
 
 # Copy build_info.txt
 cp -r $BUILD_INFO_TXT $BINSTAGE/../
+
+cp -r qt.conf $BINSTAGE/
 
 # Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/desktop_client $BINSTAGE/client-bin
@@ -103,7 +103,7 @@ cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
-#copying qt libs
+# Copy Qt libs
 QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia MultimediaQuick_p Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
 if [ '@arch@' == 'arm' ]
 then

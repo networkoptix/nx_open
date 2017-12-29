@@ -122,6 +122,9 @@ protected:
     };
 
 protected:
+    void backupCurrentData(const quint8* currentBufferBase);
+
+protected:
     QnAbstractMediaDataPtr m_mediaData;
     std::vector<Chunk> m_chunks;
     std::vector<quint8> m_nextFrameChunksBuffer;
