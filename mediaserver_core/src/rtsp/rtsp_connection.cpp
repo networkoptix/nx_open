@@ -1687,7 +1687,7 @@ void QnRtspConnectionProcessor::run()
                 // text request
                 while (true)
                 {
-                    const auto msgLen = isFullMessage(d->clientRequest);
+                    const auto msgLen = isFullMessage(d->receiveBuffer);
                     if (msgLen < 0)
                         return;
 
