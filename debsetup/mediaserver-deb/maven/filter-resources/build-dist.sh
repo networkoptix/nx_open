@@ -66,15 +66,18 @@ buildDistribution()
     fi
 
     local LIB
-
+    local LIB_BASENAME
     for LIB in "$SERVER_LIB_PATH"/*.so*
     do
-        if [[ "$LIB" != libQt5* ]]; then
-            echo "Copying $(basename "$LIB")"
+        LIB_BASENAME=$(basename "$LIB")
+        if [[ "$LIB_BASENAME" != libQt5* \
+            && "$LIB_BASENAME" != libEnginio.so* \
+            && "$LIB_BASENAME" !=  libqgsttools_p.* ]]
+        then
+            echo "Copying $LIB_BASENAME"
             cp -P "$LIB" "$LIBSTAGE/"
         fi
     done
-
     for LIB in "$SERVER_LIB_PLUGIN_PATH"/*.so*
     do
         echo "Copying (plugin) $(basename "$LIB")"

@@ -102,10 +102,15 @@ buildDistribution()
     cp -r $CLIENT_BG_PATH/* $BGSTAGE
 
     local LIB
+    local LIB_BASENAME
     for LIB in "$CLIENT_LIB_PATH"/*.so*
     do
-        if [[ "$LIB" != libQt5* ]]; then
-            echo "Copying $(basename "$LIB")"
+        LIB_BASENAME=$(basename "$LIB")
+        if [[ "$LIB_BASENAME" != libQt5* \
+            && "$LIB_BASENAME" != libEnginio.so* \
+            && "$LIB_BASENAME" !=  libqgsttools_p.* ]]
+        then
+            echo "Copying $LIB_BASENAME"
             cp -P "$LIB" "$LIBSTAGE/"
         fi
     done
