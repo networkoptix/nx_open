@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "custom_printers.h"
+
 #include <common/common_module.h>
 
 #include <nx/core/access/access_types.h>

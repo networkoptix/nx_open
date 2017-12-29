@@ -1,19 +1,13 @@
 #if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
-
-#include <QtCore/QString>
-
-#include <festival/festival.h>
-#include <EST_wave_aux.h>
-
-// This is required to solve QT automatic type conversion conflict.
-static QString toString(const EST_String& value) { return QString::fromUtf8(value.str()); }
-
 #include "text_to_wav.h"
 
 #include <QtCore/QFile>
 
 #include <mutex>
 #include <memory>
+
+#include <festival/festival.h>
+#include <EST_wave_aux.h>
 
 #ifdef QN_USE_VLD
 #include <vld.h>

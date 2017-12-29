@@ -72,8 +72,3 @@ private:
 
 // TODO: Move to namespace nx (at least).
 typedef nx::utils::log::Message lm;
-
-inline QDebug& operator<<(QDebug& stream, const nx::utils::log::Message& message)
-{
-    return stream << message.toQString();
-}

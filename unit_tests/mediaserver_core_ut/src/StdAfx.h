@@ -1,10 +1,13 @@
+#include <nx/network/test_support/custom_gtest_printers.h>
 #include <nx/utils/compiler_options.h>
-#include <nx/utils/deprecation.h>
+
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+
 #include <nx/utils/literal.h>
-#include <nx/utils/log/to_string.h>
+#include <nx/utils/deprecation.h>
+#include <nx/utils/test_support/custom_gtest_printers.h>
 
-extern "C" {
-
-#include <libavformat/avformat.h>
-
-} // extern "C"
+#include <test_support/custom_gtest_printers.h>

@@ -57,16 +57,6 @@ QString toString(const QUrl& value)
     return value.toString(QUrl::RemovePassword);
 }
 
-QString toString(const QHostAddress& value)
-{
-    return value.toString();
-}
-
-QString toString(const QUuid& value)
-{
-    return value.toString();
-}
-
 QString toString(const std::chrono::hours& value)
 {
     return QString(QLatin1String("%1h")).arg(value.count());

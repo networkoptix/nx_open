@@ -5,7 +5,6 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/test_support/sync_queue.h>
-#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace network {

@@ -11,7 +11,7 @@ bool UdtInternetTrafficMetric::isSignificant() const
 
 QString UdtInternetTrafficMetric::value() const
 {
-    return toString(nx::network::UdtStatistics::global.internetBytesTransfered.load());
+    return toString(nx::network::UdtStatistics::global.internetBytesTransfered);
 }
 
 void UdtInternetTrafficMetric::reset()
