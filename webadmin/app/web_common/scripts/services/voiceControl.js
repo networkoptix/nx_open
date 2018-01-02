@@ -26,10 +26,11 @@ angular.module('nxCommon')
             console.log("Stop listening.");
         };
 
-        this.initControls = function(cameraDetails, switchPlaying, switchPosition){
+        this.initControls = function(cameraDetails, switchPlaying, switchPosition, viewScope){
             this.cameraDetails = cameraDetails;
             this.switchPlaying = switchPlaying;
             this.switchPosition = switchPosition;
+            this.viewScope = viewScope;
         };
 
         recognition.onresult = function(event) {
@@ -42,9 +43,10 @@ angular.module('nxCommon')
                 "pause": /(pause|stop|end)/i,
                 "live": /live/i,
                 "open": /open details/i,
-                "close": /close details/i
+                "close": /close details/i,
+                "search": /(search|look for|find)/i,
+                "select": /(select|choose|use)\ (camera|server)/i
             };
-            console.log(voicePatterns);
             var command = null;
             for(var k in voicePatterns){
                 if(text.match(voicePatterns[k])){
@@ -68,6 +70,20 @@ angular.module('nxCommon')
                     break;
                 case "close":
                     self.cameraDetails.enabled = false;
+                    break;
+                case "search":
+                    text = ((text.replace(/^\s+|\s+$/g, '')).replace(voicePatterns["search"], '')).replace(/^\s+|\s+$/g, '');
+                    self.viewScope.searchCams = text;
+                    break;
+                case "select":
+                    var server = text.match(/server ([\d]+)/i);
+                    var camera = text.match(/camera ([\d]+)/i);
+                    console.log(server, camera);
+                    if(server && camera){
+                        var serverId = self.viewScope.camerasProvider.mediaServers[server[1]].id;
+                        //console.log(self.viewScope.camerasProvider.cameras[serverId][camera[1]]);
+                        self.viewScope.activeCamera = self.viewScope.camerasProvider.cameras[serverId][camera[1]];
+                    }
                     break;
                 default:
                     console.log("Did not recognize command");

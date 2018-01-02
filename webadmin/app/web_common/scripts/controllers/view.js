@@ -25,11 +25,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.storage.serverStates = $scope.storage.serverStates || {};
 
         $scope.canViewArchive = false;
+        $scope.searchCams = "";
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
         $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
-        $scope.voiceControls = {enabled: false};
+        $scope.voiceControls = {enabled: true};
 
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
@@ -322,7 +323,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         if($scope.betaMode && window.chrome){
-            voiceControl.initControls($scope.cameraLinks, $scope.switchPlaying, $scope.switchPosition);
+            voiceControl.initControls($scope.cameraLinks, $scope.switchPlaying,
+                                      $scope.switchPosition, $scope);
             $scope.$watch('voiceControls.enabled', function(){
                 if($scope.voiceControls.enabled){
                     voiceControl.startListening();

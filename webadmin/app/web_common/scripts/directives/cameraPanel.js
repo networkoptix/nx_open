@@ -6,13 +6,13 @@ angular.module('nxCommon')
             scope:{
                 "activeCamera":"=",
                 "camerasProvider": "=",
-                "showCameraPanel": "="
+                "showCameraPanel": "=",
+                "searchCams": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
                 scope.storage = $localStorage;
-                scope.searchCams = '';
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
                 var updateCameras = function(){
