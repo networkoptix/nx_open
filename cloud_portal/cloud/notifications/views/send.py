@@ -105,10 +105,8 @@ def cloud_notification_action(request):
     if 'Save' in request.data:
         notification_id = str(update_or_create_notification(request.data))
     elif 'Preview' in request.data:
-        if not notification_id:
-            notification_id = str(update_or_create_notification(request.data))
-        notification = CloudNotification.objects.get(id=notification_id)
-        message = format_message(notification)
+        notification_id = str(update_or_create_notification(request.data))
+        message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
         api.send(request.user.email, 'cloud_notification', message, 'default')
     elif 'Send' in request.data:

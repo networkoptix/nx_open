@@ -3,7 +3,7 @@
 {% block content %}
     <form id="notificationForm" action="{% url 'cloud_notification' %}" method="post" class="aligned" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="hidden" name="id" value="{{cloud_notification.id}}">
+        <input type="hidden" name="id" value="{{original.id}}">
         {% for fieldset in adminform %}
             {% include "admin/includes/fieldset.html" %}
         {% endfor %}

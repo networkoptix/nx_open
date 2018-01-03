@@ -5,8 +5,8 @@ from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
 
-if hasattr(settings, "CLOUD_NOTIFICATIONS"):
-    CLOUD_NOTIFICATIONS = settings.CLOUD_NOTIFICATIONS
+if hasattr(settings, "BROKER_TRANSPORT_OPTIONS"):
+    CLOUD_NOTIFICATIONS = settings.NOTIFICATIONS_CONFIG['cloud_notification']['queue']
 
 
 class Event(models.Model):
@@ -74,7 +74,7 @@ class Message(models.Model):
         from .tasks import send_email
 
         if settings.USE_ASYNC_QUEUE:
-            if self.type == 'cloud_notification' and CLOUD_NOTIFICATIONS:
+            if self.type == 'cloud_notification' and CLOUD_NOTIFICATIONS != "":
                 result = send_email.apply_async(args=[self.user_email, self.type, self.message, self.customization],
                                                 queue=CLOUD_NOTIFICATIONS)
             else:
