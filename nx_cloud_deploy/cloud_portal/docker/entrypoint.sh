@@ -84,7 +84,7 @@ do
 
             python manage.py filldata all
 
-            exec celery worker -A notifications -l info --concurrency=1 -Q cloud-notifications --pidfile=/tmp/celery-w1.pid
+            exec celery worker -Q cloud-notifications -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         *)
             echo Usage: cloud_portal '[web|celery|config|copystatic|migratedb]'

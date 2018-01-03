@@ -18,11 +18,15 @@ def html_to_text(html):
     tags = re.compile(r'<[\w\=\'\"\:\;\_\-\,\!\/\ ]+>')
     return tags.sub('', new_line.sub('\n', html))
 
+def add_brs(html):
+    br = re.compile(r'\n')
+    return br.sub('<br>', html)
+
 
 def format_message(notification):
     message = {}
     message['subject'] = notification.subject
-    message['html_body'] = notification.body
+    message['html_body'] = add_brs(notification.body)
     message['text_body'] = html_to_text(notification.body)
     return message
 

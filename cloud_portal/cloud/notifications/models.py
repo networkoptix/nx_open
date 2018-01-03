@@ -5,8 +5,9 @@ from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
 
-if hasattr(settings, "BROKER_TRANSPORT_OPTIONS"):
-    CLOUD_NOTIFICATIONS = settings.NOTIFICATIONS_CONFIG['cloud_notification']['queue']
+#When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
+#This allows cloud notifications to run locally without changing settings to use sqs.
+USE_SQS_FOR_CLOUD_NOTIFICATIONS = hasattr(settings, "BROKER_TRANSPORT_OPTIONS")
 
 
 class Event(models.Model):
@@ -74,9 +75,9 @@ class Message(models.Model):
         from .tasks import send_email
 
         if settings.USE_ASYNC_QUEUE:
-            if self.type == 'cloud_notification' and CLOUD_NOTIFICATIONS != "":
+            if self.type == 'cloud_notification' and USE_SQS_FOR_CLOUD_NOTIFICATIONS:
                 result = send_email.apply_async(args=[self.user_email, self.type, self.message, self.customization],
-                                                queue=CLOUD_NOTIFICATIONS)
+                                                queue=settings.NOTIFICATIONS_CONFIG['cloud_notification']['queue'])
             else:
                 result = send_email.delay(self.user_email, self.type, self.message, self.customization)
             self.task_id = result.task_id
