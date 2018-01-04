@@ -10,7 +10,10 @@
 namespace nx {
 namespace hpm {
 
-StunServer::StunServer(const conf::Settings& settings):
+StunServer::StunServer(
+    const conf::Settings& settings,
+    http::Server* httpServer)
+    :
     m_settings(settings),
     m_stunOverHttpServer(&m_stunMessageDispatcher),
     m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
@@ -22,6 +25,8 @@ StunServer::StunServer(const conf::Settings& settings):
 {
     if (!bind())
         throw std::runtime_error("Error binding to specified STUN address");
+
+    initializeHttpTunnelling(httpServer);
 }
 
 void StunServer::listen()

@@ -16,11 +16,8 @@ View::View(
         settings,
         controller->listeningPeerRegistrator(),
         &controller->discoveredPeerPool()),
-    m_stunServer(settings)
+    m_stunServer(settings, &m_httpServer)
 {
-    // TODO: #ak Following call should be removed.
-    // Http server should be passed to STUN server via constructor.
-    m_stunServer.initializeHttpTunnelling(&m_httpServer);
     registerStunApiHandlers(controller);
 }
 
