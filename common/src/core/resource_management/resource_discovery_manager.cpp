@@ -372,7 +372,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!ownServer->isRedundancy())
     {
         // return own camera back for edge server
-        char  mac[MAC_ADDR_LEN];
+        char  mac[nx::network::MAC_ADDR_LEN];
         char* host = 0;
         nx::network::getMacFromPrimaryIF(mac, &host);
         return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
@@ -545,7 +545,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
 #ifdef EDGE_SERVER
-                char  mac[MAC_ADDR_LEN];
+                char  mac[nx::network::MAC_ADDR_LEN];
                 char* host = 0;
                 nx::network::getMacFromPrimaryIF(mac, &host);
                 if( existingCamRes->getUniqueId().toLocal8Bit() == QByteArray(mac) )
