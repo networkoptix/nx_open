@@ -24,8 +24,6 @@ class MessageDispatcher;
 namespace nx {
 namespace hpm {
 
-class PeerRegistrator;
-
 namespace conf { class Settings; }
 namespace http { class Server; }
 

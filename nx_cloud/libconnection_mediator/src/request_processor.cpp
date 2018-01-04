@@ -1,19 +1,13 @@
-
 #include "request_processor.h"
 
 #include <nx/utils/log/log.h>
 #include <nx/network/cloud/data/result_code.h>
 
-
 namespace nx {
 namespace hpm {
 
-RequestProcessor::RequestProcessor( AbstractCloudDataProvider* cloudData )
-    : m_cloudData( cloudData )
-{
-}
-
-RequestProcessor::~RequestProcessor()
+RequestProcessor::RequestProcessor(AbstractCloudDataProvider* cloudData):
+    m_cloudData(cloudData)
 {
 }
 
@@ -60,12 +54,12 @@ api::ResultCode RequestProcessor::getMediaserverData(
         return api::ResultCode::notAuthorized;
     }
 
-//    if( !system->mediatorEnabled )    //cloud connect is not
-//    {
-//        sendErrorResponse( connection, request.header, network::stun::error::badRequest,
-//                       "Mediator is not enabled for this system" );
-//        return boost::none;
-//    }
+    //    if( !system->mediatorEnabled )    //cloud connect is not
+    //    {
+    //        sendErrorResponse( connection, request.header, network::stun::error::badRequest,
+    //                       "Mediator is not enabled for this system" );
+    //        return boost::none;
+    //    }
 
     if (!request.verifyIntegrity(data.systemId, system->authKey))
     {

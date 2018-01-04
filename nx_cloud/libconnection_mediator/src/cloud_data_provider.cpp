@@ -9,11 +9,6 @@
 namespace nx {
 namespace hpm {
 
-AbstractCloudDataProvider::~AbstractCloudDataProvider()
-{
-}
-
-
 static AbstractCloudDataProviderFactory::FactoryFunc cloudDataProviderFactoryFunc;
 
 std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::create(
