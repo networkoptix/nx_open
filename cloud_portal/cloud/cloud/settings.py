@@ -327,7 +327,7 @@ NOTIFICATIONS_CONFIG = {
     },
     'cloud_notification':{
         'engine': 'email',
-        'queue': 'cloud-notifications'
+        'queue': 'broadcast-notifications'
     }
 }
 
