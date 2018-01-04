@@ -30,6 +30,7 @@ public:
         int /*eventTypeListSize*/) override;
 
     virtual nx::sdk::Error setHandler(
+        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
