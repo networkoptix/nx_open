@@ -70,7 +70,7 @@ protected:
         m_client = std::make_unique<ClientImpl>(m_baseUrl);
 
         m_client->beginListening(
-            "peerName",
+            ::testing::UnitTest::GetInstance()->current_test_info()->name(),
             std::bind(&RelayApiClient::saveBeginListeningCompletionResult, this, _1, _2, _3));
     }
 
