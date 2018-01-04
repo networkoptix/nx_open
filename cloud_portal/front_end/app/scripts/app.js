@@ -10,7 +10,8 @@ angular.module('cloudApp', [
     'ngStorage',
     'base64',
     'nxCommon',
-    'ngToast'
+    'ngToast',
+    'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
