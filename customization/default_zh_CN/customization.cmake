@@ -1,4 +1,3 @@
-[basic]
 # Components Namings
 set(parent.customization "default")
 set(product.name "Nx Witness Simplified Chinese")
