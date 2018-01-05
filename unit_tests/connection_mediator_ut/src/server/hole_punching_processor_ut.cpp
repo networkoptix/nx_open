@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 19, 2016
-* akolesnikov
-***********************************************************/
-
 #include <future>
 
 #include <gtest/gtest.h>
@@ -398,7 +393,6 @@ public:
         m_holePunchingProcessor(
             m_settings,
             &m_cloudData,
-            &m_dispatcher,
             &m_listeningPeerPool,
             &m_relayClusterClient,
             &m_statisticsCollector)
@@ -472,7 +466,6 @@ private:
 
     conf::Settings m_settings;
     TestCloudDataProvider m_cloudData;
-    nx::network::stun::MessageDispatcher m_dispatcher;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
     RelayClusterClient m_relayClusterClient;

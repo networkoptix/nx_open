@@ -6,9 +6,6 @@
 #include "request_processor.h"
 
 namespace nx {
-
-namespace network { namespace stun { class MessageDispatcher; } }
-
 namespace hpm {
 
 /**
@@ -18,9 +15,7 @@ class MediaserverEndpointTesterBase:
     protected RequestProcessor
 {
 public:
-    MediaserverEndpointTesterBase(
-        AbstractCloudDataProvider* cloudData,
-        nx::network::stun::MessageDispatcher* dispatcher);
+    MediaserverEndpointTesterBase(AbstractCloudDataProvider* cloudData);
 
     void ping(const ConnectionStrongRef& connection, network::stun::Message message);
 
@@ -41,9 +36,7 @@ class MediaserverEndpointTester:
     public MediaserverEndpointTesterBase
 {
 public:
-    MediaserverEndpointTester(
-        AbstractCloudDataProvider* cloudData,
-        nx::network::stun::MessageDispatcher* dispatcher);
+    MediaserverEndpointTester(AbstractCloudDataProvider* cloudData);
 
     virtual void pingServer(
         const network::SocketAddress& address,

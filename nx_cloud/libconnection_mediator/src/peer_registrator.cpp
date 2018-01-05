@@ -16,7 +16,6 @@ namespace hpm {
 PeerRegistrator::PeerRegistrator(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
-    nx::network::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool,
     AbstractRelayClusterClient* const relayClusterClient)
 :
@@ -25,70 +24,6 @@ PeerRegistrator::PeerRegistrator(
     m_listeningPeerPool(listeningPeerPool),
     m_relayClusterClient(relayClusterClient)
 {
-    using namespace std::placeholders;
-    const auto result =
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::bind,
-            [this](const ConnectionStrongRef& connection, network::stun::Message message)
-                { bind( std::move(connection), std::move( message ) ); } ) &&
-
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::listen,
-            [this](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::listen,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            } ) &&
-
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::getConnectionState,
-            [this](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::checkOwnState,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            } ) &&
-
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::resolveDomain,
-            [this](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::resolveDomain,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
-
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::resolvePeer,
-            [this](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::resolvePeer,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
-
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::clientBind,
-            [this](const ConnectionStrongRef& connection, network::stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::clientBind,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            }) ;
-
-    // TODO: NX_LOG
-    NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
 PeerRegistrator::~PeerRegistrator()

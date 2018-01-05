@@ -27,6 +27,7 @@
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
 #include <relay/relay_cluster_client.h>
+#include <view.h>
 
 #include "mediator_mocks.h"
 
@@ -36,44 +37,38 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-class ConnectTest : public testing::Test
+class ConnectTest:
+    public testing::Test
 {
 protected:
     ConnectTest():
-        listeningPeerPool(settings.listeningPeer())
+        m_listeningPeerPool(m_settings.listeningPeer())
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-        relayClusterClient = std::make_unique<RelayClusterClient>(settings);
+        m_relayClusterClient = std::make_unique<RelayClusterClient>(m_settings);
 
-        listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
-            settings,
+        m_listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
+            m_settings,
             &cloud,
-            &stunMessageDispatcher,
-            &listeningPeerPool,
-            relayClusterClient.get());
-        server = std::make_unique<network::server::MultiAddressServer<stun::SocketServer>>(
-            &stunMessageDispatcher,
+            &m_listeningPeerPool,
+            m_relayClusterClient.get());
+        View::registerStunApiHandlers(m_listeningPeerRegistrator.get(), &m_stunMessageDispatcher);
+
+        m_server = std::make_unique<stun::SocketServer>(
+            &m_stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled);
 
-        EXPECT_TRUE(server->bind(std::vector<nx::network::SocketAddress>{nx::network::SocketAddress::anyAddress}));
-        EXPECT_TRUE(server->listen());
+        EXPECT_TRUE(m_server->bind(nx::network::SocketAddress::anyPrivateAddress));
+        EXPECT_TRUE(m_server->listen());
 
-        EXPECT_TRUE(server->endpoints().size());
-        m_address = nx::network::SocketAddress(nx::network::HostAddress::localhost, server->endpoints().front().port);
+        m_address = m_server->address();
         network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(m_address));
     }
 
-    nx::network::stun::MessageDispatcher stunMessageDispatcher;
-
     CloudDataProviderMock cloud;
-    conf::Settings settings;
-    ListeningPeerPool listeningPeerPool;
-    std::unique_ptr<RelayClusterClient> relayClusterClient;
-    std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
-    std::unique_ptr<network::server::MultiAddressServer<stun::SocketServer>> server;
 
     nx::network::SocketAddress address() const
     {
@@ -81,7 +76,14 @@ protected:
     }
 
 private:
+    conf::Settings m_settings;
+    ListeningPeerPool m_listeningPeerPool;
+    std::unique_ptr<RelayClusterClient> m_relayClusterClient;
+    std::unique_ptr<PeerRegistrator> m_listeningPeerRegistrator;
+
     nx::network::SocketAddress m_address;
+    nx::network::stun::MessageDispatcher m_stunMessageDispatcher;
+    std::unique_ptr<stun::SocketServer> m_server;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();

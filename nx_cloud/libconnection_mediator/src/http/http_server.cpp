@@ -38,14 +38,19 @@ void Server::listen()
         .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
 }
 
+void Server::stopAcceptingNewRequests()
+{
+    m_multiAddressHttpServer->pleaseStopSync();
+}
+
 nx::network::http::server::rest::MessageDispatcher& Server::messageDispatcher()
 {
     return *m_httpMessageDispatcher;
 }
 
-std::vector<network::SocketAddress> Server::httpEndpoints() const
+std::vector<network::SocketAddress> Server::endpoints() const
 {
-    return m_httpEndpoints;
+    return m_endpoints;
 }
 
 bool Server::launchHttpServerIfNeeded(
@@ -77,7 +82,7 @@ bool Server::launchHttpServerIfNeeded(
         return false;
     }
 
-    m_httpEndpoints = m_multiAddressHttpServer->endpoints();
+    m_endpoints = m_multiAddressHttpServer->endpoints();
     m_multiAddressHttpServer->forEachListener(
         [&settings](nx::network::http::HttpStreamSocketServer* server)
         {

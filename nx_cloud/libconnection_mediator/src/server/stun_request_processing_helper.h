@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 23, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_STUN_REQUEST_PROCESSING_HELPER_H
-#define NX_MEDIATOR_STUN_REQUEST_PROCESSING_HELPER_H
+#pragma once
 
 #include <type_traits>
 
@@ -12,14 +6,13 @@
 #include <nx/network/stun/server_connection.h>
 #include <nx/fusion/serialization/lexical.h>
 
-
 namespace nx {
 namespace hpm {
 
 typedef std::shared_ptr< network::stun::AbstractServerConnection > ConnectionStrongRef;
 typedef std::weak_ptr< network::stun::AbstractServerConnection > ConnectionWeakRef;
 
-/** Send success responce without attributes */
+/** Send success responce without attributes. */
 template<typename ConnectionPtr>
 void sendSuccessResponse(
     const ConnectionPtr& connection,
@@ -35,7 +28,7 @@ void sendSuccessResponse(
     connection->sendMessage(std::move(response), nullptr);
 }
 
-/** Send error responce with error code and description as attribute */
+/** Send error responce with error code and description as attribute. */
 template<typename ConnectionPtr>
 void sendErrorResponse(
     const ConnectionPtr& connection,
@@ -102,14 +95,12 @@ void fillAndSendResponse(
     connection->sendMessage(std::move(response));
 }
 
-
 /**
-    Does following:\n
-    - reads input data out of STUN \a request
-    - passes it to the member function \a processingFunc of \a processor
-    - on processin done sends response
-    //TODO #ak come up with a single implementation when variadic templates are available
-*/
+ * - Reads input data out of STUN request.
+ * - Passes it to the member function processingFunc of processor.
+ * - On processing done sends response.
+ * TODO: #ak Come up with a single implementation when variadic templates are available.
+ */
 template<
     typename ProcessorType,
     typename InputData>
@@ -135,7 +126,7 @@ void processRequestWithNoOutput(
     auto requestHeader = request.header;
     if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
     {
-        //holding ownership of connection until request processing completion
+        // Holding ownership of connection until request processing completion.
         (processor->*processingFunc)(
             connection,
             std::move(input),
@@ -151,14 +142,14 @@ void processRequestWithNoOutput(
     else
     {
         ConnectionWeakRef weakConnectionRef = connection;
-        //holding ownership of connection until request processing completion
+        // Holding ownership of connection until request processing completion.
         (processor->*processingFunc)(
             connection,
             std::move(input),
             request,
             [/*std::move*/ requestHeader, weakConnectionRef](api::ResultCode resultCode) mutable
             {
-                //connection can be removed at any moment
+                // Connection can be removed at any moment.
                 auto connectionStrongRef = weakConnectionRef.lock();
                 if (!connectionStrongRef)
                     return;
@@ -196,7 +187,7 @@ void processRequestWithOutput(
     auto requestHeader = request.header;
     if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
     {
-        //holding ownership of connection until request processing completion
+        // Holding ownership of connection until request processing completion.
         (processor->*processingFunc)(
             connection,
             std::move(input),
@@ -215,7 +206,7 @@ void processRequestWithOutput(
     else
     {
         ConnectionWeakRef weakConnectionRef = connection;
-        //holding ownership of connection until request processing completion
+        // Holding ownership of connection until request processing completion.
         (processor->*processingFunc)(
             connection,
             std::move(input),
@@ -224,7 +215,7 @@ void processRequestWithOutput(
                 api::ResultCode resultCode,
                 OutputData outputData) mutable
             {
-                //connection can be removed at any moment
+                // Connection can be removed at any moment.
                 auto connectionStrongRef = weakConnectionRef.lock();
                 if (!connectionStrongRef)
                     return;
@@ -237,7 +228,5 @@ void processRequestWithOutput(
     }
 }
 
-}   //hpm
-}   //nx
-
-#endif  //NX_MEDIATOR_STUN_REQUEST_PROCESSING_HELPER_H
+} // namespace hpm
+} // namespace nx

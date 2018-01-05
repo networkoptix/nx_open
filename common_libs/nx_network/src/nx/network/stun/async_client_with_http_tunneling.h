@@ -27,7 +27,6 @@ class NX_NETWORK_API AsyncClientWithHttpTunneling:
 
 public:
     AsyncClientWithHttpTunneling(Settings settings = Settings());
-    ~AsyncClientWithHttpTunneling();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 

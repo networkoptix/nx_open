@@ -16,7 +16,6 @@
 #include "request_processor.h"
 #include "settings.h"
 
-namespace nx { namespace network { namespace stun { class MessageDispatcher; } } }
 namespace nx { namespace hpm { namespace data { struct ListeningPeers; } } }
 
 namespace nx {
@@ -35,14 +34,12 @@ public:
     PeerRegistrator(
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
-        nx::network::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool,
         AbstractRelayClusterClient* const relayClusterClient);
     virtual ~PeerRegistrator() override;
 
     data::ListeningPeers getListeningPeers() const;
 
-private:
     void bind(
         const ConnectionStrongRef& connection,
         network::stun::Message requestMessage);

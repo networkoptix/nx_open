@@ -24,14 +24,12 @@ class MessageDispatcher;
 namespace nx {
 namespace hpm {
 
-class PeerRegistrator;
-
 namespace conf { class Settings; }
 namespace http { class Server; }
 
 class Controller;
 class ListeningPeerPool;
-class StunServer;
+class View;
 
 class MediatorProcess:
     public nx::utils::Service
@@ -53,12 +51,8 @@ protected:
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
-    Controller* m_controller;
-    StunServer* m_stunServer;
-    http::Server* m_httpServer;
-
-    QString getDataDirectory();
-    int printHelp();
+    Controller* m_controller = nullptr;
+    View* m_view = nullptr;
 };
 
 } // namespace hpm
