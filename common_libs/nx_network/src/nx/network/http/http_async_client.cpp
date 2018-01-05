@@ -533,9 +533,9 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
         return;
     }
 
-    NX_LOGX(lm("Request has been successfully sent to %1: %2")
-        .arg(m_contentLocationUrl)
-        .args(logTraffic() ? request().toString() : request().requestLine.toString()),
+    NX_LOGX(lm("Request has been successfully sent to %1 from %2. %3")
+        .args(m_contentLocationUrl, m_socket->getLocalAddress(),
+            logTraffic() ? request().toString() : request().requestLine.toString()),
         cl_logDEBUG2);
 
     const auto requestSequenceBak = m_requestSequence;
