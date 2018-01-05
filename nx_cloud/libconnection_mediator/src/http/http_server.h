@@ -31,6 +31,8 @@ public:
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool);
 
     void listen();
+    void stopAcceptingNewRequests();
+
     nx::network::http::server::rest::MessageDispatcher& messageDispatcher();
     std::vector<network::SocketAddress> endpoints() const;
 

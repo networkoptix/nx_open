@@ -27,6 +27,12 @@ void View::start()
     m_stunServer.listen();
 }
 
+void View::stop()
+{
+    m_stunServer.stopAcceptingNewRequests();
+    m_httpServer.stopAcceptingNewRequests();
+}
+
 std::vector<network::SocketAddress> View::httpEndpoints() const
 {
     return m_httpServer.endpoints();

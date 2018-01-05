@@ -76,6 +76,9 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     const int result = runMainLoop();
 
+    view.stop();
+    controller.stop();
+
     NX_ALWAYS(this, lm("%1 is stopped")
         .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()));
 

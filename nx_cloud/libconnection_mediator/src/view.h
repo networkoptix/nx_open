@@ -24,6 +24,7 @@ public:
         Controller* controller);
 
     void start();
+    void stop();
 
     std::vector<network::SocketAddress> httpEndpoints() const;
     std::vector<network::SocketAddress> stunEndpoints() const;

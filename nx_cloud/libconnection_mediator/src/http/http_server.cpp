@@ -38,6 +38,11 @@ void Server::listen()
         .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
 }
 
+void Server::stopAcceptingNewRequests()
+{
+    m_multiAddressHttpServer->pleaseStopSync();
+}
+
 nx::network::http::server::rest::MessageDispatcher& Server::messageDispatcher()
 {
     return *m_httpMessageDispatcher;
