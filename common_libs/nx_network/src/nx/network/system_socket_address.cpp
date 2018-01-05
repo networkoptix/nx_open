@@ -81,6 +81,7 @@ SocketAddress SystemSocketAddress::toSocketAddress() const
             resultHostAddr = HostAddress(m_sockaddr.v6.sin6_addr, m_sockaddr.v6.sin6_scope_id);
 
         return SocketAddress(resultHostAddr, ntohs(m_sockaddr.v6.sin6_port));
+    }
 
     NX_ASSERT(false, lm("Unknown socket family type: %1").arg(m_sockaddr.untyped.sa_family));
     return SocketAddress();
