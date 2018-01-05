@@ -64,7 +64,7 @@ Error MetadataManager::startFetchingMetadata(
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
-                event->setEventTypeId(
+                event->setTypeId(
                     nxpt::NxGuidHelper::fromRawData(hikvisionEvent.typeId.toRfc4122()));
                 event->setCaption(hikvisionEvent.caption.toStdString());
                 event->setDescription(hikvisionEvent.caption.toStdString());

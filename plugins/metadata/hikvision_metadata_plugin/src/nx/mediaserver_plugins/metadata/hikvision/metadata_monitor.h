@@ -23,7 +23,7 @@ class HikvisionMetadataMonitor: public QObject
     Q_OBJECT;
     using MetadataType = QString;
     using MetadataValue = QString;
-    using MultipartContentParserPtr = std::unique_ptr<nx_http::MultipartContentParser>;
+    using MultipartContentParserPtr = std::unique_ptr<nx::network::http::MultipartContentParser>;
 
 public:
     using Handler = std::function<void(const HikvisionEventList&)>;
@@ -59,7 +59,7 @@ private:
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
     QElapsedTimer m_timeSinceLastOpen;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     MultipartContentParserPtr m_contentParser;
 
     mutable QnMutex m_mutex;

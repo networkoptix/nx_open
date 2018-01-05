@@ -97,7 +97,7 @@ QUrl HikvisionMetadataMonitor::buildMonitoringUrl(
 
 void HikvisionMetadataMonitor::initMonitorUnsafe()
 {
-    auto httpClient = std::make_unique<nx_http::AsyncClient>();
+    auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_timer.pleaseStopSync();
     httpClient->bindToAioThread(m_timer.getAioThread());
 
@@ -106,7 +106,7 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
     httpClient->setOnDone([this]() { at_connectionClosed(); });
 
     m_timeSinceLastOpen.restart();
-    httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
+    httpClient->setTotalReconnectTries(nx::network::http::AsyncClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
@@ -119,7 +119,7 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
                 handler(events);
         };
 
-    m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
+    m_contentParser = std::make_unique<nx::network::http::MultipartContentParser>();
     m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, handler));
 
     m_httpClient = std::move(httpClient);
@@ -131,7 +131,7 @@ void HikvisionMetadataMonitor::at_responseReceived()
     if (!m_httpClient)
         return;
     const auto response = m_httpClient->response();
-    if (response && response->statusLine.statusCode == nx_http::StatusCode::ok)
+    if (response && response->statusLine.statusCode == nx::network::http::StatusCode::ok)
         m_contentParser->setContentType(m_httpClient->contentType());
     else
         at_connectionClosed();

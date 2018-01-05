@@ -165,8 +165,8 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
     url.setPassword(resourceInfo.password);
     int statusCode = 0;
     QByteArray buffer;
-    if (nx_http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
-        statusCode != nx_http::StatusCode::ok)
+    if (nx::network::http::downloadFileSync(url, &statusCode, &buffer) != SystemError::noError ||
+        statusCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
             arg(resourceInfo.url).arg(statusCode));
