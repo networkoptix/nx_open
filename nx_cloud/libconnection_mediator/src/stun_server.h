@@ -18,15 +18,15 @@ namespace http { class Server; };
 class StunServer
 {
 public:
-    StunServer(const conf::Settings& settings);
+    StunServer(
+        const conf::Settings& settings,
+        http::Server* httpServer);
 
     void listen();
     void stopAcceptingNewRequests();
 
     const std::vector<network::SocketAddress>& endpoints() const;
     nx::network::stun::MessageDispatcher& dispatcher();
-
-    void initializeHttpTunnelling(http::Server* httpServer);
 
 private:
     const conf::Settings& m_settings;
@@ -36,6 +36,7 @@ private:
     std::unique_ptr<network::server::MultiAddressServer<network::stun::UdpServer>> m_udpStunServer;
     std::vector<network::SocketAddress> m_endpoints;
 
+    void initializeHttpTunnelling(http::Server* httpServer);
     bool bind();
 };
 

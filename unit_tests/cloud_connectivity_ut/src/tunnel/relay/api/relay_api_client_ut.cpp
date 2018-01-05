@@ -70,7 +70,7 @@ protected:
         m_client = std::make_unique<ClientImpl>(m_baseUrl);
 
         m_client->beginListening(
-            "peerName",
+            ::testing::UnitTest::GetInstance()->current_test_info()->name(),
             std::bind(&RelayApiClient::saveBeginListeningCompletionResult, this, _1, _2, _3));
     }
 
@@ -111,8 +111,8 @@ private:
         BeginListeningResponse response,
         std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
     {
-        m_requestResultQueue.push(resultCode);
         m_prevBeginListeningResponse = std::move(response);
+        m_requestResultQueue.push(resultCode);
     }
 
     void initializeHttpServerIfNeeded()

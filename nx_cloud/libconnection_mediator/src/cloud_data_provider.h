@@ -18,7 +18,7 @@ namespace hpm {
 class AbstractCloudDataProvider
 {
 public:
-    virtual ~AbstractCloudDataProvider() = 0;
+    virtual ~AbstractCloudDataProvider() = default;
 
     struct System
     {

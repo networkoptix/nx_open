@@ -1,22 +1,33 @@
 #pragma once
 
-#include <memory>
-
 #include "socket_common.h"
 
 namespace nx {
 namespace network {
 
-struct NX_NETWORK_API SystemSocketAddress
+class NX_NETWORK_API SystemSocketAddress
 {
-    std::shared_ptr<sockaddr> ptr;
-    socklen_t size;
-
+public:
     SystemSocketAddress();
     SystemSocketAddress(int ipVersion);
     SystemSocketAddress(SocketAddress address, int ipVersion);
 
     SocketAddress toSocketAddress() const;
+
+    const struct sockaddr* addr() const;
+    struct sockaddr* addr();
+
+    const socklen_t& addrLen() const;
+    socklen_t& addrLen();
+
+private:
+    union
+    {
+        struct sockaddr untyped;
+        struct sockaddr_in v4;
+        struct sockaddr_in6 v6;
+    } m_sockaddr;
+    socklen_t m_sockaddrLen = 0;
 };
 
 } // namespace network

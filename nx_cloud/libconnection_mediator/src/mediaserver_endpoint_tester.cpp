@@ -30,20 +30,10 @@ struct PingCollector
 //-------------------------------------------------------------------------------------------------
 
 MediaserverEndpointTesterBase::MediaserverEndpointTesterBase(
-    AbstractCloudDataProvider* cloudData,
-    nx::network::stun::MessageDispatcher* dispatcher)
+    AbstractCloudDataProvider* cloudData)
     :
     RequestProcessor(cloudData)
 {
-    const auto result =
-        dispatcher->registerRequestProcessor(
-            network::stun::extension::methods::ping,
-            [this](ConnectionStrongRef connection, network::stun::Message message)
-            {
-                ping(std::move(connection), std::move(message));
-            });
-
-    NX_ASSERT(result, Q_FUNC_INFO, "Could not register ping processor");
 }
 
 void MediaserverEndpointTesterBase::ping(
@@ -116,10 +106,9 @@ void MediaserverEndpointTesterBase::ping(
 //-------------------------------------------------------------------------------------------------
 
 MediaserverEndpointTester::MediaserverEndpointTester(
-    AbstractCloudDataProvider* cloudData,
-    nx::network::stun::MessageDispatcher* dispatcher)
+    AbstractCloudDataProvider* cloudData)
     :
-    MediaserverEndpointTesterBase(cloudData, dispatcher)
+    MediaserverEndpointTesterBase(cloudData)
 {
 }
 

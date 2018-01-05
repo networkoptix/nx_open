@@ -35,16 +35,6 @@ nx::utils::db::DBResult DataObject::save(
     }
 
     QnSql::bind(stats, &saveRecordQuery);
-
-    //saveRecordQuery.bindValue(":start_time_utc", stats.startTime.time_since_epoch().count());
-    //saveRecordQuery.bindValue(":end_time", stats.endTime.time_since_epoch().count());
-    //saveRecordQuery.bindValue(":result_code", static_cast<int>(stats.resultCode));
-    //saveRecordQuery.bindValue(":session_id", QLatin1String(stats.sessionId));
-    //saveRecordQuery.bindValue(":originating_host_endpoint", stats.originatingHostEndpoint.toString());
-    //saveRecordQuery.bindValue(":originating_host_name", QLatin1String(stats.originatingHostName));
-    //saveRecordQuery.bindValue(":destination_host_endpoint", stats.destinationHostEndpoint.toString());
-    //saveRecordQuery.bindValue(":destination_host_name", QLatin1String(stats.destinationHostName));
-
     if (!saveRecordQuery.exec())
     {
         NX_LOGX(lm("Failed to save connect session statistics to DB. %1")

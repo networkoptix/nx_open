@@ -7,10 +7,10 @@ namespace cloud {
 enum class ConnectType
 {
     unknown = 0,
-    forwardedTcpPort = 0x01,    /**< E.g., Upnp. */
-    udpHp = 0x02,               /**< UDP hole punching. */
-    tcpHp = 0x04,               /**< TCP hole punching. */
-    proxy = 0x08,               /**< Proxy server address. */
+    forwardedTcpPort = 1 << 0,    /**< E.g., Upnp. */
+    udpHp = 1 << 1,               /**< UDP hole punching. */
+    tcpHp = 1 << 2,               /**< TCP hole punching. */
+    proxy = 1 << 3,               /**< Proxy server address. */
     all = forwardedTcpPort | udpHp | tcpHp | proxy,
 };
 

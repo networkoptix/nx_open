@@ -19,6 +19,7 @@
 #include <peer_registrator.h>
 #include <mediaserver_endpoint_tester.h>
 #include <relay/relay_cluster_client.h>
+#include <view.h>
 
 #include "mediator_mocks.h"
 
@@ -33,36 +34,40 @@ class StunCustomTest:
 {
 protected:
     StunCustomTest():
-        mediaserverApi(&cloudData, &stunMessageDispatcher),
-        relayClusterClient(settings),
-        listeningPeerPool(settings.listeningPeer()),
-        listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool, &relayClusterClient),
-        server(
-            &stunMessageDispatcher,
+        mediaserverApi(&cloudData),
+        m_relayClusterClient(settings),
+        m_listeningPeerPool(settings.listeningPeer()),
+        m_listeningPeerRegistrator(settings, &cloudData, &m_listeningPeerPool, &m_relayClusterClient),
+        m_server(
+            &m_stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled)
     {
-        EXPECT_TRUE(server.bind(std::vector<nx::network::SocketAddress>{nx::network::SocketAddress::anyAddress}));
-        EXPECT_TRUE(server.listen());
+        View::registerStunApiHandlers(&mediaserverApi, &m_stunMessageDispatcher);
+        View::registerStunApiHandlers(&m_listeningPeerRegistrator, &m_stunMessageDispatcher);
 
-        EXPECT_TRUE(server.endpoints().size());
-        address = nx::network::SocketAddress(nx::network::HostAddress::localhost, server.endpoints().front().port);
+        EXPECT_TRUE(m_server.bind(nx::network::SocketAddress::anyPrivateAddress));
+        EXPECT_TRUE(m_server.listen());
+
+        address = m_server.address();
     }
 
     ~StunCustomTest()
     {
-        server.pleaseStopSync();
+        m_server.pleaseStopSync();
     }
 
     nx::network::SocketAddress address;
-    MessageDispatcher stunMessageDispatcher;
+    conf::Settings settings;
     CloudDataProviderMock cloudData;
     MediaserverEndpointTesterMock mediaserverApi;
-    conf::Settings settings;
-    RelayClusterClient relayClusterClient;
-    ListeningPeerPool listeningPeerPool;
-    PeerRegistrator listeningPeerRegistrator;
-    network::server::MultiAddressServer<SocketServer> server;
+
+private:
+    RelayClusterClient m_relayClusterClient;
+    ListeningPeerPool m_listeningPeerPool;
+    PeerRegistrator m_listeningPeerRegistrator;
+    MessageDispatcher m_stunMessageDispatcher;
+    network::stun::SocketServer m_server;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
