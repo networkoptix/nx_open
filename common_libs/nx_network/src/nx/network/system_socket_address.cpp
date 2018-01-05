@@ -88,12 +88,12 @@ SocketAddress SystemSocketAddress::toSocketAddress() const
 
 const struct sockaddr* SystemSocketAddress::addr() const
 {
-    return &m_sockaddr.untyped;
+    return m_sockaddrLen == 0 ? nullptr : &m_sockaddr.untyped;
 }
 
 struct sockaddr* SystemSocketAddress::addr()
 {
-    return &m_sockaddr.untyped;
+    return m_sockaddrLen == 0 ? nullptr : &m_sockaddr.untyped;
 }
 
 const socklen_t& SystemSocketAddress::addrLen() const
