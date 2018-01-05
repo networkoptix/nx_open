@@ -24,8 +24,8 @@ private:
     union
     {
         struct sockaddr untyped;
-        sockaddr_in v4;
-        sockaddr_in6 v6;
+        struct sockaddr_in v4;
+        struct sockaddr_in6 v6;
     } m_sockaddr;
     socklen_t m_sockaddrLen = 0;
 };
