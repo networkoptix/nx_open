@@ -31,7 +31,7 @@
         <div class="text-left pull-left hidden-xs" ng-class="{'pp-only': !canViewArchive, 'shadows-off': emptyArchive}">
             <span class="webclient-button glyphicon-pp inline-block player-controls pull-left"
                   ng-class="{disabled: !canPlayLive && (emptyArchive || positionProvider.liveMode)}"
-                    ng-click="(!canPlayLive && (emptyArchive || positionProvider.liveMode)) || playPause()">
+                    ng-disable="(!canPlayLive && (emptyArchive || positionProvider.liveMode))" ng-click="playPause()">
                 <span class="glyphicon glyphicon-play"
                         ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
@@ -63,7 +63,7 @@
         <div class="text-left pull-left pp-only">
             <span class="webclient-button glyphicon-pp inline-block player-controls pull-left"
                 ng-class="{disabled: !canPlayLive && (emptyArchive || positionProvider.liveMode)}"
-                ng-click="(!canPlayLive && (emptyArchive || positionProvider.liveMode)) || playPause()">
+                ng-disable="(!canPlayLive && (emptyArchive || positionProvider.liveMode))" ng-click="playPause();">
                 <span class="glyphicon glyphicon-play"
                       ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
