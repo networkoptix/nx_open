@@ -1,6 +1,5 @@
 #pragma once
 
-#include <common/common_globals.h>
 #include <transaction/transaction.h>
 
 #include "../transaction_transport_header.h"

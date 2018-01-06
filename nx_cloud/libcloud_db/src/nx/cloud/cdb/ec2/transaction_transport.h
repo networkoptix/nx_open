@@ -6,7 +6,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
-#include <common/common_globals.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>

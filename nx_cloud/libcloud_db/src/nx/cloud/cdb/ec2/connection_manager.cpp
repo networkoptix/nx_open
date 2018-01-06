@@ -1,8 +1,10 @@
 #include "connection_manager.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -21,7 +23,6 @@
 #include "websocket_transaction_transport.h"
 #include "../access_control/authorization_manager.h"
 #include "../stree/cdb_ns.h"
-#include <nx/network/websocket/websocket_handshake.h>
 
 namespace nx {
 namespace cdb {
@@ -387,6 +388,9 @@ void ConnectionManager::closeConnectionsToSystem(
     const nx::String& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("Closing all connections to system %1").args(systemId), cl_logDEBUG1);
+
     auto allConnectionsRemovedGuard = makeSharedGuard(std::move(completionHandler));
 
     QnMutexLocker lock(&m_mutex);
@@ -570,6 +574,8 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("Removing connection %1").args(connectionId), cl_logDEBUG2);
+
     QnMutexLocker lock(&m_mutex);
     removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
 }
