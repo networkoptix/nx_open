@@ -32,12 +32,17 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
 
 void HttpServerConnection::processMessage(nx::network::http::Message requestMessage)
 {
+    if (requestMessage.type == nx::network::http::MessageType::request)
+    {
+        NX_VERBOSE(this, lm("Processing request %1 received from %2")
+            .args(requestMessage.request->requestLine.url.toString(), getForeignAddress()));
+    }
+
     // TODO: #ak Incoming message body. Use AbstractMsgBodySource.
 
     // TODO: #ak pipelining support.
     // Makes sense to add sequence to sendResponseFunc and use it to queue responses.
 
-    // Checking if connection is persistent.
     checkForConnectionPersistency(requestMessage);
 
     if (!m_authenticationManager)
@@ -329,6 +334,7 @@ void HttpServerConnection::responseSent()
         return;
     }
 
+    NX_VERBOSE(this, lm("Not full message has been sent yet. Fetching more message body to send..."));
     readMoreMessageBodyData();
 }
 
@@ -338,6 +344,7 @@ void HttpServerConnection::someMsgBodyRead(
 {
     if (errorCode != SystemError::noError)
     {
+        NX_DEBUG(this, lm("Error fetching message body to send. %1").args(SystemError::toString(errorCode)));
         closeConnection(errorCode);
         return;
     }
@@ -376,6 +383,8 @@ void HttpServerConnection::readMoreMessageBodyData()
 
 void HttpServerConnection::fullMessageHasBeenSent()
 {
+    NX_VERBOSE(this, lm("Complete response message has been sent"));
+
     NX_ASSERT(!m_responseQueue.empty());
     if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
     {

@@ -387,6 +387,9 @@ void ConnectionManager::closeConnectionsToSystem(
     const nx::String& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("Closing all connections to system %1").args(systemId), cl_logDEBUG1);
+
     auto allConnectionsRemovedGuard = makeSharedGuard(std::move(completionHandler));
 
     QnMutexLocker lock(&m_mutex);
@@ -570,6 +573,8 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("Removing connection %1").args(connectionId), cl_logDEBUG2);
+
     QnMutexLocker lock(&m_mutex);
     removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
 }

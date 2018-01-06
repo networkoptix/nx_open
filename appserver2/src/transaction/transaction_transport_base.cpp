@@ -390,6 +390,8 @@ void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
 
 void QnTransactionTransportBase::setState(State state)
 {
+    NX_VERBOSE(this, lm("State changed to %1 from outside").args(toString(state)));
+
     QnMutexLocker lock( &m_mutex );
     setStateNoLock(state);
 }
@@ -659,6 +661,8 @@ void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCo
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()), cl_logWARNING );
         }
+        NX_VERBOSE(this, lm("Closing connection due to error %1")
+            .args(SystemError::toString(errorCode == SystemError::noError ? SystemError::connectionReset : errorCode)));
         return setStateNoLock( State::Error );
     }
 

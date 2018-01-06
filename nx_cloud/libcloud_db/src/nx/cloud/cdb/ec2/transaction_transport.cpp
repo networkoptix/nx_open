@@ -361,6 +361,10 @@ void TransactionTransport::forwardStateChangedEvent(
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("systemId %1, connection %2. Reporting connection closure")
+                .args(m_systemId, m_connectionId), cl_logDEBUG2);
+
         m_closed = true;
         if (m_connectionClosedEventHandler)
             m_connectionClosedEventHandler(SystemError::connectionReset);
@@ -471,6 +475,8 @@ void TransactionTransport::restartInactivityTimer()
 
 void TransactionTransport::onInactivityTimeout()
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("systemId %1, connection %2. Inactivity timeout triggered")
+        .args(m_systemId, m_connectionId), cl_logDEBUG2);
     m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::Error);
 }
 
