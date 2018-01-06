@@ -8,12 +8,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QSet>
 
-#include <transaction/transaction.h>
-#include <transaction/binary_transaction_serializer.h>
-#include <transaction/json_transaction_serializer.h>
-#include <transaction/ubjson_transaction_serializer.h>
-#include <transaction/transaction_transport_header.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
@@ -28,14 +22,13 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <utils/common/id.h>
-
 #include "connection_guard.h"
-#include <common/common_module_aware.h>
 #include "abstract_transaction_transport.h"
 
 namespace ec2
 {
+
+struct QnTransactionTransportHeader;
 
 namespace ConnectionType
 {

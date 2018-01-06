@@ -8,22 +8,23 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/network/http/base64_decoder_filter.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_factory.h>
-#include <nx/utils/timer_manager.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/byte_stream/sized_data_decoder.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
-#include <nx/utils/byte_stream/custom_output_stream.h>
-#include <utils/common/util.h>
-#include <nx/network/http/custom_headers.h>
-#include <api/global_settings.h>
-#include <common/common_module.h>
+
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
+#include <transaction/transaction_transport_header.h>
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -1382,7 +1383,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
 
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
         // Servers 3.1 and above sends keep-alive to the client
-        if (keepAliveHeaderIter != m_httpClient->response()->headers.end() && 
+        if (keepAliveHeaderIter != m_httpClient->response()->headers.end() &&
             m_remotePeerEcProtoVersion >= kMinServerVersionWithClientKeepAlive)
         {
             m_remotePeerSupportsKeepAlive = true;
