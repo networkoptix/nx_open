@@ -951,6 +951,10 @@ ShortCache.prototype.checkEndOfArchive = function(){
     },function(){return null;});
 };
 
+
+ShortCache.prototype.isArchiveEmpty = function(){
+    return this.currentDetailization < 1;
+}
 //Used by ShortCache and CameraRecords
 function parseChunks(chunks){
     return _.forEach(chunks,function(chunk){

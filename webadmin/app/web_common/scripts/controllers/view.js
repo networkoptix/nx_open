@@ -300,7 +300,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
                     if(!play){
                         $timeout(function(){
-                            $scope.positionProvider.liveMode = $scope.positionProvider.currentDetailization < 1; // Do it async
+                            $scope.positionProvider.liveMode = $scope.positionProvider.isArchiveEmpty(); // Do it async
                         });
                     }
                 }
