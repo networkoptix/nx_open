@@ -4,6 +4,9 @@
 
 #include <QtCore/QDir>
 
+#include <nx/utils/db/request_executor_factory.h>
+#include <nx/utils/db/request_execution_thread.h>
+
 #include "functional_tests/test_setup.h"
 #include "functional_tests/test_email_manager.h"
 
@@ -69,66 +72,128 @@ TEST_F(DbRegress, general)
     ASSERT_EQ(api::SystemStatus::activated, laOfficeTestSystemIter->status);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+class QueryExecutorStub:
+    public nx::utils::db::DbRequestExecutionThread
+{
+    using base_type = nx::utils::db::DbRequestExecutionThread;
+
+public:
+    QueryExecutorStub(
+        const nx::utils::db::ConnectionOptions& connectionOptions,
+        nx::utils::db::QueryExecutorQueue* const queryExecutorQueue)
+        :
+        base_type(connectionOptions, queryExecutorQueue)
+    {
+    }
+
+    void setForcedDbResult(boost::optional<nx::utils::db::DBResult> forcedDbResult)
+    {
+        m_forcedDbResult = forcedDbResult;
+    }
+
+protected:
+    virtual void processTask(std::unique_ptr<nx::utils::db::AbstractExecutor> task) override
+    {
+        if (m_forcedDbResult)
+            task->reportErrorWithoutExecution(*m_forcedDbResult);
+        else
+            base_type::processTask(std::move(task));
+    }
+
+private:
+    boost::optional<nx::utils::db::DBResult> m_forcedDbResult;
+};
+
+} // namespace
+
 class DbFailure:
     public CdbFunctionalTest
 {
 public:
     DbFailure()
     {
+        using namespace std::placeholders;
+
         QDir().mkpath(testDataDir());
+
+        addArg("--db/maxPeriodQueryWaitsForAvailableConnection=1s");
+        addArg("--db/maxConnectionCount=1");
+
+        // Installing sql query executor that always reports timedout.
+        m_requestExecutorFactoryBak =
+            nx::utils::db::RequestExecutorFactory::instance().setCustomFunc(
+                std::bind(&DbFailure::createInfiniteLatencyDbQueryExecutorFactory, this, _1, _2));
+    }
+
+    ~DbFailure()
+    {
+        nx::utils::db::RequestExecutorFactory::instance().setCustomFunc(
+            std::move(m_requestExecutorFactoryBak));
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_cdbConnection = connection(std::string(), std::string());
+    }
+
+    void givenInfiniteLatencyDb()
+    {
+        m_prevDbQueryExecutor->setForcedDbResult(nx::utils::db::DBResult::retryLater);
+    }
+
+    void whenIssueDataModificationRequest()
+    {
+        using namespace std::placeholders;
+
+        api::AccountRegistrationData accountData;
+        accountData.email = generateRandomEmailAddress();
+        accountData.passwordHa1 = "sdfdsfsdf";
+        m_cdbConnection->accountManager()->registerNewAccount(
+            std::move(accountData),
+            std::bind(&DbFailure::saveRequestResult, this, _1));
+    }
+
+    void thenResultCodeIs(api::ResultCode expected)
+    {
+        ASSERT_EQ(expected, m_requestResultCodeQueue.pop());
+    }
+
+private:
+    nx::utils::db::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    nx::utils::SyncQueue<api::ResultCode> m_requestResultCodeQueue;
+    std::unique_ptr<api::Connection> m_cdbConnection;
+    QueryExecutorStub* m_prevDbQueryExecutor = nullptr;
+
+    void saveRequestResult(api::ResultCode resultCode)
+    {
+        m_requestResultCodeQueue.push(resultCode);
+    }
+
+    std::unique_ptr<nx::utils::db::BaseRequestExecutor>
+        createInfiniteLatencyDbQueryExecutorFactory(
+            const nx::utils::db::ConnectionOptions& connectionOptions,
+            nx::utils::db::QueryExecutorQueue* const queryExecutorQueue)
+    {
+        auto result = std::make_unique<QueryExecutorStub>(
+            connectionOptions,
+            queryExecutorQueue);
+        m_prevDbQueryExecutor = result.get();
+        return result;
     }
 };
 
-/**
- * Blocking db connection thread and checking if subsequent db request will fail with
- * retryLater result.
- */
-TEST_F(DbFailure, basic)
+TEST_F(DbFailure, timed_out_db_query_results_in_retryLater_result)
 {
-    addArg("--db/maxPeriodQueryWaitsForAvailableConnection=1s");
-    addArg("--db/maxConnectionCount=1");
-
-    bool insertDelay = false;
-    TestEmailManager testEmailManager(
-        [&insertDelay](const AbstractNotification& /*notification*/)
-        {
-            if (insertDelay)
-                std::this_thread::sleep_for(std::chrono::seconds(2));
-        });
-
-    EMailManagerFactory::setFactory(
-        [&testEmailManager](const conf::Settings& /*settings*/)
-        {
-            return std::make_unique<EmailManagerStub>(&testEmailManager);
-        });
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto account = addActivatedAccount2();
-
-    auto cdbConnection = connection(account.email, account.password);
-    api::AccountRegistrationData accountData;
-    accountData.email = generateRandomEmailAddress();
-    accountData.passwordHa1 = "sdfdsfsdf";
-    insertDelay = true;
-    nx::utils::promise<api::ResultCode> newAccountRegisteredPromise;
-    cdbConnection->accountManager()->registerNewAccount(
-        std::move(accountData),
-        [&newAccountRegisteredPromise](
-            api::ResultCode resultCode,
-            api::AccountConfirmationCode /*confirmationCode*/)
-        {
-            newAccountRegisteredPromise.set_value(resultCode);
-        });
-
-    api::AccountUpdateData accountUpdate;
-    accountUpdate.fullName = "qweasd123";
-    ASSERT_EQ(
-        api::ResultCode::retryLater,
-        updateAccount(account.email, account.password, accountUpdate));
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        newAccountRegisteredPromise.get_future().get());
+    givenInfiniteLatencyDb();
+    whenIssueDataModificationRequest();
+    thenResultCodeIs(api::ResultCode::retryLater);
 }
 
 } // namespace test

@@ -33,6 +33,9 @@ public:
     virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void start() override;
 
+protected:
+    virtual void processTask(std::unique_ptr<AbstractExecutor> task);
+
 private:
     std::atomic<ConnectionState> m_state;
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
@@ -43,7 +46,6 @@ private:
     const nx::utils::QueueReaderId m_queueReaderId;
 
     void queryExecutionThreadMain();
-    void processTask(std::unique_ptr<AbstractExecutor> task);
     void closeConnection();
 
     static bool isDbErrorRecoverable(DBResult dbResult);
