@@ -102,15 +102,18 @@ public:
         m_concurrentDataModificationRequests(0)
     {
         using namespace std::placeholders;
-        RequestExecutorFactory::instance().setCustomFunc(
-            std::bind(&DbAsyncSqlQueryExecutor::createConnection, this, _1, _2));
+
+        m_requestExecutorFactoryBak =
+            RequestExecutorFactory::instance().setCustomFunc(
+                std::bind(&DbAsyncSqlQueryExecutor::createConnection, this, _1, _2));
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
     }
 
     ~DbAsyncSqlQueryExecutor()
     {
-        RequestExecutorFactory::instance().setCustomFunc(nullptr);
+        RequestExecutorFactory::instance().setCustomFunc(
+            std::move(m_requestExecutorFactoryBak));
     }
 
     void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
@@ -293,6 +296,7 @@ private:
     nx::utils::promise<void> m_finishHangingQuery;
     std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests;
     std::atomic<int> m_concurrentDataModificationRequests;
+    RequestExecutorFactory::Function m_requestExecutorFactoryBak;
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
