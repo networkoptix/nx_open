@@ -185,7 +185,7 @@ private:
             connectionOptions,
             queryExecutorQueue);
         m_prevDbQueryExecutor = result.get();
-        return result;
+        return std::move(result);
     }
 };
 
