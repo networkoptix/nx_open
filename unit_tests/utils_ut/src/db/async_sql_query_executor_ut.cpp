@@ -102,7 +102,7 @@ public:
         m_concurrentDataModificationRequests(0)
     {
         using namespace std::placeholders;
-        RequestExecutorFactory::setFactoryFunc(
+        RequestExecutorFactory::instance().setCustomFunc(
             std::bind(&DbAsyncSqlQueryExecutor::createConnection, this, _1, _2));
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
@@ -110,7 +110,7 @@ public:
 
     ~DbAsyncSqlQueryExecutor()
     {
-        RequestExecutorFactory::setFactoryFunc(nullptr);
+        RequestExecutorFactory::instance().setCustomFunc(nullptr);
     }
 
     void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
