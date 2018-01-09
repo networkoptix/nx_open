@@ -159,7 +159,7 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
     if (!data.hasExpired())
         return data.supportedEventTypes;
 
-    QUrl url(resourceInfo.url);
+    nx::utils::Url url(resourceInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
     url.setUserInfo(resourceInfo.login);
     url.setPassword(resourceInfo.password);

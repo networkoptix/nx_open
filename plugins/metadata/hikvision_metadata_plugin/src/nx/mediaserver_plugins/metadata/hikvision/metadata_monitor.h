@@ -12,6 +12,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <QtCore/QElapsedTimer>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace mediaserver {
@@ -30,7 +31,7 @@ public:
 
     HikvisionMetadataMonitor(
         const Hikvision::DriverManifest& manifest,
-        const QUrl& resourceUrl,
+        const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth,
         const std::vector<QnUuid>& eventTypes);
     virtual ~HikvisionMetadataMonitor();
@@ -43,8 +44,8 @@ public:
     void clearHandlers();
 
 private:
-    QUrl buildMonitoringUrl(
-        const QUrl& resourceUrl,
+    nx::utils::Url buildMonitoringUrl(
+        const nx::utils::Url& resourceUrl,
         const std::vector<QnUuid>& eventTypes) const;
     void initMonitorUnsafe();
 
@@ -55,7 +56,7 @@ private:
 
 private:
     const Hikvision::DriverManifest& m_manifest;
-    const QUrl m_url;
+    const nx::utils::Url m_url;
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
     QElapsedTimer m_timeSinceLastOpen;

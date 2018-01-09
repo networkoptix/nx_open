@@ -184,7 +184,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         if (!pluginManifest)
             continue; //< Error already logged.
 
-        const auto deviceManifest = addManifestToCamera(camera, manager.get());
+        const auto deviceManifest = addManifestToCamera(camera, manager.get(), plugin);
         if (!deviceManifest)
             continue; //< Error already logged.
 
@@ -424,7 +424,8 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
 
 boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCamera(
     const QnSecurityCamResourcePtr& camera,
-    AbstractMetadataManager* manager)
+    AbstractMetadataManager* manager,
+    const nx::sdk::metadata::AbstractMetadataPlugin* plugin)
 {
     NX_ASSERT(manager);
     NX_ASSERT(camera);
@@ -434,13 +435,13 @@ boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCame
     if (error != Error::noError)
     {
         NX_ERROR(this) << lm("Unable to receive Manager manifest for \"%1\": %2.")
-            .args(manager->plugin()->name(), error);
+            .args(plugin->name(), error);
         return boost::none;
     }
     if (manifestStr == nullptr)
     {
         NX_ERROR(this) << lm("Received null Manager manifest for \"%1\".")
-            .arg(manager->plugin()->name());
+            .arg(plugin->name());
         return boost::none;
     }
 
