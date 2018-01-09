@@ -13,8 +13,9 @@ QnMutex Hikvision::DriverManifest::m_cachedIdMutex;
 QMap<QString, QnUuid> Hikvision::DriverManifest::m_idByInternalName;
 QMap<QnUuid, Hikvision::EventDescriptor> Hikvision::DriverManifest::m_recordById;
 
-QnUuid Hikvision::DriverManifest::eventTypeByInternalName(const QString& internalEventName) const
+QnUuid Hikvision::DriverManifest::eventTypeByInternalName(const QString& value) const
 {
+    const auto internalEventName = value.toLower();
     QnMutexLocker lock(&m_cachedIdMutex);
     QnUuid result = m_idByInternalName.value(internalEventName);
     if (!result.isNull())
@@ -22,7 +23,7 @@ QnUuid Hikvision::DriverManifest::eventTypeByInternalName(const QString& interna
 
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        const auto possibleInternalNames = eventDescriptor.internalName.split(L',');
+        const auto possibleInternalNames = eventDescriptor.internalName.toLower().split(L',');
         for (const auto& name: possibleInternalNames)
         {
             if (internalEventName.contains(name))
