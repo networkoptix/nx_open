@@ -196,23 +196,28 @@ void QnServerStreamRecorder::resumeRebuildIfLowDataNoLock()
     }
 }
 
+bool QnServerStreamRecorder::isQueueFull() const 
+{
+    QnMutexLocker lock(&m_queueSizeMutex);
+
+    if (m_dataQueue.size() > m_maxRecordQueueSizeElements)
+        return true;
+
+    // check for global overflow bytes between all recorders
+    const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+    if (totalAllowedBytes > m_totalQueueSize)
+        return false; //< no need to cleanup
+
+    if (m_queuedSize < m_maxRecordQueueSizeBytes)
+        return false; //< no need to cleanup
+
+    return true;
+}
+
 bool QnServerStreamRecorder::cleanupQueueIfOverflow()
 {
-    {
-        QnMutexLocker lock( &m_queueSizeMutex );
-
-        bool needCleanup = m_dataQueue.size() > m_maxRecordQueueSizeElements;
-        if (!needCleanup)
-        {
-            // check for global overflow bytes between all recorders
-            const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
-            if (totalAllowedBytes > m_totalQueueSize)
-                return false; //< no need to cleanup
-
-            if (m_queuedSize < m_maxRecordQueueSizeBytes)
-                return false; //< no need to cleanup
-        }
-    }
+    if (!isQueueFull())
+        return false;
 
     if (!m_recordingContextVector.empty())
     {

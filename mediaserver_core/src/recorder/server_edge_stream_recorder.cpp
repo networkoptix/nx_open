@@ -21,6 +21,11 @@ void QnServerEdgeStreamRecorder::setOnFileWrittenHandler(FileWrittenHandler hand
     m_fileWrittenHandler = handler;
 }
 
+bool QnServerEdgeStreamRecorder::canAcceptData() const 
+{
+    return !isQueueFull();
+}
+
 bool QnServerEdgeStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
     return true;

@@ -50,6 +50,7 @@ public:
 
     int getFRAfterThreshold() const;
     bool needConfigureProvider() const;
+    bool isQueueFull() const;
 
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
@@ -143,7 +144,7 @@ private:
     qint64 m_queuedSize;
     static std::atomic<qint64> m_totalQueueSize;
     static std::atomic<int> m_totalRecorders;
-    QnMutex m_queueSizeMutex;
+    mutable QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
