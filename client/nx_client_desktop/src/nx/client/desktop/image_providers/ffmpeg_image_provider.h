@@ -2,7 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/image_provider.h>
+#include "image_provider.h"
 
 /** Utility class to get an image from the local media file using ffmpeg. */
 class QnFfmpegImageProvider: public QnImageProvider

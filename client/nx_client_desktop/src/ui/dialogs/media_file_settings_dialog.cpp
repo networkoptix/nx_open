@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
-#include <utils/ffmpeg_image_provider.h>
+#include <nx/client/desktop/image_providers/ffmpeg_image_provider.h>
 
 
 QnMediaFileSettingsDialog::QnMediaFileSettingsDialog(QWidget* parent):

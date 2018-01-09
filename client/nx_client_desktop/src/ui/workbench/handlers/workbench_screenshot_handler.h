@@ -14,7 +14,7 @@
 
 #include <transcoding/timestamp_params.h>
 
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/common/connective.h>
 

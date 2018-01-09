@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <QtGui/QPainter>
 
-#include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/client/desktop/utils/layout_background_image_provider.h>
+#include <nx/client/desktop/image_providers/layout_background_image_provider.h>
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>

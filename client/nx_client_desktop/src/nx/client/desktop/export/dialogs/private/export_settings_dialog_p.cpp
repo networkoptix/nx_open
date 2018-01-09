@@ -7,8 +7,6 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <camera/camera_thumbnail_manager.h>
-#include <camera/single_thumbnail_loader.h>
 #include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
@@ -20,8 +18,10 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
-#include <nx/client/desktop/utils/proxy_image_provider.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/proxy_image_provider.h>
 #include <nx/client/desktop/utils/transcoding_image_processor.h>
 
 namespace {

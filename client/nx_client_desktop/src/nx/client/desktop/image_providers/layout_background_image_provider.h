@@ -1,9 +1,10 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
-#include <utils/image_provider.h>
 #include <utils/common/connective.h>
+
+#include "image_provider.h"
+
 
 namespace nx {
 namespace client {

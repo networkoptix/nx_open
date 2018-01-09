@@ -2,9 +2,10 @@
 
 #include <core/resource/layout_resource.h>
 
-#include "server_image_cache.h"
-#include "local_file_cache.h"
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/utils/server_image_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
+
+#include "threaded_image_loader.h"
 
 namespace nx {
 namespace client {
@@ -14,7 +15,7 @@ struct LayoutBackgroundImageProvider::Private
 {
     QScopedPointer<ServerImageCache> cache;
     QSize maxImageSize;
-    QScopedPointer<QnThreadedImageLoader> loader;
+    QScopedPointer<ThreadedImageLoader> loader;
     QImage image;
 
     QSize sizeHint() const
@@ -46,15 +47,11 @@ LayoutBackgroundImageProvider::LayoutBackgroundImageProvider(const QnLayoutResou
         ? new LocalFileCache()
         : new ServerImageCache());
     d->maxImageSize = maxImageSize;
-    d->loader.reset(new QnThreadedImageLoader());
+    d->loader.reset(new ThreadedImageLoader());
     d->loader->setInput(d->cache->getFullPath(layout->backgroundImageFilename()));
     d->loader->setSize(d->sizeHint());
 
-#define QnThreadedImageLoaderFinished \
-        static_cast<void (QnThreadedImageLoader::*)(const QImage& )> \
-        (&QnThreadedImageLoader::finished)
-
-    connect(d->loader, QnThreadedImageLoaderFinished, this,
+    connect(d->loader, &ThreadedImageLoader::imageLoaded, this,
         [this](const QImage& image)
         {
             d->image = image;

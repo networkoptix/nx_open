@@ -7,7 +7,9 @@
 #include <api/helpers/thumbnail_request_data.h>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/image_provider.h>
+
+#include "image_provider.h"
+
 
 class QnSingleThumbnailLoader: public QnImageProvider, public QnConnectionContextAware
 {

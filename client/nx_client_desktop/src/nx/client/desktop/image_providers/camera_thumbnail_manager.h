@@ -12,9 +12,10 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/image_provider.h>
-
 #include <nx/utils/uuid.h>
+
+#include "image_provider.h"
+
 
 // TODO: #GDM create an application-wide set of thumbnails managers with different options: VMS-6759
 class QnCameraThumbnailManager: public QnImageProvider, public QnConnectionContextAware
