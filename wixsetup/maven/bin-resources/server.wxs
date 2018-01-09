@@ -82,6 +82,9 @@
                     <Component Id="ServerHikvisionMetadataPlugin">
                         <File Id="hikvision_metadata_plugin.dll" Name="hikvision_metadata_plugin.dll" Source="$(var.PluginsDir)\hikvision_metadata_plugin.dll" DiskId="10" />
                     </Component>
+                    <Component Id="ServerAxisMetadataPlugin">
+                        <File Id="axis_metadata_plugin.dll" Name="axis_metadata_plugin.dll" Source="$(var.PluginsDir)\axis_metadata_plugin.dll" DiskId="10" />
+                    </Component>
                 </Directory>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
@@ -246,6 +249,7 @@
                 <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
             <?endif?>
             <ComponentRef Id="ServerHikvisionMetadataPlugin"/>
+            <ComponentRef Id="ServerAxisMetadataPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
