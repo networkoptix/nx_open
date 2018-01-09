@@ -322,15 +322,12 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
 }
 
 LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo():
-    status(Qn::ThumbnailStatus::Invalid),
-    ignoreTrasformation(true)
+    ThumbnailInfo(Qn::ThumbnailStatus::Invalid, true, QPixmap())
 {
 }
 
 LayoutPreviewPainter::ThumbnailInfo::ThumbnailInfo(const QPixmap& pixmap):
-    status(Qn::ThumbnailStatus::Loaded),
-    ignoreTrasformation(true),
-    pixmap(pixmap)
+    ThumbnailInfo(Qn::ThumbnailStatus::Loaded, true, pixmap)
 {
 }
 

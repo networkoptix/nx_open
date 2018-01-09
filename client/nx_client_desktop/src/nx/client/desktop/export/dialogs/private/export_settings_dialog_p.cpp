@@ -354,7 +354,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
 
     m_layoutImageProvider.reset(new LayoutThumbnailLoader(
         layout,
-        /*allowNonCameraResources*/ false,
+        /*allowNonCameraResources*/ true,
         m_previewSize,
         m_exportLayoutSettings.period.startTimeMs));
 

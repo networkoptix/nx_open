@@ -47,7 +47,7 @@ void QnMediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr& res
     if (resourcePtr->hasFlags(Qn::still_image))
         m_imageProvider.reset(new QnBasicImageProvider(QImage(resourcePtr->getUrl()), this));
     else
-        m_imageProvider.reset(new QnFfmpegImageProvider(resourcePtr, this));
+        m_imageProvider.reset(new nx::client::desktop::FfmpegImageProvider(resourcePtr, this));
 
     m_imageProvider->loadAsync();
 
