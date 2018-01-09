@@ -1,6 +1,6 @@
 #include <nx/network/system_socket.h>
 
-#include "../stream_socket_acceptance_tests.h"
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 
 namespace nx {
 namespace network {

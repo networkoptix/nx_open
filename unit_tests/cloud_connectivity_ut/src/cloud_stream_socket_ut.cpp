@@ -9,6 +9,7 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/network/test_support/test_outgoing_tunnel.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/object_destruction_flag.h>
@@ -17,6 +18,22 @@
 
 namespace nx {
 namespace network {
+
+namespace test {
+
+struct CloudStreamSocketTypeSet
+{
+    using ClientSocket = cloud::CloudStreamSocket;
+    using ServerSocket = TCPServerSocket;
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    CloudStreamSocket,
+    StreamSocketAcceptance,
+    CloudStreamSocketTypeSet);
+
+} // namespace test
+
 namespace cloud {
 namespace test {
 

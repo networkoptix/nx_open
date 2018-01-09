@@ -8,13 +8,13 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 
 #include "common_server_socket_ut.h"
-#include "stream_socket_acceptance_tests.h"
 
 namespace nx {
 namespace network {
