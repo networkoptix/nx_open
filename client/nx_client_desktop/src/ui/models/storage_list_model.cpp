@@ -140,7 +140,7 @@ QString urlPath(const QString& url)
         return url;
 
     const QUrl u(url);
-    return SocketAddress(u.host(), u.port(0)).toString() + u.path();
+    return nx::network::SocketAddress(u.host(), u.port(0)).toString() + u.path();
 }
 
 QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedText) const

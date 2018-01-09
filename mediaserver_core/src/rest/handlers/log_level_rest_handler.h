@@ -2,8 +2,11 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnLogLevelRestHandler : public QnJsonRestHandler {
-    Q_OBJECT
+class QnLogLevelRestHandler: public QnJsonRestHandler
+{
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor);
+    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
+
+private:
+    virtual JsonRestResponse manageLogLevelById(const JsonRestRequest& request);
 };

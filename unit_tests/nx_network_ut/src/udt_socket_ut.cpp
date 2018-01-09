@@ -8,13 +8,13 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 
 #include "common_server_socket_ut.h"
-#include "stream_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -405,7 +405,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
             });
 
         UdtStreamSocket clientSock(AF_INET);
-        ASSERT_TRUE(clientSock.connect(serverAddress))
+        ASSERT_TRUE(clientSock.connect(serverAddress, nx::network::kNoTimeout))
             << serverAddress.toStdString() <<", "
             << SystemError::getLastOSErrorText().toStdString();
 
@@ -444,7 +444,7 @@ protected:
     void connectToUdtServer()
     {
         m_clientSock = std::make_unique<UdtStreamSocket>(AF_INET);
-        ASSERT_TRUE(m_clientSock->connect(m_serverAddress))
+        ASSERT_TRUE(m_clientSock->connect(m_serverAddress, nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
     }
 
@@ -547,7 +547,7 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         ASSERT_TRUE(clientSock->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_NE(server.getLocalAddress(), clientSock->getLocalAddress());
 
-        ASSERT_TRUE(clientSock->connect(server.getLocalAddress()));
+        ASSERT_TRUE(clientSock->connect(server.getLocalAddress(), nx::network::kNoTimeout));
 
         auto connectionAcceptedFuture = connectionAcceptedPromise.get_future();
         ASSERT_EQ(
@@ -628,7 +628,7 @@ protected:
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         socketConfig(socket.get());
-        EXPECT_TRUE((bool) socket->connect(address));
+        EXPECT_TRUE(socket->connect(address, nx::network::kNoTimeout));
         return socket;
     }
 
@@ -765,7 +765,7 @@ struct UdtSocketTypeSet
     using ServerSocket = UdtStreamServerSocket;
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
+INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocketAcceptance, UdtSocketTypeSet);
 
 //-------------------------------------------------------------------------------------------------
 

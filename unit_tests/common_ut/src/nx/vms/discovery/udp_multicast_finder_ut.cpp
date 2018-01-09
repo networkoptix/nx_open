@@ -43,18 +43,18 @@ protected:
 
 TEST_F(DiscoveryUdpMulticastFinder, Base)
 {
-    utils::TestSyncMultiQueue<QnModuleInformationWithAddresses, SocketAddress> discoveryQueue;
+    utils::TestSyncMultiQueue<QnModuleInformationWithAddresses, nx::network::SocketAddress> discoveryQueue;
     moduleFinder.setSendInterval(std::chrono::milliseconds(500));
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
         [this, &discoveryQueue](
-            const QnModuleInformationWithAddresses& module, const SocketAddress& endpoint)
+            const QnModuleInformationWithAddresses& module, const nx::network::SocketAddress& endpoint)
         {
             if (module.localSystemId == systemId)
                 discoveryQueue.push(module, endpoint);
         });
 
-    const auto interfaceCount = (size_t) getLocalIpV4AddressList().size();
+    const auto interfaceCount = (size_t) nx::network::getLocalIpV4AddressList().size();
     const auto waitForDiscovery =
         [&](const QnModuleInformationWithAddresses& information)
         {
@@ -94,7 +94,7 @@ TEST_F(DiscoveryUdpMulticastFinder, DISABLED_RealUse)
 {
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
-        [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
+        [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress endpoint)
         {
             NX_LOGX(lm("Found module %1 on %2").args(module.id, endpoint), cl_logINFO);
         });

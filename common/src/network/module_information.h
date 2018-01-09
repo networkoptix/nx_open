@@ -54,12 +54,12 @@ struct QnModuleInformationWithAddresses : QnModuleInformation
 
     // TODO: Also make a tempate.
     inline
-    std::set<SocketAddress> endpoints() const
+    std::set<nx::network::SocketAddress> endpoints() const
     {
-        std::set<SocketAddress> endpoints;
+        std::set<nx::network::SocketAddress> endpoints;
         for (const auto& address: remoteAddresses)
         {
-            SocketAddress endpoint(address);
+            nx::network::SocketAddress endpoint(address);
             if (endpoint.port == 0)
                 endpoint.port = (uint16_t) port;
 

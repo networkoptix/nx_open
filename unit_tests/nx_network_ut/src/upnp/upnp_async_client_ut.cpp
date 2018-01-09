@@ -4,7 +4,9 @@
 
 #include <nx/utils/std/future.h>
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 namespace test {
 
 static const nx::utils::Url URL(lit("http://192.168.20.1:52869/ctl/IPConn"));
@@ -98,4 +100,6 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
 }
 
 } // namespace test
-} // namespace nx_upnp
+} // namespace upnp
+} // namespace network
+} // namespace nx

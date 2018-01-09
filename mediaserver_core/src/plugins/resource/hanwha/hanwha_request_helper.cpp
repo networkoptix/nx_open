@@ -38,7 +38,7 @@ HanwhaRequestHelper::HanwhaRequestHelper(
 HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesPath)
 {
     nx::Buffer buffer;
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
     if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
@@ -50,7 +50,7 @@ HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesP
 HanwhaCgiParameters HanwhaRequestHelper::fetchCgiParameters(const QString& cgiParametersPath)
 {
     nx::Buffer buffer;
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     auto url = buildAttributesUrl(cgiParametersPath);
 
     if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
@@ -69,7 +69,7 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
 
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaResponse(statusCode, url.toString(QUrl::RemoveUserInfo));
 
@@ -186,13 +186,13 @@ bool HanwhaRequestHelper::doRequestInternal(
     const utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
-    nx_http::StatusCode::Value* outStatusCode)
+    nx::network::http::StatusCode::Value* outStatusCode)
 {
     NX_ASSERT(outBuffer);
     if (!outBuffer)
         return false;
 
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
 
     httpClient.setIgnoreMutexAnalyzer(m_ignoreMutexAnalyzer);
     httpClient.setUserName(auth.user());
@@ -216,7 +216,7 @@ bool HanwhaRequestHelper::doRequestInternal(
     while (!httpClient.eof())
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
-    *outStatusCode = (nx_http::StatusCode::Value) httpClient.response()->statusLine.statusCode;
+    *outStatusCode = (nx::network::http::StatusCode::Value) httpClient.response()->statusLine.statusCode;
     NX_VERBOSE(m_resourceContext.get(), lm("%1 result %2").args(
         httpClient.contentLocationUrl(), httpClient.response()->statusLine.statusCode));
 
@@ -231,7 +231,7 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 {
     if (!m_resourceContext)
     {
-        return HanwhaResponse(nx_http::StatusCode::serviceUnavailable,
+        return HanwhaResponse(nx::network::http::StatusCode::serviceUnavailable,
             lit("Resource is not initilized, try different server"));
     }
 
@@ -247,7 +247,7 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
             .arg(action)
             .arg(parameterString);
 
-        return HanwhaResponse(nx_http::StatusCode::undefined, urlString);
+        return HanwhaResponse(nx::network::http::StatusCode::undefined, urlString);
     }
 
     return doRequest(split[0], split[1], action, parameters, groupBy);

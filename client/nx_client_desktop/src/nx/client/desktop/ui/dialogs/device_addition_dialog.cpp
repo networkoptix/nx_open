@@ -81,9 +81,9 @@ void DeviceAdditionDialog::initializeControls()
     autoResizePagesToContents(ui->tabWidget, tabWidgetSizePolicy, true);
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
-    connect(&m_serversWatcher, &SystemServersWatcher::serverAdded,
+    connect(&m_serversWatcher, &CurrentSystemServers::serverAdded,
         ui->selectServerMenuButton, &QnChooseServerButton::addServer);
-    connect(&m_serversWatcher, &SystemServersWatcher::serverRemoved,
+    connect(&m_serversWatcher, &CurrentSystemServers::serverRemoved,
         ui->selectServerMenuButton, &QnChooseServerButton::removeServer);
     for (const auto server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
@@ -110,7 +110,7 @@ void DeviceAdditionDialog::initializeControls()
     ui->serverOfflineAlertBar->setText(tr("Server offline"));
 
     updateSelectedServerButtonVisibility();
-    connect(&m_serversWatcher, &SystemServersWatcher::serversCountChanged,
+    connect(&m_serversWatcher, &CurrentSystemServers::serversCountChanged,
         this, &DeviceAdditionDialog::updateSelectedServerButtonVisibility);
     connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged,
         this, &DeviceAdditionDialog::handleServerOnlineStateChanged);

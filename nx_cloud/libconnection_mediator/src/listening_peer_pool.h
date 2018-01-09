@@ -25,8 +25,8 @@ struct ListeningPeerData
     bool isListening;
     nx::String hostName;
     /** Valid for locally-registered peer only. */
-    std::shared_ptr<nx::stun::ServerConnection> peerConnection;
-    std::list<SocketAddress> endpoints;
+    std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
+    std::list<network::SocketAddress> endpoints;
     api::ConnectionMethods connectionMethods;
 
     ListeningPeerData():
@@ -104,7 +104,7 @@ public:
      *     DataLocker instance is still alive.
      */
     DataLocker insertAndLockPeerData(
-        const std::shared_ptr<nx::stun::ServerConnection>& connection,
+        const std::shared_ptr<nx::network::stun::ServerConnection>& connection,
         const MediaserverData& peerData);
 
     boost::optional<ConstDataLocker> findAndLockPeerDataByHostName(
@@ -126,8 +126,8 @@ private:
 
     void onListeningPeerConnectionClosed(
         const MediaserverData& peerData,
-        nx::stun::AbstractServerConnection* connection);
-    void closeConnectionAsync(std::shared_ptr<nx::stun::ServerConnection> peerConnection);
+        nx::network::stun::AbstractServerConnection* connection);
+    void closeConnectionAsync(std::shared_ptr<nx::network::stun::ServerConnection> peerConnection);
 };
 
 } // namespace hpm

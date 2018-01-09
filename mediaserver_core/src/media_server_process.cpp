@@ -236,8 +236,8 @@
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
-#include "streaming/hls/hls_session_pool.h"
-#include "streaming/hls/hls_server.h"
+#include "nx/mediaserver/hls/hls_session_pool.h"
+#include "nx/mediaserver/hls/hls_server.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -448,7 +448,7 @@ QString defaultLocalAddress(const QHostAddress& target)
 
     {
         // if nothing else works use first enabled hostaddr
-        QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
+        QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
 
         for (int i = 0; i < interfaces.size();++i)
         {
@@ -804,7 +804,7 @@ QString getDefaultServerName()
 {
     QString id = getComputerName();
     if (id.isEmpty())
-        id = getMacFromPrimaryIF();
+        id = nx::network::getMacFromPrimaryIF();
     return lit("Server %1").arg(id);
 }
 
@@ -1249,34 +1249,34 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    AddressFilters addressMask =
-        AddressFilter::ipV4
-        | AddressFilter::ipV6
-        | AddressFilter::noLocal
-        | AddressFilter::noLoopback;
+    nx::network::AddressFilters addressMask =
+        nx::network::AddressFilter::ipV4
+        | nx::network::AddressFilter::ipV6
+        | nx::network::AddressFilter::noLocal
+        | nx::network::AddressFilter::noLoopback;
 
-    QList<SocketAddress> serverAddresses;
+    QList<nx::network::SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();
 
     for (const auto& host: allLocalAddresses(addressMask))
-        serverAddresses << SocketAddress(host, port);
+        serverAddresses << nx::network::SocketAddress(host, port);
 
     for (const auto& host : m_forwardedAddresses )
-        serverAddresses << SocketAddress(host.first, host.second);
+        serverAddresses << nx::network::SocketAddress(host.first, host.second);
 
     if (!m_ipDiscovery->publicIP().isNull())
-        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), port);
+        serverAddresses << nx::network::SocketAddress(m_ipDiscovery->publicIP().toString(), port);
 
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
             .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
     const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
-    const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
+    const nx::network::SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
     if (std::find(serverAddresses.begin(), serverAddresses.end(),
                   defaultAddress) == serverAddresses.end())
     {
-        SocketAddress newAddress;
+        nx::network::SocketAddress newAddress;
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
@@ -1293,7 +1293,7 @@ void MediaServerProcess::updateAddressesList()
     }
 
     nx::network::SocketGlobals::cloud().addressPublisher().updateAddresses(
-        std::list<SocketAddress>(
+        std::list<nx::network::SocketAddress>(
             serverAddresses.begin(),
             serverAddresses.end()));
 }
@@ -1379,7 +1379,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     if (isStopping())
         return;
 
-    SocketAddress mappedAddress(address);
+    nx::network::SocketAddress mappedAddress(address);
     if (mappedAddress.port)
     {
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
@@ -1715,12 +1715,12 @@ bool MediaServerProcess::initTcpListener(
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/.+"), nx_http::AuthMethod::http);
+    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/.+"), nx::network::http::AuthMethod::http);
 
-    nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values) (
-        nx_http::AuthMethod::cookie |
-        nx_http::AuthMethod::urlQueryParam |
-        nx_http::AuthMethod::tempUrlQueryParam);
+    nx::network::http::AuthMethod::Values methods = (nx::network::http::AuthMethod::Values) (
+        nx::network::http::AuthMethod::cookie |
+        nx::network::http::AuthMethod::urlQueryParam |
+        nx::network::http::AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     regTcp<QnRtspConnectionProcessor>("RTSP", "*");
@@ -1731,11 +1731,11 @@ bool MediaServerProcess::initTcpListener(
     regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media");
     regTcp<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
-    nx_hls::QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
+    nx::mediaserver::hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
         qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
         nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt());
-    regTcp<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
+    regTcp<nx::mediaserver::hls::HttpLiveStreamingProcessor>("HTTP", "hls");
 
     // Our HLS uses implementation uses authKey (generated by target server) to skip authorization,
     // to keep this worning we should not ask for authrorization along the way.
@@ -1808,7 +1808,7 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     const int port = qnServerModule->roSettings()->value(
         nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     m_preparedTcpServerSockets = QnUniversalTcpListener::createAndPrepareTcpSockets(
-        SocketAddress(HostAddress::anyHost, port));
+        nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     if (m_preparedTcpServerSockets.empty())
     {
         qWarning().noquote() << "WARNING: Unable to prealocate TCP sockets on port" << port << ":"
@@ -1823,11 +1823,11 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
     }
 }
 
-std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
+std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>(
+    auto mapper = std::make_unique<nx::network::upnp::PortMapper>(
         /*isEnabled*/ false,
-        nx_upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
+        nx::network::upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
         QnAppInfo::organizationName());
     auto updateEnabled =
         [mapper = mapper.get(), this]()
@@ -1843,8 +1843,8 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
     updateEnabled();
 
     mapper->enableMapping(
-        m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
-        [this](SocketAddress address)
+        m_mediaServer->getPort(), nx::network::upnp::PortMapper::Protocol::TCP,
+        [this](nx::network::SocketAddress address)
         {
             const auto result = QMetaObject::invokeMethod(
                 this, "at_portMappingChanged", Qt::AutoConnection,
@@ -2029,7 +2029,7 @@ void MediaServerProcess::updateAllowedInterfaces()
 
     if (!allowedInterfaces.isEmpty())
         qWarning() << "Using net IF filter:" << allowedInterfaces;
-    setInterfaceListFilter(allowedInterfaces);
+    nx::network::setInterfaceListFilter(allowedInterfaces);
 }
 
 QString MediaServerProcess::hardwareIdAsGuid() const
@@ -2194,7 +2194,7 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
 class TcpLogReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
-    TcpLogReceiverConnection(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+    TcpLogReceiverConnection(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
         QnTCPConnectionProcessor(socket, owner),
         m_socket(socket),
         m_file(closeDirPath(getDataDirectory()) + lit("log/external_device.log"))
@@ -2217,7 +2217,7 @@ protected:
         }
     }
 private:
-    QSharedPointer<AbstractStreamSocket> m_socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     QFile m_file;
 };
 
@@ -2232,7 +2232,7 @@ public:
     virtual ~TcpLogReceiver() override { stop(); }
 
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
     {
         return new TcpLogReceiverConnection(clientSocket, this);
     }
@@ -2268,12 +2268,12 @@ void MediaServerProcess::run()
     updateAllowedInterfaces();
 
     if (!m_cmdLineArguments.enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);
+        nx::network::SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);
     auto ipVersion = m_cmdLineArguments.ipVersion;
     if (ipVersion.isEmpty())
         ipVersion = qnServerModule->roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    SocketFactory::setIpVersion(ipVersion);
+    nx::network::SocketFactory::setIpVersion(ipVersion);
 
     m_serverModule = serverModule;
 
@@ -2611,7 +2611,7 @@ void MediaServerProcess::run()
 
     QnResource::startCommandProc();
 
-    std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
+    auto hlsSessionPool = std::make_unique<nx::mediaserver::hls::SessionPool>();
 
     if (!initTcpListener(&cloudIntegrationManager->cloudManagerGroup(), ec2ConnectionFactory->messageBus()))
     {
@@ -2675,10 +2675,10 @@ void MediaServerProcess::run()
 
 
         server->setPrimaryAddress(
-            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
+            nx::network::SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
         cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
-            SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+            nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
         // used for statistics reported
@@ -2787,7 +2787,7 @@ void MediaServerProcess::run()
 
     // ============================
     GlobalSettingsToDeviceSearcherSettingsAdapter upnpDeviceSearcherSettings(globalSettings);
-    auto upnpDeviceSearcher = std::make_unique<nx_upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
+    auto upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(
@@ -2935,7 +2935,7 @@ void MediaServerProcess::run()
         {
             updateAddressesList();
             cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
-                SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+                nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
     m_firstRunningTime = qnServerModule->lastRunningTime().count();
@@ -3340,29 +3340,29 @@ const CmdLineArguments MediaServerProcess::cmdLineArguments() const
     return m_cmdLineArguments;
 }
 
-void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions)
+void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions)
 {
     // For "OPTIONS * RTSP/1.0"
-    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth);
+    restrictions->allow(lit("."), nx::network::http::AuthMethod::noAuth);
 
     const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
-    restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx_http::AuthMethod::urlQueryParam);
-    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getNonce"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/static/.*"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/ping"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx::network::http::AuthMethod::urlQueryParam);
+    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getNonce"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/static/.*"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(lit("/crossdomain.xml"), nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx::network::http::AuthMethod::noAuth);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.
     // WARNING: This is severe vulnerability introduced in 3.0.
     restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
-        nx_http::AuthMethod::noAuth);
+        nx::network::http::AuthMethod::noAuth);
 }

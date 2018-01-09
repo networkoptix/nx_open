@@ -49,12 +49,17 @@ void StreamSocketStub::sendAsync(
     const nx::Buffer& buffer,
     IoCompletionHandler handler)
 {
-    base_type::post(
+    auto func =
         [this, &buffer, handler = std::move(handler)]()
         {
             m_reflectingPipeline.write(buffer.data(), buffer.size());
             handler(SystemError::noError, buffer.size());
-        });
+        };
+
+    if (m_postDelay)
+        m_timer.start(*m_postDelay, std::move(func));
+    else
+        base_type::post(std::move(func));
 }
 
 SocketAddress StreamSocketStub::getForeignAddress() const
@@ -72,6 +77,13 @@ bool StreamSocketStub::getKeepAlive(boost::optional<KeepAliveOptions>* result) c
 {
     *result = m_keepAliveOptions;
     return true;
+}
+
+void StreamSocketStub::cancelIOSync(nx::network::aio::EventType eventType)
+{
+    if (eventType & nx::network::aio::EventType::etRead)
+        m_readBuffer = nullptr;
+    base_type::cancelIOSync(eventType);
 }
 
 QByteArray StreamSocketStub::read()

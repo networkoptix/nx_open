@@ -30,8 +30,8 @@ public:
 
 protected:
     virtual relay::api::BeginListeningRequest prepareRequestData(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& httpRequest) override;
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& httpRequest) override;
 };
 
 } // namespace relaying

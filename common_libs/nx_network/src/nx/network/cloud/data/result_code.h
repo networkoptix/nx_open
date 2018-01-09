@@ -28,7 +28,7 @@ enum class ResultCode
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
 ResultCode NX_NETWORK_API fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorCode& errorCode);
+    const nx::network::stun::attrs::ErrorCode& errorCode);
 int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
 QString NX_NETWORK_API toString(ResultCode code);

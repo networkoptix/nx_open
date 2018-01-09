@@ -40,7 +40,7 @@ private:
         hikvision::ChannelCapabilities* outCapabilities);
 
     CameraDiagnostics::Result initialize2WayAudio();
-    std::unique_ptr<nx_http::HttpClient> getHttpClient();
+    std::unique_ptr<nx::network::http::HttpClient> getHttpClient();
 
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;

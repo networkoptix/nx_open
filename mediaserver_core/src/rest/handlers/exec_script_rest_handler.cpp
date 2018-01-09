@@ -14,14 +14,14 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
 {
     if (!nx::utils::file_system::isRelativePathSafe(path)) {
         result.setError(QnRestResult::InvalidParameter, "Path contains forbidden characters");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QString scriptName = QFileInfo(path).fileName();
     QString fileName = getDataDirectory() + "/scripts/" + scriptName;
     if (!QFile::exists(fileName)) {
         result.setError(QnRestResult::InvalidParameter, lit( "Script '%1' is missing at the server").arg(scriptName));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     
     QStringList args;
@@ -33,11 +33,11 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
     {
         if (!regExpr.exactMatch(arg)) {
             result.setError(QnRestResult::InvalidParameter, "Script params contain forbidden characters");
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnExecScript::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)

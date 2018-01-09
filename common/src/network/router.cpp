@@ -77,7 +77,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     return result;
 }
 
-void QnRouter::updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id)
+void QnRouter::updateRequest(QUrl& url, nx::network::http::HttpHeaders& headers, const QnUuid &id)
 {
     QnRoute route = routeTo(id);
     if (route.isValid())

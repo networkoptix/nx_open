@@ -5,7 +5,9 @@
 
 #include <set>
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 /**
  * UPnP SOAP based client.
@@ -106,9 +108,11 @@ public:
 private:
     // TODO: replace with single httpClient when pipeline is supported
     QnMutex m_mutex;
-    std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
+    std::set< nx::network::http::AsyncHttpClientPtr > m_httpClients;
 };
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp
 
-QN_FUSION_DECLARE_FUNCTIONS(nx_upnp::AsyncClient::Protocol, (lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::upnp::AsyncClient::Protocol, (lexical));

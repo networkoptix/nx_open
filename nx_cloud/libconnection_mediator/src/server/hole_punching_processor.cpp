@@ -25,7 +25,6 @@ static QString logRequest(
 HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
-    nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* listeningPeerPool,
     AbstractRelayClusterClient* relayClusterClient,
     stats::AbstractCollector* statisticsCollector)
@@ -36,40 +35,6 @@ HolePunchingProcessor::HolePunchingProcessor(
     m_relayClusterClient(relayClusterClient),
     m_statisticsCollector(statisticsCollector)
 {
-    // TODO #ak: decouple STUN message handling and logic.
-
-    dispatcher->registerRequestProcessor(
-        stun::extension::methods::connect,
-        [this](const ConnectionStrongRef& connection, stun::Message message)
-        {
-            processRequestWithOutput(
-                &HolePunchingProcessor::connect,
-                this,
-                std::move(connection),
-                std::move(message));
-        });
-
-    dispatcher->registerRequestProcessor(
-        stun::extension::methods::connectionAck,
-        [this](const ConnectionStrongRef& connection, stun::Message message)
-        {
-            processRequestWithNoOutput(
-                &HolePunchingProcessor::onConnectionAckRequest,
-                this,
-                std::move(connection),
-                std::move(message));
-        });
-
-    dispatcher->registerRequestProcessor(
-        stun::extension::methods::connectionResult,
-        [this](const ConnectionStrongRef& connection, stun::Message message)
-        {
-            processRequestWithNoOutput(
-                &HolePunchingProcessor::connectionResult,
-                this,
-                std::move(connection),
-                std::move(message));
-        });
 }
 
 HolePunchingProcessor::~HolePunchingProcessor()
@@ -96,14 +61,14 @@ void HolePunchingProcessor::stop()
             connectSession.second->pleaseStop(barrier.fork());
     }
 
-    //waiting for all sessions to stop...
+    // Waiting for all sessions to stop...
     allSessionsStoppedPromise.get_future().wait();
 }
 
 void HolePunchingProcessor::connect(
     const ConnectionStrongRef& connection,
     api::ConnectRequest request,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
     api::ResultCode validationResult = api::ResultCode::ok;
@@ -115,7 +80,7 @@ void HolePunchingProcessor::connect(
         return completionHandler(validationResult, api::ConnectResponse());
     NX_ASSERT(static_cast<bool>(targetPeerDataLocker));
 
-    //preparing and saving connection context
+    // Preparing and saving connection context.
     QnMutexLocker lk(&m_mutex);
     const auto connectionFsmIterAndFlag = m_activeConnectSessions.emplace(
         request.connectSessionId,
@@ -142,7 +107,7 @@ void HolePunchingProcessor::connect(
             .arg(logRequest(connection, request)), cl_logDEBUG2);
     }
 
-    //launching connect FSM
+    // Launching connect FSM.
     connectionFsmIterAndFlag.first->second->onConnectRequest(
         connection,
         std::move(request),
@@ -152,7 +117,7 @@ void HolePunchingProcessor::connect(
 void HolePunchingProcessor::onConnectionAckRequest(
     const ConnectionStrongRef& connection,
     api::ConnectionAckRequest request,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -177,7 +142,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
 void HolePunchingProcessor::connectionResult(
     const ConnectionStrongRef& connection,
     api::ConnectionResultRequest request,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -263,7 +228,7 @@ void HolePunchingProcessor::connectSessionFinished(
     QnMutexLocker lk(&m_mutex);
 
     if (m_activeConnectSessions.empty())
-        return; //HolePunchingProcessor is being stopped currently?
+        return; //< HolePunchingProcessor is being stopped currently?
 
     NX_LOGX(lm("Connect session %1 finished with result %2").
         arg(sessionIter->first).arg(QnLexical::serialized(connectionResult)),

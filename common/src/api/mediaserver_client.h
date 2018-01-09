@@ -49,7 +49,7 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
-    void setUserCredentials(const nx_http::Credentials& userCredentials);
+    void setUserCredentials(const nx::network::http::Credentials& userCredentials);
     /**
      * Authentication through query param.
      */
@@ -131,7 +131,7 @@ public:
      * NOTE: Can only be called within request completion handler.
      *   Otherwise, result is not defined.
      */
-    nx_http::StatusCode::Value lastResponseHttpStatusCode() const;
+    nx::network::http::StatusCode::Value lastResponseHttpStatusCode() const;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -142,16 +142,16 @@ protected:
         const Input& inputData,
         std::function<void(
             SystemError::ErrorCode,
-            nx_http::StatusCode::Value statusCode,
+            nx::network::http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
         using ActualOutputType =
             typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
         performGetRequest(
-            [&inputData](const nx::utils::Url& url, nx_http::AuthInfo authInfo)
+            [&inputData](const nx::utils::Url& url, nx::network::http::AuthInfo authInfo)
             {
-                return std::make_unique<nx_http::FusionDataHttpClient<Input, ActualOutputType>>(
+                return std::make_unique<nx::network::http::FusionDataHttpClient<Input, ActualOutputType>>(
                     url, std::move(authInfo), inputData);
             },
             requestPath,
@@ -163,16 +163,16 @@ protected:
         const std::string& requestPath,
         std::function<void(
             SystemError::ErrorCode,
-            nx_http::StatusCode::Value statusCode,
+            nx::network::http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
         using ActualOutputType =
             typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
         performGetRequest(
-            [](const nx::utils::Url& url, nx_http::AuthInfo authInfo)
+            [](const nx::utils::Url& url, nx::network::http::AuthInfo authInfo)
             {
-                return std::make_unique<nx_http::FusionDataHttpClient<void, ActualOutputType>>(
+                return std::make_unique<nx::network::http::FusionDataHttpClient<void, ActualOutputType>>(
                     url, std::move(authInfo));
             },
             requestPath,
@@ -185,7 +185,7 @@ protected:
         std::string requestPath,
         std::function<void(
             SystemError::ErrorCode,
-            nx_http::StatusCode::Value statusCode,
+            nx::network::http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
         const auto queryPos = requestPath.find('?');
@@ -206,7 +206,7 @@ protected:
             query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), m_authenticationKey);
             requestUrl.setQuery(query);
         }
-        nx_http::AuthInfo authInfo;
+        nx::network::http::AuthInfo authInfo;
         if (m_userCredentials)
             authInfo.user = *m_userCredentials;
 
@@ -235,7 +235,7 @@ protected:
             [this, fusionClientIter = --m_activeClients.end(),
                 completionHandler = std::move(completionHandler)](
                     SystemError::ErrorCode errorCode,
-                    const nx_http::Response* response,
+                    const nx::network::http::Response* response,
                     Output... outData) mutable
             {
                 auto client = std::move(*fusionClientIter);
@@ -243,8 +243,8 @@ protected:
 
                 m_prevResponseHttpStatusCode =
                     response
-                    ? (nx_http::StatusCode::Value)response->statusLine.statusCode
-                    : nx_http::StatusCode::undefined;
+                    ? (nx::network::http::StatusCode::Value)response->statusLine.statusCode
+                    : nx::network::http::StatusCode::undefined;
 
                 return completionHandler(
                     errorCode,
@@ -302,15 +302,15 @@ protected:
         performGetRequest<Input, QnJsonRestResult>(
             requestName,
             input,
-            std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, QnJsonRestResult)>(
+            std::function<void(SystemError::ErrorCode, nx::network::http::StatusCode::Value, QnJsonRestResult)>(
                 [this, completionHandler = std::move(completionHandler)](
                     SystemError::ErrorCode sysErrorCode,
-                    nx_http::StatusCode::Value statusCode,
+                    nx::network::http::StatusCode::Value statusCode,
                     QnJsonRestResult result)
                 {
                     if (sysErrorCode != SystemError::noError ||
                         (result.error == QnRestResult::Error::NoError &&
-                            !nx_http::StatusCode::isSuccessCode(statusCode)))
+                            !nx::network::http::StatusCode::isSuccessCode(statusCode)))
                     {
                         result.error = toApiErrorCode(sysErrorCode, statusCode);
                     }
@@ -325,15 +325,15 @@ protected:
     {
         performGetRequest<QnJsonRestResult>(
             requestName,
-            std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, QnJsonRestResult)>(
+            std::function<void(SystemError::ErrorCode, nx::network::http::StatusCode::Value, QnJsonRestResult)>(
                 [this, completionHandler = std::move(completionHandler)](
                     SystemError::ErrorCode sysErrorCode,
-                    nx_http::StatusCode::Value statusCode,
+                    nx::network::http::StatusCode::Value statusCode,
                     QnJsonRestResult result)
                 {
                     if (sysErrorCode != SystemError::noError ||
                         (result.error == QnRestResult::Error::NoError &&
-                            !nx_http::StatusCode::isSuccessCode(statusCode)))
+                            !nx::network::http::StatusCode::isSuccessCode(statusCode)))
                     {
                         result.error = toApiErrorCode(sysErrorCode, statusCode);
                     }
@@ -348,11 +348,11 @@ protected:
 
     QnRestResult::Error toApiErrorCode(
         SystemError::ErrorCode sysErrorCode,
-        nx_http::StatusCode::Value statusCode)
+        nx::network::http::StatusCode::Value statusCode)
     {
         if (sysErrorCode != SystemError::noError)
             return QnRestResult::CantProcessRequest;
-        if (!nx_http::StatusCode::isSuccessCode(statusCode))
+        if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
             return QnRestResult::CantProcessRequest;
         return QnRestResult::NoError;
     }
@@ -366,10 +366,10 @@ protected:
         performGetRequest<Output...>(
             requestName,
             request,
-            std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value)>(
+            std::function<void(SystemError::ErrorCode, nx::network::http::StatusCode::Value)>(
                 [this, completionHandler = std::move(completionHandler)](
                     SystemError::ErrorCode sysErrorCode,
-                    nx_http::StatusCode::Value statusCode,
+                    nx::network::http::StatusCode::Value statusCode,
                     Output... output)
                 {
                     completionHandler(
@@ -385,10 +385,10 @@ protected:
     {
         performGetRequest<Output...>(
             requestName,
-            std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, Output...)>(
+            std::function<void(SystemError::ErrorCode, nx::network::http::StatusCode::Value, Output...)>(
                 [this, completionHandler = std::move(completionHandler)](
                     SystemError::ErrorCode sysErrorCode,
-                    nx_http::StatusCode::Value statusCode,
+                    nx::network::http::StatusCode::Value statusCode,
                     Output... result)
                 {
                     completionHandler(
@@ -399,14 +399,14 @@ protected:
 
     ec2::ErrorCode toEc2ErrorCode(
         SystemError::ErrorCode systemErrorCode,
-        nx_http::StatusCode::Value statusCode);
+        nx::network::http::StatusCode::Value statusCode);
 
 private:
     boost::optional<std::chrono::milliseconds> m_requestTimeout;
     const nx::utils::Url m_baseRequestUrl;
-    boost::optional<nx_http::Credentials> m_userCredentials;
+    boost::optional<nx::network::http::Credentials> m_userCredentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
-    nx_http::StatusCode::Value m_prevResponseHttpStatusCode =
-        nx_http::StatusCode::undefined;
+    nx::network::http::StatusCode::Value m_prevResponseHttpStatusCode =
+        nx::network::http::StatusCode::undefined;
     QString m_authenticationKey;
 };

@@ -27,7 +27,7 @@ void SetupSystemProcessor::setSystemSettingsProcessor(
     m_systemSettingsProcessor = systemSettingsProcessor;
 }
 
-nx_http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
+nx::network::http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
     const QnAuthSession& authSession,
     const SetupLocalSystemData& data,
     QnJsonRestResult* result)
@@ -37,21 +37,21 @@ nx_http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
         result->setError(
             QnJsonRestResult::Forbidden,
             lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
         result->setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     if (!data.hasPassword())
     {
         result->setError(
             QnJsonRestResult::MissingParameter,
             lit("Password or password digest MUST be provided"));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (data.systemName.isEmpty())
@@ -59,7 +59,7 @@ nx_http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
         result->setError(
             QnJsonRestResult::MissingParameter
             , lit("Parameter 'systemName' must be provided."));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     const auto systemNameBak = m_commonModule->globalSettings()->systemName();
@@ -76,7 +76,7 @@ nx_http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
         result->setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     if (!nx::vms::utils::updateUserCredentials(
@@ -90,7 +90,7 @@ nx_http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
         // Changing system name back.
         m_commonModule->globalSettings()->setSystemName(systemNameBak);
         result->setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     std::unique_ptr<nx::vms::utils::SystemSettingsProcessor> defaultSystemSettingsProcessor;
@@ -111,13 +111,13 @@ nx_http::StatusCode::Value SetupSystemProcessor::setupLocalSystem(
         authSession,
         data.systemSettings,
         result);
-    if (resultCode != nx_http::StatusCode::ok)
+    if (resultCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(this, lm("Failed to write system settings. %1")
-            .arg(nx_http::StatusCode::toString(resultCode)));
+            .arg(nx::network::http::StatusCode::toString(resultCode)));
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 QnUserResourcePtr SetupSystemProcessor::getModifiedLocalAdmin() const

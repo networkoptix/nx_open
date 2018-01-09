@@ -294,7 +294,7 @@ public:
                         : QString::fromLocal8Bit( reinterpret_cast<const char*>(ifInfo.bDescr),
                                                   ifInfo.dwDescrLen - 1 );
 
-                p.first->second.load.macAddress = QnMacAddress( physicalAddress );
+                p.first->second.load.macAddress = nx::network::QnMacAddress( physicalAddress );
                 p.first->second.load.type = QnPlatformMonitor::PhysicalInterface;
                 p.first->second.load.bytesPerSecMax = ifInfo.dwSpeed / CHAR_BIT;
                 p.first->second.prevMeasureClock = currentClock;

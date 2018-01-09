@@ -515,7 +515,8 @@ enum IDType
     * Shares selected camera with another user.
     *
     * Parameters:
-    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user or role to share camera with.
+    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share camera with.
+    * <tt>QnUuid UuidRole</tt> --- role id to share camera with.
     */
     ShareCameraAction,
 

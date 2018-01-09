@@ -86,6 +86,8 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     if (!m_currentFetchId)
         return false;
 
+    qDebug() << "Prefetch id:" << m_currentFetchId;
+
     m_prefetchCompletionHandler = completionHandler;
     return true;
 }
@@ -95,6 +97,7 @@ void AbstractAsyncSearchListModel::Private::commit(qint64 earliestTimeToCommitMs
     if (!m_currentFetchId)
         return;
 
+    qDebug() << "Commit id:" << m_currentFetchId;
     m_currentFetchId = rest::Handle();
 
     if (!commitPrefetch(earliestTimeToCommitMs, m_fetchedAll))

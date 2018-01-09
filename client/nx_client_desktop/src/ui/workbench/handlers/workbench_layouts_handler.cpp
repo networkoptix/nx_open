@@ -34,6 +34,9 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
+
+#include <nx/vms/event/actions/abstract_action.h>
+
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -169,6 +172,27 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             {
                 action(action::OpenNewTabAction)->trigger();
             }
+        });
+
+    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
+        [this](const vms::event::AbstractActionPtr& businessAction)
+        {
+            if (businessAction->actionType() != vms::event::openLayoutAction)
+                return;
+            const auto &actionParams = businessAction->getParams();
+
+            if (actionParams.additionalResources.empty())
+                return;
+            QnResourcePool* pool = this->resourcePool();
+
+            QnResourcePtr res = pool->getResourceById(actionParams.layoutResourceId);
+            if (!res)
+                return;
+            QnLayoutResourcePtr layout = res.dynamicCast<QnLayoutResource>();
+            if (!layout)
+                return;
+
+            menu()->trigger(action::OpenInNewTabAction, layout);
         });
 }
 

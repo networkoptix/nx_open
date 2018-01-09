@@ -4,7 +4,9 @@
 
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class NX_NETWORK_API MultipartBodySerializer
 {
@@ -25,7 +27,7 @@ public:
      */
     void beginPart(
         const StringType& contentType,
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         BufferType data);
     /**
      * Can be called only after MultipartMessageBodySource::beginPart.
@@ -38,7 +40,7 @@ public:
      */
     void writeBodyPart(
         const StringType& contentType,
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         BufferType data);
     /** Signal end of multipart body. */
     void writeEpilogue();
@@ -56,9 +58,11 @@ private:
 
     void startBodyPartInternal(
         const StringType& contentType,
-        const nx_http::HttpHeaders& headers,
+        const nx::network::http::HttpHeaders& headers,
         BufferType data,
         boost::optional<std::uint64_t> contentLength);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

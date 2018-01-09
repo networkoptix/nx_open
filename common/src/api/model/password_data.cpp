@@ -49,7 +49,7 @@ PasswordData PasswordData::calculateHashes(const QString& username, const QStrin
         hash.append(md5.result().toHex());
     }
     result.passwordHash = hash;
-    result.passwordDigest = nx_http::calcHa1(
+    result.passwordDigest = nx::network::http::calcHa1(
         username.toLower(),
         result.realm,
         password);

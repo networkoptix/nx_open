@@ -1,7 +1,9 @@
 #include <memory>
 #include <sstream>
 
+//#define NX_KIT_TEST_KEEP_TEMP_FILES
 #include <nx/kit/test.h>
+
 #include <nx/kit/debug.h>
 
 #include <rects_serialization.h>
@@ -20,63 +22,9 @@ static void checkRectsEq(const Rect& expected, const Rect& actual)
     ASSERT_EQ(expected.h, actual.h);
 }
 
-/**
- * Generate a unique file name to avoid collisions in this test.
- */
-class UniqueRectsFile
-{
-public:
-    static std::string tempDir()
-    {
-        static std::string tempDir;
-        if (tempDir.empty())
-            tempDir = getTempDir();
-        return tempDir;
-    }
-
-    UniqueRectsFile(const std::string& prefix)
-    {
-        static bool randomized = false;
-        if (!randomized)
-        {
-            srand((unsigned int) time(nullptr));
-            randomized = true;
-        }
-
-        m_filename = tempDir() + prefix + nx::kit::debug::format("%d.txt", rand());
-    }
-
-    ~UniqueRectsFile() { std::remove(m_filename.c_str()); }
-
-    std::string filename() const { return m_filename; }
-
-private:
-    static std::string getTempDir()
-    {
-        char tempDir[L_tmpnam] = "";
-        ASSERT_TRUE(std::tmpnam(tempDir) != nullptr);
-
-        // Extract dir name from the file path - truncate after the last path separator.
-        for (int i = (int) strlen(tempDir) - 1; i >= 0; --i)
-        {
-            if (tempDir[i] == '/' || tempDir[i] == '\\')
-            {
-                tempDir[i + 1] = '\0';
-                break;
-            }
-        }
-
-        NX_PRINT << "Using temp path: " << tempDir;
-        return tempDir;
-    }
-
-private:
-    std::string m_filename;
-};
-
 static void testRects(const Rect rects[], int rectCount)
 {
-    const UniqueRectsFile file("rects_");
+    const nx::kit::test::TempFile file("rects_", ".txt");
 
     ASSERT_TRUE(writeRectsToFile(file.filename(), rects, rectCount));
 
@@ -106,4 +54,22 @@ TEST(rects_serialization, twoRects)
     rects[1].h = 1;
 
     testRects(rects, sizeof(rects) / sizeof(rects[0]));
+}
+
+static void testModulus(int64_t modulus)
+{
+    const nx::kit::test::TempFile file("modulus_", ".txt");
+
+    ASSERT_TRUE(writeModulusToFile(file.filename(), modulus));
+
+    int64_t modulusFromFile = -1;
+    ASSERT_TRUE(readModulusFromFile(file.filename(), &modulusFromFile));
+    ASSERT_EQ(modulus, modulusFromFile);
+}
+
+TEST(rects_serialization, modulus)
+{
+    testModulus(INT64_MIN);
+    testModulus(0);
+    testModulus(INT64_MAX);
 }

@@ -101,7 +101,7 @@ int QnCameraHistoryRestHandler::executeGet(
 {
     QnChunksRequestData request = QnChunksRequestData::fromParams(owner->resourcePool(), params);
     if (!request.isValid())
-        return nx_http::StatusCode::badRequest;
+        return nx::network::http::StatusCode::badRequest;
 
     static std::atomic<int> staticRequestNum;
 
@@ -161,5 +161,5 @@ int QnCameraHistoryRestHandler::executeGet(
     QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format);
 
     qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "finished. exec time=" << timer.elapsed();
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

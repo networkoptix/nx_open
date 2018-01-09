@@ -18,6 +18,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -728,13 +729,16 @@ void QnCameraAdditionDialog::at_resPool_resourceRemoved(const QnResourcePtr &res
     }
 }
 
-void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &reply, int handle) {
+void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &reply, int handle)
+{
     Q_UNUSED(handle)
 
     if (m_state != Searching && m_state != Stopping)
         return;
 
-    if (status != 0) {
+    if (status != 0)
+    {
+        NX_LOG(this, lm("Request failed. Status=%1").arg(status), cl_logWARNING);
         setState(Initial);
         QnMessageBox::critical(this, tr("Device search failed"));
         return;

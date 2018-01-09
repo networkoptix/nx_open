@@ -290,7 +290,7 @@ protected:
                 if( ctx.interfaceName.isEmpty() )
                 {
                     ctx.interfaceName = interfaceName;
-                    ctx.macAddress = QnMacAddress( QLatin1String(readFileContents( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) )) );
+                    ctx.macAddress = nx::network::QnMacAddress( QLatin1String(readFileContents( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) )) );
                     int sysType = readFileContents( QString::fromLatin1("/sys/class/net/%1/type").arg(interfaceName) ).toInt();
                     switch( sysType )
                     {

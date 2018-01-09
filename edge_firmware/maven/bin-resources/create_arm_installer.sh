@@ -42,47 +42,9 @@ else
     LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
 fi
 
+LOG_FILE="$LOGS_DIR/create_arm_installer.log"
+
 #--------------------------------------------------------------------------------------------------
-
-help()
-{
-    echo "Options:"
-    echo " --no-client: Do not pack Lite Client."
-    echo " -v, --verbose: Do not redirect output to a log file."
-}
-
-# [out] LITE_CLIENT
-# [out] VERBOSE
-parseArgs() # "$@"
-{
-    LITE_CLIENT=1
-    VERBOSE=0
-
-    local ARG
-    for ARG in "$@"; do
-        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
-            help
-            exit 0
-        elif [ "$ARG" = "--no-client" ] ; then
-            LITE_CLIENT=0
-        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
-            VERBOSE=1
-        fi
-    done
-}
-
-redirectOutput() # log-file
-{
-    local -r LOG_FILE="$1"; shift
-
-    echo "  See the log in $LOG_FILE"
-
-    rm -rf "$LOG_FILE"
-    exec 1<&- #< Close stdout fd.
-    exec 2<&- #< Close stderr fd.
-    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
-    exec 2>&1 #< Redirect stderr to stdout.
-}
 
 createArchive() # archive dir command...
 {
@@ -487,7 +449,7 @@ copyToolchainLibsIfNeeded()
 buildInstaller()
 {
     echo ""
-    echo "Creating installer .tar.gz"
+    echo "Creating distribution .tar.gz"
     if [ ! -z "$SYMLINK_INSTALL_PATH" ]; then
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
@@ -539,25 +501,13 @@ buildDebugSymbolsArchive()
 
 #--------------------------------------------------------------------------------------------------
 
-main()
+# [in] WORK_DIR
+buildDistribution()
 {
-    local -i LITE_CLIENT
-    local -i VERBOSE
-    parseArgs "$@"
-
-    local -r WORK_DIR="$BUILD_DIR/arm_installer"
-    rm -rf "$WORK_DIR"
-
     local -r TAR_DIR="$WORK_DIR/tar"
     local -r INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
     local -r LIB_INSTALL_DIR="$TAR_DIR/$LIB_INSTALL_PATH"
     local -r MEDIASERVER_BIN_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin"
-
-    echo "Creating installer in $WORK_DIR (will be deleted on success)."
-
-    if [ $VERBOSE = 0 ]; then
-        redirectOutput "$BUILD_DIR/create_arm_installer.log"
-    fi
 
     mkdir -p "$INSTALL_DIR"
     mkdir -p "$LIB_INSTALL_DIR"
@@ -568,7 +518,7 @@ main()
         mkdir -p "$ALT_LIB_INSTALL_DIR"
     fi
 
-    echo "Creating version.txt: $VERSION"
+    echo "Generating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
 
     echo "Copying build_info.txt"
@@ -595,11 +545,100 @@ main()
 
     buildInstaller
     buildDebugSymbolsArchive
+}
 
+#--------------------------------------------------------------------------------------------------
+
+showHelp()
+{
+    echo "Options:"
+    echo " --no-client: Do not pack Lite Client."
+    echo " -v, --verbose: Do not redirect output to a log file."
+    echo " -k, --keep-work-dir: Do not delete work directory on success."
+}
+
+# [out] LITE_CLIENT
+# [out] KEEP_WORK_DIR
+# [out] VERBOSE
+parseArgs() # "$@"
+{
+    LITE_CLIENT=1
+    KEEP_WORK_DIR=0
+    VERBOSE=0
+
+    local ARG
+    for ARG in "$@"; do
+        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
+            showHelp
+            exit 0
+        elif [ "$ARG" = "--no-client" ] ; then
+            LITE_CLIENT=0
+        elif [ "$ARG" = "-k" ] || [ "$ARG" = "--keep-work-dir" ]; then
+            KEEP_WORK_DIR=1
+        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
+            VERBOSE=1
+        fi
+    done
+}
+
+redirectOutputToLog()
+{
+    echo "  See the log in $LOG_FILE"
+
+    mkdir -p "$LOGS_DIR" #< In case log dir is not created yet.
+    rm -rf "$LOG_FILE"
+
+    # Redirect only stdout to the log file, leaving stderr as is, because there seems to be no
+    # reliable way to duplicate error output to both log file and stderr, keeping the correct order
+    # of regular and error lines in the log file.
+    exec 1>"$LOG_FILE" #< Open log file for writing as stdout.
+}
+
+# Called by trap.
+# [in] $?
+# [in] VERBOSE
+onExit()
+{
+    local RESULT=$?
+    echo "" #< Newline, to separate SUCCESS/FAILURE message from the above log.
+    if [ $RESULT != 0 ]; then #< Failure.
+        echo "FAILURE (status $RESULT); see the error message(s) above." >&2 #< To stderr.
+        if [ $VERBOSE = 0 ]; then #< stdout redirected to log file.
+            echo "FAILURE (status $RESULT); see the error message(s) on stderr." #< To log file.
+        fi
+    else
+        echo "SUCCESS"
+    fi
+    return $RESULT
+}
+
+main()
+{
+    declare -i VERBOSE #< Mot local - needed by onExit().
+    local -i LITE_CLIENT
+    parseArgs "$@"
+
+    trap onExit EXIT
+
+    local -r WORK_DIR="$BUILD_DIR/create_arm_installer_tmp"
     rm -rf "$WORK_DIR"
 
-    echo ""
-    echo "FINISHED"
+    if [ KEEP_WORK_DIR = 1 ]; then
+        local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
+    else
+        local -r WORK_DIR_NOTE="(will be deleted on success)"
+    fi
+    echo "Creating distribution in $WORK_DIR $WORK_DIR_NOTE."
+
+    if [ $VERBOSE = 0 ]; then
+        redirectOutputToLog
+    fi
+
+    buildDistribution
+
+    if [ KEEP_WORK_DIR = 0 ]; then
+        rm -rf "$WORK_DIR"
+    fi
 }
 
 main "$@"

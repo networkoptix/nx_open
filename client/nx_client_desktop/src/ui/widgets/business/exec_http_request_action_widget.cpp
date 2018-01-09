@@ -94,10 +94,10 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
 
     switch (params.authType)
     {
-        case nx_http::AuthType::authBasicAndDigest:
+        case nx::network::http::AuthType::authBasicAndDigest:
             ui->authTypeComboBox->setCurrentIndex(0);
             break;
-        case nx_http::AuthType::authBasic:
+        case nx::network::http::AuthType::authBasic:
             ui->authTypeComboBox->setCurrentIndex(1);
             break;
         default:
@@ -135,9 +135,9 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     if (params.contentType == ui->contentTypeComboBox->itemText(kAutoContentTypeItemIndex))
         params.contentType.clear(); //< Auto value
 
-    params.authType = static_cast<nx_http::AuthType>(!ui->authTypeComboBox->currentIndex() ?
-        nx_http::AuthType::authBasicAndDigest :  //Auto
-        nx_http::AuthType::authBasic);           //Basic
+    params.authType = static_cast<nx::network::http::AuthType>(!ui->authTypeComboBox->currentIndex() ?
+        nx::network::http::AuthType::authBasicAndDigest :  //Auto
+        nx::network::http::AuthType::authBasic);           //Basic
 
     params.requestType = ui->requestTypeComboBox->currentText().toLatin1();
     if (params.requestType == ui->requestTypeComboBox->itemText(kAutoRequestTypeItemIndex).toLatin1())

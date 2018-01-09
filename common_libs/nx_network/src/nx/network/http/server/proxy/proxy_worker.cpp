@@ -6,7 +6,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace proxy {
 
@@ -14,7 +16,7 @@ std::atomic<int> ProxyWorker::m_proxyingIdSequence(0);
 
 ProxyWorker::ProxyWorker(
     const nx::String& targetHost,
-    nx_http::Request translatedRequest,
+    nx::network::http::Request translatedRequest,
     AbstractResponseSender* responseSender,
     std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer)
     :
@@ -30,7 +32,7 @@ ProxyWorker::ProxyWorker(
         .args(m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
             translatedRequest.requestLine.url, connectionToTheTargetPeer->getLocalAddress()));
 
-    m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
+    m_targetHostPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
         this,
         std::move(connectionToTheTargetPeer));
 
@@ -41,11 +43,11 @@ ProxyWorker::ProxyWorker(
     m_targetHostPipeline->setOnMessageEnd(
         std::bind(&ProxyWorker::onMessageEnd, this));
 
-    m_proxyHost = nx_http::getHeaderValue(translatedRequest.headers, "Host");
+    m_proxyHost = nx::network::http::getHeaderValue(translatedRequest.headers, "Host");
 
     bindToAioThread(m_targetHostPipeline->getAioThread());
 
-    nx_http::Message requestMsg(nx_http::MessageType::request);
+    nx::network::http::Message requestMsg(nx::network::http::MessageType::request);
     *requestMsg.request = std::move(translatedRequest);
     m_targetHostPipeline->sendMessage(std::move(requestMsg));
 
@@ -62,7 +64,7 @@ void ProxyWorker::bindToAioThread(
 
 void ProxyWorker::closeConnection(
     SystemError::ErrorCode closeReason,
-    nx_http::AsyncMessagePipeline* connection)
+    nx::network::http::AsyncMessagePipeline* connection)
 {
     NX_DEBUG(this, lm("Proxy %1. Connection to target peer %2(%3) has been closed: %4")
         .args(m_proxyingId, m_targetHost, connection->socket()->getForeignAddress().toString(),
@@ -71,7 +73,7 @@ void ProxyWorker::closeConnection(
     NX_ASSERT(connection == m_targetHostPipeline.get());
 
     m_responseSender->sendResponse(
-        nx_http::StatusCode::serviceUnavailable,
+        nx::network::http::StatusCode::serviceUnavailable,
         boost::none);
 }
 
@@ -94,9 +96,9 @@ void ProxyWorker::replaceTargetHostWithFullCloudNameIfAppropriate(
     m_targetHost = connectionToTheTargetPeer->getForeignHostName().toUtf8();
 }
 
-void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
+void ProxyWorker::onMessageFromTargetHost(nx::network::http::Message message)
 {
-    if (message.type != nx_http::MessageType::response)
+    if (message.type != nx::network::http::MessageType::response)
     {
         NX_DEBUG(this,
             lm("Proxy %1. Received unexpected request from target host %2(%3). Closing connection...")
@@ -104,24 +106,24 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
 
         // TODO: #ak Use better status code.
         m_responseSender->sendResponse(
-            nx_http::StatusCode::serviceUnavailable,
+            nx::network::http::StatusCode::serviceUnavailable,
             boost::none);
         return;
     }
 
     const auto statusCode = message.response->statusLine.statusCode;
     const auto contentType =
-        nx_http::getHeaderValue(message.response->headers, "Content-Type");
+        nx::network::http::getHeaderValue(message.response->headers, "Content-Type");
 
     NX_VERBOSE(this, lm("Proxy %1. Received response from target host %2(%3). status %4, Content-Type %5")
         .args(
             m_proxyingId,
             m_targetHost,
             m_targetHostPipeline->socket()->getForeignAddress().toString(),
-            nx_http::StatusCode::toString(statusCode),
+            nx::network::http::StatusCode::toString(statusCode),
             contentType.isEmpty() ? nx::String("none") : contentType));
 
-    if (nx_http::isMessageBodyPresent(*message.response) &&
+    if (nx::network::http::isMessageBodyPresent(*message.response) &&
         !messageBodyNeedsConvertion(*message.response))
     {
         return startMessageBodyStreaming(std::move(message));
@@ -131,26 +133,26 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
     m_responseMessage = std::move(message);
 }
 
-void ProxyWorker::startMessageBodyStreaming(nx_http::Message message)
+void ProxyWorker::startMessageBodyStreaming(nx::network::http::Message message)
 {
     auto msgBody = prepareStreamingMessageBody(message);
     m_responseSender->sendResponse(
-        nx_http::RequestResult(
-            static_cast<nx_http::StatusCode::Value>(message.response->statusLine.statusCode),
+        nx::network::http::RequestResult(
+            static_cast<nx::network::http::StatusCode::Value>(message.response->statusLine.statusCode),
             std::move(msgBody)),
         std::move(*message.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource>
-    ProxyWorker::prepareStreamingMessageBody(const nx_http::Message& message)
+std::unique_ptr<nx::network::http::AbstractMsgBodySource>
+    ProxyWorker::prepareStreamingMessageBody(const nx::network::http::Message& message)
 {
     const auto contentType =
-        nx_http::getHeaderValue(message.response->headers, "Content-Type");
+        nx::network::http::getHeaderValue(message.response->headers, "Content-Type");
 
     NX_VERBOSE(this, lm("Proxy %1 (target %2). Preparing streaming message body of type %3")
         .args(m_proxyingId, m_targetHost, contentType));
 
-    auto bodySource = nx_http::makeAsyncChannelMessageBodySource(
+    auto bodySource = nx::network::http::makeAsyncChannelMessageBodySource(
         contentType,
         m_targetHostPipeline->takeSocket());
 
@@ -162,7 +164,7 @@ std::unique_ptr<nx_http::AbstractMsgBodySource>
     return std::move(bodySource);
 }
 
-bool ProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& response)
+bool ProxyWorker::messageBodyNeedsConvertion(const nx::network::http::Response& response)
 {
     const auto contentTypeIter = response.headers.find("Content-Type");
     if (contentTypeIter == response.headers.end())
@@ -187,8 +189,8 @@ void ProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
 
 void ProxyWorker::onMessageEnd()
 {
-    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
-    if (nx_http::isMessageBodyPresent(*m_responseMessage.response))
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
+    if (nx::network::http::isMessageBodyPresent(*m_responseMessage.response))
     {
         updateMessageHeaders(m_responseMessage.response);
         msgBody = prepareFixedMessageBody();
@@ -196,13 +198,13 @@ void ProxyWorker::onMessageEnd()
 
     const auto statusCode = m_responseMessage.response->statusLine.statusCode;
     m_responseSender->sendResponse(
-        nx_http::RequestResult(
-            static_cast<nx_http::StatusCode::Value>(statusCode),
+        nx::network::http::RequestResult(
+            static_cast<nx::network::http::StatusCode::Value>(statusCode),
             std::move(msgBody)),
         std::move(*m_responseMessage.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource> ProxyWorker::prepareFixedMessageBody()
+std::unique_ptr<nx::network::http::AbstractMsgBodySource> ProxyWorker::prepareFixedMessageBody()
 {
     NX_VERBOSE(this, lm("Proxy %1 (target %2). Preparing fixed message body")
         .args(m_proxyingId, m_targetHost));
@@ -212,32 +214,34 @@ std::unique_ptr<nx_http::AbstractMsgBodySource> ProxyWorker::prepareFixedMessage
     decltype(m_messageBodyBuffer) messageBodyBuffer;
     m_messageBodyBuffer.swap(messageBodyBuffer);
 
-    const auto contentType = nx_http::getHeaderValue(
+    const auto contentType = nx::network::http::getHeaderValue(
         m_responseMessage.response->headers,
         "Content-Type");
 
     if (m_messageBodyConverter)
     {
-        return std::make_unique<nx_http::BufferSource>(
+        return std::make_unique<nx::network::http::BufferSource>(
             contentType,
             m_messageBodyConverter->convert(std::move(messageBodyBuffer)));
     }
     else
     {
-        return std::make_unique<nx_http::BufferSource>(
+        return std::make_unique<nx::network::http::BufferSource>(
             contentType,
             std::move(messageBodyBuffer));
     }
 }
 
-void ProxyWorker::updateMessageHeaders(nx_http::Response* response)
+void ProxyWorker::updateMessageHeaders(nx::network::http::Response* response)
 {
-    nx_http::insertOrReplaceHeader(
+    nx::network::http::insertOrReplaceHeader(
         &response->headers,
-        nx_http::HttpHeader("Content-Encoding", "identity"));
+        nx::network::http::HttpHeader("Content-Encoding", "identity"));
     response->headers.erase("Transfer-Encoding");
 }
 
 } // namespace proxy
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -21,14 +21,14 @@ int QnEventLogRestHandler::executeGet(
     {
         qnServerDb->getAndSerializeActions(request, result);
         contentType = "application/octet-stream";
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     else
     {
         result.append("<root>\n");
         result.append(errStr);
         result.append("</root>\n");
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
     }
 }
 

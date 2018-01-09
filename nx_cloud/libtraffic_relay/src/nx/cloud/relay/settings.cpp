@@ -57,7 +57,7 @@ Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize),
     connectionInactivityTimeout(kDefaultHttpInactivityTimeout)
 {
-    endpoints.push_back(SocketAddress(kDefaultHttpEndpointsToListen));
+    endpoints.push_back(network::SocketAddress(kDefaultHttpEndpointsToListen));
 }
 
 ConnectingPeer::ConnectingPeer():
@@ -145,7 +145,7 @@ void Settings::loadHttp()
             httpAddrToListenStrList.begin(),
             httpAddrToListenStrList.end(),
             std::back_inserter(m_http.endpoints),
-            [](const QString& str) { return SocketAddress(str); });
+            [](const QString& str) { return network::SocketAddress(str); });
     }
 
     m_http.tcpBacklogSize = settings().value(

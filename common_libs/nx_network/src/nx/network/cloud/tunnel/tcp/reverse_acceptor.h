@@ -56,20 +56,20 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    void fillNxRcHeaders(nx_http::HttpHeaders* headers) const;
-    void saveConnection(String name, nx_http::HttpServerConnection* connection);
+    void fillNxRcHeaders(nx::network::http::HttpHeaders* headers) const;
+    void saveConnection(String name, nx::network::http::HttpServerConnection* connection);
 
-    class NxRcHandler: public nx_http::AbstractHttpRequestHandler
+    class NxRcHandler: public nx::network::http::AbstractHttpRequestHandler
     {
     public:
         NxRcHandler(ReverseAcceptor* acceptor);
 
         void processRequest(
-            nx_http::HttpServerConnection* const connection,
+            nx::network::http::HttpServerConnection* const connection,
             nx::utils::stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::RequestProcessedHandler handler) override;
+            nx::network::http::Request request,
+            nx::network::http::Response* const response,
+            nx::network::http::RequestProcessedHandler handler) override;
 
     private:
         ReverseAcceptor* m_acceptor;
@@ -82,8 +82,8 @@ private:
     boost::optional<size_t> m_poolSize;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
 
-    nx_http::MessageDispatcher m_httpMessageDispatcher;
-    std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
+    nx::network::http::MessageDispatcher m_httpMessageDispatcher;
+    std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
 };
 
 } // namespace tcp

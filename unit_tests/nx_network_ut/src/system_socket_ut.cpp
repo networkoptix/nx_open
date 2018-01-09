@@ -172,13 +172,6 @@ TEST_F(TcpSocket, DISABLED_KeepAliveOptionsServer)
     waitForKeepAliveDisconnect(client.get());
 }
 
-TEST_F(TcpSocket, DISABLED_KeepAliveOptionsClient)
-{
-    const auto client = std::make_unique<TCPSocket>(AF_INET);
-    ASSERT_TRUE(client->connect(SocketAddress("52.55.219.5:3345")));
-    waitForKeepAliveDisconnect(client.get());
-}
-
 struct TcpSocketIpv4Factory
 {
     std::unique_ptr<nx::network::TCPSocket> operator()() const
@@ -223,7 +216,7 @@ TEST_F(TcpSocket, ConnectErrorReporting)
     const SocketAddress localAddress(HostAddress::localhost, 1);
 
     TCPSocket tcpSocket(AF_INET);
-    const bool connectResult = tcpSocket.connect(localAddress, 1500);
+    const bool connectResult = tcpSocket.connect(localAddress, std::chrono::milliseconds(100));
     const auto connectErrorCode = SystemError::getLastOSErrorCode();
     ASSERT_FALSE(connectResult);
     ASSERT_NE(SystemError::noError, connectErrorCode);

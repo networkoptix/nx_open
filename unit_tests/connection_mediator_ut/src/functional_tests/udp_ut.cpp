@@ -32,8 +32,8 @@ TEST_F(MediatorFunctionalTest, udp_transport)
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
 
-    nx::stun::MessageParser messageParser;
-    nx::stun::MessageSerializer messageSerializer;
+    nx::network::stun::MessageParser messageParser;
+    nx::network::stun::MessageSerializer messageSerializer;
     const auto udpSocket = std::make_unique<network::UDPSocket>();
     udpSocket->setRecvTimeout(3000);
 
@@ -42,10 +42,10 @@ TEST_F(MediatorFunctionalTest, udp_transport)
     {
         //sending resolve request
         api::ResolvePeerRequest request(system1Servers[i]->serverId() + "." + system1.id);
-        nx::stun::Message requestMessage(
-            stun::Header(
-                nx::stun::MessageClass::request,
-                nx::stun::extension::methods::resolvePeer));
+        nx::network::stun::Message requestMessage(
+            nx::network::stun::Header(
+                nx::network::stun::MessageClass::request,
+                nx::network::stun::extension::methods::resolvePeer));
         request.serialize(&requestMessage);
         messageSerializer.setMessage(&requestMessage);
         nx::Buffer sendBuffer;
@@ -58,11 +58,11 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         //reading response
         nx::Buffer recvBuffer;
         recvBuffer.resize(nx::network::kMaxUDPDatagramSize);
-        SocketAddress serverAddress;
+        nx::network::SocketAddress serverAddress;
         const int bytesRead = udpSocket->recvFrom(recvBuffer.data(), recvBuffer.size(), &serverAddress);
         ASSERT_NE(-1, bytesRead);
         recvBuffer.resize(bytesRead);
-        nx::stun::Message responseMessage;
+        nx::network::stun::Message responseMessage;
         messageParser.setMessage(&responseMessage);
         size_t bytesParsed = 0;
         ASSERT_EQ(nx::network::server::ParserState::done, messageParser.parse(recvBuffer, &bytesParsed));

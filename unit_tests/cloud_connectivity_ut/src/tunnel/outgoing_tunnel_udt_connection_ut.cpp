@@ -37,7 +37,7 @@ public:
 
     bool start()
     {
-        if (!m_serverSocket->bind(SocketAddress(HostAddress::localhost, 0)) ||
+        if (!m_serverSocket->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)) ||
             !m_serverSocket->listen() ||
             !m_serverSocket->setNonBlockingMode(true))
         {
@@ -55,7 +55,7 @@ public:
         return true;
     }
 
-    SocketAddress serverEndpoint() const
+    nx::network::SocketAddress serverEndpoint() const
     {
         return m_serverSocket->getLocalAddress();
     }
@@ -64,7 +64,7 @@ protected:
     struct ConnectResult
     {
         SystemError::ErrorCode errorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
     };
 
@@ -77,8 +77,8 @@ protected:
     };
 
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
-    std::unique_ptr<AbstractStreamSocket> m_controlConnection;
-    std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_controlConnection;
+    std::list<std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptedSockets;
 
     std::vector<ConnectContext> startConnections(
         udp::OutgoingTunnelConnection* const tunnelConnection,
@@ -101,7 +101,7 @@ protected:
                 SocketAttributes(),
                 [&connectContext](
                     SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> connection,
+                    std::unique_ptr<nx::network::AbstractStreamSocket> connection,
                     bool stillValid)
             {
                 connectContext.endTime = std::chrono::steady_clock::now();
@@ -135,7 +135,7 @@ private:
 
     void onNewConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> socket)
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket)
     {
         using namespace std::placeholders;
 
@@ -170,7 +170,7 @@ TEST_F(OutgoingTunnelConnectionTest, common)
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
     auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
-    ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
+    ASSERT_TRUE(udtConnection->connect(serverEndpoint(), nx::network::kNoTimeout));
     const auto localAddress = udtConnection->getLocalAddress();
 
     OutgoingTunnelConnection tunnelConnection(
@@ -213,7 +213,7 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
     auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
-    ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
+    ASSERT_TRUE(udtConnection->connect(serverEndpoint(), nx::network::kNoTimeout));
 
     OutgoingTunnelConnection tunnelConnection(
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
@@ -221,20 +221,20 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         std::move(udtConnection));
     auto tunnelConnectionGuard = makeScopeGuard(
         [&tunnelConnection]() { tunnelConnection.pleaseStopSync(); });
-        
+
     tunnelConnection.start();
 
     m_serverSocket->pleaseStopSync();
     m_serverSocket.reset();
     //server socket is stopped, no connection can be accepted
 
-    auto connectContexts = 
+    auto connectContexts =
         startConnections(
             &tunnelConnection,
             connectionsToCreate,
             minTimeoutMillis,
             maxTimeoutMillis);
-     
+
     for (std::size_t i = 0; i < connectContexts.size(); ++i)
     {
         const auto result = connectContexts[i].connectedPromise.get_future().get();
@@ -269,7 +269,7 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
     for (int i = 0; i < loopLength; ++i)
     {
         auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
-        ASSERT_TRUE(udtConnection->connect(serverEndpoint()))
+        ASSERT_TRUE(udtConnection->connect(serverEndpoint(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
 
         OutgoingTunnelConnection tunnelConnection(
@@ -290,7 +290,7 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
             {
                 auto result = future.get();
                 ASSERT_TRUE(
-                    result.errorCode == SystemError::noError || 
+                    result.errorCode == SystemError::noError ||
                     result.errorCode == SystemError::interrupted);
             }
         }
@@ -312,7 +312,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
 
     const auto serverAddress = serverEndpoint();
     auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
-    ASSERT_TRUE(udtConnection->connect(serverAddress, 3000))
+    ASSERT_TRUE(udtConnection->connect(serverAddress, nx::network::kNoTimeout))
         << SystemError::getLastOSErrorText().toStdString();
 
     Timeouts udpTunnelKeepAlive;

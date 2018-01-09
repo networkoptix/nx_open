@@ -48,7 +48,7 @@ public:
     virtual const MediaStreamCache* liveCache(MediaQuality streamQuality) const override;
     virtual MediaStreamCache* liveCache(MediaQuality streamQuality) override;
 
-    virtual nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager(
+    virtual nx::mediaserver::hls::LivePlaylistManagerPtr hlsLivePlaylistManager(
         MediaQuality streamQuality) const override;
 
     virtual bool ensureLiveCacheStarted(

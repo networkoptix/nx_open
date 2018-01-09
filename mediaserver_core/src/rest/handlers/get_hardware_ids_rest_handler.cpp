@@ -11,5 +11,5 @@ int QnGetHardwareIdsRestHandler::executeGet(
 {
     const QStringList hardwareIds = LLUtil::getAllHardwareIds();
     result.setReply(hardwareIds);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

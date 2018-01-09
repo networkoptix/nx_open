@@ -47,18 +47,18 @@ static Buffer httpJoin(std::vector<Buffer> lines, Buffer append = {})
 
 TEST(TcpReverseConnector, General)
 {
-    utils::promise<SocketAddress> serverAddress;
+    utils::promise<nx::network::SocketAddress> serverAddress;
     nx::utils::thread serverThread(
         [this, &serverAddress]()
         {
             const auto server = std::make_unique<TCPServerSocket>(
                 SocketFactory::tcpClientIpVersion());
 
-            ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+            ASSERT_TRUE(server->bind(nx::network::SocketAddress::anyAddress));
             ASSERT_TRUE(server->listen());
             serverAddress.set_value(server->getLocalAddress());
 
-            std::unique_ptr<AbstractStreamSocket> client(server->accept());
+            std::unique_ptr<nx::network::AbstractStreamSocket> client(server->accept());
             ASSERT_TRUE((bool)client);
 
             Buffer buffer(1024, Qt::Uninitialized);
@@ -81,7 +81,7 @@ TEST(TcpReverseConnector, General)
     auto connector = std::make_unique<ReverseConnector>("client", "server");
     utils::promise<void> connectorDone;
     connector->connect(
-        SocketAddress(HostAddress::localhost, serverAddress.get_future().get().port),
+        nx::network::SocketAddress(nx::network::HostAddress::localhost, serverAddress.get_future().get().port),
         [&connector, &connectorDone](SystemError::ErrorCode code)
         {
             auto buffer = std::make_shared<Buffer>();
@@ -92,7 +92,7 @@ TEST(TcpReverseConnector, General)
                 KeepAliveOptions(std::chrono::seconds(1), std::chrono::seconds(2), 3),
                 connector->getKeepAliveOptions());
 
-            std::shared_ptr<AbstractStreamSocket> socket(connector->takeSocket());
+            std::shared_ptr<nx::network::AbstractStreamSocket> socket(connector->takeSocket());
             auto socketRaw = socket.get();
             socketRaw->readAsyncAtLeast(
                 buffer.get(), 5,

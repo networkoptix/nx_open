@@ -5,7 +5,15 @@
 
 #include <nx/vms/event//event_fwd.h>
 
-namespace nx_http { class AsyncHttpClientPtr; };
+namespace nx {
+namespace network {
+namespace http {
+
+class AsyncHttpClientPtr;
+
+} // namespace nx
+} // namespace network
+} // namespace http
 
 namespace rest
 {

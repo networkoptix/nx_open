@@ -29,7 +29,7 @@ public:
     }
 
     virtual void connectAsync(
-        const SocketAddress& /*addr*/,
+        const nx::network::SocketAddress& /*addr*/,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
     {
         // Just ignoring request to emulate unresponsive server.
@@ -46,7 +46,7 @@ public:
     }
 
     virtual void connectAsync(
-        const SocketAddress& /*addr*/,
+        const nx::network::SocketAddress& /*addr*/,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         post([handler = std::move(handler)]() { handler(SystemError::connectionRefused); });
@@ -69,7 +69,7 @@ public:
     }
 
 protected:
-    virtual std::unique_ptr<AbstractStreamSocket> createTcpSocket(int ipVersion) override
+    virtual std::unique_ptr<nx::network::AbstractStreamSocket> createTcpSocket(int ipVersion) override
     {
         return std::make_unique<SocketType>(ipVersion);
     }
@@ -166,12 +166,12 @@ private:
     struct Result
     {
         SystemError::ErrorCode sysErrorCode = SystemError::noError;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
 
         Result() {}
         Result(
             SystemError::ErrorCode sysErrorCode,
-            std::unique_ptr<AbstractStreamSocket> connection)
+            std::unique_ptr<nx::network::AbstractStreamSocket> connection)
             :
             sysErrorCode(sysErrorCode),
             connection(std::move(connection))
@@ -186,13 +186,13 @@ private:
     Result m_lastResult;
     StreamSocketAttributes m_socketAttributes;
 
-    SocketAddress addServer()
+    nx::network::SocketAddress addServer()
     {
         auto tcpServer = std::make_unique<network::test::RandomDataTcpServer>(
             network::test::TestTrafficLimitType::none,
             0,
             network::test::TestTransmissionMode::spam);
-        tcpServer->setLocalAddress(SocketAddress(HostAddress::localhost, 0));
+        tcpServer->setLocalAddress(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0));
         NX_GTEST_ASSERT_TRUE(tcpServer->start());
         const auto serverEndpoint = tcpServer->addressBeingListened();
 
@@ -225,7 +225,7 @@ private:
     void onConnectCompletion(
         SystemError::ErrorCode sysErrorCode,
         boost::optional<TunnelAttributes> /*tunnelAttributes*/,
-        std::unique_ptr<AbstractStreamSocket> connection)
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection)
     {
         m_connectResultQueue.push(Result(sysErrorCode, std::move(connection)));
     }

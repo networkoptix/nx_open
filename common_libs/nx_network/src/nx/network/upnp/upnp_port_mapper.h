@@ -8,7 +8,9 @@
 #include "upnp_async_client.h"
 #include "upnp_search_handler.h"
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 class NX_NETWORK_API PortMapper:
     SearchAutoHandler,
@@ -125,4 +127,6 @@ protected: // for testing only
     std::map< QString, Device > m_devices;
 };
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

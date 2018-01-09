@@ -46,7 +46,7 @@ FcResource::~FcResource()
 CameraDiagnostics::Result FcResource::initInternal()
 {
     quint16 port = nexus::kDefaultNexusPort;
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     auto auth = getAuth();
 
     httpClient.setSendTimeoutMs(kServerStatusRequestTimeout.count());
@@ -215,7 +215,7 @@ bool FcResource::hasDualStreaming() const
     return false;
 }
 
-bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const nx::utils::Url& url)
+bool FcResource::doGetRequestAndCheckResponse(nx::network::http::HttpClient& httpClient, const nx::utils::Url& url)
 {
     auto success = httpClient.doGet(url);
     if (!success)
@@ -223,13 +223,13 @@ bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, c
 
     auto response = httpClient.response();
 
-    if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return false;
 
     return true;
 }
 
-boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx_http::HttpClient& httpClient)
+boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx::network::http::HttpClient& httpClient)
 {
     nx::utils::Url url = getUrl();
     url.setPath(fc_private::kConfigurationFile);
@@ -237,14 +237,14 @@ boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx_ht
     if (!doGetRequestAndCheckResponse(httpClient, url))
         return boost::none;
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
     return parseNexusServerStatusResponse(QString::fromUtf8(messageBody));
 }
 
-bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
+bool FcResource::tryToEnableNexusServer(nx::network::http::HttpClient& httpClient)
 {
     nx::utils::Url url = getUrl();
     url.setPath(fc_private::kStartNexusServerCommand);
@@ -252,7 +252,7 @@ bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
     if (!doGetRequestAndCheckResponse(httpClient, url))
         return false;
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 

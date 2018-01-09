@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 19, 2016
-* akolesnikov
-***********************************************************/
-
 #include <future>
 
 #include <gtest/gtest.h>
@@ -78,11 +73,11 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
     const auto server1 = addRandomServer(m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
     ASSERT_NE(nullptr, server1);
 
-    static const std::vector<std::list<SocketAddress>> kTestCases =
+    static const std::vector<std::list<nx::network::SocketAddress>> kTestCases =
     {
         {}, // no public addresses
         { server1->endpoint() },
-        { server1->endpoint(), SocketAddress("12.34.56.78:12345") },
+        { server1->endpoint(), nx::network::SocketAddress("12.34.56.78:12345") },
     };
 
     for (const auto& directTcpAddresses : kTestCases)
@@ -112,7 +107,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
         const auto listenResult = server1->listen();
         ASSERT_EQ(api::ResultCode::ok, listenResult.first);
         ASSERT_EQ(
-            KeepAliveOptions(std::chrono::seconds(10), std::chrono::seconds(10), 3),
+            nx::network::KeepAliveOptions(std::chrono::seconds(10), std::chrono::seconds(10), 3),
             listenResult.second.tcpConnectionKeepAlive);
 
         //requesting connect to the server
@@ -123,7 +118,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
         api::ConnectResponse connectResponseData;
         auto connectCompletionHandler =
             [&connectResultPromise, &connectResponseData](
-                stun::TransportHeader /*stunTransportHeader*/,
+                nx::network::stun::TransportHeader /*stunTransportHeader*/,
                 api::ResultCode resultCode,
                 api::ConnectResponse responseData)
             {
@@ -206,7 +201,7 @@ TEST_F(FtHolePunchingProcessor, destruction)
         m_udpClient->connect(
             connectRequest,
             [&connectResponsePromise](
-                stun::TransportHeader /*stunTransportHeader*/,
+                nx::network::stun::TransportHeader /*stunTransportHeader*/,
                 api::ResultCode /*resultCode*/,
                 api::ConnectResponse /*responseData*/)
             {
@@ -265,7 +260,7 @@ protected:
         api::ConnectResponse connectResponseData;
         auto connectCompletionHandler =
             [&connectResult, &connectResponseData](
-                stun::TransportHeader /*stunTransportHeader*/,
+                nx::network::stun::TransportHeader /*stunTransportHeader*/,
                 api::ResultCode resultCode,
                 api::ConnectResponse responseData)
             {
@@ -398,7 +393,6 @@ public:
         m_holePunchingProcessor(
             m_settings,
             &m_cloudData,
-            &m_dispatcher,
             &m_listeningPeerPool,
             &m_relayClusterClient,
             &m_statisticsCollector)
@@ -438,7 +432,7 @@ protected:
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
             m_connectRequest,
-            nx::stun::Message(),
+            nx::network::stun::Message(),
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
@@ -452,7 +446,7 @@ protected:
         m_holePunchingProcessor.connect(
             m_originatingPeerConnection,
             m_connectRequest,
-            nx::stun::Message(),
+            nx::network::stun::Message(),
             std::bind(&HolePunchingProcessor::sendConnectResponse, this, _1, _2));
     }
 
@@ -472,7 +466,6 @@ private:
 
     conf::Settings m_settings;
     TestCloudDataProvider m_cloudData;
-    nx::stun::MessageDispatcher m_dispatcher;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
     RelayClusterClient m_relayClusterClient;

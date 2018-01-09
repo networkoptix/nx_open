@@ -17,7 +17,7 @@ template<
     typename CompletionHandler,
     typename ... Response>
 class BasicHandler:
-    public nx_http::AbstractFusionRequestHandler<
+    public nx::network::http::AbstractFusionRequestHandler<
         RequestBodyData,
         typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type>
 {
@@ -59,7 +59,7 @@ private:
     {
         auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
         if (resultCode == relay::api::ResultCode::needRedirect)
-            requestResult.setHttpStatusCode(nx_http::StatusCode::found);
+            requestResult.setHttpStatusCode(nx::network::http::StatusCode::found);
 
         this->requestCompleted(requestResult, std::move(response)...);
     }
@@ -67,13 +67,13 @@ private:
     void onRequestProcessed(
         relay::api::ResultCode resultCode,
         Response ... response,
-        nx_http::ConnectionEvents connectionEvents)
+        nx::network::http::ConnectionEvents connectionEvents)
     {
         this->setConnectionEvents(std::move(connectionEvents));
 
         auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
         if (resultCode == relay::api::ResultCode::ok)
-            requestResult.setHttpStatusCode(nx_http::StatusCode::switchingProtocols);
+            requestResult.setHttpStatusCode(nx::network::http::StatusCode::switchingProtocols);
 
         this->requestCompleted(
             std::move(requestResult),
@@ -97,8 +97,8 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer /*authInfo*/) override
     {
         Request inputData = prepareRequestData(connection, request);
@@ -107,8 +107,8 @@ public:
 
 protected:
     virtual Request prepareRequestData(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& httpRequest) = 0;
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& httpRequest) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -127,8 +127,8 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer /*authInfo*/,
         Request inputData) override
     {
@@ -138,8 +138,8 @@ public:
 
 protected:
     virtual void prepareRequestData(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& httpRequest,
+        nx::network::http::HttpServerConnection* const connection,
+        const nx::network::http::Request& httpRequest,
         Request* request) = 0;
 };
 

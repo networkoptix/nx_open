@@ -124,7 +124,7 @@ protected:
 
     void whenSlaveSystemFailsEveryRequest()
     {
-        m_vmsApiResult = nx_http::StatusCode::internalServerError;
+        m_vmsApiResult = nx::network::http::StatusCode::internalServerError;
     }
 
     void thenResultCodeIs(api::ResultCode resultCode)
@@ -162,10 +162,10 @@ protected:
     void thenVmsRequestIsAuthenticatedWithOwnerCredentials()
     {
         m_prevVmsApiRequest = m_vmsApiRequests.pop();
-        const auto authorizationHeaderStr = nx_http::getHeaderValue(
-            m_prevVmsApiRequest->headers, nx_http::header::Authorization::NAME);
+        const auto authorizationHeaderStr = nx::network::http::getHeaderValue(
+            m_prevVmsApiRequest->headers, nx::network::http::header::Authorization::NAME);
         ASSERT_FALSE(authorizationHeaderStr.isEmpty());
-        nx_http::header::Authorization authorization;
+        nx::network::http::header::Authorization authorization;
         ASSERT_TRUE(authorization.parse(authorizationHeaderStr));
         ASSERT_EQ(m_ownerAccount.email, authorization.userid().toStdString());
     }
@@ -192,10 +192,10 @@ private:
     api::ResultCode m_prevResultCode = api::ResultCode::ok;
     SystemHealthInfoProviderStub* m_systemHealthInfoProviderStub = nullptr;
     SystemHealthInfoProviderFactory::Function m_factoryBak;
-    TestHttpServer m_vmsGatewayEmulator;
-    nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
-    boost::optional<nx_http::Request> m_prevVmsApiRequest;
-    boost::optional<nx_http::StatusCode::Value> m_vmsApiResult;
+    nx::network::http::TestHttpServer m_vmsGatewayEmulator;
+    nx::utils::SyncQueue<nx::network::http::Request> m_vmsApiRequests;
+    boost::optional<nx::network::http::Request> m_prevVmsApiRequest;
+    boost::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         ec2::ConnectionManager*,
@@ -207,20 +207,20 @@ private:
     }
 
     void vmsApiRequestStub(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_vmsApiRequests.push(std::move(request));
 
         QnJsonRestResult response;
         response.error = QnRestResult::Error::NoError;
 
-        nx_http::RequestResult requestResult(
-            m_vmsApiResult ? *m_vmsApiResult : nx_http::StatusCode::ok);
-        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
+        nx::network::http::RequestResult requestResult(
+            m_vmsApiResult ? *m_vmsApiResult : nx::network::http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
             QJson::serialized(response));
 

@@ -8,6 +8,10 @@ typedef ULONG in_addr_t;
 
 #include <nx/network/socket_common.h>
 
+namespace nx {
+namespace network {
+namespace test {
+
 namespace {
 
 static void testHostAddress(
@@ -192,3 +196,7 @@ TEST(SocketAddress, Base)
     testSocketAddress("[::ffff:12.34.56.78]", "::ffff:12.34.56.78", 0);
     testSocketAddress("[::ffff:12.34.56.78]:777", "::ffff:12.34.56.78", 777);
 }
+
+} // namespace test
+} // namespace network
+} // namespace nx

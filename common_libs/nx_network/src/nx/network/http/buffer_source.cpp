@@ -1,6 +1,8 @@
 #include "buffer_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 BufferSource::BufferSource(StringType mimeType, BufferType msgBody):
     m_mimeType(std::move(mimeType)),
@@ -28,4 +30,6 @@ void BufferSource::readAsync(
     completionHandler(SystemError::noError, std::move(outMsgBody));
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

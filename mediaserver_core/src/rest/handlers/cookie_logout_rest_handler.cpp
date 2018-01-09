@@ -10,16 +10,16 @@ static const QString cookieDeletePattern(lit("%1=deleted; path=/; HttpOnly; expi
 
 } // namespace
 
-void QnCookieHelper::addLogoutHeaders(nx_http::HttpHeaders* outHeaders)
+void QnCookieHelper::addLogoutHeaders(nx::network::http::HttpHeaders* outHeaders)
 {
-    nx_http::insertHeader(outHeaders,
-        nx_http::HttpHeader("Set-Cookie", cookieDeletePattern.arg("auth").toUtf8()));
-    nx_http::insertHeader(outHeaders,
-        nx_http::HttpHeader("Set-Cookie", cookieDeletePattern.arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).toUtf8()));
+    nx::network::http::insertHeader(outHeaders,
+        nx::network::http::HttpHeader("Set-Cookie", cookieDeletePattern.arg("auth").toUtf8()));
+    nx::network::http::insertHeader(outHeaders,
+        nx::network::http::HttpHeader("Set-Cookie", cookieDeletePattern.arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).toUtf8()));
 }
 
 int QnCookieLogoutRestHandler::executeGet(const QString &, const QnRequestParams &/*params*/, QnJsonRestResult &/*result*/, const QnRestConnectionProcessor* owner)
 {
     QnCookieHelper::addLogoutHeaders(&owner->response()->headers);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

@@ -10,7 +10,7 @@
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
-class SocketAddress;
+namespace nx { namespace network { class SocketAddress; } }
 class QnCameraUserAttributePool;
 class QnCommonModule;
 
@@ -111,7 +111,7 @@ namespace ec2
     void fromApiToResourceList(const ApiWebPageDataList& src, QnResourceList& dst);
     void fromApiToResourceList(const ApiWebPageDataList& src, QnWebPageResourceList& dst);
 
-    void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target, int defaultPort);
+    void deserializeNetAddrList(const QString& source, QList<nx::network::SocketAddress>& target, int defaultPort);
 } // namespace ec2
 
 #endif // QN_API_CONVERSION_FUNCTIONS_H

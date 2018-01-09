@@ -5,7 +5,9 @@
 #include "nx/fusion/serialization/lexical_functions.h"
 #include <nx/utils/log/log.h>
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 namespace /* noname */ {
 
 static const auto MESSAGE_BODY_READ_TIMEOUT_MS = 20 * 1000; // 20 sec
@@ -124,7 +126,7 @@ public:
 
 AsyncClient::~AsyncClient()
 {
-    std::set<nx_http::AsyncHttpClientPtr> httpClients;
+    std::set<nx::network::http::AsyncHttpClientPtr> httpClients;
     {
         QnMutexLocker lk(&m_mutex);
         std::swap(httpClients, m_httpClients);
@@ -169,7 +171,7 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
     const auto request = SOAP_REQUEST.arg(message.action).arg(service)
         .arg(params.join(lit("")));
 
-    auto complete = [this, url, callback](const nx_http::AsyncHttpClientPtr& ptr)
+    auto complete = [this, url, callback](const nx::network::http::AsyncHttpClientPtr& ptr)
     {
         {
             QnMutexLocker lk(&m_mutex);
@@ -205,10 +207,10 @@ void AsyncClient::doUpnp(const nx::utils::Url& url, const Message& message,
         callback(Message());
     };
 
-    const auto httpClient = nx_http::AsyncHttpClient::create();
+    const auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->addAdditionalHeader("SOAPAction", action.toUtf8());
     httpClient->setMessageBodyReadTimeoutMs(MESSAGE_BODY_READ_TIMEOUT_MS);
-    QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
+    QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         httpClient.get(), std::move(complete), Qt::DirectConnection);
 
     QnMutexLocker lk(&m_mutex);
@@ -410,9 +412,11 @@ void AsyncClient::getAllMappings(
         });
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_upnp::AsyncClient, Protocol,
-    (nx_upnp::AsyncClient::Protocol::TCP, "tcp")
-    (nx_upnp::AsyncClient::Protocol::UDP, "udp")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::upnp::AsyncClient, Protocol,
+    (nx::network::upnp::AsyncClient::Protocol::TCP, "tcp")
+    (nx::network::upnp::AsyncClient::Protocol::UDP, "udp")
 )

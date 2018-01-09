@@ -12,10 +12,11 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QWhatsThis>
 
+#include <client_core/client_core_settings.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
-#include <client_core/client_core_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/system_weights_manager.h>
 
 #include <common/common_module.h>
 
@@ -487,4 +488,10 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString
 {
     qnForgottenSystemsManager->forgetSystem(systemId);
     qnForgottenSystemsManager->forgetSystem(localSystemId);
+}
+
+void QnWorkbenchWelcomeScreen::moveToBack(const QUuid& localSystemId)
+{
+    qnSystemWeightsManager->setWeight(localSystemId, 0); //< Moves system to the end of tile's list.
+    qnClientCoreSettings->save();
 }

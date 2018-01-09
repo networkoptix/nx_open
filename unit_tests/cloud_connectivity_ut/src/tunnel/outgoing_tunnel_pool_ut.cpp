@@ -138,7 +138,7 @@ private:
     void saveConnectResult(
         SystemError::ErrorCode systemErrorCode,
         TunnelAttributes /*tunnelAttributes*/,
-        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+        std::unique_ptr<nx::network::AbstractStreamSocket> /*connection*/)
     {
         m_connectResults.push(systemErrorCode);
     }

@@ -48,7 +48,7 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType),
+    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
     m_sunapiProbePackets(createProbePackets())
 {
 }
@@ -116,7 +116,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     if (!info || info->macAddress.isEmpty())
         return QList<QnResourcePtr>();
 
-    resource->setMAC(QnMacAddress(info->macAddress));
+    resource->setMAC(nx::network::QnMacAddress(info->macAddress));
     resource->setModel(info->model);
     resource->setName(info->model);
     resource->setFirmware(info->firmware);
@@ -153,15 +153,15 @@ void HanwhaResourceSearcher::addResourcesViaSunApi(QnResourceList& upnpResults)
 
 void HanwhaResourceSearcher::updateSocketList()
 {
-    const auto interfaceList = getAllIPv4Interfaces();
+    const auto interfaceList = nx::network::getAllIPv4Interfaces();
     if (m_lastInterfaceList == interfaceList)
         return;
     m_lastInterfaceList = interfaceList;
 
     m_sunApiSocketList.clear();
-    for (const QnInterfaceAndAddr& iface: interfaceList)
+    for (const nx::network::QnInterfaceAndAddr& iface: interfaceList)
     {
-        auto socket(SocketFactory::createDatagramSocket());
+        auto socket(nx::network::SocketFactory::createDatagramSocket());
         if (!socket->setReuseAddrFlag(true) ||
             !socket->bind(iface.address.toString(), kSunApiProbeSrcPort))
         {
@@ -173,12 +173,12 @@ void HanwhaResourceSearcher::updateSocketList()
 
 bool HanwhaResourceSearcher::isHostBelongsToValidSubnet(const QHostAddress& address) const
 {
-    const auto interfaceList = getAllIPv4Interfaces(
+    const auto interfaceList = nx::network::getAllIPv4Interfaces(
         false, /*allowInterfacesWithoutAddress*/
         true /*keepAllAddressesPerInterface*/);
     return std::any_of(
         interfaceList.begin(), interfaceList.end(),
-        [&address](const QnInterfaceAndAddr& netInterface)
+        [&address](const nx::network::QnInterfaceAndAddr& netInterface)
         {
             return netInterface.isHostBelongToIpv4Network(address);
         });
@@ -194,7 +194,7 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
 
 
     static const int kMacAddressOffset = 19;
-    outData->macAddress = QnMacAddress(QLatin1String(data.data() + kMacAddressOffset));
+    outData->macAddress = nx::network::QnMacAddress(QLatin1String(data.data() + kMacAddressOffset));
     if (outData->macAddress.isNull())
         return false;
 
@@ -219,25 +219,25 @@ void HanwhaResourceSearcher::sendSunApiProbe()
     for (const auto& socket: m_sunApiSocketList)
     {
         for(const auto& packet: m_sunapiProbePackets)
-            socket->sendTo(packet.data(), packet.size(), BROADCAST_ADDRESS, kSunApiProbeDstPort);
+            socket->sendTo(packet.data(), packet.size(), nx::network::BROADCAST_ADDRESS, kSunApiProbeDstPort);
     }
 }
 
 void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceList)
 {
     auto resourceAlreadyFound =
-        [](const QnResourceList& resultResourceList, const QnMacAddress& macAddress)
+        [](const QnResourceList& resultResourceList, const nx::network::QnMacAddress& macAddress)
         {
             return std::any_of(
                 resultResourceList.begin(), resultResourceList.end(),
                 [&macAddress](const QnResourcePtr& resource)
                 {
-                    return QnMacAddress(resource->getUniqueId()) == macAddress;
+                    return nx::network::QnMacAddress(resource->getUniqueId()) == macAddress;
                 });
         };
 
     QByteArray datagram;
-    datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+    datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
     for (const auto& socket: m_sunApiSocketList)
     {
         while (socket->hasData())
@@ -259,7 +259,7 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
     }
 }
 
-bool HanwhaResourceSearcher::isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const
+bool HanwhaResourceSearcher::isHanwhaCamera(const nx::network::upnp::DeviceInfo& devInfo) const
 {
     auto simplifyStr = [](const QString& value)
     {
@@ -276,8 +276,8 @@ bool HanwhaResourceSearcher::isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) 
 
 bool HanwhaResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const SocketAddress& deviceEndpoint,
-    const nx_upnp::DeviceInfo& devInfo,
+    const nx::network::SocketAddress& deviceEndpoint,
+    const nx::network::upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/)
 {
     if (discoveryMode() == DiscoveryMode::disabled)
@@ -286,9 +286,9 @@ bool HanwhaResourceSearcher::processPacket(
     if (!isHanwhaCamera(devInfo))
         return false;
 
-    QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
+    nx::network::QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
-        cameraMac = QnMacAddress(devInfo.serialNumber);
+        cameraMac = nx::network::QnMacAddress(devInfo.serialNumber);
     if (cameraMac.isNull())
     {
         NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
@@ -319,8 +319,8 @@ bool HanwhaResourceSearcher::processPacket(
 }
 
 void HanwhaResourceSearcher::createResource(
-    const nx_upnp::DeviceInfo& devInfo,
-    const QnMacAddress& mac,
+    const nx::network::upnp::DeviceInfo& devInfo,
+    const nx::network::QnMacAddress& mac,
     QnResourceList& result)
 {
     auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);

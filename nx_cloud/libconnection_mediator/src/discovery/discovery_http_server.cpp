@@ -16,7 +16,7 @@ namespace discovery {
 namespace {
 
 class GetDiscoveredModulesHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     GetDiscoveredModulesHandler(RegisteredPeerPool* registeredPeerPool):
@@ -25,11 +25,11 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler) override
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
         // TODO Filter by peer type.
 
@@ -39,8 +39,8 @@ public:
         peerInfoListJson += boost::join(peerInfoList, ",");
         peerInfoListJson += "]";
 
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
-        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
+        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
             nx::Buffer::fromStdString(peerInfoListJson));
         completionHandler(std::move(requestResult));
@@ -51,7 +51,7 @@ private:
 };
 
 class GetDiscoveredModuleHandler:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     GetDiscoveredModuleHandler(RegisteredPeerPool* registeredPeerPool):
@@ -60,21 +60,21 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler) override
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
         if (requestPathParams().empty())
-            return completionHandler(nx_http::StatusCode::badRequest);
+            return completionHandler(nx::network::http::StatusCode::badRequest);
 
         auto peerInfo = m_registeredPeerPool->getPeerInfo(requestPathParams()[0].toStdString());
         if (!peerInfo)
-            return completionHandler(nx_http::StatusCode::notFound);
+            return completionHandler(nx::network::http::StatusCode::notFound);
 
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
-        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
+        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
             nx::Buffer::fromStdString(*peerInfo));
         completionHandler(std::move(requestResult));
@@ -89,7 +89,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 HttpServer::HttpServer(
-    nx_http::server::rest::MessageDispatcher* httpMessageDispatcher,
+    nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher,
     RegisteredPeerPool* registeredPeerPool)
     :
     m_httpMessageDispatcher(httpMessageDispatcher),
@@ -100,7 +100,7 @@ HttpServer::HttpServer(
     m_httpMessageDispatcher->registerRequestProcessor<GetDiscoveredModulesHandler>(
         http::kDiscoveredModulesPath,
         [this](){ return std::make_unique<GetDiscoveredModulesHandler>(m_registeredPeerPool); },
-        nx_http::Method::get);
+        nx::network::http::Method::get);
 
     m_httpMessageDispatcher->registerRequestProcessor<nx::network::websocket::server::AcceptConnectionHandler>(
         http::kModuleKeepAliveConnectionPath,
@@ -109,17 +109,17 @@ HttpServer::HttpServer(
             return std::make_unique<nx::network::websocket::server::AcceptConnectionHandler>(
                 std::bind(&HttpServer::onKeepAliveConnectionAccepted, this, _1, _2));
         },
-        nx_http::Method::post);
+        nx::network::http::Method::post);
 
     m_httpMessageDispatcher->registerRequestProcessor<GetDiscoveredModuleHandler>(
         http::kDiscoveredModulePath,
         [this]() { return std::make_unique<GetDiscoveredModuleHandler>(m_registeredPeerPool); },
-        nx_http::Method::get);
+        nx::network::http::Method::get);
 }
 
 void HttpServer::onKeepAliveConnectionAccepted(
     std::unique_ptr<nx::network::WebSocket> connection,
-    std::vector<nx_http::StringType> restParams)
+    std::vector<nx::network::http::StringType> restParams)
 {
     if (restParams.empty())
         return;

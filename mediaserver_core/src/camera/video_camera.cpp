@@ -8,7 +8,7 @@
 #include <utils/media/media_stream_cache.h>
 #include <utils/memory/cyclic_allocator.h>
 
-#include <nx/network/hls/hls_types.h>
+#include <nx/mediaserver/hls/hls_types.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
@@ -724,11 +724,11 @@ MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
         : nullptr;
 }
 
-nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
+nx::mediaserver::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
     return streamQuality < m_hlsLivePlaylistManager.size()
         ? m_hlsLivePlaylistManager[streamQuality]
-        : nx_hls::HLSLivePlaylistManagerPtr();
+        : nx::mediaserver::hls::LivePlaylistManagerPtr();
 }
 
 QnResourcePtr QnVideoCamera::resource() const
@@ -815,7 +815,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
 
 
         m_hlsLivePlaylistManager[streamQuality] =
-            std::make_shared<nx_hls::HLSLivePlaylistManager>(
+            std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
                 targetDurationUSec,
                 removedChunksToKeepCount);

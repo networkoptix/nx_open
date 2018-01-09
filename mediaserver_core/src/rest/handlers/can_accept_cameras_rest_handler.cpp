@@ -98,5 +98,5 @@ int QnCanAcceptCameraRestHandler::executePost(
     }
 
     result.setReply( outCameras );
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

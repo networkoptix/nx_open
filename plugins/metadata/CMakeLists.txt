@@ -3,6 +3,8 @@ if(customization STREQUAL "hanwha")
 endif()
 add_subdirectory(tegra_video_metadata_plugin)
 
+add_subdirectory(hikvision_metadata_plugin)
+
 if(withPluginStubs)
     add_subdirectory(stub_metadata_plugin)
 endif()

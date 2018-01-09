@@ -9,6 +9,7 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/network/test_support/test_outgoing_tunnel.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/object_destruction_flag.h>
@@ -17,6 +18,22 @@
 
 namespace nx {
 namespace network {
+
+namespace test {
+
+struct CloudStreamSocketTypeSet
+{
+    using ClientSocket = cloud::CloudStreamSocket;
+    using ServerSocket = TCPServerSocket;
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    CloudStreamSocket,
+    StreamSocketAcceptance,
+    CloudStreamSocketTypeSet);
+
+} // namespace test
+
 namespace cloud {
 namespace test {
 
@@ -44,7 +61,7 @@ class TestTcpServerSocket:
     public TCPServerSocket
 {
 public:
-    TestTcpServerSocket(HostAddress host):
+    TestTcpServerSocket(nx::network::HostAddress host):
         TCPServerSocket(AF_INET),
         m_host(std::move(host))
     {
@@ -56,7 +73,7 @@ public:
             SocketGlobals::addressResolver().removeFixedAddress(m_host, *m_socketAddress);
     }
 
-    virtual bool bind(const SocketAddress& localAddress) override
+    virtual bool bind(const nx::network::SocketAddress& localAddress) override
     {
         if (!TCPServerSocket::bind(localAddress))
             return false;
@@ -66,20 +83,20 @@ public:
         return true;
     }
 
-    virtual SocketAddress getLocalAddress() const override
+    virtual nx::network::SocketAddress getLocalAddress() const override
     {
-        return m_socketAddress ? *m_socketAddress : SocketAddress();
+        return m_socketAddress ? *m_socketAddress : nx::network::SocketAddress();
     }
 
 private:
-    const HostAddress m_host;
-    boost::optional<SocketAddress> m_socketAddress;
+    const nx::network::HostAddress m_host;
+    boost::optional<nx::network::SocketAddress> m_socketAddress;
 };
 
 struct CloudStreamSocketTcpByHost:
     public ::testing::Test
 {
-    const HostAddress testHost;
+    const nx::network::HostAddress testHost;
     CloudStreamSocketTcpByHost(): testHost(id() + lit(".") + id()) {}
     static QString id() { return QnUuid::createUuid().toSimpleString(); }
 };
@@ -88,7 +105,7 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
     TEST_F, CloudStreamSocketTcpByHost,
     [&]() { return std::make_unique<TestTcpServerSocket>(testHost); },
     [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
-    SocketAddress(testHost));
+    nx::network::SocketAddress(testHost));
 
 TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
 {
@@ -103,7 +120,7 @@ TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
             return std::make_unique<deprecated::SslSocket>(
                 std::make_unique<CloudStreamSocket>(AF_INET), false);
         },
-        SocketAddress(testHost));
+        nx::network::SocketAddress(testHost));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -162,7 +179,7 @@ TEST_F(CloudStreamSocketTest, simple)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), 0));
+        ASSERT_TRUE(cloudSocket.connect(nx::network::SocketAddress(tempHostName), nx::network::kNoTimeout));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
@@ -172,7 +189,7 @@ TEST_F(CloudStreamSocketTest, simple)
     // also try to connect just by system name
     {
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
+        ASSERT_TRUE(cloudSocket.connect(nx::network::SocketAddress("bla"), nx::network::kNoTimeout));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
@@ -191,7 +208,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         []( bool /*sslRequired*/,
             nx::network::NatTraversalSupport /*natTraversalRequired*/,
             boost::optional<int> /*ipVersion*/) ->
-                std::unique_ptr< AbstractStreamSocket >
+                std::unique_ptr< nx::network::AbstractStreamSocket >
         {
             return std::make_unique<CloudStreamSocket>(AF_INET);
         });
@@ -211,7 +228,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 
     network::test::ConnectionsGenerator connectionsGenerator(
-        SocketAddress(tempHostName),
+        nx::network::SocketAddress(tempHostName),
         maxSimultaneousConnections,
         network::test::TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
@@ -229,7 +246,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 }
 
-const auto createServerSocketFunc = 
+const auto createServerSocketFunc =
     []() -> std::unique_ptr<AbstractStreamServerSocket>
     {
         return SocketFactory::createStreamServerSocket();
@@ -277,7 +294,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
         ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
             << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.connectAsync(
-            SocketAddress(tempHostName),
+            nx::network::SocketAddress(tempHostName),
             [](SystemError::ErrorCode /*code*/){});
         cloudSocket.cancelIOSync(aio::etNone);
     }
@@ -287,9 +304,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(
-            SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()))
+        ASSERT_TRUE(cloudSocket.connect(nx::network::SocketAddress(tempHostName), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.reserve(bytesToSendThroughConnection);
@@ -306,9 +321,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
-        ASSERT_TRUE(cloudSocket.connect(
-            SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()))
+        ASSERT_TRUE(cloudSocket.connect(nx::network::SocketAddress(tempHostName), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
@@ -345,7 +358,7 @@ protected:
             network::test::TestTrafficLimitType::none,
             0,
             network::test::TestTransmissionMode::spam);
-        m_tcpServer->setLocalAddress(SocketAddress(HostAddress::localhost, 0));
+        m_tcpServer->setLocalAddress(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0));
         ASSERT_TRUE(m_tcpServer->start());
     }
 
@@ -357,7 +370,7 @@ protected:
             m_tcpServer->pleaseStopSync();
     }
 
-    SocketAddress serverAddress() const
+    nx::network::SocketAddress serverAddress() const
     {
         return m_tcpServer->addressBeingListened();
     }
@@ -386,7 +399,7 @@ TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
 
                 if (!socket->isConnected())
                 {
-                    ASSERT_TRUE(socket->connect(targetAddress, 3000));
+                    ASSERT_TRUE(socket->connect(targetAddress, nx::network::kNoTimeout));
                     socketState = SocketState::connected;
                 }
 
@@ -441,7 +454,7 @@ class TestSocket:
     public TCPSocket
 {
 public:
-    TestSocket(std::tuple<SocketAddress, nx::utils::promise<void>*, nx::utils::promise<bool>*> args):
+    TestSocket(std::tuple<nx::network::SocketAddress, nx::utils::promise<void>*, nx::utils::promise<bool>*> args):
         TCPSocket(SocketFactory::tcpClientIpVersion())
     {
         m_socketInRecv = std::get<1>(args);
@@ -479,13 +492,13 @@ private:
 
 using TestOutgoingTunnelConnection = test::OutgoingTunnelConnection<
     TestSocket,
-    SocketAddress,
+    nx::network::SocketAddress,
     nx::utils::promise<void>*,
     nx::utils::promise<bool>*>;
 
 using TestCrossNatConnector = test::CrossNatConnector<
     TestOutgoingTunnelConnection,
-    SocketAddress,
+    nx::network::SocketAddress,
     nx::utils::promise<void>*,
     nx::utils::promise<bool>*>;
 
@@ -534,7 +547,8 @@ protected:
     {
         m_clientSocket = std::make_unique<CloudStreamSocket>(
             SocketFactory::tcpServerIpVersion());
-        ASSERT_TRUE(m_clientSocket->connect(QnUuid::createUuid().toSimpleString(), -1));
+        ASSERT_TRUE(m_clientSocket->connect(
+            QnUuid::createUuid().toSimpleString(), nx::network::kNoTimeout));
     }
 
     void startSocketReadThread()
@@ -566,16 +580,15 @@ protected:
 
     void assertThatSocketHasBeenShutdownCorrectly()
     {
-        m_continueReadingSocket.set_value(true);
-
         m_terminated = true;
+        m_continueReadingSocket.set_value(true);
         m_socketReadThread.join();
     }
 
 private:
     std::unique_ptr<CloudStreamSocket> m_clientSocket;
     nx::utils::thread m_socketReadThread;
-    bool m_terminated;
+    std::atomic<bool> m_terminated;
     CrossNatConnectorFactory::Function m_oldFactory;
     nx::utils::promise<void> m_socketInRecv;
     nx::utils::promise<bool> m_continueReadingSocket;

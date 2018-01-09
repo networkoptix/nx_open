@@ -196,9 +196,9 @@ nx::cdb::api::ResultCode CdbNonceFetcher::initializeConnectionToCloudSync()
 }
 
 bool CdbNonceFetcher::parseCloudNonce(
-    const nx_http::BufferType& nonce,
-    nx_http::BufferType* const cloudNonce,
-    nx_http::BufferType* const nonceTrailer)
+    const nx::network::http::BufferType& nonce,
+    nx::network::http::BufferType* const cloudNonce,
+    nx::network::http::BufferType* const nonceTrailer)
 {
     if ((nonce.size() <= kNonceTrailerLength) ||
         (memcmp(

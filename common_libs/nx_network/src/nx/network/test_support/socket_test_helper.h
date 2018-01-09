@@ -327,7 +327,10 @@ class NX_NETWORK_API MultipleClientSocketTester:
 {
 public:
     MultipleClientSocketTester(AddressBinder* addressBinder);
-    bool connect(const SocketAddress& address, unsigned int timeout) override;
+
+    bool connect(
+        const SocketAddress& address,
+        std::chrono::milliseconds timeout) override;
     void connectAsync(
         const SocketAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;

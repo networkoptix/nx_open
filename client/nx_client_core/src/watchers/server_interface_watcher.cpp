@@ -41,7 +41,7 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (resource != currentServer)
         return;
 
-    const SocketAddress address = 
+    const nx::network::SocketAddress address = 
         nx::network::url::getEndpoint(commonModule()->currentUrl());
     currentServer->setPrimaryAddress(address);
     NX_LOG(

@@ -37,7 +37,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual SocketAddress getForeignAddress() const override;
     virtual void cancelIOAsync(

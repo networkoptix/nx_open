@@ -131,7 +131,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                     return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String("old firmware"));
                 }
 
-                return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+                return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
             }
 
             QByteArray body;
@@ -235,7 +235,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             }
             else if (status != CL_HTTP_SUCCESS)
             {
-                return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
+                return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status))));
             }
 
             if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)

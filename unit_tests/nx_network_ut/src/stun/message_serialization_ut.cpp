@@ -7,6 +7,7 @@
 #include <nx/utils/string.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -359,4 +360,5 @@ TEST_F(StunMessageSerializer, serializer_accepts_empty_output_buffer)
 
 } // namespace test
 } // namespace stun
+} // namespace network
 } // namespace nx

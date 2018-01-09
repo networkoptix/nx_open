@@ -11,7 +11,9 @@
 
 #include "../deprecated/asynchttpclient.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 /**
  * Synchronous http client.
@@ -46,16 +48,16 @@ public:
      */
     bool doPost(
         const nx::utils::Url& url,
-        const nx_http::StringType& contentType,
-        nx_http::StringType messageBody);
+        const nx::network::http::StringType& contentType,
+        nx::network::http::StringType messageBody);
 
     /**
      * @return true if response has been received.
      */
     bool doPut(
         const nx::utils::Url& url,
-        const nx_http::StringType& contentType,
-        nx_http::StringType messageBody);
+        const nx::network::http::StringType& contentType,
+        nx::network::http::StringType messageBody);
 
     /**
      * @return true if response has been received.
@@ -115,13 +117,13 @@ public:
     static bool fetchResource(const nx::utils::Url& url, BufferType* msgBody, StringType* contentType);
 
 private:
-    nx_http::AsyncHttpClientPtr m_asyncHttpClient;
+    nx::network::http::AsyncHttpClientPtr m_asyncHttpClient;
     QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
     bool m_done;
     bool m_error;
     bool m_terminated;
-    nx_http::BufferType m_msgBodyBuffer;
+    nx::network::http::BufferType m_msgBodyBuffer;
     std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
     boost::optional<int> m_subsequentReconnectTries;
     boost::optional<int> m_reconnectTries;
@@ -150,4 +152,6 @@ private slots:
     void onReconnected();
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

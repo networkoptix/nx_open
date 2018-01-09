@@ -33,12 +33,12 @@ public:
     VmsGatewayProcess(int argc, char **argv);
     ~VmsGatewayProcess();
 
-    const std::vector<SocketAddress>& httpEndpoints() const;
+    const std::vector<network::SocketAddress>& httpEndpoints() const;
 
     relaying::RelayEngine& relayEngine();
     const relaying::RelayEngine& relayEngine() const;
 
-    void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
+    void enforceSslFor(const network::SocketAddress& targetAddress, bool enabled = true);
 
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
@@ -46,7 +46,7 @@ protected:
 
 private:
     conf::RunTimeOptions m_runTimeOptions;
-    std::vector<SocketAddress> m_httpEndpoints;
+    std::vector<network::SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
     relaying::RelayEngine* m_relayEngine = nullptr;
 
@@ -62,7 +62,7 @@ private:
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         relaying::RelayEngine* relayEngine,
-        nx_http::server::rest::MessageDispatcher* const msgDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* const msgDispatcher);
 };
 
 } // namespace gateway

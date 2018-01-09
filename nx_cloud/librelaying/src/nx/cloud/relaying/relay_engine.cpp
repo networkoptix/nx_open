@@ -11,7 +11,7 @@ namespace relaying {
 
 RelayEngine::RelayEngine(
     const Settings& settings,
-    nx_http::server::rest::MessageDispatcher* httpMessageDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher)
     :
     m_listeningPeerPool(settings),
     m_listeningPeerManager(
@@ -28,7 +28,7 @@ ListeningPeerPool& RelayEngine::listeningPeerPool()
 }
 
 void RelayEngine::registerApiHandlers(
-    nx_http::server::rest::MessageDispatcher* httpMessageDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher)
 {
     httpMessageDispatcher->registerRequestProcessor<BeginListeningHandler>(
         BeginListeningHandler::kPath,
@@ -36,7 +36,7 @@ void RelayEngine::registerApiHandlers(
         {
             return std::make_unique<BeginListeningHandler>(m_listeningPeerManager.get());
         },
-        nx_http::Method::post);
+        nx::network::http::Method::post);
 }
 
 } // namespace relaying

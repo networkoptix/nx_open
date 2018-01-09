@@ -64,7 +64,7 @@ protected:
     {
         base_type::SetUp();
 
-        auto discoveryUrl = nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+        auto discoveryUrl = nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(httpEndpoint()).toUrl();
         m_moduleRegistrar = std::make_unique<DiscoveryClient>(discoveryUrl, m_moduleId);
 
@@ -133,7 +133,7 @@ private:
     nx::cloud::discovery::PeerStatus fetchPeerStatus()
     {
         nx::cloud::discovery::ModuleFinder moduleFinder(
-            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(httpEndpoint()).toUrl());
         nx::utils::promise<
             std::tuple<nx::cloud::discovery::ResultCode, std::vector<InstanceInformation>>

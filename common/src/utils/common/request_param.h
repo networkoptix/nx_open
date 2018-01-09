@@ -109,7 +109,7 @@ struct QnHTTPRawResponse
     QnHTTPRawResponse();
     QnHTTPRawResponse(
         SystemError::ErrorCode sysErrorCode,
-        const nx_http::StatusLine& statusLine,
+        const nx::network::http::StatusLine& statusLine,
         const QByteArray& contentType,
         const QByteArray& msgBody);
 
@@ -123,7 +123,7 @@ private:
     QNetworkReply::NetworkError sysErrorCodeToNetworkError(
         SystemError::ErrorCode errorCode);
     QNetworkReply::NetworkError httpStatusCodeToNetworkError(
-        nx_http::StatusCode::Value statusCode);
+        nx::network::http::StatusCode::Value statusCode);
 };
 
 Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */

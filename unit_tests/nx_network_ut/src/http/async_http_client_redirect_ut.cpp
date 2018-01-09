@@ -8,7 +8,9 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace test {
 
 static const nx::String kTestPath = "/test/test";
@@ -102,7 +104,7 @@ protected:
         ASSERT_EQ(StatusCode::ok, m_httpClient.response()->statusLine.statusCode);
         ASSERT_EQ(
             "text/plain",
-            nx_http::getHeaderValue(m_httpClient.response()->headers, "Content-Type"));
+            nx::network::http::getHeaderValue(m_httpClient.response()->headers, "Content-Type"));
         QByteArray msgBody;
         while (!m_httpClient.eof())
             msgBody += m_httpClient.fetchMessageBodyBuffer();
@@ -149,9 +151,9 @@ protected:
     void andDigestUrlIsCorrectAndFullyEncoded()
     {
         const auto authHeader =
-            m_prevReceivedPostRequest->headers.find(nx_http::header::Authorization::NAME);
+            m_prevReceivedPostRequest->headers.find(nx::network::http::header::Authorization::NAME);
         ASSERT_NE(authHeader, m_prevReceivedPostRequest->headers.end());
-        nx_http::header::Authorization auth(nx_http::header::AuthScheme::digest);
+        nx::network::http::header::Authorization auth(nx::network::http::header::AuthScheme::digest);
         ASSERT_TRUE(auth.parse(authHeader->second));
         ASSERT_EQ(auth.digest->params["uri"],
             m_prevReceivedPostRequest->requestLine.url.toString(QUrl::FullyEncoded).toUtf8());
@@ -165,21 +167,21 @@ protected:
 private:
     std::unique_ptr<TestHttpServer> m_redirector;
     std::unique_ptr<TestHttpServer> m_resourceServer;
-    nx_http::HttpClient m_httpClient;
+    nx::network::http::HttpClient m_httpClient;
     nx::utils::Url m_redirectUrl;
     nx::utils::Url m_actualUrl;
-    nx::utils::SyncQueue<nx_http::Request> m_postResourceRequests;
-    boost::optional<nx_http::Request> m_prevReceivedPostRequest;
+    nx::utils::SyncQueue<nx::network::http::Request> m_postResourceRequests;
+    boost::optional<nx::network::http::Request> m_prevReceivedPostRequest;
 
     void savePostedResource(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         m_postResourceRequests.push(std::move(request));
-        completionHandler(nx_http::StatusCode::ok);
+        completionHandler(nx::network::http::StatusCode::ok);
     }
 
     void registerContentHandlers()
@@ -190,12 +192,12 @@ private:
             nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
             kTestMessageBody,
             "text/plain",
-            nx_http::Method::get));
+            nx::network::http::Method::get));
 
         ASSERT_TRUE(m_resourceServer->registerRequestProcessorFunc(
             nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
             std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2, _3, _4, _5),
-            nx_http::Method::post));
+            nx::network::http::Method::post));
     }
 };
 
@@ -252,4 +254,6 @@ TEST_F(AsyncHttpClientRedirect, digest_url_is_correct)
 }
 
 } // namespace test
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -164,7 +164,6 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <nx/client/desktop/watchers/system_servers_watcher.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/app_info.h>
@@ -1894,24 +1893,15 @@ void ActionHandler::at_serverAddCameraManuallyAction_triggered()
 
 void ActionHandler::at_mainMenuAddDeviceManually_triggered()
 {
-    const auto servers = nx::client::desktop::SystemServersWatcher(this).servers();
+    const auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
     if (servers.isEmpty())
     {
-        NX_EXPECT(false, "No servers for device searching");
+        NX_EXPECT(false, "No online servers for device searching");
         return;
     }
 
-    const auto itOnlineServer = std::find_if(servers.begin(), servers.end(),
-        [](const QnMediaServerResourcePtr& server)
-        {
-            return server->getStatus() == Qn::Online;
-        });
-
-    if (itOnlineServer == servers.end())
-        return;
-
     menu()->triggerForced(action::AddDeviceManuallyAction,
-        action::Parameters(*itOnlineServer));
+        action::Parameters(servers.first()));
 }
 
 void ActionHandler::at_addDeviceManually_triggered()
@@ -2592,7 +2582,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
     {
         // No other requests to this proxy, so we have to get nonce by ourselves.
-        auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
+        auto reply = new QnAsyncHttpClientReply(nx::network::http::AsyncHttpClient::create(), this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
             this, &ActionHandler::at_nonceReceived);
@@ -2631,7 +2621,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
-            auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
+            auth.realm, nx::network::http::Method::get, auth.nonce.toUtf8());
 
         nx::utils::Url targetUrl(request.url);
         QUrlQuery urlQuery(targetUrl.toQUrl());

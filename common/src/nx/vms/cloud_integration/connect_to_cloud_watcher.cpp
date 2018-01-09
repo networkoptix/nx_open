@@ -79,10 +79,10 @@ void QnConnectToCloudWatcher::at_updateConnection()
     else
     {
         m_cdbEndPointFetcher->get(
-            nx_http::AuthInfo(),
+            nx::network::http::AuthInfo(),
             [this](int statusCode, nx::utils::Url url)
             {
-                if (statusCode != nx_http::StatusCode::ok)
+                if (statusCode != nx::network::http::StatusCode::ok)
                 {
                     NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
                         .arg(statusCode), cl_logWARNING);

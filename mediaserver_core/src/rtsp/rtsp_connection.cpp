@@ -81,18 +81,18 @@ QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
 namespace {
 
-    bool updatePort(AbstractDatagramSocket* &socket, int port)
+    bool updatePort(nx::network::AbstractDatagramSocket* &socket, int port)
     {
         delete socket;
-        socket = SocketFactory::createDatagramSocket().release();
-        return socket->bind(SocketAddress(HostAddress::anyHost, port));
+        socket = nx::network::SocketFactory::createDatagramSocket().release();
+        return socket->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     }
 
-    QByteArray getParamValue(const QByteArray& paramName, const QUrlQuery& urlQuery, const nx_http::HttpHeaders& headers)
+    QByteArray getParamValue(const QByteArray& paramName, const QUrlQuery& urlQuery, const nx::network::http::HttpHeaders& headers)
     {
         QByteArray paramValue = urlQuery.queryItemValue(paramName).toUtf8();
         if (paramValue.isEmpty())
-            paramValue = nx_http::getHeaderValue(headers, QByteArray("x-") + paramName);
+            paramValue = nx::network::http::getHeaderValue(headers, QByteArray("x-") + paramName);
         return paramValue;
     }
 
@@ -117,17 +117,17 @@ bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
     QnMutexLocker lock( &m_createSocketMutex );
-    mediaSocket = SocketFactory::createDatagramSocket().release();
-    rtcpSocket = SocketFactory::createDatagramSocket().release();
+    mediaSocket = nx::network::SocketFactory::createDatagramSocket().release();
+    rtcpSocket = nx::network::SocketFactory::createDatagramSocket().release();
 
-    bool opened = mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+    bool opened = mediaSocket->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, 0 ) );
     if (!opened)
         return false;
     int startPort = mediaSocket->getLocalAddress().port;
     if(startPort&1)
         opened = updatePort(mediaSocket, ++startPort);
     if (opened)
-        opened = rtcpSocket->bind( SocketAddress( HostAddress::anyHost, startPort+1 ) );
+        opened = rtcpSocket->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, startPort+1 ) );
 
     while (!opened && startPort < 65534) {
         startPort+=2;
@@ -273,7 +273,7 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
 {
 }
@@ -305,7 +305,7 @@ void QnRtspConnectionProcessor::parseRequest()
     Q_D(QnRtspConnectionProcessor);
     QnTCPConnectionProcessor::parseRequest();
 
-    nx_http::HttpHeaders::const_iterator scaleIter = d->request.headers.find("Scale");
+    nx::network::http::HttpHeaders::const_iterator scaleIter = d->request.headers.find("Scale");
     if( scaleIter != d->request.headers.end() )
         d->rtspScale = scaleIter->second.toDouble();
 
@@ -335,7 +335,7 @@ void QnRtspConnectionProcessor::parseRequest()
     if (!d->mediaRes)
         return;
 
-    if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
+    if (!nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
     else {
         d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT;
@@ -383,7 +383,7 @@ void QnRtspConnectionProcessor::parseRequest()
             d->transcodeParams.codecId = DEFAULT_VIDEO_CODEC;
     }
 
-    QString qualityStr = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
+    QString qualityStr = nx::network::http::getHeaderValue(d->request.headers, "x-media-quality");
     if (!qualityStr.isEmpty())
     {
         d->quality = QnLexical::deserialized<MediaQuality>(qualityStr, MEDIA_Quality_High);
@@ -435,20 +435,20 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 {
     Q_D(QnRtspConnectionProcessor);
 
-    d->response = nx_http::Response();
+    d->response = nx::network::http::Response();
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = code;
     d->response.statusLine.reasonPhrase = message.toUtf8();
-    d->response.headers.insert(nx_http::HttpHeader("CSeq", nx_http::getHeaderValue(d->request.headers, "CSeq")));
-    QString transport = nx_http::getHeaderValue(d->request.headers, "Transport");
+    d->response.headers.insert(nx::network::http::HttpHeader("CSeq", nx::network::http::getHeaderValue(d->request.headers, "CSeq")));
+    QString transport = nx::network::http::getHeaderValue(d->request.headers, "Transport");
     if (!transport.isEmpty())
-        d->response.headers.insert(nx_http::HttpHeader("Transport", transport.toLatin1()));
+        d->response.headers.insert(nx::network::http::HttpHeader("Transport", transport.toLatin1()));
 
     if (!d->sessionId.isEmpty()) {
         QString sessionId = d->sessionId;
         if (d->sessionTimeOut > 0)
             sessionId += QString(QLatin1String(";timeout=%1")).arg(d->sessionTimeOut);
-        d->response.headers.insert(nx_http::HttpHeader("Session", sessionId.toLatin1()));
+        d->response.headers.insert(nx::network::http::HttpHeader("Session", sessionId.toLatin1()));
     }
 }
 
@@ -467,23 +467,23 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase =
-        nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
+        nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)httpStatusCode);
 
-    nx_http::insertOrReplaceHeader(
+    nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
-    nx_http::insertOrReplaceHeader(
+        nx::network::http::HttpHeader(nx::network::http::header::Server::NAME, nx::network::http::serverString()));
+    nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
+        nx::network::http::HttpHeader("Date", nx::network::http::formatDateTime(QDateTime::currentDateTime())));
 
     if (!contentType.isEmpty())
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader("Content-Type", contentType));
+            nx::network::http::HttpHeader("Content-Type", contentType));
     if (!d->response.messageBody.isEmpty())
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader(
+            nx::network::http::HttpHeader(
                 "Content-Length",
                 QByteArray::number(d->response.messageBody.size())));
 
@@ -622,9 +622,9 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     QByteArray range = getRangeStr();
     if (!range.isEmpty())
     {
-        nx_http::insertOrReplaceHeader(
+        nx::network::http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader( "Range", range ) );
+            nx::network::http::HttpHeader( "Range", range ) );
     }
 };
 
@@ -782,7 +782,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     createDataProvider();
 
-    QString acceptMethods = nx_http::getHeaderValue(d->request.headers, "Accept");
+    QString acceptMethods = nx::network::http::getHeaderValue(d->request.headers, "Accept");
     if (acceptMethods.indexOf("sdp") == -1)
         return CODE_NOT_IMPLEMETED;
 
@@ -931,7 +931,7 @@ int QnRtspConnectionProcessor::composeSetup()
     if (!d->mediaRes)
         return CODE_NOT_FOUND;
 
-    QByteArray transport = nx_http::getHeaderValue(d->request.headers, "Transport");
+    QByteArray transport = nx::network::http::getHeaderValue(d->request.headers, "Transport");
     //if (transport.indexOf("TCP") == -1)
     //    return CODE_NOT_IMPLEMETED;
     //QByteArray lowLevelTransport = transport.split(';').first().split('/').last().toLower();
@@ -990,7 +990,7 @@ int QnRtspConnectionProcessor::composeSetup()
             }
         }
     }
-    d->response.headers.insert(nx_http::HttpHeader("Transport", transport));
+    d->response.headers.insert(nx::network::http::HttpHeader("Transport", transport));
     return CODE_OK;
 }
 
@@ -1028,7 +1028,7 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 void QnRtspConnectionProcessor::processRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
-    const auto rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
+    const auto rangeStr = nx::network::http::getHeaderValue(d->request.headers, "Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (!nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
         d->startTime = DATETIME_NOW;
@@ -1072,9 +1072,9 @@ void QnRtspConnectionProcessor::createDataProvider()
     const QUrlQuery urlQuery( d->request.requestLine.url.query() );
     QString speedStr = urlQuery.queryItemValue( "speed" );
     if( speedStr.isEmpty() )
-        speedStr = nx_http::getHeaderValue( d->request.headers, "Speed" );
+        speedStr = nx::network::http::getHeaderValue( d->request.headers, "Speed" );
 
-    const auto clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
+    const auto clientGuid = nx::network::http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
 
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
@@ -1256,11 +1256,11 @@ PlaybackMode QnRtspConnectionProcessor::getStreamingMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
+    if (!nx::network::http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
         return PlaybackMode::ThumbNails;
     else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
         return PlaybackMode::Live;
-    const bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+    const bool isExport = nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
     return isExport ? PlaybackMode::Export : PlaybackMode::Archive;
 }
 
@@ -1278,7 +1278,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     if (d->trackInfo.isEmpty())
     {
-        if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
+        if (nx::network::http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
@@ -1289,7 +1289,7 @@ int QnRtspConnectionProcessor::composePlay()
         if (videoLayout) {
             QString layoutStr = videoLayout->toString();
             if (!layoutStr.isEmpty())
-                d->response.headers.insert( std::make_pair(nx_http::StringType("x-video-layout"), layoutStr.toLatin1()) );
+                d->response.headers.insert( std::make_pair(nx::network::http::StringType("x-video-layout"), layoutStr.toLatin1()) );
         }
     }
     else if (d->useProprietaryFormat)
@@ -1298,7 +1298,7 @@ int QnRtspConnectionProcessor::composePlay()
     }
 
     d->prevTranscodeParams = d->transcodeParams;
-    d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
+    d->lastPlayCSeq = nx::network::http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
 
     QnVideoCameraPtr camera;
@@ -1406,7 +1406,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
-        QString sendMotion = nx_http::getHeaderValue(d->request.headers, "x-send-motion");
+        QString sendMotion = nx::network::http::getHeaderValue(d->request.headers, "x-send-motion");
 
         d->archiveDP->lock();
 
@@ -1419,7 +1419,7 @@ int QnRtspConnectionProcessor::composePlay()
         {
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
             d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
-            bool findIFrame = nx_http::getHeaderValue( d->request.headers, "x-no-find-iframe" ).isNull();
+            bool findIFrame = nx::network::http::getHeaderValue( d->request.headers, "x-no-find-iframe" ).isNull();
             d->archiveDP->setMarker(d->lastPlayCSeq);
             if (findIFrame)
                 d->archiveDP->jumpTo(d->startTime, 0);
@@ -1435,7 +1435,7 @@ int QnRtspConnectionProcessor::composePlay()
     else if (d->playbackMode == PlaybackMode::ThumbNails && d->thumbnailsDP)
     {
         d->thumbnailsDP->addDataProcessor(d->dataProcessor);
-        d->thumbnailsDP->setRange(d->startTime, d->endTime, nx_http::getHeaderValue(d->request.headers, "x-media-step").toLongLong(), d->lastPlayCSeq);
+        d->thumbnailsDP->setRange(d->startTime, d->endTime, nx::network::http::getHeaderValue(d->request.headers, "x-media-step").toLongLong(), d->lastPlayCSeq);
         d->thumbnailsDP->setQuality(d->quality);
     }
 
@@ -1650,7 +1650,7 @@ void QnRtspConnectionProcessor::run()
 
     if (!d->peerHasAccess)
     {
-        sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
         return;
     }
 
@@ -1687,7 +1687,7 @@ void QnRtspConnectionProcessor::run()
                 // text request
                 while (true)
                 {
-                    const auto msgLen = isFullMessage(d->clientRequest);
+                    const auto msgLen = isFullMessage(d->receiveBuffer);
                     if (msgLen < 0)
                         return;
 
@@ -1699,7 +1699,7 @@ void QnRtspConnectionProcessor::run()
                     parseRequest();
                     if (!d->peerHasAccess)
                     {
-                        sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+                        sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
                         return;
                     }
                     processRequest();

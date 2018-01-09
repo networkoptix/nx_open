@@ -24,7 +24,7 @@ class View
 {
 public:
     using MultiHttpServer =
-        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>;
+        network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
 
     View(
         const conf::Settings& settings,
@@ -36,15 +36,15 @@ public:
 
     void start();
 
-    std::vector<SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpEndpoints() const;
 
     const MultiHttpServer& httpServer() const;
 
 private:
     const conf::Settings& m_settings;
     Controller* m_controller;
-    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
-    nx_http::AuthMethodRestrictionList m_authRestrictionList;
+    nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
 
@@ -53,13 +53,13 @@ private:
 
     template<typename Handler, typename Arg>
     void registerApiHandler(
-        const nx_http::StringType& method,
+        const nx::network::http::StringType& method,
         Arg arg);
 
     template<typename Handler, typename Arg>
     void registerApiHandler(
         const char* path,
-        const nx_http::StringType& method,
+        const nx::network::http::StringType& method,
         Arg arg);
 
     void startAcceptor();

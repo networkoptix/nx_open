@@ -157,28 +157,28 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
     apiUrl.setUserName( auth.user() );
     apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/common/info.cgi") );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx_http::StatusCode::ok )
+            statusCode != nx::network::http::StatusCode::ok )
         {
             return completionHandler( false );
         }
 
         //msgBody contains parameters "param1=value1" each on its line
 
-        nx_http::LineSplitter lineSplitter;
+        nx::network::http::LineSplitter lineSplitter;
         QnByteArrayConstRef line;
         size_t bytesRead = 0;
         size_t dataOffset = 0;
-        while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(msgBody, dataOffset), &line, &bytesRead) )
+        while( lineSplitter.parseByLines( nx::network::http::ConstBufferRefType(msgBody, dataOffset), &line, &bytesRead) )
         {
             dataOffset += bytesRead;
             const int sepIndex = line.indexOf('=');
@@ -195,7 +195,7 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
         completionHandler( false );
     };
 
-    nx_http::downloadFileAsync(
+    nx::network::http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }

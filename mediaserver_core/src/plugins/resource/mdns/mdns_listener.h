@@ -37,8 +37,8 @@ public:
 private:
     static const std::chrono::seconds kRefreshTimeout;
 
-    QList<AbstractDatagramSocket*> m_socketList;
-    AbstractDatagramSocket* m_receiveSocket;
+    QList<nx::network::AbstractDatagramSocket*> m_socketList;
+    nx::network::AbstractDatagramSocket* m_receiveSocket;
     QElapsedTimer m_socketLifeTime;
     QStringList m_localAddressList;
     detail::ConsumerDataListPtr m_consumersData;
@@ -48,7 +48,7 @@ private:
     void readDataFromSocket();
     void deleteSocketList();
     QString getBestLocalAddress(const QString& remoteAddress);
-    void readSocketInternal(AbstractDatagramSocket* socket, const QString& localAddress);
+    void readSocketInternal(nx::network::AbstractDatagramSocket* socket, const QString& localAddress);
     bool needRefresh() const;
 };
 

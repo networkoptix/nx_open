@@ -2,7 +2,10 @@
 
 #include <nx/utils/move_only_func.h>
 
-namespace nx { namespace network { namespace aio { class AIOService; } } }
+namespace nx {
+namespace network {
+
+namespace aio { class AIOService; }
 
 /**
  * Abstract interface to interrupt asynchronous operation with completion notification.
@@ -41,3 +44,6 @@ protected:
         const nx::network::aio::AIOService* aioService,
         bool checkForLocks);
 };
+
+} // namespace network
+} // namespace nx

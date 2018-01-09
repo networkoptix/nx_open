@@ -193,7 +193,7 @@ void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QA
     resource->setVendor(manufacture());
     resource->setTypeId(m_eipFlirResTypeId);
     resource->setUrl(info.url.toString());
-    resource->setMAC(QnMacAddress(info.mac));
+    resource->setMAC(nx::network::QnMacAddress(info.mac));
     resource->setDefaultAuth(auth);
     resource->setFirmware(info.firmware);
 

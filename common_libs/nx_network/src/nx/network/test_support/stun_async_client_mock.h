@@ -1,10 +1,10 @@
-#ifndef STUN_ASYNC_CLIENT_MOCK_H
-#define STUN_ASYNC_CLIENT_MOCK_H
+#pragma once
 
 #include <gmock/gmock.h>
 #include <nx/network/stun/async_client.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace test {
 
@@ -90,8 +90,7 @@ private:
     }
 };
 
-} // test
-} // stun
-} // nx
-
-#endif // STUN_ASYNC_CLIENT_MOCK_H
+} // namespace test
+} // namespace stun
+} // namespace network
+} // namespace nx

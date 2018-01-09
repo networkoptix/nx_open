@@ -120,13 +120,15 @@ protected:
         RequestData requestData,
         CompletionHandlerType completionHandler)
     {
-        stun::Message request(stun::Header(stun::MessageClass::request, RequestData::kMethod));
+        using namespace nx::network;
+
+        network::stun::Message request(network::stun::Header(network::stun::MessageClass::request, RequestData::kMethod));
         requestData.serialize(&request);
 
         if (auto credentials = m_connector->getSystemCredentials())
         {
-            request.newAttribute<stun::extension::attrs::SystemId>(credentials->systemId);
-            request.newAttribute<stun::extension::attrs::ServerId>(credentials->serverId);
+            request.newAttribute<network::stun::extension::attrs::SystemId>(credentials->systemId);
+            request.newAttribute<network::stun::extension::attrs::ServerId>(credentials->serverId);
             request.insertIntegrity(credentials->systemId, credentials->key);
         }
 
@@ -139,14 +141,14 @@ private:
     AbstractCloudSystemCredentialsProvider* m_connector;
 };
 
-typedef MediatorServerConnection<stun::UdpClient> MediatorServerUdpConnection;
+typedef MediatorServerConnection<network::stun::UdpClient> MediatorServerUdpConnection;
 
 class NX_NETWORK_API MediatorServerTcpConnection:
-    public MediatorServerConnection<stun::AsyncClientUser>
+    public MediatorServerConnection<network::stun::AsyncClientUser>
 {
 public:
     MediatorServerTcpConnection(
-        std::shared_ptr<nx::stun::AbstractAsyncClient> stunClient,
+        std::shared_ptr<nx::network::stun::AbstractAsyncClient> stunClient,
         AbstractCloudSystemCredentialsProvider* connector);
 
     virtual ~MediatorServerTcpConnection() override;

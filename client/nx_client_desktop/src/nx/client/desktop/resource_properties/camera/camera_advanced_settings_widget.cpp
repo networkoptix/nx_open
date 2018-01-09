@@ -250,7 +250,7 @@ void CameraAdvancedSettingsWidget::reloadData()
         if (gateway->isSslEnabled())
         {
             gateway->enforceSslFor(
-                SocketAddress(currentServerUrl.host(), currentServerUrl.port()),
+                nx::network::SocketAddress(currentServerUrl.host(), currentServerUrl.port()),
                 currentServerUrl.scheme() == lit("https"));
         }
 

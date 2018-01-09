@@ -17,24 +17,24 @@ class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 public:
     QnProxyConnectionProcessor(
         ec2::TransactionMessageBusAdapter* messageBus,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     QnProxyConnectionProcessor(
         QnProxyConnectionProcessorPrivate* priv,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
 
-    static void cleanupProxyInfo(nx_http::Request* request);
+    static void cleanupProxyInfo(nx::network::http::Request* request);
 
     virtual ~QnProxyConnectionProcessor();
 protected:
     virtual void run() override;
 private:
     bool doProxyData(
-        AbstractStreamSocket* srcSocket,
-        AbstractStreamSocket* dstSocket,
+        nx::network::AbstractStreamSocket* srcSocket,
+        nx::network::AbstractStreamSocket* dstSocket,
         char* buffer,
         int bufferSize,
         bool* outSomeBytesRead);
@@ -50,7 +50,7 @@ private:
 
     /** Returns false if socket would block in blocking mode */
     bool readSocketNonBlock(
-        int* returnValue, AbstractStreamSocket* socket, void* buffer, int bufferSize);
+        int* returnValue, nx::network::AbstractStreamSocket* socket, void* buffer, int bufferSize);
 private:
     Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
 };

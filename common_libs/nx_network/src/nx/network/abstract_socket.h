@@ -18,13 +18,17 @@ namespace network {
 
 class Pollable;
 
-namespace aio {
+namespace aio { class AbstractAioThread; }
 
-class AbstractAioThread;
+namespace deprecated {
 
-} // namespace aio
-} // namespace network
-} // namespace nx
+constexpr static const std::chrono::milliseconds kDefaultConnectTimeout =
+    std::chrono::milliseconds(3000);
+
+} // namespace deprecated
+
+constexpr static const std::chrono::milliseconds kNoTimeout =
+    std::chrono::milliseconds::zero();
 
 /**
  * Base interface for sockets. Provides methods to set different socket configuration parameters.
@@ -219,26 +223,19 @@ class NX_NETWORK_API AbstractCommunicatingSocket:
     public AbstractSocket
 {
 public:
-    constexpr static const int kDefaultTimeoutMillis = 3000;
-    constexpr static const int kNoTimeout = 0;
-
     /**
      * Establish connection to specified foreign address.
      * @param remoteSocketAddress remote address (IP address or name) and port.
-     * @param timeoutMillis connection timeout, 0 - no timeout.
+     * @param timeout connection timeout, 0 - no timeout.
      * @return false if unable to establish connection.
      */
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
-
+        std::chrono::milliseconds timeout) = 0;
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis);
-    bool connect(
-        const SocketAddress& remoteSocketAddress,
-        std::chrono::milliseconds timeoutMillis);
+        std::chrono::milliseconds timeout);
     /**
      * Read into the given buffer up to bufferLen bytes data from this socket.
      * Call AbstractCommunicatingSocket::connect()
@@ -604,3 +601,6 @@ public:
     virtual bool leaveGroup(const QString &multicastGroup) = 0;
     virtual bool leaveGroup(const QString &multicastGroup, const QString& multicastIF) = 0;
 };
+
+} // namespace network
+} // namespace nx

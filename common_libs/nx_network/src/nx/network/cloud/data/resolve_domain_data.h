@@ -17,30 +17,30 @@ class NX_NETWORK_API ResolveDomainRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::resolveDomain;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::resolveDomain;
 
     nx::String domainName;
 
     ResolveDomainRequest(nx::String domainName_ = {});
 
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 class NX_NETWORK_API ResolveDomainResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::extension::methods::Value kMethod =
-        stun::extension::methods::resolveDomain;
+    constexpr static const network::stun::extension::methods::Value kMethod =
+        network::stun::extension::methods::resolveDomain;
 
     std::vector<nx::String> hostNames;
 
     ResolveDomainResponse(std::vector<nx::String> hostNames_ = {});
 
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

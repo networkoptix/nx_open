@@ -81,7 +81,7 @@ QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
     int bestIndex = 0;
     for (int i = 0; i < m_localAddressList.size(); ++i)
     {
-        int eq = strEqualAmount(
+        int eq = nx::network::strEqualAmount(
             m_localAddressList[i].toLatin1().constData(),
             remoteAddress.toLatin1().constData());
 
@@ -104,8 +104,8 @@ void QnMdnsListener::readDataFromSocket()
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        AbstractDatagramSocket* sock = m_socketList[i];
-        
+        nx::network::AbstractDatagramSocket* sock = m_socketList[i];
+
         // send request for next read
         QnMdnsPacket request;
         request.addQuery();
@@ -117,12 +117,12 @@ void QnMdnsListener::readDataFromSocket()
     m_lastRefreshTime = std::chrono::steady_clock::now();
 }
 
-void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, const QString& localAddress)
+void QnMdnsListener::readSocketInternal(nx::network::AbstractDatagramSocket* socket, const QString& localAddress)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
     {
-        SocketAddress remoteEndpoint;
+        nx::network::SocketAddress remoteEndpoint;
         int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint);
         if (datagramSize <= 0)
             continue;
@@ -141,12 +141,12 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, const QS
 void QnMdnsListener::updateSocketList()
 {
     deleteSocketList();
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
         std::unique_ptr<UDPSocket> sock( new UDPSocket(AF_INET) );
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
-        if( sock->bind( SocketAddress( iface.address.toString() ) ) )
+        if( sock->bind( nx::network::SocketAddress( iface.address.toString() ) ) )
         {
             sock->setMulticastIF(localAddress);
             m_socketList << sock.release();
@@ -154,9 +154,9 @@ void QnMdnsListener::updateSocketList()
         }
     }
 
-    m_receiveSocket = SocketFactory::createDatagramSocket().release();
+    m_receiveSocket = nx::network::SocketFactory::createDatagramSocket().release();
     m_receiveSocket->setReuseAddrFlag(true);
-    m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, MDNS_PORT ) );
+    m_receiveSocket->bind( nx::network::SocketAddress( nx::network::HostAddress::anyHost, MDNS_PORT ) );
 
     for (int i = 0; i < m_localAddressList.size(); ++i)
         m_receiveSocket->joinGroup(groupAddress, m_localAddressList[i]);
@@ -169,7 +169,7 @@ void QnMdnsListener::deleteSocketList()
     for (int i = 0; i < m_socketList.size(); ++i)
     {
         delete m_socketList[i];
-        if (m_receiveSocket) 
+        if (m_receiveSocket)
             m_receiveSocket->leaveGroup(groupAddress, m_localAddressList[i]);
     }
     m_socketList.clear();

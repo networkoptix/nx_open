@@ -230,11 +230,11 @@ void HanwhaTimeSyncronizer::doRequest(
             {
                 NX_DEBUG(this, lm("Failed request: %1").arg(url));
                 return handler(HanwhaResponse(
-                    nx_http::StatusCode::serviceUnavailable, url.toString()));
+                    nx::network::http::StatusCode::serviceUnavailable, url.toString()));
             }
 
             auto body = m_httpClient.fetchMessageBodyBuffer();
-            auto code = static_cast<nx_http::StatusCode::Value>(
+            auto code = static_cast<nx::network::http::StatusCode::Value>(
                 m_httpClient.response()->statusLine.statusCode);
 
             handler(HanwhaResponse(std::move(body), code, url.toString(), QString(), isList));

@@ -351,7 +351,12 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
                 lm("Starting metadata fetching for resource %1. Event list is %2")
                     .args(resourceId, eventTypeIds));
 
-            auto result = data.manager->startFetchingMetadata(); //< TODO: #dmishin pass event types.
+            std::vector<nxpl::NX_GUID> eventTypeList;
+            for (const auto& eventTypeId: eventTypeIds)
+                eventTypeList.push_back(nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122()));
+            auto result = data.manager->startFetchingMetadata(
+                !eventTypeList.empty() ? &eventTypeList[0] : nullptr,
+                eventTypeList.size()); //< TODO: #dmishin pass event types.
 
             if (result != Error::noError)
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));

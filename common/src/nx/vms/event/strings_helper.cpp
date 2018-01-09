@@ -96,6 +96,7 @@ QString StringsHelper::actionName(ActionType value) const
         case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
         case execHttpRequestAction:   return tr("Do HTTP request");
         case acknowledgeAction:       return tr("Acknowledge");
+        case openLayoutAction:        return tr("Open layout");
 
         case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -626,7 +627,7 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
     if (const auto& connection = camera->commonModule()->ec2Connection())
     {
         auto appServerUrl = connection->connectionInfo().ecUrl;
-        if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+        if (appServerUrl.host().isEmpty() || nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
         {
             appServerUrl = server->getApiUrl();
             if (isPublic)

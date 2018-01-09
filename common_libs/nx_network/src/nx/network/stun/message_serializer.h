@@ -11,6 +11,7 @@
 #include "../connection_server/base_protocol_message_types.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -112,4 +113,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

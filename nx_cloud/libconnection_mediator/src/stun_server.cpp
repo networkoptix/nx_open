@@ -10,18 +10,23 @@
 namespace nx {
 namespace hpm {
 
-StunServer::StunServer(const conf::Settings& settings):
+StunServer::StunServer(
+    const conf::Settings& settings,
+    http::Server* httpServer)
+    :
     m_settings(settings),
     m_stunOverHttpServer(&m_stunMessageDispatcher),
-    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::SocketServer>>(
+    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
         nx::network::NatTraversalSupport::disabled)),
-    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::UdpServer>>(
+    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::UdpServer>>(
         &m_stunMessageDispatcher))
 {
     if (!bind())
         throw std::runtime_error("Error binding to specified STUN address");
+
+    initializeHttpTunnelling(httpServer);
 }
 
 void StunServer::listen()
@@ -47,15 +52,15 @@ void StunServer::listen()
 void StunServer::stopAcceptingNewRequests()
 {
     m_tcpStunServer->pleaseStopSync();
-    m_udpStunServer->forEachListener(&stun::UdpServer::stopReceivingMessagesSync);
+    m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
 }
 
-const std::vector<SocketAddress>& StunServer::endpoints() const
+const std::vector<network::SocketAddress>& StunServer::endpoints() const
 {
     return m_endpoints;
 }
 
-nx::stun::MessageDispatcher& StunServer::dispatcher()
+network::stun::MessageDispatcher& StunServer::dispatcher()
 {
     return m_stunMessageDispatcher;
 }
@@ -76,7 +81,7 @@ bool StunServer::bind()
     }
 
     m_tcpStunServer->forEachListener(
-        [this](stun::SocketServer* server)
+        [this](network::stun::SocketServer* server)
         {
             server->setConnectionInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
         });

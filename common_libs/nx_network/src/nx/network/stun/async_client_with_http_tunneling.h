@@ -14,6 +14,7 @@
 #include "async_client.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -26,7 +27,6 @@ class NX_NETWORK_API AsyncClientWithHttpTunneling:
 
 public:
     AsyncClientWithHttpTunneling(Settings settings = Settings());
-    ~AsyncClientWithHttpTunneling();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -81,7 +81,7 @@ private:
 
     Settings m_settings;
     std::unique_ptr<AsyncClient> m_stunClient;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     ConnectHandler m_connectHandler;
     /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
@@ -104,7 +104,7 @@ private:
     void createStunClient(
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
-    void dispatchIndication(nx::stun::Message indication);
+    void dispatchIndication(nx::network::stun::Message indication);
     void sendPendingRequests();
 
     void openHttpTunnel(
@@ -115,7 +115,7 @@ private:
 
     void onRequestCompleted(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message response,
+        nx::network::stun::Message response,
         int requestId);
 
     void onConnectionClosed(SystemError::ErrorCode closeReason);
@@ -125,4 +125,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

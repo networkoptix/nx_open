@@ -38,14 +38,19 @@ void Server::listen()
         .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
 }
 
-nx_http::server::rest::MessageDispatcher& Server::messageDispatcher()
+void Server::stopAcceptingNewRequests()
+{
+    m_multiAddressHttpServer->pleaseStopSync();
+}
+
+nx::network::http::server::rest::MessageDispatcher& Server::messageDispatcher()
 {
     return *m_httpMessageDispatcher;
 }
 
-std::vector<SocketAddress> Server::httpEndpoints() const
+std::vector<network::SocketAddress> Server::endpoints() const
 {
-    return m_httpEndpoints;
+    return m_endpoints;
 }
 
 bool Server::launchHttpServerIfNeeded(
@@ -55,7 +60,7 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_LOGX("Bringing up HTTP server", cl_logINFO);
 
-    m_httpMessageDispatcher = std::make_unique<nx_http::server::rest::MessageDispatcher>();
+    m_httpMessageDispatcher = std::make_unique<nx::network::http::server::rest::MessageDispatcher>();
 
     // Registering HTTP handlers.
     m_httpMessageDispatcher->registerRequestProcessor<http::GetListeningPeerListHandler>(
@@ -63,7 +68,7 @@ bool Server::launchHttpServerIfNeeded(
         [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
 
     m_multiAddressHttpServer =
-        std::make_unique<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+        std::make_unique<nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>>(
             nullptr, //< TODO: #ak Add authentication.
             m_httpMessageDispatcher.get(),
             /*ssl required*/ false,
@@ -77,9 +82,9 @@ bool Server::launchHttpServerIfNeeded(
         return false;
     }
 
-    m_httpEndpoints = m_multiAddressHttpServer->endpoints();
+    m_endpoints = m_multiAddressHttpServer->endpoints();
     m_multiAddressHttpServer->forEachListener(
-        [&settings](nx_http::HttpStreamSocketServer* server)
+        [&settings](nx::network::http::HttpStreamSocketServer* server)
         {
             server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
         });

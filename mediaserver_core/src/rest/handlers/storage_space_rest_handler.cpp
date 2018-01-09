@@ -75,7 +75,7 @@ int QnStorageSpaceRestHandler::executeGet(
     reply.storageProtocols = getStorageProtocols();
 
     result.setReply(reply);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const

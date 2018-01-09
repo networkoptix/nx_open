@@ -167,11 +167,11 @@ public:
 
     virtual bool tryRead(nx::Buffer* const dataBuffer, std::size_t maxBytesToRead) override;
 
-    void setByteRange(const nx_http::header::ContentRange& range);
+    void setByteRange(const nx::network::http::header::ContentRange& range);
     void waitForSomeDataAvailable();
 
 private:
     StreamingChunk* m_chunk;
     StreamingChunk::SequentialReadingContext m_readCtx;
-    boost::optional<nx_http::header::ContentRange> m_range;
+    boost::optional<nx::network::http::header::ContentRange> m_range;
 };

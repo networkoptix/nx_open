@@ -43,7 +43,7 @@ namespace ec2
 
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
         QnTransactionMessageBus* messageBus,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner )
     :
         QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner)
@@ -96,17 +96,17 @@ namespace ec2
                 break;
             }
 
-            if( d->request.requestLine.method != nx_http::Method::post &&
-                d->request.requestLine.method != nx_http::Method::put )
+            if( d->request.requestLine.method != nx::network::http::Method::post &&
+                d->request.requestLine.method != nx::network::http::Method::put )
             {
-                sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+                sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
                 break;
             }
 
             auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
             if( connectionGuidIter == d->request.headers.end() )
             {
-                sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+                sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
                 break;
             }
 
@@ -119,7 +119,7 @@ namespace ec2
             else if( requestConnectionGuid != connectionGuid )
             {
                 //not allowing to use TCP same connection for multiple transaction connections
-                sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+                sendResponse( nx::network::http::StatusCode::forbidden, nx::network::http::StringType() );
                 break;
             }
 
@@ -130,13 +130,13 @@ namespace ec2
             {
                 NX_LOG( lit("QnHttpTransactionReceiver. Received transaction from %1 for unknown connection %2").
                     arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()), cl_logWARNING );
-                sendResponse( nx_http::StatusCode::notFound, nx_http::StringType() );
+                sendResponse( nx::network::http::StatusCode::notFound, nx::network::http::StringType() );
                 break;
             }
 
             //checking whether connection persistent or not...
             bool closeConnection = true;
-            if( d->request.requestLine.version == nx_http::http_1_1 )
+            if( d->request.requestLine.version == nx::network::http::http_1_1 )
             {
                 closeConnection = false;
                 auto connectionHeaderIter = d->request.headers.find( "Connection" );
@@ -149,7 +149,7 @@ namespace ec2
                 }
             }
 
-            sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
+            sendResponse( nx::network::http::StatusCode::ok, nx::network::http::StringType() );
 
             if( closeConnection )
                 break;

@@ -64,7 +64,7 @@ namespace {
     };
 
     static void getAddresses(const QnMediaServerResourcePtr &server, QSet<nx::utils::Url> &autoUrls, QSet<nx::utils::Url> &additionalUrls, QSet<nx::utils::Url> &ignoredUrls) {
-        for (const SocketAddress &address: server->getNetAddrList()) {
+        for (const nx::network::SocketAddress &address: server->getNetAddrList()) {
             nx::utils::Url url;
             url.setScheme(lit("http"));
             url.setHost(address.address.toString());

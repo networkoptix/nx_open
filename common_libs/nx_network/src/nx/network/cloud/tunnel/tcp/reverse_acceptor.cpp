@@ -43,7 +43,7 @@ private:
 ReverseAcceptor::ReverseAcceptor(ConnectHandler connectHandler):
     m_connectHandler(std::move(connectHandler)),
     m_httpServer(
-        new nx_http::HttpStreamSocketServer(
+        new nx::network::http::HttpStreamSocketServer(
             nullptr, &m_httpMessageDispatcher, false, // TODO: think about SSL?
             NatTraversalSupport::disabled))
 {
@@ -70,12 +70,12 @@ bool ReverseAcceptor::start(
         bindToAioThread(aioThread);
 
     auto registration = m_httpMessageDispatcher.registerRequestProcessor<NxRcHandler>(
-        nx_http::kAnyPath,
+        nx::network::http::kAnyPath,
         [this]() -> std::unique_ptr<NxRcHandler>
         {
             return std::make_unique<NxRcHandler>(this);
         },
-        nx_http::StringType("OPTIONS"));
+        nx::network::http::StringType("OPTIONS"));
 
     NX_CRITICAL(registration);
     return m_httpServer->bind(address) && m_httpServer->listen();
@@ -109,7 +109,7 @@ void ReverseAcceptor::stopWhileInAioThread()
     m_httpServer->pleaseStopSync();
 }
 
-void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
+void ReverseAcceptor::fillNxRcHeaders(nx::network::http::HttpHeaders* headers) const
 {
     headers->emplace(kNxRcHostName, m_selfHostName);
     QnMutexLocker lk(&m_dataMutex);
@@ -121,7 +121,7 @@ void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
         headers->emplace(kNxRcKeepAliveOptions, m_keepAliveOptions->toString().toUtf8());
 }
 
-void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnection* connection)
+void ReverseAcceptor::saveConnection(String hostName, nx::network::http::HttpServerConnection* connection)
 {
     auto socket = std::make_unique<AcceptedReverseConnection>(
         hostName,
@@ -156,19 +156,19 @@ ReverseAcceptor::NxRcHandler::NxRcHandler(ReverseAcceptor* acceptor):
 }
 
 void ReverseAcceptor::NxRcHandler::processRequest(
-    nx_http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const connection,
     nx::utils::stree::ResourceContainer,
-    nx_http::Request request,
-    nx_http::Response* const response,
-    nx_http::RequestProcessedHandler handler)
+    nx::network::http::Request request,
+    nx::network::http::Response* const response,
+    nx::network::http::RequestProcessedHandler handler)
 {
     auto connectionIt = request.headers.find(kConnection);
     if (connectionIt == request.headers.end() || connectionIt->second != kUpgrade)
-        return handler(nx_http::StatusCode::notAcceptable);
+        return handler(nx::network::http::StatusCode::notAcceptable);
 
     auto upgradeIt = request.headers.find(kUpgrade);
     if (upgradeIt == request.headers.end() || !upgradeIt->second.startsWith(kNxRc))
-        return handler(nx_http::StatusCode::notImplemented);
+        return handler(nx::network::http::StatusCode::notImplemented);
 
     String upgrade = upgradeIt->second + ", ";
     request.requestLine.version.serialize(&upgrade);
@@ -177,7 +177,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
 
     auto hostNameIt = request.headers.find(kNxRcHostName);
     if (hostNameIt == request.headers.end() || hostNameIt->second.isEmpty())
-        return handler(nx_http::StatusCode::badRequest);
+        return handler(nx::network::http::StatusCode::badRequest);
 
     NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
     connection->setSendCompletionHandler(
@@ -189,7 +189,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
         });
 
     m_acceptor->fillNxRcHeaders(&response->headers);
-    handler(nx_http::StatusCode::switchingProtocols);
+    handler(nx::network::http::StatusCode::switchingProtocols);
 }
 
 } // namespace tcp

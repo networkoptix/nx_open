@@ -124,8 +124,8 @@ CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSu
 }
 
 Qn::AuthResult CloudUserInfoPool::authenticate(
-    const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authHeader) const
+    const nx::network::http::Method::ValueType& method,
+    const nx::network::http::header::Authorization& authHeader) const
 {
     const QByteArray userName = authHeader.userid().toLower();
     const auto nonce = authHeader.digest->params["nonce"];
@@ -144,8 +144,8 @@ Qn::AuthResult CloudUserInfoPool::authenticate(
     if (!intermediateResponse)
         return Qn::Auth_WrongLogin;
 
-    const auto ha2 = nx_http::calcHa2(method, authHeader.digest->params["uri"]);
-    const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
+    const auto ha2 = nx::network::http::calcHa2(method, authHeader.digest->params["uri"]);
+    const auto calculatedResponse = nx::network::http::calcResponseFromIntermediate(
         *intermediateResponse,
         cloudNonce.size(),
         nonceTrailer,

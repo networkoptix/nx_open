@@ -35,7 +35,7 @@ namespace
 
 QString Nx1::getMac()
 {
-    return getMacFromPrimaryIF().replace(QLatin1Char('-'), QLatin1Char(':'));
+    return nx::network::getMacFromPrimaryIF().replace(QLatin1Char('-'), QLatin1Char(':'));
 }
 
 QString Nx1::getSerial()

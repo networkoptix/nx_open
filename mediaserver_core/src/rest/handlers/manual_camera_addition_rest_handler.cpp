@@ -34,6 +34,10 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
+    QElapsedTimer timer;
+    timer.restart();
+    NX_LOG(this, lm("Start searching new cameras"), cl_logDEBUG1);
+
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
     auth.setPassword(params.value("password", "admin"));
@@ -44,7 +48,10 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     int port = params.value("port").toInt();
 
     if (addr1.isNull())
+    {
+        NX_LOG(this, lm("Invalid parameter 'start_ip'."), cl_logWARNING);
         return CODE_INVALID_PARAMETER;
+    }
 
     if (addr2 == addr1)
         addr2.clear();
@@ -70,7 +77,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
-
+    NX_LOG(this, lm("Finish searching new cameras. Working time=%1ms").arg(timer.elapsed()), cl_logDEBUG1);
     return CODE_OK;
 }
 

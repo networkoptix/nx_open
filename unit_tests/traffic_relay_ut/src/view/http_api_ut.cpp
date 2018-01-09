@@ -267,7 +267,7 @@ protected:
         m_httpClient = std::make_unique<GetStatisticsHttpClient>(
             nx::network::url::Builder(basicUrl())
                 .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
-            nx_http::AuthInfo());
+            nx::network::http::AuthInfo());
         m_httpClient->execute(
             std::bind(&HttpApiStatistics::saveStatisticsRequestResult, this, _1, _2, _3));
     }
@@ -280,7 +280,7 @@ protected:
 
 private:
     using GetStatisticsHttpClient =
-        nx_http::FusionDataHttpClient<void, nx::cloud::relay::Statistics>;
+        nx::network::http::FusionDataHttpClient<void, nx::cloud::relay::Statistics>;
 
     std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
     nx::utils::SyncQueue<nx::cloud::relay::Statistics> m_receivedStatistics;
@@ -315,12 +315,12 @@ private:
 
     void saveStatisticsRequestResult(
         SystemError::ErrorCode /*systemErrorCode*/,
-        const nx_http::Response* response,
+        const nx::network::http::Response* response,
         nx::cloud::relay::Statistics statistics)
     {
         onRequestCompletion(
             response
-            ? api::fromHttpStatusCode(static_cast<nx_http::StatusCode::Value>(
+            ? api::fromHttpStatusCode(static_cast<nx::network::http::StatusCode::Value>(
                 response->statusLine.statusCode))
             : api::ResultCode::networkError);
         m_receivedStatistics.push(std::move(statistics));

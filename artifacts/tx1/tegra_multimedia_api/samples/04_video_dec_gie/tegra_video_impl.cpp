@@ -39,6 +39,8 @@ public:
 
 private:
     bool processRectsFromAdditionalDetectors();
+    void updateMinAndMaxPts(int64_t ptsUs);
+    void writeRects(const Rect rects[], int rectCount, int64_t ptsUs);
 
     std::string m_id;
     std::string m_modelFile;
@@ -50,6 +52,10 @@ private:
     std::vector<std::unique_ptr<Detector>> m_detectors;
     int64_t m_inFrameCounter = 0;
     std::mutex m_mutex;
+    int64_t m_prevPtsUs = 0;
+    int64_t m_minPtsUs = INT64_MAX;
+    int64_t m_maxPtsUs = INT64_MIN;
+    int64_t m_incrementOfMaxPts = 0;
 };
 
 Impl::Impl()
@@ -190,7 +196,7 @@ bool Impl::processRectsFromAdditionalDetectors()
 }
 
 bool Impl::pullRectsForFrame(
-    Rect outRects[], int maxRectCount, int* outRectCount, int64_t* outPtsUs)
+    Rect outRects[], int maxRectCount, int* const outRectCount, int64_t* const outPtsUs)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     if (!outRects || !outPtsUs)
@@ -209,6 +215,8 @@ bool Impl::pullRectsForFrame(
     }
 
     const auto rectsFromGie = m_detectors.front()->getRectangles(outPtsUs);
+
+    updateMinAndMaxPts(*outPtsUs);
 
     if (rectsFromGie.size() > maxRectCount)
     {
@@ -230,15 +238,39 @@ bool Impl::pullRectsForFrame(
     }
 
     if (ini().rectanglesFilePrefix[0])
-    {
-        writeRectsToFile(
-            ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", *outPtsUs),
-            outRects,
-            *outRectCount);
-    }
+        writeRects(outRects, *outRectCount, *outPtsUs);
 
     NX_OUTPUT << __func__ << "() END -> true";
     return true;
+}
+
+void Impl::updateMinAndMaxPts(int64_t ptsUs)
+{
+    if (ptsUs > m_maxPtsUs)
+    {
+        m_maxPtsUs = ptsUs;
+        m_incrementOfMaxPts = m_maxPtsUs - m_prevPtsUs;
+    }
+    m_minPtsUs = std::min(ptsUs, m_minPtsUs);
+    m_prevPtsUs = ptsUs;
+}
+
+void Impl::writeRects(const Rect outRects[], int rectCount, int64_t ptsUs)
+{
+    const bool noPrevFile = writeRectsToFile(
+        ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", ptsUs),
+        outRects, rectCount);
+
+    if (noPrevFile)
+        return;
+    // A frame with the same pts was already saved - detect looping and save the modulus.
+
+    // Assume the interval between the last and the first frame of the loop equal to the interval
+    // between the frame with the maximum pts and its previous frame.
+    const int64_t ptsModulusUs = m_maxPtsUs - m_minPtsUs + m_incrementOfMaxPts;
+
+    writeModulusToFile(std::string(ini().rectanglesFilePrefix) + "modulus.txt", ptsModulusUs);
+    // Ignore the returned value - error already logged.
 }
 
 bool Impl::hasMetadata() const

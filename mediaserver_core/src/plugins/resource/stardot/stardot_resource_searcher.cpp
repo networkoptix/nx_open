@@ -35,12 +35,12 @@ QnResourceList QnStardotResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
         if (shouldStop())
             return QnResourceList();
 
-        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
+        std::unique_ptr<nx::network::AbstractDatagramSocket> sock( nx::network::SocketFactory::createDatagramSocket() );
 
         //if (!bindToInterface(sock, iface))
         //    continue;
@@ -52,7 +52,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
         datagram.append('\0');
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, STARDOT_DISCOVERY_PORT);
+            sock->sendTo(datagram.data(), datagram.size(), nx::network::BROADCAST_ADDRESS, STARDOT_DISCOVERY_PORT);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -65,9 +65,9 @@ QnResourceList QnStardotResourceSearcher::findResources()
             while (sock->hasData())
             {
                 QByteArray datagram;
-                datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+                datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-                SocketAddress senderEndpoint;
+                nx::network::SocketAddress senderEndpoint;
                 int readed = sock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
                 if (readed < 1)
                     continue;
@@ -113,7 +113,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 resource->setTypeId(typeId);
 
                 resource->setHostAddress(senderEndpoint.address.toString());
-                resource->setMAC(QnMacAddress(mac));
+                resource->setMAC(nx::network::QnMacAddress(mac));
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));
 
@@ -249,7 +249,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const nx::utils::U
     res->setTypeId(rt);
     res->setName(model);
     res->setModel(model);
-    res->setMAC(QnMacAddress(mac));
+    res->setMAC(nx::network::QnMacAddress(mac));
     res->setHostAddress(host);
     res->setDefaultAuth(auth);
 

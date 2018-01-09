@@ -17,11 +17,11 @@
 
 namespace {
 
-bool isResponseOK(const nx_http::HttpClient& client)
+bool isResponseOK(const nx::network::http::HttpClient& client)
 {
     if (!client.response())
         return false;
-    return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+    return client.response()->statusLine.statusCode == nx::network::http::StatusCode::ok;
 }
 
 const int requestTimeoutMs = 10000;
@@ -44,10 +44,10 @@ int QnGetNonceRestHandler::executeGet(
         if (m_remotePath.isEmpty())
         {
             result.setError(QnRestResult::InvalidParameter, "Parameter url is forbidden");
-            return nx_http::StatusCode::forbidden;
+            return nx::network::http::StatusCode::forbidden;
         }
 
-        nx_http::HttpClient client;
+        nx::network::http::HttpClient client;
         client.setResponseReadTimeoutMs(requestTimeoutMs);
         client.setSendTimeoutMs(requestTimeoutMs);
         client.setMessageBodyReadTimeoutMs(requestTimeoutMs);
@@ -58,15 +58,15 @@ int QnGetNonceRestHandler::executeGet(
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
             result.setError(QnRestResult::CantProcessRequest, "Destination server unreachable");
-            return nx_http::StatusCode::ok;
+            return nx::network::http::StatusCode::ok;
         }
 
-        nx_http::BufferType data;
+        nx::network::http::BufferType data;
         while (!client.eof())
             data.append(client.fetchMessageBodyBuffer());
 
         result = QJson::deserialized<QnJsonRestResult>(data);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     QnGetNonceReply reply;
@@ -86,5 +86,5 @@ int QnGetNonceRestHandler::executeGet(
     }
 
     result.setReply(reply);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

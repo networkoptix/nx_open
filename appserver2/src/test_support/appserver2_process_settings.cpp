@@ -50,9 +50,9 @@ int Settings::moduleInstance() const
     return m_settings.value("moduleInstance").toInt();
 }
 
-SocketAddress Settings::endpoint() const
+nx::network::SocketAddress Settings::endpoint() const
 {
-    return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
+    return nx::network::SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
 }
 
 QnUuid Settings::moduleGuid() const

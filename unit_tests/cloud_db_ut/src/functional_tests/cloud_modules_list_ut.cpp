@@ -145,7 +145,7 @@ protected:
             fetcher.addAdditionalHttpHeaderForGetRequest(header.first, header.second);
         nx::utils::promise<void> done;
         auto completionHandler =
-            [this, &done](nx_http::StatusCode::Value statusCode, nx::utils::Url moduleUrl)
+            [this, &done](nx::network::http::StatusCode::Value statusCode, nx::utils::Url moduleUrl)
             {
                 m_fetchUrlResult = {statusCode, moduleUrl};
                 done.set_value();
@@ -160,20 +160,20 @@ protected:
 
     void assertHostHasBeenTakenFromHttpRequest()
     {
-        ASSERT_EQ(nx_http::StatusCode::ok, m_fetchUrlResult.first);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, m_fetchUrlResult.first);
         ASSERT_EQ(m_expectedHost, m_fetchUrlResult.second.host());
     }
 
     void assertModuleUrlHasBeenSuccessfullyReported()
     {
-        ASSERT_EQ(nx_http::StatusCode::ok, m_fetchUrlResult.first);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, m_fetchUrlResult.first);
         ASSERT_FALSE(m_fetchUrlResult.second.host().isEmpty());
         ASSERT_FALSE(m_fetchUrlResult.second.scheme().isEmpty());
     }
 
 private:
     QString m_expectedHost;
-    std::pair<nx_http::StatusCode::Value, nx::utils::Url> m_fetchUrlResult;
+    std::pair<nx::network::http::StatusCode::Value, nx::utils::Url> m_fetchUrlResult;
     std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeaders;
 
     void init()

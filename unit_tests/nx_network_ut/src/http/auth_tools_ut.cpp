@@ -3,7 +3,9 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace test {
 
 TEST(HttpAuthDigest, partialResponse_test)
@@ -16,15 +18,15 @@ TEST(HttpAuthDigest, partialResponse_test)
     const char method[] = "GET";
     const char uri[] = "/get_all";
 
-    const auto ha1 = nx_http::calcHa1(username, realm, password);
-    const auto ha2 = nx_http::calcHa2(method, uri);
-    const auto response = nx_http::calcResponse(
+    const auto ha1 = nx::network::http::calcHa1(username, realm, password);
+    const auto ha2 = nx::network::http::calcHa2(method, uri);
+    const auto response = nx::network::http::calcResponse(
         ha1,
         QByteArray(nonce)+QByteArray(nonceTrailer),
         ha2);
 
-    const auto partialResponce = nx_http::calcIntermediateResponse(ha1, nonce);
-    const auto responseFromPartial = nx_http::calcResponseFromIntermediate(
+    const auto partialResponce = nx::network::http::calcIntermediateResponse(ha1, nonce);
+    const auto responseFromPartial = nx::network::http::calcResponseFromIntermediate(
         partialResponce,
         sizeof(nonce) - 1,
         nonceTrailer,
@@ -78,4 +80,6 @@ TEST(HttpAuthDigest, calcDigestResponse)
 }
 
 } // namespace test
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

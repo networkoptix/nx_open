@@ -13,9 +13,9 @@ namespace discovery {
 
 struct ModuleEndpoint: QnModuleInformation
 {
-    SocketAddress endpoint;
+    nx::network::SocketAddress endpoint;
 
-    ModuleEndpoint(QnModuleInformation old = {}, SocketAddress endpoint = {});
+    ModuleEndpoint(QnModuleInformation old = {}, nx::network::SocketAddress endpoint = {});
     bool operator==(const ModuleEndpoint& rhs) const;
 };
 
@@ -43,7 +43,7 @@ public:
     void stop();
 
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
-    boost::optional<SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
+    boost::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
     boost::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
 
     /**
@@ -55,7 +55,7 @@ public:
      *     address in use is disconnected. If expectedId is not scpecified, the endpoint will be
      *     pinged just once.
      */
-    void checkEndpoint(SocketAddress endpoint, QnUuid expectedId = QnUuid());
+    void checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId = QnUuid());
     void checkEndpoint(const nx::utils::Url &url, QnUuid expectedId = QnUuid());
 
     template<typename Ptr, typename Found, typename Changed, typename Lost>

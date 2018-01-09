@@ -59,9 +59,9 @@ int QnPingSystemRestHandler::executeGet(
         moduleInformation = remoteModuleInformation(url, getKey, status);
         if (status != CL_HTTP_SUCCESS)
         {
-            if (status == nx_http::StatusCode::unauthorized)
+            if (status == nx::network::http::StatusCode::unauthorized)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
-            else if (status == nx_http::StatusCode::forbidden)
+            else if (status == nx::network::http::StatusCode::forbidden)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
             else
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));

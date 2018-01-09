@@ -83,12 +83,12 @@ private:
     {
         auto requestCompletionFunc =
             [context, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode,
-                nx_http::BufferType msgBody )
+                nx::network::http::BufferType msgBody )
             {
                 vms::event::ActionDataList remoteData;
                 bool success = false;
 
-                if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+                if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
                 {
                     remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
                     NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
@@ -164,5 +164,5 @@ int QnMultiserverEventsRestHandler::executeGet(
     QnFusionRestHandlerDetail::serializeRestReply(outputData,
         params, result, contentType, restResult);
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

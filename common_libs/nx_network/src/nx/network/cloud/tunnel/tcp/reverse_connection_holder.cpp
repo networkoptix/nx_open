@@ -88,11 +88,14 @@ size_t ReverseConnectionHolder::socketCount() const
     return m_socketCount;
 }
 
+// Code here is not written to work without timeout.
+// So, instead of "no timeout" using timeout that is unusually large for sockets.
+static const std::chrono::milliseconds kInfiniteTimeoutEmulation(std::chrono::hours(2));
+
 void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Handler handler)
 {
-    // TODO: #ak Generally, zero timeout for socket operations means "no timeout".
-    // Here it isn't so. But I'm not sure that making it so will not cause problems.
-    // Have to investigate.
+    if (timeout == nx::network::kNoTimeout)
+        timeout = kInfiniteTimeoutEmulation;
 
     post(
         [this, expirationTime = std::chrono::steady_clock::now() + timeout,

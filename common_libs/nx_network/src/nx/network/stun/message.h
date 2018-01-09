@@ -26,6 +26,7 @@
 
 //!Implementation of STUN protocol (rfc5389)
 namespace nx {
+namespace network {
 namespace stun {
 
 class MessageParserBuffer;
@@ -178,4 +179,5 @@ public:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

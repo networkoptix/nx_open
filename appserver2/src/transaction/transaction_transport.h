@@ -1,5 +1,9 @@
-
 #pragma once
+
+#include <transaction/transaction.h>
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
+#include <transaction/transaction_transport_header.h>
 
 #include "transaction_descriptor.h"
 #include "transaction_transport_base.h"
@@ -20,9 +24,9 @@ public:
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
-        const nx_http::Request& request,
+        const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
@@ -137,7 +141,7 @@ public:
     }
 protected:
     virtual void fillAuthInfo(
-        const nx_http::AsyncHttpClientPtr& httpClient,
+        const nx::network::http::AsyncHttpClientPtr& httpClient,
         bool authByKey) override;
 
 private:

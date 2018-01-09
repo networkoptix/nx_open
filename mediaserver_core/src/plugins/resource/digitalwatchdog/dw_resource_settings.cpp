@@ -209,7 +209,7 @@ void QnPravisCameraProxy::addToFlatParams(const QnCameraAdvancedParamGroup& grou
         m_flatParams.insert(param.id, param);
 }
 
-QString parseParamFromHttpResponse(const QnCameraAdvancedParameter& cameraAdvParam, nx_http::BufferType msgBody)
+QString parseParamFromHttpResponse(const QnCameraAdvancedParameter& cameraAdvParam, nx::network::http::BufferType msgBody)
 {
     // camera returns result as human readable page. The page format depends on parameter name.
     // There are two different formats so far. Param value follows after the prefix
@@ -254,12 +254,12 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
-        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType msgBody)
+        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx::network::http::StringType, nx::network::http::BufferType msgBody)
         {
             {
                 QnMutexLocker lock(&waitMutex);
                 QnCameraAdvancedParamValue param;
-                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty())
+                if (statusCode == nx::network::http::StatusCode::ok && !msgBody.isEmpty())
                     param.value = fromInnerValue(cameraAdvParam, parseParamFromHttpResponse(cameraAdvParam, msgBody));
                 else
                     qWarning() << "error reading param" << cameraAdvParam.id << "for camera" << m_host;
@@ -270,11 +270,11 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             waitCond.wakeAll();
         };
 
-        nx_http::AsyncHttpClient::Timeouts timeouts;
+        nx::network::http::AsyncHttpClient::Timeouts timeouts;
         timeouts.responseReadTimeout = std::chrono::milliseconds(kHttpReadTimeout);
-        nx_http::downloadFileAsyncEx(
-            apiUrl, requestCompletionFunc, nx_http::HttpHeaders(),
-            nx_http::AuthType::authBasicAndDigest, std::move(timeouts));
+        nx::network::http::downloadFileAsyncEx(
+            apiUrl, requestCompletionFunc, nx::network::http::HttpHeaders(),
+            nx::network::http::AuthType::authBasicAndDigest, std::move(timeouts));
         ++workers;
     }
     while (workers > 0)
@@ -340,11 +340,11 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
-        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType msgBody)
+        auto requestCompletionFunc = [&](SystemError::ErrorCode, int statusCode, nx::network::http::StringType, nx::network::http::BufferType msgBody)
         {
             {
                 QnMutexLocker lock(&waitMutex);
-                if (statusCode == nx_http::StatusCode::ok &&  httpResultErrCode(msgBody) == kNoError)
+                if (statusCode == nx::network::http::StatusCode::ok &&  httpResultErrCode(msgBody) == kNoError)
                 {
                     QnCameraAdvancedParamValue param;
                     param.value = value;
@@ -360,11 +360,11 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
             waitCond.wakeAll();
         };
 
-        nx_http::AsyncHttpClient::Timeouts timeouts;
+        nx::network::http::AsyncHttpClient::Timeouts timeouts;
         timeouts.responseReadTimeout = std::chrono::milliseconds(kHttpReadTimeout);
-        nx_http::downloadFileAsyncEx(
-            apiUrl, requestCompletionFunc, nx_http::HttpHeaders(),
-            nx_http::AuthType::authBasicAndDigest, std::move(timeouts));
+        nx::network::http::downloadFileAsyncEx(
+            apiUrl, requestCompletionFunc, nx::network::http::HttpHeaders(),
+            nx::network::http::AuthType::authBasicAndDigest, std::move(timeouts));
         ++workers;
     }
     while (workers > 0)

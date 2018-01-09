@@ -1,5 +1,6 @@
 set(_withMediaServer ON)
 set(_withTrayTool OFF)
+set(_withNxTool OFF)
 set(_withDesktopClient ON)
 set(_withMobileClient ON)
 set(_withClouds ON)
@@ -41,6 +42,7 @@ endif()
 
 if(WINDOWS)
     set(_withTrayTool ON)
+    set(_withNxTool ON)
 endif()
 
 if(targetDevice STREQUAL "edge1")
@@ -49,6 +51,7 @@ endif()
 
 option(withMediaServer "Enable media server" ${_withMediaServer})
 option(withTrayTool "Enable tray tool" ${_withTrayTool})
+option(withNxTool "Enable NxTool" ${_withNxTool})
 option(withDesktopClient "Enable desktop client" ${_withDesktopClient})
 option(withMobileClient "Enable mobile client" ${_withMobileClient})
 option(withClouds "Enable cloud components" ${_withClouds})
@@ -57,7 +60,13 @@ option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withPluginStubs "Enable plugin stubs" ON)
 
+cmake_dependent_option(withDistributions "Enable distributions build"
+    OFF "developerBuild"
+    ON
+)
+
 unset(_withMediaServer)
+unset(_withNxTool)
 unset(_withTrayTool)
 unset(_withDesktopClient)
 unset(_withMobileClient)

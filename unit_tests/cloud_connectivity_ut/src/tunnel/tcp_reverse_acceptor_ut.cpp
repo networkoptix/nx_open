@@ -51,7 +51,7 @@ protected:
                 auto buffer = std::make_shared<Buffer>();
                 buffer->reserve(1024);
 
-                std::shared_ptr<AbstractStreamSocket> socket(connector->takeSocket().release());
+                std::shared_ptr<nx::network::AbstractStreamSocket> socket(connector->takeSocket().release());
                 auto socketRaw = socket.get();
                 socketRaw->readAsyncAtLeast(
                     buffer.get(), buffer->capacity(),
@@ -116,15 +116,15 @@ protected:
 
 private:
     ReverseAcceptor m_acceptor;
-    SocketAddress m_acceptorAddress;
-    utils::SyncMultiQueue<String, std::unique_ptr<AbstractStreamSocket>> m_acceptResults;
+    nx::network::SocketAddress m_acceptorAddress;
+    utils::SyncMultiQueue<String, std::unique_ptr<nx::network::AbstractStreamSocket>> m_acceptResults;
     nx::String m_originatingHostName;
-    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_prevAcceptedConnection;
 
     virtual void SetUp() override
     {
-        ASSERT_TRUE(m_acceptor.start(kAcceptorHostName, SocketAddress::anyAddress));
-        m_acceptorAddress = SocketAddress(HostAddress::localhost, m_acceptor.address().port);
+        ASSERT_TRUE(m_acceptor.start(kAcceptorHostName, nx::network::SocketAddress::anyAddress));
+        m_acceptorAddress = nx::network::SocketAddress(nx::network::HostAddress::localhost, m_acceptor.address().port);
     }
 };
 

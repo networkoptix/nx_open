@@ -131,10 +131,10 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qt::ConnectionType>();
     qRegisterMetaType<Qt::Orientations>();
 
-    qRegisterMetaType<QnMacAddress>();
+    qRegisterMetaType<nx::network::QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
-    qRegisterMetaType<HostAddress>();
-    qRegisterMetaType<SocketAddress>();
+    qRegisterMetaType<nx::network::HostAddress>();
+    qRegisterMetaType<nx::network::SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
 

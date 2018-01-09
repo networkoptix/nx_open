@@ -61,8 +61,8 @@ CameraDiagnostics::Result error(
     const CameraDiagnostics::Result& authorizedResult)
 {
     auto statusCode = response.statusCode();
-    bool unauthorizedResponse = statusCode == nx_http::StatusCode::unauthorized
-        || statusCode == nx_http::StatusCode::notAllowed
+    bool unauthorizedResponse = statusCode == nx::network::http::StatusCode::unauthorized
+        || statusCode == nx::network::http::StatusCode::notAllowed
         || statusCode == kHanwhaBlockedHttpCode;
 
     if (!unauthorizedResponse)

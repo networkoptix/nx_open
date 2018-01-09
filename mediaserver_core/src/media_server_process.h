@@ -116,7 +116,7 @@ public:
 
     MSSettings* serverSettings() const { return m_settings.get(); }
 
-    static void configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions);
+    static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
 signals:
     void started();
@@ -167,7 +167,7 @@ private:
     void initializeCloudConnect();
     void changeSystemUser(const QString& userName);
 
-    std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
+    std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
@@ -196,12 +196,12 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    std::vector<std::unique_ptr<AbstractStreamServerSocket>> m_preparedTcpServerSockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> m_preparedTcpServerSockets;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
-    std::map<HostAddress, quint16> m_forwardedAddresses;
+    std::map<nx::network::HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;

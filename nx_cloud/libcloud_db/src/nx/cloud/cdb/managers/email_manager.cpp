@@ -57,13 +57,13 @@ void EMailManager::sendAsync(
         return;
     }
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     QObject::connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         httpClient.get(),
         [this, asyncOperationLocker, currentNotificationIndex,
             completionHandler = std::move(completionHandler)](
-                nx_http::AsyncHttpClientPtr client)
+                nx::network::http::AsyncHttpClientPtr client)
         {
             onSendNotificationRequestDone(
                 std::move(asyncOperationLocker),
@@ -89,7 +89,7 @@ void EMailManager::sendAsync(
 
 void EMailManager::onSendNotificationRequestDone(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-    nx_http::AsyncHttpClientPtr client,
+    nx::network::http::AsyncHttpClientPtr client,
     std::uint64_t notificationIndex,
     std::function<void(bool)> completionHandler)
 {
@@ -99,7 +99,7 @@ void EMailManager::onSendNotificationRequestDone(
             .arg(notificationIndex).arg(SystemError::toString(client->lastSysErrorCode())),
             cl_logERROR);
     }
-    else if (!nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode))
+    else if (!nx::network::http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode))
     {
         NX_LOGX(lm("Failed (2) to send email notification %1. Received %2(%3) response")
             .arg(notificationIndex).arg(client->response()->statusLine.statusCode)
@@ -115,7 +115,7 @@ void EMailManager::onSendNotificationRequestDone(
     {
         completionHandler(
             client->response() &&
-            nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode));
+            nx::network::http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode));
     }
 
     QnMutexLocker lk(&m_mutex);

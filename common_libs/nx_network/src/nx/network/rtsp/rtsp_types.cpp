@@ -9,7 +9,7 @@ const char* const kSecureUrlSchemeName = "rtsps";
 
 namespace {
 
-void extractNptTime(const nx_http::StringType& strValue, qint64* dst)
+void extractNptTime(const nx::network::http::StringType& strValue, qint64* dst)
 {
     if (strValue == "now")
     {
@@ -28,12 +28,12 @@ void extractNptTime(const nx_http::StringType& strValue, qint64* dst)
 
 namespace header {
 
-const nx_http::StringType Range::NAME = "Range";
+const nx::network::http::StringType Range::NAME = "Range";
 
 } // namespace header
 
 bool parseRangeHeader(
-    const nx_http::StringType& rangeStr,
+    const nx::network::http::StringType& rangeStr,
     qint64* startTime,
     qint64* endTime)
 {
@@ -57,12 +57,12 @@ bool parseRangeHeader(
     return false;
 }
 
-bool RtspResponse::parse(const nx_http::ConstBufferRefType &data)
+bool RtspResponse::parse(const nx::network::http::ConstBufferRefType &data)
 {
-    return nx_http::parseRequestOrResponse(
+    return nx::network::http::parseRequestOrResponse(
         data,
-        (nx_http::Response*)this,
-        &nx_http::Response::statusLine,
+        (nx::network::http::Response*)this,
+        &nx::network::http::Response::statusLine,
         true);
 }
 

@@ -39,27 +39,27 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
 {
     static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
-    UDPSocket sender(ipVersion);
-    const auto senderCleanupGuard = makeScopeGuard([&sender]() { sender.pleaseStopSync(); });
+    const auto sender = std::make_unique<UDPSocket>(ipVersion);
+    const auto senderCleanupGuard = makeScopeGuard([&sender]() { sender->pleaseStopSync(); });
 
-    ASSERT_TRUE(sender.bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(sender.setSendTimeout(1000));
+    ASSERT_TRUE(sender->bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(sender->setSendTimeout(1000));
 
-    SocketAddress senderEndpoint("127.0.0.1", sender.getLocalAddress().port);
+    SocketAddress senderEndpoint("127.0.0.1", sender->getLocalAddress().port);
     const auto& senderHost = senderEndpoint.address;
     ASSERT_FALSE(senderHost.isIpAddress());
 
-    UDPSocket receiver(ipVersion);
-    const auto receiverCleanupGuard = makeScopeGuard([&receiver]() { receiver.pleaseStopSync(); });
-    ASSERT_TRUE(receiver.bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(receiver.setRecvTimeout(1000));
+    const auto& receiver = std::make_unique<UDPSocket>(ipVersion);
+    const auto receiverCleanupGuard = makeScopeGuard([&receiver]() { receiver->pleaseStopSync(); });
+    ASSERT_TRUE(receiver->bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(receiver->setRecvTimeout(1000));
 
-    SocketAddress receiverEndpoint("127.0.0.1", receiver.getLocalAddress().port);
+    SocketAddress receiverEndpoint("127.0.0.1", receiver->getLocalAddress().port);
     ASSERT_FALSE(receiverEndpoint.address.isIpAddress());
 
     nx::utils::promise<void> sendPromise;
-    ASSERT_TRUE(sender.setNonBlockingMode(true));
-    sender.sendToAsync(
+    ASSERT_TRUE(sender->setNonBlockingMode(true));
+    sender->sendToAsync(
         kTestMessage, SocketAddress(targetHost, receiverEndpoint.port),
         [&](SystemError::ErrorCode code, SocketAddress ip, size_t size)
         {
@@ -73,7 +73,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     Buffer buffer;
     buffer.resize(1024);
     SocketAddress remoteEndpoint;
-    ASSERT_EQ(kTestMessage.size(), receiver.recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
+    ASSERT_EQ(kTestMessage.size(), receiver->recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
     ASSERT_EQ(kTestMessage, buffer.left(kTestMessage.size()));
 
     const auto& remoteHost = remoteEndpoint.address;
@@ -142,9 +142,9 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     }
 
     constexpr const char* testMessage = "bla-bla-bla";
-    UDPSocket sendingSocket;
+    const auto sendingSocket = std::make_unique<UDPSocket>();
     ASSERT_TRUE(
-        sendingSocket.sendTo(
+        sendingSocket->sendTo(
             testMessage,
             strlen(testMessage),
             sockets[0].socket->getLocalAddress()));
@@ -163,9 +163,9 @@ TEST(UdpSocket, DISABLED_Performance)
     const uint64_t kBufferSize = 1500;
     const uint64_t kTransferSize = uint64_t(10) * 1024 * 1024 * 1024;
 
-    UDPSocket server(AF_INET);
-    server.bind(SocketAddress::anyPrivateAddress);
-    const auto address = server.getLocalAddress();
+    const auto& server = std::make_unique<UDPSocket>(AF_INET);
+    server->bind(SocketAddress::anyPrivateAddress);
+    const auto address = server->getLocalAddress();
     NX_LOG(lm("%1").arg(address), cl_logINFO);
     nx::utils::thread serverThread(
         [&]()
@@ -178,7 +178,7 @@ TEST(UdpSocket, DISABLED_Performance)
             uint64_t transferCount = 0;
             while (transferSize < kTransferSize)
             {
-                recv = server.recv(buffer.data(), buffer.size(), 0);
+                recv = server->recv(buffer.data(), buffer.size(), 0);
                 if (recv <= 0)
                     break;
 
@@ -202,14 +202,14 @@ TEST(UdpSocket, DISABLED_Performance)
     nx::utils::thread clientThread(
         [&]()
         {
-            UDPSocket client(AF_INET);
-            client.setDestAddr(address);
+            const auto& client = std::make_unique<UDPSocket>(AF_INET);
+            client->setDestAddr(address);
             Buffer buffer((int) kBufferSize, 'X');
             int send = 0;
             uint64_t transferSize = 0;
             while (transferSize < kTransferSize + kTransferSize / 10)
             {
-                send = client.send(buffer.data(), buffer.size());
+                send = client->send(buffer.data(), buffer.size());
                 if (send <= 0)
                     break;
 

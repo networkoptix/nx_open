@@ -1673,7 +1673,7 @@ int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
 
     ApiLoginData loginInfo;
     loginInfo.login = addr.userName();
-    loginInfo.passwordHash = nx_http::calcHa1(
+    loginInfo.passwordHash = nx::network::http::calcHa1(
         loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());
     loginInfo.clientInfo = clientInfo;
 
@@ -1904,7 +1904,7 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
 ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     const ApiLoginData& loginInfo,
     QnConnectionInfo* const connectionInfo,
-    nx_http::Response* response)
+    nx::network::http::Response* response)
 {
     connectionInfo->version = qnStaticCommon->engineVersion();
     connectionInfo->brand = qnStaticCommon->brand();
@@ -1924,7 +1924,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     if (response)
     {
         connectionInfo->effectiveUserName =
-            nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
+            nx::network::http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
     }
 
     #ifdef ENABLE_EXTENDED_STATISTICS
@@ -2004,7 +2004,7 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
 
     ApiLoginData loginInfo;
     loginInfo.login = addr.userName();
-    loginInfo.passwordHash = nx_http::calcHa1(
+    loginInfo.passwordHash = nx::network::http::calcHa1(
         loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());
     auto func =
         [this, reqId, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
@@ -2083,7 +2083,7 @@ template<class InputType, class OutputType>
 void Ec2DirectConnectionFactory::regFunctorWithResponse(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
-    std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler,
+    std::function<ErrorCode(InputType, OutputType*, nx::network::http::Response*)> handler,
     Qn::GlobalPermission permission)
 {
     restProcessorPool->registerHandler(

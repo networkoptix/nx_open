@@ -13,14 +13,14 @@ class NX_NETWORK_API ConnectionRequestedEvent:
     public StunIndicationData
 {
 public:
-    constexpr static const stun::extension::indications::Value kMethod =
-        stun::extension::indications::connectionRequested;
+    constexpr static const network::stun::extension::indications::Value kMethod =
+        network::stun::extension::indications::connectionRequested;
 
     nx::String connectSessionId;
     nx::String originatingPeerID;
     /** Peer UDP addresses. */
-    std::list<SocketAddress> udpEndpointList;
-    std::list<SocketAddress> tcpReverseEndpointList;
+    std::list<network::SocketAddress> udpEndpointList;
+    std::list<network::SocketAddress> tcpReverseEndpointList;
     /** All requests connection types. */
     ConnectionMethods connectionMethods;
     ConnectionParameters params;
@@ -28,8 +28,8 @@ public:
     bool isPersistent;
 
     ConnectionRequestedEvent();
-    virtual void serializeAttributes(nx::stun::Message* const message) override;
-    virtual bool parseAttributes(const nx::stun::Message& message) override;
+    virtual void serializeAttributes(nx::network::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
 } // namespace api

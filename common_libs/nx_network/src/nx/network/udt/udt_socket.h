@@ -124,7 +124,7 @@ public:
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -160,7 +160,9 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+    bool connectToIp(
+        const SocketAddress& remoteAddress,
+        std::chrono::milliseconds timeout);
     /**
     * @return false if failed to read socket options.
     */

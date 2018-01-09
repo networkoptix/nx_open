@@ -34,7 +34,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         useSsl),
     m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false),
-    m_httpModManager(new nx_http::HttpModManager())
+    m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
@@ -54,7 +54,7 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 }
 
 void QnUniversalTcpListener::addProxySenderConnections(
-    const SocketAddress& proxyUrl,
+    const nx::network::SocketAddress& proxyUrl,
     int size)
 {
     if (m_needStop)
@@ -74,14 +74,14 @@ void QnUniversalTcpListener::addProxySenderConnections(
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
-    QSharedPointer<AbstractStreamSocket> clientSocket)
+    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
 {
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
 
-AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
+nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     bool sslNeeded,
-    const SocketAddress& localAddress)
+    const nx::network::SocketAddress& localAddress)
 {
     QnMutexLocker lk(&m_mutex);
     if (m_preparedTcpSockets.empty())
@@ -136,7 +136,7 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 }
 
 void QnUniversalTcpListener::destroyServerSocket(
-    AbstractStreamServerSocket* serverSocket)
+    nx::network::AbstractStreamServerSocket* serverSocket)
 {
     decltype(m_serverSocket) serverSocketToDestroy;
     {
@@ -210,12 +210,12 @@ void QnUniversalTcpListener::updateCloudConnectState(
     }
 }
 
-void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
+void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* request)
 {
     m_httpModManager->apply(request);
 }
 
-bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& request)
+bool QnUniversalTcpListener::isAuthentificationRequired(nx::network::http::Request& request)
 {
     const auto targetHeader = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
     if (targetHeader == request.headers.end())
@@ -243,23 +243,23 @@ void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
 }
 
 void QnUniversalTcpListener::setPreparedTcpSockets(
-    std::vector<std::unique_ptr<AbstractStreamServerSocket>> sockets)
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets)
 {
     m_preparedTcpSockets = std::move(sockets);
 }
 
-std::vector<std::unique_ptr<AbstractStreamServerSocket>> 
-    QnUniversalTcpListener::createAndPrepareTcpSockets(const SocketAddress& localAddress)
+std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> 
+    QnUniversalTcpListener::createAndPrepareTcpSockets(const nx::network::SocketAddress& localAddress)
 {
     uint16_t assignedPort = 0;
-    std::vector<std::unique_ptr<AbstractStreamServerSocket>> sockets;
+    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> sockets;
     const auto addSocket =
-        [&](SocketAddress localAddress, int ipVersion)
+        [&](nx::network::SocketAddress localAddress, int ipVersion)
         {
             if (assignedPort)
                 localAddress.port = assignedPort;
 
-            auto socket = SocketFactory::createStreamServerSocket(
+            auto socket = nx::network::SocketFactory::createStreamServerSocket(
                 false,
                 nx::network::NatTraversalSupport::enabled,
                 ipVersion);
@@ -277,14 +277,14 @@ std::vector<std::unique_ptr<AbstractStreamServerSocket>>
             return true;
         };
 
-    if (localAddress.address.toString() == HostAddress::anyHost.toString()
+    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
         || (bool) localAddress.address.ipV4())
     {
         if (!addSocket(localAddress, AF_INET))
             return {};
     }
 
-    if (localAddress.address.toString() == HostAddress::anyHost.toString()
+    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
         || (bool) localAddress.address.isPureIpV6())
     {
         if (!addSocket(localAddress, AF_INET6))
@@ -294,7 +294,7 @@ std::vector<std::unique_ptr<AbstractStreamServerSocket>>
     return sockets;
 }
 
-nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const
+nx::network::http::HttpModManager* QnUniversalTcpListener::httpModManager() const
 {
     return m_httpModManager.get();
 }

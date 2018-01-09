@@ -5,10 +5,7 @@
 namespace nx {
 namespace hpm {
 
-Controller::Controller(
-    const conf::Settings& settings,
-    nx::stun::MessageDispatcher* stunMessageDispatcher)
-:
+Controller::Controller(const conf::Settings& settings):
     m_statsManager(settings),
     m_cloudDataProvider(
         settings.cloudDB().runWithCloud
@@ -19,19 +16,17 @@ Controller::Controller(
             settings.cloudDB().updateInterval,
             settings.cloudDB().startTimeout)
         : nullptr),
-    m_mediaserverApi(m_cloudDataProvider.get(), stunMessageDispatcher),
+    m_mediaserverEndpointTester(m_cloudDataProvider.get()),
     m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
     m_listeningPeerPool(settings.listeningPeer()),
     m_listeningPeerRegistrator(
         settings,
         m_cloudDataProvider.get(),
-        stunMessageDispatcher,
         &m_listeningPeerPool,
         m_relayClusterClient.get()),
     m_cloudConnectProcessor(
         settings,
         m_cloudDataProvider.get(),
-        stunMessageDispatcher,
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
@@ -41,6 +36,16 @@ Controller::Controller(
     {
         NX_LOGX(lit("STUN Server is running without cloud (debug mode)"), cl_logALWAYS);
     }
+}
+
+MediaserverEndpointTester& Controller::mediaserverEndpointTester()
+{
+    return m_mediaserverEndpointTester;
+}
+
+ListeningPeerPool& Controller::listeningPeerPool()
+{
+    return m_listeningPeerPool;
 }
 
 PeerRegistrator& Controller::listeningPeerRegistrator()
@@ -53,12 +58,17 @@ const PeerRegistrator& Controller::listeningPeerRegistrator() const
     return m_listeningPeerRegistrator;
 }
 
-ListeningPeerPool& Controller::listeningPeerPool()
+HolePunchingProcessor& Controller::cloudConnectProcessor()
 {
-    return m_listeningPeerPool;
+    return m_cloudConnectProcessor;
 }
 
 nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
+{
+    return m_discoveredPeerPool;
+}
+
+const nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool() const
 {
     return m_discoveredPeerPool;
 }
