@@ -2,10 +2,26 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="${short.company.name} Server Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
-        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${short.company.name} Server Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
-        <?include ControlPanel.wxi ?>
+     <?include ../BuildVars.wxi ?>
+    <Product
+        Id="*"
+        Name="$(var.nxtoolName)"
+        Language="1033"
+        Version="$(var.releaseVersionFull)"
+        Manufacturer="$(var.companyName)"
+        UpgradeCode="$(var.nxtoolBundleUpgradeCode)">
+            <Package
+                Id="*"
+                InstallerVersion="405"
+                Compressed="yes"
+                Keywords="Installer"
+                Comments="$(var.nxtoolName) Installer"
+                Manufacturer="$(var.companyName)"
+                InstallPrivileges="elevated"
+                InstallScope="perMachine"/>
+
+        <?include ../ControlPanel.wxi ?>
 
         <Property Id="REINSTALLMODE" Value="dmus"/>
 
@@ -16,7 +32,7 @@
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
         <?define LaunchNxtoolChecBoxText="Launch [nxtoolName] when setup exits." ?>
-        
+
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
             <![CDATA[ NOT VersionNT64 ]]>
@@ -33,15 +49,15 @@
 
         <SetProperty Id="NXTOOL_DIRECTORY_REG" Value="[NXTOOL_DIRECTORY_REG32]" After="AppSearch">
             <![CDATA[ NXTOOL_DIRECTORY_REG = "" ]]>
-        </SetProperty>        
+        </SetProperty>
 
-        <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="nxtool\logo_493x58.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="nxtool\logo_493x312.bmp" />
+        <WixVariable Id="WixUILicenseRtf" Value="$(var.CustomizationDir)/wixsetup/License.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x58.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x312.bmp" />
 
         <!-- Logo -->
-        <Icon Id="icon_menu.exe" SourceFile="nxtool.ico"/>
-        <Icon Id="icon_desktop.exe" SourceFile="nxtool.ico"/>
+        <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"/>
+        <Icon Id="icon_desktop.exe" SourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"/>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
@@ -50,38 +66,21 @@
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${display.product.name} Server Configuration Tool Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="$(var.nxtoolName) Installer Setup" />
 
         <Property Id="INSTALL_NXTOOL_DESKTOP" Value="1"/>
 
         <!-- NXTOOL properties-->
         <Property Id="NXTOOL_VMS_MODE" Value="1"/>
-        <Property Id="NXTOOL_DIRECTORY_REG" Secure="yes">
-            <RegistrySearch Id="NxtoolDirectoryReg"
-                            Root="HKCU"
-                            Key="Software\[Manufacturer]\${product.name}"
-                            Name="mediaRoot"
-                            Type="raw"
-                            Win64="yes"/>
-        </Property>
 
-        <Property Id="NXTOOL_DIRECTORY_REG32" Secure="yes">
-            <RegistrySearch Id="NxtoolDirectoryReg32"
-                            Root="HKCU"
-                            Key="Software\[Manufacturer]\${product.name}"
-                            Name="mediaRoot"
-                            Type="raw"
-                            Win64="no"/>
-        </Property>
-
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions/Release/CustomActions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <!--CustomAction Id="LaunchNxtool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="nxtool.exe" ExeCommand=""/-->
         <Property Id="WixShellExecTarget" Value="[#nxtool.exe]" />
         <CustomAction Id="LaunchNxtool" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-        <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
+        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             Schedule="afterInstallInitialize"
@@ -98,14 +97,14 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="${company.name}">
-                    <Directory Id="INSTALLDIR" Name="${display.product.name}">
+                <Directory Id="NetworkOptix" Name="$(var.companyName)">
+                    <Directory Id="INSTALLDIR" Name="$(var.productName)">
                     </Directory>
                 </Directory>
             </Directory>
 
             <Directory Id="ProgramMenuFolder" Name="Programs">
-                <Directory Id="ProgramMenuDir" Name="${company.name}">
+                <Directory Id="ProgramMenuDir" Name="$(var.companyName)">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
                         <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
@@ -114,7 +113,7 @@
             </Directory>
 
             <Directory Id="DesktopFolder" Name="Desktop"/>
-            <Directory Id="StartupFolder" Name="Startup"/>            
+            <Directory Id="StartupFolder" Name="Startup"/>
         </Directory>
 
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -133,7 +132,7 @@
         <UI>
             <!-- These dialog references are needed for CloseApplication above to work correctly -->
             <DialogRef Id="FilesInUse" />
-            <DialogRef Id="MsiRMFilesInUse" />      
+            <DialogRef Id="MsiRMFilesInUse" />
 
             <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
@@ -153,7 +152,7 @@
             <DialogRef Id="UserExit" />
             <!--Width="260" Height="85"-->
 
-            <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
+            <Binary Id="Warning" SourceFile="Binary/Exclam.ico" />
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchNxtool">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
 
