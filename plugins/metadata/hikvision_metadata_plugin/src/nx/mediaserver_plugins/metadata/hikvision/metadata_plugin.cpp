@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
 #include <nx/network/http/http_client.h>
 #include <nx/api/analytics/device_manifest.h>
