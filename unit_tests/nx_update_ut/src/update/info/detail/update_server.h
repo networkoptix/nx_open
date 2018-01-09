@@ -21,7 +21,7 @@ public:
         NX_ASSERT(start());
     }
 
-    SocketAddress address() const
+    network::SocketAddress address() const
     {
         return m_httpServer.serverAddress();
     }
@@ -31,7 +31,7 @@ private:
     const QString m_updatePathSuffix = "/update.json";
     const QByteArray m_jsonMimeType = "application/json";
 
-    TestHttpServer m_httpServer;
+    network::http::TestHttpServer m_httpServer;
 
     void registerHandlers()
     {

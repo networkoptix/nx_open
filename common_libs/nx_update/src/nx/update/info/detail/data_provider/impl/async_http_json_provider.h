@@ -23,7 +23,7 @@ public:
 private:
     QString m_baseUrl;
     AbstractAsyncRawDataProviderHandler* m_handler;
-    nx_http::AsyncClient m_asyncHttpClient;
+    network::http::AsyncClient m_asyncHttpClient;
 
     void onGetMetaUpdatesInformationDone();
     void onGetSpecificUpdateInformationDone();

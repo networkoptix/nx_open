@@ -42,13 +42,13 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
             [&context, &updates2StatusDataList, serverId = server->getId()](
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
-                nx_http::BufferType msgBody)
+                network::http::BufferType msgBody)
             {
                 api::Updates2StatusData updates2StatusData(
                     serverId,
                     api::Updates2StatusData::StatusCode::error,
                     "Multi request failed");
-                if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+                if (osErrorCode == SystemError::noError && statusCode == network::http::StatusCode::ok)
                     QJson::deserialize(msgBody, &updates2StatusData);
 
                 context.executeGuarded(
@@ -72,14 +72,14 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
 
     updates2StatusDataList.append(qnServerModule->updates2Manager()->status());
 
-    JsonRestResponse result(nx_http::StatusCode::ok);
+    JsonRestResponse result(network::http::StatusCode::ok);
     result.json.setReply(updates2StatusDataList);
     return result;
 }
 
 JsonRestResponse createResponse()
 {
-    JsonRestResponse result(nx_http::StatusCode::ok);
+    JsonRestResponse result(network::http::StatusCode::ok);
     result.json.setReply(qnServerModule->updates2Manager()->status());
     return result;
 }
@@ -94,7 +94,7 @@ JsonRestResponse Updates2RestHandler::executeGet(const JsonRestRequest& request)
     if (request.path.endsWith(kUpdates2StatusAllPath))
         return createStatusAllResponse(request.owner);
 
-    JsonRestResponse response(nx_http::StatusCode::notFound);
+    JsonRestResponse response(network::http::StatusCode::notFound);
     response.json.setError(QnRestResult::Error::CantProcessRequest);
     return response;
 }
