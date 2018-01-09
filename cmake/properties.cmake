@@ -14,6 +14,7 @@ set(testcamera.binary.name "testcamera")
 set(installation.root "/opt/${deb.customization.company.name}")
 set(launcher.version.file "launcher.version")
 set(client.mediafolder.name "${product.name} Media")
+set(nxtool.name "${company.name} ${display.product.name} Server Tool")
 
 if(WINDOWS)
     set(client.binary.name "${product.name}.exe")

@@ -24,11 +24,14 @@ minilauncher_binary_name: '${minilauncher.binary.name}'
 launcher_version_file: '${launcher.version.file}'
 
 # Signing section
-signtool_directory: '${signtool_directory}/bin'
-main_certificate: '${certificates_path}/wixsetup/${sign.cer}'
-additional_certificate: '${sign.intermediate.cer}'
-sign_password: '${sign.password}'
-sign_description: '${company.name} ${display.product.name}'
+code_signing: {
+  enabled: ${codeSigning},
+  signtool_directory: '${signtool_directory}/bin',
+  main_certificate: '${certificates_path}/wixsetup/${sign.cer}',
+  additional_certificate: '${sign.intermediate.cer}',
+  sign_password: '${sign.password}',
+  sign_description: '${company.name} ${display.product.name}'
+}
 
 # Distrib names
 client_distribution_name: '${client_distribution_name}'

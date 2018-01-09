@@ -36,7 +36,6 @@ nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 
-
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
@@ -90,6 +89,7 @@ if(withNxTool)
         COMMAND ${PYTHON_EXECUTABLE} create_nxtool_installer.py
             "--config" ${config_file}
             "--qml-dir" ${nxtool_qml_dir}
+            "--sources-dir" "${CMAKE_CURRENT_BINARY_DIR}"
             "--output" ${distribution_output_dir}
     )
 endif()

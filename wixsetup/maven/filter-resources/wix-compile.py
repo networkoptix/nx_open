@@ -32,11 +32,6 @@ server_exe_file = os.path.join(installer_target_dir, server_exe_name)
 bundle_exe_name = environment.bundle_distribution_name + '.exe'
 bundle_exe_file = os.path.join(installer_target_dir, bundle_exe_name)
 
-nxtool_msi_name = environment.servertool_distribution_name + '.msi'
-nxtool_msi_file = os.path.join(engine_tmp_folder, 'nxtool.msi')
-nxtool_exe_name = environment.servertool_distribution_name + '.exe'
-nxtool_exe_file = os.path.join(installer_target_dir, nxtool_exe_name)
-
 paxton_stripped_file = os.path.join(engine_tmp_folder, 'paxton-strip.msi')
 paxton_exe_name = environment.paxton_distribution_name + '.exe'
 paxton_exe_file = os.path.join(installer_target_dir, paxton_exe_name)
@@ -84,7 +79,6 @@ paxton_components = [
 client_exe_components = ['ArchCheck', 'ClientPackage', 'Product-client-exe']
 server_exe_components = ['ArchCheck', 'ServerPackage', 'Product-server-exe']
 full_exe_components = ['ArchCheck', 'ClientPackage', 'ServerPackage', 'Product-full-exe']
-nxtool_exe_components = ['ArchCheck', 'NxtoolPackage', 'Product-nxtool-exe']
 paxton_exe_components = ['PaxtonPackage', 'Product-paxton-exe']
 
 
@@ -211,9 +205,6 @@ def main():
     build_bundle()
     if build_paxton_option:
         build_paxton()
-
-    if build_nxtool_option:
-        build_nxtool()
 
 
 if __name__ == '__main__':
