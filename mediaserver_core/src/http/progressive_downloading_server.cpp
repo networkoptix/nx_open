@@ -583,7 +583,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         boost::optional<CameraMediaStreams> mediaStreams;
-        if (const auto physicalResource = resource.dynamicCast<QnPhysicalCameraResource>())
+        if (const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>())
             mediaStreams = physicalResource->mediaStreams();
 
         QnServer::ChunksCatalog qualityToUse = QnServer::HiQualityCatalog;

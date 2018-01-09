@@ -1,14 +1,12 @@
-#ifndef pulse_resource_h_1947
-#define pulse_resource_h_1947
+#pragma once
 
 #ifdef ENABLE_PULSE_CAMERA
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
 
-class QnPlPulseResource : public QnPhysicalCameraResource
+class QnPlPulseResource : public nx::mediaserver::resource::Camera
 {
 public:
     static const QString MANUFACTURE;
@@ -31,4 +29,3 @@ protected:
 };
 
 #endif // #ifdef ENABLE_PULSE_CAMERA
-#endif //pulse_resource_h_1947

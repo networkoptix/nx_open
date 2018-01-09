@@ -421,7 +421,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 
 CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
 
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
     QAuthenticator auth = getAuth();
@@ -742,10 +742,10 @@ QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractS
         if (axisReader && axisReader->getDPAudioLayout())
             return axisReader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 int QnPlAxisResource::getChannelNumAxis() const

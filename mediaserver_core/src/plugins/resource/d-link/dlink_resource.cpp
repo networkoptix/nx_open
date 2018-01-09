@@ -231,7 +231,7 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
 
 CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
 
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));
 

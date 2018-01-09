@@ -3,14 +3,13 @@
 
 #ifdef ENABLE_DROID
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
 
 static const int DROID_WEB_CAM_PORT = 8089;
 
-class QnPlDriodIpWebCamResource : public QnPhysicalCameraResource
+class QnPlDriodIpWebCamResource: public nx::mediaserver::resource::Camera
 {
 public:
     static const QString MANUFACTURE;

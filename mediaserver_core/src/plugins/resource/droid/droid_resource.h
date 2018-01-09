@@ -1,13 +1,10 @@
-#ifndef droid_resource_h_18_04
-#define droid_resource_h_18_04
+#pragma once
 
 #ifdef ENABLE_DROID
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 
-
-class QnDroidResource : public QnPhysicalCameraResource
+class QnDroidResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -32,4 +29,3 @@ private:
 typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;
 
 #endif // #ifdef ENABLE_DROID
-#endif //droid_resource_h_18_04

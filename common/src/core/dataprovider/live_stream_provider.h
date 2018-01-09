@@ -149,8 +149,7 @@ private:
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     std::atomic<int> m_videoChannels;
-    QnPhysicalCameraResourcePtr m_cameraRes;
-    bool m_isPhysicalResource;
+    QnVirtualCameraResourcePtr m_cameraRes;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
     QElapsedTimer m_resolutionCheckTimer;
     int m_framesSincePrevMediaStreamCheck;

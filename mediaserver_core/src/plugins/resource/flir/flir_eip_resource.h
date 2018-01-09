@@ -2,13 +2,13 @@
 
 #ifdef ENABLE_FLIR
 
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/xml/camera_advanced_param_reader.h>
-#include "simple_eip_client.h"
+
 #include "eip_async_client.h"
 #include "flir_eip_data.h"
-#include <nx/utils/timer_manager.h>
+#include "simple_eip_client.h"
 
 enum class FlirAlarmMonitoringState
 {
@@ -18,7 +18,7 @@ enum class FlirAlarmMonitoringState
     WaitingForMeasFuncId
 };
 
-class QnFlirEIPResource : public QnPhysicalCameraResource
+class QnFlirEIPResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 public:

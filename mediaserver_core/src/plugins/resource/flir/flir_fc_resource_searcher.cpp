@@ -182,7 +182,7 @@ QnResourcePtr FcResourceSearcher::createResource(
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result = QnPhysicalCameraResourcePtr(new FcResource());
+    result.reset(new FcResource());
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create FLIR (FC) camera resource. typeID:" << resourceTypeId.toString();

@@ -7,7 +7,7 @@
 #include "flir_fc_private.h"
 #include "flir_web_socket_io_manager.h"
 
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/http_client.h>
 
 namespace nx {
@@ -17,7 +17,7 @@ namespace flir {
 /**
  * Flir FC-series resource.
  */
-class FcResource: public QnPhysicalCameraResource
+class FcResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 

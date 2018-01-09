@@ -1,14 +1,12 @@
-#ifndef iq_resource_h_1547
-#define iq_resource_h_1547
+#pragma once
 
 #ifdef ENABLE_IQE
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 
-class QnPlIqResource : public QnPhysicalCameraResource
+class QnPlIqResource : public nx::mediaserver::resource::Camera
 {
 public:
     static const QString MANUFACTURE;
@@ -36,4 +34,3 @@ protected:
 };
 
 #endif // #ifdef ENABLE_IQE
-#endif //iq_resource_h_1547

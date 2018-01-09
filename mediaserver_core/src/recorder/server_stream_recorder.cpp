@@ -32,6 +32,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/utils/cryptographic_hash.h>
 #include "archive_integrity_watcher.h"
+#include <nx/mediaserver/resource/camera.h>
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -104,7 +105,7 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, const QString & key)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    const auto camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_device.data());
     m_usePrimaryRecorder = (camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() == 0);
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
 
@@ -321,7 +322,7 @@ int QnServerStreamRecorder::getBufferSize() const
 
 void QnServerStreamRecorder::updateStreamParams()
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<const QnPhysicalCameraResource*>(m_device.data());
+    const nx::mediaserver::resource::Camera* camera = dynamic_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
@@ -350,7 +351,7 @@ void QnServerStreamRecorder::updateStreamParams()
 
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
-    const QnSecurityCamResource* camera = static_cast<const QnPhysicalCameraResource*>(m_device.data());
+    const QnSecurityCamResource* camera = static_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     return recType == Qn::RT_MotionOnly ||
            (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
@@ -486,7 +487,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<const QnPhysicalCameraResource*>(m_device.data());
+    const nx::mediaserver::resource::Camera* camera = dynamic_cast<const nx::mediaserver::resource::Camera*>(m_device.data());
     if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
         if (m_catalog == QnServer::HiQualityCatalog)
@@ -877,6 +878,6 @@ void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, in
 
 bool QnServerStreamRecorder::needConfigureProvider() const
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    const nx::mediaserver::resource::Camera* camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_device.data());
     return !camera->isScheduleDisabled();
 }

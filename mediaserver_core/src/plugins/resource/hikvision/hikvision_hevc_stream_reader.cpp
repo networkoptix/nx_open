@@ -112,15 +112,15 @@ QSize HikvisionHevcStreamReader::chooseResolution(
     const int maxArea = SECONDARY_STREAM_MAX_RESOLUTION.width() 
         * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
-    auto secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+    auto secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
         SECONDARY_STREAM_DEFAULT_RESOLUTION,
-        QnPhysicalCameraResource::getResolutionAspectRatio(primaryResolution),
+        nx::mediaserver::resource::Camera::getResolutionAspectRatio(primaryResolution),
         maxArea,
         QList<QSize>::fromVector(QVector<QSize>::fromStdVector(resolutions)));
 
     if (secondaryResolution.isEmpty())
     {
-        secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+        secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
             SECONDARY_STREAM_DEFAULT_RESOLUTION,
             0.0,
             maxArea,

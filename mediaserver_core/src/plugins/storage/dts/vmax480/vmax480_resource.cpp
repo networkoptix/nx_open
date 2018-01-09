@@ -139,7 +139,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, getAuth()))
         return CameraDiagnostics::CannotEstablishConnectionResult(httpPort);
 
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
@@ -193,14 +193,14 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     {
         for (int i = 0; i < VMAX_MAX_CH; ++i)
         {
-            QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
+            nx::mediaserver::resource::CameraPtr otherRes = getOtherResource(i);
             if (otherRes && otherRes.data() != this)
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
 }
 
-QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
+nx::mediaserver::resource::CameraPtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
     QUrlQuery urlQuery(url.query());
@@ -213,7 +213,7 @@ QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
+    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<nx::mediaserver::resource::Camera>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
@@ -221,7 +221,7 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
     if (channel == getChannel())
         setChunks(chunks);
     else {
-        QnPhysicalCameraResourcePtr otherRes = getOtherResource(channel);
+        nx::mediaserver::resource::CameraPtr otherRes = getOtherResource(channel);
         if (otherRes)
             otherRes.dynamicCast<QnPlVmax480Resource>()->setChunks(chunks);
     }

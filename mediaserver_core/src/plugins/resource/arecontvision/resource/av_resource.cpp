@@ -198,7 +198,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
 
     QString maxSensorWidth;
     QString maxSensorHeight;

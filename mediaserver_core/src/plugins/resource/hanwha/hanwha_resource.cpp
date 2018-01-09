@@ -1601,7 +1601,7 @@ int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamPar
     const QString bitrateString = getProperty(propertyName);
     int bitrateKbps = bitrateString.toInt();
     if (bitrateKbps == 0)
-        bitrateKbps = QnPhysicalCameraResource::suggestBitrateKbps(streamResolution(role), streamParams, role);
+        bitrateKbps = nx::mediaserver::resource::Camera::suggestBitrateKbps(streamResolution(role), streamParams, role);
     auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
     return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
@@ -2601,7 +2601,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
-    auto defaultLayout = QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    auto defaultLayout = nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     if (!isAudioEnabled())
         return defaultLayout;
 

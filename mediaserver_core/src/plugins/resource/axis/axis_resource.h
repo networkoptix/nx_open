@@ -1,5 +1,4 @@
-#ifndef axis_resource_h_2215
-#define axis_resource_h_2215
+#pragma once
 
 #ifdef ENABLE_AXIS
 
@@ -7,24 +6,23 @@
 #include <set>
 #include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/network/simple_http_client.h>
 #include <api/model/api_ioport_data.h>
-#include <nx/network/http/multipart_content_parser.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/multipart_content_parser.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
 
 class QnAxisPtzController;
 
-class QnPlAxisResource: public QnPhysicalCameraResource
+class QnPlAxisResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
 public:
-    typedef QnPhysicalCameraResource base_type;
+    typedef nx::mediaserver::resource::Camera base_type;
 
     struct AxisResolution
     {
@@ -250,4 +248,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_AXIS
-#endif //axis_resource_h_2215

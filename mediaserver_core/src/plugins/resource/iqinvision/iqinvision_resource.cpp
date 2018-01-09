@@ -42,7 +42,7 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 
 CameraDiagnostics::Result QnPlIqResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
 
     updateDefaultAuthIfEmpty(lit("root"), lit("system"));
 

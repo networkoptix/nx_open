@@ -1,15 +1,14 @@
-#ifndef vmax480_resource_2047_h
-#define vmax480_resource_2047_h
+#pragma once
 
 #ifdef ENABLE_VMAX
 
-#include "core/resource/camera_resource.h"
-#include "recording/time_period_list.h"
+#include <nx/mediaserver/resource/camera.h>
+#include <recording/time_period_list.h>
 
 class QnVMax480ChunkReader;
 class QnAbstractArchiveDelegate;
 
-class QnPlVmax480Resource : public QnPhysicalCameraResource
+class QnPlVmax480Resource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -49,7 +48,7 @@ protected:
 
     virtual CameraDiagnostics::Result initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
-    QnPhysicalCameraResourcePtr getOtherResource(int channel);
+    nx::mediaserver::resource::CameraPtr getOtherResource(int channel);
     virtual Qn::LicenseType calculateLicenseType() const override;
 
 private slots:
@@ -72,4 +71,3 @@ private:
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
 
 #endif // #ifdef ENABLE_VMAX
-#endif //vmax480_resource_2047_h

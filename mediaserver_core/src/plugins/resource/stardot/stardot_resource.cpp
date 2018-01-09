@@ -132,7 +132,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
 
 CameraDiagnostics::Result QnStardotResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("admin"));
 
@@ -171,10 +171,10 @@ QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstract
         if (stardotReader && stardotReader->getDPAudioLayout())
             return stardotReader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 QString QnStardotResource::getRtspUrl() const

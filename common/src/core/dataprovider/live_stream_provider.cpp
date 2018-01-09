@@ -90,11 +90,10 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
-    m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
-    NX_ASSERT(m_cameraRes);
+    m_cameraRes = res.dynamicCast<QnVirtualCameraResource>();
+    NX_CRITICAL(m_cameraRes && m_cameraRes->flags().testFlag(Qn::local_live_cam));
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
-    m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
     m_resolutionCheckTimer.invalidate();
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
@@ -302,7 +301,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 
 bool QnLiveStreamProvider::canChangeStatus() const
 {
-    return m_role == Qn::CR_LiveVideo && m_isPhysicalResource;
+    return m_role == Qn::CR_LiveVideo;
 }
 
 float QnLiveStreamProvider::getDefaultFps() const

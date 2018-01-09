@@ -79,7 +79,6 @@ namespace
 
 
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
-static const float MAX_EPS = 0.01f;
 //static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
@@ -428,7 +427,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
 
 void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
-    //QnPhysicalCameraResource::se
+    //nx::mediaserver::resource::Camera::se
     {
         QnMutexLocker lock( &m_mutex );
 
@@ -449,7 +448,7 @@ void QnPlOnvifResource::setHostAddress(const QString &ip)
         }
     }
 
-    QnPhysicalCameraResource::setHostAddress(ip);
+    nx::mediaserver::resource::Camera::setHostAddress(ip);
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
@@ -572,7 +571,7 @@ void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 
 CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
-    auto result = QnPhysicalCameraResource::initInternal();
+    auto result = nx::mediaserver::resource::Camera::initInternal();
     if (!result)
         return result;
 
@@ -848,7 +847,7 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
 
 int QnPlOnvifResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(resolution, streamParams, role), role);
+    return strictBitrate(nx::mediaserver::resource::Camera::suggestBitrateKbps(resolution, streamParams, role), role);
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
@@ -969,7 +968,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
     for (const QSize& resolution: m_resolutionList) {
         float aspect = getResolutionAspectRatio(resolution);
 
-        if (std::abs(aspect - currentAspect) < MAX_EPS) {
+        if (std::abs(aspect - currentAspect) < kMaxEps) {
             continue;
         }
         currentAspect = aspect;
@@ -1689,7 +1688,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     if (!onvifR)
         return false;
 
-    bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
+    bool result = nx::mediaserver::resource::Camera::mergeResourcesIfNeeded(source);
 
     QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
     if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
@@ -2835,10 +2834,10 @@ QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstract
         if (onvifReader && onvifReader->getDPAudioLayout())
             return onvifReader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {

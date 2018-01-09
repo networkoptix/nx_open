@@ -14,12 +14,13 @@ QString QnDesktopCameraResource::getDriverName() const
     return MANUFACTURE;
 }
 
-QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource() {
+QnDesktopCameraResource::QnDesktopCameraResource()
+{
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
 
-QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhysicalCameraResource()
+QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
@@ -48,7 +49,7 @@ QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAb
     if (deskopReader && deskopReader->getDPAudioLayout())
         return deskopReader->getDPAudioLayout();
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {

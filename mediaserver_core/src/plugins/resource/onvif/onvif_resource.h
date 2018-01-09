@@ -1,5 +1,4 @@
-#ifndef onvif_resource_h
-#define onvif_resource_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
@@ -19,8 +18,7 @@
 #include <QElapsedTimer>
 #include <QtCore/QTimeZone>
 
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
 #include <nx/network/simple_http_client.h>
@@ -77,10 +75,10 @@ struct QnOnvifServiceUrls
 
 };
 
-class QnPlOnvifResource: public QnPhysicalCameraResource
+class QnPlOnvifResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
-    using base_type = QnPhysicalCameraResource;
+    using base_type = nx::mediaserver::resource::Camera;
 public:
 
     typedef GSoapAsyncCallWrapper <
@@ -593,5 +591,3 @@ protected:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif //onvif_resource_h

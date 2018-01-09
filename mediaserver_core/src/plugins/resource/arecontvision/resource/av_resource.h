@@ -1,21 +1,18 @@
-#ifndef QnPlAreconVisionResource_h_1252
-#define QnPlAreconVisionResource_h_1252
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
 #include <QtGui/QImage>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
-
+#include <nx/streaming/media_data_packet.h>
 
 class QDomElement;
 
 // TODO: #Elric rename class to *ArecontVision*, rename file
-class QnPlAreconVisionResource : public QnPhysicalCameraResource
+class QnPlAreconVisionResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
     friend class QnPlArecontResourceSearcher;
@@ -109,5 +106,3 @@ private:
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
 
 #endif
-
-#endif // QnPlAreconVisionResource_h_1252

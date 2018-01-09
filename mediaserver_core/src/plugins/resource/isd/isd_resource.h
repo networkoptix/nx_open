@@ -1,19 +1,15 @@
-#ifndef isd_resource_h_1934
-#define isd_resource_h_1934
+#pragma once
 
 #ifdef ENABLE_ISD
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
 
-class QnPlIsdResource : public QnPhysicalCameraResource
+class QnPlIsdResource: public nx::mediaserver::resource::Camera
 {
 public:
-
     static QString MAX_FPS_PARAM_NAME;
-
     static const QString MANUFACTURE;
 
     QnPlIsdResource();
@@ -46,5 +42,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_ISD
-
-#endif //isd_resource_h_1934

@@ -1,10 +1,4 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef THIRD_PARTY_RESOURCE_H
-#define THIRD_PARTY_RESOURCE_H
+#pragma once
 
 #ifdef ENABLE_THIRD_PARTY
 
@@ -13,19 +7,18 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
-#include "core/resource/camera_resource.h"
-#include "plugins/camera_plugin_qt_wrapper.h"
-
+#include <nx/mediaserver/resource/camera.h>
+#include <plugins/camera_plugin_qt_wrapper.h>
 
 //!Camera resource, integrated via external driver. Routes requests to \a nxcip::BaseCameraManager interface
 class QnThirdPartyResource
 :
-    public QnPhysicalCameraResource,
+    public nx::mediaserver::resource::Camera,
     public nxcip::CameraInputEventHandler
 {
     Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
 
-    typedef QnPhysicalCameraResource base_type;
+    typedef nx::mediaserver::resource::Camera base_type;
 
 public:
     static const QString AUX_DATA_PARAM_NAME;
@@ -139,5 +132,3 @@ private:
 };
 
 #endif // ENABLE_THIRD_PARTY
-
-#endif  //THIRD_PARTY_RESOURCE_H

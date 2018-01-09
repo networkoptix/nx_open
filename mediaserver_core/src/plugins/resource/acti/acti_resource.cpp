@@ -334,7 +334,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
 CameraDiagnostics::Result QnActiResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
     CLHttpStatus status;
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
@@ -765,10 +765,10 @@ QnConstResourceAudioLayoutPtr QnActiResource::getAudioLayout(const QnAbstractStr
         if (actiReader && actiReader->getDPAudioLayout())
             return actiReader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const

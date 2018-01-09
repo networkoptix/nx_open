@@ -119,7 +119,7 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QStrin
 
 CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
     const CameraDiagnostics::Result result = QnPlAreconVisionResource::initInternal();
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;

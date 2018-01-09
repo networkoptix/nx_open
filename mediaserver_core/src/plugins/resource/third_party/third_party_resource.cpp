@@ -198,10 +198,10 @@ QnConstResourceAudioLayoutPtr QnThirdPartyResource::getAudioLayout(const QnAbstr
         if (reader && reader->getDPAudioLayout())
             return reader->getDPAudioLayout();
         else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+            return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
     }
     else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+        return nx::mediaserver::resource::Camera::getAudioLayout(dataProvider);
 }
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
@@ -262,7 +262,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
 {
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     if( !archiveDelegate )
-        return QnPhysicalCameraResource::createArchiveDataProvider();
+        return nx::mediaserver::resource::Camera::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
     return archiveReader;
@@ -429,7 +429,7 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int enc
 
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    nx::mediaserver::resource::Camera::initInternal();
 
     updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
     QAuthenticator auth = getAuth();
@@ -796,7 +796,7 @@ static const nxcip::Resolution DEFAULT_SECOND_STREAM_RESOLUTION = nxcip::Resolut
 nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
 {
     const nxcip::Resolution& primaryStreamResolution = getMaxResolution( PRIMARY_ENCODER_INDEX );
-    const float currentAspect = QnPhysicalCameraResource::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
+    const float currentAspect = nx::mediaserver::resource::Camera::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
 
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( SECONDARY_ENCODER_INDEX );
     if( resolutionList.isEmpty() )
@@ -808,13 +808,13 @@ nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
         resolutionList.begin(), resolutionList.end(), std::back_inserter(resList),
         []( const nxcip::Resolution& resolution ){ return QSize(resolution.width, resolution.height); } );
 
-    QSize secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+    QSize secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
         QSize(DEFAULT_SECOND_STREAM_RESOLUTION.width, DEFAULT_SECOND_STREAM_RESOLUTION.height),
         currentAspect,
         SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(),
         resList );
     if( secondaryResolution == EMPTY_RESOLUTION_PAIR )
-        secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+        secondaryResolution = nx::mediaserver::resource::Camera::getNearestResolution(
             QSize(DEFAULT_SECOND_STREAM_RESOLUTION.width, DEFAULT_SECOND_STREAM_RESOLUTION.height),
             0.0,        //ignoring aspect ratio
             SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(),

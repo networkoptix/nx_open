@@ -1,28 +1,24 @@
-#ifndef __ACTI_RESOURCE_H__
-#define __ACTI_RESOURCE_H__
+#pragma once
 
 #ifdef ENABLE_ACTI
+
 #include <QtCore/QFile>
 #include <QtCore/QMap>
-#include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
-#include "utils/common/request_param.h"
-#include <nx/utils/timer_manager.h>
+#include <network/multicodec_rtp_reader.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
+#include <utils/common/request_param.h>
 #include <utils/xml/camera_advanced_param_reader.h>
-#include <network/multicodec_rtp_reader.h>
-
-
 
 class QnActiPtzController;
 
-class QnActiResource
-:
-    public QnPhysicalCameraResource,
+class QnActiResource:
+    public nx::mediaserver::resource::Camera,
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
@@ -227,4 +223,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_ACTI
-#endif // __ACTI_RESOURCE_H__

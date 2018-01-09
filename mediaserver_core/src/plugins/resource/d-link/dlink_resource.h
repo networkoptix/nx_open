@@ -1,13 +1,10 @@
-#ifndef dlink_resource_h_2215
-#define dlink_resource_h_2215
+#pragma once
 
 #ifdef ENABLE_DLINK
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
 #include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
-
+#include <nx/streaming/media_data_packet.h>
+#include <nx/mediaserver/resource/camera.h>
 
 struct QnDlink_ProfileInfo
 {
@@ -46,7 +43,7 @@ struct QnDlink_cam_info
     QVector<QnDlink_ProfileInfo> profiles;
 };
 
-class QnPlDlinkResource : public QnPhysicalCameraResource
+class QnPlDlinkResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -81,4 +78,3 @@ protected:
 typedef QnSharedResourcePointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
 #endif // ENABLE_DLINK
-#endif //dlink_resource_h_2215

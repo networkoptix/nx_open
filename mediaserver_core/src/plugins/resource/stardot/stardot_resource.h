@@ -1,18 +1,16 @@
-#ifndef __STARDOT_RESOURCE_H__
-#define __STARDOT_RESOURCE_H__
+#pragma once
 
 #ifdef ENABLE_STARDOT
 
 #include <QtCore/QMap>
 #include <nx/utils/thread/mutex.h>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
 
-class QnStardotResource : public QnPhysicalCameraResource
+class QnStardotResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -60,4 +58,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_STARDOT
-#endif // __STARDOT_RESOURCE_H__
