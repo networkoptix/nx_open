@@ -14,7 +14,7 @@
 #include <nx/utils/test_support/test_options.h>
 
 #include "common_server_socket_ut.h"
-#include "stream_socket_ut.h"
+#include "stream_socket_acceptance_tests.h"
 
 namespace nx {
 namespace network {
@@ -765,7 +765,7 @@ struct UdtSocketTypeSet
     using ServerSocket = UdtStreamServerSocket;
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
+INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocketAcceptance, UdtSocketTypeSet);
 
 //-------------------------------------------------------------------------------------------------
 
