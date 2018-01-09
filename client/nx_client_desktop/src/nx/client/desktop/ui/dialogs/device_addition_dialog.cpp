@@ -9,7 +9,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/widgets/views/fake_resource_list_view.h>
+#include <nx/client/desktop/resource_views/views/fake_resource_list_view.h>
 
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
@@ -17,19 +17,21 @@
 
 namespace {
 
+using namespace nx::client::desktop;
+
 bool isKnownAddressPage(QTabWidget* tabWidget)
 {
     static constexpr auto kKnownAddressPageIndex = 0;
     return tabWidget->currentIndex() == kKnownAddressPageIndex;
 }
 
-QnFakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
+FakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
 {
-    QnFakeResourceList result;
+    FakeResourceList result;
 
     for(const auto& device: devices)
     {
-        const QnFakeResourceDescription camera =
+        const FakeResourceDescription camera =
             {
                 device.uniqueId,
                 qnSkin->icon("tree/camera.png"),
@@ -359,14 +361,14 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     }
 }
 
-void DeviceAdditionDialog::showAdditionFailedDialog(const QnFakeResourceList& resources)
+void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)
 {
     QnMessageBox dialog(QnMessageBoxIcon::Critical,
         tr("Failed to add %n devices", "", resources.size()), QString(),
         QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         this);
 
-    dialog.addCustomWidget(new QnFakeResourceListView(resources, this));
+    dialog.addCustomWidget(new FakeResourceListView(resources, this));
     dialog.exec();
 }
 

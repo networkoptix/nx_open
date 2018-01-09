@@ -4,7 +4,6 @@
 
 #include <ui/style/helper.h>
 #include <ui/common/indents.h>
-#include <ui/models/resource/fake_resource_list_model.h>
 
 namespace {
 
@@ -13,12 +12,16 @@ static constexpr int kRecommendedWidth = 284;
 
 } // namespace
 
-QnFakeResourceListView::QnFakeResourceListView(
-    const QnFakeResourceList& fakeResources,
+namespace nx {
+namespace client {
+namespace desktop {
+
+FakeResourceListView::FakeResourceListView(
+    const FakeResourceList& fakeResources,
     QWidget* parent)
     :
     base_type(),
-    m_model(new QnFakeResourceListModel(fakeResources, this))
+    m_model(new FakeResourceListModel(fakeResources, this))
 {
     setModel(m_model);
 
@@ -35,15 +38,18 @@ QnFakeResourceListView::QnFakeResourceListView(
     horizontalHeader->setStretchLastSection(true);
 }
 
-QnFakeResourceListView::~QnFakeResourceListView()
+FakeResourceListView::~FakeResourceListView()
 {
 }
 
-QSize QnFakeResourceListView::sizeHint() const
+QSize FakeResourceListView::sizeHint() const
 {
     const auto height = style::Metrics::kViewRowHeight
         * std::min(kMaximumRows, m_model->resources().size());
     return QSize(kRecommendedWidth, height);
 }
 
+} // namespace desktop
+} // namespace client
+} // namespace nx
 

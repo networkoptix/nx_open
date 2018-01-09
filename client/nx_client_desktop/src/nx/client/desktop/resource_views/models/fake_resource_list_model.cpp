@@ -14,26 +14,30 @@ const auto kNameFont =
         return font;
     }();
 
-} //namespace
+} // namespace
 
-QnFakeResourceListModel::QnFakeResourceListModel(
-    const QnFakeResourceList& fakeResources,
-    QObject *parent)
+namespace nx {
+namespace client {
+namespace desktop {
+
+FakeResourceListModel::FakeResourceListModel(
+    const FakeResourceList& fakeResources,
+    QObject* parent)
     :
     m_resources(fakeResources)
 {
 }
 
-QnFakeResourceListModel::~QnFakeResourceListModel()
+FakeResourceListModel::~FakeResourceListModel()
 {
 }
 
-QnFakeResourceList QnFakeResourceListModel::resources() const
+FakeResourceList FakeResourceListModel::resources() const
 {
     return m_resources;
 }
 
-int QnFakeResourceListModel::rowCount(const QModelIndex &parent) const
+int FakeResourceListModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
     {
@@ -44,7 +48,7 @@ int QnFakeResourceListModel::rowCount(const QModelIndex &parent) const
     return m_resources.size();
 }
 
-QVariant QnFakeResourceListModel::data(const QModelIndex& index, int role) const
+QVariant FakeResourceListModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -81,7 +85,11 @@ QVariant QnFakeResourceListModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-int QnFakeResourceListModel::columnCount(const QModelIndex &parent) const
+int FakeResourceListModel::columnCount(const QModelIndex& parent) const
 {
     return Columns::count;
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
