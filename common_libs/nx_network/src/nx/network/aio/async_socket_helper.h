@@ -128,8 +128,7 @@ public:
                 "deleting socket if you delete socket from non-aio thread";
             NX_CRITICAL(
                 !(m_addressResolverIsInUse.load() &&
-                    m_addressResolver->dnsResolver()
-                    .isRequestIdKnown(this)), kFailureMessage);
+                    m_addressResolver->isRequestIdKnown(this)), kFailureMessage);
 
             if (this->m_socket->impl()->aioThread.load())
             {
@@ -145,14 +144,20 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
     {
         m_addressResolverIsInUse = true;
-        m_addressResolver->dnsResolver().resolveAsync(
+        m_addressResolver->resolveAsync(
             address.toString(),
             [this, handler = std::move(handler)](
-                SystemError::ErrorCode code, std::deque<HostAddress> ips)
+                SystemError::ErrorCode code, std::deque<AddressEntry> addresses)
             {
+                std::deque<HostAddress> ips;
+                std::transform(
+                    addresses.begin(), addresses.end(),
+                    std::back_inserter(ips),
+                    [](AddressEntry& addressEntry) { return std::move(addressEntry.host); });
                 m_addressResolverIsInUse = false;
                 handler(code, std::move(ips));
             },
+            NatTraversalSupport::disabled,
             m_ipVersion,
             this);
     }
@@ -325,7 +330,7 @@ public:
             };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            m_addressResolver->dnsResolver().cancel(this, true);
+            m_addressResolver->cancel(this);
 
         cancelImpl();
     }
@@ -708,7 +713,7 @@ private:
      */
     void stopPollingSocket(const aio::EventType eventType)
     {
-        m_addressResolver->dnsResolver().cancel(this, true); //< TODO: #ak Must not block here!
+        m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
 
         if (eventType == aio::etNone)
             this->m_aioService->cancelPostedCalls(this->m_socket, true);
