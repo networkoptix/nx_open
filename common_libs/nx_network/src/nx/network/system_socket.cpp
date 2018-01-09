@@ -559,15 +559,14 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
     if (remoteAddress.address.isIpAddress())
         return connectToIp(remoteAddress, timeout);
 
-    std::deque<HostAddress> resolvedAddresses;
-    const SystemError::ErrorCode resultCode =
-        SocketGlobals::addressResolver().dnsResolver().resolveSync(
-            remoteAddress.address.toString(), this->m_ipVersion, &resolvedAddresses);
-    if (resultCode != SystemError::noError)
-    {
-        SystemError::setLastErrorCode(resultCode);
+    auto resolvedEntries = SocketGlobals::addressResolver().resolveSync(
+        remoteAddress.address.toString(), NatTraversalSupport::disabled, this->m_ipVersion);
+    if (resolvedEntries.empty())
         return false;
-    }
+
+    std::deque<HostAddress> resolvedAddresses;
+    for (auto& entry: resolvedEntries)
+        resolvedAddresses.push_back(std::move(entry.host));
 
     while (!resolvedAddresses.empty())
     {
@@ -1701,7 +1700,6 @@ int UDPSocket::send(const void* buffer, unsigned int bufferLen)
             m_destAddr.addr(), m_destAddr.addrLen()),
         sendTimeout);
 #endif
-
 }
 
 bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
@@ -1712,15 +1710,14 @@ bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
     }
     else
     {
-        std::deque<HostAddress> resolvedAddresses;
-        const SystemError::ErrorCode resultCode =
-            SocketGlobals::addressResolver().dnsResolver().resolveSync(
-                endpoint.address.toString(), m_ipVersion, &resolvedAddresses);
-        if (resultCode != SystemError::noError)
-        {
-            SystemError::setLastErrorCode(resultCode);
+        auto resolvedEntries = SocketGlobals::addressResolver().resolveSync(
+            endpoint.address.toString(), NatTraversalSupport::disabled, m_ipVersion);
+        if (resolvedEntries.empty())
             return false;
-        }
+
+        std::deque<HostAddress> resolvedAddresses;
+        for (auto& entry: resolvedEntries)
+            resolvedAddresses.push_back(std::move(entry.host));
 
         // TODO: Here we select first address with hope it is correct one. This will never work
         // for NAT64, so we have to fix it somehow.
