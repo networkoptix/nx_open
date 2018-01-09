@@ -1,4 +1,4 @@
-var customization = require('./test-customization.json');
+var customization = require('./test-customizations.json');
 exports.config = {
 
 
