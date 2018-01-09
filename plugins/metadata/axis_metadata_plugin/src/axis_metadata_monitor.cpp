@@ -48,13 +48,14 @@ void AxisMetadataMonitor::setRule(const SocketAddress& localAddress, nxpl::NX_GU
         std::string("http://") + localAddress.toStdString() + std::string(kWebServerPath);
 
     for (int i = 0; i < eventTypeListSize; ++i)
-        {
-        //auto event = m_manager->m_axisEvents[i];
-        const auto it = std::find_if(m_manager->m_axisEvents.cbegin(),
-            m_manager->m_axisEvents.cend(), [=](const auto& event)
-        {
-            return memcmp(&event.typeId, &eventTypeList[i], sizeof(event.typeId)) == 0;
-        });
+    {
+        const auto it = std::find_if(
+            m_manager->m_axisEvents.cbegin(),
+            m_manager->m_axisEvents.cend(),
+            [eventTypeList,i](const AxisEvent& event)
+            {
+                return memcmp(&event.typeId, &eventTypeList[i], sizeof(event.typeId)) == 0;
+            });
         if (it != m_manager->m_axisEvents.cend())
         {
             int actionId = cameraController.addActiveHttpNotificationAction(

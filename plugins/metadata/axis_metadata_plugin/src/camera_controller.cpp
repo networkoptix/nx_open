@@ -312,11 +312,11 @@ void CameraController::filterSupportedEvents(const std::vector<std::string>& nee
         return;
     std::vector<SupportedEvent> events;
     std::copy_if(m_supportedEvents.cbegin(), m_supportedEvents.cend(), std::back_inserter(events),
-        [&neededTopics](const auto& event)
-    {
-        return find(neededTopics.cbegin(), neededTopics.cend(), event.topic) !=
-            neededTopics.cend();
-    });
+        [&neededTopics](const SupportedEvent& event)
+        {
+            return find(neededTopics.cbegin(), neededTopics.cend(), event.topic) !=
+                neededTopics.cend();
+        });
     m_supportedEvents = std::move(events);
 }
 

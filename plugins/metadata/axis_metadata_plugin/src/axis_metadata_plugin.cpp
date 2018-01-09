@@ -117,7 +117,7 @@ AbstractMetadataManager* AxisMetadataPlugin::managerForResource(
     auto sharedRes = sharedResources(resourceInfo);
     ++sharedRes->managerCounter;
 
-    auto supportedEvents = fetchSupportedEvents(resourceInfo);
+    const auto supportedEvents = fetchSupportedEvents(resourceInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -184,7 +184,7 @@ boost::optional<QList<QnUuid>> AxisMetadataPlugin::fetchSupportedEvents(
 
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
-        [](const auto& supportedEvent)
+        [](const nx::axis::SupportedEvent& supportedEvent)
         {
             AxisEvent axisEvent = convertEvent(supportedEvent);
             return nxpt::fromPluginGuidToQnUuid(axisEvent.typeId);
