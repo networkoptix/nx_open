@@ -565,15 +565,14 @@ bool UdtStreamSocket::connect(
     if (remoteAddress.address.isIpAddress())
         return connectToIp(remoteAddress, timeout);
 
-    std::deque<HostAddress> ips;
-    const SystemError::ErrorCode resultCode =
-        SocketGlobals::addressResolver().dnsResolver().resolveSync(
-            remoteAddress.address.toString(), m_ipVersion, &ips);
-    if (resultCode != SystemError::noError)
-    {
-        SystemError::setLastErrorCode(resultCode);
+    auto resolvedEntries = SocketGlobals::addressResolver().resolveSync(
+        remoteAddress.address.toString(), NatTraversalSupport::disabled, m_ipVersion);
+    if (resolvedEntries.empty())
         return false;
-    }
+
+    std::deque<HostAddress> ips;
+    for (auto& entry: resolvedEntries)
+        ips.push_back(std::move(entry.host));
 
     while (!ips.empty())
     {

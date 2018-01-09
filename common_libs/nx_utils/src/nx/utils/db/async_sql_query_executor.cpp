@@ -231,7 +231,7 @@ std::unique_ptr<BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionT
     const ConnectionOptions& connectionOptions,
     detail::QueryQueue* const queryQueue)
 {
-    auto executorThread = RequestExecutorFactory::create(
+    auto executorThread = RequestExecutorFactory::instance().create(
         connectionOptions,
         queryQueue);
 

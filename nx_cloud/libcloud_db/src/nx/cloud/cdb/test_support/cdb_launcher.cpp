@@ -145,7 +145,8 @@ std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
     const std::string& password)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(login, password);
+    if (!login.empty() || !password.empty())
+        connection->setCredentials(login, password);
     return connection;
 }
 
