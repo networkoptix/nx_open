@@ -34,7 +34,10 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
         if (server->getId() == qnServerModule->commonModule()->moduleGUID())
             continue;
 
-        const auto requestUrl = utils::Url(server->getApiUrl().toString() + kUpdates2StatusPath);
+        auto requestUrl = server->getApiUrl();
+        requestUrl.setPath("/" + kUpdates2StatusPath);
+        NX_ASSERT(requestUrl.isValid());
+
         runMultiserverDownloadRequest(
             qnServerModule->commonModule()->router(),
             requestUrl,
