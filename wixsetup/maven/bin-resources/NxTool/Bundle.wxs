@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <?include BuildVars.wxi ?>
+    <?include ../BuildVars.wxi ?>
 
     <Bundle
             Name="$(var.productName) Server Tool"

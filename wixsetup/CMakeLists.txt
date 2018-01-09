@@ -1,9 +1,11 @@
+# These variables must be defined first as they are going to config file
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")
 set(filter_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources")
 set(ClientHelpSourceDir "${bin_source_dir}/help")
 set(VoxSourceDir "${bin_source_dir}/vox")
 set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
+set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
 set(ClientBgSourceDir "${CMAKE_CURRENT_BINARY_DIR}/Backgrounds")
 set(ClientFontsDir "${bin_source_dir}/fonts")
 set(VC14RedistPath "${vcredist_directory}")
@@ -34,28 +36,19 @@ nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 
-
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
 
-set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
-# This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
-set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
+if (withMediaServer OR withDesktopClient)
+    add_custom_target(wixsetup ALL
+        DEPENDS
+            customactions
+        COMMENT "Creating installer..."
+        COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
+        COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
+    )
+endif()
 
-
-
-add_custom_target(wixsetup ALL
-    DEPENDS
-        customactions
-    COMMENT "Creating installer..."
-    # TODO move python to cmake
-    COMMAND ${CMAKE_COMMAND} -E copy
-        "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
-    COMMAND ${CMAKE_COMMAND} -E copy
-        "${desktop_client_executable}" "${bin_source_dir}/${client.binary.name}"
-    COMMAND ${PYTHON_EXECUTABLE} wix-gen.py
-    COMMAND ${PYTHON_EXECUTABLE} wix-compile.py
-)
 
 if(withTestCamera)
     add_dependencies(wixsetup testcamera)
@@ -71,7 +64,41 @@ if(withTestCamera)
     )
 endif()
 
+
+if(withNxTool)
+    set(nxtool_qml_root "${CMAKE_SOURCE_DIR}/nxtool/static-resources/src/qml/")
+    set(nxtool_executable "${bin_source_dir}/nxtool.exe")
+
+    add_custom_target(collect_nxtool_qml_dependencies ALL
+        DEPENDS
+            nxtool
+        COMMENT "Collecting NxTool QML libraries..."
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
+            "--config" ${config_file}
+            "--source" ${nxtool_executable}
+            "--qml-root" ${nxtool_qml_root}
+            "--output" ${nxtool_qml_dir}
+        )
+
+    add_custom_target(create_nxtool_installer ALL
+        COMMENT "Generating NxTool installer..."
+        DEPENDS
+            collect_nxtool_qml_dependencies
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} create_nxtool_installer.py
+            "--config" ${config_file}
+            "--qml-dir" ${nxtool_qml_dir}
+            "--sources-dir" "${CMAKE_CURRENT_BINARY_DIR}"
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
 if(withDesktopClient)
+    # This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
+    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
+    set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
+
     add_custom_target(collect_qml_dependencies ALL
         DEPENDS
             desktop_client
@@ -85,8 +112,20 @@ if(withDesktopClient)
         )
     add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
 
+    add_custom_target(copy_client_binaries ALL
+    COMMENT "Copying client binaries..."
+    DEPENDS
+        desktop_client
+        minilauncher
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${bin_source_dir}/minilauncher.exe" "${bin_source_dir}/${minilauncher.binary.name}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${desktop_client_executable}" "${bin_source_dir}/${client.binary.name}"
+    )
+    add_dependencies(wixsetup copy_client_binaries)
+
     add_custom_target(generate_client_update_package ALL
-    COMMENT "Preparing client update package ..."
+    COMMENT "Preparing client update package..."
     DEPENDS
         collect_qml_dependencies
         applauncher
