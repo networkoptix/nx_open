@@ -213,6 +213,16 @@ if(withClouds)
     )
 endif()
 
+if(addQtPdb)
+    add_custom_target(generate_qt_debug_package ALL
+        COMMENT "Preparing Qt debug package..."
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_qt_debug_package.py
+            "--config" ${config_file}
+            "--output" ${distribution_output_dir}
+    )
+endif()
+
 add_custom_target(generate_misc_debug_package ALL
     COMMENT "Preparing misc debug package..."
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts

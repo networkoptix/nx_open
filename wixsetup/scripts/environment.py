@@ -77,9 +77,9 @@ def icu_files(qt_bin_dir):
         yield file
 
 
-def qt_files(qt_bin_dir, libs):
+def qt_files(qt_bin_dir, libs, extension='dll'):
     for lib in libs:
-        yield os.path.join(qt_bin_dir, 'Qt5{}.dll'.format(lib))
+        yield os.path.join(qt_bin_dir, 'Qt5{0}.{1}'.format(lib, extension))
 
 
 def qt_plugins_files(qt_plugins_dir, libs):
