@@ -1,11 +1,12 @@
 #!/bin/bash
-
 set -e
 
-COMPANY_NAME=${deb.customization.company.name}
+# ATTENTION: This script works with both maven and cmake builds.
 
-VERSION=${release.version}
-ARCHITECTURE=${os.arch}
+COMPANY_NAME=@deb.customization.company.name@
+
+VERSION=@release.version@
+ARCHITECTURE=@os.arch@
 
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
@@ -17,8 +18,8 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
 
-FINALNAME=${artifact.name.server}
-UPDATE_NAME=${artifact.name.server_update}.zip
+FINALNAME=@artifact.name.server@
+UPDATE_NAME=@artifact.name.server_update@.zip
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -31,113 +32,267 @@ INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 SYSTEMDSTAGE=$STAGE$SYSTEMDTARGET
 
-SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
-SERVER_SHARE_PATH=${libdir}/share
-#SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
-SERVER_DEB_PATH=${libdir}/deb
+SERVER_BIN_PATH=@libdir@/bin/@build.configuration@
+SERVER_SHARE_PATH=@libdir@/share
+SERVER_DEB_PATH=@libdir@/deb
 SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
-SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
+SERVER_LIB_PATH=@libdir@/lib/@build.configuration@
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
-SCRIPTS_PATH=${basedir}/../scripts
-BUILD_INFO_TXT=${libdir}/build_info.txt
+SCRIPTS_PATH=@basedir@/../scripts
+BUILD_INFO_TXT=@libdir@/build_info.txt
+LOGS_DIR="@libdir@/build_logs"
+LOG_FILE="$LOGS_DIR/server-build-dist.log"
 
-# Prepare stage dir
-rm -rf $STAGE
-mkdir -p $BINSTAGE
-mkdir -p $LIBSTAGE
-mkdir -p $LIBPLUGINSTAGE
-mkdir -p $ETCSTAGE
-mkdir -p $SHARESTAGE
-mkdir -p $INITSTAGE
-mkdir -p $INITDSTAGE
-mkdir -p $SYSTEMDSTAGE
+buildDistribution()
+{
+    echo "Creating directories"
+    mkdir -p $BINSTAGE
+    mkdir -p $LIBSTAGE
+    mkdir -p $LIBPLUGINSTAGE
+    mkdir -p $ETCSTAGE
+    mkdir -p $SHARESTAGE
+    mkdir -p $INITSTAGE
+    mkdir -p $INITDSTAGE
+    mkdir -p $SYSTEMDSTAGE
 
-# Copy build_info.txt
-cp -r $BUILD_INFO_TXT $BINSTAGE/../
+    echo "Copying build_info.txt"
+    cp -r $BUILD_INFO_TXT $BINSTAGE/../
 
-# Copy dbsync 2.2
-if [ '${arch}' != 'arm' ]
-then
-    cp -r ${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
-    cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
-fi
+    if [ '@arch@' != 'arm' ]
+    then
+        echo "Copying dbsync 2.2"
+        cp -r @packages.dir@/@rdep.target@/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
+        cp @libdir@/version.py $SHARESTAGE/dbsync-2.2/bin
+    fi
 
-# Copy libraries
-cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
-cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
-[ $COMPANY_NAME != "hanwha" ] && rm $LIBPLUGINSTAGE\hanwha* || true
-cp -r $SERVER_VOX_PATH $BINSTAGE
-#'libstdc++.so.6 is needed on some machines
-if [ '${arch}' != 'arm' ]
-then
-    cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
-    cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
-fi
+    local LIB
+    local LIB_BASENAME
+    for LIB in "$SERVER_LIB_PATH"/*.so*
+    do
+        LIB_BASENAME=$(basename "$LIB")
+        if [[ "$LIB_BASENAME" != libQt5* \
+            && "$LIB_BASENAME" != libEnginio.so* \
+            && "$LIB_BASENAME" !=  libqgsttools_p.* ]]
+        then
+            echo "Copying $LIB_BASENAME"
+            cp -P "$LIB" "$LIBSTAGE/"
+        fi
+    done
 
-#copying qt libs
-QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql WebSockets"
-for var in $QTLIBS
-do
-    qtlib=libQt5$var.so
-    echo "Adding Qt lib" $qtlib
-    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
-done
+    # Copy mediaserver plugins.
+    local PLUGIN_FILENAME
+    local -r PLUGINS=( hikvision_metadata_plugin )
+    if [ "$COMPANY_NAME" == "hanwha" ]
+    then
+        PLUGINS+=( hanwha_metadata__plugin )
+    fi
+    for PLUGIN in "${PLUGINS[@]}"
+    do
+        PLUGIN_FILENAME="lib$PLUGIN.so"
+        echo "Copying (plugin) $PLUGIN_FILENAME"
+        cp "$SERVER_LIB_PLUGIN_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE/"
+    done
 
-#cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
+    echo "Copying Festival VOX files"
+    cp -r $SERVER_VOX_PATH $BINSTAGE
 
-# Strip and remove rpath
+    # libstdc++.so.6 is needed on some machines
+    if [ '@arch@' != 'arm' ]
+    then
+        echo "Copying libstdc++ and libicu"
+        cp -r /usr/lib/@arch.dir@/libstdc++.so.6* $LIBSTAGE
+        cp -P @qt.dir@/lib/libicu*.so* $LIBSTAGE
+    fi
 
-if [ '${build.configuration}' == 'release' ] && [ '${arch}' != 'arm' ]
-then
-  for f in `find $LIBPLUGINSTAGE -type f`
-  do
-    strip $f
-  done
+    QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql WebSockets"
+    for var in $QTLIBS
+    do
+        qtlib=libQt5$var.so
+        echo "Copying (Qt) $qtlib"
+        cp -P @qt.dir@/lib/$qtlib* $LIBSTAGE
+    done
 
-  for f in `find $LIBSTAGE -type f`
-  do
-    strip $f
-  done
-fi
+    # Strip and remove rpath
+    if [[ ('@build.configuration@' == 'release' || '@CMAKE_BUILD_TYPE@' == 'Release') \
+        && '@arch@' != 'arm' ]]
+    then
+        for f in `find $LIBPLUGINSTAGE -type f`
+        do
+            echo "Stripping $f"
+            strip $f
+        done
 
-find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
-find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
-chmod -R 755 $BINSTAGE
-if [ '${arch}' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}; fi
+        for f in `find $LIBSTAGE -type f`
+        do
+            echo "Stripping $f"
+            strip $f
+        done
+    fi
 
-# Copy mediaserver binary and sqldrivers
-install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
-install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
-install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE
-install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
-install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
-install -m 755 $SCRIPTS_PATH/shell_utils.sh $BINSTAGE
+    echo "Setting permissions"
+    find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
+    find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
+    chmod -R 755 $BINSTAGE
+    if [ '@arch@' != 'arm' ]
+    then
+        chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}
+    fi
 
-# Copy mediaserver startup script
-install -m 755 bin/mediaserver $BINSTAGE
+    echo "Copying mediaserver binaries and scripts"
+    install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+    install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
+    install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE
+    install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
+    install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
+    install -m 755 $SCRIPTS_PATH/shell_utils.sh $BINSTAGE
 
-# Copy upstart and sysv script
-install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
-install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE/$COMPANY_NAME-mediaserver
-install -m 644 systemd/networkoptix-mediaserver.service $SYSTEMDSTAGE/$COMPANY_NAME-mediaserver.service
+    echo "Copying mediaserver startup script"
+    install -m 755 bin/mediaserver $BINSTAGE
 
-# Prepare DEBIAN dir
-mkdir -p $STAGE/DEBIAN
-chmod go+rx $STAGE/DEBIAN
+    echo "Copying upstart and sysv script"
+    install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
+    install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE/$COMPANY_NAME-mediaserver
+    install -m 644 systemd/networkoptix-mediaserver.service $SYSTEMDSTAGE/$COMPANY_NAME-mediaserver.service
 
-INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
+    echo "Preparing DEBIAN dir"
+    mkdir -p $STAGE/DEBIAN
+    chmod 00775 $STAGE/DEBIAN
 
-cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
-install -m 755 debian/preinst $STAGE/DEBIAN
-install -m 755 debian/postinst $STAGE/DEBIAN
-install -m 755 debian/prerm $STAGE/DEBIAN
-install -m 644 debian/templates $STAGE/DEBIAN
+    INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
-(cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
+    echo "Generating DEBIAN/control"
+    cat debian/control.template \
+        | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" \
+        | sed "s/VERSION/$VERSION/g" \
+        | sed "s/ARCHITECTURE/$ARCHITECTURE/g" \
+        > $STAGE/DEBIAN/control
 
-(cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
+    echo "Copying DEBIAN dir files"
+    install -m 755 debian/preinst $STAGE/DEBIAN
+    install -m 755 debian/postinst $STAGE/DEBIAN
+    install -m 755 debian/prerm $STAGE/DEBIAN
+    install -m 644 debian/templates $STAGE/DEBIAN
 
-cp -Rf $SERVER_DEB_PATH/* $STAGEBASE
-(cd $STAGEBASE; zip -r ./$UPDATE_NAME ./ -x ./$FINALNAME/**\* $FINALNAME/)
-mv $STAGEBASE/$UPDATE_NAME ${project.build.directory}
-echo "server.finalName=$FINALNAME" >> finalname-server.properties
+    echo "Generating DEBIAN/md5sums"
+    (cd $STAGE
+        md5sum $(find * -type f | grep -v '^DEBIAN/') > DEBIAN/md5sums
+        chmod 644 DEBIAN/md5sums
+    )
+
+    echo "Creating .deb $FINALNAME.deb"
+    (cd $STAGEBASE
+        fakeroot dpkg-deb -b $FINALNAME
+    )
+
+    local DEB
+    for DEB in "$SERVER_DEB_PATH"/*
+    do
+        echo "Copying $DEB"
+        cp -Rf "$DEB" "$STAGEBASE/"
+    done
+
+    echo "Generating finalname-server.properties"
+    echo "server.finalName=$FINALNAME" >> finalname-server.properties
+
+    echo "Creating .zip $UPDATE_NAME"
+    (cd $STAGEBASE
+        zip -r ./$UPDATE_NAME ./ -x ./$FINALNAME/**\* $FINALNAME/
+    )
+
+    if [ '@distribution_output_dir@' != '' ]
+    then
+        echo "Moving distribution .zip and .deb to @distribution_output_dir@"
+        mv "$STAGEBASE/$UPDATE_NAME" "@distribution_output_dir@/"
+        mv "$STAGEBASE/$FINALNAME.deb" "@distribution_output_dir@/"
+    else
+        echo "Moving distribution .zip to @project.build.directory@"
+        mv "$STAGEBASE/$UPDATE_NAME" "@project.build.directory@/"
+    fi
+}
+
+showHelp()
+{
+    echo "Options:"
+    echo " -v, --verbose: Do not redirect output to a log file."
+    echo " -k, --keep-work-dir: Do not delete work directory on success."
+}
+
+# [out] KEEP_WORK_DIR
+# [out] VERBOSE
+parseArgs() # "$@"
+{
+    KEEP_WORK_DIR=0
+    VERBOSE=0
+
+    local ARG
+    for ARG in "$@"; do
+        if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
+            showHelp
+            exit 0
+        elif [ "$ARG" = "-k" ] || [ "$ARG" = "--keep-work-dir" ]; then
+            KEEP_WORK_DIR=1
+        elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
+            VERBOSE=1
+        fi
+    done
+}
+
+redirectOutputToLog()
+{
+    echo "  See the log in $LOG_FILE"
+
+    mkdir -p "$LOGS_DIR" #< In case log dir is not created yet.
+    rm -rf "$LOG_FILE"
+
+    # Redirect only stdout to the log file, leaving stderr as is, because there seems to be no
+    # reliable way to duplicate error output to both log file and stderr, keeping the correct order
+    # of regular and error lines in the log file.
+    exec 1>"$LOG_FILE" #< Open log file for writing as stdout.
+}
+
+# Called by trap.
+# [in] $?
+# [in] VERBOSE
+onExit()
+{
+    local RESULT=$?
+    echo "" #< Newline, to separate SUCCESS/FAILURE message from the above log.
+    if [ $RESULT != 0 ]; then #< Failure.
+        echo "FAILURE (status $RESULT); see the error message(s) above." >&2 #< To stderr.
+        if [ $VERBOSE = 0 ]; then #< stdout redirected to log file.
+            echo "FAILURE (status $RESULT); see the error message(s) on stderr." #< To log file.
+        fi
+    else
+        echo "SUCCESS"
+    fi
+    return $RESULT
+}
+
+main()
+{
+    declare -i VERBOSE #< Mot local - needed by onExit().
+    parseArgs "$@"
+
+    trap onExit EXIT
+
+    rm -rf "$STAGEBASE"
+
+    if [ KEEP_WORK_DIR = 1 ]; then
+        local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
+    else
+        local -r WORK_DIR_NOTE="(will be deleted on success)"
+    fi
+    echo "Creating distribution in $STAGEBASE $WORK_DIR_NOTE."
+
+    if [ $VERBOSE = 0 ]; then
+        redirectOutputToLog
+    fi
+
+    buildDistribution
+
+    if [ KEEP_WORK_DIR = 0 ]; then
+        rm -rf "$STAGEBASE"
+    fi
+}
+
+main "$@"

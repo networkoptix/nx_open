@@ -29,13 +29,14 @@ bool isResponseOK(const nx_http::HttpClient* client)
 
 
 XmlRequestHelper::XmlRequestHelper(
-    QUrl url, const QAuthenticator& authenticator, 
+    QUrl url, const QAuthenticator& authenticator,
     nx_http::AsyncHttpClient::AuthType authType)
 :
     m_url(std::move(url)),
     m_client(makeHttpClient(authenticator))
 {
     m_client->setAuthType(authType);
+    m_client->setIgnoreMutexAnalyzer(true);
 }
 
 boost::optional<QDomDocument> XmlRequestHelper::get(const QString& path)
@@ -103,19 +104,6 @@ boost::optional<QDomDocument> XmlRequestHelper::readBody()
     }
 
     return document;
-}
-
-std::vector<QDomElement> xmlElements(const QDomNodeList& nodeList)
-{
-    std::vector<QDomElement> elementList;
-    for (int i = 0; i < nodeList.size(); ++i)
-    {
-        const auto element = nodeList.at(i).toElement();
-        if (!element.isNull())
-            elementList.push_back(element);
-    }
-
-    return elementList;
 }
 
 } // namespace utils

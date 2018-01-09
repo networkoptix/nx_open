@@ -858,11 +858,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Bazı kameralar için şifre ayarlanması gerekir</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Videoyu Dışa Aktar...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -870,15 +870,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Çözünürlük...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation type="unfinished">Cell Aspect Ratio...</translation>
+      <translation>En boy oranı...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation type="unfinished">Cell Spacing...</translation>
+      <translation>Hücre aralığı...</translation>
     </message>
   </context>
   <context>
@@ -975,58 +975,58 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
+      <translation>Seçilen ayarlar kodlamayı gerektirir. CPU kullanımını artabilir ve işlemler daha uzun zaman alabilir.</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
+      <translation>AVI formatı, ses kaydına sahip sürekli olmayan bir kaydı dışa aktarmak için önerilmez.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
+      <translation>Görüntü kaybını engellemek için &quot;Multi Video&quot; seçmenizi öneririz.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation>Uzun bir videoyu dışa aktarmak üzeresiniz. Aktarım uzun sürebilir ve diskte tutacağı alan Gigabayt seviyesinde olabilir.</translation>
     </message>
     <message>
       <source>Settings are not available for .EXE files.</source>
-      <translation type="unfinished">Settings are not available for .EXE files.</translation>
+      <translation>.EXE dosyaları için ayarlar kullanılamaz.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
+      <translation>Yerel dosyalar, sunucu monitörü widget'ları ve web sayfaları dışa aktarılmaz.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
+      <translation>Dışa aktarılan .EXE dosyası 4 GB'dan büyük olacağından Windows'ta çift tıklatılarak açılmaz. Yalnızca %1 İstemcide oynatılabilir.</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Medya Dosyası</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>Yürütülebilir %1 Medya Dosyası (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>(X86) yürütülebilir %1 medya dosyası</translation>
     </message>
   </context>
   <context>
@@ -1162,23 +1162,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Uzun</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>Sadece latin harfler ve klavye simgeleri %1 kullanılabilir.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>Şifre %n farklı kombinasyonları karakterler, semboller veya basamak içermelidir</numerusform>
+        <numerusform>Şifre %n farklı kombinasyonları karakterler, semboller veya basamak içermelidir</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Şifre en az %n karakterden oluşmalıdır.</numerusform>
         <numerusform>Password must be at least %n characters long.</numerusform>
       </translation>
     </message>
@@ -1186,21 +1186,21 @@ to view more bookmarks</source>
       <source>Password must be no longer than %n characters.</source>
       <translation type="unfinished">
         <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Parola %n karakterden uzun olmak zorundadır.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
       <translation type="unfinished">
         <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation type="unfinished">
         <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Parola %n veya daha fazla ardışık karakter içermemelidir.</numerusform>
       </translation>
     </message>
   </context>
@@ -2322,7 +2322,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Don&apos;t change</source>
-      <translation type="unfinished">Don&apos;t change</translation>
+      <translation>Değiştirme</translation>
     </message>
     <message>
       <source>Low</source>
@@ -2518,7 +2518,7 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password shouldn&apos;t be equal to camera&apos;s user name</translation>
+      <translation>Parola kullanıcı adı ile aynı olamaz</translation>
     </message>
     <message>
       <source>New Password</source>
@@ -2526,7 +2526,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Parolayı tekrarla</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2534,7 +2534,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>Parola en az 8 sembol uzunluğunda ve farklı karakter türleri içermelidir.</translation>
     </message>
   </context>
   <context>
@@ -2620,11 +2620,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>Basit ayarlar</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>Daha Fazla Ayar</translation>
     </message>
   </context>
   <context>
@@ -3165,22 +3165,22 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation type="unfinished">This camera requires password to be set up.</translation>
+      <translation>Bu kameranın ayarlanabilmesi için şifre gerekir.</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
+      <translation>Seçili bazı kamerların ayarlanabilmesi için şifre gerekir.</translation>
     </message>
     <message numerus="yes">
       <source>Set Password</source>
-      <translation type="unfinished">
-        <numerusform>Set Password</numerusform>
-        <numerusform>Set Password</numerusform>
+      <translation>
+        <numerusform>Parola Belirle</numerusform>
+        <numerusform>Parola Belirle</numerusform>
       </translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation type="unfinished">Ask your system administrator to do it.</translation>
+      <translation>Bunu yapmak için sistem yöneticinize başvurun.</translation>
     </message>
   </context>
   <context>
@@ -3432,7 +3432,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Temel</translation>
     </message>
   </context>
   <context>
@@ -4225,9 +4225,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Use licenses to view these %n cameras</numerusform>
-        <numerusform>Use licenses to view these %n cameras</numerusform>
+      <translation>
+        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
+        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
       </translation>
     </message>
   </context>
@@ -4474,9 +4474,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Tüm %n kameralar için ayarla</numerusform>
+        <numerusform>Tüm %n kameralar için ayarla</numerusform>
       </translation>
     </message>
   </context>
@@ -4621,7 +4621,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>NVR a bağlı kameralar senkronize olmayan oynatmayı desteklemez</translation>
     </message>
   </context>
   <context>
@@ -4719,7 +4719,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>Parola Belirle</translation>
     </message>
   </context>
   <context>
@@ -6101,15 +6101,15 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>ÇOK FAZLA BAĞLANTI</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>PAROLA GEREKLİ</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Bu Kamera için ayarla</translation>
     </message>
   </context>
   <context>
@@ -6525,7 +6525,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Arşiv bütünlüğü sorunu tespit edildi</translation>
     </message>
   </context>
   <context>
@@ -6593,11 +6593,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Sistem saati Internet'le senkronize edilir ve sunuculardaki yerel saate bağlı değildir.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Sistem saati seçili sistem ile senkronize edilir ve sunuculardaki yerel saate bağlı değildir.</translation>
     </message>
   </context>
   <context>
@@ -7732,38 +7732,38 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation type="unfinished">Dynamic</translation>
+      <translation>Dinamik</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>Veri aktarımı için desteklenmeyen medya.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>Seçilen format FFMPEG kütüphanesi tarafından desteklenmiyor.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>FFMPEG library hatası.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>Ses veya Video Kodek'i Seçilen Formatla Uyumsuz.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Dosya yazma hatası.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Dahili hata</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Veri dışarı aktarma.</translation>
     </message>
   </context>
   <context>
@@ -7782,15 +7782,15 @@ to %1</source>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Ayarları Dışa Aktar</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>Zaman Damgasını Ekle</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>Zaman Damgasını Sil</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -7798,11 +7798,11 @@ to %1</source>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>Resim Ekle</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>Resmi sil</translation>
     </message>
     <message>
       <source>Image</source>
@@ -7810,27 +7810,27 @@ to %1</source>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>Metin ekle</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>Metni sil</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Metin</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Hızı Sıfırla</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>Yer İşaret Bilgisi Ekle</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>Yer işaretini sil</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
@@ -7864,7 +7864,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>Resimler (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -7872,7 +7872,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>Resim yüklenemiyor.</translation>
     </message>
   </context>
   <context>
@@ -7883,7 +7883,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>KAMERA DEĞİL</translation>
     </message>
   </context>
   <context>
@@ -7909,16 +7909,16 @@ to %1</source>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>Performansı artırmak için düzen için &quot;Otomatik&quot; olarak ayarlayýn.</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>Hızlı bakış dışarı aktarmak için video en az %n saniye olmalıdır.</numerusform>
+        <numerusform>Hızlı bakış dışarı aktarmak için video en az %n saniye olmalıdır.</numerusform>
       </translation>
     </message>
   </context>
@@ -7926,7 +7926,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Uzun</translation>
     </message>
     <message>
       <source>Short</source>
@@ -7937,14 +7937,14 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 Analiz</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>Aktarmayı durdur</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -7952,16 +7952,16 @@ to %1</source>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Dışa aktarma başarısız oldu</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Dosyaya yazılamıyor</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
     </message>
   </context>
   <context>
@@ -8171,14 +8171,14 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>Desteklenen etkinlik türü yok</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>Etkinlik tüm şartlar karşılandığında tetiklenecektir. Anahtar kelime alanı boş ise şartlar her zaman karşılanmış olacaktır. Eğer değilse anahtar kelimeye karşılık gelen analiz tetiklenecektir.</translation>
     </message>
   </context>
   <context>
@@ -8527,11 +8527,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>Parola Değiştirilemedi</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>%2 kameradan %1'de şifre değiştirilemedi</translation>
     </message>
   </context>
   <context>
@@ -8572,7 +8572,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Showreel %1'i silinsin mi?</translation>
     </message>
   </context>
   <context>

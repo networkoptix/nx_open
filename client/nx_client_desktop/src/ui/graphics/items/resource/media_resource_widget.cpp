@@ -290,6 +290,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::handleDewarpingParamsChanged);
     connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
         &QnMediaResourceWidget::handleDewarpingParamsChanged);
+    connect(this, &QnResourceWidget::zoomTargetWidgetChanged, this,
+        &QnMediaResourceWidget::updateDisplay);
 
     connect(item, &QnWorkbenchItem::imageEnhancementChanged, this,
         &QnMediaResourceWidget::at_item_imageEnhancementChanged);
@@ -343,6 +345,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(context, &QnWorkbenchContext::userChanged,
         this, &QnMediaResourceWidget::resetTriggers);
 
+    updateDisplay();
     updateDewarpingParams();
 
     /* Set up static text. */
@@ -875,6 +878,17 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     return defaultAspectRatio(); /*< Here we can get -1.0 if there are no predefined AR set */
 }
 
+void QnMediaResourceWidget::updateDisplay()
+{
+    const auto zoomTargetWidget = dynamic_cast<QnMediaResourceWidget*>(this->zoomTargetWidget());
+
+    const auto display = zoomTargetWidget
+        ? zoomTargetWidget->display()
+        : QnResourceDisplayPtr(new QnResourceDisplay(d->mediaResource->toResourcePtr()));
+
+    setDisplay(display);
+}
+
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const
 {
     return d->mediaResource;
@@ -1375,30 +1389,41 @@ void QnMediaResourceWidget::invalidateMotionLabelPositions() const
 
 void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
 {
+    if (d->display())
+        d->display()->removeRenderer(m_renderer);
+
     d->setDisplay(display);
 
-    connect(display->camDisplay(), &QnCamDisplay::stillImageChanged, this,
-        &QnMediaResourceWidget::updateButtonsVisibility);
-
-    connect(display->camDisplay(), &QnCamDisplay::liveMode, this,
-        &QnMediaResourceWidget::at_camDisplay_liveChanged);
-    connect(d->resource, &QnResource::videoLayoutChanged, this,
-        &QnMediaResourceWidget::at_videoLayoutChanged);
-
-    if (const auto archiveReader = display->archiveReader())
+    if (display)
     {
-        connect(archiveReader, &QnAbstractArchiveStreamReader::streamPaused,
-            this, &QnMediaResourceWidget::updateButtonsVisibility);
-        connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
-            this, &QnMediaResourceWidget::updateButtonsVisibility);
-        connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
-            this, &QnMediaResourceWidget::clearEntropixEnhancedImage);
-    }
+        connect(display->camDisplay(), &QnCamDisplay::stillImageChanged, this,
+            &QnMediaResourceWidget::updateButtonsVisibility);
 
-    setChannelLayout(display->videoLayout());
-    display->addRenderer(m_renderer);
-    m_renderer->setChannelCount(display->videoLayout()->channelCount());
-    updateCustomAspectRatio();
+        connect(display->camDisplay(), &QnCamDisplay::liveMode, this,
+            &QnMediaResourceWidget::at_camDisplay_liveChanged);
+        connect(d->resource, &QnResource::videoLayoutChanged, this,
+            &QnMediaResourceWidget::at_videoLayoutChanged);
+
+        if (const auto archiveReader = display->archiveReader())
+        {
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamPaused,
+                this, &QnMediaResourceWidget::updateButtonsVisibility);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
+                this, &QnMediaResourceWidget::updateButtonsVisibility);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
+                this, &QnMediaResourceWidget::clearEntropixEnhancedImage);
+        }
+
+        setChannelLayout(display->videoLayout());
+        display->addRenderer(m_renderer);
+        m_renderer->setChannelCount(display->videoLayout()->channelCount());
+        updateCustomAspectRatio();
+    }
+    else
+    {
+        setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
+        m_renderer->setChannelCount(0);
+    }
 
     emit displayChanged();
 }

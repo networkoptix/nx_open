@@ -46,10 +46,15 @@ public:
     /**
      * @brief startFetchingMetadata starts fetching metadata from the resource.
      * @param handler metadata fetched by plugin should be passed to this handler.
+     * @param eventTypeList pointer to Guid array.
+     * @param eventTypeListSize guid array size.
      * Errors are also should reported via this handler.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error startFetchingMetadata(AbstractMetadataHandler* handler) = 0;
+    virtual Error startFetchingMetadata(
+        AbstractMetadataHandler* handler,
+        nxpl::NX_GUID* eventTypeList,
+        int eventTypeListSize) = 0;
 
     /**
      * @brief stopFetchingMetadata stops fetching metadata from the resource synchronously

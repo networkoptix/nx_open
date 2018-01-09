@@ -80,7 +80,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
     m_gotSDP =  false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
-    
+
     QString portStr = m_resource->getUrl();
 	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
 
@@ -99,7 +99,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
 
     if (ports[0].contains(QLatin1Char(':')))
         m_connectionPort = ports[0].mid(ports[0].indexOf(QLatin1Char(':'))+1).toInt();
-    
+
     //m_videoPort = ports[1].toInt();
     //m_audioPort = ports[2].toInt();
     m_dataPort = ports[1].toInt();
@@ -129,7 +129,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
     }
     QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalAddress().port).
             arg(m_audioIoDevice->getMediaSocket()->getLocalAddress().port).arg(DROID_CONTROL_TCP_SERVER_PORT).toLatin1();
-    
+
     int sendLen = m_tcpSock->send(request.data(), request.size());
     if (sendLen != request.size())
     {
@@ -184,7 +184,7 @@ bool PlDroidStreamReader::isStreamOpened() const
 void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
 {
     QnMutexLocker lock( &m_controlPortSync );
-    m_h264Parser->setSDPInfo(sdpInfo.split('\n'));
+    m_h264Parser->setSdpInfo(sdpInfo.split('\n'));
     m_gotSDP = true;
 }
 

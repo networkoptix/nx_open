@@ -48,14 +48,22 @@ HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const Q
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType)
+    nx_upnp::SearchAutoHandler(kUpnpBasicDeviceType),
+    m_sunapiProbePackets(createProbePackets())
 {
-    m_sunapiProbePackets.resize(2);
-    m_sunapiProbePackets[0].resize(262);
-    m_sunapiProbePackets[0][0] = '\x1';
+}
 
-    m_sunapiProbePackets[1].resize(334);
-    m_sunapiProbePackets[1][0] = '\x6';
+std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
+{
+    std::vector<std::vector<quint8>> result;
+    result.resize(2);
+    result[0].resize(262);
+    result[0][0] = '\x1';
+
+    result[1].resize(334);
+    result[1][0] = '\x6';
+
+    return result;
 }
 
 QnResourcePtr HanwhaResourceSearcher::createResource(
@@ -163,6 +171,19 @@ void HanwhaResourceSearcher::updateSocketList()
     }
 }
 
+bool HanwhaResourceSearcher::isHostBelongsToValidSubnet(const QHostAddress& address) const
+{
+    const auto interfaceList = getAllIPv4Interfaces(
+        false, /*allowInterfacesWithoutAddress*/
+        true /*keepAllAddressesPerInterface*/);
+    return std::any_of(
+        interfaceList.begin(), interfaceList.end(),
+        [&address](const QnInterfaceAndAddr& netInterface)
+        {
+            return netInterface.isHostBelongToIpv4Network(address);
+        });
+}
+
 bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData* outData)
 {
     // Packet format is reverse engenered.
@@ -182,10 +203,11 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
 
     static const int kUrlOffset = 133;
     const auto urlStr = QLatin1String(data.data() + kUrlOffset);
-    outData->presentationUrl = QUrl(urlStr).toString(QUrl::RemovePath);
-
-    if (outData->presentationUrl.isEmpty())
+    QUrl url(urlStr);
+    if (!url.isValid() || !isHostBelongsToValidSubnet(QHostAddress(url.host())))
         return false;
+    outData->presentationUrl = url.toString(QUrl::RemovePath);
+
     outData->manufacturer = kHanwhaManufacturerName;
 
     return true;
@@ -196,7 +218,6 @@ void HanwhaResourceSearcher::sendSunApiProbe()
     updateSocketList();
     for (const auto& socket: m_sunApiSocketList)
     {
-        // Sending broadcast
         for(const auto& packet: m_sunapiProbePackets)
             socket->sendTo(packet.data(), packet.size(), BROADCAST_ADDRESS, kSunApiProbeDstPort);
     }
@@ -223,7 +244,10 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
         {
             int bytesRead = socket->recv(datagram.data(), datagram.size());
             if (bytesRead < 1)
+            {
+                m_sunApiSocketList.clear(); //< Recreate socket list after error.
                 continue;
+            }
 
             SunApiData sunApiData;
             if (parseSunApiData(datagram.left(bytesRead), &sunApiData))

@@ -568,7 +568,7 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
         QnPlatformMonitor::PartitionSpace partitionInfo;
         partitionInfo.devName = data.devName;
         partitionInfo.path = data.path;
-        partitionInfo.type = data.isUsb ? QnPlatformMonitor::UsbDiskPartition : fsNameToType(data.fsName);
+        partitionInfo.type = data.isUsb ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
         partitionInfo.sizeBytes = data.sizeBytes;
         partitionInfo.freeBytes = data.freeBytes;
         result.push_back(partitionInfo);

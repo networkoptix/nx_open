@@ -72,7 +72,7 @@ struct UdtEpollHandlerHelper
 #endif
         }
     }
-    
+
     int epoll_fd;
     UDTSOCKET udt_handler;
 };
@@ -148,9 +148,9 @@ bool UdtSocket<InterfaceToImplement>::bindToUdpSocket(UDPSocket&& udpSocket)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::bind(const SocketAddress& localAddress)
 {
-    SystemSocketAddress addr(localAddress, m_ipVersion);
+    const SystemSocketAddress addr(localAddress, m_ipVersion);
 
-    int ret = UDT::bind(m_impl->udtHandle, addr.ptr.get(), addr.size);
+    int ret = UDT::bind(m_impl->udtHandle, addr.addr(), addr.addrLen());
     if (ret != 0)
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -161,7 +161,7 @@ template<typename InterfaceToImplement>
 SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getsockname(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
+    if (UDT::getsockname(m_impl->udtHandle, addr.addr(), reinterpret_cast<int*>(&addr.addrLen())) != 0)
     {
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -201,7 +201,7 @@ template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::shutdown()
 {
     // TODO #ak: Implementing shutdown via close may lead to undefined behavior in case of handle reuse.
-    // But, UDT allocates socket handles as atomic increment, so handle reuse is 
+    // But, UDT allocates socket handles as atomic increment, so handle reuse is
     // hard to imagine in real life.
 
 #if 0   //no LINGER
@@ -475,7 +475,7 @@ bool UdtSocket<InterfaceToImplement>::open()
 
     constexpr const int kMtuSize = 1400;
     constexpr const int kMaximumUdtWindowSizePacketsBase = 64;
-    constexpr const int kMaximumUdtWindowSizePackets = 
+    constexpr const int kMaximumUdtWindowSizePackets =
         kMaximumUdtWindowSizePacketsBase * kPacketsCoeff;
 
     constexpr const int kUdtBufferMultiplier = 48;
@@ -644,7 +644,7 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 SocketAddress UdtStreamSocket::getForeignAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getpeername(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
+    if (UDT::getpeername(m_impl->udtHandle, addr.addr(), reinterpret_cast<int*>(&addr.addrLen())) != 0)
     {
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -765,7 +765,9 @@ bool UdtStreamSocket::connectToIp(
 
     NX_ASSERT(m_state == detail::SocketState::open);
 
-    SystemSocketAddress addr(remoteAddress, m_ipVersion);
+    const SystemSocketAddress addr(remoteAddress, m_ipVersion);
+    if (!addr.addr())
+        return false;
 
     // The official documentation doesn't advice using select but here we just need
     // to wait on a single socket fd, select is way more faster than epoll on linux
@@ -778,7 +780,7 @@ bool UdtStreamSocket::connectToIp(
         if (!setNonBlockingMode(nbk_sock))
             return false;
     }
-    int ret = UDT::connect(m_impl->udtHandle, addr.ptr.get(), addr.size);
+    int ret = UDT::connect(m_impl->udtHandle, addr.addr(), addr.addrLen());
     // The UDT connect will always return zero even if such operation is async which is
     // different with the existed Posix/Win32 socket design. So if we meet an non-zero
     // value, the only explanation is an error happened which cannot be solved.

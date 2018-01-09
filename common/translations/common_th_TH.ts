@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>การเชื่อมต่อ</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>ใบอนุญาตของการเชื่อมต่อ</translation>
     </message>
   </context>
   <context>

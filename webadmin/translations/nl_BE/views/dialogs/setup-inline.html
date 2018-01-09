@@ -77,12 +77,12 @@
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
                 <label>
                     <input type="checkbox" id="{{setting}}"
-                           ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
+                           ng-model="systemSettings[setting]"> <span>{{L.settingsConfig[setting]}}</span>
                 </label>
             </div>
 
             <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
-                   for="{{setting}}" >{{Config.settingsConfig[setting].label}}</label>
+                   for="{{setting}}" >{{L.settingsConfig[setting]}}</label>
             <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
                    id="{{setting}}"
                    placeholder="{{}}"

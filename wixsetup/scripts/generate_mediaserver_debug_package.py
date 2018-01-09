@@ -13,6 +13,7 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'plugins/generic_multicast_plugin.pdb',
         'plugins/genericrtspplugin.pdb',
         'plugins/hanwha_metadata_plugin.pdb',
+        'plugins/hikvision_metadata_plugin.pdb',
         'plugins/image_library_plugin.pdb',
         'plugins/mjpg_link.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename, mandatory=False)

@@ -102,7 +102,7 @@ function(nx_get_dependencies)
         set(haveServer TRUE)
     endif()
 
-    if (WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
+    if (WINDOWS OR MACOSX OR (LINUX AND box MATCHES "none|tx1"))
         set(haveDesktopClient TRUE)
     endif()
 
@@ -111,7 +111,7 @@ function(nx_get_dependencies)
     endif()
 
     if(WINDOWS OR MACOSX
-        OR (LINUX AND NOT arch STREQUAL "x86" AND NOT ANDROID AND box MATCHES "none|bpi|tx1"))
+        OR (LINUX AND NOT arch STREQUAL "x86" AND box MATCHES "none|bpi|tx1"))
 
         set(haveTests TRUE)
     endif()
@@ -139,6 +139,7 @@ function(nx_get_dependencies)
     if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
         nx_rdep_add_package(opengl-es-mali)
+        nx_rdep_add_package(libstdc++-6.0.19)
     endif()
 
     if(box MATCHES "rpi")
@@ -162,6 +163,11 @@ function(nx_get_dependencies)
         nx_rdep_add_package(quazip)
     endif()
 
+    if(LINUX AND box STREQUAL "none")
+        nx_rdep_add_package(cifs-utils)
+        nx_rdep_add_package(appserver-2.2.1)
+    endif()
+
     if(WINDOWS)
         nx_rdep_add_package(directx)
         nx_rdep_add_package("vcredist-2015" PATH_VARIABLE vcredist_directory)
@@ -180,7 +186,7 @@ function(nx_get_dependencies)
 
     if(haveDesktopClient)
         nx_rdep_add_package(any/qtsingleapplication)
-        nx_rdep_add_package(any/help-${customization}-3.1.1 PATH_VARIABLE help_directory)
+        nx_rdep_add_package(any/help-${customization}-3.1 PATH_VARIABLE help_directory)
         set(help_directory ${help_directory} PARENT_SCOPE)
     endif()
 
@@ -236,8 +242,6 @@ function(nx_get_dependencies)
         nx_rdep_add_package(ldpreloadhook-1.0-deb7)
         nx_rdep_add_package(libpixman-0.34.0-deb7)
         nx_rdep_add_package(libcedrus-1.0-deb7)
-
-        nx_rdep_add_package(libstdc++-6.0.19)
 
         nx_rdep_add_package(fontconfig-2.11.0)
         nx_rdep_add_package(additional-fonts)

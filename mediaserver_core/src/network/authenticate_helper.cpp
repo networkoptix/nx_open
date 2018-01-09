@@ -42,6 +42,9 @@
 //// class QnAuthHelper
 ////////////////////////////////////////////////////////////
 
+// TODO: Does it make sense to move into some config?
+static const bool kVerifyDigestUriWithParams = false;
+
 void QnAuthHelper::UserDigestData::parse(const nx_http::Request& request)
 {
     ha1Digest = nx_http::getHeaderValue(request.headers, Qn::HA1_DIGEST_HEADER_NAME);
@@ -301,7 +304,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 authResult == Qn::Auth_WrongLogin) &&
                 authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
             {
-                if (doDigestAuth(request.requestLine.method,
+                if (doDigestAuth(request.requestLine,
                     authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
                 {
                     // Cached value matched user digest by not LDAP server.
@@ -325,7 +328,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 *usedAuthMethod = nx_http::AuthMethod::httpDigest;
 
             authResult = doDigestAuth(
-                request.requestLine.method, authorizationHeader, response, isProxy, accessRights);
+                request.requestLine, authorizationHeader, response, isProxy, accessRights);
             NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
@@ -414,8 +417,24 @@ void QnAuthHelper::authenticationExpired(const QString& authKey, quint64 /*timer
     m_authenticatedPaths.erase(authKey);
 }
 
+static bool verifyDigestUri(const QUrl& requestUrl, const QByteArray& uri)
+{
+    const QUrl digestUrl(QString::fromUtf8(uri));
+    const auto requestPath = requestUrl.path();
+    const auto digsetPath = digestUrl.path();
+    if (requestUrl.path() != digestUrl.path())
+        return false;
+
+    const auto requestQuery = requestUrl.query();
+    const auto digestQuery = digestUrl.query();
+    if (kVerifyDigestUriWithParams && requestUrl.query() != digestUrl.query())
+        return false;
+
+    return true;
+}
+
 Qn::AuthResult QnAuthHelper::doDigestAuth(
-    const QByteArray& method,
+    const nx_http::RequestLine& requestLine,
     const nx_http::header::Authorization& authorization,
     nx_http::Response& responseHeaders,
     bool isProxy,
@@ -427,7 +446,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     const QByteArray realm = authorization.digest->params["realm"];
     const QByteArray uri = authorization.digest->params["uri"];
 
-    if (nonce.isEmpty() || userName.isEmpty() || realm.isEmpty())
+    if (nonce.isEmpty() || userName.isEmpty() || !verifyDigestUri(requestLine.url, uri))
         return Qn::Auth_WrongDigest;
 
     QnUserResourcePtr userResource;
@@ -438,7 +457,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
 
         QnResourcePtr res;
         std::tie(errCode, res) = m_userDataProvider->authorize(
-            method,
+            requestLine.method,
             authorization,
             &responseHeaders.headers);
 
@@ -528,6 +547,11 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         return authenticateByUrl(
             QUrl::fromPercentEncoding(auth).toUtf8(),
             method, responseHeaders, accessRights);
+    }
+    else
+    {
+        NX_ASSERT(false); 
+        return Qn::Auth_Forbidden;
     }
 
     nx_http::Response tmpHeaders;

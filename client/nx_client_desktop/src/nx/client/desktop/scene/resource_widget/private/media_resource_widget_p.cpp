@@ -51,10 +51,22 @@ QnResourceDisplayPtr MediaResourceWidgetPrivate::display() const
 
 void MediaResourceWidgetPrivate::setDisplay(const QnResourceDisplayPtr& display)
 {
-    NX_ASSERT(display && !m_display);
+    // TODO: #dklychkov Make QnMediaResourceWidget::setDisplay work with the previous
+    // implementation which has an assert for repeated setDisplay call.
+
+    if (display == m_display)
+        return;
+
+    if (m_display)
+        m_display->camDisplay()->disconnect(this);
+
     m_display = display;
-    connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this,
-        &MediaResourceWidgetPrivate::updateIsPlayingLive);
+
+    if (m_display)
+    {
+        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this,
+            &MediaResourceWidgetPrivate::updateIsPlayingLive);
+    }
 
     {
         QSignalBlocker blocker(this);

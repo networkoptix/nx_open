@@ -1022,7 +1022,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64) (*.exe)</translation>
+      <translation>ปฏิบัติการ %1 สื่อไฟล์ (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
@@ -1336,7 +1336,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -2145,7 +2145,7 @@ to view more bookmarks</source>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -3503,7 +3503,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์ ...</translation>
+      <translation>เลือกโฟลเดอร์...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -4912,7 +4912,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์ ...</translation>
+      <translation>เลือกโฟลเดอร์...</translation>
     </message>
     <message>
       <source>Best</source>
@@ -6213,7 +6213,7 @@ to %1</source>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -6610,7 +6610,7 @@ to %1</source>
     <name>QnTwoStepFileDialog</name>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์ ...</translation>
+      <translation>เลือกโฟลเดอร์...</translation>
     </message>
     <message>
       <source>Select file...</source>
@@ -7638,31 +7638,31 @@ to %1</source>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation type="unfinished">Unsupported media for data export.</translation>
+      <translation>สื่อที่ไม่สนับสนุนสำหรับการส่งออกข้อมูล</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
+      <translation>ไลบรารี FFMPEG ไม่สนับสนุนไลบรารีที่เลือก</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation type="unfinished">FFMPEG library error.</translation>
+      <translation>ข้อผิดพลาดของไลบรารี FFMPEG</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
+      <translation>วิดีโอหรือตัวแปลงสัญญาณเสียงไม่เข้ากันกับรูปแบบที่เลือก</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>ข้อผิดพลาดในการเขียนไฟล์</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>ไม่มีข้อมูลที่ส่งออก</translation>
     </message>
   </context>
   <context>
@@ -7681,15 +7681,15 @@ to %1</source>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>ตั้งค่าส่งออก</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation type="unfinished">Add Timestamp</translation>
+      <translation>เพิ่มการประทับเวลา</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation type="unfinished">Delete Timestamp</translation>
+      <translation>ลบประทับเวลา</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -7697,11 +7697,11 @@ to %1</source>
     </message>
     <message>
       <source>Add Image</source>
-      <translation type="unfinished">Add Image</translation>
+      <translation>เพิ่มรูปภาพ</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation type="unfinished">Delete Image</translation>
+      <translation>ลบรูปภาพ</translation>
     </message>
     <message>
       <source>Image</source>
@@ -7709,31 +7709,31 @@ to %1</source>
     </message>
     <message>
       <source>Add Text</source>
-      <translation type="unfinished">Add Text</translation>
+      <translation>เพิ่มข้อความ</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation type="unfinished">Delete Text</translation>
+      <translation>ลบข้อความ</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>ข้อความ</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>รีเซ็ตความเร็ว</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation type="unfinished">Add Bookmark Info</translation>
+      <translation>เพิ่มบุ๊คมาร์ค</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation type="unfinished">Delete Bookmark Info</translation>
+      <translation>ลบ​บุ๊ค​มา​ร์ค</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>ข้อมูลบุ๊กมาร์ก</translation>
     </message>
   </context>
   <context>
@@ -7752,7 +7752,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์ ...</translation>
+      <translation>เลือกโฟลเดอร์...</translation>
     </message>
   </context>
   <context>
@@ -7763,7 +7763,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation type="unfinished">Pictures (%1)</translation>
+      <translation>รูปภาพ (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -7771,7 +7771,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>รูปภาพไม่สามารถโหลดได้</translation>
     </message>
   </context>
   <context>
@@ -7782,7 +7782,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation type="unfinished">NOT A CAMERA</translation>
+      <translation>กล้องไม่ได้</translation>
     </message>
   </context>
   <context>
@@ -7808,15 +7808,15 @@ to %1</source>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>ตั้งค่าเค้าโครงละเอียดเป็น &quot;Auto&quot; ในการเพิ่มประสิทธิภาพ</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+      <translation>
+        <numerusform>สำหรับการส่งออกเป็นรีวิวรวดเร็ว ความยาววิดีโอควรที่น้อยที่สุด %n วินาที</numerusform>
       </translation>
     </message>
   </context>
@@ -7824,7 +7824,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>ยาว</translation>
     </message>
     <message>
       <source>Short</source>
@@ -7835,14 +7835,14 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 วิเคราะห์</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>หยุดการส่งออก</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -7850,16 +7850,16 @@ to %1</source>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>ส่งออกล้มเหลว</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>ไม่สามารถเขียนไฟล์ได้</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 ถูกใช้โดยส่งออกอื่น</translation>
     </message>
   </context>
   <context>
@@ -8069,14 +8069,14 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
     <message>
       <source>No event types supported</source>
-      <translation type="unfinished">No event types supported</translation>
+      <translation>ไม่มีประเภทเหตุการณ์ที่สนับสนุน</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation type="unfinished">Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</translation>
+      <translation>เหตุการณ์นี้จะถูกเรียกเฉพาะในกรณีที่กิจกรรมตรงตามเงื่อนไขข้างต้น หากมีข้อมูลตรงตามเงื่อนไขจะพบเสมอ ถ้าไม่ได้สภาพจะพบว่าข้อมูลที่สอดคล้องกันของเหตุการณ์ทั่วไปมีคำหลัก</translation>
     </message>
   </context>
   <context>
@@ -8308,7 +8308,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>เลือกโฟลเดอร์ ...</translation>
+      <translation>เลือกโฟลเดอร์...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -8418,11 +8418,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>ไม่สามารถเปลี่ยนรหัสผ่าน</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
+      <translation>ไม่สามารถเปลี่ยนรหัสผ่านได้ที่ %1 จาก %2 กล้อง</translation>
     </message>
   </context>
   <context>

@@ -141,7 +141,7 @@ private:
         bool isProxy,
         bool isDigest = true);
     Qn::AuthResult doDigestAuth(
-        const QByteArray& method,
+        const nx_http::RequestLine& requestLine,
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         bool isProxy,

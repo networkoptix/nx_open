@@ -3,9 +3,9 @@ if(targetDevice STREQUAL "bpi")
     list(APPEND depends "mobile_client")
 endif()
 
-set(tar_filename ${artifact.name.server}.tar.gz)
-set(zip_filename ${artifact.name.server_update}.zip)
-set(installer_output_list ${tar_filename} ${zip_filename})
+set(tar_file ${distribution_output_dir}/${artifact.name.server}.tar.gz)
+set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
+set(installer_output_list ${tar_file} ${zip_file})
 
 # Set variables which may depend on current project and are used by create_arm_installer.conf.
 set(project.build.directory ${CMAKE_CURRENT_BINARY_DIR})

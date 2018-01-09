@@ -55,9 +55,12 @@ void initialize(
         write(lm("Binary path: %1").arg(binaryPath));
 
     const auto filePath = logger->filePath();
-    write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
+    write(lm("Log level: %1, file size: %2, backup count: %3, file: %4").args(
         toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
         settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
+
+    if (!settings.exceptionFilers.empty())
+        write(lm("Filters: %1").container(settings.exceptionFilers));
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)

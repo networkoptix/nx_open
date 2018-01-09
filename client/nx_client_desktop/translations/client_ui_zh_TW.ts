@@ -404,7 +404,7 @@
     <message>
       <location/>
       <source>Timeout</source>
-      <translation>&amp;逾時</translation>
+      <translation>逾時</translation>
     </message>
     <message>
       <location/>
