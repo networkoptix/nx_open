@@ -917,6 +917,9 @@ enum IDType
     LayoutTourSettingsAction,
     CurrentLayoutTourSettingsAction,
 
+    NewWearableCameraAction,
+    UploadWearableCameraFileAction,
+
     /* Timeline actions. */
 
     /**

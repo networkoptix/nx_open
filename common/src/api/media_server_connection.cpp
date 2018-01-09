@@ -86,6 +86,8 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraSearchStatusObject, "manualCamera/status")
     (CameraSearchStopObject, "manualCamera/stop")
     (CameraAddObject, "manualCamera/add")
+    (WearableCameraAddObject, "wearableCamera/add")
+    (WearableCameraUploadFileObject, "wearableCamera/upload")
     (EventLogObject, "events")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
@@ -197,8 +199,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnStatisticsReply>(this, response, handle);
             break;
         case GetParamsObject:
-	    case SetParamsObject:
-		    processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
+        case SetParamsObject:
+            processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
             break;
         case TimeObject:
             processJsonReply<QnTimeReply>(this, response, handle);
@@ -207,6 +209,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
             break;
         case CameraAddObject:
+            emitFinished(this, response.status, handle);
+            break;
+        case WearableCameraAddObject:
+            processJsonReply<QnWearableCameraReply>(this, response, handle);
+            break;
+        case WearableCameraUploadFileObject:
             emitFinished(this, response.status, handle);
             break;
         case PtzContinuousMoveObject:
@@ -370,7 +378,7 @@ QnMediaServerConnection::QnMediaServerConnection(
         extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
             connection->connectionInfo().ecUrl.userName().toUtf8());
     }
-	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
+    extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
 
@@ -472,9 +480,9 @@ int QnMediaServerConnection::getTimePeriodsAsync(
 int QnMediaServerConnection::getParamsAsync(
     const QnNetworkResourcePtr& camera, const QStringList& keys, QObject* target, const char* slot)
 {
-	NX_ASSERT(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+    NX_ASSERT(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
 
-	QnRequestParamList params;
+    QnRequestParamList params;
     params << QnRequestParam("cameraId", camera->getId());
     for(const QString &param: keys)
         params << QnRequestParam(param, QString());
@@ -487,7 +495,7 @@ int QnMediaServerConnection::setParamsAsync(
     const QnNetworkResourcePtr& camera, const QnCameraAdvancedParamValueList& values,
     QObject* target, const char* slot)
 {
-	NX_ASSERT(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+    NX_ASSERT(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
 
     QnRequestParamList params;
     params << QnRequestParam("cameraId", camera->getId());
@@ -545,6 +553,22 @@ int QnMediaServerConnection::addCameraAsync(
     params << QnRequestParam("password", password);
 
     return sendAsyncGetRequestLogged(CameraAddObject, params, nullptr, target, slot);
+}
+
+int QnMediaServerConnection::addWearableCameraAsync(const QString& name, QObject* target, const char* slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("name", name);
+
+    return sendAsyncGetRequestLogged(WearableCameraAddObject, params, QN_STRINGIZE_TYPE(QnWearableCameraReply), target, slot);
+}
+
+int QnMediaServerConnection::uploadWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QByteArray& file, qint64 startTimeMs, QObject* target, const char* slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("resourceId", camera->getId());
+    params << QnRequestParam("startTime", startTimeMs);
+
+    nx_http::HttpHeaders headers;
+    return sendAsyncPostRequestLogged(WearableCameraUploadFileObject, headers, params, file, nullptr, target, slot);
 }
 
 void QnMediaServerConnection::addOldVersionPtzParams(

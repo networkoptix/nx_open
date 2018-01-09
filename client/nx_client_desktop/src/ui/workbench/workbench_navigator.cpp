@@ -174,7 +174,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
     {
         if (res.dynamicCast<QnStorageResource>())
-            m_cameraDataManager->clearCache();	// TODO:#GDM #bookmarks check if should be placed into camera manager
+            m_cameraDataManager->clearCache();    // TODO:#GDM #bookmarks check if should be placed into camera manager
     });
     discardCacheTimer->start();
 
@@ -1247,6 +1247,11 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
 
         if (m_currentWidget->resource()->flags().testFlag(Qn::sync))
             flags |= WidgetSupportsSync;
+
+        // TODO: #wearable resource flags are not propagated to client, so cannot check Qn::live here,
+        // probably should come up with a better way to handle this.
+        if (m_currentWidget->resource()->getTypeId() == QnResourceTypePool::kWearableCameraTypeUuid)
+            flags &= ~WidgetSupportsLive;
 
         if (workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);

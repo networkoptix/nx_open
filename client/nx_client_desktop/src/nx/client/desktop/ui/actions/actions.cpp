@@ -340,6 +340,14 @@ void initialize(Manager* manager, Action* root)
             )
             .autoRepeat(false);
 
+        factory(NewWearableCameraAction)
+            .flags(Main | NoTarget)
+            .text(ContextMenu::tr("Wearable Camera..."))
+            .pulledText(ContextMenu::tr("New Wearable Camera..."))
+            .condition(condition::isLoggedIn()
+                && !condition::isSafeMode()
+            )
+            .autoRepeat(false);
     }
     factory.endSubMenu();
 
@@ -1236,6 +1244,12 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::treeNodeType({Qn::UsersNode, Qn::RoleNode}));
 
+    factory(UploadWearableCameraFileAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Upload to Wearable Camera..."))
+        .condition(condition::isWearable(MatchMode::All));
+
     factory(CameraIssuesAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1247,6 +1261,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::live_cam, Any)
+            && !condition::isWearable(MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1263,6 +1278,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::live_cam, ExactlyOne)
+            && !condition::isWearable(MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()

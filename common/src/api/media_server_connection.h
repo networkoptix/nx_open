@@ -66,13 +66,13 @@ public:
      * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant>>& params)</tt>.
      * Status is 0 in case of success, in other cases it holds error code.
      *
-	 * @param keys List of parameter ids that are requested.
+     * @param keys List of parameter ids that are requested.
      * @return Request handle.
      */
     int getParamsAsync(const QnNetworkResourcePtr& camera, const QStringList& keys,
         QObject* target, const char* slot);
 
-	/**
+    /**
      * Set camera params.
      *
      * Returns immediately. On request completion the specified slot of the specified target is
@@ -123,6 +123,9 @@ public:
     int addCameraAsync(
         const QnManualResourceSearchList& cameras, const QString& username,
         const QString& password, QObject* target, const char* slot);
+
+    int addWearableCameraAsync(const QString& name, QObject* target, const char* slot);
+    int uploadWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QByteArray& file, qint64 startTimeMs, QObject* target, const char* slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr& camera,
         const QVector3D& speed, const QnUuid& sequenceId, int sequenceNumber, QObject* target,

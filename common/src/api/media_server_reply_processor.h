@@ -21,6 +21,7 @@
 #include <api/model/camera_list_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
+#include <api/model/wearable_camera_reply.h>
 #include "model/getnonce_reply.h"
 
 #include "media_server_connection.h"
@@ -49,7 +50,7 @@ signals:
     void finished(int status, const QnTimePeriodList &reply, int handle, const QString &errorString);
     void finished(int status, const QnStatisticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QVector3D &reply, int handle, const QString &errorString);
-	void finished(int status, const QnCameraAdvancedParamValueList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraAdvancedParamValueList &reply, int handle, const QString &errorString);
     void finished(int status, const QnTimeReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
@@ -72,9 +73,10 @@ signals:
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
     void finished(int status, const ec2::ApiCameraHistoryDataList &reply, int handle, const QString &errorString);
     void finished(int status, const MultiServerPeriodDataList &reply, int handle, const QString &errorString);
-	void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnAuditRecordList&reply, int handle, const QString &errorString);
     void finished(int status, const QnLdapUsers &reply, int handle, const QString &errorString);
+    void finished(int status, const QnWearableCameraReply &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

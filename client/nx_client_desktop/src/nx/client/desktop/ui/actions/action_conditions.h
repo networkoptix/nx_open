@@ -593,6 +593,9 @@ ConditionWrapper isSafeMode();
 /** Allowed only for resource parameters with corresponding flags. */
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
+/** Allowed only for wearable cameras. */
+ConditionWrapper isWearable(MatchMode matchMode);
+
 ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
 inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
 
