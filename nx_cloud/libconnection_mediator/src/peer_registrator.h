@@ -10,6 +10,7 @@
 #include <nx/network/cloud/data/resolve_domain_data.h>
 #include <nx/network/cloud/data/resolve_peer_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/counter.h>
 
 #include "data/listening_peer.h"
@@ -91,6 +92,7 @@ private:
     ListeningPeerPool* const m_listeningPeerPool;
     AbstractRelayClusterClient* const m_relayClusterClient;
     nx::utils::Counter m_counter;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
 
     void sendListenResponse(
         const ConnectionStrongRef& connection,

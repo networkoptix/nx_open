@@ -29,6 +29,7 @@ PeerRegistrator::PeerRegistrator(
 PeerRegistrator::~PeerRegistrator()
 {
     m_counter.wait();
+    m_asyncOperationGuard->terminate();
 }
 
 data::ListeningPeers PeerRegistrator::getListeningPeers() const
@@ -290,8 +291,15 @@ void PeerRegistrator::clientBind(
     }
 
     connection->addOnConnectionCloseHandler(
-        [this, peerId, connection]()
+        [this, peerId, connection, guard = m_asyncOperationGuard.sharedGuard()]()
         {
+            // TODO: #ak Logic here seems to duplicate ListeningPeerPool.
+            // The only difference is here we have client connection, there - server connection.
+
+            auto lock = guard->lock();
+            if (!lock)
+                return; //< ListeningPeerPool has been destroyed.
+
             QnMutexLocker lk(&m_mutex);
             const auto it = m_boundClients.find(peerId);
             if (it == m_boundClients.end() || it->second.connection.lock() != connection)
