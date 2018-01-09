@@ -104,7 +104,7 @@
                 "localization": {
                 }
             },
-            "internalName": "LineDetect",
+            "internalName": "LineDetect,linedetection",
             "description": "Virtual line #%1 was crossed",
             "flags": "regionDependent",
             "regionDescription": "#%1"

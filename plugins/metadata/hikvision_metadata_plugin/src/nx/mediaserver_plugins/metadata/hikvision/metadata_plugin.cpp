@@ -40,6 +40,16 @@ MetadataPlugin::MetadataPlugin()
     QFile file(":manifest.json");
     if (file.open(QFile::ReadOnly))
         m_manifest = file.readAll();
+    {
+        QFile file("plugins/hikvision/manifest.json");
+        if (file.open(QFile::ReadOnly))
+        {
+            NX_INFO(this,
+                lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
+            m_manifest = file.readAll();
+        }
+    }
+
     m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(m_manifest);
 }
 
