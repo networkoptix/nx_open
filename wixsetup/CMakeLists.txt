@@ -111,15 +111,8 @@ endif()
 if(withMediaServer)
     add_dependencies(wixsetup
         mediaserver
-        genericrtspplugin
-        mjpg_link
-        generic_multicast_plugin
-		hikvision_metadata_plugin
-		axis_metadata_plugin)
-
-    if(TARGET hanwha_metadata_plugin)
-        add_dependencies(wixsetup hanwha_metadata_plugin)
-    endif()
+        server_plugins
+    )
 
     if(withTrayTool)
         add_dependencies(wixsetup traytool)
@@ -157,20 +150,13 @@ if(withMediaServer)
         COMMENT "Preparing mediaserver debug package..."
         DEPENDS
             mediaserver
-            genericrtspplugin
-            generic_multicast_plugin
-            image_library_plugin
-            mjpg_link
-			hikvision_metadata_plugin
-			axis_metadata_plugin
+            server_plugins
+
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_mediaserver_debug_package.py
             "--config" ${config_file}
             "--output" ${distribution_output_dir}
     )
-    if(TARGET hanwha_metadata_plugin)
-        add_dependencies(generate_mediaserver_debug_package hanwha_metadata_plugin)
-    endif()
 endif()
 
 if(withClouds)
