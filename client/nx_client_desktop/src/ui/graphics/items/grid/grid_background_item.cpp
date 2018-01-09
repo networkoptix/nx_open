@@ -6,7 +6,7 @@
 
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 
@@ -38,8 +38,6 @@
 using namespace nx::client::desktop;
 
 namespace {
-
-static const auto loaderFilenamePropertyName = "_qn_loaderFilename";
 
 enum class ImageStatus
 {
@@ -440,16 +438,15 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
         return;
     }
 
-    const auto loader = new QnThreadedImageLoader(this);
+    const auto loader = new ThreadedImageLoader(this);
     loader->setInput(cache()->getFullPath(filename));
     loader->setSize(cache()->getMaxImageSize());
-    loader->setProperty(loaderFilenamePropertyName, d->imageData.fileName);
-
-    #define QnThreadedImageLoaderFinished \
-        static_cast<void (QnThreadedImageLoader::*)(const QImage& )> \
-        (&QnThreadedImageLoader::finished)
-
-    connect(loader, QnThreadedImageLoaderFinished, this, &QnGridBackgroundItem::setImage);
+    connect(loader, &ThreadedImageLoader::imageLoaded, this,
+        [this, filename = d->imageData.fileName](const QImage& image)
+        {
+            setImage(image, filename);
+        });
+    connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 }
 
@@ -462,13 +459,9 @@ ServerImageCache* QnGridBackgroundItem::cache()
         : context()->instance<ServerImageCache>();
 }
 
-void QnGridBackgroundItem::setImage(const QImage& image)
+void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename)
 {
     Q_D(QnGridBackgroundItem);
-
-    const auto filename = sender()
-        ? sender()->property(loaderFilenamePropertyName).toString()
-        : QString();
 
     if (!filename.isEmpty() && filename != d->imageData.fileName)
         return; // race condition

@@ -70,7 +70,7 @@ private slots:
     void updateDefaultBackground();
 
     void at_imageLoaded(const QString& filename, bool ok);
-    void setImage(const QImage& image);
+    void setImage(const QImage& image, const QString& filename = QString());
 
 private:
     nx::client::desktop::ServerImageCache* cache();

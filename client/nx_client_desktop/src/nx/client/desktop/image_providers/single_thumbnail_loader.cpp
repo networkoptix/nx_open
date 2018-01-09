@@ -2,7 +2,7 @@
 
 #include <api/server_rest_connection.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <common/common_module.h>
 

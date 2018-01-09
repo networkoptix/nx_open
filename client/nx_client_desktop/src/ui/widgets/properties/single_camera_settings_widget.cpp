@@ -8,7 +8,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
 // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module

@@ -2,7 +2,8 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <utils/image_provider.h>
+#include "image_provider.h"
+
 
 class QnDisconnectHelper;
 

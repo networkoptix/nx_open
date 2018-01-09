@@ -5,7 +5,9 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/image_provider.h>
+
+#include "image_provider.h"
+
 
 namespace nx {
 namespace client {
