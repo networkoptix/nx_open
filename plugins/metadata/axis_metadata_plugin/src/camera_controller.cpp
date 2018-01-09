@@ -4,14 +4,8 @@
 #include "gsoap/generated_with_soapcpp2/soapActionBindingProxy.h"
 #include "gsoap/generated_with_soapcpp2/EventBinding.nsmap"
 
-#include <memory>
-#include <vector>
-#include <tuple>
-#include <utility>
-#include <algorithm>
-#include <sstream>
 #include <iomanip>
-
+#include <sstream>
 
 namespace nx {
 namespace axis {

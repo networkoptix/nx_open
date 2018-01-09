@@ -3,9 +3,12 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace axis {
@@ -55,10 +58,10 @@ public:
     template<class T, class ...Args>
     T* create(Args&& ... args)
     {
-        // auto_ptr provides exception safity if code below throws exception.
+        // auto_ptr provides exception safety if code below throws exception.
         auto object = std::make_unique<T>(std::forward<Args>(args)...);
 
-        // Separate push_back call provides exception safity if push_back fails.
+        // Separate push_back call provides exception safety if push_back fails.
         m_deleters.push_back(nullptr);
         m_deleters.back() = new Deleter<T>(object.get());
 

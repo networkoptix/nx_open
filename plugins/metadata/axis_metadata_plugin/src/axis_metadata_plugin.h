@@ -76,7 +76,7 @@ public:
     std::shared_ptr<SharedResources> sharedResources(const QString& sharedId);
 
 private:
-    QList<AxisEvent> AxisMetadataPlugin::fetchSupportedAxisEvents(
+    QList<AxisEvent> fetchSupportedAxisEvents(
         const nx::sdk::ResourceInfo& resourceInfo);
 
     boost::optional<QList<QnUuid>> fetchSupportedEvents(
