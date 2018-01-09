@@ -47,6 +47,7 @@ public:
 
 protected:
     std::mutex m_mutex;
+    AddressResolver* m_addressResolver = nullptr;
     std::atomic<int> m_startedConnectionsCount;
     std::atomic<int> m_completedConnectionsCount;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_connections;
@@ -208,10 +209,9 @@ protected:
     // (end) Stopping multiple connections test.
 
 private:
+    SocketAddress m_mappedEndpoint;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
     nx::utils::promise<int> m_serverPort;
-    AddressResolver* m_addressResolver = nullptr;
-    SocketAddress m_mappedEndpoint;
     std::unique_ptr<typename SocketTypeSet::ServerSocket> m_serverSocket;
     std::unique_ptr<typename SocketTypeSet::ClientSocket> m_connection;
 
@@ -324,7 +324,7 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
     this->givenListeningServer();
     this->givenRandomNameMappedToServerHostIp();
 
-    startMaximumConcurrentConnections();
+    this->startMaximumConcurrentConnections();
 
     int canCancelIndex = 0;
     int cancelledConnectionsCount = 0;
