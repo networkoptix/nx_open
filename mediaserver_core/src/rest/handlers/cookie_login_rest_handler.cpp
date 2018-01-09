@@ -66,20 +66,23 @@ int QnCookieLoginRestHandler::executePost(
     }
 
     const auto setCookie =
-        [&](const QByteArray& name, const QByteArray& value)
+        [&](const QByteArray& name, const QByteArray& value, const QByteArray& options)
     {
         QByteArray data = name;
         data += "=";
         data += value;
-        data += "; Path=/; HttpOnly";
+        data += "; Path=/";
+        if (!options.isEmpty())
+            data += "; " + options;
+
         nx_http::insertHeader(&owner->response()->headers, nx_http::HttpHeader("Set-Cookie", data));
     };
 
     // TODO: Save ganegated UUID and CSRF tocken for verification in
     // QnAuthHelper::doCookieAuthorization.
-    setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth);
-    setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray());
-    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnUuid::createUuid().toSimpleByteArray());
+    setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth, "HttpOnly");
+    setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray(), "HttpOnly");
+    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnUuid::createUuid().toSimpleByteArray(), "");
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);
