@@ -537,27 +537,21 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     nx::utils::parseNameValuePairs(authData, ';', &params);
 
     const auto auth = params.value(Qn::URL_QUERY_AUTH_KEY_NAME);
-    if (!auth.isEmpty())
+    if (auth.isEmpty())
     {
-        const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
-        if (csrfParam.isEmpty() || csrfParam != csrfToken)
-            return Qn::Auth_InvalidCsrfToken;
-
-        // TODO: Verify UUID and CSRF tocken against some cache as well.
-        return authenticateByUrl(
-            QUrl::fromPercentEncoding(auth).toUtf8(),
-            method, responseHeaders, accessRights);
-    }
-    else
-    {
-        NX_ASSERT(false); 
+        NX_ASSERT(false);
         return Qn::Auth_Forbidden;
     }
 
-    nx_http::Response tmpHeaders;
-    nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
-    authorization.digest->parse(authData, ';');
-    return doDigestAuth(method, authorization, tmpHeaders, false, accessRights);
+    const auto csrfParam = params.value(Qn::CSRF_TOKEN_COOKIE_NAME);
+    if (csrfParam.isEmpty() || csrfParam != csrfToken)
+        return Qn::Auth_InvalidCsrfToken;
+
+    // TODO: Verify UUID and CSRF token against some cache as well.
+    return authenticateByUrl(
+        QUrl::fromPercentEncoding(auth).toUtf8(),
+        method, responseHeaders, accessRights);
+
 }
 
 void QnAuthHelper::addAuthHeader(
