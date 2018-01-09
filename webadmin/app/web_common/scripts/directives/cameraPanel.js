@@ -41,7 +41,7 @@ angular.module('nxCommon')
                 
                 function searchCams(){
                     function has(str, substr){
-                        return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
+                        return str && str.toLowerCase().replace(/\ /g, '').indexOf(substr.toLowerCase().replace(/\ /g, '')) >= 0;
                     }
                     _.forEach(scope.mediaServers,function(server){
                         var cameras = scope.cameras[server.id];

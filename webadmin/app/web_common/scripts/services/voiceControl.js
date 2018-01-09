@@ -35,17 +35,23 @@ angular.module('nxCommon')
 
         recognition.onresult = function(event) {
             var last = event.results.length - 1;
-            var text = event.results[last][0].transcript;
+            var text = event.results[last][0].transcript.replace(/^\ /i, '');
             console.log(text);
             console.log('Confidence: ' + event.results[0][0].confidence);
             var voicePatterns = {
-                "play": /(play|continue|start)/i,
-                "pause": /(pause|stop|end)/i,
-                "live": /live/i,
-                "open": /open details/i,
-                "close": /close details/i,
-                "search": /(search|look for|find)/i,
-                "select": /(select|choose|use)\ (camera|server)/i
+                "stop listening": /^(stop|halt|disable)\ (listening|eavsdropping)/i,
+                "play": /^(play|continue|start|go on)/im,
+                "pause": /^(pause|stop|end|wait)/im,
+                "live": /^(live|go to live|jump to live|show me live)/im,
+                "open server": /^(open|uncollapse)\ server/im,
+                "close server": /^(close|collapse)\ server/im,
+                "open all servers": /open\ all/i,
+                "close all servers": /close\ all/i,
+                "open details": /^(open details|show details|open panel|open camera links)/im,
+                "close details": /^(close details|hide details|close panel|hide panel)/im,
+                "search": /^(search|look for|find)/im,
+                "select": /^(select|choose|use|switch to)\ camera/im,
+                "clear search": /^(clear|empty)\ search/im
             };
             var command = null;
             for(var k in voicePatterns){
@@ -54,7 +60,7 @@ angular.module('nxCommon')
                     break;
                 }
             }
-            console.log(command);
+            text = text.replace(voicePatterns[command], '');
             switch(command){
                 case "play":
                     self.switchPlaying(true);
@@ -65,25 +71,47 @@ angular.module('nxCommon')
                 case "live":
                     self.switchPosition();
                     break;
-                case "open":
+                case "open server":
+                    var serverName = text.replace(/ /g,'').toLowerCase();
+                    self.viewScope.camerasProvider.collapseServer(serverName, false);
+                    break;
+                case "close server":
+                    var serverName = text.replace(/ /g,'').toLowerCase();
+                    self.viewScope.camerasProvider.collapseServer(serverName, true);
+                    break;
+                case "open details":
                     self.cameraDetails.enabled = true;
                     break;
-                case "close":
+                case "close details":
                     self.cameraDetails.enabled = false;
                     break;
+                case "open all servers":
+                    self.viewScope.camerasProvider.collapseServers(false);
+                    break;
+                case "close all servers":
+                    self.viewScope.camerasProvider.collapseServers(true);
+                    break;
                 case "search":
-                    text = ((text.replace(/^\s+|\s+$/g, '')).replace(voicePatterns["search"], '')).replace(/^\s+|\s+$/g, '');
                     self.viewScope.searchCams = text;
                     break;
+                case "clear search":
+                    self.viewScope.searchCams = "";
+                    break;
                 case "select":
-                    var server = text.match(/server ([\d]+)/i);
-                    var camera = text.match(/camera ([\d]+)/i);
-                    console.log(server, camera);
-                    if(server && camera){
-                        var serverId = self.viewScope.camerasProvider.mediaServers[server[1]].id;
-                        //console.log(self.viewScope.camerasProvider.cameras[serverId][camera[1]]);
-                        self.viewScope.activeCamera = self.viewScope.camerasProvider.cameras[serverId][camera[1]];
+                    var cameraName = text.replace(/ /g,'').toLowerCase();
+                    if(cameraName){
+                        var camera = self.viewScope.camerasProvider.getCameraByVoice(cameraName);
+                        if(camera){
+                            self.viewScope.activeCamera = camera;
+                        }
+                        else{
+                            console.log("Camera Not found!!");
+                        }
                     }
+                    break;
+                case "stop listening":
+                    self.viewScope.voiceControls.enabled = false;
+                    self.stopListening();
                     break;
                 default:
                     console.log("Did not recognize command");

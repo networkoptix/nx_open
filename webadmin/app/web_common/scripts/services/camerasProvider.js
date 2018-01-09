@@ -301,6 +301,7 @@ angular.module('nxCommon')
             }
         };
 
+        //External Functions
         camerasProvider.prototype.getFirstCam = function(){
             var tmpServerList = this.mediaServers;
             var tmpCamerasList = this.cameras;
@@ -328,6 +329,35 @@ angular.module('nxCommon')
                     var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
                     self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
                 });
+            });
+        };
+
+        camerasProvider.prototype.getCameraByVoice = function(cameraName){
+            for(var i in this.mediaServers){
+                var server = this.mediaServers[i];
+                if(!server.visible || server.collapsed){
+                    continue;
+                }
+                for(var j in this.cameras[server.id]){
+                    var camera = this.cameras[server.id][j];
+                    if(camera.visible && camera.name.replace(/ /g, '').toLowerCase().indexOf(cameraName) >= 0){
+                        return camera;
+                    }
+                }
+            }
+            return null;
+        };
+
+        camerasProvider.prototype.collapseServer = function(serverName, collapseServer){
+            var server = _.find(this.mediaServers, function(server){
+                return server.name.toLowerCase().replace(/ /g, '').indexOf(serverName) >= 0;
+            });
+            server.collapsed = collapseServer;
+        };
+
+        camerasProvider.prototype.collapseServers = function(collapseServer){
+            _.forEach(this.mediaServers, function(server){
+                server.collapsed = collapseServer;
             });
         };
 
