@@ -28,11 +28,12 @@ public:
     Manager(Plugin* plugin);
     virtual ~Manager();
 
-    virtual Plugin* plugin() override { return m_plugin; }
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nx::sdk::Error startFetchingMetadata() override;
+    virtual nx::sdk::Error startFetchingMetadata(
+        nxpl::NX_GUID* /*eventTypeList*/,
+        int /*eventTypeListSize*/) override;
+
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::metadata::AbstractMetadataHandler* handler) override;

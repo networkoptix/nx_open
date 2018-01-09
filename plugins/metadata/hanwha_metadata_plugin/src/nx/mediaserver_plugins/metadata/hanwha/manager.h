@@ -27,8 +27,6 @@ public:
     Manager(Plugin* plugin);
     virtual ~Manager();
 
-    virtual Plugin* plugin() override { return m_plugin; }
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setHandler(
