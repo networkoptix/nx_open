@@ -564,7 +564,7 @@ int QnMediaServerConnection::addWearableCameraAsync(const QString& name, QObject
 
 int QnMediaServerConnection::uploadWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QByteArray& file, qint64 startTimeMs, QObject* target, const char* slot) {
     QnRequestParamList params;
-    params << QnRequestParam("resourceId", camera->getId());
+    params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("startTime", startTimeMs);
 
     nx_http::HttpHeaders headers;
