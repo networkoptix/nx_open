@@ -2,8 +2,8 @@
 #include "wearable_camera_resource.h"
 
 QnWearableCameraResourceSearcher::QnWearableCameraResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {}
 
 QnWearableCameraResourceSearcher::~QnWearableCameraResourceSearcher()
