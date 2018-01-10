@@ -94,7 +94,9 @@ Error Manager::setHandler(AbstractMetadataHandler* handler)
     return Error::noError;
 }
 
-Error Manager::startFetchingMetadata()
+Error Manager::startFetchingMetadata(
+    nxpl::NX_GUID* /*eventTypeList*/,
+    int /*eventTypeListSize*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     std::lock_guard<std::mutex> lock(m_mutex);

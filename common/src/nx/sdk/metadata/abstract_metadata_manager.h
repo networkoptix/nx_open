@@ -42,15 +42,15 @@ class AbstractMetadataPlugin;
 class AbstractMetadataManager: public nxpl::PluginInterface
 {
 public:
-    // TODO: #mike: Decide on separation between events and other metadata packet types.
-
-    virtual AbstractMetadataPlugin* plugin() = 0;
-
     /**
-     * Starts fetching metadata from the resource.
+     * Start fetching metadata from the resource.
+     * @param eventTypeList pointer to Guid array.
+     * @param eventTypeListSize guid array size.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error startFetchingMetadata() = 0;
+    virtual Error startFetchingMetadata(
+        nxpl::NX_GUID* eventTypeList,
+        int eventTypeListSize) = 0;
 
     /**
      * Starts fetching metadata from the resource.

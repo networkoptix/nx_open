@@ -56,8 +56,8 @@ patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
 python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
-security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
-security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
+security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain \
+    || security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 
 if [ '@mac.skip.sign@' == 'false'  ]
 then

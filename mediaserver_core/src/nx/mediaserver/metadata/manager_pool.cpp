@@ -184,7 +184,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         if (!pluginManifest)
             continue; //< Error already logged.
 
-        const auto deviceManifest = addManifestToCamera(camera, manager.get());
+        const auto deviceManifest = addManifestToCamera(camera, manager.get(), plugin);
         if (!deviceManifest)
             continue; //< Error already logged.
 
@@ -351,7 +351,12 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
                 lm("Starting metadata fetching for resource %1. Event list is %2")
                     .args(resourceId, eventTypeIds));
 
-            auto result = data.manager->startFetchingMetadata(); //< TODO: #dmishin pass event types.
+            std::vector<nxpl::NX_GUID> eventTypeList;
+            for (const auto& eventTypeId: eventTypeIds)
+                eventTypeList.push_back(nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122()));
+            auto result = data.manager->startFetchingMetadata(
+                !eventTypeList.empty() ? &eventTypeList[0] : nullptr,
+                eventTypeList.size()); //< TODO: #dmishin pass event types.
 
             if (result != Error::noError)
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
@@ -419,7 +424,8 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServ
 
 boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCamera(
     const QnSecurityCamResourcePtr& camera,
-    AbstractMetadataManager* manager)
+    AbstractMetadataManager* manager,
+    const nx::sdk::metadata::AbstractMetadataPlugin* plugin)
 {
     NX_ASSERT(manager);
     NX_ASSERT(camera);
@@ -429,13 +435,13 @@ boost::optional<nx::api::AnalyticsDeviceManifest> ManagerPool::addManifestToCame
     if (error != Error::noError)
     {
         NX_ERROR(this) << lm("Unable to receive Manager manifest for \"%1\": %2.")
-            .args(manager->plugin()->name(), error);
+            .args(plugin->name(), error);
         return boost::none;
     }
     if (manifestStr == nullptr)
     {
         NX_ERROR(this) << lm("Received null Manager manifest for \"%1\".")
-            .arg(manager->plugin()->name());
+            .arg(plugin->name());
         return boost::none;
     }
 

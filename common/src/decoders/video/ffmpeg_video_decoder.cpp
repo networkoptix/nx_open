@@ -181,8 +181,8 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
                 quint8 nalType = *curNal & 0x1f;
                 if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
                     BitStreamReader bitReader;
-                    bitReader.setBuffer(curNal+1, end);
                     try {
+                        bitReader.setBuffer(curNal + 1, end);
                         int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
                         if (first_mb_in_slice > 0) {
                             nextSliceCnt++;

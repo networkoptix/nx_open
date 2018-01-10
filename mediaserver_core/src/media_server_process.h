@@ -170,6 +170,7 @@ private:
     std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
+    void initPublicIpDiscoveryUpadate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(
         ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);

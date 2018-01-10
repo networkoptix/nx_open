@@ -50,7 +50,12 @@ MetadataMonitor::~MetadataMonitor()
 
 void MetadataMonitor::startMonitoring()
 {
-    m_timer.post([this](){ initMonitorUnsafe(); });
+    m_timer.post(
+        [this]()
+        {
+            m_monitoringIsInProgress = true;
+            initMonitorUnsafe();
+        });
 }
 
 void MetadataMonitor::stopMonitoring()
@@ -59,6 +64,7 @@ void MetadataMonitor::stopMonitoring()
     m_timer.post(
         [this, &promise]()
         {
+            m_monitoringIsInProgress = false;
             if (m_httpClient)
                 m_httpClient->pleaseStopSync();
 
@@ -88,6 +94,19 @@ void MetadataMonitor::clearHandlers()
     m_handlers.clear();
 }
 
+void MetadataMonitor::setResourceAccess(const nx::utils::Url& url, const QAuthenticator& auth)
+{
+    m_timer.post(
+        [this, url, auth]()
+        {
+            m_url = buildMonitoringUrl(url);
+            m_auth = auth;
+
+            if (m_monitoringIsInProgress)
+                initMonitorUnsafe();
+        });
+}
+
 /*static*/ nx::utils::Url MetadataMonitor::buildMonitoringUrl(const nx::utils::Url &url)
 {
     return nx::utils::Url(kMonitorUrlTemplate
@@ -97,9 +116,12 @@ void MetadataMonitor::clearHandlers()
 
 void MetadataMonitor::initMonitorUnsafe()
 {
+    if (!m_monitoringIsInProgress)
+        return;
+
     std::cout << "--------------" << NX_PRETTY_FUNCTION << std::endl;
     auto httpClient = nx::network::http::AsyncHttpClient::create();
-    m_timer.pleaseStopSync();
+    m_timer.cancelSync();
     httpClient->bindToAioThread(m_timer.getAioThread());
 
     connect(

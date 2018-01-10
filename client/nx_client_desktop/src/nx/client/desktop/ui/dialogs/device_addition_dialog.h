@@ -5,7 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/models/resource/fake_resource_list_model.h>
+#include <nx/client/desktop/resource_views/models/fake_resource_list_model.h>
 
 class QStackedWidget;
 
@@ -31,7 +31,7 @@ class DeviceAdditionDialog: public Connective<QnSessionAwareDialog>
 public:
     DeviceAdditionDialog(QWidget* parent = nullptr);
 
-    virtual ~DeviceAdditionDialog();
+    virtual ~DeviceAdditionDialog() override;
 
     void setServer(const QnMediaServerResourcePtr& server);
 
@@ -61,7 +61,7 @@ private:
         const QModelIndex& bottomRight,
         const QVector<int>& roles);
 
-    void showAdditionFailedDialog(const QnFakeResourceList& resources);
+    void showAdditionFailedDialog(const FakeResourceList& resources);
 
     int port() const;
     QString password() const;

@@ -36,12 +36,25 @@ else()
     set(ios_sources)
 endif()
 
+# When merge with mobile branch take everything from mobile branch!
+if(parent.customization AND NOT ${parent.customization} STREQUAL ${customization})
+    set(additional_resources
+        "${PROJECT_SOURCE_DIR}/customization/${parent.customization}/mobile_client/resources")
+else()
+    set(additional_resources)
+endif()
+
+set(customization_resources "${customization_dir}/mobile_client/resources")
+if(EXISTS ${customization_resources})
+    list(APPEND additional_resources ${customization_resources})
+endif()
+
 set(target_args
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
         ${ios_sources}
     ADDITIONAL_RESOURCES
-        "${customization_dir}/mobile_client/resources"
+        ${additional_resources}
     OTHER_SOURCES
         ${QML_FILES}
         ${resources}
@@ -78,15 +91,25 @@ if(ANDROID)
     get_target_property(FFMPEG_LIBS ffmpeg INTERFACE_LINK_LIBRARIES)
     get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
 
-    add_android_apk(mobile_client.apk TARGET mobile_client
-        APK_NAME "${mobile_client_distribution_name}.apk"
+    set(apk_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.apk")
+
+    if(codeSigning)
+        set(code_signing_parameters
+            KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
+            KEYSTORE_ALIAS "${android.alias}"
+            KEYSTORE_PASSWORD "${android.storepass}"
+            KEYSTORE_KEY_PASSWORD "${android.keypass}"
+        )
+    else()
+        set(code_signing_parameters)
+    endif()
+
+    add_android_apk(mobile_client_apk TARGET mobile_client
+        FILE_NAME ${apk_file_name}
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
-        KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
-        KEYSTORE_ALIAS "hdwitness"
-        KEYSTORE_PASSWORD "hYCmvTDu"
-        KEYSTORE_KEY_PASSWORD "31O2zNNy"
+        ${code_signing_parameters}
     )
 endif()
 

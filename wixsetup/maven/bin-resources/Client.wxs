@@ -41,8 +41,12 @@
                     <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\$(var.clientName)">
-                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.defaultTranslation).qm"/>
+                            <RegistryValue Type="string" Name="locale" Value="$(var.defaultTranslation)"/>
                         </RegistryKey>
+                    </Component>
+
+                    <Component Id="QtConf">
+                        <File Id="qt.conf" Name="qt.conf" Source="$(var.CurrentBinaryDir)/qt.conf" KeyPath="yes" DiskId="14"/>
                     </Component>
 
                     <Component Id="ClientUriHandler">
@@ -312,6 +316,7 @@
             <ComponentRef Id="DefaultLanguage" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
+            <ComponentRef Id="QtConf"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientFontsComponent"/>

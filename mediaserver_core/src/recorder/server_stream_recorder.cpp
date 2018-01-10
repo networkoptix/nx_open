@@ -412,7 +412,6 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metadata) const
 {
     using namespace nx::mediaserver;
-    NX_ASSERT(m_startDateTime > 0);
     metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
     metadata->integrityHash =
         IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTime / 1000));

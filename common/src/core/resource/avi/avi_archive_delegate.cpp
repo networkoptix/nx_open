@@ -234,7 +234,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 if (stream->codec->codec_id == AV_CODEC_ID_ADPCM_G726 &&
                     stream->codec->bits_per_coded_sample == 16)
                 {
-                    // Workaround for ffmpeg bug. It losts 'bits_per_coded_sample' field when saves G726 to the MKV.
+                    // Workaround for ffmpeg bug. It loses 'bits_per_coded_sample' field when saves G726 to the MKV.
                     // Valid range for this field is [2..5]. Try to restore value from field 'block_align' if possible.
                     // Otherwise use default value 4. Value 2 can't be restored.
                     // https://ffmpeg.org/pipermail/ffmpeg-devel/2014-January/153139.html

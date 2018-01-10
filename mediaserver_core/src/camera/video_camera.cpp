@@ -724,11 +724,11 @@ MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
         : nullptr;
 }
 
-nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
+nx::mediaserver::hls::LivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
     return streamQuality < m_hlsLivePlaylistManager.size()
         ? m_hlsLivePlaylistManager[streamQuality]
-        : nx_hls::HLSLivePlaylistManagerPtr();
+        : nx::mediaserver::hls::LivePlaylistManagerPtr();
 }
 
 QnResourcePtr QnVideoCamera::resource() const
@@ -815,7 +815,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
 
 
         m_hlsLivePlaylistManager[streamQuality] =
-            std::make_shared<nx_hls::HLSLivePlaylistManager>(
+            std::make_shared<nx::mediaserver::hls::LivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
                 targetDurationUSec,
                 removedChunksToKeepCount);

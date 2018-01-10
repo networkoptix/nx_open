@@ -20,6 +20,8 @@ option(developerBuild
     "Disable this option for production builds (Jenkins)"
     ON)
 
+option(codeSigning "Enable code signing." ON)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
@@ -166,10 +168,13 @@ add_subdirectory(dependencies)
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
-add_subdirectory(common_libs)
-add_subdirectory(common)
-add_subdirectory(appserver2)
-add_subdirectory(nx_cloud)
+
+if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
+    add_subdirectory(common_libs)
+    add_subdirectory(common)
+    add_subdirectory(appserver2)
+    add_subdirectory(nx_cloud)
+endif()
 
 if(withMediaServer)
     add_subdirectory(mediaserver_core)

@@ -83,6 +83,7 @@
         <?endif?>
 
         <?define SourceDir="${bin_source_dir}"?>
+        <?define CurrentBinaryDir="${CMAKE_CURRENT_BINARY_DIR}"?>
         <?define CustomizationDir="${customization.dir}"?>
         <?define NxtoolSourceDir="${bin_source_dir}"?>
         <?define PluginsDir="${bin_source_dir}/plugins"?>

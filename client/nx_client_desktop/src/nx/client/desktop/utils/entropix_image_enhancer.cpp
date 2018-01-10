@@ -6,7 +6,7 @@
 
 #include <nx/utils/log/log.h>
 #include <core/resource/camera_resource.h>
-#include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <nx/client/core/utils/geometry.h>
 
 #include <ini.h>

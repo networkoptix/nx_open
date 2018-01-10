@@ -1,4 +1,4 @@
-nx_add_target(generic_multicast_plugin LIBRARY
+nx_add_server_plugin(generic_multicast_plugin
     NO_MOC NO_PCH 
     PUBLIC_LIBS 
         Qt5::Core Qt5::Network Qt5::Multimedia

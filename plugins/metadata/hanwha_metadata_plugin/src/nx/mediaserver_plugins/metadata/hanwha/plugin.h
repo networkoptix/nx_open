@@ -73,6 +73,8 @@ private:
             const Hanwha::DriverManifest& driverManifest,
             const nx::utils::Url &url,
             const QAuthenticator& auth);
+
+        void setResourceAccess(const nx::utils::Url& url, const QAuthenticator& auth);
     };
 
 private:

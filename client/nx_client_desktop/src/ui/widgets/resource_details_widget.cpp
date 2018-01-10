@@ -5,7 +5,7 @@
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QStyle>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/camera_resource.h>
 

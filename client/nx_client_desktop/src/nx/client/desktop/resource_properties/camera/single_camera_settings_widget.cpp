@@ -10,7 +10,7 @@
 
 #include <client/client_settings.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
 #include <core/resource/resource.h>

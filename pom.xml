@@ -89,6 +89,7 @@
         <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
         <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
         <hanwha_metadata_plugin.guid>{414bb961-a348-4e39-ac20-4e65e1d246ca}</hanwha_metadata_plugin.guid>
+        <hikvision_metadata_plugin.guid>{67178141-FE19-410C-BA94-3A2166A8BE47}</hikvision_metadata_plugin.guid>
         <stub_metadata_plugin.guid>{8f5484ec-6bea-4a9c-8746-9e49d6fea726}</stub_metadata_plugin.guid>
         <root_tool.guid>{366783da-a82c-11e7-b026-57c39dec835a}</root_tool.guid>
 
@@ -126,6 +127,7 @@
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
         <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
         <hanwha_metadata_plugin.name>${company.name} Hanwha metadata plugin</hanwha_metadata_plugin.name>
+        <hikvision_metadata_plugin.name>${company.name} Hikvision metadata plugin</hikvision_metadata_plugin.name>
         <stub_metadata_plugin.name>${company.name} Stub metadata plugin</stub_metadata_plugin.name>
         <root_tool.name>${company.name} Root tool</root_tool.name>
 
@@ -539,6 +541,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>plugins/metadata/hanwha_metadata_plugin</module>
+                <module>plugins/metadata/hikvision_metadata_plugin</module>
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->

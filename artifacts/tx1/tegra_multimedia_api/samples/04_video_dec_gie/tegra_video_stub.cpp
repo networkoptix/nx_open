@@ -31,6 +31,20 @@ public:
         NX_OUTPUT << __func__ << "()";
 
         initializeRectangles();
+
+        if (ini().rectanglesFilePrefix[0])
+        {
+            if (!readModulusFromFile(
+                std::string(ini().rectanglesFilePrefix) + "modulus.txt", &m_ptsModulusUs))
+            {
+                m_ptsModulusUs = -1;
+            }
+            if (m_ptsModulusUs <= 0)
+            {
+                NX_PRINT << "ERROR: Expected a positive integer in Modulus file, but "
+                    << m_ptsModulusUs << " found.";
+            }
+        }
     }
 
     virtual ~Stub() override
@@ -93,10 +107,12 @@ public:
         *outPtsUs = m_ptsUsQueue.front();
         m_ptsUsQueue.pop();
 
-        if (ini().rectanglesFilePrefix[0])
+        if (ini().rectanglesFilePrefix[0] && m_ptsModulusUs > 0)
         {
+            const int64_t ptsModuloUs = *outPtsUs % m_ptsModulusUs;
+
             const std::string filename =
-                ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", *outPtsUs);
+                ini().rectanglesFilePrefix + nx::kit::debug::format("%lld.txt", ptsModuloUs);
             if (!readRectsFromFile(filename, outRects, maxRectCount, outRectCount))
                 return false; //< Error already logged.
         }
@@ -179,6 +195,8 @@ private:
     int m_currentFrameIndex = 0;
 
     std::vector<PointF> m_currentRectangleCenters;
+
+    int64_t m_ptsModulusUs = 0;
 };
 
 } // namespace

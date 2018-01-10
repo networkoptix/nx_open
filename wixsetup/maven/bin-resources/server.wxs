@@ -79,6 +79,12 @@
                             <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
                         </Component>
                     <?endif?>
+                    <Component Id="ServerHikvisionMetadataPlugin">
+                        <File Id="hikvision_metadata_plugin.dll" Name="hikvision_metadata_plugin.dll" Source="$(var.PluginsDir)\hikvision_metadata_plugin.dll" DiskId="10" />
+                    </Component>
+                    <Component Id="ServerAxisMetadataPlugin">
+                        <File Id="axis_metadata_plugin.dll" Name="axis_metadata_plugin.dll" Source="$(var.PluginsDir)\axis_metadata_plugin.dll" DiskId="10" />
+                    </Component>
                 </Directory>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
@@ -250,6 +256,8 @@
             <?if $(var.customization) = "hanwha"?>
                 <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
             <?endif?>
+            <ComponentRef Id="ServerHikvisionMetadataPlugin"/>
+            <ComponentRef Id="ServerAxisMetadataPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>

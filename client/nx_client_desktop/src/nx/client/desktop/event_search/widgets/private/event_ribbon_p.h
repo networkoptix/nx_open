@@ -11,6 +11,7 @@
 #include <nx/utils/disconnect_helper.h>
 
 class QScrollBar;
+class QVariantAnimation;
 
 namespace nx {
 namespace client {
@@ -50,6 +51,9 @@ private:
     void clear();
 
     void highlightAppearance(EventTile* tile);
+    void addAnimatedShift(int index, int shift); //< Animates from shift to zero.
+    void updateCurrentShifts(); //< Updates m_currentShifts from m_itemShiftAnimations.
+    void clearShiftAnimations();
 
     int indexOf(EventTile* tile) const;
 
@@ -79,6 +83,13 @@ private:
     int m_totalHeight = 0;
 
     QSet<EventTile*> m_visible;
+
+    // Maps animation object to item index. Duplicate indices are allowed.
+    // Animation objects are owned by EventRibbon::Private object.
+    // When stopped/finished they are destroyed and pointers removed from this hash.
+    QHash<QVariantAnimation*, int> m_itemShiftAnimations;
+
+    QHash<int, int> m_currentShifts; //< Maps item index to shift value.
 };
 
 } // namespace desktop

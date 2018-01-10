@@ -16,7 +16,7 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
 
