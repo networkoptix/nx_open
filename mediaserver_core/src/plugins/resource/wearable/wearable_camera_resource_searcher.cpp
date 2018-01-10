@@ -6,17 +6,22 @@ QnWearableCameraResourceSearcher::QnWearableCameraResourceSearcher(QnCommonModul
     QnAbstractResourceSearcher(commonModule)
 {}
 
-QnWearableCameraResourceSearcher::~QnWearableCameraResourceSearcher() {}
-
-QString QnWearableCameraResourceSearcher::manufacture() const {
-    return QnWearableCameraResource::MANUFACTURE;
+QnWearableCameraResourceSearcher::~QnWearableCameraResourceSearcher() 
+{
 }
 
-bool QnWearableCameraResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const {
+QString QnWearableCameraResourceSearcher::manufacture() const 
+{
+    return QnWearableCameraResource::kManufacture;
+}
+
+bool QnWearableCameraResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const 
+{
     return resourceTypeId == QnResourceTypePool::kWearableCameraTypeUuid;
 }
 
-QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) 
+{
     QnWearableCameraResourcePtr result;
 
     auto resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -45,11 +50,13 @@ QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &res
     return result;
 }
 
-QnResourceList QnWearableCameraResourceSearcher::findResources() {
+QnResourceList QnWearableCameraResourceSearcher::findResources() 
+{
     return {};
 }
 
-QList<QnResourcePtr> QnWearableCameraResourceSearcher::checkHostAddr(const QUrl&, const QAuthenticator&, bool) {
+QList<QnResourcePtr> QnWearableCameraResourceSearcher::checkHostAddr(const QUrl&, const QAuthenticator&, bool) 
+{
     return {};
 }
 

@@ -11,7 +11,8 @@
 class QnNewWearableCameraDialog;
 struct QnFileUpload;
 
-class QnWorkbenchWearableHandler : public Connective<QObject>, public QnWorkbenchContextAware {
+class QnWorkbenchWearableHandler : public Connective<QObject>, public QnWorkbenchContextAware 
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
@@ -33,7 +34,8 @@ private slots:
     void at_processWearableCameraFileAsync_finished(int status, int handle);
 
 private:
-    struct FootageInfo {
+    struct FootageInfo 
+    {
         QnSecurityCamResourcePtr camera;
         qint64 startTimeMs;
     };

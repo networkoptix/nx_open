@@ -27,12 +27,14 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     m_startTimeMs(startTimeMs)
 {}
 
-WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask() {
+WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask() 
+{
     if (m_file)
         delete m_file.data(); /* execute was never called / something went terribly wrong. */
 }
 
-bool WearableArchiveSynchronizationTask::execute() {
+bool WearableArchiveSynchronizationTask::execute() 
+{
     createArchiveReader(m_startTimeMs);
     createStreamRecorder(m_startTimeMs);
 
@@ -46,7 +48,8 @@ bool WearableArchiveSynchronizationTask::execute() {
     return true;
 }
 
-void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs) {
+void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs) 
+{
     QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
     storage->registerResourceData(temporaryFilePath, m_file.data());
@@ -81,7 +84,8 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     });
 }
 
-void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs) {
+void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs) 
+{
     using namespace std::chrono;
 
     NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));

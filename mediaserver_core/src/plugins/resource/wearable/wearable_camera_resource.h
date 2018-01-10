@@ -3,11 +3,12 @@
 #include "core/resource/camera_resource.h"
 
 
-class QnWearableCameraResource : public QnPhysicalCameraResource {
+class QnWearableCameraResource : public QnPhysicalCameraResource 
+{
     Q_OBJECT
 
 public:
-    static const QString MANUFACTURE;
+    static const QString kManufacture;
 
     QnWearableCameraResource();
     virtual ~QnWearableCameraResource();

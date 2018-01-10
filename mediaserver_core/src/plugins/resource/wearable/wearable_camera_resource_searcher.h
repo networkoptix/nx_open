@@ -2,7 +2,8 @@
 
 #include "core/resource_management/resource_searcher.h"
 
-class QnWearableCameraResourceSearcher: public QnAbstractNetworkResourceSearcher {
+class QnWearableCameraResourceSearcher: public QnAbstractNetworkResourceSearcher 
+{
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
     QnWearableCameraResourceSearcher(QnCommonModule* commonModule);

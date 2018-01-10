@@ -3,9 +3,7 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <core/resource/resource_fwd.h>
 
-namespace Ui {
-    class NewWearableCameraDialog;
-}
+namespace Ui { class NewWearableCameraDialog; }
 
 class QnResourceListModel;
 

@@ -1,18 +1,23 @@
 #include "wearable_camera_resource.h"
 
-const QString QnWearableCameraResource::MANUFACTURE = lit("WEARABLE_CAMERA");
+const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
 
-QnWearableCameraResource::QnWearableCameraResource() {
+QnWearableCameraResource::QnWearableCameraResource() 
+{
     removeFlags(Qn::live | Qn::network | Qn::streamprovider);
 }
 
-QnWearableCameraResource::~QnWearableCameraResource() {}
-
-QString QnWearableCameraResource::getDriverName() const {
-    return MANUFACTURE;
+QnWearableCameraResource::~QnWearableCameraResource() 
+{
 }
 
-QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider() {
-    return nullptr; /* No live data! */
+QString QnWearableCameraResource::getDriverName() const 
+{
+    return kManufacture;
+}
+
+QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider() 
+{
+    return nullptr; 
 }
 
