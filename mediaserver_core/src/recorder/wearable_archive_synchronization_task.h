@@ -20,6 +20,9 @@ namespace recorder {
 class WearableArchiveSynchronizationTask: public QnCommonModuleAware {
     using base_type = QnCommonModuleAware;
 public:
+    /**
+     * Takes ownership of the provided file.
+     */
     WearableArchiveSynchronizationTask(
         QnCommonModule* commonModule,
         const QnSecurityCamResourcePtr& resource,
