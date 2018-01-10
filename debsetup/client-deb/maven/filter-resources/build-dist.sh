@@ -26,7 +26,7 @@ INITDTARGET=/etc/init.d
 FINALNAME=@artifact.name.client@
 UPDATE_NAME=@artifact.name.client_update@.zip
 
-STAGEBASE=deb
+STAGEBASE=stagebase
 STAGE=$STAGEBASE/$FINALNAME
 STAGETARGET=$STAGE/$TARGET
 BINSTAGE=$STAGE$BINTARGET

@@ -10,7 +10,7 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
-#include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
@@ -314,7 +314,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
         if (m_viewport->isVisible() && m_viewport->width() > 0)
         {
-            tile->move(-10000, 0); //< Somewhere outside of visible area.
+            static const QPoint kOutside(-10000, 0); //< Somewhere outside of visible area.
+            tile->move(kOutside);
             tile->setParent(m_viewport);
             tile->setVisible(true); //< For sizeHint calculation.
             tile->resize(m_viewport->width(), calculateHeight(tile));
@@ -618,15 +619,11 @@ void EventRibbon::Private::addAnimatedShift(int index, int shift)
     animator->setEasingCurve(QEasingCurve::OutCubic);
     animator->setDuration(duration_cast<milliseconds>(kAnimationDuration).count());
 
-    connect(animator, &QAbstractAnimation::finished, this,
-        [this, animator]()
-        {
-            m_itemShiftAnimations.remove(animator);
-            animator->deleteLater();
-        });
+    connect(animator, &QObject::destroyed, this,
+        [this, animator]() { m_itemShiftAnimations.remove(animator); });
 
     m_itemShiftAnimations[animator] = index;
-    animator->start(QAbstractAnimation::KeepWhenStopped);
+    animator->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void EventRibbon::Private::updateCurrentShifts()

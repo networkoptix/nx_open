@@ -22,7 +22,7 @@ static const std::chrono::seconds kMinReopenInterval(10);
 
 HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const Hikvision::DriverManifest& manifest,
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const std::vector<QnUuid>& eventTypes)
     :
@@ -78,8 +78,8 @@ void HikvisionMetadataMonitor::clearHandlers()
     m_handlers.clear();
 }
 
-QUrl HikvisionMetadataMonitor::buildMonitoringUrl(
-    const QUrl& resourceUrl,
+nx::utils::Url HikvisionMetadataMonitor::buildMonitoringUrl(
+    const nx::utils::Url& resourceUrl,
     const std::vector<QnUuid>& eventTypes) const
 {
     int channel = std::max(1, QUrlQuery(resourceUrl.query()).queryItemValue("channel").toInt());
@@ -90,7 +90,7 @@ QUrl HikvisionMetadataMonitor::buildMonitoringUrl(
         eventListIds += lit("/%1-%2").arg(name).arg(channel).toLower();
     }
 
-    QUrl monitorUrl(resourceUrl);
+    nx::utils::Url monitorUrl(resourceUrl);
     monitorUrl.setPath(kMonitorUrlTemplate);
     return monitorUrl;
 }

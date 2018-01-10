@@ -12,6 +12,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace mediaserver {
@@ -31,9 +32,10 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
         nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize) override;
+
+    virtual nx::sdk::Error setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -46,7 +48,7 @@ private:
     Hikvision::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;
 
-    QUrl m_url;
+    nx::utils::Url m_url;
     QString m_model;
     QString m_firmware;
     QAuthenticator m_auth;

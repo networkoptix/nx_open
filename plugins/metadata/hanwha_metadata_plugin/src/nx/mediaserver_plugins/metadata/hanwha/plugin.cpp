@@ -9,6 +9,7 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/scope_guard.h>
 
 #include "manager.h"
 #include "common.h"
@@ -49,6 +50,14 @@ Plugin::SharedResources::SharedResources(
         sharedId))
 {
     sharedContext->setRecourceAccess(url, auth);
+}
+
+void Plugin::SharedResources::setResourceAccess(
+    const nx::utils::Url& url,
+    const QAuthenticator& auth)
+{
+    sharedContext->setRecourceAccess(url, auth);
+    monitor->setResourceAccess(url, auth);
 }
 
 Plugin::Plugin()
@@ -125,7 +134,12 @@ AbstractMetadataManager* Plugin::managerForResource(
         return nullptr;
 
     auto sharedRes = sharedResources(resourceInfo);
-    ++sharedRes->managerCounter;
+    auto sharedResourceGuard = makeScopeGuard(
+        [&sharedRes, &resourceInfo, this]()
+        {
+            if (sharedRes->managerCounter == 0)
+                m_sharedResources.remove(QString::fromUtf8(resourceInfo.sharedId));
+        });
 
     auto supportedEvents = fetchSupportedEvents(resourceInfo);
     if (!supportedEvents)
@@ -138,6 +152,8 @@ AbstractMetadataManager* Plugin::managerForResource(
     manager->setResourceInfo(resourceInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
+
+    ++sharedRes->managerCounter;
 
     return manager;
 }
@@ -302,6 +318,10 @@ std::shared_ptr<Plugin::SharedResources> Plugin::sharedResources(
                 driverManifest(),
                 url,
                 auth));
+    }
+    else
+    {
+        sharedResourcesItr.value()->setResourceAccess(url, auth);
     }
 
     return sharedResourcesItr.value();

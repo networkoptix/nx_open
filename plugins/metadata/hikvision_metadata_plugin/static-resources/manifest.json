@@ -104,9 +104,9 @@
                 "localization": {
                 }
             },
-            "internalName": "LineDetect",
+            "internalName": "LineDetect,linedetection",
             "description": "Virtual line #%1 was crossed",
-            "flags": "regionDependent",
+            "flags": "regionDependent | stateDependent",
             "regionDescription": "#%1"
         },
         {
@@ -118,7 +118,7 @@
             },
             "internalName": "RegionEntrance",
             "description": "Object has entered %1",
-            "flags": "regionDependent",
+            "flags": "regionDependent | stateDependent",
             "regionDescription": " the region #%1"
         },
         {
@@ -130,7 +130,7 @@
             },
             "internalName": "RegionExiting",
             "description": "Object has exited %1",
-            "flags": "regionDependent",
+            "flags": "regionDependent | stateDependent",
             "regionDescription": " the region #%1"
         },
         {

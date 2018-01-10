@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/mediaserver/hls/hls_types.h>
+#include <nx/network/hls/hls_types.h>
 #include <nx/network/http/server/proxy/m3u_playlist_converter.h>
 #include <nx/utils/std/cpp14.h>
 

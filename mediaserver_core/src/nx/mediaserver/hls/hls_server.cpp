@@ -16,7 +16,7 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/network/http/http_content_type.h>
-#include <nx/mediaserver/hls/hls_types.h>
+#include <nx/network/hls/hls_types.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/byte_stream/pipeline.h>

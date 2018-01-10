@@ -8,9 +8,11 @@ distribution_output_dir: '${distribution_output_dir}'
 
 # Source directories
 bin_source_dir: '${bin_source_dir}'
+current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
 vox_source_dir: '${VoxSourceDir}'
 vcredist_directory: '${vcredist_directory}'
 client_qml_dir: '${client_qml_dir}'
+nxtool_qml_dir: '${nxtool_qml_dir}'
 help_directory: '${help_directory}'
 festival_vox_directory: '${festival_vox_directory}'
 fonts_directory: '${fonts_directory}'
@@ -23,11 +25,14 @@ minilauncher_binary_name: '${minilauncher.binary.name}'
 launcher_version_file: '${launcher.version.file}'
 
 # Signing section
-signtool_directory: '${signtool_directory}/bin'
-main_certificate: '${certificates_path}/wixsetup/${sign.cer}'
-additional_certificate: '${sign.intermediate.cer}'
-sign_password: '${sign.password}'
-sign_description: '${company.name} ${display.product.name}'
+code_signing: {
+  enabled: ${codeSigning},
+  signtool_directory: '${signtool_directory}/bin',
+  main_certificate: '${certificates_path}/wixsetup/${sign.cer}',
+  additional_certificate: '${sign.intermediate.cer}',
+  sign_password: '${sign.password}',
+  sign_description: '${company.name} ${display.product.name}'
+}
 
 # Distrib names
 client_distribution_name: '${client_distribution_name}'

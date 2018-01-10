@@ -13,7 +13,7 @@
 
 #include <business/business_resource_validation.h>
 
-#include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -62,7 +62,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
-#include <utils/multi_image_provider.h>
+#include <nx/client/desktop/image_providers/multi_image_provider.h>
 
 #include <nx/fusion/model_functions.h>
 #include <camera/camera_bookmarks_manager.h>

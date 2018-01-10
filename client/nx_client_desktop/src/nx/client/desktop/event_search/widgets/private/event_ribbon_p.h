@@ -84,8 +84,11 @@ private:
 
     QSet<EventTile*> m_visible;
 
-    //< Maps animation object to item index. Duplicate indices are allowed.
+    // Maps animation object to item index. Duplicate indices are allowed.
+    // Animation objects are owned by EventRibbon::Private object.
+    // When stopped/finished they are destroyed and pointers removed from this hash.
     QHash<QVariantAnimation*, int> m_itemShiftAnimations;
+
     QHash<int, int> m_currentShifts; //< Maps item index to shift value.
 };
 

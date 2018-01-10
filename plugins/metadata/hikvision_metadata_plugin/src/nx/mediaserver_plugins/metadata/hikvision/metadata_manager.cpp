@@ -1,8 +1,6 @@
 #include "common.h"
 #include "metadata_manager.h"
 
-#include <QtCore/QUrl>
-
 #include <chrono>
 
 #include <nx/sdk/metadata/common_detected_event.h>
@@ -44,8 +42,13 @@ void* MetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
+nx::sdk::Error MetadataManager::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+{
+    m_handler = handler;
+    return nx::sdk::Error::noError;
+}
+
 Error MetadataManager::startFetchingMetadata(
-    AbstractMetadataHandler* handler,
     nxpl::NX_GUID* eventTypeList,
     int eventTypeListSize)
 {
@@ -88,8 +91,6 @@ Error MetadataManager::startFetchingMetadata(
         eventTypes.push_back(nxpt::fromPluginGuidToQnUuid(eventTypeList[i]));
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(m_plugin->driverManifest(), m_url, m_auth, eventTypes);
-
-    m_handler = handler;
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();

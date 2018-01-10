@@ -19,7 +19,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/media/audio_player.h>
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 
 #include <nx/fusion/model_functions.h>
 

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns6="http://www.w3.org/2005/08/addressing"
+    xmlns:ns4="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:ns2="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:ns3="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:ns1="http://www.axis.com/vapix/ws/event1"
+    xmlns:ns5="http://www.axis.com/vapix/ws/action1">
+ <SOAP-ENV:Body>
+  <!-- __ns5__GetActionConfigurations(..., _ns5__GetActionConfigurationsResponse &ns5__GetActionConfigurationsResponse) -->
+  <ns5:GetActionConfigurationsResponse>
+   <!-- ns5__ActionConfigurations *ActionConfigurations -->
+   <ns5:ActionConfigurations>
+    <!-- std::vector<ns5__ActionConfiguration *> ActionConfiguration -->
+    <ns5:ActionConfiguration>
+     <!-- std::string ConfigurationID -->
+     <ns5:ConfigurationID>0</ns5:ConfigurationID>
+     <!-- std::string *Name -->
+     <ns5:Name></ns5:Name>
+     <!-- std::string TemplateToken -->
+     <ns5:TemplateToken></ns5:TemplateToken>
+     <!-- ns5__ActionParameters *Parameters -->
+     <ns5:Parameters>
+      <!-- std::vector<ns5__ActionParameter *> Parameter -->
+      <ns5:Parameter Name="" Value="">
+      </ns5:Parameter>
+      <ns5:Parameter Name="" Value="">
+      </ns5:Parameter>
+     </ns5:Parameters>
+    </ns5:ActionConfiguration>
+    <ns5:ActionConfiguration>
+     <!-- std::string ConfigurationID -->
+     <ns5:ConfigurationID>0</ns5:ConfigurationID>
+     <!-- std::string *Name -->
+     <ns5:Name></ns5:Name>
+     <!-- std::string TemplateToken -->
+     <ns5:TemplateToken></ns5:TemplateToken>
+     <!-- ns5__ActionParameters *Parameters -->
+     <ns5:Parameters>
+      <!-- std::vector<ns5__ActionParameter *> Parameter -->
+      <ns5:Parameter Name="" Value="">
+      </ns5:Parameter>
+      <ns5:Parameter Name="" Value="">
+      </ns5:Parameter>
+     </ns5:Parameters>
+    </ns5:ActionConfiguration>
+   </ns5:ActionConfigurations>
+  </ns5:GetActionConfigurationsResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

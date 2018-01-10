@@ -8,7 +8,7 @@
 #include <utils/media/media_stream_cache.h>
 #include <utils/memory/cyclic_allocator.h>
 
-#include <nx/mediaserver/hls/hls_types.h>
+#include <nx/network/hls/hls_types.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>

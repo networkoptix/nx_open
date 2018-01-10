@@ -239,10 +239,14 @@ public:
 
     QnCommonMessageProcessor* messageProcessor() const;
 
-    template <class MessageProcessorType> void createMessageProcessor()
+    template <class MessageProcessorType>
+    MessageProcessorType* createMessageProcessor()
     {
-        createMessageProcessorInternal(new MessageProcessorType(this));
+        const auto processor = new MessageProcessorType(this);
+        createMessageProcessorInternal(processor);
+        return processor;
     }
+
     void deleteMessageProcessor();
 
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
