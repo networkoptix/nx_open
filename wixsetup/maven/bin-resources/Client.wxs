@@ -41,7 +41,7 @@
                     <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\$(var.clientName)">
-                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.defaultTranslation).qm"/>
+                            <RegistryValue Type="string" Name="locale" Value="$(var.defaultTranslation)"/>
                         </RegistryKey>
                     </Component>
 
