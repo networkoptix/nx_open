@@ -27,7 +27,7 @@
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <nx/client/ptz/ptz_helpers.h>
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/image_providers/threaded_image_loader.h>
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/widgets/ptz_tour_widget.h>
@@ -673,13 +673,13 @@ void QnPtzManageDialog::at_cache_imageLoaded(const QString &filename)
     if (rowData.id() != filename)
         return;
 
-    QnThreadedImageLoader *loader = new QnThreadedImageLoader(this);
+    auto loader = new ThreadedImageLoader(this);
     loader->setInput(m_cache->getFullPath(filename));
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->previewLabel->size());
-    loader->setFlags(Qn::TouchSizeFromOutside);
-    // TODO: #dklychkov rename QnThreadedImageLoader::finished() and use the new syntax
-    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
+    loader->setFlags(ThreadedImageLoader::TouchSizeFromOutside);
+    connect(loader, &ThreadedImageLoader::imageLoaded, this, &QnPtzManageDialog::setPreview);
+    connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 }
 

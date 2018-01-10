@@ -17,7 +17,7 @@
 
 static const std::chrono::seconds kCproApiCacheTimeout(5);
 
-// NOTE: This class using hardcoded XML reding/writeing intentionally, because CPro API may 
+// NOTE: This class uses hardcoded XML reading/writing intentionally, because CPro API may
 // reject or crash on requests, which are different from the original.
 // TODO: Move out to a separate file as soon as it makes sense.
 class QnDigitalWatchdogResource::CproApiClient
@@ -41,7 +41,7 @@ public:
 
             m_cacheExpiration = std::chrono::steady_clock::now() + kCproApiCacheTimeout;
         }
-        
+
         return (bool) m_videoConfig;
     }
 
@@ -126,7 +126,7 @@ private:
     int indexOfStream(bool isPrimary)
     {
         if (!updateVideoConfig())
-            return false;
+            return -1;
 
         const auto i = m_videoConfig->indexOf(isPrimary ? "<item id=\"1\"" : "<item id=\"3\"");
         if (i == -1)
@@ -278,7 +278,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
 
     auto result = http.doGET(QString("/cgi-bin/system?User=%1&pwd=%2&RTP_B2=1")
         .arg(getAuth().user()).arg(getAuth().password()));
-    
+
     qDebug() << "disable RTP B2 frames for camera" << getHostAddress() << "result=" << result;
     return result == CL_HTTP_SUCCESS;
 }
@@ -336,7 +336,7 @@ bool QnDigitalWatchdogResource::loadCproAdvancedParameters(QnCameraAdvancedParam
     // TODO: Makes sence to move into some template as soon as it supports parameter merge.
     QnCameraAdvancedParamGroup streams;
     streams.name = lit("Video Streams");
-    const auto addStream = 
+    const auto addStream =
         [&](const QString& name, bool isPrimary, const QString& codecParamId)
         {
             QnCameraAdvancedParamGroup group;
@@ -431,7 +431,7 @@ bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedPara
         values.insert(kCproPrimaryVideoCodec, *codec);
     if (const auto codec = m_cproApiClient->getVideoCodec(/*isPrimary*/ false))
         values.insert(kCproSecondaryVideoCodec, *codec);
-    
+
     bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
 
     if (!m_cameraProxy)
@@ -472,7 +472,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     for(const QnCameraAdvancedParamValue &value: values)
     {
         QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
-        if (parameter.isValid()) 
+        if (parameter.isValid())
         {
             if (kCproParameters.contains(parameter.id))
             {

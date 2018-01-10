@@ -5,7 +5,7 @@
 
 #include <client/client_globals.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -17,7 +17,7 @@
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
 
-#include <utils/image_provider.h>
+#include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using nx::client::core::Geometry;

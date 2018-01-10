@@ -4,7 +4,6 @@
 
 #include <limits>
 
-#include <camera/single_thumbnail_loader.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
@@ -26,9 +25,9 @@
 #include <utils/common/event_processors.h>
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
-#include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace client {

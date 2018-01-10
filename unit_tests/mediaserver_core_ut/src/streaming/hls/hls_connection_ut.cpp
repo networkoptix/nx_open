@@ -1,19 +1,21 @@
 #include <gtest/gtest.h>
 
-#include <streaming/hls/hls_server.h>
+#include <nx/mediaserver/hls/hls_server.h>
 #include <network/tcp_listener.h>
 #include <nx/core/access/access_types.h>
 #include <common/common_module.h>
 #include <test_support/network/tcp_listener_stub.h>
 
-namespace nx_hls {
+namespace nx {
+namespace mediaserver {
+namespace hls {
 namespace test {
 
-class QnHttpLiveStreamingProcessorHttpResponse:
+class HttpLiveStreamingProcessorHttpResponse:
     public ::testing::Test
 {
 public:
-    QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::MimeProtoVersion httpVersion):
+    HttpLiveStreamingProcessorHttpResponse(nx::network::http::MimeProtoVersion httpVersion):
         m_commonModule(/*clientMode*/ false, nx::core::access::Mode::direct),
         m_tcpListener(&m_commonModule),
         m_hlsRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket>(), &m_tcpListener)
@@ -21,7 +23,7 @@ public:
         m_request.requestLine.version = httpVersion;
     }
 
-    ~QnHttpLiveStreamingProcessorHttpResponse()
+    ~HttpLiveStreamingProcessorHttpResponse()
     {
     }
 
@@ -87,25 +89,25 @@ public:
 private:
     QnCommonModule m_commonModule;
     TcpListenerStub m_tcpListener;
-    QnHttpLiveStreamingProcessor m_hlsRequestProcessor;
+    HttpLiveStreamingProcessor m_hlsRequestProcessor;
     nx::network::http::Request m_request;
     nx::network::http::Response m_response;
 };
 
 //-------------------------------------------------------------------------------------------------
-// QnHttpLiveStreamingProcessorHttp11Response
+// HttpLiveStreamingProcessorHttp11Response
 
-class QnHttpLiveStreamingProcessorHttp11Response:
-    public QnHttpLiveStreamingProcessorHttpResponse
+class HttpLiveStreamingProcessorHttp11Response:
+    public HttpLiveStreamingProcessorHttpResponse
 {
 public:
-    QnHttpLiveStreamingProcessorHttp11Response():
-        QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::http_1_1)
+    HttpLiveStreamingProcessorHttp11Response():
+        HttpLiveStreamingProcessorHttpResponse(nx::network::http::http_1_1)
     {
     }
 };
 
-TEST_F(QnHttpLiveStreamingProcessorHttp11Response, fixed_length_resource)
+TEST_F(HttpLiveStreamingProcessorHttp11Response, fixed_length_resource)
 {
     givenHlsResourceWithFixedLength();
     havingPreparedResponse();
@@ -114,7 +116,7 @@ TEST_F(QnHttpLiveStreamingProcessorHttp11Response, fixed_length_resource)
     expectNoTransferEncodingInResponse();
 }
 
-TEST_F(QnHttpLiveStreamingProcessorHttp11Response, unknown_length_resource)
+TEST_F(HttpLiveStreamingProcessorHttp11Response, unknown_length_resource)
 {
     givenHlsResourceWithUnknownLength();
     havingPreparedResponse();
@@ -124,19 +126,19 @@ TEST_F(QnHttpLiveStreamingProcessorHttp11Response, unknown_length_resource)
 }
 
 //-------------------------------------------------------------------------------------------------
-// QnHttpLiveStreamingProcessorHttp10Response
+// HttpLiveStreamingProcessorHttp10Response
 
-class QnHttpLiveStreamingProcessorHttp10Response:
-    public QnHttpLiveStreamingProcessorHttpResponse
+class HttpLiveStreamingProcessorHttp10Response:
+    public HttpLiveStreamingProcessorHttpResponse
 {
 public:
-    QnHttpLiveStreamingProcessorHttp10Response():
-        QnHttpLiveStreamingProcessorHttpResponse(nx::network::http::http_1_0)
+    HttpLiveStreamingProcessorHttp10Response():
+        HttpLiveStreamingProcessorHttpResponse(nx::network::http::http_1_0)
     {
     }
 };
 
-TEST_F(QnHttpLiveStreamingProcessorHttp10Response, fixed_length_resource)
+TEST_F(HttpLiveStreamingProcessorHttp10Response, fixed_length_resource)
 {
     givenHlsResourceWithFixedLength();
     havingPreparedResponse();
@@ -145,7 +147,7 @@ TEST_F(QnHttpLiveStreamingProcessorHttp10Response, fixed_length_resource)
     expectNoTransferEncodingInResponse();
 }
 
-TEST_F(QnHttpLiveStreamingProcessorHttp10Response, unknown_length_resource)
+TEST_F(HttpLiveStreamingProcessorHttp10Response, unknown_length_resource)
 {
     givenHlsResourceWithUnknownLength();
     havingPreparedResponse();
@@ -160,13 +162,13 @@ TEST(HLSMimeTypes, main)
     QnCommonModule commonModule(false, nx::core::access::Mode::direct);
     TcpListenerStub tcpListener(&commonModule);
 
-    class HlsServerTest : public nx_hls::QnHttpLiveStreamingProcessor
+    class HlsServerTest : public nx::mediaserver::hls::HttpLiveStreamingProcessor
     {
     public:
-        using nx_hls::QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor;
+        using nx::mediaserver::hls::HttpLiveStreamingProcessor::HttpLiveStreamingProcessor;
         const char *mimeTypeByExtension(const QString& extension) const
         {
-            return nx_hls::QnHttpLiveStreamingProcessor::mimeTypeByExtension(extension);
+            return nx::mediaserver::hls::HttpLiveStreamingProcessor::mimeTypeByExtension(extension);
         }
     } hlsServerTest(QSharedPointer<nx::network::AbstractStreamSocket>(), &tcpListener);
 
@@ -178,4 +180,6 @@ TEST(HLSMimeTypes, main)
 }
 
 } // namespace test
-} // namespace nx_hls
+} // namespace hls
+} // namespace mediaserver
+} // namespace nx

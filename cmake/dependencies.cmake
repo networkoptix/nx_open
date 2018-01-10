@@ -176,7 +176,7 @@ function(nx_get_dependencies)
 
     if(haveDesktopClient)
         nx_rdep_add_package(any/qtsingleapplication)
-        nx_rdep_add_package(any/help-${customization}-3.1.1 PATH_VARIABLE help_directory)
+        nx_rdep_add_package(any/help-${customization}-3.1 PATH_VARIABLE help_directory)
         set(help_directory ${help_directory} PARENT_SCOPE)
     endif()
 

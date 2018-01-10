@@ -57,14 +57,22 @@ target_compile_definitions(tegra_video
     INTERFACE TEGRA_VIDEO_API=${TEGRA_VIDEO_API_IMPORT_MACRO}
 )
 
-add_executable(tegra_video_ut
-    samples/04_video_dec_gie/unit_tests/main.cpp
-    samples/04_video_dec_gie/net_dimensions.h
-    samples/04_video_dec_gie/net_dimensions.cpp
-    samples/04_video_dec_gie/unit_tests/net_dimensions_ut.cpp
-    samples/04_video_dec_gie/rects_serialization.h
-    samples/04_video_dec_gie/rects_serialization.cpp
-    samples/04_video_dec_gie/unit_tests/rects_serialization_ut.cpp
-    samples/04_video_dec_gie/unit_tests/tegra_video_stub_ut.cpp
-)
-target_link_libraries(tegra_video_ut nx_kit tegra_video)
+if("${withTests}" STREQUAL "")
+    set(withTests ON)
+endif()
+
+if(withTests)
+    add_executable(tegra_video_ut
+        samples/04_video_dec_gie/unit_tests/main.cpp
+        samples/04_video_dec_gie/net_dimensions.h
+        samples/04_video_dec_gie/net_dimensions.cpp
+        samples/04_video_dec_gie/unit_tests/net_dimensions_ut.cpp
+        samples/04_video_dec_gie/rects_serialization.h
+        samples/04_video_dec_gie/rects_serialization.cpp
+        samples/04_video_dec_gie/unit_tests/rects_serialization_ut.cpp
+        samples/04_video_dec_gie/unit_tests/tegra_video_stub_ut.cpp
+    )
+    target_link_libraries(tegra_video_ut nx_kit tegra_video)
+
+    add_test(NAME tegra_video_ut COMMAND tegra_video_ut)
+endif()

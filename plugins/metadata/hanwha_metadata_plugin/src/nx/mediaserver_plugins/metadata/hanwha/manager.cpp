@@ -55,7 +55,9 @@ nx::sdk::Error Manager::setHandler(AbstractMetadataHandler* handler)
     return Error::noError;
 }
 
-Error Manager::startFetchingMetadata()
+Error Manager::startFetchingMetadata(
+    nxpl::NX_GUID* /*eventTypeList*/,
+    int /*eventTypeListSize*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)

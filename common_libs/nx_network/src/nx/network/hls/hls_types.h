@@ -10,10 +10,9 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QUrl>
 
-/**
- * Consolidates hls implementation types.
- */
-namespace nx_hls {
+namespace nx {
+namespace mediaserver {
+namespace hls {
 
 class NX_NETWORK_API Chunk
 {
@@ -59,4 +58,6 @@ public:
 /** iOS device starts playing first chunk when downloading third one. */
 static const int MIN_CHUNKS_REQUIRED_TO_START_PLAYBACK = 3;
 
-} // namespace nx_hls
+} // namespace hls
+} // namespace mediaserver
+} // namespace nx

@@ -82,7 +82,7 @@ private:
 
     void fetchMetadataForResourceUnsafe(
         const QnUuid& resourceId,
-        ResourceMetadataContext& context, 
+        ResourceMetadataContext& context,
         QSet<QnUuid>& eventTypeIds);
 
     template<typename T>
@@ -108,7 +108,8 @@ private:
 
     boost::optional<nx::api::AnalyticsDeviceManifest> addManifestToCamera(
         const QnSecurityCamResourcePtr& camera,
-        nx::sdk::metadata::AbstractMetadataManager* manager);
+        nx::sdk::metadata::AbstractMetadataManager* manager,
+        const nx::sdk::metadata::AbstractMetadataPlugin* plugin);
 
     bool resourceInfoFromResource(
         const QnSecurityCamResourcePtr& camera,

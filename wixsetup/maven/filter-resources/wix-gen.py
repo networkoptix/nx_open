@@ -1,15 +1,9 @@
-import os, sys, subprocess, shutil
-from subprocess import Popen, PIPE, STDOUT
-from os.path import dirname, join, exists, isfile
-
 import environment
 from heat_interface import harvest_dir
-from windeployqt_interface import deploy_qt, cleanup_qtwebprocess
 
 properties_dir = '${project.build.directory}'
-has_nxtool = ('${nxtool}' == 'true')
-has_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 bin_source_dir = '${bin_source_dir}'
+
 
 def generate_client_backround():
     harvest_dir(
@@ -19,6 +13,7 @@ def generate_client_backround():
         '${customization}BgDir',
         'var.ClientBgSourceDir')
 
+
 def generate_fonts():
     harvest_dir(
         '${ClientFontsDir}',
@@ -26,6 +21,7 @@ def generate_fonts():
         'ClientFontsComponent',
         'ClientFontsDir',
         'var.ClientFontsSourceDir')
+
 
 def generate_help():
     clientHelpFile = 'ClientHelp.wxs'
@@ -42,12 +38,13 @@ def generate_help():
         (r'''Id="index.html"''', '''Id="skawixindex.html"'''),
         (r'''Id="calendar_checked.png"''', '''Id="skawixcalendar_checked.png"'''),
         (r'''Id="live_checked.png"''', '''Id="skawixlive_checked.png"'''),
-        )
+    )
 
     text = open(clientHelpFile, 'r').read()
     for xfrom, xto in fragments:
         text = text.replace(xfrom, xto)
     open(clientHelpFile, 'w').write(text)
+
 
 def generate_client_qml():
     harvest_dir(
@@ -57,23 +54,6 @@ def generate_client_qml():
         'ClientQml',
         'var.ClientQmlDir')
 
-def generate_nxtool_qml():
-    qmldir_nxtool = '${root.dir}/nxtool/static-resources/src/qml'
-    nxtool_executable = '{0}/nxtool.exe'.format(bin_source_dir)
-    deploy_qt(nxtool_executable, qmldir_nxtool, 'nxtoolqml')
-    cleanup_qtwebprocess('nxtoolqml')
-    harvest_dir(
-        'nxtoolqml',
-        'NxtoolQml.wxs',
-        'NxtoolQmlComponent',
-        'NxtoolQml',
-        'var.NxtoolQmlDir')
-    harvest_dir(
-        '${NxtoolQuickControlsDir}',
-        'NxtoolQuickControls.wxs',
-        'NxtoolQuickControlsComponent',
-        'QtQuickControls',
-        'var.NxtoolQuickControlsDir')
 
 def generate_client_vox():
     harvest_dir(
@@ -83,6 +63,7 @@ def generate_client_vox():
         '${customization}VoxDir',
         'var.VoxSourceDir')
 
+
 def generate_server_vox():
     harvest_dir(
         '${VoxSourceDir}',
@@ -90,6 +71,7 @@ def generate_server_vox():
         'ServerVoxComponent',
         '${customization}ServerVoxDir',
         'var.VoxSourceDir')
+
 
 def generate_vcrt_14_client():
     harvest_dir(
@@ -99,6 +81,7 @@ def generate_vcrt_14_client():
         'ClientRootDir',
         'var.Vcrt14SrcDir')
 
+
 def generate_vcrt_14_mediaserver():
     harvest_dir(
         '${VC14RedistPath}/bin',
@@ -107,6 +90,7 @@ def generate_vcrt_14_mediaserver():
         'MediaServerRootDir',
         'var.Vcrt14SrcDir')
 
+
 def generate_vcrt_14_traytool():
     harvest_dir(
         '${VC14RedistPath}/bin',
@@ -114,6 +98,7 @@ def generate_vcrt_14_traytool():
         'TraytoolVcrt14ComponentGroup',
         'TrayToolRootDir',
         'var.Vcrt14SrcDir')
+
 
 def main():
     generate_client_backround()
@@ -125,11 +110,6 @@ def main():
     generate_vcrt_14_client()
     generate_vcrt_14_mediaserver()
     generate_vcrt_14_traytool()
-    if has_nxtool:
-        generate_nxtool_qml()
-        generate_vcrt_14('Nxtool')
-    if has_paxton:
-        generate_vcrt_14('Paxton')
 
 
 if __name__ == '__main__':

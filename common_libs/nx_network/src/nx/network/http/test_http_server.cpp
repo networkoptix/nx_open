@@ -48,7 +48,7 @@ void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 
 TestHttpServer::~TestHttpServer()
 {
-    m_httpServer->pleaseStopSync();
+    m_httpServer->pleaseStopSync(false);
     NX_LOGX("Stopped", cl_logINFO);
 }
 

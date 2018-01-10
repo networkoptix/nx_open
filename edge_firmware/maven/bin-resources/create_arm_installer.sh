@@ -42,6 +42,8 @@ else
     LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
 fi
 
+LOG_FILE="$LOGS_DIR/create_arm_installer.log"
+
 #--------------------------------------------------------------------------------------------------
 
 createArchive() # archive dir command...
@@ -447,7 +449,7 @@ copyToolchainLibsIfNeeded()
 buildInstaller()
 {
     echo ""
-    echo "Creating installer .tar.gz"
+    echo "Creating distribution .tar.gz"
     if [ ! -z "$SYMLINK_INSTALL_PATH" ]; then
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
@@ -500,7 +502,7 @@ buildDebugSymbolsArchive()
 #--------------------------------------------------------------------------------------------------
 
 # [in] WORK_DIR
-createArmInstaller()
+buildDistribution()
 {
     local -r TAR_DIR="$WORK_DIR/tar"
     local -r INSTALL_DIR="$TAR_DIR/$INSTALL_PATH"
@@ -516,7 +518,7 @@ createArmInstaller()
         mkdir -p "$ALT_LIB_INSTALL_DIR"
     fi
 
-    echo "Creating version.txt: $VERSION"
+    echo "Generating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
 
     echo "Copying build_info.txt"
@@ -547,27 +549,32 @@ createArmInstaller()
 
 #--------------------------------------------------------------------------------------------------
 
-help()
+showHelp()
 {
     echo "Options:"
     echo " --no-client: Do not pack Lite Client."
     echo " -v, --verbose: Do not redirect output to a log file."
+    echo " -k, --keep-work-dir: Do not delete work directory on success."
 }
 
 # [out] LITE_CLIENT
+# [out] KEEP_WORK_DIR
 # [out] VERBOSE
 parseArgs() # "$@"
 {
     LITE_CLIENT=1
+    KEEP_WORK_DIR=0
     VERBOSE=0
 
     local ARG
     for ARG in "$@"; do
         if [ "$ARG" = "-h" -o "$ARG" = "--help" ]; then
-            help
+            showHelp
             exit 0
         elif [ "$ARG" = "--no-client" ] ; then
             LITE_CLIENT=0
+        elif [ "$ARG" = "-k" ] || [ "$ARG" = "--keep-work-dir" ]; then
+            KEEP_WORK_DIR=1
         elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]; then
             VERBOSE=1
         fi
@@ -576,8 +583,6 @@ parseArgs() # "$@"
 
 redirectOutputToLog()
 {
-    local -r LOG_FILE="$LOGS_DIR/create_arm_installer.log"
-
     echo "  See the log in $LOG_FILE"
 
     mkdir -p "$LOGS_DIR" #< In case log dir is not created yet.
@@ -609,24 +614,31 @@ onExit()
 
 main()
 {
+    declare -i VERBOSE #< Mot local - needed by onExit().
+    local -i LITE_CLIENT
+    parseArgs "$@"
+
     trap onExit EXIT
 
     local -r WORK_DIR="$BUILD_DIR/create_arm_installer_tmp"
     rm -rf "$WORK_DIR"
 
-    local -i LITE_CLIENT
-    declare -i VERBOSE #< Mot local - needed by onExit().
-    parseArgs "$@"
-
-    echo "Creating installer in $WORK_DIR (will be deleted on success)."
+    if [ KEEP_WORK_DIR = 1 ]; then
+        local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
+    else
+        local -r WORK_DIR_NOTE="(will be deleted on success)"
+    fi
+    echo "Creating distribution in $WORK_DIR $WORK_DIR_NOTE."
 
     if [ $VERBOSE = 0 ]; then
         redirectOutputToLog
     fi
 
-    createArmInstaller
+    buildDistribution
 
-    rm -rf "$WORK_DIR"
+    if [ KEEP_WORK_DIR = 0 ]; then
+        rm -rf "$WORK_DIR"
+    fi
 }
 
 main "$@"

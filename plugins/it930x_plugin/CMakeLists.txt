@@ -1,4 +1,4 @@
-nx_add_target(it930x_plugin LIBRARY
+nx_add_server_plugin(it930x_plugin
     ADDITIONAL_SOURCES
         "src/dtvapi_v14/DTVAPI.c"
         "src/dtvapi_v15/DTVAPI_15.c"
