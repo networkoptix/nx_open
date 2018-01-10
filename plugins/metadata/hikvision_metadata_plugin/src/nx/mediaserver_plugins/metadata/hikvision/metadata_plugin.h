@@ -13,9 +13,6 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
-#include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
-#include <plugins/resource/hanwha/hanwha_response.h>
-#include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 #include <nx/utils/elapsed_timer.h>
 #include <chrono>
 
