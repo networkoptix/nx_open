@@ -71,6 +71,7 @@ Client cab files:
         applauncher.exe
         client.exe
         launcherVersionFile
+        qt.conf
 
 Server cab files:
     1: srvmisc.cab:

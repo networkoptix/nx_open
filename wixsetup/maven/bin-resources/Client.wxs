@@ -45,6 +45,10 @@
                         </RegistryKey>
                     </Component>
 
+                    <Component Id="QtConf">
+                        <File Id="qt.conf" Name="qt.conf" Source="$(var.CurrentBinaryDir)/qt.conf" KeyPath="yes" DiskId="14"/>
+                    </Component>
+
                     <Component Id="ClientUriHandler">
                         <RegistryKey Root="HKCR" Key="$(var.uriProtocol)">
                             <RegistryValue Type="string" Value="$(var.clientDisplayName)"/>
@@ -75,7 +79,7 @@
 
                     <Directory Id="Mediaservice" Name="mediaservice">
                     </Directory>
-                
+
                     <Directory Id="Audio" Name="audio">
                     </Directory>
 
@@ -280,8 +284,8 @@
             <Component>
                 <File Id="qtmedia_audioengine.dll" Name="qtmedia_audioengine.dll" Source="$(var.QtPluginsDir)\mediaservice\qtmedia_audioengine.dll" DiskId="12" />
             </Component>
-        </ComponentGroup>		
-		
+        </ComponentGroup>
+
         <ComponentGroup Id="AudioPlugins" Directory="Audio">
             <Component>
                 <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
@@ -306,6 +310,7 @@
             <ComponentRef Id="DefaultLanguage" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
+            <ComponentRef Id="QtConf"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientFontsComponent"/>

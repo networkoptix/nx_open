@@ -8,6 +8,7 @@ distribution_output_dir: '${distribution_output_dir}'
 
 # Source directories
 bin_source_dir: '${bin_source_dir}'
+current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
 vox_source_dir: '${VoxSourceDir}'
 vcredist_directory: '${vcredist_directory}'
 client_qml_dir: '${client_qml_dir}'
