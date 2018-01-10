@@ -1,0 +1,382 @@
+{
+    "driverId": "{190ed57a-b435-a80b-1f7b-9f31c52ad63e}",
+    "driverName": {
+        "value": "Axis driver",
+        "localization": {
+        }
+    },
+    "outputEventTypes": [
+        {
+            "eventTypeId": "ae197d39-2fc5-d798-abe6-07329771417f",
+            "eventName": {
+                "value": "Create Recording",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RecordingConfig/CreateRecording",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "eae2bd46-1690-0c22-8096-53ed3f90ac14",
+            "eventName": {
+                "value": "Delete Recording",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RecordingConfig/DeleteRecording",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "cf5d2e3f-a421-f832-63dd-6cad0cab1610",
+            "eventName": {
+                "value": "Track Configuration",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RecordingConfig/TrackConfiguration",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "20e581ba-d1c4-91cd-fa41-f02a842841da",
+            "eventName": {
+                "value": "Recording Configuration",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RecordingConfig/RecordingConfiguration",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "41b191bc-9087-fbfb-d46f-753936fab67d",
+            "eventName": {
+                "value": "Recording Job Configuration",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RecordingConfig/RecordingJobConfiguration",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "50f62d52-d635-1d51-7cfd-ef2f6ae5645d",
+            "eventName": {
+                "value": "Recording ongoing",
+                "localization": {
+                }
+            },
+            "internalName": "tnsaxis:Storage/Recording",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "5a240d3e-570d-973c-f4c7-36ca36f49071",
+            "eventName": {
+                "value": "Storage disruption",
+                "localization": {
+                }
+            },
+            "internalName": "tnsaxis:Storage/Disruption",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "98294426-5b64-3e33-33d4-84a92aa310f4",
+            "eventName": {
+                "value": "PTZ movement on channel 1",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:Move/Channel_1",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "2bf86848-9d25-d051-0151-1265d281b399",
+            "eventName": {
+                "value": "PTZ movement on channel 2",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:Move/Channel_2",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "bc392cc1-ea46-3a04-ed27-93ca5ff5a7c5",
+            "eventName": {
+                "value": "PTZ control queue",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:ControlQueue",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "b5d0e55b-b0e9-fadb-6662-e72b5f3e7e20",
+            "eventName": {
+                "value": "PTZ error",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:PTZError",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "882961a4-3509-341d-4b56-1bc9c9b2a345",
+            "eventName": {
+                "value": "PTZ preset reached on channel 1",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:PTZPresets/Channel_1",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "609c56bf-05b6-4e10-4a6f-c98712d633c8",
+            "eventName": {
+                "value": "PTZ preset reached on channel 2",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:PTZPresets/Channel_2",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "e552851f-ace2-08d0-72c6-e765b704b6c9",
+            "eventName": {
+                "value": "PTZ ready",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:PTZController/tnsaxis:PTZReady",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "aff661fa-4d75-249e-7f0a-cedee8d0c555",
+            "eventName": {
+                "value": "Action failed",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:SystemMessage/ActionFailed",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "0e17efbc-e751-8c00-2611-62fb5928e855",
+            "eventName": {
+                "value": "Storage Failure",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:HardwareFailure/StorageFailure",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "b8056e06-8d7c-e41b-709e-0a0c433086eb",
+            "eventName": {
+                "value": "Above operating temperature",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:Status/Temperature/Above",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "55259d7b-edcd-9385-1a53-ffd8cdf0ff11",
+            "eventName": {
+                "value": "Below operating temperature",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:Status/Temperature/Below",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "ab0c33ab-e921-bcc3-1bc6-73a11c6301f1",
+            "eventName": {
+                "value": "Within operating temperature",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:Status/Temperature/Inside",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "e9a1b886-b455-f68b-e9e3-68c23ff79f96",
+            "eventName": {
+                "value": "Above or below operating temperature",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:Status/Temperature/Above_or_below",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "e62d8472-a32a-ba17-037a-a5810a0845f9",
+            "eventName": {
+                "value": "System Ready",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:Status/SystemReady",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "34e26e46-ff63-d635-74b7-b1d70020e337",
+            "eventName": {
+                "value": "Virtual input",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:IO/VirtualInput",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "7a1e317c-c559-0ff8-5cba-f6ab06cc67b4",
+            "eventName": {
+                "value": "Manual trigger",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:IO/VirtualPort",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "48d7d0e8-e789-e969-3084-db2dd9e56121",
+            "eventName": {
+                "value": "Network lost",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:Device/tnsaxis:Network/Lost",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "f83daede-7fae-6a51-2e90-69017dadfd62",
+            "eventName": {
+                "value": "Camera tampering",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:VideoSource/tnsaxis:Tampering",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "b37730fe-3e2d-9eb7-bee0-7732877ec61f",
+            "eventName": {
+                "value": "ImagingService",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:VideoSource/GlobalSceneChange/ImagingService",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "b20ea678-fbab-d97f-f5cc-681e31ffdbee",
+            "eventName": {
+                "value": "Live stream accessed",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:VideoSource/tnsaxis:LiveStreamAccessed",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "7ef7f596-3831-201a-6093-da4ae8f70e08",
+            "eventName": {
+                "value": "Day night vision",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:VideoSource/tnsaxis:DayNightVision",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "0d50994b-0126-a437-3b7f-5bff70d14424",
+            "eventName": {
+                "value": "timer",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/timer",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "ed203a0c-2eae-9ce5-1022-87e993224816",
+            "eventName": {
+                "value": "linetouched",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:RuleEngine/tnsaxis:CrossLineDetection/linetouched",
+            "stateMode": "stateless",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        },
+        {
+            "eventTypeId": "0f215eb4-1a53-f244-673a-ee8cc5ccdfba",
+            "eventName": {
+                "value": "Scheduled event",
+                "localization": {
+                }
+            },
+            "internalName": "tns1:UserAlarm/tnsaxis:Recurring/Interval",
+            "stateMode": "stateful",
+            "_": "machine-generated",
+            "source": "Axis P1405-E"
+        }
+	]
+}

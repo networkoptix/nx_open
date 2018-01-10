@@ -49,7 +49,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     const auto& senderHost = senderEndpoint.address;
     ASSERT_FALSE(senderHost.isIpAddress());
 
-    const auto& receiver = std::make_unique<UDPSocket>(ipVersion);
+    const auto receiver = std::make_unique<UDPSocket>(ipVersion);
     const auto receiverCleanupGuard = makeScopeGuard([&receiver]() { receiver->pleaseStopSync(); });
     ASSERT_TRUE(receiver->bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(receiver->setRecvTimeout(1000));
@@ -163,7 +163,7 @@ TEST(UdpSocket, DISABLED_Performance)
     const uint64_t kBufferSize = 1500;
     const uint64_t kTransferSize = uint64_t(10) * 1024 * 1024 * 1024;
 
-    const auto& server = std::make_unique<UDPSocket>(AF_INET);
+    const auto server = std::make_unique<UDPSocket>(AF_INET);
     server->bind(SocketAddress::anyPrivateAddress);
     const auto address = server->getLocalAddress();
     NX_LOG(lm("%1").arg(address), cl_logINFO);
@@ -202,7 +202,7 @@ TEST(UdpSocket, DISABLED_Performance)
     nx::utils::thread clientThread(
         [&]()
         {
-            const auto& client = std::make_unique<UDPSocket>(AF_INET);
+            const auto client = std::make_unique<UDPSocket>(AF_INET);
             client->setDestAddr(address);
             Buffer buffer((int) kBufferSize, 'X');
             int send = 0;

@@ -11,28 +11,28 @@ nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources
     ${filtered_files_dir}
     @ONLY
-    OUTPUT_FILES_VARIABLE filtered1
+    OUTPUT_FILES_VARIABLE filtered_files
 )
 
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources
     ${filtered_files_dir}
-    @ONLY COPYONLY
-    OUTPUT_FILES_VARIABLE filtered2
+    COPYONLY
+    OUTPUT_FILES_VARIABLE copied_files
 )
 
 nx_configure_directory(
     ${customization_dir}/client-dmg
     ${filtered_files_dir}
-    @ONLY COPYONLY
-    OUTPUT_FILES_VARIABLE filtered3
+    COPYONLY
+    OUTPUT_FILES_VARIABLE customization_files
 )
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/launcher.version "${releaseVersion.full}")
 
 add_custom_target(desktop_client_dmg ALL
     DEPENDS desktop_client applauncher
-        ${filtered1} ${filtered2} ${filtered3}
+        ${filtered_files} ${copied_files} ${customization_files}
         ${customization_dir}/icons/macosx/logo.icns
     COMMENT "Creating ${distribution_output_dir}/${dmg_file_name}"
     BYPRODUCTS
