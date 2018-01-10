@@ -18,19 +18,20 @@ namespace recorder {
 WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     QnCommonModule* commonModule,
     const QnSecurityCamResourcePtr& resource,
-    QIODevice* file,
+    std::unique_ptr<QIODevice> file,
     qint64 startTimeMs
 ): 
     base_type(commonModule),
     m_resource(resource),
-    m_file(file),
+    m_file(file.release()),
     m_startTimeMs(startTimeMs)
 {}
 
 WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask() 
 {
+    /* execute() was never called? */
     if (m_file)
-        delete m_file.data(); /* execute was never called / something went terribly wrong. */
+        delete m_file.data();
 }
 
 bool WearableArchiveSynchronizationTask::execute() 

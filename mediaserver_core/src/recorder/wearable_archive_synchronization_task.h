@@ -21,13 +21,10 @@ class WearableArchiveSynchronizationTask: public QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 public:
-    /**
-     * Takes ownership of the provided file.
-     */
     WearableArchiveSynchronizationTask(
         QnCommonModule* commonModule,
         const QnSecurityCamResourcePtr& resource,
-        QIODevice* file,
+        std::unique_ptr<QIODevice> file,
         qint64 startTimeMs
     );
 

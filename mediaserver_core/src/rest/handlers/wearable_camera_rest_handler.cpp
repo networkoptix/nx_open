@@ -18,7 +18,7 @@
 
 QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
 {
-    return { lit("cameraId") };
+    return {lit("cameraId")};
 }
 
 int QnWearableCameraRestHandler::executeGet(
@@ -33,20 +33,20 @@ int QnWearableCameraRestHandler::executeGet(
     else if (action == "consume")
         return executeConsume(params, result, owner);
     else
-        return CODE_NOT_FOUND;
+        return nx_http::StatusCode::notFound;
 }
 
 int QnWearableCameraRestHandler::executeAdd(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QString name;
     if (!requireParameter(params, lit("name"), result, &name))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     QnMediaServerResourcePtr server = owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
     if (!server) 
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("No server in resource pool!"));
-        return CODE_INTERNAL_ERROR;
+        return nx_http::StatusCode::internalServerError;
     }
 
     ec2::ApiCameraData camera;
@@ -69,53 +69,53 @@ int QnWearableCameraRestHandler::executeAdd(const QnRequestParams &params, QnJso
     if (code != ec2::ErrorCode::ok) 
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("EC returned error '%1'.").arg(toString(code)));
-        return CODE_INTERNAL_ERROR;
+        return nx_http::StatusCode::internalServerError;
     }
 
     QnWearableCameraReply reply;
     reply.id = camera.id;
     result.setReply(reply);
 
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
 int QnWearableCameraRestHandler::executeConsume(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     qint64 startTimeMs;
     if (!requireParameter(params, lit("startTime"), result, &startTimeMs))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     QString uploadId;
     if (!requireParameter(params, lit("uploadId"), result, &uploadId))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     QnSecurityCamResourcePtr camera = owner->resourcePool()->getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
     if (!camera)
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
     if (camera->getTypeId() != QnResourceTypePool::kWearableCameraTypeUuid)
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     using namespace nx::vms::common::p2p::downloader;
     Downloader* downloader = qnServerModule->findInstance<Downloader>();
     if (!downloader) 
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("DistributedFileDownloader is not initialized."));
-        return CODE_INTERNAL_ERROR;
+        return nx_http::StatusCode::internalServerError;
     }
 
-    std::unique_ptr<QFile> file(new QFile(downloader->filePath(uploadId)));
+    std::unique_ptr<QFile> file = std::make_unique<QFile>(downloader->filePath(uploadId));
     if (!file->open(QIODevice::ReadOnly)) 
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Couldn't open file \"%1\" for reading.").arg(uploadId));
-        return CODE_INTERNAL_ERROR;
+        return nx_http::StatusCode::internalServerError;
     }
 
-    nx::mediaserver_core::recorder::WearableArchiveSynchronizationTask task(owner->commonModule(), camera, file.release(), startTimeMs);
+    nx::mediaserver_core::recorder::WearableArchiveSynchronizationTask task(owner->commonModule(), camera, std::move(file), startTimeMs);
     task.execute();
     downloader->deleteFile(uploadId);
 
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }

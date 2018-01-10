@@ -7,7 +7,7 @@ class QnWearableCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
     QnWearableCameraResourceSearcher(QnCommonModule* commonModule);
-    virtual ~QnWearableCameraResourceSearcher();
+    virtual ~QnWearableCameraResourceSearcher() override;
 
     virtual QString manufacture() const override;
 

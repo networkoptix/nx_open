@@ -7,7 +7,7 @@ namespace Ui { class NewWearableCameraDialog; }
 
 class QnResourceListModel;
 
-class QnNewWearableCameraDialog : public QnSessionAwareButtonBoxDialog
+class QnNewWearableCameraDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
     using base_type = QnSessionAwareButtonBoxDialog;
@@ -21,5 +21,5 @@ public:
 
 private:
     QScopedPointer<Ui::NewWearableCameraDialog> ui;
-    QnResourceListModel* m_model;
+    QnResourceListModel* m_model = nullptr;
 };

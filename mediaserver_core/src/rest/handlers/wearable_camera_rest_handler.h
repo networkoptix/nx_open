@@ -2,7 +2,7 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnWearableCameraRestHandler : public QnJsonRestHandler
+class QnWearableCameraRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 

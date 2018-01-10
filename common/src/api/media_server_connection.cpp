@@ -555,7 +555,9 @@ int QnMediaServerConnection::addCameraAsync(
     return sendAsyncGetRequestLogged(CameraAddObject, params, nullptr, target, slot);
 }
 
-int QnMediaServerConnection::addWearableCameraAsync(const QString& name, QObject* target, const char* slot) {
+int QnMediaServerConnection::addWearableCameraAsync(
+    const QString& name, QObject* target, const char* slot) 
+{
     return sendAsyncGetRequestLogged(
         WearableCameraAddObject, 
         QnRequestParamList{{lit("name"), name}},
@@ -564,7 +566,10 @@ int QnMediaServerConnection::addWearableCameraAsync(const QString& name, QObject
         slot);
 }
 
-int QnMediaServerConnection::consumeWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QString& uploadId, qint64 startTimeMs, QObject* target, const char* slot) {
+int QnMediaServerConnection::consumeWearableCameraFileAsync(
+    const QnNetworkResourcePtr& camera, const QString& uploadId, 
+    qint64 startTimeMs, QObject* target, const char* slot) 
+{
     nx_http::HttpHeaders headers;
     return sendAsyncGetRequestLogged(
         WearableCameraConsumeFileObject,

@@ -7,7 +7,7 @@
 
 struct QnWearableCameraReply 
 {
-	QnUuid id;
+    QnUuid id;
 };
 #define QnWearableCameraReply_Fields (id)
 

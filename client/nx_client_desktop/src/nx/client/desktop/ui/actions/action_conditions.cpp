@@ -1689,12 +1689,14 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode)
         }, matchMode);
 }
 
-ConditionWrapper isWearable(MatchMode matchMode) {
+ConditionWrapper isWearable(MatchMode matchMode) 
+{
     return new ResourceCondition(
         [](const QnResourcePtr& resource)
         {
             return resource->getTypeId() == QnResourceTypePool::kWearableCameraTypeUuid;
-        }, matchMode);
+        }, 
+        matchMode);
 }
 
 ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)

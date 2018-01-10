@@ -11,10 +11,10 @@
 class QnNewWearableCameraDialog;
 struct QnFileUpload;
 
-class QnWorkbenchWearableHandler : public Connective<QObject>, public QnWorkbenchContextAware 
+class QnWorkbenchWearableHandler: public Connective<QObject>, public QnWorkbenchContextAware 
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
     explicit QnWorkbenchWearableHandler(QObject *parent = 0);

@@ -8,7 +8,7 @@ struct ManualCameraData
 {
     QString url;
     QString uniqueId;
-    QString manufacturer; // TODO: #wearable this is actually resource type name
+    QString manufacturer; // TODO: #wearable This is actually resource type name.
 };
 
 typedef QList<ManualCameraData> ManualCameraDataList;

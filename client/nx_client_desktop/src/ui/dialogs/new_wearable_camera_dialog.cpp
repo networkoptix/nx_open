@@ -10,7 +10,7 @@
 #include <core/resource/camera_resource.h>
 
 
-QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent) :
+QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::NewWearableCameraDialog)
 {
@@ -21,7 +21,8 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent) :
 
     /* Set up combobox. */
     QnResourceList servers = resourcePool()->getAllServers(Qn::AnyStatus);
-    std::sort(servers.begin(), servers.end(), [](auto&& l, auto&& r) { return l->getName() < r->getName(); });
+    auto nameLess = [](const QnResourcePtr& l, const QnResourcePtr& r) { return l->getName() < r->getName(); };
+    std::sort(servers.begin(), servers.end(), nameLess);
 
     m_model = new QnResourceListModel(this);
     m_model->setHasCheckboxes(false);
