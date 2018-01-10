@@ -20,7 +20,7 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent) :
     //setHelpTopic(, Qn::);
 
     /* Set up combobox. */
-    QnResourceList servers = resourcePool()->getAllServers();
+    QnResourceList servers = resourcePool()->getAllServers(Qn::AnyStatus);
     std::sort(servers.begin(), servers.end(), [](auto&& l, auto&& r) { return l->getName() < r->getName(); });
 
     m_model = new QnResourceListModel(this);
