@@ -278,7 +278,7 @@ private:
     HostAddress m_stubAddress;
 
     SystemError::ErrorCode dnsResolveStub(
-        const QString& hostName,
+        const QString& /*hostName*/,
         int /*ipVersion*/,
         std::deque<HostAddress>* resolvedAddresses)
     {
