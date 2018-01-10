@@ -51,6 +51,9 @@ TEST(StorageManager, deleteRecordsToTime)
 
     qnNormalStorageMan->deleteRecordsToTime(catalog, 600);
     ASSERT_EQ(AV_NOPTS_VALUE, catalog->minTime());
+
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 }
 
 } // namespace test
