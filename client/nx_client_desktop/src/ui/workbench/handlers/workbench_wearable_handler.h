@@ -9,6 +9,7 @@
 #include <nx/utils/uuid.h>
 
 class QnNewWearableCameraDialog;
+class QnFileUpload;
 
 class QnWorkbenchWearableHandler : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -16,10 +17,10 @@ class QnWorkbenchWearableHandler : public Connective<QObject>, public QnWorkbenc
 
 public:
     explicit QnWorkbenchWearableHandler(QObject *parent = 0);
-    ~QnWorkbenchWearableHandler();
+    virtual ~QnWorkbenchWearableHandler() override;
 
 private:
-    void maybeOpenSettings();
+    void maybeOpenCurrentSettings();
 
 private slots:
     void at_newWearableCameraAction_triggered();
@@ -28,10 +29,17 @@ private slots:
     void at_addWearableCameraAsync_finished(int status, const QnWearableCameraReply &reply, int handle);
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
 
-    void at_uploadWearableCameraFileAsync_finished(int status, int handle);
+    void at_uploadManager_progress(const QnFileUpload& upload);
+    void at_processWearableCameraFileAsync_finished(int status, int handle);
 
 private:
+    struct FootageInfo {
+        QnSecurityCamResourcePtr camera;
+        qint64 startTimeMs;
+    };
+
     QPointer<QnNewWearableCameraDialog> m_dialog;
-    QnUuid m_uuid;
+    QnUuid m_currentCameraUuid;
+    QHash<QString, FootageInfo> m_infoByUploadId;
 };
 

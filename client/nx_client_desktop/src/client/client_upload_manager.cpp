@@ -31,7 +31,7 @@ public:
         else
         {
             upload.status = QnFileUpload::Error;
-            upload.message = QnClientUploadManager::tr("Could not open file \"%1\"").arg(path);
+            upload.errorMessage = QnClientUploadManager::tr("Could not open file \"%1\"").arg(path);
         }
     }
 
@@ -99,7 +99,7 @@ void QnClientUploadManager::handleError(const QString& message)
     QnFileUploadData* data = dropCurrentData();
 
     data->upload.status = QnFileUpload::Error;
-    data->upload.message = message;
+    data->upload.errorMessage = message;
     emit progress(data->upload);
 
     advance();

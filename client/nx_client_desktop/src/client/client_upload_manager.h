@@ -3,8 +3,10 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-struct QnFileUpload {
-    enum Status {
+struct QnFileUpload 
+{
+    enum Status 
+    {
         Opened,
         CalculatingMD5,
         CreatingUpload,
@@ -18,13 +20,14 @@ struct QnFileUpload {
     qint64 size = 0;
     qint64 uploaded = 0;
     Status status = Error;
-    QString message;
+    QString errorMessage;
 };
 Q_DECLARE_METATYPE(QnFileUpload)
 
 class QnFileUploadData;
 
-class QnClientUploadManager: public QObject {
+class QnClientUploadManager: public QObject 
+{
     Q_OBJECT
 public:
     QnClientUploadManager(QObject* parent = nullptr);
