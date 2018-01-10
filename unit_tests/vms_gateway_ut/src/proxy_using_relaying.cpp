@@ -34,8 +34,8 @@ public:
     {
         if (m_relayConnectionAcceptor)
             m_relayConnectionAcceptor->pleaseStopSync();
-        if (m_httpClient)
-            m_httpClient->pleaseStopSync();
+        for (auto& httpClient: m_httpClients)
+            httpClient->pleaseStopSync();
         if (m_serverConnection)
             m_serverConnection->pleaseStopSync();
     }
@@ -52,9 +52,10 @@ protected:
 
     void whenIssueProxyRequest()
     {
-        m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
-        m_httpClient->doGet(nx::network::url::Builder(m_baseUrl)
+        auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
+        httpClient->doGet(nx::network::url::Builder(m_baseUrl)
             .appendPath(lm("/%1/%2").arg(m_peerName).arg(kTestRequestPath)));
+        m_httpClients.push_back(std::move(httpClient));
     }
 
     void thenConnectionIsAccepted()
@@ -93,7 +94,7 @@ private:
     std::unique_ptr<nx::network::cloud::relay::ConnectionAcceptor> m_relayConnectionAcceptor;
     nx::utils::Url m_baseUrl;
     nx::String m_peerName;
-    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
+    std::vector<std::unique_ptr<nx::network::http::AsyncClient>> m_httpClients;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_serverConnection;
     nx::utils::SyncQueue<nx::network::http::Message> m_receivedMessageQueue;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosureReasons;

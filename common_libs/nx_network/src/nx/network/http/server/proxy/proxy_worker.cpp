@@ -26,6 +26,8 @@ ProxyWorker::ProxyWorker(
 {
     using namespace std::placeholders;
 
+    NX_ASSERT(connectionToTheTargetPeer->isInSelfAioThread());
+
     replaceTargetHostWithFullCloudNameIfAppropriate(connectionToTheTargetPeer.get());
 
     NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5").arg(m_proxyingId)
@@ -49,7 +51,12 @@ ProxyWorker::ProxyWorker(
 
     nx::network::http::Message requestMsg(nx::network::http::MessageType::request);
     *requestMsg.request = std::move(translatedRequest);
-    m_targetHostPipeline->sendMessage(std::move(requestMsg));
+    m_targetHostPipeline->sendMessage(std::move(requestMsg),
+        [this](SystemError::ErrorCode resultCode)
+        {
+            NX_VERBOSE(this, lm("Proxy %1. Sending message completed with result %2")
+                .args(m_proxyingId, SystemError::toString(resultCode)));
+        });
 
     m_targetHostPipeline->startReadingConnection();
 }
