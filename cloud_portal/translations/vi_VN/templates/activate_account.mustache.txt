@@ -1,8 +1,8 @@
-Chào mừng bạn đến với {{PRODUCT_NAME}}
+Welcome to {{PRODUCT_NAME}}
 
-Cảm ơn bạn đã tham gia {{PRODUCT_NAME}}. Vui lòng truy cập nút bên dưới để xác nhận địa chỉ Email của bạn và kích hoạt tài khoản.
+Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
 
-Kích hoạt tài khoản: {{config.portal_url}} / kích hoạt / {{message.code}}
+Activate account: {{config.portal_url}}/activate/{{message.code}}
 
 Nếu bạn không đăng ký ở {{PRODUCT_NAME}}, Hãy bỏ qua email này.
-Vui lòng không chia sẻ thông điệp hoặc liên kết này với bên thứ ba.
+Please do not share the message or the link with third parties.

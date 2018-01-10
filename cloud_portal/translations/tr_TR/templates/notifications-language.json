@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Hesabını onayla"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "Parolanı sıfırla"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "Video sistemi {{message.system_name}} sizinle paylaşıldı"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Sürüm {{message.id}} incelenmeye hazır"

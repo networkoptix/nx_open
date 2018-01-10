@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "確認您的帳號"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "還原您的密碼"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "有人分享影像 {{message.system_name}} 給您"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "版本 {{message.id}} 已準備好審查"

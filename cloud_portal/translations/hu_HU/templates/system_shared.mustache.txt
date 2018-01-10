@@ -1,11 +1,11 @@
-A rendszert megosztották Önnel
+System was shared with you
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) megosztotta {{message.system_name}} rendszerét Önnel.
+{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Hozzáférést kapott {{message.system_name}} videó rendszerhez.
+The system {{message.system_name}} was shared with you.
 {{/message.sharer_name}}
 
-Nyissa meg a rendszert: {{config.portal_url}}/rendszer/{{message.system_id}}
+Open the system: {{config.portal_url}}/systems/{{message.system_id}}

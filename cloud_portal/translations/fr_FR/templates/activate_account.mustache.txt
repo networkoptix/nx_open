@@ -1,8 +1,8 @@
-Bienvenue sur {{PRODUCT_NAME}}
+Welcome to {{PRODUCT_NAME}}
 
-Merci de joindre {{PRODUCT_NAME}}. S.V.P visitez lien lien ci-dessous  pour confirmer votre courriel et activer le compte.
+Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
 
-Activer compte: {{config.portal_url}}/activate/{{message.code}}
+Activate account: {{config.portal_url}}/activate/{{message.code}}
 
 Si vous n'avez pas enregistré sur {{PRODUCT_NAME}}, ignorez ce courriel.
-S.V.P ne partagé pas ce message ou le lien avec des tierces parties.
+Please do not share the message or the link with third parties.

@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Xác nhận tài khoản của bạn"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "Khôi phục mật khẩu của bạn"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "Hệ thống video {{message.system_name}} đã được chia sẻ với bạn"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Phiên bản {{message.id}} đã sẵn sàng xem"

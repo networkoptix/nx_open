@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "ยืนยันบัญชีของคุณ"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "เรียกคืนรหัสผ่านของคุณ"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "ใช้ระบบวีดีโอร่วมกัน {{message.system_name}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "ตรวจสอบความพร้อมของ Version {{message.id}}"

@@ -1,11 +1,11 @@
-Système a été partagé avec vous
+System was shared with you
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) système partagé {{message.system_name}} avec vous.
+{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Le système {{message.system_name}} a été partagé avec vous.
+The system {{message.system_name}} was shared with you.
 {{/message.sharer_name}}
 
-Ouvrir système: {{config.portal_url}}/systems/{{message.system_id}}
+Open the system: {{config.portal_url}}/systems/{{message.system_id}}

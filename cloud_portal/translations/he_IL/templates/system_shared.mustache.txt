@@ -1,11 +1,11 @@
-מערכת שותפה איתך
+System was shared with you
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) שיתף את המערכת {{message.system_name}} איתך.
+{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-המערכת {{message.system_name}} שותפה איתך.
+The system {{message.system_name}} was shared with you.
 {{/message.sharer_name}}
 
-פתח את המערכת: {{config.portal_url}} / systems / {{message.system_id}}
+Open the system: {{config.portal_url}}/systems/{{message.system_id}}

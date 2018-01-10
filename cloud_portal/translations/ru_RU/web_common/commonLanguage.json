@@ -15,13 +15,13 @@
         "unauthorized": "Требуется аутентификация",
         "noData": "Нет данных",
         "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
-        "flashRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM.",
+        "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
         "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
         "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
-        "noFormat": "Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
+        "noFormat": "This browser or device does not support video playback from  this camera.",
         "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
         "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
         "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
     },
-    "searchCamPlaceholder": "поиск"
+    "searchCamPlaceholder": "search"
 }

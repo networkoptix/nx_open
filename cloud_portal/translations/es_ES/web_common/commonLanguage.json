@@ -15,13 +15,13 @@
         "unauthorized": "Autentificación requerida",
         "noData": "No hay datos",
         "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
-        "flashRequired": "Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'> Instale Adobe Flash</a> para reproducir el video de servidores basados en ARM.",
+        "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir video desde servidores basados ​​en ARM.",
         "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
         "noArmSupport": "Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
-        "noFormat": "Este navegador o dispositivo no admite la reproducción de vídeo desde esta cámara.",
+        "noFormat": "Este navegador o dispositivo no es compatible con la reproducción de video desde esta cámara.",
         "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
         "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
         "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar."
     },
-    "searchCamPlaceholder": "búsqueda"
+    "searchCamPlaceholder": "buscar"
 }

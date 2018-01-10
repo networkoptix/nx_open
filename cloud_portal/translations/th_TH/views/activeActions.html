@@ -12,10 +12,10 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>คุณได้ลงทะเบียนไว้ใน Nx Cloud แล้ว</h1>
+            <h1>You have registered in {{PRODUCT_NAME}}</h1>
             <p>เราได้ส่งจดหมายที่มีลิงก์การเปิดใช้งานถึงคุณ {{data.email}} <br> โปรดเปิดใช้งานบัญชีของคุณโดยไปที่ลิงก์นี้</p>
         </div>
-        <h1 ng-if="!data.email">ยืนยันบัญชีของคุณ</h1>
+        <h1 ng-if="!data.email">Confirm your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">อีเมลล์</label>

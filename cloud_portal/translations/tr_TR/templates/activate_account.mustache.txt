@@ -1,8 +1,8 @@
-{{PRODUCT_NAME}}'e hoş geldiniz
+Welcome to {{PRODUCT_NAME}}
 
-{{PRODUCT_NAME}}'e katıldığınız için teşekkür ederiz. E-posta adresinizi doğrulamak ve hesabı etkinleştirmek için lütfen aşağıdaki düğmeye tıklayın.
+Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
 
-Hesabı etkinleştir: {{config.portal_url}} / etkinleştir / {{message.code}}
+Activate account: {{config.portal_url}}/activate/{{message.code}}
 
 {{PRODUCT_NAME}}'e kaydolmadıysanız, bu e-postayı yok sayın.
-Lütfen mesajı veya bağlantıyı üçüncü taraflarla paylaşmayın.
+Please do not share the message or the link with third parties.

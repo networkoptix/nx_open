@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Activate your account"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "Reset your password"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "You have been granted access to {{message.system_name}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "You have been granted access to {{message.system_name}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} is ready to be reviewed"

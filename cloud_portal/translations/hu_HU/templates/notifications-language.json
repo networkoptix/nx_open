@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Fiók nyugtázása"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "Jelszó visszaállítása"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "Hozzáférést kapott {{message.system_name}} videó rendszerhez"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "Hozzáférést kapott {{message.system_name}} videó rendszerhez"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "{{message.id}} verzió készen áll a felülvizsgálatra"

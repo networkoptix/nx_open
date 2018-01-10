@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Подтвердить свою учетную запись"
+    "emailSubject": "Confirm your account"
   },
   "restore_password": {
-    "emailSubject": "Восстановление пароля"
+    "emailSubject": "Restore your password"
   },
   "system_invite": {
-    "emailSubject": "Вам открыт доступ к системе {{message.system_name}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "system_shared": {
-    "emailSubject": "Вам открыт доступ к системе {{message.system_name}}"
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
   },
   "review_version": {
     "emailSubject": "Версия {{message.id}} готова к проверке"

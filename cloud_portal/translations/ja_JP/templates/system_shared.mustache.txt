@@ -1,11 +1,11 @@
-システムが共有されました
+System was shared with you
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) が {{message.system_name}}を共有しました
+{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-{{message.system_name}} が共有されました
+The system {{message.system_name}} was shared with you.
 {{/message.sharer_name}}
 
-システムを開く: {{config.portal_url}}/システム/{{message.system_id}}
+Open the system: {{config.portal_url}}/systems/{{message.system_id}}

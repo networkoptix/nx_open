@@ -15,10 +15,10 @@
         "unauthorized": "Hitelesítés szükséges",
         "noData": "Nincs adat",
         "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
-        "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához.",
+        "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
         "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
         "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
-        "noFormat": "Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
+        "noFormat": "This browser or device does not support video playback from  this camera.",
         "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
         "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
         "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt."

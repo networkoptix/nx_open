@@ -1,8 +1,8 @@
-Добро пожаловать в {{PRODUCT_NAME}}
+Welcome to {{PRODUCT_NAME}}
 
-Спасибо за регистрацию в {{PRODUCT_NAME}}. Пожалуйста, нажмите на кнопку ниже, чтобы подтвердить свой адрес электронной почты и активировать учетную запись.
+Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
 
-Активировать учетную запись: {{config.portal_url}}/activate/{{message.code}}
+Activate account: {{config.portal_url}}/activate/{{message.code}}
 
 Если вы не регистрировались в {{PRODUCT_NAME}}, проигнорируйте это сообщение.
-Пожалуйста, не показывайте это сообщение или ссылку посторонним.
+Please do not share the message or the link with third parties.

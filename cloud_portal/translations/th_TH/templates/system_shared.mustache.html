@@ -1,11 +1,11 @@
-<h1>ระบบถูกแชร์กับคุณ</h1>
+<h1>System was shared with you</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> ระบบที่ใช้ร่วมกัน {{message.system_name}} กับคุณ</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> shared system {{message.system_name}} with you.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>ระบบ {{message.system_name}} ถูกแชร์กับคุณ</p>
+<p>The system {{message.system_name}} was shared with you.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">เปิดระบบ</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Open the system</a>
