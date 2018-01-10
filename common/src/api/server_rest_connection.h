@@ -145,6 +145,14 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    Handle addFileUpload(
+        const QString& fileName,
+        int size,
+        int chunkSize,
+        const QByteArray& md5,
+        PostCallback callback,
+        QThread* targetThread = nullptr);
+
     Handle removeFileDownload(
         const QString& fileName,
         bool deleteData,
@@ -174,7 +182,7 @@ public:
         const QString& fileName,
         int index,
         const QByteArray& data,
-        GetCallback callback,
+        PostCallback callback,
         QThread* targetThread = nullptr);
 
     Handle downloadsStatus(

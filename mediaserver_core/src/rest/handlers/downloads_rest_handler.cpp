@@ -99,6 +99,7 @@ public:
         QByteArray& resultContentType);
 
     int handleAddDownload(const QString& fileName);
+    int handleAddUpload(const QString& fileName);
     int handleRemoveDownload(const QString& fileName);
     int handleGetChunkChecksums(const QString& fileName);
     int handleDownloadChunk(const QString& fileName, int chunkIndex);
@@ -174,6 +175,59 @@ int Helper::handleAddDownload(const QString& fileName)
         if (!fileInfo.url.isValid())
             return makeInvalidParameterError("url");
     }
+
+    const auto errorCode = downloader->addFile(fileInfo);
+    if (errorCode != ResultCode::ok)
+        return makeDownloaderError(errorCode);
+
+    return nx_http::StatusCode::ok;
+}
+
+int Helper::handleAddUpload(const QString& fileName)
+{
+    FileInformation fileInfo(fileName);
+
+    const auto sizeString = params.value("size");
+    if (!sizeString.isEmpty())
+    {
+        bool ok;
+        fileInfo.size = sizeString.toInt(&ok);
+        if (!ok || fileInfo.size <= 0)
+            return makeInvalidParameterError("size");
+    }
+    else
+    {
+        return makeInvalidParameterError("size", QnRestResult::MissingParameter);
+    }
+
+    const auto md5String = params.value("md5").toUtf8();
+    if (!md5String.isEmpty())
+    {
+        fileInfo.md5 = QByteArray::fromHex(md5String);
+        /* QByteArray::fromHex() silently ignores all invalid characters,
+           so converting md5 back to hex to check the checksum format validity. */
+        if (fileInfo.md5.toHex() != md5String)
+            return makeInvalidParameterError("md5");
+    }
+    else
+    {
+        return makeInvalidParameterError("md5", QnRestResult::MissingParameter);
+    }
+
+    const auto chunkSizeString = params.value("chunkSize");
+    if (!chunkSizeString.isEmpty())
+    {
+        bool ok;
+        fileInfo.chunkSize = chunkSizeString.toLongLong(&ok);
+        if(!ok || fileInfo.chunkSize > kMaxChunkSize)
+            return makeInvalidParameterError("chunkSize");
+    }
+    else 
+    {
+        return makeInvalidParameterError("chunkSize", QnRestResult::MissingParameter);
+    }
+
+    fileInfo.status = FileInformation::Status::uploading;
 
     const auto errorCode = downloader->addFile(fileInfo);
     if (errorCode != ResultCode::ok)
@@ -443,7 +497,10 @@ int QnDownloadsRestHandler::executePost(
     switch (request.subject)
     {
         case Request::Subject::file:
-            return helper.handleAddDownload(request.fileName);
+            if (params.value("upload", "false") != "false")
+                return helper.handleAddUpload(request.fileName);
+            else
+                return helper.handleAddDownload(request.fileName);
         case Request::Subject::chunk:
             return helper.handleUploadChunk(
                 request.fileName, request.chunkIndex, body, bodyContentType);

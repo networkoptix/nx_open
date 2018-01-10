@@ -285,6 +285,27 @@ Handle ServerConnection::addFileDownload(
         targetThread);
 }
 
+Handle ServerConnection::addFileUpload(
+    const QString& fileName,
+    int size,
+    int chunkSize,
+    const QByteArray& md5,
+    PostCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/downloads/%1").arg(fileName),
+        QnRequestParamList{
+            { lit("size"), QString::number(size) },
+            { lit("chunkSize"), QString::number(chunkSize) },
+            { lit("md5"), QString::fromUtf8(md5) },
+            { lit("upload"), lit("true") } },
+            QByteArray(),
+            QByteArray(),
+            callback,
+            targetThread);
+}
+
 Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,
@@ -344,7 +365,7 @@ Handle ServerConnection::uploadFileChunk(
     const QString& fileName,
     int index,
     const QByteArray& data,
-    GetCallback callback,
+    PostCallback callback,
     QThread* targetThread)
 {
     return executePut(
