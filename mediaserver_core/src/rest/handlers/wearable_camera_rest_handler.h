@@ -15,14 +15,7 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;
 
-    virtual int executePost(
-        const QString& path,
-        const QnRequestParams& params,
-        const QByteArray& body,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
-
 private:
     int executeAdd(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
-    int executeUpload(const QnRequestParams &params, const QByteArray& body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
+    int executeProcess(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
 };
