@@ -34,6 +34,7 @@
 #include <client/client_settings_watcher.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
+#include <client/client_upload_manager.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -354,6 +355,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
     QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
+    m_uploadManager = new QnClientUploadManager(commonModule);
+
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
 #endif
@@ -598,6 +601,11 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+QnClientUploadManager* QnClientModule::uploadManager() const
+{
+    return m_uploadManager;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

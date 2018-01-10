@@ -12,6 +12,7 @@ class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
+class QnClientUploadManager;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -26,6 +27,7 @@ public:
 
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QnClientUploadManager* uploadManager() const;
 private:
     void initApplication();
     void initThread();
@@ -43,6 +45,7 @@ private:
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
+    QnClientUploadManager* m_uploadManager;
 };
 
 #define qnClientModule QnClientModule::instance()
