@@ -47,12 +47,26 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
                 int statusCode,
                 network::http::BufferType msgBody)
             {
+
                 api::Updates2StatusData updates2StatusData(
                     serverId,
                     api::Updates2StatusData::StatusCode::error,
-                    "Multi request failed");
-                if (osErrorCode == SystemError::noError && statusCode == network::http::StatusCode::ok)
-                    QJson::deserialize(msgBody, &updates2StatusData);
+                    "Multi update request failed");
+
+                if (osErrorCode == SystemError::noError
+                        && statusCode == network::http::StatusCode::ok)
+                {
+                    QnJsonRestResult restResult;
+                    bool deserializeResult = QJson::deserialize(msgBody, &restResult);
+                    NX_ASSERT(deserializeResult);
+                    if (deserializeResult && restResult.error == QnRestResult::Error::NoError)
+                    {
+                        deserializeResult = QJson::deserialize<api::Updates2StatusData>(
+                            restResult.reply,
+                            &updates2StatusData);
+                        NX_ASSERT(deserializeResult);
+                    }
+                }
 
                 context.executeGuarded(
                     [&context, &updates2StatusData, &updates2StatusDataList]()

@@ -41,6 +41,12 @@ Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
 {
     loadStatusFromFile();
     m_currentStatus.serverId = qnServerModule->commonModule()->moduleGUID();
+
+    using namespace std::placeholders;
+    m_timerManager.addNonStopTimer(
+        std::bind(&Updates2Manager::checkForUpdateUnsafe, this, _1),
+        std::chrono::milliseconds(refreshTimeout()),
+        std::chrono::milliseconds(0));
 }
 
 api::Updates2StatusData Updates2Manager::status()
@@ -61,6 +67,7 @@ api::Updates2StatusData Updates2Manager::status()
             updatePreparingStatus();
             break;
         case api::Updates2StatusData::StatusCode::readyToInstall:
+        case api::Updates2StatusData::StatusCode::checking:
             break;
     }
 
@@ -96,7 +103,7 @@ void Updates2Manager::loadStatusFromFile()
 }
 
 
-void Updates2Manager::checkForUpdateUnsafe()
+void Updates2Manager::checkForUpdate(utils::TimerId timerId)
 {
     if (qnSyncTime->currentMSecsSinceEpoch() - m_currentStatus.lastRefreshTime < refreshTimeout())
         return;

@@ -3,6 +3,7 @@
 #include <nx/api/updates2/updates2_status_data.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/mediaserver/updates2/detail/updates2_status_data_ex.h>
 
 namespace nx {
@@ -19,6 +20,7 @@ public:
 private:
     detail::Updates2StatusDataEx m_currentStatus;
     QnMutex m_mutex;
+    utils::TimerManager m_timerManager;
 
     void checkForUpdateUnsafe();
     void updateDownloadingStatus();
