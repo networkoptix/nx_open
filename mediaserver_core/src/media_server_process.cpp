@@ -1166,6 +1166,8 @@ void MediaServerProcess::stopObjects()
 
     qnNormalStorageMan->cancelRebuildCatalogAsync();
     qnBackupStorageMan->cancelRebuildCatalogAsync();
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 
     if (qnFileDeletor)
         qnFileDeletor->stop();
@@ -2607,6 +2609,7 @@ void MediaServerProcess::run()
             case Qn::IncompatibleVersionConnectionResult:
             case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
+                stopObjects();
                 return;
             default:
                 break;
@@ -2628,7 +2631,10 @@ void MediaServerProcess::run()
         this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
+    {
+        stopObjects();
         return; //TODO #ak correctly deinitialize what has been initialised
+    }
 
     qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
@@ -2638,6 +2644,7 @@ void MediaServerProcess::run()
     if (qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
+        stopObjects();
         nx::SystemName systemName(connectInfo.systemName);
         systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
@@ -2715,7 +2722,10 @@ void MediaServerProcess::run()
     }
 
     if (needToStop())
+    {
+        stopObjects();
         return;
+    }
 
     if (qnServerModule->roSettings()->value("disableTranscoding").toBool())
         commonModule()->setTranscodeDisabled(true);
@@ -2728,6 +2738,7 @@ void MediaServerProcess::run()
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
+        stopObjects();
         return;
     }
 
@@ -3169,9 +3180,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
 
     //ptzPool.reset();
 
