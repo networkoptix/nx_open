@@ -39,7 +39,7 @@ public:
     void setRule(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize);
     HostAddress getLocalIp(const SocketAddress& cameraAddress);
-    void startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
+    nx::sdk::Error startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
     void stopMonitoring();
 
     void setManager(AxisMetadataManager* manager);
