@@ -44,15 +44,19 @@ void* AxisMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error AxisMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler,
-    nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error AxisMetadataManager::setHandler(AbstractMetadataHandler* handler)
+{
+    m_handler = handler;
+    return Error::noError;
+}
+
+Error AxisMetadataManager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
     NX_ASSERT(m_plugin);
     if (m_plugin)
         m_monitor = m_plugin->monitor(m_sharedId, m_url, m_auth);
     if (!m_monitor)
         return Error::unknownError;
-    m_handler = handler;
     m_monitor->setManager(this);
     m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
     return Error::noError;

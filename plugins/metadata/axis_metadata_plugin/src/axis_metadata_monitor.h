@@ -12,7 +12,7 @@
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/test_http_server.h>
 #include <common/common_module.h>
@@ -36,9 +36,9 @@ public:
         const QAuthenticator& auth);
     virtual ~AxisMetadataMonitor();
 
-    void setRule(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
+    void setRule(const nx::network::SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize);
-    HostAddress getLocalIp(const SocketAddress& cameraAddress);
+    nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
     void startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
     void stopMonitoring();
 
@@ -57,7 +57,7 @@ private:
 
     std::vector<int> m_actionIds;
     std::vector<int> m_ruleIds;
-    TestHttpServer* m_httpServer;
+    nx::network::http::TestHttpServer* m_httpServer;
 
     AxisMetadataManager* m_manager = nullptr;
 };

@@ -38,7 +38,7 @@ AxisMetadataMonitor::~AxisMetadataMonitor()
     stopMonitoring();
 }
 
-void AxisMetadataMonitor::setRule(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
+void AxisMetadataMonitor::setRule(const nx::network::SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
     int eventTypeListSize)
 {
     nx::axis::CameraController cameraController(m_url.host().toLatin1(),
@@ -75,15 +75,15 @@ void AxisMetadataMonitor::setRule(const SocketAddress& localAddress, nxpl::NX_GU
     }
 }
 
-class axisHandler: public nx_http::AbstractHttpRequestHandler
+class axisHandler: public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler)
     {
         using namespace std::chrono;
 
@@ -109,7 +109,7 @@ public:
                 auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
 
                 auto event1 = new nx::sdk::metadata::CommonDetectedEvent();
-                event1->setEventTypeId(axisEvent.typeId);
+                event1->setTypeId(axisEvent.typeId);
                 event1->setCaption(axisEvent.caption.toStdString());
                 event1->setDescription(axisEvent.description.toStdString());
                 event1->setIsActive(true);// axisEvent.isActive);
@@ -119,7 +119,7 @@ public:
                 packet->addEvent(event1);
 
                 auto event2 = new nx::sdk::metadata::CommonDetectedEvent();
-                event2->setEventTypeId(axisEvent.typeId);
+                event2->setTypeId(axisEvent.typeId);
                 event2->setCaption(axisEvent.caption.toStdString());
                 event2->setDescription(axisEvent.description.toStdString());
                 event2->setIsActive(false); // TODO: Consider axisEvent.isActive().
@@ -133,7 +133,7 @@ public:
 
                 m_manager->metadataHandler()->handleMetadata(nx::sdk::Error::noError, packet);
 
-                completionHandler(nx_http::StatusCode::ok);
+                completionHandler(nx::network::http::StatusCode::ok);
                 return;
             }
         }
@@ -149,11 +149,14 @@ private:
     AxisMetadataManager* m_manager;
 };
 
-HostAddress AxisMetadataMonitor::getLocalIp(const SocketAddress& cameraAddress)
+nx::network::HostAddress AxisMetadataMonitor::getLocalIp(const nx::network::SocketAddress& cameraAddress)
 {
+    static std::chrono::seconds kCameraResponseTimeout(5);
     nx::network::TCPSocket s;
-    s.connect(cameraAddress);
-    return s.getLocalAddress().address;
+    if (s.connect(cameraAddress, kCameraResponseTimeout))
+        return s.getLocalAddress().address;
+    NX_WARNING(this, "Can't detect local IP address for TCP server");
+    return nx::network::HostAddress();
 }
 
 void AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
@@ -161,17 +164,17 @@ void AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList, int even
     const int kSchemePrefixLength = sizeof("http://") - 1;
     QString str = m_url.toString().remove(0, kSchemePrefixLength);
 
-    SocketAddress cameraAddress(str);
-    HostAddress localIp=this->getLocalIp(cameraAddress);
+    nx::network::SocketAddress cameraAddress(str);
+    nx::network::HostAddress localIp = this->getLocalIp(cameraAddress);
 
-    SocketAddress localAddress(localIp);
-    m_httpServer = new TestHttpServer;
+    nx::network::SocketAddress localAddress(localIp);
+    m_httpServer = new nx::network::http::TestHttpServer;
     m_httpServer->bindAndListen(localAddress);
 
     m_httpServer->registerRequestProcessor<axisHandler>(
         kWebServerPath,
         [&]() -> std::unique_ptr<axisHandler> { return std::make_unique<axisHandler>(m_manager); },
-        nx_http::kAnyMethod);
+        nx::network::http::kAnyMethod);
 
     localAddress = m_httpServer->server().address();
     this->setRule(localAddress, eventTypeList, eventTypeListSize);

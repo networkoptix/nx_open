@@ -30,18 +30,6 @@ QnUuid fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid)
 
 nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
 {
-    nxpl::NX_GUID result;
-    const auto binary = uuid.toRfc4122();
-
-    NX_ASSERT(sizeof(result.bytes) == binary.size());
-    for (auto i = 0; i < binary.size(); ++i)
-        result.bytes[i] = binary.at(i);
-
-    return result;
-}
-
-nxpl::NX_GUID fromQnUuidToPluginGuid(const QnUuid& uuid)
-{
     return nxpt::NxGuidHelper::fromRawData(uuid.toRfc4122());
 }
 
