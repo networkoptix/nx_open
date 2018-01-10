@@ -69,7 +69,7 @@ if(withNxTool)
     set(nxtool_qml_root "${CMAKE_SOURCE_DIR}/nxtool/static-resources/src/qml/")
     set(nxtool_executable "${bin_source_dir}/nxtool.exe")
 
-    add_custom_target(collect_nxtool_qml_dependencies ALL
+    add_custom_target(collect_nxtool_qml_dependencies
         DEPENDS
             nxtool
         COMMENT "Collecting NxTool QML libraries..."
@@ -99,7 +99,7 @@ if(withDesktopClient)
     set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
     set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
 
-    add_custom_target(collect_qml_dependencies ALL
+    add_custom_target(collect_qml_dependencies
         DEPENDS
             desktop_client
         COMMENT "Collecting QML libraries..."
@@ -112,7 +112,7 @@ if(withDesktopClient)
         )
     add_dependencies(wixsetup collect_qml_dependencies applauncher minilauncher)
 
-    add_custom_target(copy_client_binaries ALL
+    add_custom_target(copy_client_binaries
     COMMENT "Copying client binaries..."
     DEPENDS
         desktop_client

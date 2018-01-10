@@ -5,7 +5,7 @@ nx_configure_file(maven/filter-resources/nxtool_app_info_impl.cpp
 
 file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml)
 
-set(target_args
+nx_add_target(nxtool EXECUTABLE
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/nxtool_app_info_impl.cpp"
     OTHER_SOURCES
@@ -16,10 +16,7 @@ set(target_args
         Qt5::Gui
         Qt5::Network
         Qt5::Quick
-        Qt5::Qml
-)
-
-nx_add_target(nxtool EXECUTABLE ${target_args})
+        Qt5::Qml)
 
 if(WINDOWS)
     target_link_libraries(nxtool PRIVATE ws2_32)
