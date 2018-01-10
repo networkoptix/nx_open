@@ -14,6 +14,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx/kit/debug.h>
 
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
@@ -38,6 +39,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 #include <api/resource_property_adaptor.h>
 
 #include <QtCore/QJsonDocument>
@@ -185,24 +187,27 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
     return true;
 }
 
-
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 {
+    const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
+    QString buildSuffix = lit("_v") + QString::number(productVersion.build());
+
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
-    for (int i = -1; ; i++) {
-        QString suffix = (i < 0) ? QString() : lit("_") + QString::number(i);
-        fileName = dir + lit("ecs") + suffix + lit(".backup");
+    for (int i = -1; ; ++i)
+    {
+        QString numSuffix = (i < 0) ? QString() : lit("_") + QString::number(i);
+        fileName = dir + lit("ecs") + buildSuffix + numSuffix + lit(".backup");
         if (!QFile::exists(fileName))
             break;
     }
 
-    const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync( fileName );
-    if (errorCode != ec2::ErrorCode::ok) {
+    const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
+    if (errorCode != ec2::ErrorCode::ok)
+    {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
     }
-
     return true;
 }
 
