@@ -87,7 +87,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraSearchStopObject, "manualCamera/stop")
     (CameraAddObject, "manualCamera/add")
     (WearableCameraAddObject, "wearableCamera/add")
-    (WearableCameraProcessFileObject, "wearableCamera/process")
+    (WearableCameraConsumeFileObject, "wearableCamera/consume")
     (EventLogObject, "events")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
@@ -214,7 +214,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case WearableCameraAddObject:
             processJsonReply<QnWearableCameraReply>(this, response, handle);
             break;
-        case WearableCameraProcessFileObject:
+        case WearableCameraConsumeFileObject:
             emitFinished(this, response.status, handle);
             break;
         case PtzContinuousMoveObject:
@@ -564,10 +564,10 @@ int QnMediaServerConnection::addWearableCameraAsync(const QString& name, QObject
         slot);
 }
 
-int QnMediaServerConnection::processWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QString& uploadId, qint64 startTimeMs, QObject* target, const char* slot) {
+int QnMediaServerConnection::consumeWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QString& uploadId, qint64 startTimeMs, QObject* target, const char* slot) {
     nx_http::HttpHeaders headers;
     return sendAsyncGetRequestLogged(
-        WearableCameraProcessFileObject,
+        WearableCameraConsumeFileObject,
         QnRequestParamList{
             {lit("cameraId"), camera->getId().toSimpleString()},
             {lit("uploadId"), uploadId},

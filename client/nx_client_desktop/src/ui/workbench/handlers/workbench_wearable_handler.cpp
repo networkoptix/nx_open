@@ -138,7 +138,7 @@ void QnWorkbenchWearableHandler::at_uploadManager_progress(const QnFileUpload& u
             return;
 
         QnMediaServerResourcePtr server = info.camera->getParentServer();
-        server->apiConnection()->processWearableCameraFileAsync(info.camera, upload.id, info.startTimeMs, this, SLOT(at_processWearableCameraFileAsync_finished(int, int)));
+        server->apiConnection()->consumeWearableCameraFileAsync(info.camera, upload.id, info.startTimeMs, this, SLOT(at_processWearableCameraFileAsync_finished(int, int)));
     }
 }
 

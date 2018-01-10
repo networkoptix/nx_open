@@ -30,12 +30,11 @@ int QnWearableCameraRestHandler::executeGet(
     QString action = extractAction(path);
     if (action == "add")
         return executeAdd(params, result, owner);
-    else if (action == "process")
-        return executeProcess(params, result, owner);
+    else if (action == "consume")
+        return executeConsume(params, result, owner);
     else
         return CODE_NOT_FOUND;
 }
-
 
 int QnWearableCameraRestHandler::executeAdd(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
@@ -78,7 +77,7 @@ int QnWearableCameraRestHandler::executeAdd(const QnRequestParams &params, QnJso
     return CODE_OK;
 }
 
-int QnWearableCameraRestHandler::executeProcess(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) {
+int QnWearableCameraRestHandler::executeConsume(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
         return CODE_INVALID_PARAMETER;

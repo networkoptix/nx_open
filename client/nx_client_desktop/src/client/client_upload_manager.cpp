@@ -98,6 +98,9 @@ void QnClientUploadManager::handleError(const QString& message)
 {
     QnFileUploadData* data = dropCurrentData();
 
+    if (data->upload.status >= QnFileUpload::CreatingUpload)
+        data->server->restConnection()->removeFileDownload(data->upload.id, true, nullptr);
+
     data->upload.status = QnFileUpload::Error;
     data->upload.errorMessage = message;
     emit progress(data->upload);
@@ -217,6 +220,7 @@ void QnClientUploadManager::handleChunkUploaded(bool success, rest::Handle handl
         return;
     }
 
+    data->upload.uploaded = qMin(data->upload.uploaded + data->chunkSize, data->upload.size);
     handleUpload();
 }
 

@@ -17,5 +17,5 @@ public:
 
 private:
     int executeAdd(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
-    int executeProcess(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
+    int executeConsume(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
 };

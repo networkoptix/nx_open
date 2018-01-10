@@ -125,7 +125,7 @@ public:
         const QString& password, QObject* target, const char* slot);
 
     int addWearableCameraAsync(const QString& name, QObject* target, const char* slot);
-    int processWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QString& uploadId, qint64 startTimeMs, QObject* target, const char* slot);
+    int consumeWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QString& uploadId, qint64 startTimeMs, QObject* target, const char* slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr& camera,
         const QVector3D& speed, const QnUuid& sequenceId, int sequenceNumber, QObject* target,

@@ -309,7 +309,7 @@ Handle ServerConnection::addFileUpload(
 Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,
-    GetCallback callback,
+    PostCallback callback,
     QThread* targetThread)
 {
     return executeDelete(

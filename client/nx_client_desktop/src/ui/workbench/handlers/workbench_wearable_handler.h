@@ -9,7 +9,7 @@
 #include <nx/utils/uuid.h>
 
 class QnNewWearableCameraDialog;
-class QnFileUpload;
+struct QnFileUpload;
 
 class QnWorkbenchWearableHandler : public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
