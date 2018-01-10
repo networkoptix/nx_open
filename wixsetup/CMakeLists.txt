@@ -97,8 +97,7 @@ if(withNxTool)
 endif()
 
 if(withDesktopClient)
-    # This line is version-dependent. In vms-4.0 path is 'static-resources/qml/'
-    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/src/qml/")
+    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/client/nx_client_desktop/static-resources/qml/")
     set(desktop_client_executable "${bin_source_dir}/desktop_client.exe")
 
     add_custom_target(collect_qml_dependencies
