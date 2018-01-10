@@ -1209,7 +1209,7 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
-    // these threads below should've been stopped and destroyed manually by this moment
+    // These threads below should've been stopped and destroyed manually by this moment.
     {
         QnMutexLocker lock(&m_testStorageThreadMutex);
         NX_ASSERT(!m_testStorageThread);
