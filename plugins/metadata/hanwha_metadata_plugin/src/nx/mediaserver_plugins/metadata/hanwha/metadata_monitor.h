@@ -44,6 +44,8 @@ public:
     void removeHandler(const QString& handlerId);
     void clearHandlers();
 
+    void setResourceAccess(const nx::utils::Url& url, const QAuthenticator& auth);
+
 private:
     static nx::utils::Url buildMonitoringUrl(const nx::utils::Url& url);
     void initMonitorUnsafe();
@@ -55,8 +57,8 @@ private:
 
 private:
     const Hanwha::DriverManifest& m_manifest;
-    const nx::utils::Url m_url;
-    const QAuthenticator m_auth;
+    nx::utils::Url m_url;
+    QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;
     QElapsedTimer m_timeSinceLastOpen;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
@@ -64,6 +66,7 @@ private:
 
     mutable QnMutex m_mutex;
     QMap<QString, Handler> m_handlers;
+    std::atomic<bool> m_monitoringIsInProgress{false};
 };
 
 } // namespace hanwha
