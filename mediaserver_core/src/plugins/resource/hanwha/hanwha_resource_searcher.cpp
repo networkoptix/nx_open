@@ -27,6 +27,8 @@ static const QString kHanwhaDefaultPassword = lit("4321");
 static const int kSunApiProbeSrcPort = 7711;
 static const int kSunApiProbeDstPort = 7701;
 
+static const int64_t kSunApiDiscoveryTimeoutMs = 10 * 60 * 1000; //< 10 minutes.
+
 } // namespace
 
 namespace nx {
@@ -207,7 +209,6 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
     if (!url.isValid() || !isHostBelongsToValidSubnet(QHostAddress(url.host())))
         return false;
     outData->presentationUrl = url.toString(QUrl::RemovePath);
-
     outData->manufacturer = kHanwhaManufacturerName;
 
     return true;
@@ -252,6 +253,7 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
             SunApiData sunApiData;
             if (parseSunApiData(datagram.left(bytesRead), &sunApiData))
             {
+                m_sunapiDiscoveredDevices[sunApiData.macAddress] = sunApiData;
                 if (!resourceAlreadyFound(resultResourceList, sunApiData.macAddress))
                     createResource(sunApiData, sunApiData.macAddress, resultResourceList);
             }
@@ -293,6 +295,15 @@ bool HanwhaResourceSearcher::processPacket(
     {
         NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
             .arg(devInfo.udn).arg(devInfo.serialNumber));
+        return false;
+    }
+
+    // Due to some bugs in UPnP implementation higher priority is given
+    // to the native SUNAPI discovery protocol.
+    auto itr = m_sunapiDiscoveredDevices.find(cameraMac);
+    if (itr != m_sunapiDiscoveredDevices.end()
+        && !itr->timer.hasExpired(kSunApiDiscoveryTimeoutMs))
+    {
         return false;
     }
 
@@ -340,7 +351,12 @@ void HanwhaResourceSearcher::createResource(
     resource->setVendor(kHanwhaManufacturerName);
     resource->setName(devInfo.modelName);
     resource->setModel(devInfo.modelName);
-    resource->setUrl(devInfo.presentationUrl);
+
+    QUrl url(devInfo.presentationUrl);
+    if (url.port() == -1)
+        url.setPort(nx_http::DEFAULT_HTTP_PORT);
+
+    resource->setUrl(url.toString(QUrl::RemovePath));
     resource->setMAC(mac);
 
     auto resPool = commonModule()->resourcePool();
