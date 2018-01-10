@@ -114,10 +114,10 @@ template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::bind(const SocketAddress& localAddress)
 {
     const SystemSocketAddress addr(localAddress, m_ipVersion);
-    if (!addr.addr())
+    if (!addr.get())
         return false;
 
-    return ::bind(m_fd, addr.addr(), addr.addrLen()) == 0;
+    return ::bind(m_fd, addr.get(), addr.length()) == 0;
 }
 
 template<typename SocketInterfaceToImplement>
@@ -831,7 +831,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     m_connected = false;
 
     const SystemSocketAddress addr(remoteAddress, this->m_ipVersion);
-    if (!addr.addr())
+    if (!addr.get())
         return false;
 
     //switching to non-blocking mode to connect with timeout
@@ -841,7 +841,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     if (!isNonBlockingModeBak && !this->setNonBlockingMode(true))
         return false;
 
-    int connectResult = ::connect(this->m_fd, addr.addr(), addr.addrLen());
+    int connectResult = ::connect(this->m_fd, addr.get(), addr.length());
     if (connectResult != 0)
     {
         auto errorCode = SystemError::getLastOSErrorCode();
@@ -1569,7 +1569,7 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 #ifdef _WIN32
     return sendto(
         handle(), (raw_type *)buffer, bufferLen, 0,
-        m_destAddr.addr(), m_destAddr.addrLen()) == bufferLen;
+        m_destAddr.get(), m_destAddr.length()) == bufferLen;
 #else
     unsigned int sendTimeout = 0;
     if (!getSendTimeout(&sendTimeout))
@@ -1584,7 +1584,7 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
     return doInterruptableSystemCallWithTimeout<>(
         std::bind(
             &::sendto, handle(), (const void*)buffer, (size_t)bufferLen, flags,
-            m_destAddr.addr(), m_destAddr.addrLen()),
+            m_destAddr.get(), m_destAddr.length()),
         sendTimeout) == bufferLen;
 #endif
 }
@@ -1687,7 +1687,7 @@ int UDPSocket::send(const void* buffer, unsigned int bufferLen)
 #ifdef _WIN32
     return sendto(
         handle(), (raw_type *)buffer, bufferLen, 0,
-        m_destAddr.addr(), m_destAddr.addrLen());
+        m_destAddr.get(), m_destAddr.length());
 #else
     unsigned int sendTimeout = 0;
     if (!getSendTimeout(&sendTimeout))
@@ -1697,7 +1697,7 @@ int UDPSocket::send(const void* buffer, unsigned int bufferLen)
         std::bind(
             &::sendto, handle(),
             (const void*)buffer, (size_t)bufferLen, 0,
-            m_destAddr.addr(), m_destAddr.addrLen()),
+            m_destAddr.get(), m_destAddr.length()),
         sendTimeout);
 #endif
 }
@@ -1725,7 +1725,7 @@ bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
             SocketAddress(resolvedAddresses.front(), endpoint.port), m_ipVersion);
     }
 
-    return m_destAddr.addr() != nullptr;
+    return m_destAddr.get() != nullptr;
 }
 
 bool UDPSocket::sendTo(
@@ -1847,7 +1847,7 @@ int UDPSocket::recvFrom(
 
 #ifdef _WIN32
     const auto h = handle();
-    int rtn = recvfrom(h, (raw_type*)buffer, bufferLen, 0, address.addr(), &address.addrLen());
+    int rtn = recvfrom(h, (raw_type*)buffer, bufferLen, 0, address.get(), &address.length());
     if ((rtn == SOCKET_ERROR) &&
         (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
     {
@@ -1862,7 +1862,7 @@ int UDPSocket::recvFrom(
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::recvfrom, handle(), (void*)buffer, (size_t)bufferLen, 0, address.addr(), &address.addrLen()),
+        std::bind(&::recvfrom, handle(), (void*)buffer, (size_t)bufferLen, 0, address.get(), &address.length()),
         recvTimeout);
 #endif
 

@@ -77,7 +77,7 @@ public:
 
     /**
      * Add new peer address.
-     * Peer addresses are resolved from time to time in the following way:\n
+     * Peer addresses are resolved from time to time in the following way:
      * - Custom NX resolve request is sent if nxApiPort attribute is provided.
      *   If peer responds and reports same name as peerName than address
      *   considered "resolved".
@@ -93,7 +93,8 @@ public:
         const HostAddress& hostName, const SocketAddress& endpoint);
 
     /**
-     * Removes added address, if endpoint is boost::none, removes all addresses.
+     * Removes address added with AddressResolver::addFixedAddress.
+     * If endpoint is boost::none then removes all addresses.
      */
     void removeFixedAddress(
         const HostAddress& hostName,
@@ -104,15 +105,15 @@ public:
 
     /**
      * Resolves hostName like DNS server does.
-     * handler is called with complete address list includung:
+     * Handler is called with complete address list includung:
      * - Addresses reported by AddressResolver::addFixedAddress.
      * - Resolve result from DnsResolver.
-     * - Resolve result from MediatorAddressResolver (TODO :).
+     * - Resolve result from MediatorAddressResolver.
      *
      * @param natTraversalSupport defines if mediator should be used for address resolution.
      *
      * NOTE: Handler might be called within this function in case if
-     *   values are avaliable from cache.
+     *     values are avaliable from cache.
      */
     void resolveAsync(
         const HostAddress& hostName,

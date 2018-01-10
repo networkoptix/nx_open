@@ -21,17 +21,10 @@ boost::optional<std::unique_ptr<AbstractExecutor>> QueryQueue::pop(
 {
     using namespace std::placeholders;
 
-    auto nextQuery = base_type::popIf(
+    return base_type::popIf(
         std::bind(&QueryQueue::checkAndUpdateQueryLimits, this, _1),
         timeout,
         readerId);
-    if (!nextQuery || !(*nextQuery))
-        return nextQuery;
-
-    (*nextQuery)->setOnBeforeDestruction(
-        std::bind(&QueryQueue::decreaseLimitCounters, this, nextQuery->get()));
-
-    return nextQuery;
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
@@ -57,7 +50,11 @@ bool QueryQueue::checkAndUpdateQueryLimits(
         }
 
         if (newModificationCount <= m_concurrentModificationQueryLimit)
+        {
+            nextQuery->setOnBeforeDestruction(
+                std::bind(&QueryQueue::decreaseLimitCounters, this, nextQuery.get()));
             return true;
+        }
 
         --m_currentModificationCount;
         return false;
