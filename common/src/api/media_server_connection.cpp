@@ -87,7 +87,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraSearchStopObject, "manualCamera/stop")
     (CameraAddObject, "manualCamera/add")
     (WearableCameraAddObject, "wearableCamera/add")
-    (WearableCameraUploadFileObject, "wearableCamera/upload")
+    (WearableCameraProcessFileObject, "wearableCamera/process")
     (EventLogObject, "events")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
@@ -214,7 +214,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case WearableCameraAddObject:
             processJsonReply<QnWearableCameraReply>(this, response, handle);
             break;
-        case WearableCameraUploadFileObject:
+        case WearableCameraProcessFileObject:
             emitFinished(this, response.status, handle);
             break;
         case PtzContinuousMoveObject:
@@ -556,19 +556,25 @@ int QnMediaServerConnection::addCameraAsync(
 }
 
 int QnMediaServerConnection::addWearableCameraAsync(const QString& name, QObject* target, const char* slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("name", name);
-
-    return sendAsyncGetRequestLogged(WearableCameraAddObject, params, QN_STRINGIZE_TYPE(QnWearableCameraReply), target, slot);
+    return sendAsyncGetRequestLogged(
+        WearableCameraAddObject, 
+        QnRequestParamList{{lit("name"), name}},
+        QN_STRINGIZE_TYPE(QnWearableCameraReply), 
+        target, 
+        slot);
 }
 
-int QnMediaServerConnection::uploadWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QByteArray& file, qint64 startTimeMs, QObject* target, const char* slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("cameraId", camera->getId());
-    params << QnRequestParam("startTime", startTimeMs);
-
+int QnMediaServerConnection::processWearableCameraFileAsync(const QnNetworkResourcePtr& camera, const QString& uploadId, qint64 startTimeMs, QObject* target, const char* slot) {
     nx_http::HttpHeaders headers;
-    return sendAsyncPostRequestLogged(WearableCameraUploadFileObject, headers, params, file, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(
+        WearableCameraProcessFileObject,
+        QnRequestParamList{
+            {lit("cameraId"), camera->getId().toSimpleString()},
+            {lit("uploadId"), uploadId},
+            {lit("startTime"), QString::number(startTimeMs)}},
+        nullptr,
+        target,
+        slot);
 }
 
 void QnMediaServerConnection::addOldVersionPtzParams(
