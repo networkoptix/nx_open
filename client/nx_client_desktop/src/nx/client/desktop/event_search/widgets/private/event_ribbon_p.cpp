@@ -10,7 +10,7 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
-#include <camera/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
