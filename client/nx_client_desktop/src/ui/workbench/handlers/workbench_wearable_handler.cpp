@@ -29,11 +29,11 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject *parent):
     connect(qnClientModule->uploadManager(), &QnClientUploadManager::progress, this, &QnWorkbenchWearableHandler::at_uploadManager_progress);
 }
 
-QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler() 
+QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
 {
 }
 
-void QnWorkbenchWearableHandler::maybeOpenCurrentSettings() 
+void QnWorkbenchWearableHandler::maybeOpenCurrentSettings()
 {
     using namespace nx::client::desktop::ui::action;
 
@@ -50,7 +50,7 @@ void QnWorkbenchWearableHandler::maybeOpenCurrentSettings()
     menu()->trigger(UploadWearableCameraFileAction, camera);
 }
 
-void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered() 
+void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
 {
     if (!commonModule()->currentServer())
         return;
@@ -66,22 +66,22 @@ void QnWorkbenchWearableHandler::at_newWearableCameraAction_triggered()
         return;
 
     /* Wait for signals to come through. */
-    setReadOnly(m_dialog.data(), true); 
+    setReadOnly(m_dialog.data(), true);
 
     QString name = m_dialog->name();
     QnMediaServerResourcePtr server = m_dialog->server();
     server->apiConnection()->addWearableCameraAsync(
-        name, 
-        this, 
+        name,
+        this,
         SLOT(at_addWearableCameraAsync_finished(int, const QnWearableCameraReply &, int)));
 }
 
-void QnWorkbenchWearableHandler::at_addWearableCameraAsync_finished(int status, const QnWearableCameraReply &reply, int) 
+void QnWorkbenchWearableHandler::at_addWearableCameraAsync_finished(int status, const QnWearableCameraReply &reply, int)
 {
-    if (status != 0) 
+    if (status != 0)
     {
         QnMessageBox::critical(
-            mainWindow(), 
+            mainWindow(),
             tr("Could not add wearable camera to server \"%1\".").arg(m_dialog->server()->getName())
         );
 
@@ -93,12 +93,12 @@ void QnWorkbenchWearableHandler::at_addWearableCameraAsync_finished(int status, 
     maybeOpenCurrentSettings();
 }
 
-void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &) 
+void QnWorkbenchWearableHandler::at_resourcePool_resourceAdded(const QnResourcePtr &)
 {
     maybeOpenCurrentSettings();
 }
 
-void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered() 
+void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 {
     QnSecurityCamResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnSecurityCamResource>();
     if (!camera)
@@ -116,10 +116,10 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 
     QnFileUpload upload = qnClientModule->uploadManager()->addUpload(server, fileName);
 
-    if (upload.status == QnFileUpload::Error) 
+    if (upload.status == QnFileUpload::Error)
     {
         QnMessageBox::critical(
-            mainWindow(), 
+            mainWindow(),
             upload.errorMessage
         );
         return;
@@ -133,9 +133,9 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     //QnAviResource
 }
 
-void QnWorkbenchWearableHandler::at_uploadManager_progress(const QnFileUpload& upload) 
+void QnWorkbenchWearableHandler::at_uploadManager_progress(const QnFileUpload& upload)
 {
-    if (upload.status == QnFileUpload::Error) 
+    if (upload.status == QnFileUpload::Error)
     {
         m_infoByUploadId.remove(upload.id);
         return;
@@ -150,10 +150,10 @@ void QnWorkbenchWearableHandler::at_uploadManager_progress(const QnFileUpload& u
 
         QnMediaServerResourcePtr server = info.camera->getParentServer();
         server->apiConnection()->consumeWearableCameraFileAsync(
-            info.camera, 
-            upload.id, 
-            info.startTimeMs, 
-            this, 
+            info.camera,
+            upload.id,
+            info.startTimeMs,
+            this,
             SLOT(at_processWearableCameraFileAsync_finished(int, int)));
     }
 }

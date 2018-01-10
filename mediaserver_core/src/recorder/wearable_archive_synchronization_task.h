@@ -14,10 +14,10 @@ namespace mediaserver_core {
 namespace recorder {
 
 /**
- * Synchronization task for wearable cameras. 
+ * Synchronization task for wearable cameras.
  * Basically just writes a single file into archive.
  */
-class WearableArchiveSynchronizationTask: public QnCommonModuleAware 
+class WearableArchiveSynchronizationTask: public QnCommonModuleAware
 {
     using base_type = QnCommonModuleAware;
 public:

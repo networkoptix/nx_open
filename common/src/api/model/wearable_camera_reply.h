@@ -5,7 +5,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
-struct QnWearableCameraReply 
+struct QnWearableCameraReply
 {
     QnUuid id;
 };

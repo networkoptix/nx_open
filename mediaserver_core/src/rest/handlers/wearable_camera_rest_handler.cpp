@@ -25,7 +25,7 @@ int QnWearableCameraRestHandler::executeGet(
     const QString& path,
     const QnRequestParams& params,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor* owner) 
+    const QnRestConnectionProcessor* owner)
 {
     QString action = extractAction(path);
     if (action == "add")
@@ -43,7 +43,7 @@ int QnWearableCameraRestHandler::executeAdd(const QnRequestParams &params, QnJso
         return nx_http::StatusCode::invalidParameter;
 
     QnMediaServerResourcePtr server = owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
-    if (!server) 
+    if (!server)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("No server in resource pool!"));
         return nx_http::StatusCode::internalServerError;
@@ -66,7 +66,7 @@ int QnWearableCameraRestHandler::executeAdd(const QnRequestParams &params, QnJso
     camera.url = lit("wearable:///") + camera.physicalId; /* Note that physical id is in path, not in host. */
 
     ec2::ErrorCode code = owner->commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->addCameraSync(camera);
-    if (code != ec2::ErrorCode::ok) 
+    if (code != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("EC returned error '%1'.").arg(toString(code)));
         return nx_http::StatusCode::internalServerError;
@@ -100,14 +100,14 @@ int QnWearableCameraRestHandler::executeConsume(const QnRequestParams &params, Q
 
     using namespace nx::vms::common::p2p::downloader;
     Downloader* downloader = qnServerModule->findInstance<Downloader>();
-    if (!downloader) 
+    if (!downloader)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("DistributedFileDownloader is not initialized."));
         return nx_http::StatusCode::internalServerError;
     }
 
     std::unique_ptr<QFile> file = std::make_unique<QFile>(downloader->filePath(uploadId));
-    if (!file->open(QIODevice::ReadOnly)) 
+    if (!file->open(QIODevice::ReadOnly))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Couldn't open file \"%1\" for reading.").arg(uploadId));
         return nx_http::StatusCode::internalServerError;

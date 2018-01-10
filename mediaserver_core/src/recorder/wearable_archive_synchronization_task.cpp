@@ -20,21 +20,21 @@ WearableArchiveSynchronizationTask::WearableArchiveSynchronizationTask(
     const QnSecurityCamResourcePtr& resource,
     std::unique_ptr<QIODevice> file,
     qint64 startTimeMs
-): 
+):
     base_type(commonModule),
     m_resource(resource),
     m_file(file.release()),
     m_startTimeMs(startTimeMs)
 {}
 
-WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask() 
+WearableArchiveSynchronizationTask::~WearableArchiveSynchronizationTask()
 {
     /* execute() was never called? */
     if (m_file)
         delete m_file.data();
 }
 
-bool WearableArchiveSynchronizationTask::execute() 
+bool WearableArchiveSynchronizationTask::execute()
 {
     createArchiveReader(m_startTimeMs);
     createStreamRecorder(m_startTimeMs);
@@ -49,7 +49,7 @@ bool WearableArchiveSynchronizationTask::execute()
     return true;
 }
 
-void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs) 
+void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
 {
     QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
@@ -85,7 +85,7 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     });
 }
 
-void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs) 
+void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs)
 {
     using namespace std::chrono;
 

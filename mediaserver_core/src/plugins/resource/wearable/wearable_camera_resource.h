@@ -2,7 +2,7 @@
 
 #include "core/resource/camera_resource.h"
 
-class QnWearableCameraResource: public QnPhysicalCameraResource 
+class QnWearableCameraResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
 

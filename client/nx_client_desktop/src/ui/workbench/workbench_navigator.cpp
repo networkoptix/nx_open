@@ -174,7 +174,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
     {
         if (res.dynamicCast<QnStorageResource>())
-            m_cameraDataManager->clearCache();    // TODO:#GDM #bookmarks check if should be placed into camera manager
+            m_cameraDataManager->clearCache(); // TODO:#GDM #bookmarks check if should be placed into camera manager
     });
     discardCacheTimer->start();
 
