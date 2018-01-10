@@ -5,6 +5,7 @@
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
 #include <client/client_color_types.h>
+#include <client/client_upload_manager.h>
 
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
@@ -114,6 +115,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnFullUpdateStage>();
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
+    qRegisterMetaType<QnFileUpload>();
 
     qRegisterMetaType<nx::cdb::api::ResultCode>();
     qRegisterMetaType<nx::cdb::api::SystemData>();
