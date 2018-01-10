@@ -155,7 +155,7 @@ bool UdtSocket<InterfaceToImplement>::bind(const SocketAddress& localAddress)
 {
     const SystemSocketAddress addr(localAddress, m_ipVersion);
 
-    int ret = UDT::bind(m_impl->udtHandle, addr.addr(), addr.addrLen());
+    int ret = UDT::bind(m_impl->udtHandle, addr.get(), addr.length());
     if (ret != 0)
         detail::setLastSystemErrorCodeAppropriately();
     return ret == 0;
@@ -165,7 +165,7 @@ template<typename InterfaceToImplement>
 SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getsockname(m_impl->udtHandle, addr.addr(), reinterpret_cast<int*>(&addr.addrLen())) != 0)
+    if (UDT::getsockname(m_impl->udtHandle, addr.get(), reinterpret_cast<int*>(&addr.length())) != 0)
     {
         detail::setLastSystemErrorCodeAppropriately();
         return SocketAddress();
@@ -643,7 +643,7 @@ int UdtStreamSocket::send(const void* buffer, unsigned int bufferLen)
 SocketAddress UdtStreamSocket::getForeignAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getpeername(m_impl->udtHandle, addr.addr(), reinterpret_cast<int*>(&addr.addrLen())) != 0)
+    if (UDT::getpeername(m_impl->udtHandle, addr.get(), reinterpret_cast<int*>(&addr.length())) != 0)
     {
         detail::setLastSystemErrorCodeAppropriately();
         return SocketAddress();
@@ -764,7 +764,7 @@ bool UdtStreamSocket::connectToIp(
     NX_ASSERT(m_state == detail::SocketState::open);
 
     const SystemSocketAddress addr(remoteAddress, m_ipVersion);
-    if (!addr.addr())
+    if (!addr.get())
         return false;
 
     // The official documentation doesn't advice using select but here we just need
@@ -778,7 +778,7 @@ bool UdtStreamSocket::connectToIp(
         if (!setNonBlockingMode(nbk_sock))
             return false;
     }
-    int ret = UDT::connect(m_impl->udtHandle, addr.addr(), addr.addrLen());
+    int ret = UDT::connect(m_impl->udtHandle, addr.get(), addr.length());
     // The UDT connect will always return zero even if such operation is async which is
     // different with the existed Posix/Win32 socket design. So if we meet an non-zero
     // value, the only explanation is an error happened which cannot be solved.

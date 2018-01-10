@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
+#include <nx/network/retry_timer.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -8,6 +9,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include <nx/utils/scope_guard.h>
 
@@ -35,67 +37,154 @@ void onBytesRead(
 
 } // namespace
 
-void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
+class UdpSocket:
+    public ::testing::Test
 {
-    static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
+public:
+    UdpSocket():
+        m_testMessage(QnUuid::createUuid().toSimpleString().toUtf8()),
+        m_sender()
+    {
+    }
 
-    const auto sender = std::make_unique<UDPSocket>(ipVersion);
-    const auto senderCleanupGuard = makeScopeGuard([&sender]() { sender->pleaseStopSync(); });
+    ~UdpSocket()
+    {
+        if (m_sender)
+            m_sender->pleaseStopSync();
+        if (m_receiver)
+            m_receiver->pleaseStopSync();
+        if (m_retryTimer)
+            m_retryTimer->pleaseStopSync();
+    }
 
-    ASSERT_TRUE(sender->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(sender->setSendTimeout(1000));
+protected:
+    void udpSocketTransferTest(
+        int ipVersion,
+        const HostAddress& hostNameMappedToLocalHost)
+    {
+        initializeSender(ipVersion);
+        initializeReceiver(ipVersion);
 
-    SocketAddress senderEndpoint("127.0.0.1", sender->getLocalAddress().port);
-    const auto& senderHost = senderEndpoint.address;
-    ASSERT_FALSE(senderHost.isIpAddress());
+        startSending(
+            SocketAddress(hostNameMappedToLocalHost, m_receiver->getLocalAddress().port));
 
-    const auto receiver = std::make_unique<UDPSocket>(ipVersion);
-    const auto receiverCleanupGuard = makeScopeGuard([&receiver]() { receiver->pleaseStopSync(); });
-    ASSERT_TRUE(receiver->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(receiver->setRecvTimeout(1000));
+        assertMessageIsReceivedFrom(
+            ipVersion,
+            SocketAddress("127.0.0.1", m_sender->getLocalAddress().port));
 
-    SocketAddress receiverEndpoint("127.0.0.1", receiver->getLocalAddress().port);
-    ASSERT_FALSE(receiverEndpoint.address.isIpAddress());
+        assertSendResultIsCorrect(
+            SocketAddress("127.0.0.1", m_receiver->getLocalAddress().port));
+    }
 
-    nx::utils::promise<void> sendPromise;
-    ASSERT_TRUE(sender->setNonBlockingMode(true));
-    sender->sendToAsync(
-        kTestMessage, SocketAddress(targetHost, receiverEndpoint.port),
-        [&](SystemError::ErrorCode code, SocketAddress ip, size_t size)
+private:
+    struct SendResult
+    {
+        SystemError::ErrorCode code;
+        SocketAddress resolvedTargetEndpoint;
+        std::size_t size;
+    };
+
+    const Buffer m_testMessage;
+    std::unique_ptr<UDPSocket> m_sender;
+    std::unique_ptr<UDPSocket> m_receiver;
+    nx::utils::SyncQueue<SendResult> m_sendResultQueue;
+    std::unique_ptr<RetryTimer> m_retryTimer;
+
+    void initializeSender(int ipVersion)
+    {
+        m_sender = std::make_unique<UDPSocket>(ipVersion);
+        ASSERT_TRUE(m_sender->bind(SocketAddress::anyPrivateAddress));
+    }
+
+    void initializeReceiver(int ipVersion)
+    {
+        m_receiver = std::make_unique<UDPSocket>(ipVersion);
+        ASSERT_TRUE(m_receiver->bind(SocketAddress::anyPrivateAddress));
+    }
+
+    void startSending(const SocketAddress& targetEndpoint)
+    {
+        ASSERT_TRUE(m_sender->setNonBlockingMode(true));
+        m_retryTimer = std::make_unique<RetryTimer>(RetryPolicy(
+            RetryPolicy::kInfiniteRetries,
+            std::chrono::milliseconds(100),
+            1,
+            RetryPolicy::kNoMaxDelay));
+        m_retryTimer->bindToAioThread(m_sender->getAioThread());
+
+        issueSendTo(targetEndpoint);
+    }
+
+    void issueSendTo(const SocketAddress& targetEndpoint)
+    {
+        m_sender->sendToAsync(
+            m_testMessage,
+            targetEndpoint,
+            [this, targetEndpoint](
+                SystemError::ErrorCode code,
+                SocketAddress resolvedTargetEndpoint,
+                size_t size)
+            {
+                m_sendResultQueue.push(SendResult{code, resolvedTargetEndpoint, size});
+
+                m_retryTimer->scheduleNextTry(
+                    [this, targetEndpoint]()
+                    {
+                        issueSendTo(targetEndpoint);
+                    });
+            });
+    }
+
+    void assertMessageIsReceivedFrom(
+        int ipVersion,
+        const SocketAddress& senderEndpoint)
+    {
+        Buffer buffer;
+        buffer.resize(1024);
+        SocketAddress remoteEndpoint;
+        ASSERT_EQ(
+            m_testMessage.size(),
+            m_receiver->recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
+        ASSERT_EQ(m_testMessage, buffer.left(m_testMessage.size()));
+
+        ASSERT_TRUE(remoteEndpoint.address.isIpAddress());
+        ASSERT_EQ(senderEndpoint.toString(), remoteEndpoint.toString());
+
+        if (ipVersion == AF_INET)
         {
-            ASSERT_EQ(SystemError::noError, code);
-            ASSERT_TRUE(ip.address.isIpAddress());
-            ASSERT_EQ(receiverEndpoint.toString(), ip.toString());
-            ASSERT_EQ((size_t)kTestMessage.size(), size);
-            sendPromise.set_value();
-        });
+            ASSERT_EQ(
+                senderEndpoint.address.ipV4()->s_addr,
+                remoteEndpoint.address.ipV4()->s_addr);
+        }
+        else if (ipVersion == AF_INET6)
+        {
+            ASSERT_TRUE(memcmp(
+                &senderEndpoint.address.ipV6().first.get(),
+                &remoteEndpoint.address.ipV6().first.get(),
+                sizeof(in6_addr)) == 0);
+        }
+        else
+        {
+            FAIL();
+        }
+    }
 
-    Buffer buffer;
-    buffer.resize(1024);
-    SocketAddress remoteEndpoint;
-    ASSERT_EQ(kTestMessage.size(), receiver->recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
-    ASSERT_EQ(kTestMessage, buffer.left(kTestMessage.size()));
+    void assertSendResultIsCorrect(const SocketAddress& receiverEndpoint)
+    {
+        const auto sendResult = m_sendResultQueue.pop();
+        ASSERT_EQ(SystemError::noError, sendResult.code);
+        ASSERT_TRUE(sendResult.resolvedTargetEndpoint.address.isIpAddress());
+        ASSERT_EQ(receiverEndpoint.toString(), sendResult.resolvedTargetEndpoint.toString());
+        ASSERT_EQ((size_t)m_testMessage.size(), sendResult.size);
+    }
+};
 
-    const auto& remoteHost = remoteEndpoint.address;
-    ASSERT_TRUE(remoteHost.isIpAddress());
-    ASSERT_EQ(senderEndpoint.toString(), remoteEndpoint.toString());
+TEST_F(UdpSocket, TransferIpV4) { udpSocketTransferTest(AF_INET, "127.0.0.1"); }
+TEST_F(UdpSocket, TransferDnsIpV4) { udpSocketTransferTest(AF_INET, "localhost"); }
+TEST_F(UdpSocket, TransferIpV6) { udpSocketTransferTest(AF_INET6, "127.0.0.1"); }
+TEST_F(UdpSocket, TransferDnsIpV6) { udpSocketTransferTest(AF_INET6, "localhost"); }
 
-    if (ipVersion == AF_INET)
-        ASSERT_EQ(senderHost.ipV4()->s_addr, remoteHost.ipV4()->s_addr);
-    else if (ipVersion == AF_INET6)
-        ASSERT_EQ(0, memcmp(&senderHost.ipV6().first.get(), &remoteHost.ipV6().first.get(), sizeof(in6_addr)));
-    else
-        FAIL();
-
-    sendPromise.get_future().wait();
-}
-
-TEST(UdpSocket, TransferIpV4) { udpSocketTransferTest(AF_INET, "127.0.0.1"); }
-TEST(UdpSocket, TransferDnsIpV4) { udpSocketTransferTest(AF_INET, "localhost"); }
-TEST(UdpSocket, TransferIpV6) { udpSocketTransferTest(AF_INET6, "127.0.0.1"); }
-TEST(UdpSocket, TransferDnsIpV6) { udpSocketTransferTest(AF_INET6, "localhost"); }
-
-TEST(UdpSocket, TransferNat64)
+TEST_F(UdpSocket, TransferNat64)
 {
     HostAddress ip("12.34.56.78");
     SocketGlobals::addressResolver().dnsResolver().addEtcHost(
@@ -105,7 +194,7 @@ TEST(UdpSocket, TransferNat64)
     SocketGlobals::addressResolver().dnsResolver().removeEtcHost(ip.toString());
 }
 
-TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
+TEST_F(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
 {
     constexpr int socketCount = 2;
 
@@ -113,7 +202,7 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     const auto socketsCleanupGuard = makeScopeGuard(
         [&sockets]()
         {
-            for (auto& ctx : sockets)
+            for (auto& ctx: sockets)
                 ctx.socket->pleaseStopSync();
         });
 
@@ -142,9 +231,9 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     }
 
     constexpr const char* testMessage = "bla-bla-bla";
-    const auto sendingSocket = std::make_unique<UDPSocket>();
+    UDPSocket sendingSocket;
     ASSERT_TRUE(
-        sendingSocket->sendTo(
+        sendingSocket.sendTo(
             testMessage,
             strlen(testMessage),
             sockets[0].socket->getLocalAddress()));
@@ -158,14 +247,14 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     }
 }
 
-TEST(UdpSocket, DISABLED_Performance)
+TEST_F(UdpSocket, DISABLED_Performance)
 {
     const uint64_t kBufferSize = 1500;
     const uint64_t kTransferSize = uint64_t(10) * 1024 * 1024 * 1024;
 
-    const auto server = std::make_unique<UDPSocket>(AF_INET);
-    server->bind(SocketAddress::anyPrivateAddress);
-    const auto address = server->getLocalAddress();
+    UDPSocket server(AF_INET);
+    server.bind(SocketAddress::anyPrivateAddress);
+    const auto address = server.getLocalAddress();
     NX_LOG(lm("%1").arg(address), cl_logINFO);
     nx::utils::thread serverThread(
         [&]()
@@ -178,7 +267,7 @@ TEST(UdpSocket, DISABLED_Performance)
             uint64_t transferCount = 0;
             while (transferSize < kTransferSize)
             {
-                recv = server->recv(buffer.data(), buffer.size(), 0);
+                recv = server.recv(buffer.data(), buffer.size(), 0);
                 if (recv <= 0)
                     break;
 
@@ -202,14 +291,14 @@ TEST(UdpSocket, DISABLED_Performance)
     nx::utils::thread clientThread(
         [&]()
         {
-            const auto client = std::make_unique<UDPSocket>(AF_INET);
-            client->setDestAddr(address);
+            UDPSocket client(AF_INET);
+            client.setDestAddr(address);
             Buffer buffer((int) kBufferSize, 'X');
             int send = 0;
             uint64_t transferSize = 0;
             while (transferSize < kTransferSize + kTransferSize / 10)
             {
-                send = client->send(buffer.data(), buffer.size());
+                send = client.send(buffer.data(), buffer.size());
                 if (send <= 0)
                     break;
 

@@ -26,9 +26,9 @@ public:
 
     /**
      * Called on timer event.
-     * @param timerID
+     * @param timerId
      */
-    virtual void onTimer(const TimerId& timerID) = 0;
+    virtual void onTimer(const TimerId& timerId) = 0;
 };
 
 /**
@@ -40,14 +40,13 @@ public:
  *   but it delivers timer events to internal thread,
  *   so additional synchronization in timer event handler may be required.
  */
-class NX_UTILS_API StandaloneTimerManager
-:
+class NX_UTILS_API StandaloneTimerManager:
     public QThread
 {
 public:
     /**
-     * This class is to simplify timer id usage.
-     * NOTE: Not thread-safe
+     * Simplifies timer id usage.
+     * NOTE: Not thread-safe.
      * WARNING: This class calls StandaloneTimerManager::joinAndDeleteTimer, so watch out for deadlock!
      */
     class NX_UTILS_API TimerGuard
@@ -57,7 +56,7 @@ public:
 
     public:
         TimerGuard();
-        TimerGuard(StandaloneTimerManager* const StandaloneTimerManager, TimerId timerID);
+        TimerGuard(StandaloneTimerManager* const StandaloneTimerManager, TimerId timerId);
         TimerGuard(TimerGuard&& right);
         /**
          * Calls TimerGuard::reset().
@@ -98,7 +97,7 @@ public:
      * Adds timer that is executed once after delay expiration.
      * @param taskHandler
      * @param delay Timeout (millisecond) to call taskHandler->onTimer()
-     * @return ID of created timer. Always non-zero.
+     * @return Id of created timer. Always non-zero.
      */
     TimerId addTimer(
         TimerEventHandler* const taskHandler,
@@ -122,26 +121,26 @@ public:
         std::chrono::milliseconds firstShotDelay);
     /**
      * Modifies delay on existing timer.
-     * If timer is being executed currently, nothing is done.
+     * If the timer is being executed currently, nothing is done.
      * Otherwise, timer will be called in newDelayMillis from now
      * @return true, if timer delay has been changed.
      */
-    bool modifyTimerDelay(TimerId timerID, std::chrono::milliseconds delay);
+    bool modifyTimerDelay(TimerId timerId, std::chrono::milliseconds delay);
     /**
-     * If task is already running, it can be still running after method return.
-     * If timer handler is being executed at the moment,
+     * If the task is already running, it can be still running after method return.
+     * If the timer handler is being executed at the moment,
      *   it can still be executed after return of this method.
-     * @param timerID ID of timer, created by addTimer call. If no such timer, nothing is done.
+     * @param timerId Id of timer, created by addTimer call. If no such timer, nothing is done.
      */
-    void deleteTimer(const TimerId& timerID);
+    void deleteTimer(const TimerId& timerId);
     /**
      * Delete timer and wait for handler execution (if its is being executed).
-     * This method garantees that timer timerID handler is not being executed after return of this method.
+     * Garantees that timer handler of timerId is not being executed after return of this method.
      * It is recommended to use previous method, if appropriate, since this method is a bit more heavier.
-     * @param timerID ID of timer, created by addTimer call. If no such timer, nothing is done.
+     * @param timerId Id of timer, created by addTimer call. If no such timer, nothing is done.
      * NOTE: If this method is called from TimerEventHandler::onTimer to delete timer being executed, nothing is done
      */
-    void joinAndDeleteTimer(const TimerId& timerID);
+    void joinAndDeleteTimer(const TimerId& timerId);
 
     void stop();
 
@@ -162,24 +161,24 @@ private:
     };
 
     QnWaitCondition m_cond;
-    mutable QnMutex m_mtx;
-    /** map<pair<time, timerID>, handler>. */
+    mutable QnMutex m_mutex;
+    /** map<pair<time, timerId>, handler>. */
     std::map<std::pair<qint64, TimerId>, TaskContext> m_timeToTask;
-    /** map<timerID, time>. */
+    /** map<timerId, time>. */
     std::map<TimerId, qint64> m_taskToTime;
     bool m_terminated;
-    /** ID of task, being executed. 0, if no running task. */
+    /** Id of task, being executed. 0, if no running task. */
     TimerId m_runningTaskID;
     QElapsedTimer m_monotonicClock;
 
     void addTaskNonSafe(
         const QnMutexLockerBase& lk,
-        const TimerId timerID,
+        const TimerId timerId,
         TaskContext taskContext,
         std::chrono::milliseconds delay);
     void deleteTaskNonSafe(
         const QnMutexLockerBase& lk,
-        const TimerId timerID);
+        const TimerId timerId);
     uint64_t generateNextTimerId();
 };
 
