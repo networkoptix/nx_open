@@ -59,7 +59,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
-    m_rebuildBlocked(false)
+    m_rebuildBlocked(false),
+    m_canDropPackets(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -146,7 +147,8 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     if (!isRunning())
         return;
 
-    cleanupQueueIfOverflow();
+    if(m_canDropPackets && isQueueFull())
+        cleanupQueue();
     updateRebuildState(); //< pause/resume archive rebuild
 
     const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
@@ -214,11 +216,16 @@ bool QnServerStreamRecorder::isQueueFull() const
     return true;
 }
 
-bool QnServerStreamRecorder::cleanupQueueIfOverflow()
-{
-    if (!isQueueFull())
-        return false;
+void QnServerStreamRecorder::setCanDropPackets(bool canDrop) {
+    m_canDropPackets = canDrop;
+}
 
+bool QnServerStreamRecorder::canDropPackets() const {
+    return m_canDropPackets;
+}
+
+bool QnServerStreamRecorder::cleanupQueue()
+{
     if (!m_recordingContextVector.empty())
     {
         size_t slowestStorageIndex;

@@ -9,6 +9,7 @@ QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
     :
     QnServerStreamRecorder(dev, catalog, mediaProvider)
 {
+    setCanDropPackets(false);
 }
 
 QnServerEdgeStreamRecorder::~QnServerEdgeStreamRecorder()
