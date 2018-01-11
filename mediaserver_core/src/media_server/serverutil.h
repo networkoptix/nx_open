@@ -26,7 +26,6 @@ namespace ec2 {
 
 QString getDataDirectory();
 void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
-QString makeNextUniqueName(const QString& dir, int build);
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx

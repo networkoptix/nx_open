@@ -9,6 +9,7 @@
 #include <test_support/utils.h>
 
 #include <media_server/serverutil.h>
+#include <nx/vms/utils/vms_utils.h>
 
 TEST(UniqueNameGenerator, main)
 {
@@ -26,7 +27,7 @@ TEST(UniqueNameGenerator, main)
             const int maxIndex = std::rand() % 15;
             for (int index=0; index < maxIndex; ++index)
             {
-                QString fileName = makeNextUniqueName(prefix, build);
+                QString fileName = nx::vms::utils::makeNextUniqueName(prefix, build);
                 stock.push_back(fileName);
                 QFile(fileName).open(QIODevice::WriteOnly);
             }
