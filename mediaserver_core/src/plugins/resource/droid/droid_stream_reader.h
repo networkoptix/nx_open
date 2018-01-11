@@ -6,7 +6,7 @@
 #include <providers/spush_media_stream_provider.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include "droid_resource.h"
-#include <nx/network/socket.h>
+#include <nx/network/system_socket.h>
 #include <nx/streaming/rtsp_client.h>
 
 class CLH264RtpParser;
@@ -32,7 +32,7 @@ private:
     void setSDPInfo(QByteArray sdpInfo);
 private:
     QnMutex m_controlPortSync;
-    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::TCPSocket> m_tcpSock;
     //UDPSocket* m_videoSock;
     //UDPSocket* m_audioSock;
 

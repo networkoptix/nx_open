@@ -3,6 +3,8 @@
 #include "droid_stream_reader.h"
 
 #include <nx/network/nettools.h>
+#include <nx/network/socket_factory.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "network/h264_rtp_parser.h"
 #include "droid_resource.h"
@@ -31,7 +33,8 @@ PlDroidStreamReader::PlDroidStreamReader(const QnResourcePtr& res):
     m_h264Parser(0),
     m_gotSDP(0)
 {
-    m_tcpSock = nx::network::SocketFactory::createStreamSocket();
+    m_tcpSock = std::make_unique<nx::network::TCPSocket>(
+        nx::network::SocketFactory::tcpClientIpVersion());
 
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
 

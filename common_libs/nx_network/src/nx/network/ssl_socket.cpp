@@ -1388,16 +1388,6 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
     return result.second;
 }
 
-bool SslSocket::reopen()
-{
-    if (!initializeUnderlyingSocketIfNeeded())
-        return false;
-
-    Q_D(SslSocket);
-    d->encryptionEnabled = false;
-    return d->wrappedSocket->reopen();
-}
-
 bool SslSocket::setNoDelay(bool value)
 {
     Q_D(SslSocket);
