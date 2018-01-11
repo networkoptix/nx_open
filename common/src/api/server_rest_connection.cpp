@@ -300,10 +300,10 @@ Handle ServerConnection::addFileUpload(
             { lit("chunkSize"), QString::number(chunkSize) },
             { lit("md5"), QString::fromUtf8(md5) },
             { lit("upload"), lit("true") } },
-            QByteArray(),
-            QByteArray(),
-            callback,
-            targetThread);
+        QByteArray(),
+        QByteArray(),
+        callback,
+        targetThread);
 }
 
 Handle ServerConnection::removeFileDownload(

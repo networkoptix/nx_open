@@ -222,7 +222,7 @@ int Helper::handleAddUpload(const QString& fileName)
         if(!ok || fileInfo.chunkSize > kMaxChunkSize)
             return makeInvalidParameterError("chunkSize");
     }
-    else 
+    else
     {
         return makeInvalidParameterError("chunkSize", QnRestResult::MissingParameter);
     }
@@ -497,7 +497,7 @@ int QnDownloadsRestHandler::executePost(
     switch (request.subject)
     {
         case Request::Subject::file:
-            if (params.value("upload", "false") != "false")
+            if (params.contains("upload"))
                 return helper.handleAddUpload(request.fileName);
             else
                 return helper.handleAddDownload(request.fileName);

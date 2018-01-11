@@ -10,7 +10,8 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
-class QnFileUploadData: public QObject {
+class QnFileUploadData: public QObject
+{
 public:
     QnFileUploadData(const QnMediaServerResourcePtr& server, const QString& path, QObject* parent = nullptr):
         QObject(parent),
@@ -117,13 +118,15 @@ void QnClientUploadManager::handleStarted()
     emit progress(data->upload);
 
     connect(&data->md5FutureWatcher, &QFutureWatcherBase::finished, this, &QnClientUploadManager::handleMd5Calculated);
-    data->md5Future = QtConcurrent::run([this, data]() {
-        nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Md5);
-        if (hash.addData(&data->file))
-            return hash.result();
-        else
-            return QByteArray();
-    });
+    data->md5Future = QtConcurrent::run(
+        [this, data]() {
+            nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Md5);
+            if (hash.addData(&data->file))
+                return hash.result();
+            else
+                return QByteArray();
+        }
+    );
     data->md5FutureWatcher.setFuture(data->md5Future);
 }
 
@@ -134,7 +137,7 @@ void QnClientUploadManager::handleMd5Calculated()
     QByteArray md5 = data->md5Future.result();
     if (md5.isEmpty())
     {
-        handleError(QnClientUploadManager::tr("Could not calculate md5 for file \"%1\"").arg(data->file.fileName()));
+        handleError(tr("Could not calculate md5 for file \"%1\"").arg(data->file.fileName()));
         return;
     }
 
@@ -166,7 +169,7 @@ void QnClientUploadManager::handleFileUploadCreated(bool success, rest::Handle h
 
     if (!success)
     {
-        handleError(QnClientUploadManager::tr("Could not create upload on the server side"));
+        handleError(tr("Could not create upload on the server side"));
         return;
     }
 
@@ -216,7 +219,7 @@ void QnClientUploadManager::handleChunkUploaded(bool success, rest::Handle handl
 
     if (!success)
     {
-        handleError(QnClientUploadManager::tr("Could not upload file chunk to the server"));
+        handleError(tr("Could not upload file chunk to the server"));
         return;
     }
 
@@ -235,7 +238,8 @@ void QnClientUploadManager::handleAllUploaded()
     auto callback = [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
     {
         using namespace nx::vms::common::p2p::downloader;
-        this->handleCheckFinished(success, handle, result.deserialized<FileInformation>().status == FileInformation::Status::downloaded);
+        FileInformation info = result.deserialized<FileInformation>();
+        this->handleCheckFinished(success, handle, info.status == FileInformation::Status::downloaded);
     };
 
     data->runningHandle = data->server->restConnection()->fileDownloadStatus(
@@ -253,13 +257,13 @@ void QnClientUploadManager::handleCheckFinished(bool success, rest::Handle handl
 
     if (!success)
     {
-        handleError(QnClientUploadManager::tr("Could not check uploaded file on the server"));
+        handleError(tr("Could not check uploaded file on the server"));
         return;
     }
 
     if (!ok)
     {
-        handleError(QnClientUploadManager::tr("File was corrupted while being uploaded to the server"));
+        handleError(tr("File was corrupted while being uploaded to the server"));
         return;
     }
 
