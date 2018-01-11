@@ -278,6 +278,7 @@ void ProxyHandler::onConnected(
         std::move(m_request),
         this,
         std::move(connection));
+    m_requestProxyWorker->start();
 }
 
 } // namespace gateway

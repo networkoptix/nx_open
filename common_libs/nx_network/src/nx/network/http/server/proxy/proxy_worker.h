@@ -46,6 +46,9 @@ public:
         AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
 
+    /** MUST be called to start actual activity. */
+    void start();
+
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual void closeConnection(
@@ -65,6 +68,7 @@ private:
     nx::network::http::Message m_responseMessage;
     const int m_proxyingId;
     static std::atomic<int> m_proxyingIdSequence;
+    nx::network::http::Request m_translatedRequest;
 
     void replaceTargetHostWithFullCloudNameIfAppropriate(
         const AbstractStreamSocket* connectionToTheTargetPeer);
