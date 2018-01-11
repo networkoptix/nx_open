@@ -139,7 +139,7 @@ public:
     /* DistributedFileDownloader API */
     Handle addFileDownload(
         const QString& fileName,
-        int size,
+        qint64 size,
         const QByteArray& md5,
         const QUrl& url,
         GetCallback callback,
@@ -147,8 +147,8 @@ public:
 
     Handle addFileUpload(
         const QString& fileName,
-        int size,
-        int chunkSize,
+        qint64 size,
+        qint64 chunkSize,
         const QByteArray& md5,
         PostCallback callback,
         QThread* targetThread = nullptr);
