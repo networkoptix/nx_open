@@ -2117,7 +2117,7 @@ void MediaServerProcess::initPublicIpDiscovery()
     at_updatePublicAddress(m_ipDiscovery->publicIP());
 }
 
-void MediaServerProcess::initPublicIpDiscoveryUpadate()
+void MediaServerProcess::initPublicIpDiscoveryUpdate()
 {
     m_updatePiblicIpTimer.reset(new QTimer());
     connect(m_updatePiblicIpTimer.get(), &QTimer::timeout,
@@ -2935,7 +2935,7 @@ void MediaServerProcess::run()
     commonModule()->resourceAccessProvider()->beginUpdate();
     loadResourcesFromEc(ec2Connection, messageProcessor);
     at_runtimeInfoChanged(runtimeManager->localInfo());
-    initPublicIpDiscoveryUpadate();
+    initPublicIpDiscoveryUpdate();
 
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
