@@ -151,21 +151,31 @@ private:
 
 nx::network::HostAddress AxisMetadataMonitor::getLocalIp(const nx::network::SocketAddress& cameraAddress)
 {
-    static std::chrono::seconds kCameraResponseTimeout(5);
+    static const std::chrono::seconds kCameraResponseTimeout(5);
     nx::network::TCPSocket s;
     if (s.connect(cameraAddress, kCameraResponseTimeout))
+    {
         return s.getLocalAddress().address;
-    NX_WARNING(this, "Can't detect local IP address for TCP server");
+    }
+    NX_WARNING(this, "Network connection to camera is broken.\n"
+        "Can't detect local IP address for TCP server.\n"
+        "Event monitoring can not be started.");
     return nx::network::HostAddress();
 }
 
-void AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
     const int kSchemePrefixLength = sizeof("http://") - 1;
     QString str = m_url.toString().remove(0, kSchemePrefixLength);
 
     nx::network::SocketAddress cameraAddress(str);
     nx::network::HostAddress localIp = this->getLocalIp(cameraAddress);
+
+    if (localIp == nx::network::HostAddress())
+    {
+        //warning message has been outputed int "getLocalIp" function
+        return nx::sdk::Error::networkError;
+    }
 
     nx::network::SocketAddress localAddress(localIp);
     m_httpServer = new nx::network::http::TestHttpServer;
@@ -178,6 +188,7 @@ void AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList, int even
 
     localAddress = m_httpServer->server().address();
     this->setRule(localAddress, eventTypeList, eventTypeListSize);
+    return nx::sdk::Error::noError;
 }
 
 void AxisMetadataMonitor::stopMonitoring()

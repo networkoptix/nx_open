@@ -21,6 +21,21 @@
             "negativeState": "is not detected",
             "flags": "stateDependent"
         },
+		
+        {
+            "eventTypeId": "{4168BB12-3005-4855-A5A2-A5753C0894A0}",
+            "eventName": {
+                "value": "Intrusion detected",
+                "localization": {
+                }
+            },
+
+            "internalName": "fielddetection",
+            "description": "Intrusion %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
 
         {
             "eventTypeId": "{792319D0-EE91-41B9-A160-C21F4BB6689B}",
