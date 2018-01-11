@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtGui/QImage>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
