@@ -50,6 +50,7 @@
 #include <nx/email/mustache/mustache_helper.h>
 
 #include <common/common_module.h>
+#include <common/common_globals.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -778,7 +779,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         {
             auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId);
             cameraHistoryPool()->updateCameraHistorySync(camRes);
-            if (camRes->hasVideo(nullptr))
+            if (camRes->hasVideo(nullptr) && (camRes->getStatus() == Qn::Recording))
             {
                 QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
                 if (!screenshotData.isNull())
