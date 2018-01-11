@@ -283,6 +283,7 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
 
 
 #if !defined(EDGE_SERVER)
@@ -2248,6 +2249,9 @@ void MediaServerProcess::run()
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
+
+    connect(this, &MediaServerProcess::started,
+        [&serverModule]() { serverModule->updates2Manager()->startTimers(); });
 
     qnServerModule->runTimeSettings()->remove("rebuild");
 

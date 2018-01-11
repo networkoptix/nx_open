@@ -14,7 +14,7 @@ namespace nx {
 namespace mediaserver {
 namespace hls {
 
-class Chunk
+class NX_NETWORK_API Chunk
 {
 public:
     double duration;
@@ -27,7 +27,7 @@ public:
     Chunk();
 };
 
-class Playlist
+class NX_NETWORK_API Playlist
 {
 public:
     unsigned int mediaSequence;
@@ -40,14 +40,14 @@ public:
     QByteArray toString() const;
 };
 
-class VariantPlaylistData
+class NX_NETWORK_API VariantPlaylistData
 {
 public:
     QUrl url;
     boost::optional<int> bandwidth;
 };
 
-class VariantPlaylist
+class NX_NETWORK_API VariantPlaylist
 {
 public:
     std::vector<VariantPlaylistData> playlists;

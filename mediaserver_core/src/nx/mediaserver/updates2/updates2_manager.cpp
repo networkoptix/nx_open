@@ -46,8 +46,10 @@ Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
     loadStatusFromFile();
-    m_currentStatus.serverId = qnServerModule->commonModule()->moduleGUID();
+}
 
+void Updates2Manager::startTimers()
+{
     using namespace std::placeholders;
     m_timerManager.addNonStopTimer(
         std::bind(&Updates2Manager::checkForUpdate, this, _1),
@@ -89,7 +91,6 @@ void Updates2Manager::loadStatusFromFile()
 
 void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
 {
-    detail::Updates2StatusDataEx oldStatus;
     {
         QnMutexLocker lock(&m_mutex);
         switch (m_currentStatus.status)
@@ -97,7 +98,6 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
             case api::Updates2StatusData::StatusCode::notAvailable:
             case api::Updates2StatusData::StatusCode::error:
             case api::Updates2StatusData::StatusCode::available:
-                oldStatus = m_currentStatus;
                 m_currentStatus = api::Updates2StatusData(
                     commonModule()->moduleGUID(),
                     api::Updates2StatusData::StatusCode::checking,
@@ -136,7 +136,7 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
     };
 
     auto refreshStatusAfterCheckGuard = makeScopeGuard(
-        [this, oldStatus]()
+        [this]()
         {
             QnMutexLocker lock(&m_mutex);
             switch (m_currentStatus.status)
