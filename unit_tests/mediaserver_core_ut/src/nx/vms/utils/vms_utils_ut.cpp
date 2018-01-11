@@ -11,7 +11,7 @@
 #include <media_server/serverutil.h>
 #include <nx/vms/utils/vms_utils.h>
 
-TEST(UniqueNameGenerator, main)
+TEST(vms_utils, makeNextUniqueName)
 {
     nx::ut::utils::WorkDirResource workDir(nx::utils::TestOptions::temporaryDirectoryPath());
     ASSERT_TRUE((bool)workDir.getDirName());
