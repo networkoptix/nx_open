@@ -1,11 +1,11 @@
-System was shared with you
+시스템이 공유되었습니다.
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) 이 {{message.system_name}} 시스템을 공유했습니다.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-The system {{message.system_name}} was shared with you.
+{{message.system_name}} 시스템이 공유되었습니다.
 {{/message.sharer_name}}
 
-Open the system: {{config.portal_url}}/systems/{{message.system_id}}
+시스템 열기: {{config.portal_url}}/systems/{{message.system_id}}

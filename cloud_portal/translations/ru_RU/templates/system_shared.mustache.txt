@@ -1,11 +1,11 @@
-System was shared with you
+Вам был предоставлен доступ к системе
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) предоставил вам доступ к системе {{message.system_name}}.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-The system {{message.system_name}} was shared with you.
+Вам открыт доступ к системе {{message.system_name}}.
 {{/message.sharer_name}}
 
-Open the system: {{config.portal_url}}/systems/{{message.system_id}}
+Открыть систему: {{config.portal_url}}/systems/{{message.system_id}}

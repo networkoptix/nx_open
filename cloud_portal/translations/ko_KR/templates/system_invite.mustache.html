@@ -1,14 +1,12 @@
-<h1>Welcome to {{PRODUCT_NAME}}</h1>
+<h1>{{PRODUCT_NAME}}에 오신 것을 환영합니다.</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> is inviting you to join <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
-and shared his system {{message.system_name}} with you.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a>이 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}에 가입하도록 초대하였습니다.</a> 자신의 시스템 {{message.system_name}}을 (와) 공유했습니다.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>You are invited you to join <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>.
-The system {{message.system_name}} was shared with you.</p>
+<p><a href="{{config.portal_url}}"> {{PRODUCT_NAME}} </a>에 가입하도록 초대되었습니다. {{message.system_name}} 시스템이 당신과 공유되었습니다.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Register and view the system</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">등록 하고 시스템 보기</a>
 

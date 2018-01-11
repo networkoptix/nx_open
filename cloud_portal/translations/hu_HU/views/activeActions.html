@@ -24,7 +24,7 @@
             <p>Az aktiváláshoz szükséges linket {{data.email}} címre elküldtük.<br>
             Kérjük ennek segítségével aktiválja fiókját.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">Fiók nyugtásása</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">E-mail</label>

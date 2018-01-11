@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Confirm your account"
+    "emailSubject": "アカウントを確認"
   },
   "restore_password": {
-    "emailSubject": "Restore your password"
+    "emailSubject": "パスワードを復元"
   },
   "system_invite": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"
   },
   "review_version": {
     "emailSubject": "バージョン{{message.id}}の準備ができました"

@@ -15,13 +15,13 @@
         "unauthorized": "Authentification requise",
         "noData": "Aucune donnée",
         "iosVideoTooLarge": "iOS ne supporte pas une vidéo supérieure à fullHD (2MP : 1920 x 1080).",
-        "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
+        "flashRequired": "S.V.P.<a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> pour la lecture vidéo à partir de serveurs ARM.",
         "flashOrWebmRequired": "S.V.P. <a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> ou le <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> codec WebM</a> pour la lecture vidéo dans Internet Explorer.",
         "noArmSupport": "Ce navigateur ou ce périphérique ne supporte pas la lecture vidéo à partir de serveurs basés sur ARM.",
-        "noFormat": "This browser or device does not support video playback from  this camera.",
+        "noFormat": "Ce navigateur ou le périphérique ne prend pas de lecture vidéo de cette caméra.",
         "ieNoWebm": "Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
         "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
         "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium."
     },
-    "searchCamPlaceholder": "search"
+    "searchCamPlaceholder": "recherche"
 }

@@ -1,8 +1,8 @@
-Welcome to {{PRODUCT_NAME}}
+ברוך הבא אל {{PRODUCT_NAME}}
 
-Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
+תודה שהצטרפת ל- {{PRODUCT_NAME}}. לחץ על הלחצן למטה כדי לאשר את כתובת הדוא"ל שלך ולהפעיל את החשבון.
 
-Activate account: {{config.portal_url}}/activate/{{message.code}}
+הפעל חשבון: {{config.portal_url}} / הפעל / {{message.code}}
 
 אם לא נרשמת ל- {{PRODUCT_NAME}}, פשוט התעלם מדוא"ל זה.
-Please do not share the message or the link with third parties.
+אל תשתף את ההודעה או את הקישור עם אנשים זרים.

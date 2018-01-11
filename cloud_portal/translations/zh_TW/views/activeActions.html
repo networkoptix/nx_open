@@ -24,7 +24,7 @@
             <p>我們已經將啟動連結發信給{{data.email}}。<br>
             請點擊此連結以啟動您的帳戶。</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">確認您的帳號</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>

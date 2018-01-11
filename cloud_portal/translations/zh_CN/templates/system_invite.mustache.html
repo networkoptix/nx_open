@@ -1,14 +1,12 @@
-<h1>Welcome to {{PRODUCT_NAME}}</h1>
+<h1>欢迎来到 {{PRODUCT_NAME}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> is inviting you to join <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
-and shared his system {{message.system_name}} with you.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> 邀请你去参加 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>，与您共享他系统 {{message.system_name}}。</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>You are invited you to join <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>.
-The system {{message.system_name}} was shared with you.</p>
+<p>你被邀请加入 <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>。与你分享系统 {{message.system_name}}。</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Register and view the system</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">注册并查看系统</a>
 

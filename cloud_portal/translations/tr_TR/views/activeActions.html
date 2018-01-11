@@ -24,7 +24,7 @@
             <p>{{data.email}} adresine bir aktivasyon linki gönderdik<br>
             Lütfen bu bağlantıya tıklayıp hesabınızı etkinleştirin.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">Hesabını onayla</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">E-posta</label>

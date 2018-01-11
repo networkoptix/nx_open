@@ -1,8 +1,8 @@
 Welcome to {{PRODUCT_NAME}}
 
-Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
+  Please open the link below to confirm your email address and activate the account.
 
-Activate account: {{config.portal_url}}/activate/{{message.code}}
+{{config.portal_url}}/activate/{{message.code}}
 
 If you didn't register in {{PRODUCT_NAME}}, just ignore this email.
-Please do not share the message or the link with third parties.
+Do not share the message or the link with anyone.

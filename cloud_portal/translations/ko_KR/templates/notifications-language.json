@@ -1,15 +1,15 @@
 {
   "activate_account": {
-    "emailSubject": "Confirm your account"
+    "emailSubject": "계정을 확인 하십시요"
   },
   "restore_password": {
-    "emailSubject": "Restore your password"
+    "emailSubject": "패스워드 복원"
   },
   "system_invite": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."
   },
   "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+    "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."
   },
   "review_version": {
     "emailSubject": "{{message.id}} 버전을 검토 할 준비가되었습니다."

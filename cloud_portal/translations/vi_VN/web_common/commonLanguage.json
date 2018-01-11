@@ -15,13 +15,13 @@
         "unauthorized": "Yêu cầu xác thực",
         "noData": "Không có dữ liệu",
         "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
-        "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
+        "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video từ máy chủ ARM.",
         "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
         "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
-        "noFormat": "This browser or device does not support video playback from  this camera.",
+        "noFormat": "Trình duyệt hoặc thiết bị này không hỗ trợ phát lại video từ camera này.",
         "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
         "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
         "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế."
     },
-    "searchCamPlaceholder": "search"
+    "searchCamPlaceholder": "tìm kiếm"
 }

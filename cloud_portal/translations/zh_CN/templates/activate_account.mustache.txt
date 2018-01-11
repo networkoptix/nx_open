@@ -1,8 +1,8 @@
-Welcome to {{PRODUCT_NAME}}
+欢迎来到 {{PRODUCT_NAME}}
 
-Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
+谢谢你的加入 {{PRODUCT_NAME}}。 请访问下面的按钮以确认您的电子邮件地址并激活帐户。
 
-Activate account: {{config.portal_url}}/activate/{{message.code}}
+激活帐户︰ {{config.portal_url}}，激活，{{message.code}}
 
 如果你没有在 {{PRODUCT_NAME}} 中注册，請忽略这封电子邮件。
-Please do not share the message or the link with third parties.
+请別將此消息或链接与第三方共享。

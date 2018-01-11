@@ -1,11 +1,11 @@
-System was shared with you
+系统与你分享
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) 共享系统 {{message.system_name}} 給你。
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-The system {{message.system_name}} was shared with you.
+与你分享系统 {{message.system_name}}。
 {{/message.sharer_name}}
 
-Open the system: {{config.portal_url}}/systems/{{message.system_id}}
+打开系统︰ {{config.portal_url}}/系统/{{message.system_id}}

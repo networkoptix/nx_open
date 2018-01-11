@@ -1,11 +1,11 @@
-<h1>System was shared with you</h1>
+<h1>Вам был предоставлен доступ к системе</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> shared system {{message.system_name}} with you.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> предоставил вам доступ к системе {{message.system_name}}.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>The system {{message.system_name}} was shared with you.</p>
+<p>Вам открыт доступ к системе {{message.system_name}}.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Open the system</a>
+<a class="btn" href="{{config.portal_url}}/systems/{{message.system_id}}">Открыть систему</a>

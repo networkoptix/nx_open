@@ -22,7 +22,7 @@
             <h1>You have registered in {{PRODUCT_NAME}}</h1>
             <p>Nous vous avons envoyé une lettre avec le lien d'activation à {{data.email}}. <br> Veuillez activer votre compte en visitant ce lien.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">Confirmer votre compte</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Courriel</label>
