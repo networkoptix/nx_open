@@ -22,8 +22,9 @@ public:
 private:
     detail::Updates2StatusDataEx m_currentStatus;
     QnMutex m_mutex;
-    utils::TimerManager m_timerManager;
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
+    utils::TimerManager m_timerManager;
+
 
     void checkForUpdate(utils::TimerId timerId);
     void writeStatusToFile();

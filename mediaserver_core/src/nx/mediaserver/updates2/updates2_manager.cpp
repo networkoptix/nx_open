@@ -22,7 +22,7 @@ namespace updates2 {
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 60 * 1000;
+static const qint64 kRefreshTimeoutMs = 60 * 60 * 1000;
 static const QString kFileName = "update.status";
 static const QString kUpdatePropertyName = "UpdateStatus";
 
