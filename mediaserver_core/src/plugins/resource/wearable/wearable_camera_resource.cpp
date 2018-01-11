@@ -17,6 +17,12 @@ QString QnWearableCameraResource::getDriverName() const
     return kManufacture;
 }
 
+void QnWearableCameraResource::setStatus(Qn::ResourceStatus, Qn::StatusChangeReason reason)
+{
+    // TODO: #wearable Maybe make it always offline instead?
+    base_type::setStatus(Qn::Online, reason);
+}
+
 QnAbstractStreamDataProvider* QnWearableCameraResource::createLiveDataProvider()
 {
     return nullptr;

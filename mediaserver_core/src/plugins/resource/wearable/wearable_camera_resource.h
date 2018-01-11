@@ -5,6 +5,7 @@
 class QnWearableCameraResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
+    using base_type = QnPhysicalCameraResource;
 
 public:
     static const QString kManufacture;
@@ -13,6 +14,8 @@ public:
     virtual ~QnWearableCameraResource() override;
 
     virtual QString getDriverName() const override;
+
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason) override;
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
