@@ -22,7 +22,7 @@ namespace updates2 {
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 60 * 60 * 1000;
+static const qint64 kRefreshTimeoutMs = 60 * 1000;
 static const QString kFileName = "update.status";
 static const QString kUpdatePropertyName = "UpdateStatus";
 
@@ -71,7 +71,6 @@ void Updates2Manager::writeStatusToFile()
         NX_WARNING(this, "Failed to save persistent update status data");
         return;
     }
-    m_currentStatus.lastRefreshTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
 void Updates2Manager::loadStatusFromFile()
@@ -135,8 +134,12 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
         return false;
     };
 
+    const auto thisServerResource = resourcePool()->getResourceById(commonModule()->moduleGUID());
+    const auto thisServer = thisServerResource.dynamicCast<QnMediaServerResource>();
+    NX_ASSERT(thisServer);
+
     auto refreshStatusAfterCheckGuard = makeScopeGuard(
-        [this]()
+        [this, thisServer]()
         {
             QnMutexLocker lock(&m_mutex);
             switch (m_currentStatus.status)
@@ -146,6 +149,7 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
                 case api::Updates2StatusData::StatusCode::available:
                 case api::Updates2StatusData::StatusCode::checking:
                 {
+                    QnSoftwareVersion version;
                     if (!m_updateRegistry)
                     {
                         m_currentStatus = detail::Updates2StatusDataEx(
@@ -153,38 +157,40 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
                             commonModule()->moduleGUID(),
                             api::Updates2StatusData::StatusCode::error,
                             "Failed to get updates data");
-                        break;
                     }
-
-                    QnSoftwareVersion version;
-                    if (m_updateRegistry->latestUpdate(
+                    else
+                    {
+                        if (m_updateRegistry->latestUpdate(
                                 detail::UpdateRequestDataFactory::create(),
                                 &version) != update::info::ResultCode::ok)
-                    {
-                        m_currentStatus = detail::Updates2StatusDataEx(
-                            qnSyncTime->currentMSecsSinceEpoch(),
-                            commonModule()->moduleGUID(),
-                            api::Updates2StatusData::StatusCode::notAvailable,
-                            "Update is unavailable");
-                        break;
+                        {
+                            m_currentStatus = detail::Updates2StatusDataEx(
+                                qnSyncTime->currentMSecsSinceEpoch(),
+                                commonModule()->moduleGUID(),
+                                api::Updates2StatusData::StatusCode::notAvailable,
+                                "Update is unavailable");
+                        }
+                        else
+                        {
+                            m_currentStatus = detail::Updates2StatusDataEx(
+                                qnSyncTime->currentMSecsSinceEpoch(),
+                                commonModule()->moduleGUID(),
+                                api::Updates2StatusData::StatusCode::available,
+                                lit("Update is available: %1").arg(version.toString()));
+                        }
+
+                        thisServer->setProperty(
+                            kUpdatePropertyName,
+                            QString::fromLocal8Bit(m_updateRegistry->toByteArray()));
                     }
 
-                    m_currentStatus = detail::Updates2StatusDataEx(
-                        qnSyncTime->currentMSecsSinceEpoch(),
-                        commonModule()->moduleGUID(),
-                        api::Updates2StatusData::StatusCode::available,
-                        lit("Update is available: %1").arg(version.toString()));
+                    writeStatusToFile();
                     break;
                 }
-                writeStatusToFile();
                 default:
                     return;
             }
         });
-
-    const auto thisServerResource = resourcePool()->getResourceById(commonModule()->moduleGUID());
-    const auto thisServer = thisServerResource.dynamicCast<QnMediaServerResource>();
-    NX_ASSERT(thisServer);
 
     if (!thisServer->getServerFlags().testFlag(Qn::SF_HasPublicIP))
     {
