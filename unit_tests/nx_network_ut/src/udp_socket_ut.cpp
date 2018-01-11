@@ -49,12 +49,17 @@ public:
 
     ~UdpSocket()
     {
-        if (m_sender)
-            m_sender->pleaseStopSync();
+        if (m_sendRetryTimer)
+        {
+            m_sendRetryTimer->executeInAioThreadSync(
+                [this]()
+                {
+                    m_sender.reset();
+                    m_sendRetryTimer.reset();
+                });
+        }
         if (m_receiver)
             m_receiver->pleaseStopSync();
-        if (m_retryTimer)
-            m_retryTimer->pleaseStopSync();
     }
 
 protected:
@@ -88,7 +93,7 @@ private:
     std::unique_ptr<UDPSocket> m_sender;
     std::unique_ptr<UDPSocket> m_receiver;
     nx::utils::SyncQueue<SendResult> m_sendResultQueue;
-    std::unique_ptr<RetryTimer> m_retryTimer;
+    std::unique_ptr<RetryTimer> m_sendRetryTimer;
 
     void initializeSender(int ipVersion)
     {
@@ -105,12 +110,12 @@ private:
     void startSending(const SocketAddress& targetEndpoint)
     {
         ASSERT_TRUE(m_sender->setNonBlockingMode(true));
-        m_retryTimer = std::make_unique<RetryTimer>(RetryPolicy(
+        m_sendRetryTimer = std::make_unique<RetryTimer>(RetryPolicy(
             RetryPolicy::kInfiniteRetries,
             std::chrono::milliseconds(100),
             1,
             RetryPolicy::kNoMaxDelay));
-        m_retryTimer->bindToAioThread(m_sender->getAioThread());
+        m_sendRetryTimer->bindToAioThread(m_sender->getAioThread());
 
         issueSendTo(targetEndpoint);
     }
@@ -127,7 +132,7 @@ private:
             {
                 m_sendResultQueue.push(SendResult{code, resolvedTargetEndpoint, size});
 
-                m_retryTimer->scheduleNextTry(
+                m_sendRetryTimer->scheduleNextTry(
                     [this, targetEndpoint]()
                     {
                         issueSendTo(targetEndpoint);
@@ -172,7 +177,8 @@ private:
     void assertSendResultIsCorrect(const SocketAddress& receiverEndpoint)
     {
         const auto sendResult = m_sendResultQueue.pop();
-        ASSERT_EQ(SystemError::noError, sendResult.code);
+        ASSERT_EQ(SystemError::noError, sendResult.code)
+            << SystemError::toString(sendResult.code).toStdString();
         ASSERT_TRUE(sendResult.resolvedTargetEndpoint.address.isIpAddress());
         ASSERT_EQ(receiverEndpoint.toString(), sendResult.resolvedTargetEndpoint.toString());
         ASSERT_EQ((size_t)m_testMessage.size(), sendResult.size);
