@@ -1,3 +1,5 @@
+#include <memory>
+#include <vector>
 #include "updates2_rest_handler.h"
 #include <rest/server/rest_connection_processor.h>
 #include <nx/utils/log/log.h>
@@ -10,6 +12,7 @@
 #include <rest/helpers/request_context.h>
 #include <api/helpers/empty_request_data.h>
 #include <network/tcp_listener.h>
+#include <nx/utils/std/future.h>
 
 
 namespace nx {
@@ -22,12 +25,13 @@ namespace {
 static const QString kUpdates2StatusPath = kUpdates2Path + "/status";
 static const QString kUpdates2StatusAllPath = kUpdates2StatusPath + "/all";
 
-JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
+static JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
 {
     const auto resourcePool = owner->commonModule()->resourcePool();
     QList<api::Updates2StatusData> updates2StatusDataList;
     QnEmptyRequestData request;
     QnMultiserverRequestContext<QnEmptyRequestData> context(request, owner->owner()->getPort());
+    std::vector<utils::future<void>> responseFutures;
 
     for (const auto& server: resourcePool->getAllServers(Qn::ResourceStatus::Online))
     {
@@ -37,15 +41,17 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
         auto requestUrl = server->getApiUrl();
         requestUrl.setPath("/" + kUpdates2StatusPath);
         NX_ASSERT(requestUrl.isValid());
+        auto responsePromisePtr = std::make_shared<utils::promise<void>>();
+        responseFutures.emplace_back(responsePromisePtr->get_future());
 
         runMultiserverDownloadRequest(
             qnServerModule->commonModule()->router(),
             requestUrl,
             server,
-            [&context, &updates2StatusDataList, serverId = server->getId()](
+            [&context, &updates2StatusDataList, serverId = server->getId(), responsePromisePtr](
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
-                network::http::BufferType msgBody)
+                network::http::BufferType msgBody) mutable
             {
 
                 api::Updates2StatusData updates2StatusData(
@@ -74,6 +80,8 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
                         updates2StatusDataList.append(updates2StatusData);
                         context.requestProcessed();
                     });
+
+                responsePromisePtr->set_value();
             },
             &context);
     }
@@ -88,6 +96,9 @@ JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor* owner)
     }
 
     updates2StatusDataList.append(qnServerModule->updates2Manager()->status());
+
+    for (auto& future: responseFutures)
+        future.wait();
 
     JsonRestResponse result(network::http::StatusCode::ok);
     result.json.setReply(updates2StatusDataList);
