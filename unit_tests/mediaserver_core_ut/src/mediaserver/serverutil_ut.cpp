@@ -10,7 +10,7 @@
 
 #include <media_server/serverutil.h>
 
-TEST(UniqueNameGenerator, main)
+TEST(serverutil, makeNextUniqueName)
 {
     nx::ut::utils::WorkDirResource workDir(nx::utils::TestOptions::temporaryDirectoryPath());
     ASSERT_TRUE((bool)workDir.getDirName());
