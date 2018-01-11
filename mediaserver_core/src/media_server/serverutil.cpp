@@ -188,24 +188,25 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 }
 
 /**
- * @return Unique filename according to pattern "<dir>/ecs_<build>_<index>.backup" by
+ * @return Unique filename according to pattern "<prefix>_<build>_<index>.backup" by
  * incrementing index
  */
-QString makeNextUniqueName(const QString& dir, int build)
+QString makeNextUniqueName(const QString& prefix, int build)
 {
-    const QString beginning = dir + lit("/ecs");
     QString fileName;
-    int index = -1;
-
-    while (QFile::exists(fileName = lm("%1_%2_%3.backup").args(beginning, build, ++index))) {}
-
-    return fileName;
+    for (int index = 0; ; ++index)
+    {
+        auto fileName = lm("%1_%2_%3.backup").args(prefix, build, index);
+        if (!QFile::exists(fileName))
+            return fileName;
+    }
+    return fileName; //< We never reach this line.
 }
 
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 {
     const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
-    QString fileName = makeNextUniqueName(getDataDirectory(), productVersion.build());
+    QString fileName = makeNextUniqueName(getDataDirectory() + lit("/ecs"), productVersion.build());
 
     const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
     if (errorCode != ec2::ErrorCode::ok)
