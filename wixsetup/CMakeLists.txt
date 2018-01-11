@@ -74,6 +74,7 @@ if(withNxTool)
     add_custom_target(collect_nxtool_qml_dependencies
         DEPENDS
             nxtool
+            customactions
         COMMENT "Collecting NxTool QML libraries..."
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
         COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
