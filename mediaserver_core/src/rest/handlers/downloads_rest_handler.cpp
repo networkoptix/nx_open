@@ -153,7 +153,7 @@ int Helper::handleAddDownload(const QString& fileName)
     if (!sizeString.isEmpty())
     {
         bool ok;
-        fileInfo.size = sizeString.toInt(&ok);
+        fileInfo.size = sizeString.toLongLong(&ok);
         if (!ok || fileInfo.size <= 0)
             return makeInvalidParameterError("size");
     }
@@ -191,7 +191,7 @@ int Helper::handleAddUpload(const QString& fileName)
     if (!sizeString.isEmpty())
     {
         bool ok;
-        fileInfo.size = sizeString.toInt(&ok);
+        fileInfo.size = sizeString.toLongLong(&ok);
         if (!ok || fileInfo.size <= 0)
             return makeInvalidParameterError("size");
     }
