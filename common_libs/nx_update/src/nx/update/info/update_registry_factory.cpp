@@ -1,11 +1,10 @@
 #include <nx/utils/std/cpp14.h>
 #include "update_registry_factory.h"
-#include "common_update_registry.h"
+#include "impl/common_update_registry.h"
 
 namespace nx {
 namespace update {
 namespace info {
-namespace impl {
 
 UpdateRegistryFactoryFunction UpdateRegistryFactory::m_factoryFunction = nullptr;
 EmptyUpdateRegistryFactoryFunction UpdateRegistryFactory::m_emptyFactoryFunction = nullptr;
@@ -16,7 +15,7 @@ AbstractUpdateRegistryPtr createCommonUpdateRegistry(
     detail::data_parser::UpdatesMetaData metaData,
     detail::CustomizationVersionToUpdate customizationVersionToUpdate)
 {
-    return std::make_unique<CommonUpdateRegistry>(
+    return std::make_unique<impl::CommonUpdateRegistry>(
         baseUrl,
         std::move(metaData),
         std::move(customizationVersionToUpdate));
@@ -24,7 +23,7 @@ AbstractUpdateRegistryPtr createCommonUpdateRegistry(
 
 AbstractUpdateRegistryPtr createEmptyCommonUpdateRegistry()
 {
-    return std::make_unique<CommonUpdateRegistry>();
+    return std::make_unique<impl::CommonUpdateRegistry>();
 }
 } // namespace
 
@@ -65,7 +64,7 @@ void UpdateRegistryFactory::setEmptyFactoryFunction(
 {
     m_emptyFactoryFunction = std::move(emptyFactoryFunction);
 }
-} // namespace impl
+
 } // namespace info
 } // namespace update
 } // namespace nx

@@ -9,7 +9,6 @@
 namespace nx {
 namespace update {
 namespace info {
-namespace impl {
 
 using AbstractUpdateRegistryPtr = std::unique_ptr<AbstractUpdateRegistry>;
 using UpdateRegistryFactoryFunction =
@@ -34,7 +33,6 @@ private:
     static EmptyUpdateRegistryFactoryFunction m_emptyFactoryFunction;
 };
 
-} // namespace impl
 } // namespace info
 } // namespace update
 } // namespace nx

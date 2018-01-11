@@ -5,7 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/update/info/async_update_checker.h>
 #include <nx/update/info/detail/data_provider/raw_data_provider_factory.h>
-#include <nx/update/info/impl/update_registry_factory.h>
+#include <nx/update/info/update_registry_factory.h>
 #include <nx/update/info/detail/data_provider/test_support/impl/async_json_provider_mockup.h>
 
 namespace nx {
@@ -216,7 +216,7 @@ private:
     void assertSerializability() const
     {
         const auto rawData = m_updateRegistry->toByteArray();
-        auto newUpdateRegistry = impl::UpdateRegistryFactory::create();
+        auto newUpdateRegistry = UpdateRegistryFactory::create();
         ASSERT_TRUE(newUpdateRegistry->fromByteArray(rawData));
         ASSERT_TRUE(m_updateRegistry->equals(newUpdateRegistry.get()));
     }

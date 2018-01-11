@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/api/updates2/updates2_status_data.h>
+#include <nx/update/info/abstract_update_registry.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
@@ -21,10 +22,9 @@ private:
     detail::Updates2StatusDataEx m_currentStatus;
     QnMutex m_mutex;
     utils::TimerManager m_timerManager;
+    update::info::AbstractUpdateRegistryPtr m_updateRegistry;
 
-    void checkForUpdateUnsafe();
-    void updateDownloadingStatus();
-    void updatePreparingStatus();
+    void checkForUpdate(utils::TimerId timerId);
     void writeStatusToFile();
     void loadStatusFromFile();
 };
