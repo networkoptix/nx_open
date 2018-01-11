@@ -72,19 +72,23 @@ void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs)
     m_archiveReader->setArchiveDelegate(archiveDelegate);
     //m_archiveReader->setPlaybackMask(timePeriod);
 
-    m_archiveReader->setErrorHandler([this](const QString& errorString) {
-        NX_DEBUG(this, lm("Can not synchronize wearable chunk, error: %1").args(errorString));
+    m_archiveReader->setErrorHandler(
+        [this](const QString& errorString) {
+            NX_DEBUG(this, lm("Can not synchronize wearable chunk, error: %1").args(errorString));
 
-        m_archiveReader->pleaseStop();
-        if (m_recorder)
-            m_recorder->pleaseStop();
-    });
+            m_archiveReader->pleaseStop();
+            if (m_recorder)
+                m_recorder->pleaseStop();
+        }
+    );
 
-    m_archiveReader->setNoDataHandler([this]() {
-        m_archiveReader->pleaseStop();
-        if (m_recorder)
-            m_recorder->pleaseStop();
-    });
+    m_archiveReader->setNoDataHandler(
+        [this]() {
+            m_archiveReader->pleaseStop();
+            if (m_recorder)
+                m_recorder->pleaseStop();
+        }
+    );
 }
 
 void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs)
@@ -102,16 +106,20 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
     m_recorder->setSaveMotionHandler(saveMotionHandler);
     m_recorder->setObjectName(lit("WearableCameraArchiveRecorder"));
 
-    m_recorder->setOnFileWrittenHandler([this](milliseconds startTime, milliseconds duration) {
-        int a = 10;
-    });
+    m_recorder->setOnFileWrittenHandler(
+        [this](milliseconds startTime, milliseconds duration) {
+            int a = 10;
+        }
+    );
 
-    m_recorder->setEndOfRecordingHandler([this]() {
-        if (m_archiveReader)
-            m_archiveReader->pleaseStop();
+    m_recorder->setEndOfRecordingHandler(
+        [this]() {
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
 
-        m_recorder->pleaseStop();
-    });
+            m_recorder->pleaseStop();
+        }
+    );
 }
 
 
