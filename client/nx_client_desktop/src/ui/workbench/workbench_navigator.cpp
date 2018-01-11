@@ -1248,9 +1248,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
         if (m_currentWidget->resource()->flags().testFlag(Qn::sync))
             flags |= WidgetSupportsSync;
 
-        // TODO: #wearable resource flags are not propagated to client, so cannot check Qn::live here,
-        // probably should come up with a better way to handle this.
-        if (m_currentWidget->resource()->getTypeId() == QnResourceTypePool::kWearableCameraTypeUuid)
+        if (m_currentWidget->resource()->flags().testFlag(Qn::wearable_camera))
             flags &= ~WidgetSupportsLive;
 
         if (workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */

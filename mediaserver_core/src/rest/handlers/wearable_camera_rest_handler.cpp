@@ -10,10 +10,10 @@
 #include <recorder/wearable_archive_synchronization_task.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
 #include <common/common_module.h>
+#include <plugins/resource/wearable/wearable_camera_resource.h>
 #include <media_server/media_server_module.h>
 
 QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
@@ -92,10 +92,8 @@ int QnWearableCameraRestHandler::executeConsume(const QnRequestParams &params, Q
     if (!requireParameter(params, lit("uploadId"), result, &uploadId))
         return nx_http::StatusCode::invalidParameter;
 
-    QnSecurityCamResourcePtr camera = owner->resourcePool()->getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
+    QnWearableCameraResourcePtr camera = owner->resourcePool()->getResourceById(cameraId).dynamicCast<QnWearableCameraResource>();
     if (!camera)
-        return nx_http::StatusCode::invalidParameter;
-    if (camera->getTypeId() != QnResourceTypePool::kWearableCameraTypeUuid)
         return nx_http::StatusCode::invalidParameter;
 
     using namespace nx::vms::common::p2p::downloader;

@@ -1248,7 +1248,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Upload to Wearable Camera..."))
-        .condition(condition::isWearable(MatchMode::All));
+        .condition(condition::hasFlags(Qn::wearable_camera, All));
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
@@ -1261,7 +1261,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::live_cam, Any)
-            && !condition::isWearable(MatchMode::All)
+            && !condition::hasFlags(Qn::wearable_camera, All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1278,7 +1278,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::live_cam, ExactlyOne)
-            && !condition::isWearable(MatchMode::All)
+            && !condition::hasFlags(Qn::wearable_camera, All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
