@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
+#include <nx/network/connection_server/simple_message_server.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
@@ -33,7 +34,8 @@ public:
     StreamSocketAcceptance():
         m_addressResolver(&nx::network::SocketGlobals::addressResolver()),
         m_startedConnectionsCount(0),
-        m_completedConnectionsCount(0)
+        m_completedConnectionsCount(0),
+        m_serverMessage(nx::utils::random::generateName(17))
     {
     }
 
@@ -43,6 +45,8 @@ public:
             m_connection->pleaseStopSync();
         if (m_serverSocket)
             m_serverSocket->pleaseStopSync();
+        if (m_server)
+            m_server->pleaseStopSync();
     }
 
 protected:
@@ -77,6 +81,35 @@ protected:
         m_mappedEndpoint.port = nx::utils::random::number<std::uint16_t>();
     }
 
+    void givenMessageServer()
+    {
+        m_server = std::make_unique<server::SimpleMessageServer>(
+            std::make_unique<typename SocketTypeSet::ServerSocket>(
+                SocketFactory::tcpClientIpVersion()));
+        m_server->setStaticMessage(m_serverMessage);
+        m_server->setKeepConnection(true);
+        ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_server->listen());
+    }
+
+    void givenConnectedSocket()
+    {
+        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(m_connection->connect(
+            m_server->address(), nx::network::kNoTimeout));
+    }
+
+    void whenReceivedMessageFromServerAsync(
+        nx::utils::MoveOnlyFunc<void()> auxiliaryHandler)
+    {
+        m_auxiliaryRecvHandler.swap(auxiliaryHandler);
+
+        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+        continueReceiving();
+
+        thenServerMessageIsReceived();
+    }
+
     void whenConnectUsingHostName()
     {
         using namespace std::placeholders;
@@ -86,6 +119,16 @@ protected:
         m_connection->connectAsync(
             m_mappedEndpoint,
             std::bind(&StreamSocketAcceptance::saveConnectResult, this, _1));
+    }
+
+    void continueReceiving()
+    {
+        using namespace std::placeholders;
+
+        m_readBuffer.reserve(m_readBuffer.size() + 1024);
+        m_connection->readSomeAsync(
+            &m_readBuffer,
+            std::bind(&StreamSocketAcceptance::saveReadResult, this, _1, _2));
     }
 
     void whenCancelAllSocketOperations()
@@ -102,6 +145,24 @@ protected:
     {
         whenConnectUsingHostName();
         thenConnetionIsEstablished();
+    }
+
+    void setClientSocketRecvTimeout(std::chrono::milliseconds timeout)
+    {
+        ASSERT_TRUE(m_connection->setRecvTimeout(timeout.count()));
+    }
+
+    void thenServerMessageIsReceived()
+    {
+        const auto prevRecvResult = m_recvResultQueue.pop();
+        ASSERT_EQ(SystemError::noError, std::get<0>(prevRecvResult));
+        ASSERT_EQ(m_serverMessage, std::get<1>(prevRecvResult));
+    }
+
+    void thenClientSocketReportedTimedout()
+    {
+        const auto prevRecvResult = m_recvResultQueue.pop();
+        ASSERT_EQ(SystemError::timedOut, std::get<0>(prevRecvResult));
     }
 
     void runStreamingTest(bool doServerDelay, bool doClientDelay)
@@ -209,15 +270,45 @@ protected:
     // (end) Stopping multiple connections test.
 
 private:
+    using RecvResult = std::tuple<SystemError::ErrorCode, nx::Buffer>;
+
     SocketAddress m_mappedEndpoint;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
+    const nx::Buffer m_serverMessage;
+    nx::Buffer m_readBuffer;
+    nx::utils::SyncQueue<RecvResult> m_recvResultQueue;
     nx::utils::promise<int> m_serverPort;
     std::unique_ptr<typename SocketTypeSet::ServerSocket> m_serverSocket;
     std::unique_ptr<typename SocketTypeSet::ClientSocket> m_connection;
+    std::unique_ptr<server::SimpleMessageServer> m_server;
+    nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
 
     void saveConnectResult(SystemError::ErrorCode connectResult)
     {
         m_connectResultQueue.push(connectResult);
+    }
+
+    void saveReadResult(SystemError::ErrorCode systemErrorCode, std::size_t bytesRead)
+    {
+        if (systemErrorCode == SystemError::noError && bytesRead > 0)
+        {
+            if (m_readBuffer != m_serverMessage)
+            {
+                continueReceiving();
+                return;
+            }
+
+            m_recvResultQueue.push(
+                std::make_tuple(SystemError::noError, m_readBuffer));
+            m_readBuffer.clear();
+        }
+        else
+        {
+            m_recvResultQueue.push(std::make_tuple(systemErrorCode, nx::Buffer()));
+        }
+
+        if (m_auxiliaryRecvHandler)
+            nx::utils::swapAndCall(m_auxiliaryRecvHandler);
     }
 
     void streamingServerMain(bool doServerDelay)
@@ -355,13 +446,29 @@ TYPED_TEST_P(StreamSocketAcceptance, randomly_stopping_multiple_simultaneous_con
     ASSERT_TRUE(this->m_connections.empty());
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, receive_timeout_change_is_not_ignored)
+{
+    this->givenMessageServer();
+    this->givenConnectedSocket();
+
+    this->whenReceivedMessageFromServerAsync(
+        [this]()
+        {
+            this->setClientSocketRecvTimeout(std::chrono::milliseconds(1));
+            this->continueReceiving();
+        });
+
+    this->thenClientSocketReportedTimedout();
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
     uses_address_resolver,
     connect_including_resolve_is_cancelled_correctly,
     connect_including_resolving_unknown_name_is_cancelled_correctly,
-    randomly_stopping_multiple_simultaneous_connections);
+    randomly_stopping_multiple_simultaneous_connections,
+    receive_timeout_change_is_not_ignored);
 
 } // namespace test
 } // namespace network
