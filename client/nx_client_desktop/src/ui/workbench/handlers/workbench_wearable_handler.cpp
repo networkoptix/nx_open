@@ -115,6 +115,8 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         0,
         QnCustomFileDialog::fileDialogOptions()
     );
+    if (fileName.isEmpty())
+        return;
 
     QnAviResourcePtr resource(new QnAviResource(fileName));
     QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
