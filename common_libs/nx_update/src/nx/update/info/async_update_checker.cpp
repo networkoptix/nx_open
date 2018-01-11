@@ -3,7 +3,7 @@
 #include "detail/data_parser/raw_data_parser_factory.h"
 #include "detail/data_provider/raw_data_provider_factory.h"
 #include "analytics/detected_objects_storage/analytics_events_storage_types.h"
-#include "impl/update_registry_factory.h"
+#include "update_registry_factory.h"
 
 namespace nx {
 namespace update {
@@ -185,7 +185,7 @@ private:
 
         m_updateCallback(
             resultCode,
-            impl::UpdateRegistryFactory::create(
+            UpdateRegistryFactory::create(
                 m_baseUrl,
                 std::move(m_updatesMetaData),
                 m_specificUpdatesFetcher->take()));

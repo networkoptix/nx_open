@@ -136,7 +136,7 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
     };
 
     auto refreshStatusAfterCheckGuard = makeScopeGuard(
-        [this, oldStatus](api::Updates2StatusData::StatusCode updateResult)
+        [this, oldStatus]()
         {
             QnMutexLocker lock(&m_mutex);
             switch (m_currentStatus.status)
@@ -188,7 +188,7 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
 
     if (!thisServer->getServerFlags().testFlag(Qn::SF_HasPublicIP))
     {
-        for (const auto& server : resourcePool()->getAllServers(Qn::ResourceStatus::Online))
+        for (const auto& server: resourcePool()->getAllServers(Qn::ResourceStatus::Online))
         {
             if (server->hasProperty(kUpdatePropertyName))
             {
