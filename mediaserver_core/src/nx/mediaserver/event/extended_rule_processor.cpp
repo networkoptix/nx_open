@@ -779,14 +779,16 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         {
             auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId);
             cameraHistoryPool()->updateCameraHistorySync(camRes);
-            if (camRes->hasVideo(nullptr) && (camRes->getStatus() == Qn::Recording))
+            if (camRes->hasVideo(nullptr))
             {
                 QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
                 if (!screenshotData.isNull())
                 {
-                    contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-                    contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
-
+                    if (camRes->getStatus() == Qn::Recording)
+                    {
+                        contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+                        contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
+                    }
                     QBuffer screenshotStream(&screenshotData);
                     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
                     contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
