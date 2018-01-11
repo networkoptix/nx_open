@@ -58,7 +58,7 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
 }
 
-CameraDiagnostics::Result QnArchiveCamResource::initInternal()
+CameraDiagnostics::Result QnArchiveCamResource::initializeCameraDriver()
 {
     return CameraDiagnostics::LiveVideoIsNotSupportedResult();
 }

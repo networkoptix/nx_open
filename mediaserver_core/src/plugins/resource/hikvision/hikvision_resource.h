@@ -28,7 +28,7 @@ public:
     static bool tryToEnableOnvifSupport(const QUrl& url, const QAuthenticator& authenticator);
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;

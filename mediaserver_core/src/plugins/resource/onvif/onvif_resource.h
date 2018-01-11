@@ -75,7 +75,9 @@ struct QnOnvifServiceUrls
 
 };
 
-class QnPlOnvifResource: public nx::mediaserver::resource::Camera
+class QnPlOnvifResource:
+    public nx::mediaserver::resource::Camera,
+    public nx::mediaserver::resource::Camera::AdvancedParametersProvider
 {
     Q_OBJECT
     using base_type = nx::mediaserver::resource::Camera;
@@ -231,11 +233,6 @@ public:
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
-
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
@@ -284,7 +281,7 @@ protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         CapabilitiesResp* outCapabilitiesResponse,
         DeviceSoapWrapper** outDeviceSoapWrapper);
@@ -371,6 +368,13 @@ protected:
     bool createPullPointSubscription();
     bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
     void setMaxChannels(int value);
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    // TODO: Move out to a different class:
+    virtual QnCameraAdvancedParams descriptions() override;
+    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 

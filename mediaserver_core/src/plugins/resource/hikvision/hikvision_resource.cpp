@@ -42,11 +42,11 @@ HikvisionResource::~HikvisionResource()
     m_audioTransmitter.reset();
 }
 
-CameraDiagnostics::Result HikvisionResource::initInternal()
+CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
     tryToEnableOnvifSupport(getDeviceOnvifUrl(), getAuth());
 
-    auto result = QnPlOnvifResource::initInternal();
+    auto result = QnPlOnvifResource::initializeCameraDriver();
     if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
         return result;
 

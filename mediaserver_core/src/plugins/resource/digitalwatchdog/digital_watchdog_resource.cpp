@@ -234,7 +234,7 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
     return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
-CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
+CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
 {
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false)
@@ -248,8 +248,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
     }
     disableB2FramesForActiDW();
 
-    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
-
+    const CameraDiagnostics::Result result = QnPlOnvifResource::initializeCameraDriver();
     return result;
 }
 

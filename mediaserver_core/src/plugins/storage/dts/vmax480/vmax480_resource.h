@@ -46,7 +46,7 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     void setChunks(const QnTimePeriodList& chunks);
     nx::mediaserver::resource::CameraPtr getOtherResource(int channel);
     virtual Qn::LicenseType calculateLicenseType() const override;

@@ -21,6 +21,11 @@ void QnPlDriodIpWebCamResource::setIframeDistance(int /*frames*/, int /*timems*/
 
 }
 
+CameraDiagnostics::Result QnPlDriodIpWebCamResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 QnAbstractStreamDataProvider* QnPlDriodIpWebCamResource::createLiveDataProvider()
 {
     return new QnPlDroidIpWebCamReader(toSharedPointer());

@@ -1,11 +1,91 @@
 #include "camera.h"
 
 #include <common/static_common_module.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource/resource_command.h>
+#include <nx/utils/log/log.h>
+#include <utils/xml/camera_advanced_param_reader.h>
 
 namespace nx {
 namespace mediaserver {
 namespace resource {
+
+namespace {
+
+class GetAdvancedParametersCommand: public QnResourceCommand
+{
+public:
+    GetAdvancedParametersCommand(
+        const QnResourcePtr& resource,
+        const QSet<QString>& ids,
+        std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
+    :
+        QnResourceCommand(resource),
+        m_ids(ids),
+        m_handler(std::move(handler))
+    {
+    }
+
+    bool execute() override
+    {
+        const auto camera = m_resource.dynamicCast<Camera>();
+        NX_CRITICAL(camera);
+
+        QnCameraAdvancedParamValueMap values;
+        if (isConnectedToTheResource())
+            values = camera->getAdvancedParameters(m_ids);
+
+        m_handler(values);
+        return true;
+    }
+
+    void beforeDisconnectFromResource() override
+    {
+    }
+
+private:
+    QSet<QString> m_ids;
+    std::function<void(const QnCameraAdvancedParamValueMap&)> m_handler;
+};
+
+class SetAdvancedParametersCommand: public QnResourceCommand
+{
+public:
+    SetAdvancedParametersCommand(
+        const QnResourcePtr& resource,
+        const QnCameraAdvancedParamValueMap& values,
+        std::function<void(const QSet<QString>&)> handler)
+    :
+        QnResourceCommand(resource),
+        m_values(values),
+        m_handler(std::move(handler))
+    {
+    }
+
+    bool execute() override
+    {
+        const auto camera = m_resource.dynamicCast<Camera>();
+        NX_CRITICAL(camera);
+
+        QSet<QString> ids;
+        if (isConnectedToTheResource())
+            ids = camera->setAdvancedParameters(m_values);
+
+        m_handler(ids);
+        return true;
+    }
+
+    void beforeDisconnectFromResource() override
+    {
+    }
+
+private:
+    QnCameraAdvancedParamValueMap m_values;
+    std::function<void(const QSet<QString>&)> m_handler;
+};
+
+} // namespace
 
 const float Camera::kMaxEps = 0.01f;
 
@@ -33,6 +113,108 @@ void Camera::setUrl(const QString &urlStr)
     setHttpPort( url.port( httpPort() ) );
     if (m_channelNumber > 0)
         m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
+}
+
+QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
+{
+    if (m_defaultAdvancedParametersProviders == nullptr)
+    {
+        NX_ASSERT(this, "Get advanced paramiters with no providers");
+        return {};
+    }
+
+    std::map<AdvancedParametersProvider*, QSet<QString>> idsByProvider;
+    for (const auto& id: ids)
+    {
+        const auto it = m_advancedParametersProvidersByParameterId.find(id);
+        if (it != m_advancedParametersProvidersByParameterId.end())
+        {
+            idsByProvider[it->second].insert(id);
+        }
+        else
+        {
+            NX_DEBUG(this, lm("Get undeclared advanced parameter: %1").arg(id));
+            idsByProvider[m_defaultAdvancedParametersProviders].insert(id);
+        }
+    }
+
+    QnCameraAdvancedParamValueMap result;
+    for (auto& providerIds: idsByProvider)
+    {
+        const auto provider = providerIds.first;
+        const auto& ids = providerIds.second;
+        const auto values = provider->get(ids);
+        for (const auto& id: values)
+            result.insert(id, values.value(id));
+    }
+
+    return result;
+}
+
+boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
+{
+    const auto values = getAdvancedParameters({id});
+    if (values.contains(id))
+        return values.value(id);
+
+    return boost::none;
+}
+
+QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
+{
+    if (m_defaultAdvancedParametersProviders == nullptr)
+    {
+        NX_ASSERT(this, "Get advanced paramiters with no providers");
+        return {};
+    }
+
+    std::map<AdvancedParametersProvider*, QnCameraAdvancedParamValueList> valuesByProvider;
+    for (const auto& value: values.toValueList())
+    {
+        const auto it = m_advancedParametersProvidersByParameterId.find(value.id);
+        if (it != m_advancedParametersProvidersByParameterId.end())
+        {
+            valuesByProvider[it->second].push_back(value);
+        }
+        else
+        {
+            NX_WARNING(this, lm("Set undeclared advanced parameter: %1").arg(value.id));
+            valuesByProvider[m_defaultAdvancedParametersProviders].push_back(value);
+        }
+    }
+
+    QSet<QString> result;
+    for (auto& providerValues: valuesByProvider)
+    {
+        const auto provider = providerValues.first;
+        const auto& values = providerValues.second;
+        result += provider->set(values);
+    }
+
+    return result;
+}
+
+bool Camera::setAdvancedParameter(const QString& id, const QString& value)
+{
+    QnCameraAdvancedParamValueMap parameters;
+    parameters.insert(id, value);
+    return setAdvancedParameters(parameters).contains(id);
+}
+
+void Camera::getAdvancedParametersAsync(
+    const QSet<QString>& ids,
+    std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
+{
+    addCommandToProc(std::make_shared<GetAdvancedParametersCommand>(
+        toSharedPointer(this), ids, std::move(handler)));
+}
+
+void Camera::setAdvancedParametersAsync(
+    const QnCameraAdvancedParamValueMap& values,
+    std::function<void(const QSet<QString>&)> handler)
+{
+    addCommandToProc(std::make_shared<SetAdvancedParametersCommand>(
+        toSharedPointer(this), values, std::move(handler)));
 }
 
 float Camera::getResolutionAspectRatio(const QSize& resolution)
@@ -139,9 +321,40 @@ CameraDiagnostics::Result Camera::initInternal()
     {
         return CameraDiagnostics::NotAuthorisedResult(getUrl());
     }
+
     m_lastInitTime.restart();
     m_lastCredentials = credentials;
+
+    m_defaultAdvancedParametersProviders = nullptr;
+    m_advancedParametersProvidersByParameterId.clear();
+
+    const auto driverResult = initializeCameraDriver();
+    if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return driverResult;
+
+    QnCameraAdvancedParams advancedParameters;
+    for (const auto& provider: advancedParametersProviders())
+    {
+        if (m_defaultAdvancedParametersProviders == nullptr)
+            m_defaultAdvancedParametersProviders = provider;
+
+        auto providerParamiters = provider->descriptions();
+        for (const auto& id: providerParamiters.allParameterIds())
+            m_advancedParametersProvidersByParameterId.emplace(id, provider);
+
+        if (advancedParameters.groups.empty())
+            advancedParameters = std::move(providerParamiters);
+        else
+            advancedParameters.merge(providerParamiters);
+    }
+
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
     return CameraDiagnostics::NoErrorResult();
+}
+
+std::vector<Camera::AdvancedParametersProvider*> Camera::advancedParametersProviders()
+{
+    return {};
 }
 
 } // namespace resource

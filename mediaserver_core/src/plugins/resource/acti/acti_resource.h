@@ -19,6 +19,7 @@ class QnActiPtzController;
 
 class QnActiResource:
     public nx::mediaserver::resource::Camera,
+    public nx::mediaserver::resource::Camera::AdvancedParametersProvider,
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
@@ -43,11 +44,6 @@ public:
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
 
     virtual QString getDriverName() const override;
-
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -108,7 +104,7 @@ public:
     virtual bool allowRtspVideoLayout() const override { return false; }
     bool SetupAudioInput();
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
@@ -162,6 +158,11 @@ private:
 
     boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    // TODO: Move out to a different class:
+    virtual QnCameraAdvancedParams descriptions() override;
+    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
     class TriggerOutputTask

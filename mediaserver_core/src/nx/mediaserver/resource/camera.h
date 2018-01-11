@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_advanced_param.h>
 
 namespace nx {
 namespace mediaserver {
@@ -8,6 +9,8 @@ namespace resource {
 
 class Camera: public QnVirtualCameraResource
 {
+    Q_OBJECT
+
 public:
     static const float kMaxEps;
 
@@ -21,6 +24,24 @@ public:
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
+
+    /** Returns id-value pairs. */
+    QnCameraAdvancedParamValueMap getAdvancedParameters(const QSet<QString>& ids);
+    boost::optional<QString> getAdvancedParameter(const QString& id);
+
+    /** Returns ids of successfully set parameters. */
+    QSet<QString> setAdvancedParameters(const QnCameraAdvancedParamValueMap& values);
+    bool setAdvancedParameter(const QString& id, const QString& value);
+
+    /** Gets advanced paramiters async, handler is called when it's done. */
+    void getAdvancedParametersAsync(
+        const QSet<QString>& ids,
+        std::function<void(const QnCameraAdvancedParamValueMap&)> handler = nullptr);
+
+    /** Sets advanced paramiters async, handler is called when it's done. */
+    void setAdvancedParametersAsync(
+        const QnCameraAdvancedParamValueMap& values,
+        std::function<void(const QSet<QString>&)> handler = nullptr);
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
 
@@ -53,13 +74,37 @@ public:
         const QList<QSize>& resolutionList,
         double* outCoefficient = 0);
 
+    class AdvancedParametersProvider
+    {
+    public:
+        virtual ~AdvancedParametersProvider() = default;
+
+        /** Returns supported parameters descriptions. */
+        virtual QnCameraAdvancedParams descriptions() = 0;
+
+        /** Returns id-value pairs. */
+        virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) = 0;
+
+        /** Returns ids of successfully set parameters. */
+        virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) = 0;
+    };
+
 protected:
+    /** Is called during initInternal(). */
+    virtual CameraDiagnostics::Result initializeCameraDriver() = 0;
+
+    /** Override to add support for advanced paramiters. */
+    virtual std::vector<AdvancedParametersProvider*>  advancedParametersProviders();
+
+private:
     virtual CameraDiagnostics::Result initInternal() override;
 
 private:
     int m_channelNumber; // video/audio source number
     QElapsedTimer m_lastInitTime;
     QAuthenticator m_lastCredentials;
+    AdvancedParametersProvider* m_defaultAdvancedParametersProviders = nullptr;
+    std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
 };
 
 } // namespace resource

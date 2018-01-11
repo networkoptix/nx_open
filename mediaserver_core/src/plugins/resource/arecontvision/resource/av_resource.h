@@ -12,7 +12,8 @@
 class QDomElement;
 
 // TODO: #Elric rename class to *ArecontVision*, rename file
-class QnPlAreconVisionResource: public nx::mediaserver::resource::Camera
+class QnPlAreconVisionResource:
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
     friend class QnPlArecontResourceSearcher;
@@ -72,20 +73,33 @@ public:
 
     static bool isPanoramic(QnResourceTypePtr resType);
 
+    virtual bool getApiParameter(const QString &id, QString &value);
+    virtual bool setApiParameter(const QString &id, const QString &value);
+
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-
-    // should just do physical job ( network or so ) do not care about memory domain
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool setParamPhysical(const QString &id, const QString &value) override;
 
     virtual void setMotionMaskPhysical(int channel) override;
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;
 
     virtual bool isRTSPSupported() const;
+
+    struct AvParamitersProvider: AdvancedParametersProvider
+    {
+    public:
+        AvParamitersProvider(QnPlAreconVisionResource* resource): m_resource(resource) {}
+        virtual QnCameraAdvancedParams descriptions() override;
+        virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+        virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+
+    private:
+        QnPlAreconVisionResource* m_resource = nullptr;
+    };
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
 
 protected:
     QString m_description;
@@ -98,6 +112,7 @@ private:
     bool m_dualsensor;
     bool m_inputPortState;
     nx_http::AsyncHttpClientPtr m_relayInputClient;
+    AvParamitersProvider m_advancedParamitersProvider;
 
     bool getParamPhysical2(int channel, const QString& name, QString &val);
     void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);

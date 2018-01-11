@@ -43,7 +43,7 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
-CameraDiagnostics::Result FcResource::initInternal()
+CameraDiagnostics::Result FcResource::initializeCameraDriver()
 {
     quint16 port = nexus::kDefaultNexusPort;
     nx_http::HttpClient httpClient;

@@ -229,10 +229,8 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-CameraDiagnostics::Result QnPlDlinkResource::initInternal()
+CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
-
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));
 
     CLHttpStatus status;

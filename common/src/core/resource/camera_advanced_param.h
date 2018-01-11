@@ -20,10 +20,13 @@ struct QnCameraAdvancedParamValue
 
 class QnCameraAdvancedParamValueMap: public QMap<QString, QString>
 {
-
 public:
+    QnCameraAdvancedParamValueMap(const QnCameraAdvancedParamValueList& list = {});
+    QnCameraAdvancedParamValueMap(std::initializer_list<std::pair<QString, QString>> values);
+
     QnCameraAdvancedParamValueList toValueList() const;
     void appendValueList(const QnCameraAdvancedParamValueList &list);
+    QSet<QString> ids() const;
 
     /** Get all values from this map that differs from corresponding values from other map. */
     QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
@@ -191,6 +194,8 @@ struct QnCameraAdvancedParams
     void clear();
     QnCameraAdvancedParams filtered(const QSet<QString> &allowedIds) const;
     void applyOverloads(const std::vector<QnCameraAdvancedParameterOverload>& overloads);
+
+    void merge(QnCameraAdvancedParams params);
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 

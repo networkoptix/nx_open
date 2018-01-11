@@ -40,6 +40,20 @@ QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const 
 {
 }
 
+QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
+    const QnCameraAdvancedParamValueList& list)
+{
+    appendValueList(list);
+}
+
+
+QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
+    std::initializer_list<std::pair<QString, QString>> values)
+{
+    for (const auto& v: values)
+        insert(v.first, v.second);
+}
+
 QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::toValueList() const
 {
     QnCameraAdvancedParamValueList result;
@@ -73,6 +87,15 @@ void QnCameraAdvancedParamValueMap::appendValueList(const QnCameraAdvancedParamV
 {
     for (const QnCameraAdvancedParamValue &value: list)
         insert(value.id, value.value);
+}
+
+QSet<QString> QnCameraAdvancedParamValueMap::ids() const
+{
+    QSet<QString> set;
+    for (const auto& id: *this)
+        set.insert(value(id));
+
+    return set;
 }
 
 bool QnCameraAdvancedParameter::isValid() const
@@ -353,6 +376,56 @@ void QnCameraAdvancedParams::applyOverloads(const std::vector<QnCameraAdvancedPa
 
     for (auto& group: groups)
         traverseGroup(group);
+}
+
+static void mergeParams(
+    std::vector<QnCameraAdvancedParameter>* target,
+    std::vector<QnCameraAdvancedParameter>* source)
+{
+    for (auto& sourceParam: *source)
+    {
+        const auto targetParamById = std::find_if(
+            target->begin(), target->end(),
+            [&](const QnCameraAdvancedParameter& p){ return p.id == sourceParam.id; });
+
+        if (targetParamById != target->end())
+            NX_ASSERT(false, lm("Paramiter with name '%1' clash").arg(sourceParam.id));
+        else
+            target->push_back(std::move(sourceParam));
+    }
+}
+
+static void mergeGroups(
+    std::vector<QnCameraAdvancedParamGroup>* target,
+    std::vector<QnCameraAdvancedParamGroup>* source)
+{
+    for (auto& sourceGroup: *source)
+    {
+        const auto targetGroup = std::find_if(
+            target->begin(), target->end(),
+            [&](const QnCameraAdvancedParamGroup& g){ return g.name == sourceGroup.name; });
+
+        if (targetGroup != target->end())
+        {
+            targetGroup->description += lit("\n") + sourceGroup.description;
+            mergeParams(&targetGroup->params, &sourceGroup.params);
+        }
+        else
+        {
+            target->push_back(std::move(sourceGroup));
+        }
+    }
+}
+
+void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
+{
+    // These fields are never used in code, but could still be usefull for debug.
+    name += lit(", ") + params.name;
+    version += lit(", ") + params.version;
+    unique_id += lit(", ") + params.unique_id;
+    packet_mode |= params.packet_mode;
+
+    mergeGroups(&groups, &params.groups);
 }
 
 bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck) const

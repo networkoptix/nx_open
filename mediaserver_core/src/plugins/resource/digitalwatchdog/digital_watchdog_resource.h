@@ -30,7 +30,7 @@ public:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     CLSimpleHTTPClient httpClient() const;
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
     virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;

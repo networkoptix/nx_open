@@ -40,7 +40,8 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
       m_channelCount(0),
       m_prevMotionChannel(0),
       m_dualsensor(false),
-      m_inputPortState(false)
+      m_inputPortState(false),
+      m_advancedParamitersProvider{this}
 {
     setVendor(lit("ArecontVision"));
 }
@@ -196,10 +197,8 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
-CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
+CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
-
     QString maxSensorWidth;
     QString maxSensorHeight;
     {
@@ -207,22 +206,22 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
         maxSensorWidth = getProperty(lit("MaxSensorWidth"));
         maxSensorHeight = getProperty(lit("MaxSensorHeight"));
 
-        setParamPhysicalAsync(lit("sensorleft"), QString::number(0));
-        setParamPhysicalAsync(lit("sensortop"), QString::number(0));
-        setParamPhysicalAsync(lit("sensorwidth"), maxSensorWidth);
-        setParamPhysicalAsync(lit("sensorheight"), maxSensorHeight);
+        setApiParameter(lit("sensorleft"), QString::number(0));
+        setApiParameter(lit("sensortop"), QString::number(0));
+        setApiParameter(lit("sensorwidth"), maxSensorWidth);
+        setApiParameter(lit("sensorheight"), maxSensorHeight);
     }
 
     QString firmwareVersion;
-    if (!getParamPhysical(lit("fwversion"), firmwareVersion))
+    if (!getApiParameter(lit("fwversion"), firmwareVersion))
         return CameraDiagnostics::RequestFailedResult(lit("Firmware version"), lit("unknown"));
 
     QString procVersion;
-    if (!getParamPhysical(lit("procversion"), procVersion))
+    if (!getApiParameter(lit("procversion"), procVersion))
         return CameraDiagnostics::RequestFailedResult(lit("Image engine"), lit("unknown"));
 
     QString netVersion;
-    if (!getParamPhysical(lit("netversion"), netVersion))
+    if (!getApiParameter(lit("netversion"), netVersion))
         return CameraDiagnostics::RequestFailedResult(lit("Net version"), lit("unknown"));
 
     //if (!getDescription())
@@ -231,13 +230,13 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setRegister(3, 21, 20); // sets I frame frequency to 1/20
 
 
-    if (!setParamPhysical(lit("motiondetect"), lit("on"))) // enables motion detection;
+    if (!setApiParameter(lit("motiondetect"), lit("on"))) // enables motion detection;
         return CameraDiagnostics::RequestFailedResult(lit("Enable motion detection"), lit("unknown"));
 
     // check if we've got 1024 zones
     QString totalZones = QString::number(1024);
-    setParamPhysical(lit("mdtotalzones"), totalZones); // try to set total zones to 64; new cams support it
-    if (!getParamPhysical(lit("mdtotalzones"), totalZones))
+    setApiParameter(lit("mdtotalzones"), totalZones); // try to set total zones to 64; new cams support it
+    if (!getApiParameter(lit("mdtotalzones"), totalZones))
         return CameraDiagnostics::RequestFailedResult(lit("TotalZones"), lit("unknown"));
 
     if (totalZones.toInt() == 1024)
@@ -264,7 +263,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setFirmware(firmwareVersion);
     saveParams();
 
-    setParamPhysical(lit("mdzonesize"), QString::number(zone_size));
+    setApiParameter(lit("mdzonesize"), QString::number(zone_size));
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
@@ -365,7 +364,7 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
     QString mdresult;
     if (m_channelCount == 1)
     {
-        if (!getParamPhysical(QLatin1String("mdresult"), mdresult))
+        if (!getApiParameter(QLatin1String("mdresult"), mdresult))
             return QnMetaDataV1Ptr(0);
     }
     else
@@ -538,7 +537,7 @@ QString QnPlAreconVisionResource::generateRequestString(
 }
 
 // ===============================================================================================================================
-bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &value) {
+bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value) {
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -565,7 +564,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &valu
     return true;
 }
 
-bool QnPlAreconVisionResource::setParamPhysical(const QString &id, const QString &value) {
+bool QnPlAreconVisionResource::setApiParameter(const QString &id, const QString &value) {
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -668,7 +667,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamPhysicalAsync(lit("mdlevelthreshold"), QString::number(sensToLevelThreshold[sens]));
+            setApiParameter(lit("mdlevelthreshold"), QString::number(sensToLevelThreshold[sens]));
             break; // only 1 sensitivity for all frame is supported
         }
     }
@@ -754,6 +753,43 @@ bool QnPlAreconVisionResource::isRTSPSupported() const
 
     return arecontRtspIsAllowed
         && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
+}
+
+QnCameraAdvancedParams QnPlAreconVisionResource::AvParamitersProvider::descriptions()
+{
+    return {};
+}
+
+QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParamitersProvider::get(const QSet<QString>& ids)
+{
+    QnCameraAdvancedParamValueMap result;
+    for (const auto id: ids)
+    {
+        QString value;
+        if (m_resource->getApiParameter(id, value))
+            result.insert(id, value);
+    }
+
+    return result;
+}
+
+QSet<QString> QnPlAreconVisionResource::AvParamitersProvider::set(const QnCameraAdvancedParamValueMap& values)
+{
+    QSet<QString> result;
+    for (const auto id: values)
+    {
+        QString value;
+        if (m_resource->setApiParameter(id, values.value(id)))
+            result.insert(id);
+    }
+
+    return result;
+}
+
+std::vector<QnPlAreconVisionResource::AdvancedParametersProvider*>
+    QnPlAreconVisionResource::advancedParametersProviders()
+{
+    return {&m_advancedParamitersProvider};
 }
 
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)

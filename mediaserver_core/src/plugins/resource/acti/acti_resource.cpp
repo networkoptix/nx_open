@@ -332,9 +332,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
     return false;
 }
 
-CameraDiagnostics::Result QnActiResource::initInternal()
+CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
     CLHttpStatus status;
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
@@ -961,66 +960,6 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     setIOPorts(ports);
 }
 
-bool QnActiResource::getParamPhysical(const QString& id, QString& value)
-{
-    QSet<QString> idList = {id};
-    QnCameraAdvancedParamValueList result;
-    if(!getParamsPhysical(idList, result))
-        return false;
-
-    auto it = std::find_if(result.cbegin(), result.cend(), [&id](const QnCameraAdvancedParamValue& paramValue) {
-        return paramValue.id == id;
-    });
-
-    if(it == result.cend())
-        return false;
-
-    value = it->value;
-    return true;
-}
-
-bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
-{
-    QnCameraAdvancedParamValueList values = {QnCameraAdvancedParamValue(id, value)};
-    QnCameraAdvancedParamValueList result;
-
-    return setParamsPhysical(values, result);
-}
-
-bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList &result)
-{
-    bool success = true;
-    const auto params = getParamsByIds(idList);
-    const auto queries = buildGetParamsQueries(params);
-    const auto queriesResults = executeParamsQueries(queries, success);
-    parseParamsQueriesResult(queriesResults, params, result);
-
-    return result.size() == idList.size();
-}
-
-bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
-{
-    bool success;
-    QSet<QString> idList;
-
-    for(const auto& value: values)
-        idList.insert(value.id);
-
-    const auto params = getParamsByIds(idList);
-    const auto queries = buildSetParamsQueries(values);
-    const auto queriesResults = executeParamsQueries(queries, success);
-    parseParamsQueriesResult(queriesResults, params, result);
-
-    const auto maintenanceQueries = buildMaintenanceQueries(values);
-    if(!maintenanceQueries.empty())
-    {
-        executeParamsQueries(maintenanceQueries, success);
-        return success;
-    }
-
-    return result.size() == values.size();
-}
-
 /*
  * Operations with maintenance params should be performed when every other param is already changed.
  * Also maintenance params must not get into queries that obtain param values.
@@ -1400,7 +1339,6 @@ void QnActiResource::fetchAndSetAdvancedParameters()
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters(params);
     m_advancedParameters = params.filtered(supportedParams);
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
 }
 
 QString QnActiResource::getAdvancedParametersTemplate() const
@@ -1452,6 +1390,57 @@ void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
 
     if (systemInfo[kTwoAudioParamName] == kTwoWayAudioDeviceType)
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+}
+
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    QnActiResource::advancedParametersProviders()
+{
+    return {this};
+}
+
+QnCameraAdvancedParams QnActiResource::descriptions()
+{
+    return m_advancedParameters;
+}
+
+QnCameraAdvancedParamValueMap QnActiResource::get(const QSet<QString>& ids)
+{
+    QnCameraAdvancedParamValueList result;
+    bool success = true;
+    const auto params = getParamsByIds(ids);
+    const auto queries = buildGetParamsQueries(params);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+    return result;
+}
+
+QSet<QString> QnActiResource::set(const QnCameraAdvancedParamValueMap& values)
+{
+
+    bool success;
+    QSet<QString> idList;
+    for(const auto& value: values.toValueList())
+        idList.insert(value.id);
+
+    QnCameraAdvancedParamValueList result;
+    const auto params = getParamsByIds(idList);
+    const auto valueList = values.toValueList();
+    const auto queries = buildSetParamsQueries(valueList);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+
+    const auto maintenanceQueries = buildMaintenanceQueries(valueList);
+    if(!maintenanceQueries.empty())
+    {
+        executeParamsQueries(maintenanceQueries, success);
+        return success ? idList : QSet<QString>();
+    }
+
+    QSet<QString> resultIds;
+    for (const auto value: result)
+        resultIds.insert(value.id);
+
+    return resultIds;
 }
 
 #endif // #ifdef ENABLE_ACTI

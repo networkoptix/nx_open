@@ -596,7 +596,7 @@ void QnSecurityCamResource::inputPortListenerAttached()
     const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
     if( isInitialized() && (inputPortListenerCount == 0) )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
-    //if resource is not initialized, input port monitoring will start just after initInternal completion
+    //if resource is not initialized, input port monitoring will start just after init() completion
 }
 
 void QnSecurityCamResource::inputPortListenerDetached()

@@ -11,8 +11,9 @@
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/aspect_ratio.h>
 
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_media_stream_info.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/security_cam_resource.h>
 
 class CameraMediaStreams;
 class CameraBitrates;

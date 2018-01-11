@@ -22,6 +22,11 @@ void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
+CameraDiagnostics::Result QnTestCameraResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 {
     return new QnTestCameraStreamReader(toSharedPointer());

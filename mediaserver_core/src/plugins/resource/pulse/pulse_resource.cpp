@@ -33,10 +33,10 @@ void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-CameraDiagnostics::Result QnPlPulseResource::initInternal()
+CameraDiagnostics::Result QnPlPulseResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String("admin"));
-    return nx::mediaserver::resource::Camera::initInternal();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 

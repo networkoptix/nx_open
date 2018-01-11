@@ -127,7 +127,7 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
+CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
 {
     QUrl url = getUrl();
     int httpPort = url.port(80);
@@ -139,7 +139,6 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, getAuth()))
         return CameraDiagnostics::CannotEstablishConnectionResult(httpPort);
 
-    nx::mediaserver::resource::Camera::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 

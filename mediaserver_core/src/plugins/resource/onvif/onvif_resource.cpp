@@ -569,19 +569,15 @@ void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::initInternal()
+CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
 {
-    auto result = nx::mediaserver::resource::Camera::initInternal();
-    if (!result)
-        return result;
-
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
     CapabilitiesResp capabilitiesResponse;
     DeviceSoapWrapper* soapWrapper = nullptr;
 
-    result = initOnvifCapabilitiesAndUrls(&capabilitiesResponse, &soapWrapper);
+    auto result = initOnvifCapabilitiesAndUrls(&capabilitiesResponse, &soapWrapper);
     if(!checkResultAndSetStatus(result))
         return result;
 
@@ -2852,47 +2848,62 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
     return m_prevOnvifResultCode.errorCode == CameraDiagnostics::ErrorCode::noError;
 }
 
-bool QnPlOnvifResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    QnPlOnvifResource::advancedParametersProviders()
+{
+    return {this};
+}
+
+QnCameraAdvancedParams QnPlOnvifResource::descriptions()
+{
+    return m_advancedParameters;
+}
+
+QnCameraAdvancedParamValueMap QnPlOnvifResource::get(const QSet<QString>& ids)
 {
     if (m_appStopping)
-        return false;
+        return {};
 
     QnMutexLocker lock( &m_physicalParamsMutex );
     m_advancedParamsCache.clear();
-    if (loadAdvancedParamsUnderLock(m_advancedParamsCache)) {
+    if (loadAdvancedParamsUnderLock(m_advancedParamsCache))
+    {
         m_advSettingsLastUpdated.restart();
     }
-    else {
+    else
+    {
         m_advSettingsLastUpdated.invalidate();
-        return false;
-    }
-    bool success = true;
-    for(const QString &id: idList) {
-        if (m_advancedParamsCache.contains(id))
-            result << QnCameraAdvancedParamValue(id, m_advancedParamsCache[id]);
-        else
-            success = false;
+        return {};
     }
 
-    return success;
+    QnCameraAdvancedParamValueMap result;
+    for(const QString &id: ids)
+    {
+        if (m_advancedParamsCache.contains(id))
+            result.insert(id, m_advancedParamsCache[id]);
+    }
+
+    return result;
 }
 
-bool QnPlOnvifResource::getParamPhysical(const QString &id, QString &value) {
-    if (m_appStopping)
-        return false;
-
-    //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests to camera
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    if (!m_advSettingsLastUpdated.isValid() || m_advSettingsLastUpdated.hasExpired(ADVANCED_SETTINGS_VALID_TIME * 1000)) {
-        m_advancedParamsCache.clear();
-        if (loadAdvancedParamsUnderLock(m_advancedParamsCache))
-            m_advSettingsLastUpdated.restart();
+QSet<QString> QnPlOnvifResource::set(const QnCameraAdvancedParamValueMap& values)
+{
+    QnCameraAdvancedParamValueList result;
+    {
+        QnMutexLocker lock( &m_physicalParamsMutex );
+        setAdvancedParametersUnderLock(values.toValueList(), result);
+        for (const auto& updatedValue: result)
+            m_advancedParamsCache[updatedValue.id] = updatedValue.value;
     }
 
-    if (!m_advancedParamsCache.contains(id))
-        return false;
-    value = m_advancedParamsCache[id];
-    return true;
+    QSet<QString> ids;
+    for (const auto& updatedValue: result)
+    {
+        emit advancedParameterChanged(updatedValue.id, updatedValue.value);
+        ids << updatedValue.id;
+    }
+
+    return ids;
 }
 
 bool QnPlOnvifResource::setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) {
@@ -2946,45 +2957,6 @@ int QnPlOnvifResource::getOnvifRequestsSendTimeout() const
         return m_onvifSendTimeout;
 
     return DEFAULT_SOAP_TIMEOUT;
-}
-
-bool QnPlOnvifResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
-{
-    bool success;
-    {
-        setParamsBegin();
-        QnMutexLocker lock( &m_physicalParamsMutex );
-        success = setAdvancedParametersUnderLock(values, result);
-        for (const auto& updatedValue: result)
-            m_advancedParamsCache[updatedValue.id] = updatedValue.value;
-        setParamsEnd();
-    }
-    for (const auto& updatedValue: result)
-        emit advancedParameterChanged(updatedValue.id, updatedValue.value);
-    return success;
-}
-
-bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value) {
-    if (m_appStopping)
-        return false;
-
-    bool result = false;
-    {
-        QnMutexLocker lock( &m_physicalParamsMutex );
-        //if (!m_advancedParamsCache.contains(id))
-        //    return false; // there are no write-only parameters in a cache
-
-        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
-        if (!parameter.isValid())
-            return false;
-
-        result = setAdvancedParameterUnderLock(parameter, value);
-        if (result)
-            m_advancedParamsCache[id] = value;
-    }
-    if (result)
-        emit advancedParameterChanged(id, value);
-    return result;
 }
 
 bool QnPlOnvifResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const
@@ -3044,7 +3016,6 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
     m_advancedParameters = params.filtered(supportedParams);
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)

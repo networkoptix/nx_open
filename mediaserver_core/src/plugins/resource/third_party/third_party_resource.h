@@ -14,6 +14,7 @@
 class QnThirdPartyResource
 :
     public nx::mediaserver::resource::Camera,
+    public nx::mediaserver::resource::Camera::AdvancedParametersProvider,
     public nxcip::CameraInputEventHandler
 {
     Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
@@ -31,13 +32,6 @@ public:
 
     //!Implementation of QnResource::getPtzController
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
-    
-    //!Implementation of QnResource::getParamPhysical
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    //!Implementation of QnResource::setParamPhysical
-    virtual bool setParamPhysical(const QString &id, const QString &value) override;
-    virtual bool setParamsBegin() override;
-    virtual bool setParamsEnd() override;
 
     //!Implementation of QnNetworkResource::ping
     /*!
@@ -95,16 +89,17 @@ public:
     nxcip::Resolution getSelectedResolutionForEncoder( int encoderIndex ) const;
 
 protected:
-    //!Implementation of QnResource::initInternal
-    virtual CameraDiagnostics::Result initInternal() override;
-    //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    //!Implementation of QnSecurityCamResource::stopInputPortMonitoringAsync
     virtual void stopInputPortMonitoringAsync() override;
-    //!Implementation of QnSecurityCamResource::isInputPortMonitored
     virtual bool isInputPortMonitored() const override;
-    //!Implementation of QnSecurityCamResource::setMotionMaskPhysical
     virtual void setMotionMaskPhysical( int channel );
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    // TODO: Move out to a different class:
+    virtual QnCameraAdvancedParams descriptions() override;
+    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
     struct EncoderData
@@ -122,6 +117,7 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
+    QnCameraAdvancedParams m_advancedParameters;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;

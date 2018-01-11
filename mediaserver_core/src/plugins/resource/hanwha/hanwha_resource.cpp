@@ -261,28 +261,16 @@ nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveM
     return m_remoteArchiveManager.get();
 }
 
-bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
+QnCameraAdvancedParams QnPlAxisResource::descriptions()
 {
-    QnCameraAdvancedParamValueList params;
-    bool result = getParamsPhysical({id}, params);
-
-    if (!result)
-        return false;
-
-    if (params.isEmpty())
-        return false;
-
-    if (params[0].id != id)
-        return false;
-
-    value = params[0].value;
-    return true;
+    QnMutexLocker lock(&m_mutex);
+    return m_advancedParameters;
 }
 
-bool HanwhaResource::getParamsPhysical(
-    const QSet<QString> &idList,
-    QnCameraAdvancedParamValueList& result)
+QnCameraAdvancedParamValueMap HanwhaResource::get(const QSet<QString>& ids)
 {
+    QnCameraAdvancedParamValueMap result;
+
     using ParameterList = std::vector<QString>;
     using SubmenuMap = std::map<QString, ParameterList>;
     using CgiMap = std::map<QString, SubmenuMap>;
@@ -290,7 +278,7 @@ bool HanwhaResource::getParamsPhysical(
     CgiMap requests;
     std::multimap<QString, QString> parameterNameToId;
 
-    for (const auto& id: idList)
+    for (const auto& id: ids)
     {
         const auto parameter = m_advancedParameters.getParameterById(id);
         if (parameter.dataType == QnCameraAdvancedParameter::DataType::Button)
@@ -366,29 +354,18 @@ bool HanwhaResource::getParamsPhysical(
                     if (!value)
                         continue;
 
-                    result.push_back(
-                        QnCameraAdvancedParamValue(
-                            parameterId,
-                            fromHanwhaAdvancedParameterValue(parameter, *info, *value)));
+                    result.insert(
+                        parameterId,
+                        fromHanwhaAdvancedParameterValue(parameter, *info, *value));
                 }
             }
         }
     }
 
-    return true;
+    return result;
 }
 
-bool HanwhaResource::setParamPhysical(const QString &id, const QString& value)
-{
-    QnCameraAdvancedParamValueList result;
-    return setParamsPhysical(
-        {QnCameraAdvancedParamValue(id, value)},
-        result);
-}
-
-bool HanwhaResource::setParamsPhysical(
-    const QnCameraAdvancedParamValueList &values,
-    QnCameraAdvancedParamValueList &result)
+QSet<QString> HanwhaResource::set(const QnCameraAdvancedParamValueMap& values)
 {
     using ParameterMap = std::map<QString, QString>;
     using SubmenuMap = std::map<QString, ParameterMap>;
@@ -415,7 +392,7 @@ bool HanwhaResource::setParamsPhysical(
         return success;
     }
 
-    const auto filteredParameters = filterGroupParameters(values);
+    const auto filteredParameters = filterGroupParameters(values.toValueList());
     for (const auto& value: filteredParameters)
     {
         UpdateInfo updateInfo;
@@ -485,9 +462,6 @@ bool HanwhaResource::setParamsPhysical(
         }
     }
 
-    if (success)
-        result = values;
-
     if (reopenPrimaryStream || reopenSecondaryStream)
     {
         initMediaStreamCapabilities();
@@ -495,7 +469,7 @@ bool HanwhaResource::setParamsPhysical(
         reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
     }
 
-    return success;
+    return success ? values.ids() : QSet<QString>();
 }
 
 QnIOPortDataList HanwhaResource::getRelayOutputList() const
@@ -633,7 +607,7 @@ int HanwhaResource::maxProfileCount() const
     return m_maxProfileCount;
 }
 
-CameraDiagnostics::Result HanwhaResource::initInternal()
+CameraDiagnostics::Result HanwhaResource::initializeCameraDriver()
 {
     const auto result = initDevice();
 
@@ -1120,8 +1094,6 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         QnMutexLocker lock(&m_mutex);
         m_advancedParameters = parameters;
     }
-
-    QnCameraAdvancedParamsReader::setParamsToResource(toSharedPointer(this), parameters);
     return CameraDiagnostics::NoErrorResult();
 }
 

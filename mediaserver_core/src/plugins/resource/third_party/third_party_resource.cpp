@@ -69,52 +69,74 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
-bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
-    QnMutexLocker lk( &m_mutex );
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    QnThirdPartyResource::advancedParametersProviders()
+{
+    return {this};
+}
 
+QnCameraAdvancedParams QnThirdPartyResource::descriptions()
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_advancedParameters;
+}
+
+QnCameraAdvancedParamValueMap QnThirdPartyResource::get(const QSet<QString>& ids)
+{
+    QnMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
-        return false;
+        return {};
 
     static const size_t DEFAULT_PARAM_VALUE_BUF_SIZE = 256;
     int valueBufSize = DEFAULT_PARAM_VALUE_BUF_SIZE;
     std::unique_ptr<char[]> valueBuf( new char[valueBufSize] );
 
-    int result = nxcip::NX_NO_ERROR;
-    for( int i = 0; i < 2; ++i )
+    QnCameraAdvancedParamValueMap resultMap;
+    for( const auto& id: ids )
     {
-        result = m_cameraManager3->getParamValue(
-            id.toUtf8().constData(),
-            valueBuf.get(),
-            &valueBufSize );
-        switch( result )
+        int result = nxcip::NX_NO_ERROR;
+        for( int i = 0; i < 2; ++i )
         {
-            case nxcip::NX_NO_ERROR:
+            result = m_cameraManager3->getParamValue(
+                id.toUtf8().constData(),
+                valueBuf.get(),
+                &valueBufSize );
+            switch( result )
             {
-                value = QString::fromUtf8( valueBuf.get(), valueBufSize );
-                return true;
+                case nxcip::NX_NO_ERROR:
+                    resultMap.insert( id, QString::fromUtf8( valueBuf.get(), valueBufSize ) );
+                    i = 3;
+                    continue;
+
+                case nxcip::NX_MORE_DATA:
+                    valueBuf.reset( new char[valueBufSize] );
+                    continue;
+
+                default:
+                    break;
             }
-            case nxcip::NX_MORE_DATA:
-                valueBuf.reset( new char[valueBufSize] );
-                continue;
-            default:
-                break;
+
+            break;
         }
-        break;
     }
+
     //TODO #ak return error description
-    return false;
+    return {};
 }
 
-bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &value) {
-    return setParam( id.toUtf8().constData(), value.toUtf8().constData() );
-}
+QSet<QString> QnThirdPartyResource::set(const QnCameraAdvancedParamValueMap& values)
+{
+    if (!setParam("", "{"))
+        return QSet<QString>();
 
-bool QnThirdPartyResource::setParamsBegin() {
-    return setParam("", "{");   // TODO: describe in iface
-}
+    QSet<QString> ids;
+    for (const auto& id: values)
+    {
+        if (setParam(id.toUtf8().constData(), values.value(id).toUtf8().constData()))
+            ids.insert(id);
+    }
 
-bool QnThirdPartyResource::setParamsEnd() {
-    return setParam("", "}");   // TODO: describe in iface
+    return setParam("", "}") ? ids : QSet<QString>();
 }
 
 bool QnThirdPartyResource::setParam(const char * id, const char * value) {
@@ -124,7 +146,6 @@ bool QnThirdPartyResource::setParam(const char * id, const char * value) {
 
     return m_cameraManager3->setParamValue( id, value ) == nxcip::NX_NO_ERROR;
 }
-
 
 bool QnThirdPartyResource::ping()
 {
@@ -427,10 +448,8 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int enc
     return nxcip::Resolution();
 }
 
-CameraDiagnostics::Result QnThirdPartyResource::initInternal()
+CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
-
     updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
     QAuthenticator auth = getAuth();
 
@@ -697,8 +716,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
                     NX_LOG(lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)), cl_logWARNING);
                 }
 
-				if (success)
-                    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
+                {
+                    QnMutexLocker lk( &m_mutex );
+                    if (success)
+                        m_advancedParameters = std::move(params);
+                    else
+                        m_advancedParameters.clear();
+                }
             }
             else {
                 NX_LOG( lit("Could not validate camera parameters description xml"), cl_logWARNING );

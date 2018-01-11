@@ -83,12 +83,9 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-CameraDiagnostics::Result QnPlIsdResource::initInternal()
+CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
-
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
-
 
     QUrl apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );

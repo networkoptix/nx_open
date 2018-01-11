@@ -17,7 +17,9 @@
 
 class QnAxisPtzController;
 
-class QnPlAxisResource: public nx::mediaserver::resource::Camera
+class QnPlAxisResource:
+    public nx::mediaserver::resource::Camera,
+    public nx::mediaserver::resource::Camera::AdvancedParametersProvider
 {
     Q_OBJECT
 
@@ -67,11 +69,6 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
-
     AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
@@ -84,7 +81,7 @@ public slots:
 
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
@@ -106,6 +103,13 @@ private:
     void restartIOMonitorWithDelay();
     void startInputPortMonitoring();
     void stopInputPortMonitoringSync();
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    // TODO: Move out to a different class:
+    virtual QnCameraAdvancedParams descriptions() override;
+    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+
 private:
     QList<AxisResolution> m_resolutionList;
 

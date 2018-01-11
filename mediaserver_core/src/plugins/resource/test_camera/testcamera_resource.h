@@ -21,7 +21,9 @@ public:
 
     virtual QString getHostAddress() const override;
     virtual void setHostAddress(const QString &ip) override;
+
 protected:
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
 private:

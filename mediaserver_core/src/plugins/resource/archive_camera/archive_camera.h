@@ -40,6 +40,6 @@ public:
     static QString cameraName();
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };

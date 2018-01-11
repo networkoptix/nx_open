@@ -40,7 +40,7 @@ public:
     simd128i* getMotionMaskBinData() const;
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setMotionMaskPhysical(int channel) override;
 private:

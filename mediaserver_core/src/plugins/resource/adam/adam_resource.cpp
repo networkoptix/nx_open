@@ -39,10 +39,8 @@ QString QnAdamResource::getDriverName() const
     return kManufacture;
 }
 
-CameraDiagnostics::Result QnAdamResource::initInternal()
+CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 {
-    QnSecurityCamResource::initInternal();
-
     QUrl url(getUrl());
     auto host  = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);

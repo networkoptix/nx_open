@@ -25,7 +25,7 @@ protected:
 
     virtual void setCroppingPhysical(QRect cropping);
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 };
 
 #endif // #ifdef ENABLE_PULSE_CAMERA

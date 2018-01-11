@@ -24,8 +24,8 @@ public:
 
 
 protected:
-
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCroppingPhysical(QRect cropping);
 };

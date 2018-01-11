@@ -16,9 +16,9 @@ QnFlexWatchResource::~QnFlexWatchResource()
     delete m_tmpH264Conf;
 }
 
-CameraDiagnostics::Result QnFlexWatchResource::initInternal()
+CameraDiagnostics::Result QnFlexWatchResource::initializeCameraDriver()
 {
-    CameraDiagnostics::Result rez = QnPlOnvifResource::initInternal();
+    CameraDiagnostics::Result rez = QnPlOnvifResource::initializeCameraDriver();
     if (rez.errorCode == CameraDiagnostics::ErrorCode::noError && getChannel() == 0)
         rez = fetchUpdateVideoEncoder();
     return rez;

@@ -419,10 +419,8 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
     return !(square1 < square2);
 }
 
-CameraDiagnostics::Result QnPlAxisResource::initInternal()
+CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
-
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
     QAuthenticator auth = getAuth();
 
@@ -1557,8 +1555,6 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
         QnMutexLocker lock(&m_mutex);
         m_advancedParameters = filteredParams;
     }
-
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), filteredParams);
 }
 
 bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
@@ -1702,58 +1698,41 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
     return QString();
 }
 
-bool QnPlAxisResource::getParamPhysical(const QString &id, QString &value)
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    QnPlAxisResource::advancedParametersProviders()
 {
-    QSet<QString> idList;
-    QnCameraAdvancedParamValueList paramValueList;
-    idList.insert(id);
-    auto result = getParamsPhysical(idList, paramValueList);
-    if (!paramValueList.isEmpty())
-        value = paramValueList.first().value;
-
-    return result;
+    return {this};
 }
 
-bool QnPlAxisResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
+QnCameraAdvancedParams QnPlAxisResource::descriptions()
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_advancedParameters;
+}
+
+QnCameraAdvancedParamValueMap QnPlAxisResource::get(const QSet<QString>& ids)
 {
     bool success = true;
-    const auto params = getParamsByIds(idList);
+    const auto params = getParamsByIds(ids);
     const auto queries = buildGetParamsQueries(params);
-
     const auto queriesResults = executeParamsQueries(queries, success);
-
-    result = parseParamsQueriesResult(queriesResults, params);
-
-    return result.size() == idList.size();
-
+    return parseParamsQueriesResult(queriesResults, params);
 }
 
-bool QnPlAxisResource::setParamPhysical(const QString &id, const QString& value)
+QSet<QString> QnPlAxisResource::set(const QnCameraAdvancedParamValueMap& values)
 {
-    QnCameraAdvancedParamValueList inputParamList;
-    QnCameraAdvancedParamValueList resParamList;
-    inputParamList.append({ id, value });
-    return setParamsPhysical(inputParamList, resParamList);
-}
+    const auto valueList = values.toValueList();
+    const auto query = buildSetParamsQuery(valueList);
+    const auto maintenanceQuery = buildMaintenanceQuery(valueList);
 
-bool QnPlAxisResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
-{
     bool success;
-    const auto query = buildSetParamsQuery(values);
-    const auto maintenanceQuery = buildMaintenanceQuery(values);
-
-    result.clear();
-
     if (!query.isEmpty())
         executeParamsQueries(query, success);
 
     if (!maintenanceQuery.isEmpty())
         executeParamsQueries(maintenanceQuery, success);
 
-    if (success)
-        result.append(values);
-
-    return success;
+    return success ? values.ids() : QSet<QString>();
 }
 
 #endif // #ifdef ENABLE_AXIS

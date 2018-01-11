@@ -130,12 +130,9 @@ void QnStardotResource::parseInfo(const QByteArray& info)
     }
 }
 
-CameraDiagnostics::Result QnStardotResource::initInternal()
+CameraDiagnostics::Result QnStardotResource::initializeCameraDriver()
 {
-    nx::mediaserver::resource::Camera::initInternal();
-
     updateDefaultAuthIfEmpty(lit("admin"), lit("admin"));
-
 
     CLHttpStatus status;
 

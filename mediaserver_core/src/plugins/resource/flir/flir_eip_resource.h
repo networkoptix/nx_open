@@ -18,7 +18,9 @@ enum class FlirAlarmMonitoringState
     WaitingForMeasFuncId
 };
 
-class QnFlirEIPResource: public nx::mediaserver::resource::Camera
+class QnFlirEIPResource:
+    public nx::mediaserver::resource::Camera,
+    public nx::mediaserver::resource::Camera::AdvancedParametersProvider
 {
     Q_OBJECT
 public:
@@ -39,10 +41,7 @@ public:
     static QByteArray PASSTHROUGH_EPATH();
     static const QString MANUFACTURE;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int, int) override;
@@ -137,6 +136,13 @@ private:
     void getAlarmMeasurementFuncId();
     void getAlarmMeasurementFuncIdDone();
     void checkInputPortStatus();
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+    // TODO: Move out to a different class:
+    virtual QnCameraAdvancedParams descriptions() override;
+    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
+    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+
 private slots:
     void checkInputPortStatusDone();
     void routeAlarmMonitoringFlow();

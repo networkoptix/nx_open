@@ -46,7 +46,7 @@ public slots:
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override { return nullptr; }
 

@@ -26,6 +26,11 @@ void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
+CameraDiagnostics::Result QnDroidResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
 {
     return new PlDroidStreamReader(toSharedPointer());

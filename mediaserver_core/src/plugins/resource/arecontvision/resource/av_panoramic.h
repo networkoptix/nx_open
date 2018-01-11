@@ -18,9 +18,9 @@ public:
 
     void updateFlipState();
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
-    virtual bool setParamPhysical(const QString &id, const QString &value) override;
+    virtual bool setApiParameter(const QString &id, const QString &value) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

@@ -31,7 +31,7 @@ public:
     FcResource();
     virtual ~FcResource();
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;

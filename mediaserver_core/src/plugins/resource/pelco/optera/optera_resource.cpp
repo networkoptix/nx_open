@@ -78,7 +78,7 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-CameraDiagnostics::Result QnOpteraResource::initInternal()
+CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()
 {
     QString urlStr = getUrl();
 
@@ -95,7 +95,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
         .toInt();
 
     if (firmwareVersion < kMinimumTiledModeFirmwareVersion)
-        return base_type::initInternal();
+        return base_type::initializeCameraDriver();
 
     if (auth.isNull())
     {
@@ -120,7 +120,7 @@ CameraDiagnostics::Result QnOpteraResource::initInternal()
     currentStitchingMode = getCurrentStitchingMode(response);
 
     if (currentStitchingMode == kTiledMode)
-        return base_type::initInternal();
+        return base_type::initializeCameraDriver();
 
     status = makeSetStitchingModeRequest(http, kTiledMode);
 

@@ -26,7 +26,7 @@ public:
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
 private:
