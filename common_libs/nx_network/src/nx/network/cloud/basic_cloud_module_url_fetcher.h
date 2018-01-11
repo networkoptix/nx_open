@@ -64,8 +64,7 @@ class BasicCloudModuleUrlFetcher:
 
 public:
     BasicCloudModuleUrlFetcher():
-        m_requestIsRunning(false),
-        m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl())
+        m_requestIsRunning(false)
     {
         // Preparing compatibility data.
         m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, nx::network::http::kUrlSchemeName);
@@ -148,6 +147,10 @@ protected:
             duration_cast<milliseconds>(kHttpRequestTimeout).count());
 
         m_requestIsRunning = true;
+
+        if (m_modulesXmlUrl.isEmpty())
+            m_modulesXmlUrl = AppInfo::defaultCloudModulesXmlUrl();
+
         m_httpClient->doGet(
             m_modulesXmlUrl,
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
