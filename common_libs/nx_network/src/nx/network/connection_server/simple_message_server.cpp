@@ -53,7 +53,7 @@ void SimpleMessageServerConnection::stopWhileInAioThread()
 
 void SimpleMessageServerConnection::onDataSent(
     SystemError::ErrorCode errorCode,
-    size_t bytesSent)
+    size_t /*bytesSent*/)
 {
     if (errorCode != SystemError::noError)
     {
