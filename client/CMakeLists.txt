@@ -15,8 +15,8 @@ if(withDesktopClient)
     if(WINDOWS)
         add_subdirectory(minilauncher)
     endif()
-    
-    add_subdirectory(nx_client_desktop)   
+
+    add_subdirectory(nx_client_desktop)
     add_subdirectory(desktop_client)
     add_subdirectory(applauncher)
 endif()
