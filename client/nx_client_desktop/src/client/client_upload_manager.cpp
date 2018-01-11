@@ -94,7 +94,7 @@ QnFileUploadData* QnClientUploadManager::dropCurrentData()
     return data;
 }
 
-void QnClientUploadManager::handleError(const QString& message) 
+void QnClientUploadManager::handleError(const QString& message)
 {
     QnFileUploadData* data = dropCurrentData();
 
@@ -127,7 +127,7 @@ void QnClientUploadManager::handleStarted()
     data->md5FutureWatcher.setFuture(data->md5Future);
 }
 
-void QnClientUploadManager::handleMd5Calculated() 
+void QnClientUploadManager::handleMd5Calculated()
 {
     QnFileUploadData* data = currentData();
 
@@ -271,7 +271,7 @@ void QnClientUploadManager::handleCheckFinished(bool success, rest::Handle handl
     advance();
 }
 
-void QnClientUploadManager::advance() 
+void QnClientUploadManager::advance()
 {
     if (m_dataList.empty())
         return;
