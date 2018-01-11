@@ -341,14 +341,6 @@ class CloudStreamSocketCancellation:
 {
     using base_type = CloudStreamSocketTest;
 
-public:
-    enum class SocketState
-    {
-        init,
-        connected,
-        closed,
-    };
-
 protected:
     virtual void SetUp() override
     {
@@ -382,26 +374,20 @@ private:
 TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
 {
     constexpr const std::chrono::milliseconds kTestDuration =
-        std::chrono::milliseconds(2000);
-    constexpr const int kTestRuns = 10;
-
-    //launching some server
+        std::chrono::milliseconds(500);
+    constexpr const int kTestRuns = 1;
 
     for (int i = 0; i < kTestRuns; ++i)
     {
-        auto socket = std::make_unique<CloudStreamSocket>(SocketFactory::tcpServerIpVersion());
-        std::atomic<SocketState> socketState(SocketState::init);
+        auto socket = std::make_unique<CloudStreamSocket>(
+            SocketFactory::tcpServerIpVersion());
+        ASSERT_TRUE(socket->connect(serverAddress(), nx::network::kNoTimeout))
+            << SystemError::getLastOSErrorText().toStdString();
 
         nx::utils::thread sendThread(
-            [&socket, targetAddress = serverAddress(), &socketState]
+            [&socket]
             {
                 char testBuffer[16*1024];
-
-                if (!socket->isConnected())
-                {
-                    ASSERT_TRUE(socket->connect(targetAddress, nx::network::kNoTimeout));
-                    socketState = SocketState::connected;
-                }
 
                 while (!socket->isClosed() && socket->isConnected())
                 {
@@ -411,19 +397,12 @@ TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
                 }
             });
 
-        //read thread
         nx::utils::thread recvThread(
-            [&socket, &socketState]
+            [&socket]
             {
                 char readBuffer[16 * 1024];
                 for (;;)
                 {
-                    if (socketState == SocketState::init)
-                    {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                        continue;
-                    }
-
                     if (!socket->isConnected() || socket->isClosed())
                         break;
 
@@ -435,7 +414,6 @@ TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
 
         std::this_thread::sleep_for(kTestDuration);
 
-        //cancelling
         if (i & 1)
             socket->close();
         else
