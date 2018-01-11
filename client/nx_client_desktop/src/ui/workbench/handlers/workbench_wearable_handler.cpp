@@ -13,6 +13,8 @@
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/common/read_only.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 #include <client/client_module.h>
 #include <client/client_upload_manager.h>
@@ -114,6 +116,33 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         QnCustomFileDialog::fileDialogOptions()
     );
 
+    QnAviResourcePtr resource(new QnAviResource(fileName));
+    QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
+    bool opened = delegate->open(resource);
+
+    if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))
+    {
+        QnMessageBox::critical(
+            mainWindow(),
+            tr("File \"%1\" is not a video file.").arg(fileName)
+        );
+        return;
+    }
+
+    qint64 startTimeMs = delegate->startTime() / 1000;
+    qint64 durationMs = (delegate->endTime() - delegate->startTime()) / 1000;
+
+    if (startTimeMs == 0)
+    {
+        QString startTimeString = QLatin1String(delegate->getTagValue("creation_time"));
+        QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
+        if (startDateTime.isValid())
+            startTimeMs = startDateTime.toMSecsSinceEpoch();
+    }
+
+    if (startTimeMs == 0)
+        startTimeMs = QFileInfo(fileName).created().toMSecsSinceEpoch();
+
     QnFileUpload upload = qnClientModule->uploadManager()->addUpload(server, fileName);
 
     if (upload.status == QnFileUpload::Error)
@@ -127,10 +156,8 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
 
     FootageInfo info;
     info.camera = camera;
-    info.startTimeMs = QFileInfo(fileName).created().toMSecsSinceEpoch();
+    info.startTimeMs = startTimeMs;
     m_infoByUploadId[upload.id] = info;
-
-    //QnAviResource
 }
 
 void QnWorkbenchWearableHandler::at_uploadManager_progress(const QnFileUpload& upload)
