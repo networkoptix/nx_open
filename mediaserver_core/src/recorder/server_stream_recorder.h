@@ -53,7 +53,7 @@ public:
     bool isQueueFull() const;
 
     /**
-     * Sets whether this recorder can drop packets when its queue is full. 
+     * Sets whether this recorder can drop packets when its queue is full.
      * Note that this setter is not thread-safe, don't use it on a running stream recorder!
      */
     void setCanDropPackets(bool canDrop);

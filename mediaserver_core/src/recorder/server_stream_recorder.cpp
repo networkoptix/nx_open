@@ -198,7 +198,7 @@ void QnServerStreamRecorder::resumeRebuildIfLowDataNoLock()
     }
 }
 
-bool QnServerStreamRecorder::isQueueFull() const 
+bool QnServerStreamRecorder::isQueueFull() const
 {
     QnMutexLocker lock(&m_queueSizeMutex);
 
@@ -216,11 +216,13 @@ bool QnServerStreamRecorder::isQueueFull() const
     return true;
 }
 
-void QnServerStreamRecorder::setCanDropPackets(bool canDrop) {
+void QnServerStreamRecorder::setCanDropPackets(bool canDrop)
+{
     m_canDropPackets = canDrop;
 }
 
-bool QnServerStreamRecorder::canDropPackets() const {
+bool QnServerStreamRecorder::canDropPackets() const
+{
     return m_canDropPackets;
 }
 
