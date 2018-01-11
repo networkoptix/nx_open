@@ -26,6 +26,11 @@ AsyncHttpJsonProvider::AsyncHttpJsonProvider(
 {
 }
 
+AsyncHttpJsonProvider::~AsyncHttpJsonProvider()
+{
+    m_asyncHttpClient.cancelPostedCallsSync();
+}
+
 void AsyncHttpJsonProvider::getUpdatesMetaInformation()
 {
     nx::network::url::Builder urlBuilder(m_baseUrl);

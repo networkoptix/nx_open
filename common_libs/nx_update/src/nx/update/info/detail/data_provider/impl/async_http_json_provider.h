@@ -15,6 +15,7 @@ class AsyncHttpJsonProvider: public AbstractAsyncRawDataProvider
 {
 public:
     AsyncHttpJsonProvider(const QString& baseUrl, AbstractAsyncRawDataProviderHandler* handler);
+    virtual ~AsyncHttpJsonProvider() override;
     virtual void getUpdatesMetaInformation() override;
     virtual void getSpecificUpdateData(
         const QString& customization,
