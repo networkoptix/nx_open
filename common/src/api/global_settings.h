@@ -85,6 +85,9 @@ const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
 const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
 const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
+static const QString kUpdates2PropertyName = lit("updateStatus");
+
+
 } // namespace settings_names
 } // namespace nx
 
@@ -286,6 +289,9 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
+    QByteArray updates2Registry() const;
+    void setUpdates2Registry(const QByteArray& serializedRegistry);
+
 signals:
     void initialized();
 
@@ -312,6 +318,7 @@ signals:
     void timeSynchronizationSettingsChanged();
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
+    void updates2RegistryChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -415,6 +422,8 @@ private:
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads;
+
+    QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
 
     AdaptorList m_allAdaptors;
 

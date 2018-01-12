@@ -12,6 +12,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <api/global_settings.h>
 
 
 #include "updates2_manager.h"
@@ -24,7 +25,6 @@ namespace {
 
 static const qint64 kRefreshTimeoutMs = 60 * 60 * 1000;
 static const QString kFileName = "update.status";
-static const QString kUpdatePropertyName = "UpdateStatus";
 
 static QString filePath()
 {
@@ -40,6 +40,30 @@ static qint64 refreshTimeout()
     return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
 }
 
+static bool isNewRegistryBetter(
+    const update::info::AbstractUpdateRegistryPtr& oldRegistry,
+    const update::info::AbstractUpdateRegistryPtr& newRegistry)
+{
+    if (!oldRegistry)
+        return true;
+    QnSoftwareVersion newRegistryServerVersion;
+    if (newRegistry->latestUpdate(
+        detail::UpdateRequestDataFactory::create(),
+        &newRegistryServerVersion) != update::info::ResultCode::ok)
+    {
+        return false;
+    }
+    QnSoftwareVersion oldRegistryServerVersion;
+    if (oldRegistry->latestUpdate(
+        detail::UpdateRequestDataFactory::create(),
+        &oldRegistryServerVersion) != update::info::ResultCode::ok
+        || newRegistryServerVersion > oldRegistryServerVersion)
+    {
+        return true;
+    }
+    return false;
+}
+
 } // namespace
 
 Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
@@ -50,9 +74,10 @@ Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
 
 void Updates2Manager::startTimers()
 {
+    checkForGlobalDictionaryUpdate();
     using namespace std::placeholders;
     m_timerManager.addNonStopTimer(
-        std::bind(&Updates2Manager::checkForUpdate, this, _1),
+        std::bind(&Updates2Manager::checkForRemoteUpdate, this, _1),
         std::chrono::milliseconds(refreshTimeout()),
         std::chrono::milliseconds(0));
 }
@@ -87,8 +112,17 @@ void Updates2Manager::loadStatusFromFile()
         NX_VERBOSE(this, "Failed to deserialize persistent update status data");
 }
 
+void Updates2Manager::checkForGlobalDictionaryUpdate()
+{
+    auto globalRegistry = update::info::UpdateRegistryFactory::create();
+    bool deserializeResult = globalRegistry->fromByteArray(globalSettings()->updates2Registry());
+    if (!deserializeResult)
+        return;
+    swapRegistries(std::move(globalRegistry));
+    refreshStatusAfterCheck();
+}
 
-void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
+void Updates2Manager::checkForRemoteUpdate(utils::TimerId /*timerId*/)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -107,119 +141,82 @@ void Updates2Manager::checkForUpdate(utils::TimerId /*timerId*/)
         }
     }
 
-    auto swapRegistries = [this](update::info::AbstractUpdateRegistryPtr otherRegistry)
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (!m_updateRegistry)
-        {
-            m_updateRegistry = std::move(otherRegistry);
-            return true;
-        }
-        QnSoftwareVersion otherServerVersion;
-        if (otherRegistry->latestUpdate(
-                detail::UpdateRequestDataFactory::create(),
-                &otherServerVersion) != update::info::ResultCode::ok)
-        {
-            return false;
-        }
-        QnSoftwareVersion thisServerVersion;
-        if (m_updateRegistry->latestUpdate(
-                detail::UpdateRequestDataFactory::create(),
-                &thisServerVersion) != update::info::ResultCode::ok
-            || otherServerVersion > thisServerVersion)
-        {
-            m_updateRegistry = std::move(otherRegistry);
-            return true;
-        }
-        return false;
-    };
-
-    const auto thisServerResource = resourcePool()->getResourceById(commonModule()->moduleGUID());
-    const auto thisServer = thisServerResource.dynamicCast<QnMediaServerResource>();
-    NX_ASSERT(thisServer);
-
-    auto refreshStatusAfterCheckGuard = makeScopeGuard(
-        [this, thisServer]()
-        {
-            QnMutexLocker lock(&m_mutex);
-            switch (m_currentStatus.status)
-            {
-                case api::Updates2StatusData::StatusCode::notAvailable:
-                case api::Updates2StatusData::StatusCode::error:
-                case api::Updates2StatusData::StatusCode::available:
-                case api::Updates2StatusData::StatusCode::checking:
-                {
-                    QnSoftwareVersion version;
-                    if (!m_updateRegistry)
-                    {
-                        m_currentStatus = detail::Updates2StatusDataEx(
-                            qnSyncTime->currentMSecsSinceEpoch(),
-                            commonModule()->moduleGUID(),
-                            api::Updates2StatusData::StatusCode::error,
-                            "Failed to get updates data");
-                    }
-                    else
-                    {
-                        if (m_updateRegistry->latestUpdate(
-                                detail::UpdateRequestDataFactory::create(),
-                                &version) != update::info::ResultCode::ok)
-                        {
-                            m_currentStatus = detail::Updates2StatusDataEx(
-                                qnSyncTime->currentMSecsSinceEpoch(),
-                                commonModule()->moduleGUID(),
-                                api::Updates2StatusData::StatusCode::notAvailable,
-                                "Update is unavailable");
-                        }
-                        else
-                        {
-                            m_currentStatus = detail::Updates2StatusDataEx(
-                                qnSyncTime->currentMSecsSinceEpoch(),
-                                commonModule()->moduleGUID(),
-                                api::Updates2StatusData::StatusCode::available,
-                                lit("Update is available: %1").arg(version.toString()));
-                        }
-
-                        thisServer->setProperty(
-                            kUpdatePropertyName,
-                            QString::fromLocal8Bit(m_updateRegistry->toByteArray()));
-                    }
-
-                    writeStatusToFile();
-                    break;
-                }
-                default:
-                    return;
-            }
-        });
-
-    if (!thisServer->getServerFlags().testFlag(Qn::SF_HasPublicIP))
-    {
-        for (const auto& server: resourcePool()->getAllServers(Qn::ResourceStatus::Online))
-        {
-            if (server->hasProperty(kUpdatePropertyName))
-            {
-                auto otherServerRegistry = update::info::UpdateRegistryFactory::create();
-                bool deserializeResult =
-                    otherServerRegistry->fromByteArray(
-                        server->getProperty(kUpdatePropertyName).toLocal8Bit());
-                NX_ASSERT(deserializeResult);
-                if (!deserializeResult)
-                    continue;
-                if (swapRegistries(std::move(otherServerRegistry)))
-                    break;
-            }
-        }
-        return;
-    }
-
-    auto updateUrl= qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
+    auto updateUrl= qnServerModule->roSettings()->value(
+        nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
     updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
     update::info::AbstractUpdateRegistryPtr updateRegistry = update::info::checkSync(updateUrl);
 
     if (updateRegistry)
+    {
+        auto globalRegistry = update::info::UpdateRegistryFactory::create();
+        if (!globalRegistry->fromByteArray(globalSettings()->updates2Registry())
+            || isNewRegistryBetter(globalRegistry, updateRegistry))
+        {
+            globalSettings()->setUpdates2Registry(updateRegistry->toByteArray());
+            globalSettings()->synchronizeNow();
+        }
         swapRegistries(std::move(updateRegistry));
+    }
+
+    refreshStatusAfterCheck();
 }
 
+
+void Updates2Manager::swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (isNewRegistryBetter(m_updateRegistry, otherRegistry))
+        m_updateRegistry = std::move(otherRegistry);
+}
+
+void Updates2Manager::refreshStatusAfterCheck()
+{
+    QnMutexLocker lock(&m_mutex);
+    switch (m_currentStatus.status)
+    {
+        case api::Updates2StatusData::StatusCode::notAvailable:
+        case api::Updates2StatusData::StatusCode::error:
+        case api::Updates2StatusData::StatusCode::available:
+        case api::Updates2StatusData::StatusCode::checking:
+        {
+            QnSoftwareVersion version;
+            if (!m_updateRegistry)
+            {
+                m_currentStatus = detail::Updates2StatusDataEx(
+                    qnSyncTime->currentMSecsSinceEpoch(),
+                    commonModule()->moduleGUID(),
+                    api::Updates2StatusData::StatusCode::error,
+                    "Failed to get updates data");
+            }
+            else
+            {
+                if (m_updateRegistry->latestUpdate(
+                    detail::UpdateRequestDataFactory::create(),
+                    &version) != update::info::ResultCode::ok)
+                {
+                    m_currentStatus = detail::Updates2StatusDataEx(
+                        qnSyncTime->currentMSecsSinceEpoch(),
+                        commonModule()->moduleGUID(),
+                        api::Updates2StatusData::StatusCode::notAvailable,
+                        "Update is unavailable");
+                }
+                else
+                {
+                    m_currentStatus = detail::Updates2StatusDataEx(
+                        qnSyncTime->currentMSecsSinceEpoch(),
+                        commonModule()->moduleGUID(),
+                        api::Updates2StatusData::StatusCode::available,
+                        lit("Update is available: %1").arg(version.toString()));
+                }
+            }
+
+            writeStatusToFile();
+            break;
+        }
+        default:
+            return;
+    }
+}
 
 } // namespace updates2
 } // namespace mediaserver

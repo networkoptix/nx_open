@@ -25,10 +25,12 @@ private:
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
     utils::TimerManager m_timerManager;
 
-
-    void checkForUpdate(utils::TimerId timerId);
+    void checkForRemoteUpdate(utils::TimerId timerId);
+    void checkForGlobalDictionaryUpdate();
     void writeStatusToFile();
     void loadStatusFromFile();
+    void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
+    void refreshStatusAfterCheck();
 };
 
 } // namespace updates2
