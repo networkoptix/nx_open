@@ -30,7 +30,7 @@
        <number>9</number>
       </property>
       <item>
-       <widget class="QProgressBar" name="uploadProgess"/>
+       <widget class="QProgressBar" name="uploadProgressBar"/>
       </item>
       <item>
        <widget class="QPushButton" name="cancelButton">

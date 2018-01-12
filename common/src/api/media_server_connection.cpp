@@ -86,8 +86,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraSearchStatusObject, "manualCamera/status")
     (CameraSearchStopObject, "manualCamera/stop")
     (CameraAddObject, "manualCamera/add")
-    (WearableCameraAddObject, "wearableCamera/add")
-    (WearableCameraConsumeFileObject, "wearableCamera/consume")
     (EventLogObject, "events")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
@@ -209,12 +207,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
             break;
         case CameraAddObject:
-            emitFinished(this, response.status, handle);
-            break;
-        case WearableCameraAddObject:
-            processJsonReply<QnWearableCameraReply>(this, response, handle);
-            break;
-        case WearableCameraConsumeFileObject:
             emitFinished(this, response.status, handle);
             break;
         case PtzContinuousMoveObject:
@@ -553,33 +545,6 @@ int QnMediaServerConnection::addCameraAsync(
     params << QnRequestParam("password", password);
 
     return sendAsyncGetRequestLogged(CameraAddObject, params, nullptr, target, slot);
-}
-
-int QnMediaServerConnection::addWearableCameraAsync(
-    const QString& name, QObject* target, const char* slot) 
-{
-    return sendAsyncGetRequestLogged(
-        WearableCameraAddObject, 
-        QnRequestParamList{{lit("name"), name}},
-        QN_STRINGIZE_TYPE(QnWearableCameraReply), 
-        target, 
-        slot);
-}
-
-int QnMediaServerConnection::consumeWearableCameraFileAsync(
-    const QnNetworkResourcePtr& camera, const QString& uploadId, 
-    qint64 startTimeMs, QObject* target, const char* slot) 
-{
-    nx_http::HttpHeaders headers;
-    return sendAsyncGetRequestLogged(
-        WearableCameraConsumeFileObject,
-        QnRequestParamList{
-            {lit("cameraId"), camera->getId().toSimpleString()},
-            {lit("uploadId"), uploadId},
-            {lit("startTime"), QString::number(startTimeMs)}},
-        nullptr,
-        target,
-        slot);
 }
 
 void QnMediaServerConnection::addOldVersionPtzParams(

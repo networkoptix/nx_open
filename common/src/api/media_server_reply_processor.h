@@ -76,7 +76,6 @@ signals:
     void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnAuditRecordList&reply, int handle, const QString &errorString);
     void finished(int status, const QnLdapUsers &reply, int handle, const QString &errorString);
-    void finished(int status, const QnWearableCameraReply &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

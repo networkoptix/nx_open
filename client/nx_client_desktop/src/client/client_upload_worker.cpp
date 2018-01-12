@@ -63,7 +63,7 @@ QnFileUpload QnClientUploadWorker::start()
 
     d->upload.status = QnFileUpload::CalculatingMD5;
 
-    emit progress(d->upload);
+    emitProgress();
 
     QSharedPointer<QFile> fileCopy = d->file;
     d->md5Future = QtConcurrent::run(
@@ -89,12 +89,20 @@ void QnClientUploadWorker::cancel()
 
     handleStop();
     d->upload.status = QnFileUpload::Canceled;
-    emit progress(d->upload);
+    /* We don't emit signals here as canceling is also a way of silencing the worker. */
 }
 
 QnFileUpload QnClientUploadWorker::status() const
 {
     return d->upload;
+}
+
+void QnClientUploadWorker::emitProgress()
+{
+    NX_ASSERT(d->upload.status != QnFileUpload::Canceled);
+    NX_ASSERT(d->upload.status != QnFileUpload::Initial);
+
+    emit progress(d->upload);
 }
 
 void QnClientUploadWorker::handleStop()
@@ -117,7 +125,7 @@ void QnClientUploadWorker::handleError(const QString& message)
 
     d->upload.status = QnFileUpload::Error;
     d->upload.errorMessage = message;
-    emit progress(d->upload);
+    emitProgress();
 }
 
 void QnClientUploadWorker::handleMd5Calculated()
@@ -132,7 +140,7 @@ void QnClientUploadWorker::handleMd5Calculated()
     d->md5 = md5;
     d->upload.status = QnFileUpload::CreatingUpload;
 
-    emit progress(d->upload);
+    emitProgress();
 
     auto callback = [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
     {
@@ -170,7 +178,7 @@ void QnClientUploadWorker::handleUpload()
         return;
     }
 
-    emit progress(d->upload);
+    emitProgress();
 
     bool seekOk = d->file->seek(static_cast<qint64>(d->chunkSize) * d->currentChunk);
     QByteArray bytes = d->file->read(d->chunkSize);
@@ -213,7 +221,7 @@ void QnClientUploadWorker::handleAllUploaded()
 {
     d->upload.status = QnFileUpload::Checking;
 
-    emit progress(d->upload);
+    emitProgress();
 
     auto callback = [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
     {
@@ -247,6 +255,6 @@ void QnClientUploadWorker::handleCheckFinished(bool success, rest::Handle handle
 
     d->upload.status = QnFileUpload::Done;
 
-    emit progress(d->upload);
+    emitProgress();
 }
 

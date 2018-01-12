@@ -454,6 +454,36 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
+Handle ServerConnection::addWearableCameraAsync(
+    const QString& name,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/wearableCamera/add"),
+        QnRequestParamList{ { lit("name"), name } },
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::consumeWearableCameraFileAsync(
+    const QnNetworkResourcePtr& camera,
+    const QString& uploadId,
+    qint64 startTimeMs,
+    PostCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/wearableCamera/consume"),
+        QnRequestParamList{
+            { lit("cameraId"), camera->getId().toSimpleString() },
+            { lit("uploadId"), uploadId },
+            { lit("startTime"), QString::number(startTimeMs) } },
+        callback,
+        targetThread);
+}
+
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const

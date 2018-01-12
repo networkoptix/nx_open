@@ -55,6 +55,7 @@ signals:
     void progress(const QnFileUpload&);
 
 private:
+    void emitProgress();
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
@@ -9,6 +11,8 @@ class QnClientUploadManager: public QObject
 {
     Q_OBJECT
 public:
+    using Callback = std::function<void(const QnFileUpload&)>;
+
     QnClientUploadManager(QObject* parent = nullptr);
     ~QnClientUploadManager();
 
@@ -23,10 +27,13 @@ public:
      * @returns                         Upload description. Don't forget to check for
      *                                  errors in the return value.
      */
-    QnFileUpload addUpload(const QnMediaServerResourcePtr& server, const QString& path);
+    QnFileUpload addUpload(
+        const QnMediaServerResourcePtr& server,
+        const QString& path,
+        QObject* context,
+        Callback callback);
 
-signals:
-    void progress(const QnFileUpload&);
+    void cancelUpload(const QString& id);
 
 private:
     QHash<QString, QnClientUploadWorker*> m_workers;

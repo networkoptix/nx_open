@@ -21,17 +21,17 @@ public:
     virtual ~QnWorkbenchWearableHandler() override;
 
 private:
+    qreal calculateProgress(const QnFileUpload& upload, bool processed);
+
     void maybeOpenCurrentSettings();
 
 private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
 
-    void at_addWearableCameraAsync_finished(int status, const QnWearableCameraReply &reply, int handle);
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
 
-    void at_uploadManager_progress(const QnFileUpload& upload);
-    void at_processWearableCameraFileAsync_finished(int status, int handle);
+    void at_upload_progress(const QnFileUpload& upload);
 
 private:
     struct FootageInfo
@@ -40,7 +40,6 @@ private:
         qint64 startTimeMs;
     };
 
-    QPointer<QnNewWearableCameraDialog> m_dialog;
     QnUuid m_currentCameraUuid;
     QHash<QString, FootageInfo> m_infoByUploadId;
 };

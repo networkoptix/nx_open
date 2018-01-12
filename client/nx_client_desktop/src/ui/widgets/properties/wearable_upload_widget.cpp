@@ -4,6 +4,8 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <core/resource/camera_resource.h>
+#include <client/client_module.h>
+#include <client/client_wearable_manager.h>
 
 
 QnWearableUploadWidget::QnWearableUploadWidget(QWidget *parent)
@@ -19,6 +21,13 @@ QnWearableUploadWidget::QnWearableUploadWidget(QWidget *parent)
         {
             if (m_camera)
                 menu()->trigger(nx::client::desktop::ui::action::UploadWearableCameraFileAction, m_camera);
+        }
+    );
+
+    connect(qnClientModule->wearableManager(), &QnClientWearableManager::progress, this,
+        [this](qreal progress)
+        {
+            ui->uploadProgressBar->setValue(progress * 100);
         }
     );
 }

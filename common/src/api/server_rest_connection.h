@@ -16,6 +16,7 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
+#include <api/model/wearable_camera_reply.h>
 
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -200,6 +201,19 @@ public:
 
     Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
+
+
+    Handle addWearableCameraAsync(
+        const QString& name,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle consumeWearableCameraFileAsync(
+        const QnNetworkResourcePtr& camera,
+        const QString& uploadId,
+        qint64 startTimeMs,
+        PostCallback callback,
+        QThread* targetThread = nullptr);
 
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.

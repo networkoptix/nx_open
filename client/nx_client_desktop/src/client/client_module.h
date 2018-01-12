@@ -13,6 +13,7 @@ class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 class QnCloudStatusWatcher;
 class QnClientUploadManager;
+class QnClientWearableManager;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -28,6 +29,8 @@ public:
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnClientUploadManager* uploadManager() const;
+    QnClientWearableManager* wearableManager() const;
+
 private:
     void initApplication();
     void initThread();
@@ -46,6 +49,7 @@ private:
     QnNetworkProxyFactory* m_networkProxyFactory;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
     QnClientUploadManager* m_uploadManager;
+    QnClientWearableManager* m_wearableManager;
 };
 
 #define qnClientModule QnClientModule::instance()

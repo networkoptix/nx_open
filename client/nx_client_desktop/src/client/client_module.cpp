@@ -35,6 +35,7 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
 #include <client/client_upload_manager.h>
+#include <client/client_wearable_manager.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -356,6 +357,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
     m_uploadManager = new QnClientUploadManager(commonModule);
+    m_wearableManager = new QnClientWearableManager(commonModule);
 
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
@@ -606,6 +608,11 @@ QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 QnClientUploadManager* QnClientModule::uploadManager() const
 {
     return m_uploadManager;
+}
+
+QnClientWearableManager* QnClientModule::wearableManager() const
+{
+    return m_wearableManager;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

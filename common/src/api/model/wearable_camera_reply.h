@@ -11,5 +11,5 @@ struct QnWearableCameraReply
 };
 #define QnWearableCameraReply_Fields (id)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnWearableCameraReply, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnWearableCameraReply, (json)(ubjson)(metatype)(eq))
 
