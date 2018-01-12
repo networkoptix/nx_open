@@ -222,7 +222,7 @@ static std::string relativeSrcFilename(const std::string& file)
     std::string result = r;
     std::replace(result.begin(), result.end(),
         debug::pathSeparator(), '/');
-    return r;
+    return result;
 }
 
 static bool stringEndsWithSuffix(const std::string& str, const std::string& suffix)
