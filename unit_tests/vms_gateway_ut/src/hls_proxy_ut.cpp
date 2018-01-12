@@ -76,7 +76,7 @@ protected:
         nx::network::http::BufferType msgBody;
         nx::network::http::StringType contentType;
         ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
-            playlistProxyUrl(), &msgBody, &contentType));
+            playlistProxyUrl(), &msgBody, &contentType, nx::network::kNoTimeout));
         ASSERT_TRUE(m_receivedPlaylist.parse(msgBody));
     }
 
@@ -99,7 +99,7 @@ protected:
         nx::network::http::BufferType msgBody;
         nx::network::http::StringType contentType;
         ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
-            chunkUrl, &msgBody, &contentType));
+            chunkUrl, &msgBody, &contentType, nx::network::kNoTimeout));
 
         ASSERT_EQ(kHlsChunkContents, msgBody);
         ASSERT_EQ(kHlsChunkContentType, contentType);

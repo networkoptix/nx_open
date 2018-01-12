@@ -274,9 +274,12 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
 bool HttpClient::fetchResource(
     const nx::utils::Url& url,
     BufferType* msgBody,
-    StringType* contentType)
+    StringType* contentType,
+    boost::optional<std::chrono::milliseconds> customResponseReadTimeout)
 {
     nx::network::http::HttpClient client;
+    if (customResponseReadTimeout)
+        client.setResponseReadTimeoutMs(customResponseReadTimeout->count());
     if (!client.doGet(url))
         return false;
 
@@ -344,7 +347,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
-        
+
         m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
 
