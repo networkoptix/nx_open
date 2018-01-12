@@ -8,6 +8,7 @@
 #include "media_server_process.h"
 #include "common/common_module.h"
 #include <test_support/mediaserver_launcher.h>
+#include <recorder/storage_manager.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -64,6 +65,12 @@ protected:
         spaceLimit(10 * 1024 * 1024 * 1024ll)
     {}
 
+    virtual void TearDown() override
+    {
+        qnNormalStorageMan->stopAsyncTasks();
+        qnBackupStorageMan->stopAsyncTasks();
+    }
+
     enum class PathFound
     {
         yes,
@@ -109,7 +116,7 @@ protected:
     QnStorageResourceList unmountedStorages;
 };
 
-TEST_F(UnmountedLocalStoragesFilterTest , main)
+TEST_F(UnmountedLocalStoragesFilterTest, main)
 {
     when(PathFound::yes, MediaFolderSuffix::yes);
     then(StorageUnmounted::no);
