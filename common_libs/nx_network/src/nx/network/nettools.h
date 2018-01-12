@@ -55,16 +55,24 @@ NX_NETWORK_API QString MACToString(const unsigned char *mac);
 NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
+
+enum class InterfaceListPolicy
+{
+    default,
+    allowInterfacesWithoutAddress,
+    keepAllAddressesPerInterface,
+    count
+};
+
 /**
  * Returns list of network interfaces.
- * @param allowInterfacesWithoutAddress get interfaces without ipv4.
- * @param keepAllAddressesPerInterface return several records for interfaces with multiple addresses.
+ * @param InterfaceListPolicy get interface list with some addition conditions.
+ * allowInterfacesWithoutAddress - get interfaces without ipv4 at all.
+ * keepAllAddressesPerInterface return several records for interfaces with multiple addresses.
  */
 
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
-QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
-    bool allowInterfacesWithoutAddress = false,
-    bool keepAllAddressesPerInterface = false);
+QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(InterfaceListPolicy policy = InterfaceListPolicy::default);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
 QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
