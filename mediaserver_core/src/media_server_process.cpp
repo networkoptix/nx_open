@@ -2251,7 +2251,7 @@ void MediaServerProcess::run()
         m_cmdLineArguments.rwConfigFilePath));
 
     connect(this, &MediaServerProcess::started,
-        [&serverModule]() { serverModule->updates2Manager()->startTimers(); });
+        [&serverModule]() { serverModule->updates2Manager()->atServerStart(); });
 
     qnServerModule->runTimeSettings()->remove("rebuild");
 

@@ -72,9 +72,12 @@ Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
     loadStatusFromFile();
 }
 
-void Updates2Manager::startTimers()
+void Updates2Manager::atServerStart()
 {
     checkForGlobalDictionaryUpdate();
+    connect(
+        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
+        this, &Updates2Manager::checkForGlobalDictionaryUpdate);
     using namespace std::placeholders;
     m_timerManager.addNonStopTimer(
         std::bind(&Updates2Manager::checkForRemoteUpdate, this, _1),

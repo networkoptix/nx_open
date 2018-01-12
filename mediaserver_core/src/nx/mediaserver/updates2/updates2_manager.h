@@ -17,7 +17,7 @@ class Updates2Manager: public QObject, public QnCommonModuleAware
 public:
     Updates2Manager(QnCommonModule* commonModule);
     api::Updates2StatusData status();
-    void startTimers();
+    void atServerStart();
 
 private:
     detail::Updates2StatusDataEx m_currentStatus;
