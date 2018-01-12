@@ -366,8 +366,8 @@ void HanwhaResourceSearcher::createResource(
     auto auth = rpRes ? rpRes->getAuth() : getDefaultAuth();
     resource->setDefaultAuth(auth);
     result << resource;
-
-    addMultichannelResources(result, auth);
+    if (rpRes)
+        addMultichannelResources(result, auth);
 }
 
 template <typename T>
