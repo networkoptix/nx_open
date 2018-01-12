@@ -284,6 +284,7 @@
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
 #include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 
 #if !defined(EDGE_SERVER)
@@ -2250,8 +2251,15 @@ void MediaServerProcess::run()
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
 
-    connect(this, &MediaServerProcess::started,
+    connect(
+        this, &MediaServerProcess::started,
         [&serverModule]() { serverModule->updates2Manager()->atServerStart(); });
+
+    using namespace nx::vms::common::p2p::downloader;
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
+
 
     qnServerModule->runTimeSettings()->remove("rebuild");
 

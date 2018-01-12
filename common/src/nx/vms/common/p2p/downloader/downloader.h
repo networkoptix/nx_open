@@ -57,6 +57,7 @@ public:
     ResultCode deleteFile(const QString& fileName, bool deleteData = true);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
+    void atServerStart();
 
 signals:
     void downloadFinished(const QString& fileName);

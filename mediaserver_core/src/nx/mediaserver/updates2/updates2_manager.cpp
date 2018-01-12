@@ -74,11 +74,17 @@ Updates2Manager::Updates2Manager(QnCommonModule* commonModule):
 
 void Updates2Manager::atServerStart()
 {
+    using namespace vms::common::p2p::downloader;
+    using namespace std::placeholders;
+
     checkForGlobalDictionaryUpdate();
     connect(
         globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
         this, &Updates2Manager::checkForGlobalDictionaryUpdate);
-    using namespace std::placeholders;
+    connect(
+        qnServerModule->findInstance<Downloader>(), &Downloader::downloadFinished,
+        this, &Updates2Manager::onDownloadFinished);
+
     m_timerManager.addNonStopTimer(
         std::bind(&Updates2Manager::checkForRemoteUpdate, this, _1),
         std::chrono::milliseconds(refreshTimeout()),
@@ -220,7 +226,6 @@ void Updates2Manager::refreshStatusAfterCheck()
                     else
                     {
                         using namespace vms::common::p2p::downloader;
-                        auto downloader = qnServerModule->findInstance<Downloader>();
 
                         FileInformation fileInformation;
                         fileInformation.md5 = fileData.md5;
@@ -229,9 +234,6 @@ void Updates2Manager::refreshStatusAfterCheck()
                         fileInformation.url = fileData.url;
                         fileInformation.peerPolicy = FileInformation::PeerPolicy::byPlatform;
 
-                        connect(
-                            downloader, &Downloader::downloadFinished,
-                            this, &Updates2Manager::onDownloadFinished);
                         qnServerModule->findInstance<Downloader>()->addFile(fileInformation);
 
                         m_currentStatus = detail::Updates2StatusDataEx(
@@ -286,6 +288,7 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
             return onError(lit("Update file is corrupted: %1").arg(fileName));
     }
 }
+
 } // namespace updates2
 } // namespace mediaserver
 } // namespace nx

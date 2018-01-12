@@ -109,8 +109,13 @@ Downloader::Downloader(
         d->peerManagerFactory = factory.get();
         d->peerManagerFactoryOwner = std::move(factory);
     }
+}
 
-    for (const auto& fileName: d->storage->files())
+
+void Downloader::atServerStart()
+{
+    Q_D(Downloader);
+    for (const auto& fileName : d->storage->files())
         d->createWorker(fileName);
 }
 
