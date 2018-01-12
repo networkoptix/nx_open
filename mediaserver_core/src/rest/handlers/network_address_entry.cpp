@@ -81,11 +81,12 @@ QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFrom
 {
     QnNetworkAddressEntryList entryList;
 
-    const bool allInterfaces = (QnAppInfo::isBpi());
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces))
+    const auto policy = QnAppInfo::isBpi()
+        ? InterfaceListPolicy::allowInterfacesWithoutAddress : InterfaceListPolicy::default;
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(policy))
     {
         static const QChar kColon = ':';
-        if (allInterfaces && iface.name.contains(kColon))
+        if (policy == InterfaceListPolicy::allowInterfacesWithoutAddress && iface.name.contains(kColon))
             continue;
 
         QnNetworkAddressEntry entry;
