@@ -12,7 +12,11 @@ admin.site.register(Subscription, SubscriptionAdmin)
 
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('type', 'user_email', 'created_date', 'send_date', 'event', 'task_id', 'message')
+    list_display = ('type', 'user_email', 'created_date', 'send_date', 'delivery_time_interval', 'task_id')
+    readonly_fields = ('user_email', 'external_id', 'task_id', 'type', 'customization',
+                       'message', 'created_date', 'send_date', 'delivery_time_interval', 'event')
+    list_filter = ('type', 'created_date', 'send_date')
+    search_fields = ('user_email', 'created_date', 'send_date',)
 
 admin.site.register(Message, MessageAdmin)
 
