@@ -9,12 +9,12 @@ namespace mediaserver {
 namespace updates2 {
 namespace detail {
 
-class UpdateRequestDataFactory
+class UpdateFileRequestDataFactory
 {
 public:
-    using FactoryFunc = utils::MoveOnlyFunc<update::info::UpdateRequestData()>;
+    using FactoryFunc = utils::MoveOnlyFunc<update::info::UpdateFileRequestData()>;
 
-    static update::info::UpdateRequestData create();
+    static update::info::UpdateFileRequestData create();
     static void setFactoryFunc(FactoryFunc factoryFunc);
 private:
     static FactoryFunc s_factoryFunc;

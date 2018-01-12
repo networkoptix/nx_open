@@ -7,20 +7,24 @@ namespace mediaserver {
 namespace updates2 {
 namespace detail {
 
-UpdateRequestDataFactory::FactoryFunc UpdateRequestDataFactory::s_factoryFunc = nullptr;
+UpdateFileRequestDataFactory::FactoryFunc UpdateFileRequestDataFactory::s_factoryFunc = nullptr;
 
-update::info::UpdateRequestData UpdateRequestDataFactory::create()
+update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create()
 {
     if (s_factoryFunc)
         return s_factoryFunc();
 
-    return update::info::UpdateRequestData(
+    return update::info::UpdateFileRequestData(
         nx::network::AppInfo::defaultCloudHost(),
         QnAppInfo::customizationName(),
-        QnSoftwareVersion(QnAppInfo::applicationVersion()));
+        QnSoftwareVersion(QnAppInfo::applicationVersion()),
+        update::info::OsVersion(
+            QnAppInfo::applicationPlatform(),
+            QnAppInfo::applicationArch(),
+            QnAppInfo::applicationPlatformModification()));
 }
 
-void UpdateRequestDataFactory::setFactoryFunc(UpdateRequestDataFactory::FactoryFunc factoryFunc)
+void UpdateFileRequestDataFactory::setFactoryFunc(UpdateFileRequestDataFactory::FactoryFunc factoryFunc)
 {
     s_factoryFunc = std::move(factoryFunc);
 }

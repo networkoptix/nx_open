@@ -13,7 +13,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <api/global_settings.h>
-
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 #include "updates2_manager.h"
 
@@ -23,7 +23,7 @@ namespace updates2 {
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 60 * 60 * 1000;
+static const qint64 kRefreshTimeoutMs = 10 * 60 * 1000; //< 10 min
 static const QString kFileName = "update.status";
 
 static QString filePath()
@@ -48,14 +48,14 @@ static bool isNewRegistryBetter(
         return true;
     QnSoftwareVersion newRegistryServerVersion;
     if (newRegistry->latestUpdate(
-        detail::UpdateRequestDataFactory::create(),
+        detail::UpdateFileRequestDataFactory::create(),
         &newRegistryServerVersion) != update::info::ResultCode::ok)
     {
         return false;
     }
     QnSoftwareVersion oldRegistryServerVersion;
     if (oldRegistry->latestUpdate(
-        detail::UpdateRequestDataFactory::create(),
+        detail::UpdateFileRequestDataFactory::create(),
         &oldRegistryServerVersion) != update::info::ResultCode::ok
         || newRegistryServerVersion > oldRegistryServerVersion)
     {
@@ -133,7 +133,6 @@ void Updates2Manager::checkForRemoteUpdate(utils::TimerId /*timerId*/)
         {
             case api::Updates2StatusData::StatusCode::notAvailable:
             case api::Updates2StatusData::StatusCode::error:
-            case api::Updates2StatusData::StatusCode::available:
                 m_currentStatus = api::Updates2StatusData(
                     commonModule()->moduleGUID(),
                     api::Updates2StatusData::StatusCode::checking,
@@ -179,7 +178,6 @@ void Updates2Manager::refreshStatusAfterCheck()
     {
         case api::Updates2StatusData::StatusCode::notAvailable:
         case api::Updates2StatusData::StatusCode::error:
-        case api::Updates2StatusData::StatusCode::available:
         case api::Updates2StatusData::StatusCode::checking:
         {
             QnSoftwareVersion version;
@@ -194,7 +192,7 @@ void Updates2Manager::refreshStatusAfterCheck()
             else
             {
                 if (m_updateRegistry->latestUpdate(
-                    detail::UpdateRequestDataFactory::create(),
+                    detail::UpdateFileRequestDataFactory::create(),
                     &version) != update::info::ResultCode::ok)
                 {
                     m_currentStatus = detail::Updates2StatusDataEx(
@@ -203,13 +201,45 @@ void Updates2Manager::refreshStatusAfterCheck()
                         api::Updates2StatusData::StatusCode::notAvailable,
                         "Update is unavailable");
                 }
-                else
+                else //< Got available update
                 {
-                    m_currentStatus = detail::Updates2StatusDataEx(
-                        qnSyncTime->currentMSecsSinceEpoch(),
-                        commonModule()->moduleGUID(),
-                        api::Updates2StatusData::StatusCode::available,
-                        lit("Update is available: %1").arg(version.toString()));
+                    nx::update::info::FileData fileData;
+                    const auto result = m_updateRegistry->findUpdateFile(
+                        detail::UpdateFileRequestDataFactory::create(),
+                        &fileData);
+                    NX_ASSERT(result == update::info::ResultCode::ok);
+                    if (result != update::info::ResultCode::ok)
+                    {
+                        m_currentStatus = detail::Updates2StatusDataEx(
+                            qnSyncTime->currentMSecsSinceEpoch(),
+                            commonModule()->moduleGUID(),
+                            api::Updates2StatusData::StatusCode::error,
+                            lit("Failed to get update file information: %1")
+                                .arg(version.toString()));
+                    }
+                    else
+                    {
+                        using namespace vms::common::p2p::downloader;
+                        auto downloader = qnServerModule->findInstance<Downloader>();
+
+                        FileInformation fileInformation;
+                        fileInformation.md5 = fileData.md5;
+                        fileInformation.name = fileData.file;
+                        fileInformation.size = fileData.size;
+                        fileInformation.url = fileData.url;
+                        fileInformation.peerPolicy = FileInformation::PeerPolicy::byPlatform;
+
+                        connect(
+                            downloader, &Downloader::downloadFinished,
+                            this, &Updates2Manager::onDownloadFinished);
+                        qnServerModule->findInstance<Downloader>()->addFile(fileInformation);
+
+                        m_currentStatus = detail::Updates2StatusDataEx(
+                            qnSyncTime->currentMSecsSinceEpoch(),
+                            commonModule()->moduleGUID(),
+                            api::Updates2StatusData::StatusCode::downloading,
+                            lit("Update is being downloaded: %1").arg(version.toString()));
+                    }
                 }
             }
 
@@ -221,6 +251,45 @@ void Updates2Manager::refreshStatusAfterCheck()
     }
 }
 
+void Updates2Manager::onDownloadFinished(const QString& fileName)
+{
+    QnMutexLocker lock(&m_mutex);
+    using namespace vms::common::p2p::downloader;
+    auto downloader = qnServerModule->findInstance<Downloader>();
+
+    auto onError = [this, downloader, &fileName](const QString& errorMessage)
+    {
+        m_currentStatus = detail::Updates2StatusDataEx(
+            qnSyncTime->currentMSecsSinceEpoch(),
+            commonModule()->moduleGUID(),
+            api::Updates2StatusData::StatusCode::error,
+            errorMessage);
+        downloader->deleteFile(fileName);
+    };
+
+    auto writeStatusGuard = std::bind(&Updates2Manager::writeStatusToFile, this);
+
+    NX_ASSERT(m_currentStatus.status == api::Updates2StatusData::StatusCode::downloading);
+    if (m_currentStatus.status != api::Updates2StatusData::StatusCode::downloading)
+        return onError("Unexpected update manager state");
+
+    auto fileInformation = downloader->fileInformation(fileName);
+    NX_ASSERT(fileInformation.isValid());
+    if (!fileInformation.isValid())
+        return onError(lit("Downloader internal error for file: %1").arg(fileName));
+
+    switch (fileInformation.status)
+    {
+    case FileInformation::Status::notFound:
+        m_currentStatus = detail::Updates2StatusDataEx(
+            qnSyncTime->currentMSecsSinceEpoch(),
+            commonModule()->moduleGUID(),
+            api::Updates2StatusData::StatusCode::error,
+            lit("Failed find update file: %1")
+                .arg(fileName));
+
+    }
+}
 } // namespace updates2
 } // namespace mediaserver
 } // namespace nx

@@ -31,6 +31,7 @@ private:
     void loadStatusFromFile();
     void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
+    void onDownloadFinished(const QString& fileName);
 };
 
 } // namespace updates2
