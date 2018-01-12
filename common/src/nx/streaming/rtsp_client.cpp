@@ -633,7 +633,7 @@ void QnRtspClient::parseSDP()
             isBackChannel = true;
         }
     }
-    if (mapNum >= 0) 
+    if (mapNum >= 0)
     {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
@@ -1154,7 +1154,8 @@ bool QnRtspClient::sendSetup()
         {
             if (m_transport == TRANSPORT_AUTO && m_prefferedTransport == TRANSPORT_TCP) {
                 m_prefferedTransport = TRANSPORT_UDP;
-                return sendSetup(); // try UDP transport
+                if (!sendSetup()) //< Try UDP transport.
+                    return false;
             }
             else
                 return false;

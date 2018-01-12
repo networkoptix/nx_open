@@ -235,6 +235,7 @@ public:
     void setTransport(TransportType transport);
     void setTransport(const QString& transport);
     TransportType getTransport() const { return m_transport; }
+    bool isTcpMode() const { return m_prefferedTransport != TRANSPORT_UDP; }
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
     int getChannelNum(int rtpChannelNum);
