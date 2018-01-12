@@ -541,6 +541,7 @@ void EventRibbon::Private::updateView()
     while (iter != m_tiles.end())
     {
         m_positions[*iter] = currentPosition;
+        currentPosition += m_currentShifts.value(iter - m_tiles.cbegin());
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
