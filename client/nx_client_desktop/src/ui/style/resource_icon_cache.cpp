@@ -57,6 +57,7 @@ QString baseToString(QnResourceIconCache::Key base)
         QN_STRINGIFY(SharedLayouts);
 
         QN_STRINGIFY(Camera);
+        QN_STRINGIFY(WearableCamera);
         QN_STRINGIFY(Cameras);
 
         QN_STRINGIFY(Recorder);
@@ -120,6 +121,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(LayoutTour,              loadIcon(lit("tree/layout_tour.png")));
     m_cache.insert(LayoutTours,             loadIcon(lit("tree/layout_tours.png")));
     m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
+    m_cache.insert(WearableCamera,          loadIcon(lit("tree/wearable_camera.png")));
     m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
     m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
     m_cache.insert(Recorder,                loadIcon(lit("tree/encoder.png")));
@@ -232,6 +234,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         key = Layout;
     else if (flags.testFlag(Qn::io_module))
         key = IOModule;
+    else if (flags.testFlag(Qn::wearable_camera))
+        key = WearableCamera;
     else if (flags.testFlag(Qn::live_cam))
         key = Camera;
     else if (flags.testFlag(Qn::local_image))
@@ -271,6 +275,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         status = (layout->locked() && !videowall)
             ? Locked
             : Unknown;
+    }
+    else if (resource->hasFlags(Qn::wearable_camera))
+    {
+        status = Online;
     }
     else
     {
