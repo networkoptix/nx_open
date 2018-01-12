@@ -130,6 +130,11 @@ angular.module('webadminApp')
                 });
             }
             if($scope.settings.needOldPassword){
+                if($scope.settings.actionLabel == "Disconnect"){
+                    if(!confirm("All cloud users will be lost. Continue?")){
+                        return;
+                    }
+                }
                 $modalInstance.close( $scope.settings.oldPassword);
             }
 
