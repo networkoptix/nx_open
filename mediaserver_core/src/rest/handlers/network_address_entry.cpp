@@ -82,7 +82,7 @@ QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFrom
     QnNetworkAddressEntryList entryList;
 
     const auto policy = QnAppInfo::isBpi()
-        ? InterfaceListPolicy::allowInterfacesWithoutAddress : InterfaceListPolicy::default;
+        ? InterfaceListPolicy::allowInterfacesWithoutAddress : InterfaceListPolicy::oneAddressPerInterface;
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(policy))
     {
         static const QChar kColon = ':';

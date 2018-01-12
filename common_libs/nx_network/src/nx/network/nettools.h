@@ -58,21 +58,20 @@ NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pb
 
 enum class InterfaceListPolicy
 {
-    default,
-    allowInterfacesWithoutAddress,
-    keepAllAddressesPerInterface,
+    oneAddressPerInterface, //< Return interface and its first IP address.
+    allowInterfacesWithoutAddress, //< Return interface even it doesn't have any IP addresses.
+    keepAllAddressesPerInterface, //< Return several records if interface has several IP addresses.
     count
 };
 
 /**
  * Returns list of network interfaces.
- * @param InterfaceListPolicy get interface list with some addition conditions.
- * allowInterfacesWithoutAddress - get interfaces without ipv4 at all.
- * keepAllAddressesPerInterface return several records for interfaces with multiple addresses.
+ * @param InterfaceListPolicy: see description above.
  */
 
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
-QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(InterfaceListPolicy policy = InterfaceListPolicy::default);
+QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(
+    InterfaceListPolicy policy = InterfaceListPolicy::oneAddressPerInterface);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
 QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
