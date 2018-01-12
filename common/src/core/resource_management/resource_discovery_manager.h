@@ -72,9 +72,8 @@ class QnResourceDiscoveryManagerTimeoutDelegate
 public:
     QnResourceDiscoveryManagerTimeoutDelegate(QnResourceDiscoveryManager* discoveryManager);
 
-    public slots:
+public slots:
     void onTimeout();
-    void onForceSearch();
 
 private:
     QnResourceDiscoveryManager* m_discoveryManager;
@@ -92,8 +91,8 @@ class QnResourceDiscoveryManager
     public QnCommonModuleAware
 {
     Q_OBJECT
+    using base_type = Connective<QnLongRunnable>;
 
-    typedef Connective<QnLongRunnable> base_type;
 public:
     enum State
     {
@@ -130,10 +129,6 @@ public:
     //!This method MUST be called from non-GUI thread, since it can block for some time
     virtual void doResourceDiscoverIteration();
 
-    // Queries a new file discovery
-    // Can be called from any thread. It is asynchronous
-    void queryLocalDiscovery();
-
     State state() const;
 
     void setLastDiscoveredResources(const QnResourceList& resources);
@@ -146,12 +141,12 @@ public:
 
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
+
 protected:
     unsigned int m_runNumber;
     virtual void run() override;
 
 signals:
-    void forceLocalSearch();    // Local timer connects to this signal to force resource discovery
     void localSearchDone();
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
@@ -159,6 +154,7 @@ signals:
 protected slots:
     void at_resourceDeleted(const QnResourcePtr& resource);
     void at_resourceAdded(const QnResourcePtr& resource);
+
 protected:
     enum class SearchType
     {
@@ -169,19 +165,21 @@ protected:
     bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 
     friend class QnResourceDiscoveryManagerTimeoutDelegate;
+
 private:
     void updateLocalNetworkInterfaces();
 
-    // returns new resources( not from pool) or updates some in resource pool
+    // Returns new resources( not from pool) or updates some in resource pool.
     QnResourceList findNewResources();
-    // Run search of local files
-    void doLocalSearch();
+    // Run search of local files.
+    void doInitialSearch();
 
     void appendManualDiscoveredResources(QnResourceList& resources);
 
     void updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
+
 private:
     QThreadPool m_threadPool;
 
@@ -207,6 +205,7 @@ private:
     mutable QnMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
+
 protected:
     int m_serverOfflineTimeout;
 };
