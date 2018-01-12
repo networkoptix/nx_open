@@ -249,7 +249,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbit / s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <location/>
@@ -348,7 +348,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>&amp;miêu tả</translation>
+      <translation>Miêu tả</translation>
     </message>
     <message>
       <location/>
@@ -419,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>於</translation>
     </message>
   </context>
   <context>
@@ -447,7 +447,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Kiểm tra</translation>
+      <translation>Thử</translation>
     </message>
   </context>
   <context>
@@ -816,7 +816,7 @@
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Pre-recording</translation>
     </message>
     <message>
       <location/>
@@ -861,7 +861,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>Chế độ pnic:</translation>
+      <translation>Chế độ panic:</translation>
     </message>
     <message>
       <location/>
@@ -882,7 +882,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Giữ trạng thái đăng nhập</translation>
+      <translation>Duy trì đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
   </context>
   <context>
@@ -1312,7 +1312,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL Máy chủ</translation>
+      <translation>URL máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -1383,12 +1383,12 @@
     <message>
       <location/>
       <source>License Key:</source>
-      <translation>Mã bản quyền:</translation>
+      <translation>Key bản quyền:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation>Tính năng</translation>
+      <translation>Các tính năng</translation>
     </message>
     <message>
       <location/>
@@ -1482,7 +1482,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Khóa bản quyền không hợp lệ</translation>
+      <translation>Key bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <location/>
@@ -1492,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>Id phần cứng</translation>
+      <translation>Id Phần cứng</translation>
     </message>
   </context>
   <context>
@@ -1536,7 +1536,7 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation>Máy chủ</translation>
+      <translation>Host</translation>
     </message>
     <message>
       <location/>
@@ -1724,7 +1724,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Sự kiện</translation>
+      <translation>Những sự kiện</translation>
     </message>
   </context>
   <context>
@@ -1795,7 +1795,7 @@
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation>Phím nóng:</translation>
+      <translation>Hotkeys:</translation>
     </message>
   </context>
   <context>
@@ -1876,7 +1876,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Duy trì đăng nhập</translation>
+      <translation>Giữ trạng thái đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -2424,7 +2424,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Chế độ Expert</translation>
+      <translation>Xuất khẩu</translation>
     </message>
     <message>
       <location/>
@@ -2840,7 +2840,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>Nhóm người dùng</translation>
+      <translation>Kiểu người dùng</translation>
     </message>
     <message>
       <location/>

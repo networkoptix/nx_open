@@ -216,11 +216,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>สำเนา</translation>
+      <translation>คัดลอก</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>แปะ</translation>
+      <translation>วาง</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -841,7 +841,7 @@ Do you want to delete it anyway?</source>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;เลิกทำ</translation>
+      <translation>&amp;แก้</translation>
     </message>
     <message>
       <source>&amp;Redo</source>

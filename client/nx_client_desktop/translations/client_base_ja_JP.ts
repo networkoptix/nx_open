@@ -46,7 +46,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>ブックマークを削除</translation>
+      <translation>ブックマークを削除しますか</translation>
     </message>
   </context>
   <context>
@@ -928,7 +928,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>不明なエラー</translation>
+      <translation>未知のエラー.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -5965,11 +5965,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>アーカイブバックアップは&lt;b&gt;%1&lt;/b&gt;まで完了</translation>
+      <translation>アーカイブのバックアップは &lt;b&gt;%1&lt;/b&gt;まで完了</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>次のバックアップは&lt;b&gt;%1&lt;/b&gt;にスケジュールされています</translation>
+      <translation>次のバックアップは &lt;b&gt;%1&lt;/b&gt; の予定</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6254,7 +6254,7 @@ to %1</source>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
+      <translation>一部のユーザーにメール アドレスが設定されていません.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -6399,22 +6399,22 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>yyyy/MMMM/dd hh:mm</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>yyyy/MMMM/dd hh:mm</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>yyyy/MMMM/dd h ap</translation>
+      <translation>yyyy MMMM dd h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>yyyy/MMMM/dd</translation>
+      <translation>yyyy MMMM dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
@@ -6429,12 +6429,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>

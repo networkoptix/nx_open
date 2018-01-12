@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>Còn trống</translation>
+      <translation>Trống</translation>
     </message>
     <message>
       <source>Free license</source>

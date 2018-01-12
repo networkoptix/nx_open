@@ -248,7 +248,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimise</translation>
+      <translation>Minimize</translation>
     </message>
     <message>
       <source>Maximize</source>

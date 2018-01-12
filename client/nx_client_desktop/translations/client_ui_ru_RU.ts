@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -315,7 +315,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -465,7 +465,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -480,7 +480,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Остановить</translation>
+      <translation>Заканчивается</translation>
     </message>
     <message>
       <location/>
@@ -654,7 +654,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -669,7 +669,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>По умолчанию</translation>
+      <translation>Сбросить настройки</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -796,7 +796,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -1589,7 +1589,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>Шкала времени</translation>
+      <translation>Режим времени</translation>
     </message>
     <message>
       <location/>
@@ -1614,7 +1614,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>сек</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -1640,7 +1640,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Авторизация</translation>
+      <translation>Аутентификация</translation>
     </message>
     <message>
       <location/>
@@ -1912,7 +1912,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Логин:</translation>
+      <translation>Имя пользователя:</translation>
     </message>
     <message>
       <location/>
@@ -2050,7 +2050,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation>Настройки</translation>
+      <translation>Параметры</translation>
     </message>
     <message>
       <location/>
@@ -2098,7 +2098,7 @@
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>&amp;Удалить...</translation>
+      <translation>Удалить...</translation>
     </message>
     <message>
       <location/>
@@ -2111,7 +2111,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation>Настройки видеостен</translation>
+      <translation>Настройки видеостены</translation>
     </message>
     <message>
       <location/>
@@ -2177,7 +2177,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунд</translation>
+      <translation>секунды</translation>
     </message>
   </context>
   <context>
@@ -2343,7 +2343,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>сек</translation>
+      <translation>секунды</translation>
     </message>
     <message>
       <location/>
@@ -2404,7 +2404,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Авторизация</translation>
+      <translation>Аутентификация</translation>
     </message>
     <message>
       <location/>
@@ -2414,7 +2414,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>Детекция движения</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <location/>
@@ -2494,7 +2494,7 @@
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
     <message>
       <location/>
@@ -2578,7 +2578,7 @@
     <message>
       <location/>
       <source>User:</source>
-      <translation>Имя пользователя:</translation>
+      <translation>Пользователь:</translation>
     </message>
     <message>
       <location/>
@@ -2598,7 +2598,7 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
@@ -2723,7 +2723,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Логин:</translation>
+      <translation>Имя пользователя:</translation>
     </message>
     <message>
       <location/>
@@ -2736,7 +2736,7 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>Роли</translation>
+      <translation>Role</translation>
     </message>
     <message>
       <location/>
@@ -2859,7 +2859,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
   </context>
   <context>

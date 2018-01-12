@@ -18,7 +18,7 @@
   <String Id="ClientOnlyDesc">יישום הלקוח משמש כדי להציג וידאו וניהול המערכת</String>
   <String Id="ServerOnly">שרת בלבד</String>
   <String Id="ServerOnlyDesc">יישום השרת משמש לאחסון מידע מערכת, וארכיונים</String>
-  <String Id="HelpHeader">עזרה בהתקנה</String>
+  <String Id="HelpHeader">עזרה בהגדרה</String>
   <String Id="HelpCloseButton">סגירה</String>
   <String Id="InstallAcceptCheckbox">אני מסכים לתנאי השימוש</String>
   <String Id="InstallOptionsButton">אפשרויות</String>
@@ -42,13 +42,13 @@
   <String Id="SuccessInstallHeader">ההתקנה הושלמה בהצלחה</String>
   <String Id="SuccessLaunchButton">הפעל</String>
   <String Id="SuccessRestartText">עליך להפעיל מחדש את המחשב לפני שתוכל להשתמש בתוכנה</String>
-  <String Id="SuccessRestartButton">הפעל מחדש</String>
+  <String Id="SuccessRestartButton">איתחול</String>
   <String Id="SuccessCloseButton">סגירה</String>
   <String Id="FailureHeader">ההתקנה נכשלה</String>
   <String Id="FailureHyperlinkLogText">בעיה אחת או יותר גרמה להתקנה להיכשל. תקן את הבעיות ולאחר מכן נסה שוב את ההגדרה. לקבלת מידע נוסף ראה</String>
   <String Id="FailureHyperlinkLogTextLink">קובץ יומן הרישום</String>
   <String Id="FailureRestartText">עליך להפעיל מחדש את המחשב כדי להשלים את שיחזור התוכנה</String>
-  <String Id="FailureRestartButton">הפעל מחדש</String>
+  <String Id="FailureRestartButton">איתחול</String>
   <String Id="FailureCloseButton">סגירה</String>
   <String Id="WillInstall">[WixBundleName] יותקן במכשיר שלך</String>
   <String Id="InstallLicenseLinkText">הסכם רישיון למשתמש</String>
@@ -68,6 +68,6 @@
   <String Id="WixExecFirewallExceptionsInstall">התקנת תצורת חומת האש של Windows</String>
   <String Id="WixRollbackFirewallExceptionsUninstall">מחזיר את תצורת חומת האש של Windows</String>
   <String Id="WixExecFirewallExceptionsUninstall">הסרת ההתקנה של תצורת חומת האש של Windows</String>
-  <String Id="Product_ArchMismatch_x86">חבילה זו מיועדת מערכת הפעלה 32 סיביות. ההתקנה תסתיים כעת.</String>
-  <String Id="Product_ArchMismatch_x64">חבילה זו מיועדת עבור מערכת הפעלה של 64 סיביות. ההתקנה תסתיים כעת.</String>
+  <String Id="Product_ArchMismatch_x86">חבילה זו מיועדת עבור מערכת הפעלה של 32 סיביות. ההתקנה תסתיים כעת.</String>
+  <String Id="Product_ArchMismatch_x64">חבילה זו מיועדת מערכת הפעלה 64 סיביות. ההתקנה תסתיים כעת.</String>
 </WixLocalization>

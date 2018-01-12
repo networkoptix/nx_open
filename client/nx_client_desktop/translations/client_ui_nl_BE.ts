@@ -211,7 +211,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Audit Trail</translation>
+      <translation>Systeemrapportage</translation>
     </message>
     <message>
       <location/>
@@ -389,7 +389,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation>Gebeurtenis</translation>
     </message>
     <message>
       <location/>
@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Event regels</translation>
+      <translation>Gebeurtnisregels</translation>
     </message>
     <message>
       <location/>
@@ -535,12 +535,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -957,7 +957,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Gebeurtenissenlog</translation>
+      <translation>Logboek</translation>
     </message>
     <message>
       <location/>
@@ -995,7 +995,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -1005,7 +1005,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1322,7 +1322,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1546,12 +1546,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1569,7 +1569,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Personalisatie</translation>
+      <translation>Persoonlijke instellingen</translation>
     </message>
     <message>
       <location/>
@@ -1845,7 +1845,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Wachtwoord:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -1902,7 +1902,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Wachtwoord:</translation>
+      <translation>Password:</translation>
     </message>
     <message>
       <location/>
@@ -1912,7 +1912,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Aanmelden:</translation>
+      <translation>Gebruikersnaam:</translation>
     </message>
     <message>
       <location/>
@@ -2243,7 +2243,7 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation>Zoek</translation>
+      <translation>Search</translation>
     </message>
   </context>
   <context>
@@ -2479,12 +2479,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -2723,12 +2723,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Aanmelden:</translation>
+      <translation>Gebruikersnaam:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>Wachtwoord:</translation>
+      <translation>Password:</translation>
     </message>
   </context>
   <context>
@@ -2845,12 +2845,12 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
+      <translation>Profielen bewerken...</translation>
     </message>
   </context>
   <context>

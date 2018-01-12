@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>出现未知的错误。</translation>
+      <translation>未知的错误.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>免费</translation>
+      <translation>可用</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>时效性</translation>
+      <translation>时间</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -542,7 +542,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知错误</translation>
+      <translation>未知的错误</translation>
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
@@ -647,11 +647,11 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>免费许可</translation>
+      <translation>免费授权</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -835,7 +835,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -1294,7 +1294,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n次，第一次：%2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 次，第一次︰ %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1449,7 +1449,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
     <message>
       <source>Select at least one user</source>

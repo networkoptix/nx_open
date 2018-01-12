@@ -1665,7 +1665,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Erweitert</translation>
+      <translation>Experte</translation>
     </message>
   </context>
   <context>
@@ -2424,7 +2424,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Erweitert</translation>
+      <translation>Experte</translation>
     </message>
     <message>
       <location/>

@@ -285,7 +285,7 @@ to view more bookmarks</source>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>登录到 %1</translation>
+      <translation>登录到 %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -307,7 +307,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>事件规则</translation>
+      <translation>事件规则...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -929,7 +929,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>出现未知的错误。</translation>
+      <translation>未知的错误.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1107,7 +1107,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>共享视窗</translation>
+      <translation>共享的布局</translation>
     </message>
     <message>
       <source>All</source>
@@ -1272,7 +1272,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>摄像机与资源</translation>
+      <translation>所有的摄像机与资源</translation>
     </message>
   </context>
   <context>
@@ -1716,11 +1716,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>所有设备</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>所有摄像机</translation>
+      <translation>任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -1794,11 +1794,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>所有设备</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>所有摄像机</translation>
+      <translation>任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -1831,11 +1831,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>所有设备</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>所有摄像机</translation>
+      <translation>任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -4149,7 +4149,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>忘记密码?</translation>
+      <translation>忘记密码？</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4163,7 +4163,7 @@ to %1</source>
     <message>
       <source>Welcome to %1!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>欢迎来到 %1</translation>
+      <translation>欢迎来到 %1!</translation>
     </message>
   </context>
   <context>
@@ -4313,7 +4313,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>无法联网系统</translation>
+      <translation>无法合并系统</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
@@ -4333,11 +4333,11 @@ to %1</source>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将很快合并</translation>
+      <translation>系统将于短期内合并</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>您将被重新连接。</translation>
+      <translation>将重连.</translation>
     </message>
   </context>
   <context>
@@ -4371,11 +4371,11 @@ to %1</source>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>启用副码流</translation>
+      <translation>启用次码流</translation>
     </message>
     <message>
       <source>multiple values</source>
-      <translation>多个值</translation>
+      <translation>多重取值</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -5106,7 +5106,7 @@ to %1</source>
     <name>QnScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>所有</translation>
+      <translation>全部</translation>
     </message>
   </context>
   <context>
@@ -5193,7 +5193,7 @@ to %1</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>任何服务器</translation>
+      <translation>所有服务器</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -5218,7 +5218,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5724,7 +5724,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
+      <translation>密码不能为空.</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5783,7 +5783,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>网络链接错误</translation>
+      <translation>网络错误</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -5856,7 +5856,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O模块设置</translation>
+      <translation>I/O 模板设置</translation>
     </message>
     <message>
       <source>Diagnostics</source>
@@ -5966,11 +5966,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>存档备份完成於 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>档案备份被完成 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>下次备份时程为 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>下一次备份被定于 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6344,7 +6344,7 @@ to %1</source>
     </message>
     <message>
       <source>Time</source>
-      <translation>时间</translation>
+      <translation>时效性</translation>
     </message>
   </context>
   <context>
@@ -6430,12 +6430,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy h:mm ap</translation>
+      <translation>dd日 MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>
@@ -6823,7 +6823,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
+      <translation>密码不能为空.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7143,7 +7143,7 @@ to %1</source>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将于短期内合并</translation>
+      <translation>系统将很快合并</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
@@ -7687,7 +7687,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
   </context>
   <context>

@@ -1143,11 +1143,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Preset jest używany w niektórych cyklach. Czy na pewno go usunąć?</translation>
+      <translation>Preset jest używany w niektórych trasach. Czy na pewno go usunąć?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation>Te cykle staną się nieprawidłowe.</translation>
+      <translation>Te trasy staną się nieprawidłowe.</translation>
     </message>
   </context>
   <context>
@@ -4632,7 +4632,7 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>Jest to również wymagane do tworzenia/edycji presetów PTZ i cykli.</translation>
+      <translation>Jest to również wymagane do tworzenia/edycji presetów PTZ i tras.</translation>
     </message>
     <message>
       <source>Control video walls</source>
@@ -4716,7 +4716,7 @@ to %1</source>
     </message>
     <message>
       <source>Tours</source>
-      <translation>Cykle</translation>
+      <translation>Trasy</translation>
     </message>
     <message>
       <source>Positions</source>
@@ -4737,8 +4737,8 @@ to %1</source>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>Cykl ma %n identyczną pozycję</numerusform>
-        <numerusform>Cykl ma %n identyczne pozycje</numerusform>
+        <numerusform>Trasa ma %n identyczną pozycję</numerusform>
+        <numerusform>Trasa ma %n identyczne pozycje</numerusform>
         <numerusform>Cykl ma %n identycznych pozycji</numerusform>
       </translation>
     </message>
@@ -4756,11 +4756,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation>Nieprawidłowy cykl</translation>
+      <translation>Nieprawidłowa trasa</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation>Nowy cykl %1</translation>
+      <translation>Nowa trasa %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
@@ -4768,11 +4768,11 @@ to %1</source>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>Cykl powinien zawierać co najmniej 2 pozycje.</translation>
+      <translation>Trasa powinna zawierać co najmniej 2 pozycje.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>Czas cyklu: %1.</translation>
+      <translation>Czas trasy: %1.</translation>
     </message>
   </context>
   <context>
@@ -4802,7 +4802,7 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>Przycisk skrótu używany przez cykl &quot;%1&quot;</translation>
+      <translation>Przycisk skrótu używany przez trasę &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -6559,12 +6559,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>g:mm ap</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>
@@ -8203,7 +8203,7 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Delete layout tour %1?</source>
-      <translation>Usunąć układ cykliczny %1?</translation>
+      <translation>Usunąć cykl układu %1?</translation>
     </message>
     <message>
       <source>Showreel</source>

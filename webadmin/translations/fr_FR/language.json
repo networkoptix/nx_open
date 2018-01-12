@@ -116,13 +116,13 @@
     "common": {
         "systemOffline": "System Hors ligne",
         "cameraLinks": {
-            "copyToClipboard": "copier vers presse-papier",
+            "copyToClipboard": "copier vers Presse-Papier",
             "highStream": "Flux Haut",
             "copyDefaultText": "copier",
             "unknown": "Inconnu",
             "lowStream": "Flux Bas",
             "transcoding": "Transcodage",
-            "copyActiveText": "copié dvers presse-papiers"
+            "copyActiveText": "copié dans le presse-papiers"
         },
         "searchCamPlaceholder": "recherche",
         "cameraStates": {

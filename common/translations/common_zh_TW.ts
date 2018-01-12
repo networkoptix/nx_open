@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>無法初始化聲音編碼器。</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時效性</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -835,7 +835,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -986,7 +986,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>自定</translation>
+      <translation>自訂</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1434,7 +1434,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n 使用者</numerusform>
+        <numerusform>%n 個使用者</numerusform>
       </translation>
     </message>
     <message numerus="yes">
