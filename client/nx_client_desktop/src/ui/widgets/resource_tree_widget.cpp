@@ -36,6 +36,9 @@
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
+
+using namespace nx::client::desktop;
+
 class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
 {
     typedef QnResourceSearchProxyModel base_type;
@@ -351,6 +354,10 @@ Qn::GraphicsTweaksFlags QnResourceTreeWidget::graphicsTweaks()
 void QnResourceTreeWidget::setFilterVisible(bool visible)
 {
     ui->filter->setVisible(visible);
+
+    static const auto kDefaultMargins = QMargins(0, 8, 0, 0);
+    static const auto kMarginsWithFilter = QMargins(0, 0, 0, 0);
+    layout()->setContentsMargins(visible ? kMarginsWithFilter : kDefaultMargins);
 }
 
 bool QnResourceTreeWidget::isFilterVisible() const
@@ -536,18 +543,30 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 
 void QnResourceTreeWidget::initializeFilter()
 {
-    // TODO: #vkutin replace with SearchLineEdit
-    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
-        QLineEdit::LeadingPosition);
-    ui->filterLineEdit->setClearButtonEnabled(true);
+    static const auto kFilterCategories = QStringList({
+        tr("All types"),
+        QString(), // spliter
+        tr("Servers"),
+        tr("Cameras & Devices"),
+        tr("Layouts"),
+        tr("Layout Tours"),
+        tr("Web Pages"),
+        tr("Users"),
+        tr("Local Files")});
+
     ui->filter->setVisible(false);
 
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
-        &QnResourceTreeWidget::updateFilter);
-    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
-        &QnResourceTreeWidget::updateFilter);
+    const auto filterEdit = ui->filterLineEdit;
+    filterEdit->setTags(kFilterCategories);
+    filterEdit->setClearingTagIndex(0);
 
-    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
+    connect(filterEdit, &SearchEdit::textChanged,
+        this, &QnResourceTreeWidget::updateFilter);
+
+    connect(filterEdit, &SearchEdit::editingFinished,
+        this, &QnResourceTreeWidget::updateFilter);
+
+    installEventHandler(filterEdit, QEvent::KeyPress, this,
         [this](QObject* /*object*/, QEvent* event)
         {
             const auto keyEvent = static_cast<QKeyEvent*>(event);

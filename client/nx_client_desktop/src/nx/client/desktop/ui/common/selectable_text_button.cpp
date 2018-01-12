@@ -43,6 +43,7 @@ struct SelectableTextButton::Private
     bool deactivatedTextSet = false;
     QIcon deactivatedIcon;
     bool deactivatedIconSet = false;
+    bool selectable = true;
 };
 
 SelectableTextButton::SelectableTextButton(QWidget* parent):
@@ -78,6 +79,9 @@ void SelectableTextButton::setState(State value)
     if (value == State::deactivated && !deactivatable())
         return;
 
+    if (value == State::selected && !selectable())
+        return;
+
     d->state = value;
 
     if (d->deactivateButton)
@@ -95,6 +99,22 @@ void SelectableTextButton::setState(State value)
 
     update();
     emit stateChanged(value);
+}
+
+bool SelectableTextButton::selectable() const
+{
+    return d->selectable;
+}
+
+void SelectableTextButton::setSelectable(bool value)
+{
+    if (selectable() == value)
+        return;
+
+    d->selectable = value;
+
+    if (d->selectable && state() == State::selected )
+        setState(State::unselected);
 }
 
 bool SelectableTextButton::deactivatable() const
@@ -227,7 +247,7 @@ QSize SelectableTextButton::sizeHint() const
 
 QSize SelectableTextButton::minimumSizeHint() const
 {
-    const auto textSize = QFontMetrics(font()).size(Qt::TextHideMnemonic, effectiveText());
+    const auto textSize = QFontMetrics(font()).size(0, effectiveText());
     const auto iconSize = QnSkin::maximumSize(effectiveIcon());
 
     int extraWidth = iconSize.isValid()

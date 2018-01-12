@@ -89,6 +89,7 @@ public:
     void showToolTip();
 
     void clearSelection();
+
 signals:
     void currentTabChanged();
     void selectionChanged();
@@ -127,6 +128,8 @@ private:
     void setTooltipResource(const QnResourcePtr& camera);
 
     void selectIndices(const QModelIndexList& indices);
+
+    void initNewSearch();
 
 private slots:
     void updateFilter(bool force = false);

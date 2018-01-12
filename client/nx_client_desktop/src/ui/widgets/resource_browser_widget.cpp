@@ -155,61 +155,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         }
     );
 
-#ifdef _TREE_SEARCH_32
-    ui->resourceTreeWidget->setFilterVisible();
-
-    auto getFilteredResources =
-        [this]()
-        {
-            const auto model = ui->resourceTreeWidget->searchModel();
-            QnResourceList result;
-            if (!model)
-                return result;
-
-            QSet<QnResourcePtr> resources;
-            std::function<void(const QModelIndex& index)> getRecursive;
-            getRecursive =
-                [model, &resources, &result, &getRecursive](const QModelIndex& index)
-                {
-                    const int childCount = model->rowCount(index);
-                    const bool hasChildren = childCount > 0;
-                    if (hasChildren)
-                    {
-                        for (int i = 0; i < childCount; i++)
-                            getRecursive(model->index(i, 0, index));
-                    }
-                    else
-                    {
-                        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                        if (!resource || !QnResourceAccessFilter::isOpenableInLayout(resource))
-                            return;
-
-                        if (resources.contains(resource))
-                            return;
-
-                        resources.insert(resource); //< Avoid duplicates.
-                        result.push_back(resource); //< Keep sort order.
-                    }
-                };
-
-            getRecursive(QModelIndex());
-            return result;
-        };
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
-        [this, getFilteredResources]
-        {
-            auto selected = getFilteredResources();
-            menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
-        });
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
-        [this, getFilteredResources]
-        {
-            auto selected = getFilteredResources();
-            menu()->trigger(action::OpenInNewTabAction, {selected});
-        });
-#endif
+    initNewSearch();
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
 
@@ -281,6 +227,65 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     updateIcons();
 
     at_workbench_currentLayoutChanged();
+}
+
+void QnResourceBrowserWidget::initNewSearch()
+{
+    ui->tabWidget->tabBar()->hide();
+
+    ui->resourceTreeWidget->setFilterVisible();
+
+    auto getFilteredResources =
+        [this]()
+        {
+            const auto model = ui->resourceTreeWidget->searchModel();
+            QnResourceList result;
+            if (!model)
+                return result;
+
+            QSet<QnResourcePtr> resources;
+            std::function<void(const QModelIndex& index)> getRecursive;
+            getRecursive =
+                [model, &resources, &result, &getRecursive](const QModelIndex& index)
+                {
+                    const int childCount = model->rowCount(index);
+                    const bool hasChildren = childCount > 0;
+                    if (hasChildren)
+                    {
+                        for (int i = 0; i < childCount; i++)
+                            getRecursive(model->index(i, 0, index));
+                    }
+                    else
+                    {
+                        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                        if (!resource || !QnResourceAccessFilter::isOpenableInLayout(resource))
+                            return;
+
+                        if (resources.contains(resource))
+                            return;
+
+                        resources.insert(resource); //< Avoid duplicates.
+                        result.push_back(resource); //< Keep sort order.
+                    }
+                };
+
+            getRecursive(QModelIndex());
+            return result;
+        };
+
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
+        [this, getFilteredResources]
+        {
+            auto selected = getFilteredResources();
+            menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
+        });
+
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
+        [this, getFilteredResources]
+        {
+            auto selected = getFilteredResources();
+            menu()->trigger(action::OpenInNewTabAction, {selected});
+        });
 }
 
 QnResourceBrowserWidget::~QnResourceBrowserWidget()
