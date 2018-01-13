@@ -198,7 +198,7 @@ protected:
                     auto error = SystemError::getLastOSErrorCode();
                     if (error != SystemError::timedOut && error != SystemError::wouldBlock)
                     {
-                        ASSERT_EQ(0, error);
+                        ASSERT_EQ(SystemError::noError, error);
                         break; //< Send error.
                     }
                 }
@@ -322,7 +322,7 @@ private:
 
         std::unique_ptr<AbstractStreamSocket> client(server->accept());
         ASSERT_TRUE((bool)client);
-        client->setRecvTimeout(kClientDelay);
+        ASSERT_TRUE(client->setRecvTimeout(kClientDelay));
 
         QByteArray wholeData;
         wholeData.reserve(kBufferSize * sizeof(int) * kIterations);
@@ -343,7 +343,7 @@ private:
                 auto errCode = SystemError::getLastOSErrorCode();
                 if (errCode != SystemError::timedOut && errCode != SystemError::again)
                 {
-                    ASSERT_EQ(0, errCode);
+                    ASSERT_EQ(SystemError::noError, errCode);
                     ASSERT_TRUE(client->isConnected());
                 }
             }
