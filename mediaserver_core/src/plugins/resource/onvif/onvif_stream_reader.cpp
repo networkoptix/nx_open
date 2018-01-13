@@ -43,9 +43,6 @@ struct CameraInfoParams
 QnOnvifStreamReader::QnOnvifStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res),
-    m_cachedFps(-1),
-    m_cachedQuality(Qn::QualityNotDefined),
-    m_cachedSecondaryQuality(Qn::QualityNotDefined),
     m_mustNotConfigureResource(false)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
@@ -118,7 +115,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
 void QnOnvifStreamReader::setCameraControlDisabled(bool value)
 {
     if (!value)
-        m_cachedQuality = Qn::QualityNotDefined;
+        m_previousStreamParams = QnLiveStreamParams();
     CLServerPushStreamReader::setCameraControlDisabled(value);
 }
 
@@ -126,9 +123,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
 {
     //QnMutexLocker lock( m_onvifRes->getStreamConfMutex() );
 
-    int currentFps = params.fps;
-    Qn::StreamQuality currentQuality = params.quality;
-    Qn::StreamQuality secondaryQuality = m_onvifRes->getSecondaryStreamQuality();
 
     if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
     {
@@ -137,9 +131,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     }
 
     if (!m_streamUrl.isEmpty() &&
-        currentFps == m_cachedFps &&
-        currentQuality == m_cachedQuality &&
-        (secondaryQuality == m_cachedSecondaryQuality || getRole() != Qn::CR_SecondaryLiveVideo) &&
+        params == m_previousStreamParams &&
         m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         *streamUrl = m_streamUrl;
@@ -151,18 +143,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     m_onvifRes->customStreamConfiguration(getRole());
     m_onvifRes->afterConfigureStream(getRole());
 
-    if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
+    if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
+    {
         // cache value
         m_streamUrl = *streamUrl;
-        if (isCameraControlRequired) {
-            m_cachedQuality = currentQuality;
-            m_cachedFps = currentFps;
-            m_cachedTimer.restart();
-            m_cachedSecondaryQuality = secondaryQuality;
-        }
-        else {
-            m_cachedFps = -1;
-        }
+        if (isCameraControlRequired)
+            m_previousStreamParams = params;
+        else
+            m_previousStreamParams = QnLiveStreamParams();
     }
     return result;
 }
@@ -724,10 +712,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == Qn::CR_LiveVideo)
     {
-        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) 
+        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty())
         {
             bool ptzMatched = profile && profile->PTZConfiguration;
-            if (!ptzMatched) 
+            if (!ptzMatched)
             {
                 AddPTZConfigReq request;
                 AddPTZConfigResp response;
@@ -736,7 +724,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
                 request.ConfigurationToken = m_onvifRes->getPtzConfigurationToken().toStdString();
 
                 int soapRes = soapWrapper.addPTZConfiguration(request, response);
-                if (soapRes != SOAP_OK) 
+                if (soapRes != SOAP_OK)
                 {
 #ifdef PL_ONVIF_DEBUG
                     qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: "

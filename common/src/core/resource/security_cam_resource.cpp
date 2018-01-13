@@ -64,7 +64,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_manuallyAdded(false),
     m_cachedLicenseType([this] { return calculateLicenseType(); }, &m_mutex),
     m_cachedHasDualStreaming2(
-        [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
+        [this]()->bool{ return hasDualStreaming() && !isDualStreamingDisabled(); },
         &m_mutex ),
     m_cachedSupportedMotionType(
         std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
@@ -1089,23 +1089,23 @@ Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() cons
     return value;
 }
 
-void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality)
+void QnSecurityCamResource::setDisableDualStreaming(bool value)
 {
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), getId());
-        if ((*userAttributesLock)->secondaryQuality == quality)
+        if ((*userAttributesLock)->disableDualStreaming == value)
             return;
-        (*userAttributesLock)->secondaryQuality = quality;
+        (*userAttributesLock)->disableDualStreaming = value;
     }
 
     m_cachedHasDualStreaming2.reset();
     emit secondaryStreamQualityChanged(toSharedPointer());
 }
 
-Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
+bool QnSecurityCamResource::isDualStreamingDisabled() const
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    return (*userAttributesLock)->secondaryQuality;
+    return (*userAttributesLock)->disableDualStreaming;
 }
 
 void QnSecurityCamResource::setCameraControlDisabled(bool value)
@@ -1124,28 +1124,22 @@ bool QnSecurityCamResource::isCameraControlDisabled() const
     return (*userAttributesLock)->cameraControlDisabled;
 }
 
-int QnSecurityCamResource::desiredSecondStreamFps() const
+int QnSecurityCamResource::defaultSecondaryFps(Qn::StreamQuality quality) const
 {
-    switch (secondaryStreamQuality())
+    switch (quality)
     {
-        case Qn::SSQualityMedium:
+        case Qn::QualityLowest:
+        case Qn::QualityLow:
             return kDefaultSecondStreamFpsMedium;
-        case Qn::SSQualityLow:
+        case Qn::QualityNormal:
             return kDefaultSecondStreamFpsLow;
-        case Qn::SSQualityHigh:
+        case Qn::QualityHigh:
+        case Qn::QualityHighest:
             return kDefaultSecondStreamFpsHigh;
         default:
             break;
     }
     return kDefaultSecondStreamFpsMedium;
-}
-
-Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
-{
-    if (secondaryStreamQuality() != Qn::SSQualityHigh)
-        return Qn::QualityLowest;
-    else
-        return Qn::QualityNormal;
 }
 
 Qn::CameraStatusFlags QnSecurityCamResource::statusFlags() const

@@ -35,15 +35,10 @@ private slots:
 
     void at_restoreDefaultsButton_clicked();
 
-    void at_secondStreamQualityChanged();
-
     void updateControlBlock();
 
 private:
     bool areDefaultValues() const;
-
-    Qn::SecondStreamQuality selectedSecondStreamQuality() const;
-    void setSelectedSecondStreamQuality(Qn::SecondStreamQuality value) const;
 
     bool isArecontCamera(const QnVirtualCameraResourcePtr &camera) const;
     bool isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const;

@@ -21,6 +21,7 @@
 #include <core/resource/resource_media_layout.h>
 
 #include <analytics/common/video_metadata_plugin.h>
+#include <core/dataprovider/live_stream_params.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -35,18 +36,6 @@ class NaiveDetectionSmoother;
 } // namespace nx
 
 class QnLiveStreamProvider;
-
-struct QnLiveStreamParams
-{
-    Qn::StreamQuality quality = Qn::QualityNotDefined;
-    Qn::SecondStreamQuality secondaryQuality = Qn::SSQualityLow;
-    float fps = 0;
-    int bitrateKbps = 0;
-
-    QnLiveStreamParams();
-    bool operator ==(const QnLiveStreamParams& rhs);
-    bool operator !=(const QnLiveStreamParams& rhs);
-};
 
 class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {

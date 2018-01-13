@@ -342,7 +342,6 @@ void QnServerStreamRecorder::updateStreamParams()
                 params.quality = Qn::QualityHighest;
                 params.bitrateKbps = 0;
             }
-            params.secondaryQuality = (camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
             liveProvider->setParams(params);
         }
         liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
@@ -493,14 +492,14 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
         if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
-            return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
+            return QnLiveStreamParams::kFpsNotInitialized;
     }
     else
     {
         if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? fps : camera->getMaxFps();
         else
-            return camera->desiredSecondStreamFps();
+            return QnLiveStreamParams::kFpsNotInitialized;
     }
 }
 

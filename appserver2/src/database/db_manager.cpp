@@ -1994,7 +1994,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :motionMask,
             :scheduleEnabled,
             :motionType,
-            :secondaryStreamQuality,
+            :disableDualStreaming,
             :dewarpingParams,
             :minArchiveDays,
             :maxArchiveDays,
@@ -3431,7 +3431,7 @@ ErrorCode QnDbManager::doQueryNoLock(
             region as motionMask,                        \
             schedule_enabled as scheduleEnabled,         \
             motion_type as motionType,                   \
-            secondary_quality as secondaryStreamQuality, \
+            secondary_quality as disableDualStreaming, \
             dewarping_params as dewarpingParams,         \
             coalesce(min_archive_days, %1) as minArchiveDays,             \
             coalesce(max_archive_days, %2) as maxArchiveDays,             \
@@ -3492,7 +3492,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
             cu.region as motionMask,                           \
             cu.schedule_enabled as scheduleEnabled,            \
             cu.motion_type as motionType,                      \
-            cu.secondary_quality as secondaryStreamQuality,    \
+            cu.secondary_quality as disableDualStreaming,    \
             cu.dewarping_params as dewarpingParams,            \
             coalesce(cu.min_archive_days, %1) as minArchiveDays,             \
             coalesce(cu.max_archive_days, %2) as maxArchiveDays,             \

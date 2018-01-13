@@ -6,6 +6,7 @@ extern "C"
 }
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <common/common_globals.h>
 
 class CameraMediaStreamInfo
 {

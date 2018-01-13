@@ -215,14 +215,14 @@ public:
     virtual const QnResourcePtr toResourcePtr() const override;
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
-    void setSecondaryStreamQuality(Qn::SecondStreamQuality  quality);
-    Qn::SecondStreamQuality  secondaryStreamQuality() const;
+
+    void setDisableDualStreaming(bool value);
+    bool isDualStreamingDisabled() const;
 
     void setCameraControlDisabled(bool value);
     bool isCameraControlDisabled() const;
 
-    int desiredSecondStreamFps() const;
-    Qn::StreamQuality getSecondaryStreamQuality() const;
+    int defaultSecondaryFps(Qn::StreamQuality quality) const;
 
     // TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;

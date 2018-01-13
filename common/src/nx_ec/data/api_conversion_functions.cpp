@@ -262,7 +262,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
 
     dst->audioEnabled = src.audioEnabled;
 
-    dst->secondaryQuality = src.secondaryStreamQuality;
+    dst->disableDualStreaming = src.disableDualStreaming;
     dst->cameraControlDisabled = !src.controlEnabled;
     dst->dewarpingParams = QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams);
     dst->minDays = src.minArchiveDays;
@@ -292,7 +292,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     }
 
     dst.audioEnabled = src->audioEnabled;
-    dst.secondaryStreamQuality = src->secondaryQuality;
+    dst.disableDualStreaming = src->disableDualStreaming;
     dst.controlEnabled = !src->cameraControlDisabled;
     dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;

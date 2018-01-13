@@ -63,7 +63,7 @@ private:
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired, const QnLiveStreamParams& params) const;
     CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
-    
+
     CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
     Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;
@@ -103,10 +103,8 @@ private:
     onvifXsd__H264Configuration* m_tmpH264Conf;
 
     QString m_streamUrl;
-    int m_cachedFps;
-    Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
-    Qn::StreamQuality m_cachedSecondaryQuality;
+    QnLiveStreamParams m_previousStreamParams;
     bool m_mustNotConfigureResource;
 };
 

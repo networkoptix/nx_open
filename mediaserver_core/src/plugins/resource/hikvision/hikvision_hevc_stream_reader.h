@@ -43,10 +43,6 @@ private:
         Qn::StreamQuality quality,
         const hikvision::ChannelCapabilities& channelCapabilities) const;
 
-    boost::optional<int> chooseQuality(
-        Qn::SecondStreamQuality quality,
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
-
     boost::optional<int> rescaleQuality(
         const std::vector<int>& outputQuality,
         int inputScaleSize,
