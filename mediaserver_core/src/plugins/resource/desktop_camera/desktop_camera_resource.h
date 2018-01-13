@@ -38,6 +38,7 @@ public:
     virtual bool isReadyToDetach() const override;
 
     virtual bool isInitialized() const override { return true; }
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

@@ -71,4 +71,9 @@ bool QnDesktopCameraResource::isReadyToDetach() const {
     return !QnDesktopCameraResourceSearcher::instance()->isCameraConnected(camera);  // check if we have already lost connection
 }
 
+CameraDiagnostics::Result QnDesktopCameraResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 #endif //ENABLE_DESKTOP_CAMERA
