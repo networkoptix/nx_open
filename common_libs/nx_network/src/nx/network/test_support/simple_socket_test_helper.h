@@ -1091,14 +1091,9 @@ void socketIsUsefulAfterCancelIo(
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 
-    ASSERT_FALSE((bool) server->accept());
-
     auto client = clientMaker();
     ASSERT_TRUE(client->setNonBlockingMode(true));
-    ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
-    ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->connect(*endpointToConnectTo, nx::network::kNoTimeout));
-    ASSERT_TRUE(client->setNonBlockingMode(true));
 
     ASSERT_TRUE(server->setRecvTimeout(0));
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
