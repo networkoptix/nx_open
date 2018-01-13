@@ -48,7 +48,7 @@ protected:
 
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     void setChunks(const QnTimePeriodList& chunks);
-    nx::mediaserver::resource::CameraPtr getOtherResource(int channel);
+    QnSecurityCamResourcePtr getOtherResource(int channel);
     virtual Qn::LicenseType calculateLicenseType() const override;
 
 private slots:

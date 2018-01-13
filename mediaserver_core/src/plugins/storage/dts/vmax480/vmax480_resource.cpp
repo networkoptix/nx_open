@@ -192,14 +192,14 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     {
         for (int i = 0; i < VMAX_MAX_CH; ++i)
         {
-            nx::mediaserver::resource::CameraPtr otherRes = getOtherResource(i);
+            QnSecurityCamResourcePtr otherRes = getOtherResource(i);
             if (otherRes && otherRes.data() != this)
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
 }
 
-nx::mediaserver::resource::CameraPtr QnPlVmax480Resource::getOtherResource(int channel)
+QnSecurityCamResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
     QUrlQuery urlQuery(url.query());
@@ -220,7 +220,7 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
     if (channel == getChannel())
         setChunks(chunks);
     else {
-        nx::mediaserver::resource::CameraPtr otherRes = getOtherResource(channel);
+        QnSecurityCamResourcePtr otherRes = getOtherResource(channel);
         if (otherRes)
             otherRes.dynamicCast<QnPlVmax480Resource>()->setChunks(chunks);
     }
