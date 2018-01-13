@@ -241,14 +241,21 @@ protected:
         m_handler = nullptr;
 
         NX_VERBOSE(this, lm("ivokeUserCallback, status: %1").arg(m_errorCode));
-        switch(m_exitStatus)
+        switch (m_exitStatus)
         {
             case SslAsyncOperation::EXCEPTION:
-                return handler(SystemError::connectionAbort);
+                // In case of SSL-error we do not have system error code,
+                // but connection is still broken.
+                return handler(m_errorCode == SystemError::noError
+                    ? SystemError::connectionAbort
+                    : m_errorCode);
+
             case SslAsyncOperation::END_OF_STREAM:
                 return handler(SystemError::connectionReset);
+
             case SslAsyncOperation::SUCCESS:
                 return handler(SystemError::noError);
+
             default:
                 NX_ASSERT(false);
         }
@@ -1304,11 +1311,15 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     }
 
     if (result.first == SystemError::noError)
+    {
         std::memcpy(buffer, localBuffer.data(), result.second);
+        return result.second;
+    }
     else
+    {
         SystemError::setLastErrorCode(result.first);
-
-    return result.second;
+        return -1;
+    }
 }
 
 int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
