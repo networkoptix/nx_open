@@ -78,8 +78,10 @@ do
 
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
+        broadcast_notifications)
+            ;;
         *)
-            echo Usage: cloud_portal '[web|celery|config|copystatic|migratedb]'
+            echo Usage: cloud_portal '[web|broadcast_notifications|celery|config|copystatic|migratedb]'
             ;;
     esac
 done
