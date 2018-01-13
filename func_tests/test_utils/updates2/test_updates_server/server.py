@@ -5,6 +5,9 @@ the append_new_versions() function (see main() for example).
 If started with '--generate_data' key collects actual data from updates.networkoptix.com, makes needed amendments and
 saves result to the 'data' folder before HTTP server start. Without that key - tries to read data from the 'data'
 folder.
+Server can serve update files requests. Pre-generated dummy file is given as a response. This option might be turned off
+to test how mediaserver deals with update files absence. Run script with '--emulate_no_update_files' key to achieve
+this behavior.
 """
 
 import shutil
@@ -19,8 +22,17 @@ UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
 DATA_FOLDER_NAME = 'data'
+DUMMY_FILE_NAME = 'dummy.raw'
 UPDATES_FILE_NAME = 'updates.json'
 FILE_PATTERN = '{}.{}.json'
+
+
+def data_folder_path():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FOLDER_NAME)
+
+
+def dummy_file_path():
+    return os.path.join(data_folder_path(), DUMMY_FILE_NAME)
 
 
 def collect_actual_data():
@@ -65,7 +77,7 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 new_update_obj['version'] = new_version[1]
                 new_update_obj['cloudHost'] = new_version[2]
 
-                def amend_file_name(file_info_obj):
+                def amend_file_info_obj(file_info_obj):
                     old_file_name_splits = file_info_obj['file'].split('.')
                     new_version_splits = new_version[1].split('.')
                     new_file_name_prefix = list(old_file_name_splits[0])
@@ -78,35 +90,36 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 def amend_packages(update_obj, packages_name):
                     for os_key, os_obj in update_obj[packages_name].items():
                         for file_key, file_obj in os_obj.items():
-                            amend_file_name(file_obj)
+                            amend_file_info_obj(file_obj)
 
                 amend_packages(new_update_obj, 'clientPackages')
                 amend_packages(new_update_obj, 'packages')
 
-                path_to_update_obj[UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])] = new_update_obj
+                path_to_update_obj[UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])] = \
+                    new_update_obj
 
     return root_obj, path_to_update_obj
 
 
 def save_data_to_files(root_obj, path_to_update_obj):
-    script_path = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(script_path, DATA_FOLDER_NAME)
-    shutil.rmtree(data_path, ignore_errors=True)
-    os.mkdir(data_path)
-    file_path = os.path.join(data_path, UPDATES_FILE_NAME)
+    shutil.rmtree(data_folder_path(), ignore_errors=True)
+    os.mkdir(data_folder_path())
+    file_path = os.path.join(data_folder_path(), UPDATES_FILE_NAME)
     with open(file_path, 'w') as f:
         f.write(json.dumps(root_obj))
     for key, value in path_to_update_obj.items():
         key_splits = key.split('/')
-        file_path = os.path.join(data_path, FILE_PATTERN.format(key_splits[1], key_splits[2]))
+        file_path = os.path.join(data_folder_path(), FILE_PATTERN.format(key_splits[1], key_splits[2]))
         with open(file_path, 'w') as f:
             f.write(json.dumps(value))
 
 
 def load_data_from_files():
-    for dir_name, dirs, files in os.walk(os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FOLDER_NAME)):
+    for dir_name, dirs, files in os.walk(data_folder_path()):
         path_to_update = dict()
         for file_name in files:
+            if file_name == DUMMY_FILE_NAME:
+                continue
             file_path = os.path.join(dir_name, file_name)
             with open(file_path, 'r') as f:
                 json_obj = json.loads(f.read())
@@ -122,10 +135,11 @@ def load_data_from_files():
 def parse_args():
     parser = argparse.ArgumentParser(description='Test updates server')
     parser.add_argument('--generate_data', action="store_true", default=False)
+    parser.add_argument('--emulate_no_update_files', action="store_true", default=False)
     return parser.parse_args()
 
 
-def make_handler_class(root_obj, path_to_update):
+def make_handler_class(root_obj, path_to_update, args):
     path_to_update[UPDATES_PATH] = root_obj
 
     class TestHandler(BaseHTTPRequestHandler):
@@ -133,15 +147,39 @@ def make_handler_class(root_obj, path_to_update):
             self.path_to_update = path_to_update
             super().__init__(*args, **kwargs)
 
-        def _send_ok_headers(self):
+        def _send_ok_headers(self, content_type):
             self.send_response(200)
-            self.send_header('Content-type', 'application/json')
+            self.send_header('Content-type', content_type)
             self.end_headers()
 
         def do_GET(self):
             if self.path in self.path_to_update:
-                self._send_ok_headers()
+                self._send_ok_headers('application/json')
                 self.wfile.write(bytes(json.dumps(self.path_to_update[self.path]), encoding='utf-8'))
+            elif self.path.endswith('.zip') and not args.emulate_no_update_files:
+                path_components = self.path.split('/')
+                possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
+                requested_file_name = path_components[-1]
+                if possible_path_key in self.path_to_update:
+                    update_obj = self.path_to_update[possible_path_key]
+
+                    def find_file_in_packages(packages_name):
+                        for os_key, os_obj in update_obj[packages_name].items():
+                            for file_key, file_obj in os_obj.items():
+                                if file_obj['file'] == requested_file_name:
+                                    return True
+
+                    if find_file_in_packages('packages') or find_file_in_packages('clientPackages'):
+                        if not os.path.exists(dummy_file_path()):
+                            raise Exception('Dummy file not found')
+                        else:
+                            self._send_ok_headers('application/zip')
+                            with open(dummy_file_path()) as f:
+                                while True:
+                                    read_buf = f.read(4096)
+                                    if len(read_buf) <= 0:
+                                        break
+                                    self.wfile.write(bytes(read_buf, encoding='utf-8'))
             else:
                 self.send_response(404)
                 self.end_headers()
@@ -156,17 +194,20 @@ def main():
         new_root, new_path_to_update_obj = append_new_versions(*collect_actual_data(),
                                                                [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')])
         save_data_to_files(new_root, new_path_to_update_obj)
+        with open(dummy_file_path(), 'wb') as f:
+            f.seek(1024 * 1024 * 100)
+            f.write(b'\0')
     else:
-        try:
-            new_root, new_path_to_update_obj = load_data_from_files()
-        except Exception as e:
-            print(e)
-            print('Failed to load test data. Did you forget to generate it first?')
-            return
+        new_root, new_path_to_update_obj = load_data_from_files()
 
     server_address = ('', 8080)
     print('Starting HTTP server')
-    HTTPServer(server_address, make_handler_class(new_root, new_path_to_update_obj)).serve_forever()
+    try:
+        server = HTTPServer(server_address, make_handler_class(new_root, new_path_to_update_obj, args))
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print('Shutting down...')
+        server.shutdown()
 
 
 if __name__ == '__main__':
