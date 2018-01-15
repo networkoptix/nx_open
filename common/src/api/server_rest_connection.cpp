@@ -459,9 +459,11 @@ Handle ServerConnection::addWearableCameraAsync(
     GetCallback callback,
     QThread* targetThread)
 {
-    return executeGet(
+    return executePost(
         lit("/api/wearableCamera/add"),
         QnRequestParamList{ { lit("name"), name } },
+        QByteArray(),
+        QByteArray(),
         callback,
         targetThread);
 }
@@ -473,12 +475,14 @@ Handle ServerConnection::consumeWearableCameraFileAsync(
     PostCallback callback,
     QThread* targetThread)
 {
-    return executeGet(
+    return executePost(
         lit("/api/wearableCamera/consume"),
         QnRequestParamList{
             { lit("cameraId"), camera->getId().toSimpleString() },
             { lit("uploadId"), uploadId },
             { lit("startTime"), QString::number(startTimeMs) } },
+        QByteArray(),
+        QByteArray(),
         callback,
         targetThread);
 }

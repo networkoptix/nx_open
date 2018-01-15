@@ -21,9 +21,10 @@ QStringList QnWearableCameraRestHandler::cameraIdUrlParams() const
     return {lit("cameraId")};
 }
 
-int QnWearableCameraRestHandler::executeGet(
+int QnWearableCameraRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
+    const QByteArray& /*body*/,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {

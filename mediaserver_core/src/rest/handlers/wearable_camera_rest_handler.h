@@ -9,11 +9,12 @@ class QnWearableCameraRestHandler: public QnJsonRestHandler
 public:
     virtual QStringList cameraIdUrlParams() const override;
 
-    virtual int executeGet(
+    virtual int executePost(
         const QString& path,
         const QnRequestParams& params,
+        const QByteArray& body,
         QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
+        const QnRestConnectionProcessor* owner);
 
 private:
     int executeAdd(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
