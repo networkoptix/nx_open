@@ -10,7 +10,7 @@ class QnResourcePool;
 
 struct QnBaseMultiserverRequestData
 {
-    static const Qn::SerializationFormat kDefaultFormat = Qn::SerializationFormat::JsonFormat;
+    static const Qn::SerializationFormat kDefaultFormat;
 
     bool isLocal = false; //< If set, the request should not be redirected to another server.
     Qn::SerializationFormat format = kDefaultFormat;
