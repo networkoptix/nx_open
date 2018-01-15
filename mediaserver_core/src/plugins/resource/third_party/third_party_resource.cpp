@@ -125,10 +125,10 @@ QSet<QString> QnThirdPartyResource::setApiParamiters(const QnCameraAdvancedParam
         return QSet<QString>();
 
     QSet<QString> ids;
-    for (const auto& id: values)
+    for (auto it = values.begin(); it != values.end(); ++it)
     {
-        if (setParam(id.toUtf8().constData(), values.value(id).toUtf8().constData()))
-            ids.insert(id);
+        if (setParam(it.key().toUtf8().constData(), it.value().toUtf8().constData()))
+            ids.insert(it.key());
     }
 
     return setParam("", "}") ? ids : QSet<QString>();

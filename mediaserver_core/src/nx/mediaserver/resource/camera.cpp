@@ -119,7 +119,7 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
 {
     if (m_defaultAdvancedParametersProviders == nullptr)
     {
-        NX_ASSERT(this, "Get advanced paramiters with no providers");
+        NX_ASSERT(this, "Get advanced parameters with no providers");
         return {};
     }
 
@@ -143,9 +143,13 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
     {
         const auto provider = providerIds.first;
         const auto& ids = providerIds.second;
-        const auto values = provider->get(ids);
-        for (const auto& id: values)
-            result.insert(id, values.value(id));
+
+        auto values = provider->get(ids);
+        NX_VERBOSE(this, lm("Get advanced parameters %1 by %2, result %3").args(
+            containerString(ids), provider, containerString(values)));
+
+        for (auto it = values.begin(); it != values.end(); ++it)
+            result.insert(it.key(), it.value());
     }
 
     return result;
@@ -188,7 +192,12 @@ QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap&
     {
         const auto provider = providerValues.first;
         const auto& values = providerValues.second;
-        result += provider->set(values);
+
+        auto ids = provider->set(values);
+        NX_VERBOSE(this, lm("Set advanced parameters %1 by %2, result %3").args(
+            containerString(values), provider, containerString(ids)));
+
+        result += std::move(ids);
     }
 
     return result;
@@ -346,6 +355,13 @@ CameraDiagnostics::Result Camera::initInternal()
             advancedParameters = std::move(providerParamiters);
         else
             advancedParameters.merge(providerParamiters);
+    }
+
+    if (m_defaultAdvancedParametersProviders)
+    {
+        NX_VERBOSE(this, lm("Default advanced parameters provider %1, providers by params: %2").args(
+            m_defaultAdvancedParametersProviders,
+            containerString(m_advancedParametersProvidersByParameterId)));
     }
 
     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);

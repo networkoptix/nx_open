@@ -180,10 +180,10 @@ public:
         virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override
         {
             QSet<QString> ids;
-            for (const auto& id: values)
+            for (auto it = values.begin(); it != values.end(); ++it)
             {
-                if (this->m_api->setApiParameter(id, values.value(id)))
-                    ids.insert(id);
+                if (this->m_api->setApiParameter(it.key(), it.value()))
+                    ids.insert(it.key());
             }
 
             return ids;

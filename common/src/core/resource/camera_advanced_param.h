@@ -15,6 +15,7 @@ struct QnCameraAdvancedParamValue
 
     QnCameraAdvancedParamValue() = default;
 	QnCameraAdvancedParamValue(const QString &id, const QString &value);
+    QString toString() const;
 };
 #define QnCameraAdvancedParamValue_Fields (id)(value)
 

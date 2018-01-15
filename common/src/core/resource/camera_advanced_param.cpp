@@ -40,6 +40,11 @@ QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const 
 {
 }
 
+QString QnCameraAdvancedParamValue::toString() const
+{
+    return lm("%1 = %2").args(id, value);
+}
+
 QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
     const QnCameraAdvancedParamValueList& list)
 {
@@ -92,8 +97,8 @@ void QnCameraAdvancedParamValueMap::appendValueList(const QnCameraAdvancedParamV
 QSet<QString> QnCameraAdvancedParamValueMap::ids() const
 {
     QSet<QString> set;
-    for (const auto& id: *this)
-        set.insert(value(id));
+    for (const auto& id: this->keys())
+        set.insert(id);
 
     return set;
 }

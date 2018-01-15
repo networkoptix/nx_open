@@ -782,11 +782,11 @@ QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParamitersProvider::ge
 QSet<QString> QnPlAreconVisionResource::AvParamitersProvider::set(const QnCameraAdvancedParamValueMap& values)
 {
     QSet<QString> result;
-    for (const auto id: values)
+    for (auto it = values.begin(); it != values.end(); ++it)
     {
         QString value;
-        if (m_resource->setApiParameter(id, values.value(id)))
-            result.insert(id);
+        if (m_resource->setApiParameter(it.key(), it.value()))
+            result.insert(it.key());
     }
 
     return result;
