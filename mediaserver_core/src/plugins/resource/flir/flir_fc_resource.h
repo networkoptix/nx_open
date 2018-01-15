@@ -31,7 +31,7 @@ public:
     FcResource();
     virtual ~FcResource();
 
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 

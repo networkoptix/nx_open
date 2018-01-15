@@ -43,7 +43,7 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me

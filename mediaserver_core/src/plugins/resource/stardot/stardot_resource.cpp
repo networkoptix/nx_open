@@ -130,7 +130,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
     }
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnStardotResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap QnStardotResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me

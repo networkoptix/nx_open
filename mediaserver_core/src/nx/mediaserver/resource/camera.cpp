@@ -379,7 +379,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(bool primaryStream)
         return result;
     };
 
-    StreamCapabilityMap result = getStreamCapabilityMapFromDrive(primaryStream);
+    StreamCapabilityMap result = getStreamCapabilityMapFromDrives(primaryStream);
     for (auto itr = result.begin(); itr != result.end(); ++itr)
     {
         auto& value = itr.value();

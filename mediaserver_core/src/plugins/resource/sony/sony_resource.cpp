@@ -36,10 +36,10 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     if (!result || isCameraControlDisabled())
         return result;
 
-    std::string confToken = getPrimaryVideoEncoderId().toStdString();
-    if (confToken.empty()) {
+    auto capabilities = primaryVideoCapabilities();
+    std::string confToken = capabilities.id.toStdString();
+    if (confToken.empty())
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
-    }
 
     QAuthenticator auth = getAuth();
     QString login = auth.user();
@@ -59,24 +59,17 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastError());
     }
 
-    typedef QSharedPointer<QList<QSize> > ResolutionListPtr;
-    ResolutionListPtr resolutionListPtr(0);
-    {
-        QnMutexLocker lock( &m_mutex );
-        resolutionListPtr = ResolutionListPtr(new QList<QSize>(m_resolutionList)); //Sorted desc
-    }
-
     MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password, getTimeDrift());
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
-    request.Configuration->Encoding = getCodec(true) == H264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
+    request.Configuration->Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
     request.ForcePersistence = false;
     SetVideoConfigResp response;
 
     int triesNumLeft = MAX_RESOLUTION_DECREASES_NUM;
-    QList<QSize>::iterator it = resolutionListPtr->begin();
+    auto it = capabilities.resolutions.begin();
 
-    for (; it != resolutionListPtr->end() && triesNumLeft > 0; --triesNumLeft)
+    for (; it != capabilities.resolutions.end() && triesNumLeft > 0; --triesNumLeft)
     {
         request.Configuration->Resolution->Width = it->width();
         request.Configuration->Resolution->Height = it->height();
@@ -101,26 +94,22 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
             }
         }
 
-        if (soapRes == SOAP_OK) {
+        if (soapRes == SOAP_OK)
             break;
-        }
 
         qWarning() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->width()
             << " x " << it->height() << " dropped. UniqueId: " << getUniqueId();
-        it = resolutionListPtr->erase(it);
+        it = capabilities.resolutions.erase(it);
     }
 
-    if (soapRes != SOAP_OK) {
+    if (soapRes != SOAP_OK)
         return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
-    }
 
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
         return CameraDiagnostics::NoErrorResult();
     }
 
-    QnMutexLocker lock( &m_mutex );
-    m_resolutionList = *resolutionListPtr.data();
-
+    setPrimaryVideoCapabilities(capabilities);
     return CameraDiagnostics::NoErrorResult();
 }
 

@@ -443,7 +443,7 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int enc
     return nxcip::Resolution();
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me

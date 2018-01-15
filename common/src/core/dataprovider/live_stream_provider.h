@@ -73,8 +73,6 @@ public:
     virtual void updateSoftwareMotion();
     bool canChangeStatus() const;
 
-    virtual bool secondaryResolutionIsLarge() const { return false; }
-
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
 

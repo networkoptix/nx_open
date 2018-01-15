@@ -26,7 +26,7 @@ void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnDroidResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap QnDroidResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me

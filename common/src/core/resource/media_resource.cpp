@@ -34,7 +34,8 @@ namespace {
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
 public:
-    static QString displayString(Qn::StreamQuality value) {
+    static QString displayString(Qn::StreamQuality value)
+    {
         switch(value) {
         case Qn::QualityLowest:       return tr("Lowest");
         case Qn::QualityLow:          return tr("Low");
@@ -49,7 +50,8 @@ public:
         }
     }
 
-    static QString shortDisplayString(Qn::StreamQuality value) {
+    static QString shortDisplayString(Qn::StreamQuality value)
+    {
         /* Note that '//:' are comments for translators. */
         switch(value) {
         case Qn::QualityLowest:
@@ -192,42 +194,51 @@ qreal QnMediaResource::customAspectRatio() const
     return value;
 }
 
-void QnMediaResource::setCustomAspectRatio(qreal value) {
+void QnMediaResource::setCustomAspectRatio(qreal value)
+{
     if (qIsNaN(value) || qIsInf(value) || value < 0 || qFuzzyEquals(value, noCustomAspectRatio))
         clearCustomAspectRatio();
     else
         this->toResource()->setProperty(::customAspectRatioKey, QString::number(value));
 }
 
-void QnMediaResource::clearCustomAspectRatio() {
+void QnMediaResource::clearCustomAspectRatio()
+{
     this->toResource()->setProperty(::customAspectRatioKey, QString());
 }
 
-QString QnMediaResource::customAspectRatioKey() {
+QString QnMediaResource::customAspectRatioKey()
+{
     return ::customAspectRatioKey;
 }
 
-QString QnMediaResource::dontRecordPrimaryStreamKey() {
+QString QnMediaResource::dontRecordPrimaryStreamKey()
+{
     return ::dontRecordPrimaryStreamKey;
 }
 
-QString QnMediaResource::dontRecordSecondaryStreamKey() {
+QString QnMediaResource::dontRecordSecondaryStreamKey()
+{
     return ::dontRecordSecondaryStreamKey;
 }
 
-QString QnMediaResource::rtpTransportKey() {
+QString QnMediaResource::rtpTransportKey()
+{
     return ::rtpTransportKey;
 }
 
-QString QnMediaResource::panicRecordingKey() {
+QString QnMediaResource::panicRecordingKey()
+{
     return ::panicRecordingKey;
 }
 
-QString QnMediaResource::dynamicVideoLayoutKey() {
+QString QnMediaResource::dynamicVideoLayoutKey()
+{
     return ::dynamicVideoLayoutKey;
 }
 
-QString QnMediaResource::motionStreamKey() {
+QString QnMediaResource::motionStreamKey()
+{
     return ::motionStreamKey;
 }
 

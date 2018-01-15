@@ -22,7 +22,7 @@ void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap QnTestCameraResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me

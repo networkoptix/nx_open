@@ -381,7 +381,8 @@ void QnLiveStreamProvider::onPrimaryParamsChanged(const QnLiveStreamParams& prim
     int newSecondaryStreamFps = 0;
     auto params = m_newLiveParams;
 
-    if (secondaryResolutionIsLarge())
+    // TODO: #params check secondary resolution from the new getter here
+    if (0) //if (secondaryResolutionIsLarge())
     {
         newSecondaryStreamFps = MIN_SECOND_STREAM_FPS;
     }

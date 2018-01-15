@@ -91,7 +91,7 @@ public:
     QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;

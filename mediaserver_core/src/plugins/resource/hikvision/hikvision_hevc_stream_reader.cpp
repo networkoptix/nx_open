@@ -57,7 +57,8 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     }
 
     auto channelCapabilities = optionalChannelCapabilities.get();
-    auto resolution = chooseResolution(channelCapabilities, m_hikvisionResource->getPrimaryResolution());
+    auto resolutionList = m_hikvisionResource->primaryVideoCapabilities().resolutions;
+    auto resolution = chooseResolution(channelCapabilities, resolutionList.isEmpty() ? QSize() : resolutionList.front());
     auto codec = chooseCodec(channelCapabilities);
     auto fps = chooseFps(channelCapabilities, liveStreamParameters.fps);
 

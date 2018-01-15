@@ -35,7 +35,6 @@ public:
     virtual ~QnOnvifStreamReader();
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     virtual void pleaseStop() override;
-    virtual bool secondaryResolutionIsLarge() const override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 
     void setMustNotConfigureResource(bool mustNotConfigureResource);
@@ -76,7 +75,6 @@ private:
     void fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const;
     AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 
-    void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const;
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
 
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
@@ -100,7 +98,6 @@ private:
     QByteArray NETOPTIX_SECONDARY_NAME;
     QByteArray NETOPTIX_PRIMARY_TOKEN;
     QByteArray NETOPTIX_SECONDARY_TOKEN;
-    onvifXsd__H264Configuration* m_tmpH264Conf;
 
     QString m_streamUrl;
     QElapsedTimer m_cachedTimer;

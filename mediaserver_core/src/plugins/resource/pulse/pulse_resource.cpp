@@ -33,7 +33,7 @@ void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnPlPulseResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap QnPlPulseResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me

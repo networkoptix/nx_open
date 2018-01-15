@@ -42,7 +42,7 @@ HikvisionResource::~HikvisionResource()
     m_audioTransmitter.reset();
 }
 
-nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
     // TODO: implement me
@@ -95,10 +95,10 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
                 setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
                 if (!channelCapabilities.resolutions.empty())
                 {
-                    const auto primaryResolution = channelCapabilities.resolutions.front();
-                    setPrimaryResolution(primaryResolution);
-                    if (qFuzzyIsNull(customAspectRatio()))
-                        setCustomAspectRatio(primaryResolution.width() / (qreal)primaryResolution.height());
+                    auto capabilities = primaryVideoCapabilities();
+                    capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
+                        channelCapabilities.resolutions));
+                    setPrimaryVideoCapabilities(capabilities);
                 }
                 if (!channelCapabilities.fps.empty())
                     setMaxFps(channelCapabilities.fps[0] / 100);

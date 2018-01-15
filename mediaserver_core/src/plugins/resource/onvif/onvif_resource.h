@@ -24,6 +24,8 @@
 #include <nx/network/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 #include "soap_wrapper.h"
+#include <core/resource/resource_data_structures.h>
+#include <onvif/soapStub.h>
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -37,8 +39,6 @@ typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef onvifXsd__VideoSourceConfiguration VideoSource;
-
-class VideoOptionsLocal;
 
 //first = width, second = height
 
@@ -130,6 +130,30 @@ public:
         SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
+    class VideoOptionsLocal
+    {
+    public:
+        VideoOptionsLocal() = default;
+
+        VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp, QnBounds frameRateBounds = QnBounds());
+
+        QVector<onvifXsd__H264Profile> h264Profiles;
+        QString id;
+        QList<QSize> resolutions;
+        bool isH264 = false;
+        int minQ = -1;
+        int maxQ = 1;
+        int frameRateMin = -1;
+        int frameRateMax = -1;
+        int govMin = -1;
+        int govMax = -1;
+        bool usedInProfiles = false;
+        QString currentProfile;
+
+    private:
+        int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const;
+    };
+
     static const QString MANUFACTURE;
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
@@ -173,24 +197,16 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    int innerQualityToOnvif(Qn::StreamQuality quality) const;
+    int innerQualityToOnvif(Qn::StreamQuality quality, int minQuality, int maxQuality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
 
-    int getGovLength() const;
     int getAudioBitrate() const;
     int getAudioSamplerate() const;
-    QSize getPrimaryResolution() const;
-    QSize getSecondaryResolution() const;
-    int getPrimaryH264Profile() const;
-    int getSecondaryH264Profile() const;
-    QSize getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
     void setTimeDrift(int value); // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
     const QSize getVideoSourceSize() const;
 
-    const QString getPrimaryVideoEncoderId() const;
-    const QString getSecondaryVideoEncoderId() const;
     const QString getAudioEncoderId() const;
     const QString getVideoSourceId() const;
     const QString getAudioSourceId() const;
@@ -219,7 +235,6 @@ public:
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
-    CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
     virtual void setOnvifRequestsRecieveTimeout(int timeout);
@@ -264,7 +279,6 @@ public:
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
-    bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
     QnMutex* getStreamConfMutex();
@@ -278,14 +292,15 @@ public:
 
     static bool isCameraForcedToOnvif(const QString& manufacturer, const QString& model);
 
+    VideoOptionsLocal primaryVideoCapabilities() const;
+    VideoOptionsLocal secondaryVideoCapabilities() const;
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 protected:
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
-    void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
@@ -297,8 +312,6 @@ protected:
     virtual CameraDiagnostics::Result initializeAdvancedParameters(const CapabilitiesResp& onvifCapabilities);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-
-    virtual void setCroppingPhysical(QRect cropping);
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
@@ -316,13 +329,18 @@ protected:
     }
 
     void setMaxFps(int f);
-    void setPrimaryResolution(const QSize& value);
 
+    void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities) { m_primaryStreamCapabilities = capabilities; }
+    boost::optional<onvifXsd__H264Profile> getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
 private:
+    friend class QnOnvifStreamReader;
+
+    void updateVideoEncoder(
+        VideoEncoder& encoder,
+        bool isPrimary,
+        const QnLiveStreamParams& streamParams);
     CameraDiagnostics::Result fetchAndSetResourceOptions();
-    void fetchAndSetPrimarySecondaryResolution();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
-    void updateSecondaryResolutionList(const VideoOptionsLocal& opts);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
@@ -330,17 +348,11 @@ private:
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
-    void setVideoEncoderOptions(const VideoOptionsLocal& opts);
-    void setVideoEncoderOptionsH264(const VideoOptionsLocal& opts);
-    void setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts);
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
-    void setMinMaxQuality(int min, int max);
 
     int round(float value);
-    QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-    int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
 
 
@@ -349,15 +361,14 @@ private:
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
-    bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
-    QList<QSize> m_resolutionList; //Sorted desc
-    QList<QSize> m_secondaryResolutionList;
+    VideoOptionsLocal m_primaryStreamCapabilities;
+    VideoOptionsLocal m_secondaryStreamCapabilities;
 
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
@@ -492,22 +503,11 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
 
-    int m_iframeDistance;
-    int m_minQuality;
-    int m_maxQuality;
-    CODECS m_primaryCodec;
-    CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
-    QSize m_primaryResolution;
-    QSize m_secondaryResolution;
-    int m_primaryH264Profile;
-    int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
     //QRect m_physicalWindowSize;
     QSize m_videoSourceSize;
-    QString m_primaryVideoEncoderId;
-    QString m_secondaryVideoEncoderId;
     QString m_audioEncoderId;
     QString m_videoSourceId;
     QString m_audioSourceId;
@@ -546,6 +546,7 @@ private:
     QString m_portNamePrefixToIgnore;
     size_t m_inputPortCount;
     std::vector<QString> m_portAliases;
+    std::unique_ptr<onvifXsd__H264Configuration> m_tmpH264Conf;
 
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );

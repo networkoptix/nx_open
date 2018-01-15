@@ -78,10 +78,10 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     return m_videoLayout;
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrive(
+nx::mediaserver::resource::StreamCapabilityMap QnOpteraResource::getStreamCapabilityMapFromDrives(
     bool primaryStream)
 {
-    return base_type::getStreamCapabilityMapFromDrive(primaryStream);
+    return base_type::getStreamCapabilityMapFromDrives(primaryStream);
 }
 
 CameraDiagnostics::Result QnOpteraResource::initializeCameraDriver()

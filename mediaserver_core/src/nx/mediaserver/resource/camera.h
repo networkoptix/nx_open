@@ -12,6 +12,15 @@ struct StreamCapabilityKey
 {
     QString codec;
     QSize resolution;
+
+    bool operator<(const StreamCapabilityKey& other) const
+    {
+        if (codec != other.codec)
+            return codec < other.codec;
+        if (resolution.width() != other.resolution.width())
+            return resolution.width() < other.resolution.width();
+        return resolution.height() < other.resolution.height();
+    }
 };
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
 
@@ -200,7 +209,7 @@ protected:
     /** Gets supported codecs and their resolution list. For each key optional CameraStreamCapability could be provided.
     * CameraStreamCapability could be null. That case it is auto-filled with default values.
     */
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrive(bool primaryStream) = 0;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(bool primaryStream) = 0;
 private:
     virtual CameraDiagnostics::Result initInternal() override;
 
