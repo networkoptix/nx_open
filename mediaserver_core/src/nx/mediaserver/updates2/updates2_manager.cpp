@@ -258,6 +258,7 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
     QnMutexLocker lock(&m_mutex);
     using namespace vms::common::p2p::downloader;
     auto downloader = qnServerModule->findInstance<Downloader>();
+    NX_ASSERT(downloader);
 
     auto onError = [this, downloader, &fileName](const QString& errorMessage)
     {
@@ -286,6 +287,13 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
             return onError(lit("Failed to find update file: %1").arg(fileName));
         case FileInformation::Status::corrupted:
             return onError(lit("Update file is corrupted: %1").arg(fileName));
+        default:
+            NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
+            m_currentStatus = detail::Updates2StatusDataEx(
+                qnSyncTime->currentMSecsSinceEpoch(),
+                commonModule()->moduleGUID(),
+                api::Updates2StatusData::StatusCode::preparing,
+                "Update has been downloaded and now is preparing for install");
     }
 }
 
