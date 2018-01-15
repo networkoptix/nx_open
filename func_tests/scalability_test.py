@@ -236,8 +236,8 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
                 result = get_response(srv, method, api_object, api_method)
                 result_cleaned = clean_json(api_method, result)
                 if result_cleaned != expected_result:
-                    return (srv, result_cleaned)
-            return (None, None)
+                    return srv, result_cleaned
+            return None, None
     
         first_unsynced_server, unmatched_result = check(servers[1:])
         if not first_unsynced_server:

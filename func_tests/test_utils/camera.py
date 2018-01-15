@@ -222,7 +222,7 @@ class MediaListener(object):
         self._thread.start()
 
     def __str__(self):
-        return ('Test camera media listener at %s:%d' % (self.host, self.port))
+        return 'Test camera media listener at %s:%d' % (self.host, self.port)
 
     def stop(self):
         log.info('%s with %d active streamers: stopping...', self, len(self._streamers))
@@ -258,7 +258,7 @@ class MediaStreamer(object):
 
     def __str__(self):
         host, port = self._peer_address
-        return ('Test camera media streamer for %s:%d' % (host, port))
+        return 'Test camera media streamer for %s:%d' % (host, port)
 
     def stop(self):
         self._stop_flag = True

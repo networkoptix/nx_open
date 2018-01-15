@@ -413,7 +413,7 @@ class Server(object):
 
     def get_nonce(self):
         response = self.rest_api.api.getNonce.GET()
-        return (response['realm'], response['nonce'])
+        return response['realm'], response['nonce']
 
     def change_system_id(self, new_guid):
         old_local_system_id = self.local_system_id

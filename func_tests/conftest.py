@@ -172,7 +172,7 @@ def junk_shop_repository(request, init_logging):
     else:
         db_capture_repository = None
         current_test_run = None
-    return (db_capture_repository, current_test_run)
+    return db_capture_repository, current_test_run
 
 @pytest.fixture
 def artifact_factory(request, run_options, junk_shop_repository):

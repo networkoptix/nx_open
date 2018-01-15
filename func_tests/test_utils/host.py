@@ -217,7 +217,7 @@ class LocalHost(Host):
                         if e.errno == errno.EPIPE:
                             # communicate() should ignore broken pipe error
                             pass
-                        elif (e.errno == errno.EINVAL and pipe.poll() is not None):
+                        elif e.errno == errno.EINVAL and pipe.poll() is not None:
                             # stdin.write() fails with EINVAL if the process already exited before the write
                             pass
                         else:
@@ -410,7 +410,7 @@ class RemoteSshHost(Host):
         return pytz.timezone(tzname)
         
     def make_proxy_command(self):
-        return (self._make_ssh_cmd() + [self._user_and_host, 'nc', '-q0', '%h', '%p'])
+        return self._make_ssh_cmd() + [self._user_and_host, 'nc', '-q0', '%h', '%p']
 
     @property
     def _user_and_host(self):

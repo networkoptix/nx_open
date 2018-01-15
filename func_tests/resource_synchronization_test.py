@@ -145,7 +145,7 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
             for srv in servers:
                 result = get_response(srv, method, api_object, api_method)
                 if result != result_expected:
-                    return (srv, result)
+                    return srv, result
             return None
 
         result = check(servers[1:], result_expected)
