@@ -174,12 +174,12 @@ def make_handler_class(root_obj, path_to_update, args):
                             raise Exception('Dummy file not found')
                         else:
                             self._send_ok_headers('application/zip')
-                            with open(dummy_file_path()) as f:
+                            with open(dummy_file_path(), 'rb') as f:
                                 while True:
                                     read_buf = f.read(4096)
                                     if len(read_buf) <= 0:
                                         break
-                                    self.wfile.write(bytes(read_buf, encoding='utf-8'))
+                                    self.wfile.write(read_buf)
             else:
                 self.send_response(404)
                 self.end_headers()
