@@ -29,7 +29,6 @@ UPDATES_FILE_NAME = 'updates.json'
 FILE_PATTERN = '{}.{}.json'
 
 
-
 def collect_actual_data():
     base_url = 'updates.networkoptix.com'
 
