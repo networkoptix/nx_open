@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
 from notifications import api
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 from api.models import Account
 from notifications.models import *
@@ -31,11 +32,18 @@ def format_message(notification):
     return message
 
 
+#For testing we dont want to send emails to everyone so we need to set
+#"BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
 def send_to_all_users(sent_by, notification, force=False):
-    if force:
-        user = users = Account.objects.filter(is_superuser=True)
-    else:
-        users = Account.objects.filter(subscribe=True).filter(is_superuser=True)
+    # if forced and not testing dont apply any filters to send to all users
+    users = Account.objects.all()
+
+    if not force:
+        users = users.filter(subscribe=True)
+
+    if settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY:
+        users = users.filter(is_superuser=True)
+
     message = format_message(notification)
     notification.sent_by = sent_by
     notification.sent_date = datetime.now()

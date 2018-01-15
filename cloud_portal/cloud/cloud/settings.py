@@ -331,6 +331,7 @@ NOTIFICATIONS_CONFIG = {
     }
 }
 
+BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = False
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
