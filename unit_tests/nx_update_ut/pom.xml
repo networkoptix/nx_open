@@ -19,7 +19,7 @@
     <properties>
         <guid>${nx_update_ut.guid}</guid>
         <qt.libs>core</qt.libs>
-        <global.libs>-lnx_update</global.libs>
+        <global.libs>-lnx_update -lnx_utils -lnx_network -lcommon</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <rdep.packages>gtest gmock </rdep.packages>

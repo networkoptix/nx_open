@@ -33,7 +33,7 @@ protected:
         using namespace detail::data_provider;
 
         RawDataProviderFactory::setFactoryFunction(
-            [](const QString& s, AbstractAsyncRawDataProviderHandler* handler)
+            [](const QString&, AbstractAsyncRawDataProviderHandler* handler)
             {
                 return std::make_unique<test_support::AsyncJsonProviderMockup>(handler);
             });
