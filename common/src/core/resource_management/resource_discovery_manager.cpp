@@ -200,7 +200,7 @@ void QnResourceDiscoveryManager::run()
 {
     initSystemThreadId();
     m_runNumber = 0;
-    // #dkargin: I really want to move m_timer inside QnResourceDiscoveryManagerTimeoutDelegate
+    // #dkargin: I really want to move m_timer inside QnResourceDiscoveryManagerTimeoutDelegate.
     m_timer.reset( new QTimer() );
     m_timer->setSingleShot( true );
 
@@ -229,7 +229,7 @@ void QnResourceDiscoveryManager::doInitialSearch()
         searchersList = m_searchersList;
     }
 
-    for (QnAbstractResourceSearcher *searcher : searchersList)
+    for (QnAbstractResourceSearcher* searcher: searchersList)
     {
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
         {
@@ -247,26 +247,26 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
     switch( m_state )
     {
-    case InitialSearch:
-        doInitialSearch();
-        m_state = PeriodicSearch;
-        break;
-
-    case PeriodicSearch:
-        if( !m_ready )
+        case InitialSearch:
+            doInitialSearch();
+            m_state = PeriodicSearch;
             break;
 
-        updateLocalNetworkInterfaces();
+        case PeriodicSearch:
+            if( !m_ready )
+                break;
 
-        if (!m_resourceProcessor->isBusy())
-        {
-            QnResourceList result = findNewResources();
-            if (!result.isEmpty())
-                m_resourceProcessor->processResources(result);
-        }
+            updateLocalNetworkInterfaces();
 
-        ++m_runNumber;
-        break;
+            if (!m_resourceProcessor->isBusy())
+            {
+                QnResourceList result = findNewResources();
+                if (!result.isEmpty())
+                    m_resourceProcessor->processResources(result);
+            }
+
+            ++m_runNumber;
+            break;
     }
 
     m_timer->start( qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS, int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()) ));

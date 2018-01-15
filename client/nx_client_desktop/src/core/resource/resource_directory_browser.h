@@ -66,7 +66,6 @@ protected:
 private:
     BrowseHandler makeDiscoveryHandler(QnResourceList& output, QStringList& paths);
 
-
 private:
     QFileSystemWatcher m_fsWatcher;
 

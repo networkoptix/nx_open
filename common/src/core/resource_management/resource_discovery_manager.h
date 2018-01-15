@@ -169,7 +169,7 @@ protected:
 private:
     void updateLocalNetworkInterfaces();
 
-    // Returns new resources( not from pool) or updates some in resource pool.
+    // Returns new resources or updates some in resource pool.
     QnResourceList findNewResources();
     // Run search of local files.
     void doInitialSearch();
