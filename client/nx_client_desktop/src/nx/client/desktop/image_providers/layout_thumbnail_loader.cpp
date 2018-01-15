@@ -69,7 +69,7 @@ struct LayoutThumbnailLoader::Private
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
-    void updateTileStatus(Qn::ThumbnailStatus status, qreal aspectRatio,
+    void updateTileStatus(Qn::ThumbnailStatus status, const QnAspectRatio& aspectRatio,
         const QRectF& cellRect, qreal rotation)
     {
         switch (status)
@@ -87,10 +87,12 @@ struct LayoutThumbnailLoader::Private
             {
                 rotation = qMod(rotation, 180.0);
 
-                if (qFuzzyIsNull(rotation))
+                // Aspect ratio is invalid when there is no image. No need to rotate in this case.
+                if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
                 {
-                    const auto targetRect = QnGeometry::expanded(aspectRatio,
-                        cellRect, Qt::KeepAspectRatio);
+                    const auto targetRect = aspectRatio.isValid()
+                        ? QnGeometry::expanded(aspectRatio.toFloat(), cellRect, Qt::KeepAspectRatio)
+                        : cellRect;
 
                     QPainter painter(&data.image);
                     paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
@@ -104,13 +106,14 @@ struct LayoutThumbnailLoader::Private
                     // 0 = up, 1 = left, 2 = down.
                     const auto direction = qRound(rotation / 90.0);
 
+                    qreal ar = aspectRatio.toFloat();
                     rotation -= direction * 90.0;
                     if (isOdd(direction))
-                        aspectRatio = 1.0 / aspectRatio;
+                        ar = 1.0 / ar;
 
                     const auto cellCenter = cellRect.center();
                     const auto targetRect = QnGeometry::encloseRotatedGeometry(
-                        cellRect, aspectRatio, rotation);
+                        cellRect, ar, rotation);
 
                     QPainter painter(&data.image);
                     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -407,8 +410,8 @@ void LayoutThumbnailLoader::doLoadAsync()
         connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
             {
-                d->updateTileStatus(status, QnGeometry::aspectRatio(loader->sizeHint()),
-                    scaledCellRect, rotation);
+                QnAspectRatio aspectRatio(loader->sizeHint());
+                d->updateTileStatus(status, aspectRatio, scaledCellRect, rotation);
             });
 
         connect(loader.data(), &QnImageProvider::imageChanged, this,

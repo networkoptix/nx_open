@@ -1206,7 +1206,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
                 updateSpeed();
             };
 
-        executeDelayedParented(callback, kDefaultDelay, this);
+        executeDelayedParented(callback, this);
     }
 
     updateLocalOffset();

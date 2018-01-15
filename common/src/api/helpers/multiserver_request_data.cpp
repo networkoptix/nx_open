@@ -10,6 +10,8 @@ static const QString kExtraFormattingParam(lit("extraFormatting"));
 
 } // namespace
 
+const Qn::SerializationFormat QnBaseMultiserverRequestData::kDefaultFormat = Qn::JsonFormat;
+
 QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const QnRequestParamList& params)
 {
     loadFromParams(params);

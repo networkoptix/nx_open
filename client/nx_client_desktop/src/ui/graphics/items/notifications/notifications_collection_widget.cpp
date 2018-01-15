@@ -343,7 +343,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
                     action::Parameters params(camera);
                     params.setArgument(Qn::ActionDataRole, action);
                     menu()->trigger(action::AcknowledgeEventAction, params);
-                }, kDefaultDelay, this);
+                }, this);
         });
 
     m_customPopupItems.insert(action->getParams().actionId, widget);
@@ -381,7 +381,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
                     };
 
                 // Action will trigger additional event loop, which will cause problems here.
-                executeDelayedParented(triggerAction, kDefaultDelay, this);
+                executeDelayedParented(triggerAction, this);
             });
     }
 

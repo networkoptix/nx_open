@@ -10,6 +10,7 @@
 #include <plugins/resource/avi/avi_archive_delegate.h>
 
 #include <utils/media/frame_info.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace client {
@@ -57,6 +58,7 @@ Qn::ThumbnailStatus FfmpegImageProvider::status() const
 void FfmpegImageProvider::doLoadAsync()
 {
     d->status = Qn::ThumbnailStatus::NoData;
+    executeDelayedParented([this]{emit statusChanged(d->status);}, this);
 
     QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());
     if (!archiveDelegate->open(d->resource, /*archiveIntegrityWatcher*/ nullptr))
@@ -91,9 +93,16 @@ void FfmpegImageProvider::doLoadAsync()
         return;
 
     d->image = outFrame->toImage();
-    if (!d->image.isNull())
-        d->status = Qn::ThumbnailStatus::Loaded;
-    emit loadDelayed(d->image);
+    if (d->image.isNull())
+        return;
+
+    d->status = Qn::ThumbnailStatus::Loaded;
+    executeDelayedParented(
+        [this]
+        {
+            emit imageChanged(d->image);
+            emit sizeHintChanged(sizeHint());
+        }, this);
 }
 
 } // namespace desktop
