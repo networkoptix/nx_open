@@ -176,6 +176,7 @@ def make_handler_class(root_obj, path_to_update, args):
                         for file_key, file_obj in os_obj.items():
                             if file_obj['file'] == requested_file_name:
                                 return True
+                    return False
 
                 if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
                     self._send_not_found()
