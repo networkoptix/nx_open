@@ -1,7 +1,7 @@
 INCLUDEPATH += $$ROOT_DIR/common/src
 
 win* {
-    DEFINES += NX_NETWORK_API=__declspec(dllexport)
+    DEFINES += NX_UPDATE_API=__declspec(dllexport)
 }
 
 linux {
