@@ -3,11 +3,13 @@
 #include <algorithm>
 #include <QtGui/QPainter>
 
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
+#include <nx/client/desktop/image_providers/resource_thumbnail_provider.h>
+
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
@@ -32,30 +34,26 @@ static inline bool isOdd(int value)
 
 } // namespace
 
+using ResourceThumbnailProviderPtr = QSharedPointer<ResourceThumbnailProvider>;
+
 struct LayoutThumbnailLoader::Private
 {
     // Input data.
     LayoutThumbnailLoader* const q;
     QnLayoutResourcePtr layout;
-    bool allowNonCameraResources = true;
     QSize maximumSize;
     qint64 msecSinceEpoch;
-    QnThumbnailRequestData::ThumbnailFormat format;
 
     // Methods.
     Private(LayoutThumbnailLoader* q,
         const QnLayoutResourcePtr& layout,
-        bool allowNonCameraResources,
         const QSize& maximumSize,
-        qint64 msecSinceEpoch,
-        QnThumbnailRequestData::ThumbnailFormat format)
+        qint64 msecSinceEpoch)
         :
         q(q),
         layout(layout),
-        allowNonCameraResources(allowNonCameraResources),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
-        format(format),
         noDataWidget(new QnAutoscaledPlainText()),
         nonCameraWidget(new QnAutoscaledPlainText())
     {
@@ -221,7 +219,7 @@ struct LayoutThumbnailLoader::Private
     {
         QImage image;
         Qn::ThumbnailStatus status = Qn::ThumbnailStatus::Invalid;
-        QList<QSharedPointer<QnSingleThumbnailLoader>> loaders;
+        QList<ResourceThumbnailProviderPtr> loaders;
         int numLoading = 0;
     };
 
@@ -232,14 +230,12 @@ struct LayoutThumbnailLoader::Private
 
 LayoutThumbnailLoader::LayoutThumbnailLoader(
     const QnLayoutResourcePtr& layout,
-    bool allowNonCameraResources,
     const QSize& maximumSize,
     qint64 msecSinceEpoch,
-    QnThumbnailRequestData::ThumbnailFormat format,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, layout, allowNonCameraResources, maximumSize, msecSinceEpoch, format))
+    d(new Private(this, layout, maximumSize, msecSinceEpoch))
 {
 }
 
@@ -312,9 +308,6 @@ void LayoutThumbnailLoader::doLoadAsync()
 
         const auto resource = resourcePool->getResourceByDescriptor(iter->resource);
         if (!resource)
-            continue;
-
-        if (!d->allowNonCameraResources && !resource.dynamicCast<QnVirtualCameraResource>())
             continue;
 
         bounding = bounding.united(itemRect);
@@ -400,22 +393,16 @@ void LayoutThumbnailLoader::doLoadAsync()
             (cellRect.width() - spacing) * xscale,
             (cellRect.height() - spacing) * yscale);
 
-        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-        {
-            // Non-camera resources are drawn as "NOT A CAMERA".
-            const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
-            d->updateTileStatus(Qn::ThumbnailStatus::Invalid, scaledCellAr,
-                scaledCellRect, rotation);
-            continue;
-        }
-
         QSize thumbnailSize(0, scaledCellRect.height());
         if (!zoomRect.isEmpty())
             thumbnailSize /= zoomRect.height();
 
-        QSharedPointer<QnSingleThumbnailLoader> loader(new QnSingleThumbnailLoader(
-            camera, d->msecSinceEpoch, 0, thumbnailSize, d->format));
+        api::ResourceImageRequest request;
+        request.resource = resource;
+        request.msecSinceEpoch = d->msecSinceEpoch;
+        request.size = thumbnailSize;
+
+        ResourceThumbnailProviderPtr loader(new ResourceThumbnailProvider(request));
 
         connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)

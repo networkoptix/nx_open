@@ -13,7 +13,7 @@
 
 #include <business/business_resource_validation.h>
 
-#include <nx/client/desktop/image_providers/single_thumbnail_loader.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -253,23 +253,19 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
 
     NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
 
-    const auto requiredPermission = msecSinceEpoch == QnThumbnailRequestData::kLatestThumbnail
+    const auto requiredPermission = msecSinceEpoch == nx::api::ImageRequest::kLatestThumbnail
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
     if (accessController()->hasPermissions(camera, requiredPermission))
         return;
 
-    QnSingleThumbnailLoader* loader = new QnSingleThumbnailLoader(
-        camera,
-        msecSinceEpoch,
-        QnThumbnailRequestData::kDefaultRotation,
-        kDefaultThumbnailSize,
-        QnThumbnailRequestData::JpgFormat,
-        QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-        QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
-        item);
+    api::CameraImageRequest request;
+    request.camera = camera;
+    request.msecSinceEpoch = msecSinceEpoch;
+    request.size = kDefaultThumbnailSize;
 
+    auto loader = new CameraThumbnailProvider(request, item);
     item->setImageProvider(loader);
 }
 
@@ -278,7 +274,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     const QnVirtualCameraResourceList& cameraList,
     qint64 msecSinceEpoch)
 {
-    const auto requiredPermission = msecSinceEpoch == QnThumbnailRequestData::kLatestThumbnail
+    const auto requiredPermission = msecSinceEpoch == api::ImageRequest::kLatestThumbnail
         ? Qn::ViewLivePermission
         : Qn::ViewFootagePermission;
 
@@ -289,12 +285,11 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         if (accessController()->hasPermissions(camera, requiredPermission))
             continue;
 
-        std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(
-            camera,
-            msecSinceEpoch,
-            QnThumbnailRequestData::kDefaultRotation,
-            kDefaultThumbnailSize,
-            QnThumbnailRequestData::JpgFormat));
+        api::CameraImageRequest request;
+        request.camera = camera;
+        request.msecSinceEpoch = msecSinceEpoch;
+        request.size = kDefaultThumbnailSize;
+        std::unique_ptr<QnImageProvider> provider(new CameraThumbnailProvider(request));
 
         providers.push_back(std::move(provider));
     }

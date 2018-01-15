@@ -8,47 +8,46 @@ static const QString kLocalParam(lit("local"));
 static const QString kFormatParam(lit("format"));
 static const QString kExtraFormattingParam(lit("extraFormatting"));
 
-static const Qn::SerializationFormat kDefaultFormat = Qn::SerializationFormat::JsonFormat;
-
 } // namespace
 
-QnMultiserverRequestData::QnMultiserverRequestData():
-    isLocal(false),
-    format(kDefaultFormat),
-    extraFormatting(false)
+QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const QnRequestParamList& params)
 {
+    loadFromParams(params);
 }
 
-QnMultiserverRequestData::QnMultiserverRequestData(
-    QnResourcePool* resourcePool,
-    const QnRequestParamList& params)
-    :
-    QnMultiserverRequestData()
+QnBaseMultiserverRequestData::QnBaseMultiserverRequestData(const QnRequestParams& params)
 {
-    loadFromParams(resourcePool, params);
+    loadFromParams(params);
 }
 
-QnMultiserverRequestData::QnMultiserverRequestData(const QnMultiserverRequestData& src):
-    isLocal(src.isLocal),
-    format(src.format),
-    extraFormatting(src.extraFormatting)
-{
-}
-
-void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
-    const QnRequestParamList& params)
+void QnBaseMultiserverRequestData::loadFromParams(const QnRequestParamList& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
     format = QnLexical::deserialized(params.value(kFormatParam), kDefaultFormat);
 }
 
-void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
-    const QnRequestParams& params)
+void QnBaseMultiserverRequestData::loadFromParams(const QnRequestParams& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
-    QnLexical::deserialize(params.value(kFormatParam), &format);
+    format = QnLexical::deserialized(params.value(kFormatParam), kDefaultFormat);
+}
+
+QnMultiserverRequestData::~QnMultiserverRequestData()
+{
+}
+
+void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
+{
+    QnBaseMultiserverRequestData::loadFromParams(params);
+}
+
+void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParams& params)
+{
+    QnBaseMultiserverRequestData::loadFromParams(params);
 }
 
 QnRequestParamList QnMultiserverRequestData::toParams() const

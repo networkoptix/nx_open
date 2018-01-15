@@ -54,12 +54,12 @@ public:
     QnConstCompressedVideoDataPtr getIframeByTimeUnsafe(
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const;
+        nx::api::ImageRequest::RoundMethod roundMethod) const;
 
     QnConstCompressedVideoDataPtr getIframeByTime(
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const;
+        nx::api::ImageRequest::RoundMethod roundMethod) const;
 
     std::unique_ptr<QnConstDataPacketQueue> getGopTillTime(qint64 time, int channel) const;
 
@@ -213,7 +213,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
     qint64 time,
     int channel,
-    QnThumbnailRequestData::RoundMethod roundMethod) const
+    nx::api::ImageRequest::RoundMethod roundMethod) const
 {
     const auto &queue = m_lastKeyFrames[channel];
     if (queue.empty())
@@ -235,7 +235,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
     {
         const bool returnLastKeyFrame = m_lastKeyFrame[channel]
             && (m_lastKeyFrame[channel]->timestamp <= time
-                || roundMethod != QnThumbnailRequestData::RoundMethod::KeyFrameBeforeMethod);
+                || roundMethod != nx::api::ImageRequest::RoundMethod::iFrameBefore);
 
         if (returnLastKeyFrame)
             return m_lastKeyFrame[channel];
@@ -245,7 +245,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
 
     const bool returnIframeBeforeTime = itr != queue.begin()
         && (*itr)->timestamp > time
-        && roundMethod == QnThumbnailRequestData::RoundMethod::KeyFrameBeforeMethod;
+        && roundMethod == nx::api::ImageRequest::RoundMethod::iFrameBefore;
 
     if (returnIframeBeforeTime)
         --itr; // prefer frame before defined time if no exact match
@@ -256,7 +256,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTime(
     qint64 time,
     int channel,
-    QnThumbnailRequestData::RoundMethod roundMethod) const
+    nx::api::ImageRequest::RoundMethod roundMethod) const
 {
     QnMutexLocker lock( &m_queueMtx );
     return getIframeByTimeUnsafe(time, channel, roundMethod);
@@ -281,7 +281,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getGopTillTime(q
         auto iframe = getIframeByTimeUnsafe(
             time,
             channel,
-            QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod);
+            nx::api::ImageRequest::RoundMethod::iFrameAfter);
        if (iframe)
 	       frameSequence->push(iframe);
 	}
@@ -561,7 +561,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
     bool primaryLiveStream,
     qint64 time,
     int channel,
-    QnThumbnailRequestData::RoundMethod roundMethod) const
+    nx::api::ImageRequest::RoundMethod roundMethod) const
 {
     QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream
         ? m_primaryGopKeeper
@@ -569,13 +569,13 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
 
     if (gopKeeper)
     {
-        if (roundMethod == QnThumbnailRequestData::RoundMethod::PreciseMethod)
+        if (roundMethod == nx::api::ImageRequest::RoundMethod::precise)
             return gopKeeper->getGopTillTime(time, channel);
 
         auto frame = gopKeeper->getIframeByTime(time, channel, roundMethod);
         if (frame)
         {
-            if (roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod
+            if (roundMethod == nx::api::ImageRequest::RoundMethod::iFrameAfter
                 && frame->timestamp < time)
             {
                 // After frame not found. Return preceise frame instead.

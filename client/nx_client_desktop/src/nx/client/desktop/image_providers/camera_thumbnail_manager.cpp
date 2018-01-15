@@ -276,14 +276,11 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
     if (!camera || !camera->hasVideo(nullptr))
         return kInvalidHandle;
 
-    QnThumbnailRequestData request;
+    nx::api::CameraImageRequest request;
     request.camera = camera;
     request.size = m_thumbnailSize;
-    request.imageFormat = QnThumbnailRequestData::JpgFormat;
-    request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
-    request.format = Qn::SerializationFormat::UbjsonFormat;
     request.rotation = m_autoRotate
-        ? QnThumbnailRequestData::kDefaultRotation
+        ? nx::api::ImageRequest::kDefaultRotation
         : 0;
 
     if (!commonModule()->currentServer())

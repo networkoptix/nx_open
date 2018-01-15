@@ -14,6 +14,8 @@
 
 #include <utils/common/app_info.h>
 
+#include "video_camera.h"
+
 //-------------------------------------------------------------------------------------------------
 // VideoCameraLocker
 VideoCameraLocker::VideoCameraLocker(QnVideoCameraPtr camera):
