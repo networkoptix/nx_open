@@ -7,7 +7,7 @@ namespace client {
 namespace desktop {
 
 /**
-Replacement for standard tab widget that allows passing custom tab bar to a constructor.
+* Replacement for standard tab widget that allows passing custom tab bar to a constructor.
 */
 class TabWidget: public QTabWidget
 {
