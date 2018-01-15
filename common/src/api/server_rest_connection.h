@@ -202,12 +202,30 @@ public:
     Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 
-
+    /**
+     * Adds a new wearable camera to this server.
+     *
+     * @param name                      Name of the camera.
+     */
     Handle addWearableCameraAsync(
         const QString& name,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Makes the server consume a media file as a footage for a wearable camera.
+     * The file itself should be uploaded (or downloaded) to the server beforehand via
+     * file upload API.
+     *
+     * Note that once the import is completed, the server will delete the original
+     * uploaded file.
+     *
+     * @param camera                    Camera to add footage to.
+     * @param uploadId                  Name of the uploaded file to use.
+     * @param startTimeMs               Start time of the footage, in msecs since epoch.
+     *
+     * @see addFileUpload
+     */
     Handle consumeWearableCameraFileAsync(
         const QnNetworkResourcePtr& camera,
         const QString& uploadId,
