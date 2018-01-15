@@ -10,13 +10,22 @@ to test how mediaserver deals with update files absence. Run script with '--emul
 this behavior.
 """
 
-import shutil
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from http.client import HTTPConnection
-import json
 import argparse
+import json
 import os
+import shutil
+import sys
 
+if sys.version_info[:2] == (2, 7):
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from httplib import HTTPConnection
+elif sys.version_info[:2] in {(3, 5), (3, 6)}:
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    # noinspection PyCompatibility,PyUnresolvedReferences
+    from http.client import HTTPConnection
 
 UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
@@ -60,8 +69,10 @@ def collect_actual_data():
 
 def append_new_versions(root_obj, path_to_update_obj, new_versions):
     for customization_name, customization_obj in root_obj.items():
-        existing_update_key_with_customization = \
-            next(filter(lambda x: customization_name in x, path_to_update_obj.keys()), None)
+        existing_update_key_with_customization = None
+        for path in path_to_update_obj.keys():
+            if customization_name in path:
+                existing_update_key_with_customization = path
         if existing_update_key_with_customization:
             if 'packages' not in path_to_update_obj[existing_update_key_with_customization]:
                 continue
@@ -141,10 +152,10 @@ def parse_args():
 def make_handler_class(root_obj, path_to_update, args):
     path_to_update[UPDATES_PATH] = root_obj
 
-    class TestHandler(BaseHTTPRequestHandler):
+    class TestHandler(BaseHTTPRequestHandler, object):
         def __init__(self, *args, **kwargs):
             self.path_to_update = path_to_update
-            super().__init__(*args, **kwargs)
+            super(TestHandler, self).__init__(*args, **kwargs)
 
         def _send_ok_headers(self, content_type):
             self.send_response(200)
@@ -158,7 +169,7 @@ def make_handler_class(root_obj, path_to_update, args):
         def do_GET(self):
             if self.path in self.path_to_update:
                 self._send_ok_headers('application/json')
-                self.wfile.write(bytes(json.dumps(self.path_to_update[self.path]), encoding='utf-8'))
+                self.wfile.write(json.dumps(self.path_to_update[self.path]).encode())
             elif self.path.endswith('.zip') and not args.emulate_no_update_files:
                 path_components = self.path.split('/')
                 possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
@@ -200,8 +211,9 @@ def main():
     args = parse_args()
     if args.generate_data:
         print('Loading and generating data. Be patient')
-        new_root, new_path_to_update_obj = append_new_versions(*collect_actual_data(),
-                                                               [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')])
+        root_obj, path_to_update_obj = collect_actual_data()
+        new_versions = [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')]
+        new_root, new_path_to_update_obj = append_new_versions(root_obj, path_to_update_obj, new_versions)
         save_data_to_files(new_root, new_path_to_update_obj)
         with open(DUMMY_FILE_PATH, 'wb') as f:
             f.seek(1024 * 1024 * 100)
