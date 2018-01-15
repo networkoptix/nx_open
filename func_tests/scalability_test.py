@@ -180,7 +180,7 @@ def clean_transaction_log(json):
 
 def clean_full_info(json):
     # We have to not check 'resStatusList' section due to VMS-5969
-    return {k: v for k, v in json.iteritems() if k !='resStatusList'}
+    return {k: v for k, v in json.items() if k !='resStatusList'}
 
 def clean_json(api_method, json):
     cleaners = dict(

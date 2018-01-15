@@ -25,7 +25,7 @@ def test_system_settings():
 
 
 def check_system_settings(server, **kw):
-    settings_to_check = {k: v for k, v in server.settings.iteritems() if k in kw.keys()}
+    settings_to_check = {k: v for k, v in server.settings.items() if k in kw.keys()}
     assert settings_to_check == kw
 
 

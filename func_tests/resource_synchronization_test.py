@@ -170,7 +170,7 @@ def check_transaction_log(env):
         return ', '.join("%r" % s for s in servers)
 
     def transactions_to_str(transactions):
-        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.iteritems())
+        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.items())
 
     start_time = datetime_utc_now()
     while True:
@@ -180,7 +180,7 @@ def check_transaction_log(env):
                 srv.rest_api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
-        unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
+        unmatched_transactions = {t: l for t, l in srv_transactions.items()
                                   if len(l) != len(env.servers)}
         if not unmatched_transactions:
             return
