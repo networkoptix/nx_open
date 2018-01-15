@@ -35,6 +35,7 @@
         <nx_speech_synthesizer.guid>{08927adb-9495-49a3-990d-e56d699203f7}</nx_speech_synthesizer.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
+        <nx_update.guid>{7223E069-1F72-4329-838F-720D50B77D01}</nx_update.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
         <nx_cassandra.guid>{585CA31B-4D3E-40D6-B759-DD1616D7BC8A}</nx_cassandra.guid>
         <nx_fusion.guid>{0ac7e9d9-df58-456f-a568-0bd7ca5eacda}</nx_fusion.guid>
@@ -71,6 +72,7 @@
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
         <cloud_connect_integration_tests.guid>{2b60d0be-4d05-4547-a0a9-73c98d720b1a}</cloud_connect_integration_tests.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
+        <nx_update_ut.guid>{F6D33EC2-B123-43F2-9FB3-BE01DE189B90}</nx_update_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
@@ -493,6 +495,7 @@
                 <module>common</module>
                 <module>common_libs/nx_fusion</module>
                 <module>common_libs/nx_network</module>
+                <module>common_libs/nx_update</module>
                 <module>common_libs/nx_utils</module>
                 <module>common_libs/nx_vms_utils</module>
                 <module>common_libs/udt</module>
@@ -983,7 +986,7 @@
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
-                <!-- 
+                <!--
                 <module>client/nx_client_core</module>
                 <module>client/mobile_client</module>
                 -->
