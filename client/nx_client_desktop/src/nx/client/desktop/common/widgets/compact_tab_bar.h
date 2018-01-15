@@ -37,7 +37,7 @@ protected:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    const QSharedPointer<Private> d;
 };
 
 } // namespace desktop
