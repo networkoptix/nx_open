@@ -14,7 +14,6 @@
 class QnThirdPartyResource
 :
     public nx::mediaserver::resource::Camera,
-    public nx::mediaserver::resource::Camera::AdvancedParametersProvider,
     public nxcip::CameraInputEventHandler
 {
     Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
@@ -88,6 +87,9 @@ public:
 
     nxcip::Resolution getSelectedResolutionForEncoder( int encoderIndex ) const;
 
+    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
@@ -96,10 +98,6 @@ protected:
     virtual void setMotionMaskPhysical( int channel );
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-    // TODO: Move out to a different class:
-    virtual QnCameraAdvancedParams descriptions() override;
-    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
-    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
     struct EncoderData
@@ -117,7 +115,7 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
-    QnCameraAdvancedParams m_advancedParameters;
+    Camera::ApiMultiAdvancedParamitersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;

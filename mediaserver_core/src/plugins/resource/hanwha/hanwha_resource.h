@@ -39,10 +39,8 @@ public:
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 
-    // TODO: Move out to a different class:
-    virtual QnCameraAdvancedParams descriptions() override;
-    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
-    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
+    virtual QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids) override;
+    virtual QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values) override;
 
     virtual QnIOPortDataList getRelayOutputList() const override;
 

@@ -19,6 +19,7 @@ const QString kAlarmsCountParamName("alarmsCount");
 } //namespace
 
 QnFlirEIPResource::QnFlirEIPResource() :
+    m_advancedParametersProvider(this),
     m_inputPortMonitored(false),
     m_currentCheckingPortNumber(0),
     m_currentAlarmMonitoringState(FlirAlarmMonitoringState::ReadyToCheckAlarm)
@@ -377,71 +378,47 @@ bool  QnFlirEIPResource::handleButtonParam(
 std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     QnFlirEIPResource::advancedParametersProviders()
 {
-    return {this};
+    return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParams QnFlirEIPResource::descriptions()
+boost::optional<QString> QnFlirEIPResource::getApiParameter(const QString& id)
 {
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    return m_advancedParameters;
+    const auto param = m_advancedParametersProvider.getParameterById(id);
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
+        return boost::none;
+
+    const auto eipRequest = buildEIPGetRequest(param);
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
+    if (!client->registerSession())
+        return boost::none;
+
+    const auto response = client->doServiceRequest(eipRequest);
+    if(response.generalStatus != CIPGeneralStatus::kSuccess)
+        return boost::none;
+
+    return parseEIPResponse(response, param);
 }
 
-QnCameraAdvancedParamValueMap QnFlirEIPResource::get(const QSet<QString>& ids)
+bool QnFlirEIPResource::setApiParameter(const QString& id, const QString& value)
 {
-    QnCameraAdvancedParamValueMap result;
-    for (const auto& id: ids)
-    {
-        const auto param = m_advancedParameters.getParameterById(id);
-        if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
-            continue;
+    const auto param  =  m_advancedParametersProvider.getParameterById(id);
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
+    if (!client->registerSession())
+        return false;
 
-        const auto eipRequest = buildEIPGetRequest(param);
-        auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
-        if (!client->registerSession())
-            continue;
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
+        return handleButtonParam(param, client.get());
 
-        const auto response = client->doServiceRequest(eipRequest);
-        if(response.generalStatus != CIPGeneralStatus::kSuccess)
-            continue;
+    const auto response = client->doServiceRequest(buildEIPSetRequest(param, value));
+    if (response.generalStatus != CIPGeneralStatus::kSuccess)
+        return false;
 
-        result[id] = parseEIPResponse(response, param);
-    }
-    return result;
-}
-
-QSet<QString> QnFlirEIPResource::set(const QnCameraAdvancedParamValueMap& values)
-{
-    QSet<QString> result;
-    for (const auto& id: values)
-    {
-        const auto param  =  m_advancedParameters.getParameterById(id);
-        auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
-        if (!client->registerSession())
-            continue;
-
-        if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
-        {
-            if (handleButtonParam(param, client.get()))
-                result << id;
-
-            continue;
-        }
-
-        const auto response = client->doServiceRequest(buildEIPSetRequest(param, values.value(id)));
-        if (response.generalStatus != CIPGeneralStatus::kSuccess)
-            continue;
-
-        if (!param.writeCmd.isEmpty() && commitParam(param, client.get()))
-            result.insert(id);
-    }
-
-    return result;
+    return param.writeCmd.isEmpty() && commitParam(param, client.get());
 }
 
 void QnFlirEIPResource::fetchAndSetAdvancedParameters()
 {
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    m_advancedParameters.clear();
+    m_advancedParametersProvider.clear();
 
     auto templateFile = getAdvancedParametersTemplate();
     QnCameraAdvancedParams params;
@@ -453,7 +430,7 @@ void QnFlirEIPResource::fetchAndSetAdvancedParameters()
     }
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters(params);
-    m_advancedParameters = params.filtered(supportedParams);
+    m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
 QString QnFlirEIPResource::getAdvancedParametersTemplate() const

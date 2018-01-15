@@ -23,6 +23,8 @@ public:
 
 public:
     HanwhaPtzController(const HanwhaResourcePtr& resource);
+    virtual ~HanwhaPtzController() override;
+
     virtual Ptz::Capabilities getCapabilities() const override;
     void setPtzCapabilities(Ptz::Capabilities capabilities);
     void setPtzLimits(const QnPtzLimits& limits);

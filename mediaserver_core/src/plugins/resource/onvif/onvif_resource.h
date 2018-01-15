@@ -76,11 +76,11 @@ struct QnOnvifServiceUrls
 };
 
 class QnPlOnvifResource:
-    public nx::mediaserver::resource::Camera,
-    public nx::mediaserver::resource::Camera::AdvancedParametersProvider
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
     using base_type = nx::mediaserver::resource::Camera;
+
 public:
 
     typedef GSoapAsyncCallWrapper <
@@ -233,6 +233,9 @@ public:
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
+    virtual QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    virtual QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
@@ -274,6 +277,7 @@ public:
     QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
     static bool isCameraForcedToOnvif(const QString& manufacturer, const QString& model);
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 protected:
@@ -370,10 +374,6 @@ protected:
     void setMaxChannels(int value);
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-    // TODO: Move out to a different class:
-    virtual QnCameraAdvancedParams descriptions() override;
-    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
-    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
@@ -588,8 +588,9 @@ private:
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
 	mutable QnOnvifServiceUrls m_serviceUrls;
     mutable QnResourceVideoLayoutPtr m_videoLayout;
+
 protected:
-    QnCameraAdvancedParams m_advancedParameters;
+    ApiMultiAdvancedParamitersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };

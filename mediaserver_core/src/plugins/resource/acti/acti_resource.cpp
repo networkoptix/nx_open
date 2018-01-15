@@ -59,7 +59,8 @@ QnActiResource::QnActiResource() :
     m_hasAudio(false),
     m_outputCount(0),
     m_inputCount(0),
-    m_inputMonitored(false)
+    m_inputMonitored(false),
+    m_advancedParametersProvider(this)
 {
     m_audioTransmitter.reset(new ActiAudioTransmitter(this));
     setVendor(lit("ACTI"));
@@ -782,6 +783,45 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
+QnCameraAdvancedParamValueMap QnActiResource::getApiParamiters(const QSet<QString>& ids)
+{
+    QnCameraAdvancedParamValueList result;
+    bool success = true;
+    const auto params = getParamsByIds(ids);
+    const auto queries = buildGetParamsQueries(params);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+    return result;
+}
+
+QSet<QString> QnActiResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
+{
+    bool success;
+    QSet<QString> idList;
+    for(const auto& value: values.toValueList())
+        idList.insert(value.id);
+
+    QnCameraAdvancedParamValueList result;
+    const auto params = getParamsByIds(idList);
+    const auto valueList = values.toValueList();
+    const auto queries = buildSetParamsQueries(valueList);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+
+    const auto maintenanceQueries = buildMaintenanceQueries(valueList);
+    if(!maintenanceQueries.empty())
+    {
+        executeParamsQueries(maintenanceQueries, success);
+        return success ? idList : QSet<QString>();
+    }
+
+    QSet<QString> resultIds;
+    for (const auto value: result)
+        resultIds.insert(value.id);
+
+    return resultIds;
+}
+
 int QnActiResource::getMaxFps() const
 {
     return m_availFps[0].last();
@@ -974,7 +1014,7 @@ QList<QnCameraAdvancedParameter> QnActiResource::getParamsByIds(const QSet<QStri
     QList<QnCameraAdvancedParameter> params;
     for(const auto& id: idList)
     {
-        auto param = m_advancedParameters.getParameterById(id);
+        auto param = m_advancedParametersProvider.getParameterById(id);
         params.append(param);
     }
     return  params;
@@ -984,7 +1024,7 @@ QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet
 {
     QMap<QString, QnCameraAdvancedParameter> params;
     for(const auto& id: idList)
-        params[id] = m_advancedParameters.getParameterById(id);
+        params[id] = m_advancedParametersProvider.getParameterById(id);
 
     return  params;
 }
@@ -1327,8 +1367,7 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
 
 void QnActiResource::fetchAndSetAdvancedParameters()
 {
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    m_advancedParameters.clear();
+    m_advancedParametersProvider.clear();
 
     auto templateFile = getAdvancedParametersTemplate();
     QnCameraAdvancedParams params;
@@ -1338,7 +1377,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
         return;
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters(params);
-    m_advancedParameters = params.filtered(supportedParams);
+    m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
 QString QnActiResource::getAdvancedParametersTemplate() const
@@ -1395,52 +1434,7 @@ void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
 std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     QnActiResource::advancedParametersProviders()
 {
-    return {this};
-}
-
-QnCameraAdvancedParams QnActiResource::descriptions()
-{
-    return m_advancedParameters;
-}
-
-QnCameraAdvancedParamValueMap QnActiResource::get(const QSet<QString>& ids)
-{
-    QnCameraAdvancedParamValueList result;
-    bool success = true;
-    const auto params = getParamsByIds(ids);
-    const auto queries = buildGetParamsQueries(params);
-    const auto queriesResults = executeParamsQueries(queries, success);
-    parseParamsQueriesResult(queriesResults, params, result);
-    return result;
-}
-
-QSet<QString> QnActiResource::set(const QnCameraAdvancedParamValueMap& values)
-{
-
-    bool success;
-    QSet<QString> idList;
-    for(const auto& value: values.toValueList())
-        idList.insert(value.id);
-
-    QnCameraAdvancedParamValueList result;
-    const auto params = getParamsByIds(idList);
-    const auto valueList = values.toValueList();
-    const auto queries = buildSetParamsQueries(valueList);
-    const auto queriesResults = executeParamsQueries(queries, success);
-    parseParamsQueriesResult(queriesResults, params, result);
-
-    const auto maintenanceQueries = buildMaintenanceQueries(valueList);
-    if(!maintenanceQueries.empty())
-    {
-        executeParamsQueries(maintenanceQueries, success);
-        return success ? idList : QSet<QString>();
-    }
-
-    QSet<QString> resultIds;
-    for (const auto value: result)
-        resultIds.insert(value.id);
-
-    return resultIds;
+    return {&m_advancedParametersProvider};
 }
 
 #endif // #ifdef ENABLE_ACTI

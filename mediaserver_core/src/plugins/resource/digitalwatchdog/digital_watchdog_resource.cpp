@@ -470,7 +470,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     QVector<QPair<QnCameraAdvancedParameter, QString>> moreParamsToProcess;
     for(const QnCameraAdvancedParamValue &value: values)
     {
-        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
+        QnCameraAdvancedParameter parameter = m_advancedParametersProvider.getParameterById(value.id);
         if (parameter.isValid())
         {
             if (kCproParameters.contains(parameter.id))

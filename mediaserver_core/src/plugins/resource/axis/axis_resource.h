@@ -18,8 +18,7 @@
 class QnAxisPtzController;
 
 class QnPlAxisResource:
-    public nx::mediaserver::resource::Camera,
-    public nx::mediaserver::resource::Camera::AdvancedParametersProvider
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -69,6 +68,9 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
+    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
+
     AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
@@ -105,10 +107,6 @@ private:
     void stopInputPortMonitoringSync();
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-    // TODO: Move out to a different class:
-    virtual QnCameraAdvancedParams descriptions() override;
-    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
-    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
     QList<AxisResolution> m_resolutionList;
@@ -145,7 +143,7 @@ private:
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    QnCameraAdvancedParams m_advancedParameters;
+    Camera::ApiMultiAdvancedParamitersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

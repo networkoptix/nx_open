@@ -19,13 +19,11 @@ class QnActiPtzController;
 
 class QnActiResource:
     public nx::mediaserver::resource::Camera,
-    public nx::mediaserver::resource::Camera::AdvancedParametersProvider,
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 
 public:
-
     typedef QMap<QString, QString> ActiSystemInfo;
 
     static const QString MANUFACTURE;
@@ -44,6 +42,9 @@ public:
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
 
     virtual QString getDriverName() const override;
+
+    QnCameraAdvancedParamValueMap getApiParamiters(const QSet<QString>& ids);
+    QSet<QString> setApiParamiters(const QnCameraAdvancedParamValueMap& values);
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -103,6 +104,7 @@ public:
 
     virtual bool allowRtspVideoLayout() const override { return false; }
     bool SetupAudioInput();
+
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -159,10 +161,6 @@ private:
     boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-    // TODO: Move out to a different class:
-    virtual QnCameraAdvancedParams descriptions() override;
-    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
-    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
     class TriggerOutputTask
@@ -216,11 +214,8 @@ private:
     int m_inputCount;
     bool m_inputMonitored;
     QnMutex m_audioCfgMutex;
-    QnMutex m_physicalParamsMutex;
     boost::optional<bool> m_audioInputOn;
-    QnCameraAdvancedParams m_advancedParameters;
-    QnCameraAdvancedParams m_advancedParametersCache;
-
+    Camera::ApiMultiAdvancedParamitersProvider<QnActiResource> m_advancedParametersProvider;
 };
 
 #endif // #ifdef ENABLE_ACTI

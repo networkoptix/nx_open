@@ -40,7 +40,8 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_discoveryManager( discoveryManager ),
     m_refCounter( 2 ),
     m_encoderCount( 0 ),
-    m_cameraManager3( nullptr )
+    m_cameraManager3( nullptr ),
+    m_advancedParametersProvider( this )
 {
     setVendor( discoveryManager.getVendorName() );
 
@@ -72,16 +73,10 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     QnThirdPartyResource::advancedParametersProviders()
 {
-    return {this};
+    return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParams QnThirdPartyResource::descriptions()
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_advancedParameters;
-}
-
-QnCameraAdvancedParamValueMap QnThirdPartyResource::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnThirdPartyResource::getApiParamiters(const QSet<QString>& ids)
 {
     QnMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
@@ -124,7 +119,7 @@ QnCameraAdvancedParamValueMap QnThirdPartyResource::get(const QSet<QString>& ids
     return {};
 }
 
-QSet<QString> QnThirdPartyResource::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnThirdPartyResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
 {
     if (!setParam("", "{"))
         return QSet<QString>();
@@ -716,13 +711,10 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
                     NX_LOG(lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)), cl_logWARNING);
                 }
 
-                {
-                    QnMutexLocker lk( &m_mutex );
-                    if (success)
-                        m_advancedParameters = std::move(params);
-                    else
-                        m_advancedParameters.clear();
-                }
+                if (success)
+                    m_advancedParametersProvider.assign(std::move(params));
+                else
+                    m_advancedParametersProvider.clear();
             }
             else {
                 NX_LOG( lit("Could not validate camera parameters description xml"), cl_logWARNING );

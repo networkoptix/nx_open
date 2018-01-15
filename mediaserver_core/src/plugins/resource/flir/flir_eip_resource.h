@@ -19,8 +19,7 @@ enum class FlirAlarmMonitoringState
 };
 
 class QnFlirEIPResource:
-    public nx::mediaserver::resource::Camera,
-    public nx::mediaserver::resource::Camera::AdvancedParametersProvider
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 public:
@@ -40,6 +39,9 @@ public:
 
     static QByteArray PASSTHROUGH_EPATH();
     static const QString MANUFACTURE;
+
+    boost::optional<QString> getApiParameter(const QString& id);
+    bool setApiParameter(const QString& id, const QString& value);
 
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -62,6 +64,7 @@ protected:
 
 private:
     QnCameraAdvancedParams m_advancedParameters;
+    ApiSingleAdvancedParamitersProvider<QnFlirEIPResource> m_advancedParametersProvider;
     mutable QnMutex m_physicalParamsMutex;
     mutable QnMutex m_ioMutex;
     mutable QnMutex m_alarmMutex;
@@ -138,10 +141,6 @@ private:
     void checkInputPortStatus();
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-    // TODO: Move out to a different class:
-    virtual QnCameraAdvancedParams descriptions() override;
-    virtual QnCameraAdvancedParamValueMap get(const QSet<QString>& ids) override;
-    virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private slots:
     void checkInputPortStatusDone();

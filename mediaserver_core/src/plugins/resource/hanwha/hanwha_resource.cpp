@@ -261,13 +261,7 @@ nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveM
     return m_remoteArchiveManager.get();
 }
 
-QnCameraAdvancedParams QnPlAxisResource::descriptions()
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_advancedParameters;
-}
-
-QnCameraAdvancedParamValueMap HanwhaResource::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap HanwhaResource::getApiParamiters(const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap result;
 
@@ -280,7 +274,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::get(const QSet<QString>& ids)
 
     for (const auto& id: ids)
     {
-        const auto parameter = m_advancedParameters.getParameterById(id);
+        const auto parameter = m_advancedParametersProvider.getParameterById(id);
         if (parameter.dataType == QnCameraAdvancedParameter::DataType::Button)
             continue;
 
@@ -319,7 +313,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::get(const QSet<QString>& ids)
                 {
                     QString parameterString;
                     const auto parameterId = itr->second;
-                    const auto parameter = m_advancedParameters.getParameterById(parameterId);
+                    const auto parameter = m_advancedParametersProvider.getParameterById(parameterId);
                     const auto info = advancedParameterInfo(parameterId);
                     if (!info)
                         continue;
@@ -365,7 +359,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::get(const QSet<QString>& ids)
     return result;
 }
 
-QSet<QString> HanwhaResource::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> HanwhaResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
 {
     using ParameterMap = std::map<QString, QString>;
     using SubmenuMap = std::map<QString, ParameterMap>;
@@ -376,12 +370,12 @@ QSet<QString> HanwhaResource::set(const QnCameraAdvancedParamValueMap& values)
 
     std::map<UpdateInfo, ParameterMap> requests;
 
-    const auto buttonParameter = findButtonParameter(values);
+    const auto buttonParameter = findButtonParameter(values.toValueList());
     if (buttonParameter)
     {
         const auto buttonInfo = advancedParameterInfo(buttonParameter->id);
         if (!buttonInfo)
-            return false;
+            return {};
 
         const bool success = executeCommand(*buttonParameter);
         const auto streamsToReopen = buttonInfo->streamsToReopen();
@@ -389,7 +383,7 @@ QSet<QString> HanwhaResource::set(const QnCameraAdvancedParamValueMap& values)
             streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo),
             streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo));
 
-        return success;
+        return success ? QSet<QString>{buttonParameter->id} : QSet<QString>();
     }
 
     const auto filteredParameters = filterGroupParameters(values.toValueList());
@@ -400,7 +394,7 @@ QSet<QString> HanwhaResource::set(const QnCameraAdvancedParamValueMap& values)
         if (!info)
             continue;
 
-        const auto parameter = m_advancedParameters.getParameterById(value.id);
+        const auto parameter = m_advancedParametersProvider.getParameterById(value.id);
         const auto resourceProperty = info->resourceProperty();
 
         if (!resourceProperty.isEmpty())
@@ -1088,12 +1082,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!success)
         return CameraDiagnostics::NoErrorResult();
 
-    parameters = filterParameters(parameters);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_advancedParameters = parameters;
-    }
+    m_advancedParametersProvider.assign(filterParameters(parameters));
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2264,9 +2253,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         return result;
 
     // fetch group leads;
-    QnCameraAdvancedParamValueList groupLeadValues;
-    bool success = getParamsPhysical(groupLeadsToFetch, groupLeadValues);
-
+    QnCameraAdvancedParamValueList groupLeadValues = getApiParamiters(groupLeadsToFetch).toValueList();
     for (const auto& lead: groupLeadValues)
     {
         const auto info = advancedParameterInfo(lead.id);
@@ -2321,7 +2308,7 @@ boost::optional<QnCameraAdvancedParamValue> HanwhaResource::findButtonParameter(
 {
     for (const auto& parameterValue: parameterValues)
     {
-        const auto parameter = m_advancedParameters.getParameterById(parameterValue.id);
+        const auto parameter = m_advancedParametersProvider.getParameterById(parameterValue.id);
         if (!parameter.isValid())
             return boost::none;
 
@@ -2336,7 +2323,7 @@ boost::optional<QnCameraAdvancedParamValue> HanwhaResource::findButtonParameter(
 
 bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
 {
-    const auto parameter = m_advancedParameters.getParameterById(command.id);
+    const auto parameter = m_advancedParametersProvider.getParameterById(command.id);
     if (!parameter.isValid())
         return false;
 

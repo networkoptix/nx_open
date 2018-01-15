@@ -5,8 +5,8 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class CameraMediaStreamInfo
 {

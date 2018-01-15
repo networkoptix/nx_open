@@ -121,7 +121,8 @@ private:
 QnPlAxisResource::QnPlAxisResource():
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
-    m_outputIoMonitor(Qn::PT_Output)
+    m_outputIoMonitor(Qn::PT_Output),
+    m_advancedParametersProvider(this)
 {
     m_audioTransmitter.reset(new QnAxisAudioTransmitter(this));
     setVendor(lit("Axis"));
@@ -1470,14 +1471,10 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& ids) const
 {
     QList<QnCameraAdvancedParameter> params;
-
+    for (const auto& id: ids)
     {
-        QnMutexLocker lock(&m_mutex);
-        for (const auto& id: ids)
-        {
-            auto param = m_advancedParameters.getParameterById(id);
-            params.append(param);
-        }
+        auto param = m_advancedParametersProvider.getParameterById(id);
+        params.append(param);
     }
 
     return params;
@@ -1548,13 +1545,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
     params.applyOverloads(overloads);
 
     auto supportedParams = calculateSupportedAdvancedParameters(params);
-
-    auto filteredParams = params.filtered(supportedParams);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_advancedParameters = filteredParams;
-    }
+    m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
 bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
@@ -1662,7 +1653,7 @@ QString QnPlAxisResource::buildSetParamsQuery(const QnCameraAdvancedParamValueLi
         QnMutexLocker lock(&m_mutex);
         for (const auto& paramIdAndValue: params)
         {
-            auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+            auto param = m_advancedParametersProvider.getParameterById(paramIdAndValue.id);
             if (isMaintenanceParam(param))
                 continue;
 
@@ -1690,7 +1681,7 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
         QnMutexLocker lock(&m_mutex);
         for (const auto& paramIdAndValue: params)
         {
-            auto param = m_advancedParameters.getParameterById(paramIdAndValue.id);
+            auto param = m_advancedParametersProvider.getParameterById(paramIdAndValue.id);
             if (isMaintenanceParam(param))
                 return query + param.readCmd;
         }
@@ -1701,16 +1692,10 @@ QString QnPlAxisResource::buildMaintenanceQuery(const QnCameraAdvancedParamValue
 std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     QnPlAxisResource::advancedParametersProviders()
 {
-    return {this};
+    return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParams QnPlAxisResource::descriptions()
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_advancedParameters;
-}
-
-QnCameraAdvancedParamValueMap QnPlAxisResource::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlAxisResource::getApiParamiters(const QSet<QString>& ids)
 {
     bool success = true;
     const auto params = getParamsByIds(ids);
@@ -1719,7 +1704,7 @@ QnCameraAdvancedParamValueMap QnPlAxisResource::get(const QSet<QString>& ids)
     return parseParamsQueriesResult(queriesResults, params);
 }
 
-QSet<QString> QnPlAxisResource::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlAxisResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
 {
     const auto valueList = values.toValueList();
     const auto query = buildSetParamsQuery(valueList);

@@ -332,6 +332,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
     m_prevPullMessageResponseClock(0),
     m_inputPortCount(0),
     m_videoLayout(nullptr),
+    m_advancedParametersProvider(this),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
@@ -2851,15 +2852,10 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
 std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
     QnPlOnvifResource::advancedParametersProviders()
 {
-    return {this};
+    return {&m_advancedParametersProvider};
 }
 
-QnCameraAdvancedParams QnPlOnvifResource::descriptions()
-{
-    return m_advancedParameters;
-}
-
-QnCameraAdvancedParamValueMap QnPlOnvifResource::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParamiters(const QSet<QString>& ids)
 {
     if (m_appStopping)
         return {};
@@ -2886,7 +2882,7 @@ QnCameraAdvancedParamValueMap QnPlOnvifResource::get(const QSet<QString>& ids)
     return result;
 }
 
-QSet<QString> QnPlOnvifResource::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlOnvifResource::setApiParamiters(const QnCameraAdvancedParamValueMap& values)
 {
     QnCameraAdvancedParamValueList result;
     {
@@ -2921,7 +2917,7 @@ bool QnPlOnvifResource::setAdvancedParametersUnderLock(const QnCameraAdvancedPar
     bool success = true;
     for(const QnCameraAdvancedParamValue &value: values)
     {
-        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
+        QnCameraAdvancedParameter parameter = m_advancedParametersProvider.getParameterById(value.id);
         if (parameter.isValid() && setAdvancedParameterUnderLock(parameter, value.value))
             result << value;
         else
@@ -3005,8 +3001,7 @@ QSet<QString> QnPlOnvifResource::calculateSupportedAdvancedParameters() const {
 }
 
 void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    m_advancedParameters.clear();
+    m_advancedParametersProvider.clear();
 
     QnCameraAdvancedParams params;
     if (!loadAdvancedParametersTemplate(params))
@@ -3015,7 +3010,7 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
     initAdvancedParametersProviders(params);
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
-    m_advancedParameters = params.filtered(supportedParams);
+    m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
