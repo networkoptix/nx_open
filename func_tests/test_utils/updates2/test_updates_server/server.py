@@ -22,17 +22,12 @@ UPDATE_PATH_PATTERN = '/{}/{}/update.json'
 UPDATES_PATH = '/updates.json'
 
 DATA_FOLDER_NAME = 'data'
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FOLDER_NAME)
 DUMMY_FILE_NAME = 'dummy.raw'
+DUMMY_FILE_PATH = os.path.join(DATA_DIR, DUMMY_FILE_NAME)
 UPDATES_FILE_NAME = 'updates.json'
 FILE_PATTERN = '{}.{}.json'
 
-
-def data_folder_path():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FOLDER_NAME)
-
-
-def dummy_file_path():
-    return os.path.join(data_folder_path(), DUMMY_FILE_NAME)
 
 
 def collect_actual_data():
@@ -95,27 +90,30 @@ def append_new_versions(root_obj, path_to_update_obj, new_versions):
                 amend_packages(new_update_obj, 'clientPackages')
                 amend_packages(new_update_obj, 'packages')
 
-                path_to_update_obj[UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])] = \
-                    new_update_obj
+                new_path_key = UPDATE_PATH_PATTERN.format(customization_name, new_version[1].split('.')[-1])
+                path_to_update_obj[new_path_key] = new_update_obj
 
     return root_obj, path_to_update_obj
 
 
 def save_data_to_files(root_obj, path_to_update_obj):
-    shutil.rmtree(data_folder_path(), ignore_errors=True)
-    os.mkdir(data_folder_path())
-    file_path = os.path.join(data_folder_path(), UPDATES_FILE_NAME)
+    shutil.rmtree(DATA_DIR, ignore_errors=True)
+    os.mkdir(DATA_DIR)
+    file_path = os.path.join(DATA_DIR, UPDATES_FILE_NAME)
     with open(file_path, 'w') as f:
         f.write(json.dumps(root_obj))
     for key, value in path_to_update_obj.items():
         key_splits = key.split('/')
-        file_path = os.path.join(data_folder_path(), FILE_PATTERN.format(key_splits[1], key_splits[2]))
+        file_path = os.path.join(DATA_DIR, FILE_PATTERN.format(key_splits[1], key_splits[2]))
         with open(file_path, 'w') as f:
             f.write(json.dumps(value))
 
 
 def load_data_from_files():
-    for dir_name, dirs, files in os.walk(data_folder_path()):
+    if not os.path.exists(DATA_DIR):
+        raise Exception('Generated data directory has not been found')
+    root_obj, path_to_update = None, None
+    for dir_name, dirs, files in os.walk(DATA_DIR):
         path_to_update = dict()
         for file_name in files:
             if file_name == DUMMY_FILE_NAME:
@@ -129,6 +127,8 @@ def load_data_from_files():
                     file_name_splits = file_name.split('.')
                     update_path = UPDATE_PATH_PATTERN.format(file_name_splits[0], file_name_splits[1])
                     path_to_update[update_path] = json_obj
+    if root_obj is None or path_to_update is None:
+        raise Exception('Invalid generated data')
     return root_obj, path_to_update
 
 
@@ -152,6 +152,10 @@ def make_handler_class(root_obj, path_to_update, args):
             self.send_header('Content-type', content_type)
             self.end_headers()
 
+        def _send_not_found(self):
+            self.send_response(404)
+            self.end_headers()
+
         def do_GET(self):
             if self.path in self.path_to_update:
                 self._send_ok_headers('application/json')
@@ -160,29 +164,34 @@ def make_handler_class(root_obj, path_to_update, args):
                 path_components = self.path.split('/')
                 possible_path_key = '/'.join(path_components[:-1]) + '/update.json'
                 requested_file_name = path_components[-1]
-                if possible_path_key in self.path_to_update:
-                    update_obj = self.path_to_update[possible_path_key]
 
-                    def find_file_in_packages(packages_name):
-                        for os_key, os_obj in update_obj[packages_name].items():
-                            for file_key, file_obj in os_obj.items():
-                                if file_obj['file'] == requested_file_name:
-                                    return True
+                if possible_path_key not in self.path_to_update:
+                    self._send_not_found()
+                    return
 
-                    if find_file_in_packages('packages') or find_file_in_packages('clientPackages'):
-                        if not os.path.exists(dummy_file_path()):
-                            raise Exception('Dummy file not found')
-                        else:
-                            self._send_ok_headers('application/zip')
-                            with open(dummy_file_path(), 'rb') as f:
-                                while True:
-                                    read_buf = f.read(4096)
-                                    if len(read_buf) <= 0:
-                                        break
-                                    self.wfile.write(read_buf)
+                update_obj = self.path_to_update[possible_path_key]
+
+                def file_found_in_package(packages_name):
+                    for os_key, os_obj in update_obj[packages_name].items():
+                        for file_key, file_obj in os_obj.items():
+                            if file_obj['file'] == requested_file_name:
+                                return True
+
+                if not file_found_in_package('packages') and not file_found_in_package('clientPackages'):
+                    self._send_not_found()
+                    return
+
+                if not os.path.exists(DUMMY_FILE_PATH):
+                    raise Exception('Dummy file not found')
+                self._send_ok_headers('application/zip')
+                with open(DUMMY_FILE_PATH, 'rb') as f:
+                    while True:
+                        read_buf = f.read(4096)
+                        if len(read_buf) <= 0:
+                            break
+                        self.wfile.write(read_buf)
             else:
-                self.send_response(404)
-                self.end_headers()
+                self._send_not_found()
 
     return TestHandler
 
@@ -194,7 +203,7 @@ def main():
         new_root, new_path_to_update_obj = append_new_versions(*collect_actual_data(),
                                                                [('4.0', '4.0.0.21200', 'cloud-test.hdw.mx')])
         save_data_to_files(new_root, new_path_to_update_obj)
-        with open(dummy_file_path(), 'wb') as f:
+        with open(DUMMY_FILE_PATH, 'wb') as f:
             f.seek(1024 * 1024 * 100)
             f.write(b'\0')
     else:
@@ -202,12 +211,14 @@ def main():
 
     server_address = ('', 8080)
     print('Starting HTTP server')
+    server = None
     try:
         server = HTTPServer(server_address, make_handler_class(new_root, new_path_to_update_obj, args))
         server.serve_forever()
     except KeyboardInterrupt:
         print('Shutting down...')
-        server.shutdown()
+        if server:
+            server.shutdown()
 
 
 if __name__ == '__main__':
