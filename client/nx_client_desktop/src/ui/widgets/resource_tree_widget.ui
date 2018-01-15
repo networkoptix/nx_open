@@ -28,7 +28,7 @@
    </property>
    <item>
     <widget class="QWidget" name="filter" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -50,6 +50,9 @@
          <string>Filter</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="nx::client::desktop::ShortcutHintWidget" name="shortcutHintWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -100,6 +103,11 @@
    <class>nx::client::desktop::SearchEdit</class>
    <extends>QWidget</extends>
    <header location="global">nx/client/desktop/common/widgets/search_edit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ShortcutHintWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/shortcut_hint_widget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

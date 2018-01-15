@@ -52,7 +52,7 @@ SearchEdit::SearchEdit(QWidget* parent):
     setAttribute(Qt::WA_InputMethodEnabled);
     setAttribute(Qt::WA_MacShowFocusRect);
 
-    const auto menuAction = new QAction(qnSkin->icon("theme/input_search.png"), QString(), this);
+    const auto menuAction = new QAction(qnSkin->icon("theme/search_drop.png"), QString(), this);
     menuAction->setMenu(m_menu);
 
     m_lineEdit->setFrame(false);

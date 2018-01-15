@@ -448,7 +448,9 @@ void QnResourceTreeWidget::updateFilter()
     QString filter = ui->filterLineEdit->text();
 
     /* Don't allow empty filters. */
-    if (!filter.isEmpty() && filter.trimmed().isEmpty())
+    const auto trimmed = filter.trimmed();
+    ui->shortcutHintWidget->setVisible(!trimmed.isEmpty());
+    if (!filter.isEmpty() && trimmed.isEmpty())
     {
         ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
         return;
@@ -555,6 +557,11 @@ void QnResourceTreeWidget::initializeFilter()
         tr("Local Files")});
 
     ui->filter->setVisible(false);
+
+    ui->shortcutHintWidget->setDescriptions({
+        {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
+        {QKeySequence(Qt::Key_Control, Qt::Key_Enter), tr("open all at a new layout")}});
+    ui->shortcutHintWidget->setVisible(false);
 
     const auto filterEdit = ui->filterLineEdit;
     filterEdit->setTags(kFilterCategories);
