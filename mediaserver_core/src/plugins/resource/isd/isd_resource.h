@@ -32,6 +32,8 @@ protected:
     QSize m_resolution1;
     QSize m_resolution2;
 
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCroppingPhysical(QRect cropping);

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #ifdef ENABLE_FLIR
 
@@ -31,6 +31,8 @@ public:
     FcResource();
     virtual ~FcResource();
 
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;

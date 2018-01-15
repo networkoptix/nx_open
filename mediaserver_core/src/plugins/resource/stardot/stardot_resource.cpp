@@ -130,6 +130,13 @@ void QnStardotResource::parseInfo(const QByteArray& info)
     }
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnStardotResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnStardotResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(lit("admin"), lit("admin"));

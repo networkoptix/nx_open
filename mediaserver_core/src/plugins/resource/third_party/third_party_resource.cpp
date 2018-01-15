@@ -443,6 +443,13 @@ nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int enc
     return nxcip::Resolution();
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnThirdPartyResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));

@@ -229,6 +229,13 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));

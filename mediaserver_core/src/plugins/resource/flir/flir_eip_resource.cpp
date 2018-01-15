@@ -38,6 +38,13 @@ QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
         0x01);
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
 {
     m_eipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());

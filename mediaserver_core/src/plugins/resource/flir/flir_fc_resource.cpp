@@ -43,6 +43,13 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
+nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result FcResource::initializeCameraDriver()
 {
     quint16 port = nexus::kDefaultNexusPort;
@@ -128,7 +135,7 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
         {
             QnMutexLocker lock(&m_ioMutex);
             m_callbackIsInProgress = true;
-            
+
             lock.unlock();
             emit cameraInput(
                 toSharedPointer(this),

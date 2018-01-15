@@ -352,10 +352,32 @@ CameraDiagnostics::Result Camera::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
+StreamCapabilityMap Camera::getStreamCapabilityMap(bool primaryStream)
+{
+    auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
+    {
+        nx::media::CameraStreamCapability result;
+        result.minBitrateKbps = rawSuggestBitrateKbps(Qn::QualityLowest, key.resolution, 1);
+        result.maxBitrateKbps = rawSuggestBitrateKbps(Qn::QualityHighest, key.resolution, getMaxFps());
+        result.maxFps = getMaxFps();
+        return result;
+    };
+
+    StreamCapabilityMap result = getStreamCapabilityMapFromDrive(primaryStream);
+    for (auto itr = result.begin(); itr != result.end(); ++itr)
+    {
+        auto& value = itr.value();
+        if (value.isNull())
+            value = defaultStreamCapability(itr.key());
+    }
+    return result;
+}
+
 std::vector<Camera::AdvancedParametersProvider*> Camera::advancedParametersProviders()
 {
     return {};
 }
+
 
 } // namespace resource
 } // namespace mediaserver

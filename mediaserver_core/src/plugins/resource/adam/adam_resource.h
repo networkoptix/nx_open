@@ -46,6 +46,7 @@ public slots:
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override { return nullptr; }

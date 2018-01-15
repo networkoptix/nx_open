@@ -127,6 +127,13 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
 {
     QUrl url = getUrl();

@@ -42,6 +42,13 @@ HikvisionResource::~HikvisionResource()
     m_audioTransmitter.reset();
 }
 
+nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result HikvisionResource::initializeCameraDriver()
 {
     tryToEnableOnvifSupport(getDeviceOnvifUrl(), getAuth());

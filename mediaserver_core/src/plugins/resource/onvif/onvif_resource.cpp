@@ -570,6 +570,13 @@ void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
 {
     if (m_appStopping)

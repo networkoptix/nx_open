@@ -40,6 +40,13 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(lit("root"), lit("system"));

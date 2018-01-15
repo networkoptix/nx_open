@@ -83,6 +83,13 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));

@@ -46,6 +46,8 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     void setChunks(const QnTimePeriodList& chunks);
     QnSecurityCamResourcePtr getOtherResource(int channel);

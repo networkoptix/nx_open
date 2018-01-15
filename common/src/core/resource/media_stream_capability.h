@@ -8,6 +8,8 @@ namespace media {
 
 struct CameraStreamCapability
 {
+    bool isNull() const { return maxFps == 0;  }
+
     int minBitrateKbps = 0;
     int maxBitrateKbps = 0;
     int defaultBitrateKbps = 0;

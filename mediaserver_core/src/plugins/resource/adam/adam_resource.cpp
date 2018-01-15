@@ -39,6 +39,13 @@ QString QnAdamResource::getDriverName() const
     return kManufacture;
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 {
     QUrl url(getUrl());
@@ -230,7 +237,7 @@ QnIOPortDataList QnAdamResource::getInputPortList() const
         for (const auto& ioPort: savedIO)
         {
             if (ioPort.portType == Qn::PT_Input)
-                savedInputs.push_back(ioPort);            
+                savedInputs.push_back(ioPort);
         }
 
         return mergeIOPortData(deviceInputs, savedInputs);

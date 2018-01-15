@@ -18,6 +18,7 @@ public:
 
     void updateFlipState();
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool setApiParameter(const QString &id, const QString &value) override;

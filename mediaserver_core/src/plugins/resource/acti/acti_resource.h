@@ -106,6 +106,7 @@ public:
     bool SetupAudioInput();
 
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
@@ -120,7 +121,7 @@ private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
-    QString bitrateToDefaultString(int bitrateKbps) const; 
+    QString bitrateToDefaultString(int bitrateKbps) const;
 
     void initialize2WayAudio( const ActiSystemInfo& systemInfo );
     void initializeIO( const ActiSystemInfo& systemInfo );

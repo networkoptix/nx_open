@@ -26,6 +26,13 @@ void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnDroidResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnDroidResource::initializeCameraDriver()
 {
     return CameraDiagnostics::NoErrorResult();

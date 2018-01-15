@@ -197,6 +197,12 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     httpClientCaptured->doGet( url );
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlAreconVisionResource::getStreamCapabilityMapFromDrive(bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
 {
     QString maxSensorWidth;

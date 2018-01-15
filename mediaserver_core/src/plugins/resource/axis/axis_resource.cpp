@@ -420,6 +420,13 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
     return !(square1 < square2);
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnPlAxisResource::getStreamCapabilityMapFromDrive(
+    bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
 {
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));

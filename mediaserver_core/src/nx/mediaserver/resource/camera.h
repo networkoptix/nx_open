@@ -2,10 +2,18 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_advanced_param.h>
+#include <core/resource/media_stream_capability.h>
 
 namespace nx {
 namespace mediaserver {
 namespace resource {
+
+struct StreamCapabilityKey
+{
+    QString codec;
+    QSize resolution;
+};
+using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
 
 class Camera: public QnVirtualCameraResource
 {
@@ -44,6 +52,9 @@ public:
         std::function<void(const QSet<QString>&)> handler = nullptr);
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
+
+    /** Gets supported codecs and their resolution list. */
+    StreamCapabilityMap getStreamCapabilityMap(bool primaryStream);
 
     /**
      * @param resolution Resolution for which we want to find the closest one.
@@ -186,6 +197,10 @@ protected:
     /** Override to add support for advanced paramiters. */
     virtual std::vector<AdvancedParametersProvider*>  advancedParametersProviders();
 
+    /** Gets supported codecs and their resolution list. For each key optional CameraStreamCapability could be provided.
+    * CameraStreamCapability could be null. That case it is auto-filled with default values.
+    */
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDrive(bool primaryStream) = 0;
 private:
     virtual CameraDiagnostics::Result initInternal() override;
 

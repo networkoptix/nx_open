@@ -13,7 +13,7 @@ public:
 
     QnDroidResource();
 
-    virtual int getMaxFps() const override; 
+    virtual int getMaxFps() const override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
@@ -22,6 +22,8 @@ public:
     virtual void setHostAddress(const QString &ip) override;
 
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };

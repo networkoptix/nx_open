@@ -40,6 +40,8 @@ public:
     simd128i* getMotionMaskBinData() const;
 
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setMotionMaskPhysical(int channel) override;

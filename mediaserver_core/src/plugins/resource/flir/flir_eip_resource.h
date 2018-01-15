@@ -43,6 +43,8 @@ public:
     boost::optional<QString> getApiParameter(const QString& id);
     bool setApiParameter(const QString& id, const QString& value);
 
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;

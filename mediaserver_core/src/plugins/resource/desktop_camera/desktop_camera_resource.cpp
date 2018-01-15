@@ -71,6 +71,12 @@ bool QnDesktopCameraResource::isReadyToDetach() const {
     return !QnDesktopCameraResourceSearcher::instance()->isCameraConnected(camera);  // check if we have already lost connection
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnDesktopCameraResource::getStreamCapabilityMapFromDrive(
+    bool /*primaryStream*/)
+{
+    return nx::mediaserver::resource::StreamCapabilityMap(); //< Not used.
+}
+
 CameraDiagnostics::Result QnDesktopCameraResource::initializeCameraDriver()
 {
     return CameraDiagnostics::NoErrorResult();

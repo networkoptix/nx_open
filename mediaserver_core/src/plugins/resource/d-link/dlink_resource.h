@@ -24,10 +24,10 @@ struct QnDlink_cam_info
     // returns resolution with width not less than width
     QSize resolutionCloseTo(int width) const;
 
-    // returns next up bitrate 
+    // returns next up bitrate
     QByteArray bitrateCloseTo(int val);
 
-    // returns next up frame rate 
+    // returns next up frame rate
     int frameRateCloseTo(int fr);
 
     QSize primaryStreamResolution() const;
@@ -61,15 +61,17 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    
+
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrive(
+        bool primaryStream) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override; // does a lot of physical work
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCroppingPhysical(QRect cropping);
 
-    
+
 
 protected:
     QnDlink_cam_info  m_camInfo;

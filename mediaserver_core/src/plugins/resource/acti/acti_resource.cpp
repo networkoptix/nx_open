@@ -333,6 +333,12 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
     return false;
 }
 
+nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrive(bool primaryStream)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
 CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
 {
     CLHttpStatus status;
