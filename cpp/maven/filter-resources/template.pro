@@ -129,6 +129,7 @@ win* {
     DEFINES += \
         NX_KIT_API=__declspec(dllimport) \
         NX_NETWORK_API=__declspec(dllimport) \
+        NX_UPDATE_API=__declspec(dllimport) \
         NX_CASSANDRA_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
         NX_FUSION_API=__declspec(dllimport) \
@@ -141,6 +142,7 @@ win* {
     DEFINES += \
         NX_KIT_API= \
         NX_NETWORK_API= \
+        NX_UPDATE_API = \
         NX_CASSANDRA_API= \
         NX_UTILS_API= \
         NX_FUSION_API= \
