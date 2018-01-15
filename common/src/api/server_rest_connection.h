@@ -151,6 +151,7 @@ public:
         qint64 size,
         qint64 chunkSize,
         const QByteArray& md5,
+        qint64 ttl,
         PostCallback callback,
         QThread* targetThread = nullptr);
 

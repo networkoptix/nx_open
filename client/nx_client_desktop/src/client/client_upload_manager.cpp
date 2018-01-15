@@ -14,10 +14,11 @@ QnClientUploadManager::~QnClientUploadManager()
 QnFileUpload QnClientUploadManager::addUpload(
     const QnMediaServerResourcePtr& server,
     const QString& path,
+    qint64 ttl,
     QObject* context,
     Callback callback)
 {
-    std::unique_ptr<QnClientUploadWorker> worker = std::make_unique<QnClientUploadWorker>(server, path, this);
+    std::unique_ptr<QnClientUploadWorker> worker = std::make_unique<QnClientUploadWorker>(server, path, ttl, this);
 
     QnFileUpload result = worker->start();
     if (result.status == QnFileUpload::Error)

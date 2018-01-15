@@ -16,6 +16,7 @@ public:
     QnFileUpload upload;
     QnMediaServerResourcePtr server;
     QSharedPointer<QFile> file;
+    qint64 ttl = 0;
     QByteArray md5;
     int chunkSize = 1024 * 1024;
     int currentChunk = 0;
@@ -26,12 +27,13 @@ public:
     rest::Handle runningHandle = 0;
 };
 
-QnClientUploadWorker::QnClientUploadWorker(const QnMediaServerResourcePtr& server, const QString& path, QObject* parent):
+QnClientUploadWorker::QnClientUploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent):
     QObject(parent),
     d(new QnClientUploadWorkerPrivate)
 {
     d->server = server;
     d->file.reset(new QFile(path));
+    d->ttl = ttl;
 
     connect(&d->md5FutureWatcher, &QFutureWatcherBase::finished,
         this, &QnClientUploadWorker::handleMd5Calculated);
@@ -152,6 +154,7 @@ void QnClientUploadWorker::handleMd5Calculated()
         d->upload.size,
         d->chunkSize,
         d->md5.toHex(),
+        d->ttl,
         callback,
         thread());
 }

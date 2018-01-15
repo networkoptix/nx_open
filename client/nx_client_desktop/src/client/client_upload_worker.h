@@ -43,7 +43,7 @@ class QnClientUploadWorker: public QObject
 {
     Q_OBJECT
 public:
-    QnClientUploadWorker(const QnMediaServerResourcePtr& server, const QString& path, QObject* parent = nullptr);
+    QnClientUploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent = nullptr);
     ~QnClientUploadWorker();
 
     QnFileUpload start();

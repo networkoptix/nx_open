@@ -21,6 +21,13 @@
 #include <client/client_upload_manager.h>
 #include <client/client_wearable_manager.h>
 
+namespace {
+    /* Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.
+     * Also note that undershooting is not a problem here as a file that's currently open won't be
+     * deleted. */
+    const qint64 kDefaultUploadTtl = 1000 * 60 * 10;
+}
+
 QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -156,6 +163,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     QnFileUpload upload = qnClientModule->uploadManager()->addUpload(
         server,
         fileName,
+        kDefaultUploadTtl,
         this,
         [this](const QnFileUpload& upload) { at_upload_progress(upload); }
     );

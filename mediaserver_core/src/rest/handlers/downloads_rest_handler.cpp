@@ -227,6 +227,15 @@ int Helper::handleAddUpload(const QString& fileName)
         return makeInvalidParameterError("chunkSize", QnRestResult::MissingParameter);
     }
 
+    const auto ttlString = params.value("ttl");
+    if (!ttlString.isEmpty())
+    {
+        bool ok;
+        fileInfo.ttl = ttlString.toLongLong(&ok);
+        if (!ok)
+            return makeInvalidParameterError("ttl");
+    }
+
     fileInfo.status = FileInformation::Status::uploading;
 
     const auto errorCode = downloader->addFile(fileInfo);

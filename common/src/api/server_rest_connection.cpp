@@ -290,6 +290,7 @@ Handle ServerConnection::addFileUpload(
     qint64 size,
     qint64 chunkSize,
     const QByteArray& md5,
+    qint64 ttl,
     PostCallback callback,
     QThread* targetThread)
 {
@@ -299,6 +300,7 @@ Handle ServerConnection::addFileUpload(
             { lit("size"), QString::number(size) },
             { lit("chunkSize"), QString::number(chunkSize) },
             { lit("md5"), QString::fromUtf8(md5) },
+            { lit("ttl"), QString::number(ttl) },
             { lit("upload"), lit("true") } },
         QByteArray(),
         QByteArray(),
