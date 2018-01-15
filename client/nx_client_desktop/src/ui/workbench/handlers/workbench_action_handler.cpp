@@ -8,6 +8,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
 
+#include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
@@ -15,6 +16,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
+#include <QtWidgets/QHeaderView>
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
@@ -63,10 +65,10 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/client/core/utils/geometry.h>
-
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
+#include <nx/client/desktop/resource_views/functional_delegate_utilities.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -84,7 +86,6 @@
 #include <recording/time_period_list.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
@@ -103,6 +104,7 @@
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/camera_password_change_dialog.h>
+#include <ui/delegates/customizable_item_delegate.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -178,6 +180,8 @@
 #include "../extensions/workbench_stream_synchronizer.h"
 
 #include "core/resource/layout_item_data.h"
+
+#include <ui/delegates/resource_item_delegate.h>
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
@@ -186,6 +190,7 @@
 
 #include <nx/client/desktop/ui/main_window.h>
 #include <nx/client/desktop/ui/dialogs/device_addition_dialog.h>
+#include <ui/models/resource/resource_list_model.h>
 
 using nx::client::core::Geometry;
 
@@ -198,6 +203,8 @@ static const QString kBetaVersionShowOnceKey(lit("BetaVersion"));
 static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
+
+static constexpr int kSectionHeight = 20;
 
 } // namespace
 
@@ -2398,49 +2405,56 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
         latestMsVersion = latestVersion;
 
-    QStringList messageParts;
+    QnResourceList mismatched;
+
     for (const QnAppInfoMismatchData &data : watcher->mismatchData())
     {
-        QString componentName;
-        switch (data.component)
-        {
-        case Qn::ClientComponent:
-            componentName = tr("Client");
-            break;
-        case Qn::ServerComponent:
+        if (data.component == Qn::ServerComponent)
         {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-            componentName = resource ? QnResourceDisplayInfo(resource).toString(Qn::RI_WithUrl) : tr("Server");
-            break;
+            if(resource)
+                mismatched << data.resource;
         }
-        default:
-            break;
-        }
-        NX_ASSERT(!componentName.isEmpty());
-        if (componentName.isEmpty())
-            continue;
-
-        bool updateRequested = (data.component == Qn::ServerComponent) &&
-            QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-
-        const QString version = (updateRequested
-            ? setWarningStyleHtml(data.version.toString())
-            : data.version.toString());
-
-        /* Consistency with 'About' dialog. */
-        QString component = lit("%1: %2").arg(componentName, version);
-        messageParts << component;
     }
 
-    messageParts << QString();
-    messageParts << tr("Please update all components to the version %1").arg(latestMsVersion.toString());
-
-    const QString extras = messageParts.join(lit("<br/>"));
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
         new QnSessionAwareMessageBox(mainWindowWidget()));
     messageBox->setIcon(QnMessageBoxIcon::Warning);
     messageBox->setText(tr("Components of System have different versions:"));
+
+    const QString extras = tr("Please update all components to the version %1").arg(latestMsVersion.toString());
     messageBox->setInformativeText(extras);
+
+    // Add a list of mismatched servers if there are any.
+    if (!mismatched.empty())
+    {
+        QTableView * serverList = new QTableView();
+        serverList->setShowGrid(false);
+
+        QnResourceListModel * serverListModel = new QnResourceListModel(serverList);
+
+        serverListModel->setCustomColumnAccessor(1, nx::client::desktop::resourceVersionAccessor);
+        serverListModel->setHasStatus(true);
+        serverListModel->setResources(mismatched);
+
+        serverList->setModel(serverListModel);
+        serverList->setItemDelegateForColumn(0, new QnResourceItemDelegate(this));
+        serverList->setItemDelegateForColumn(1, nx::client::desktop::makeVersionStatusDelegate(context(), serverListModel));
+
+        auto* horisontalHeader = serverList->horizontalHeader();
+        horisontalHeader->hide();
+        horisontalHeader->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+        horisontalHeader->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+
+        auto* verticalHeader = serverList->verticalHeader();
+        verticalHeader->hide();
+        verticalHeader->setDefaultSectionSize(kSectionHeight);
+
+        // Finally adding control to a widget.
+        // Adding this to QnMessageBox::Layout::Main looks ugly.
+        messageBox->addCustomWidget(serverList);
+    }
+
     messageBox->setCheckBoxEnabled();
 
     const auto updateButton = messageBox->addButton(

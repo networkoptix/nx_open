@@ -1813,7 +1813,7 @@ void MediaServerProcess::changeSystemUser(const QString& userName)
         nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
     if (m_preparedTcpServerSockets.empty())
     {
-        qWarning().noquote() << "WARNING: Unable to prealocate TCP sockets on port" << port << ":"
+        qWarning().noquote() << "WARNING: Unable to preallocate TCP sockets on port" << port << ":"
             << SystemError::getLastOSErrorText();
     }
 

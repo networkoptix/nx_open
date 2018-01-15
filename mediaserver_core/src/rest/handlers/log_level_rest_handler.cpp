@@ -26,7 +26,7 @@ static QString levelString(const std::shared_ptr<Logger>& logger)
     return settings.toString();
 }
 
-static JsonRestResponse invalidParamiter(const QString& name, const QString& value)
+static JsonRestResponse invalidParameter(const QString& name, const QString& value)
 {
     return {QnJsonRestResult::InvalidParameter,
         lm("Parameter '%1' has invalid value '%2'").args(name, value)};
@@ -49,7 +49,7 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
     const auto name = request.params.value(kNameParam);
     const auto logger = QnLogs::getLogger(name);
     if (!logger)
-        return invalidParamiter(kNameParam, name);
+        return invalidParameter(kNameParam, name);
 
     const auto value = request.params.value(kValueParam);
     if (!value.isEmpty())
@@ -59,7 +59,7 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
 
         LevelSettings settings;
         if (!settings.parse(value))
-            return invalidParamiter(kValueParam, value);
+            return invalidParameter(kValueParam, value);
 
         // TODO: Also update in config.
         logger->setDefaultLevel(settings.primary);
@@ -81,7 +81,7 @@ JsonRestResponse QnLogLevelRestHandler::manageLogLevelById(const JsonRestRequest
     }
 
     if (!logger)
-        return invalidParamiter(kIdParam, logId);
+        return invalidParameter(kIdParam, logId);
 
     auto value = request.params.find(kValueParam);
     if (value != request.params.cend())
@@ -91,7 +91,7 @@ JsonRestResponse QnLogLevelRestHandler::manageLogLevelById(const JsonRestRequest
 
         const auto logLevel = nx::utils::log::levelFromString(*value);
         if (logLevel == Level::undefined)
-            return invalidParamiter(kValueParam, *value);
+            return invalidParameter(kValueParam, *value);
 
         logger->setDefaultLevel(logLevel);
     }

@@ -154,7 +154,7 @@ QString LevelSettings::toString() const
         levelList << (level + kOpenBracket + filters + kCloseBracket);
     }
 
-    return levelList.join(kSeparator + QString(" "));
+    return levelList.join(kSeparator + lit(" "));
 }
 
 static bool isSeparator(const QChar& c)

@@ -64,4 +64,4 @@ set(defaultTranslation zh_TW)
 set(additionalTranslations zh_CN)
 
 # this is required because of strange maven replacement (_ > -)
-set(customization "vmsdemoblue_cn")
+set(customization "default_cn")
