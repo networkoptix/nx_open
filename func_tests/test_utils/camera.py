@@ -121,10 +121,11 @@ class Camera(object):
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self
         server.rest_api.ec2.saveCamera.POST(id=self.id, parentId=server.ecs_guid)
+        d = None
         for d in server.rest_api.ec2.getCamerasEx.GET():
             if d['id'] == self.id:
                 break
-        else:
+        if d is None:
             pytest.fail('Camera %s is unknown for server %s' % (self, server))
         assert d['parentId'] == server.ecs_guid
 

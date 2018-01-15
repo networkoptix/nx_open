@@ -25,6 +25,8 @@ def env(box, server_factory, http_schema, nat_schema):
         env_factory = direct_env
     elif nat_schema == 'nat':
         env_factory = nat_env
+    else:
+        assert False, "nat_schema must be either 'direct' or 'nat'"
     return env_factory(box, server_factory, http_schema)
 
 def direct_env(box, server_factory, http_schema):
