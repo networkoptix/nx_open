@@ -42,8 +42,9 @@ def send_notification(request):
             raise APIRequestException('Not enough parameters in request', ErrorCodes.wrong_parameters,
                                       error_data=error_data)
 
-        user_account = Account.objects.get(email=request.data['user_email'])
-        request.data['message']['fullName'] = user_account.get_full_name()
+        user_account = Account.objects.filter(email=request.data['user_email'])
+        if user_account.exists():
+            request.data['message']['fullName'] = user_account[0].get_full_name()
         api.send(request.data['user_email'],
                  request.data['type'],
                  request.data['message'],
