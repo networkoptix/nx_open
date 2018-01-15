@@ -88,6 +88,10 @@ include(compiler_options)
 include(output_directories)
 include(distribution_names)
 
+if(MACOSX OR IOS)
+    include(macosx_keychain)
+endif()
+
 if(NOT (WINDOWS OR ANDROID OR IOS))
     set(BUILD_SHARED_LIBS ON)
 endif()
