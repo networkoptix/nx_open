@@ -56,13 +56,17 @@ void QnImageControlWidget::updateFromResources(
         const QnVirtualCameraResourceList &cameras)
 {
     QnUpdatableGuard<QnImageControlWidget> guard(this);
-    bool allCamerasHasVideo = boost::algorithm::all_of(cameras,
-        [](const QnVirtualCameraResourcePtr &camera)
-        {
-            return camera->hasVideo(0);
-        }
-    );
-    setVisible(allCamerasHasVideo);
+    bool allCamerasHaveVideo = true;
+    bool hasWearable = false;
+    for (const auto& camera : cameras)
+    {
+        allCamerasHaveVideo &= camera->hasVideo(0);
+        hasWearable |= camera->hasFlags(Qn::wearable_camera);
+    }
+
+    setVisible(allCamerasHaveVideo);
+    ui->aspectRatioLabel->setVisible(!hasWearable);
+    ui->aspectRatioComboBox->setVisible(!hasWearable);
 
     updateAspectRatioFromResources(cameras);
     updateRotationFromResources(cameras);
