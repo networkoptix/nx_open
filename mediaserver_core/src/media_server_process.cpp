@@ -128,7 +128,6 @@
 #include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
-#include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
@@ -1805,7 +1804,6 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";
     reg(kGetTimePath, new QnTimeRestHandler());
