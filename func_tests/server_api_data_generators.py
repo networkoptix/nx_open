@@ -1,7 +1,3 @@
-"""
-  Generate data for mediaserver's API calls
-"""
-
 from hashlib import md5
 
 from netaddr import IPAddress

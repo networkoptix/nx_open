@@ -1,6 +1,6 @@
-'''Camera support classes
+"""Camera support classes
 
-Server has separate protocol created specifically for test cameras. It multicast UDP packets on port 4984
+Server has separate protocol created specifically for test cameras. It multicasts UDP packets to port 4984
 and expects UDP responses from test cameras, with camera mac address and TCP endpoint for media streaming.
 Then it connects to that endpoint using TCP, with one-line request and expects media stream with specific
 formatting in response.
@@ -10,7 +10,7 @@ All this is supported by 3 classes:
 * MediaStreamer - reads TCP request on connected socket and sends media stream from file.
 All these 3 classes are internal for this module; Tests only see and use Camera and CameraFactory instances,
 created using 'camera' or 'camera_factory' fixtures.
-'''
+"""
 
 import datetime
 import logging

@@ -1,7 +1,7 @@
-'''Configuration for vagrant boxes.
+"""Configuration for vagrant boxes
 
 Functional tests define configuration required for them indirectly (via 'box' fixture) using BoxConfig class.
-'''
+"""
 
 import os.path
 

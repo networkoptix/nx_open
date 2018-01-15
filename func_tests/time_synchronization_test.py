@@ -1,4 +1,3 @@
-"""Tests time synchronization between mediaservers."""
 import logging
 import time
 from collections import namedtuple

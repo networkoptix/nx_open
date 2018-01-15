@@ -1,6 +1,7 @@
-'''Merge test
-   Initial task https://networkoptix.atlassian.net/browse/TEST-177
-'''
+"""Merge test
+
+Initial task https://networkoptix.atlassian.net/browse/TEST-177
+"""
 
 import logging
 import time

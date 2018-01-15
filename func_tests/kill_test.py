@@ -1,4 +1,4 @@
-'Test to check if coredump collection works'
+"""Test coredump collection"""
 
 import os
 

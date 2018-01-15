@@ -1,8 +1,3 @@
-'''pytest configuration file for functional testsevi
-
-Loaded by pytest before running all functional tests. Adds common fixtures used by tests.
-'''
-
 import logging
 import os.path
 

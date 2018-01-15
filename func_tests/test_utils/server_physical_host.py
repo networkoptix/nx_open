@@ -1,4 +1,4 @@
-'Support for installing servers on physical hosts, controlled by yaml test config'
+"""Support for installing servers on physical hosts, controlled by yaml test config."""
 
 import logging
 import os.path

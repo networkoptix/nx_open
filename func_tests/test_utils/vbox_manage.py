@@ -1,5 +1,3 @@
-'''Virtual Box VBoxManage command wrapper'''
-
 import re
 
 from netaddr import IPNetwork

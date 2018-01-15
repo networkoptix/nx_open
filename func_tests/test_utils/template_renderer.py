@@ -1,5 +1,3 @@
-'load and render templates'
-
 import os.path
 
 import jinja2

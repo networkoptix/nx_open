@@ -1,7 +1,3 @@
-'''Resource synchronization tests
-
-   It tests that servers of the same system sinchronize its data correctly
-'''
 import itertools
 import logging
 import time
@@ -208,10 +204,10 @@ def merge_system_if_unmerged(env):
 
 
 def get_servers_admins(env):
-    '''Return list of pairs (mediaserver, user data).
+    """Return list of pairs (mediaserver, user data).
 
     Get admin users from all tested servers
-    '''
+    """
     admins = []
     for server in env.servers:
         users = server.rest_api.ec2.getUsers.GET()
@@ -220,19 +216,19 @@ def get_servers_admins(env):
 
 
 def get_server_by_index(env, i):
-    '''Return Server object.'''
+    """Return Server object."""
     server_i = i % len(env.servers)
     return env.servers[server_i]
 
 
 def prepare_call_list(env, api_method, sequence=None):
-    '''Return list of tupples (mediaserver, REST API function name, data to POST).
+    """Return list of tupples (mediaserver, REST API function name, data to POST).
 
     Prepare data for the NX media server POST request:
       * env - test environment
       * api_method - media server REST API function name
       * sequence - list of pairs (server, data for resource generation)
-    '''
+    """
     data_generator = env.resource_generators[api_method]
     sequence = sequence or [(None, i) for i in range(env.test_size)]
     call_list = []
@@ -241,12 +237,12 @@ def prepare_call_list(env, api_method, sequence=None):
     # If we have already merged system, we can use any server to create/remove/modify resource,
     # otherwise we have to use only resource owner for modification.
     def get_server_for_modification(env, i, server):
-        '''Return server for modification.
+        """Return server for modification.
 
         * env - test environment
         * i - index for getting server by index
         * server - server where resource have been created
-        '''
+        """
         if not server or env.system_is_merged:
             # If the resource's server isn't specified or system is already merged,
             # get server for modification request by index
@@ -269,10 +265,10 @@ def prepare_call_list(env, api_method, sequence=None):
 
 
 def make_async_post_calls(env, call_list):
-    '''Return list of pairs (mediaserver, posted data).
+    """Return list of pairs (mediaserver, posted data).
 
     Make async NX media server REST API POST requests.
-    '''
+    """
     pool = ThreadPool(env.thread_number)
     pool.map(server_api_post, call_list)
     pool.close()

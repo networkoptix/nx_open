@@ -1,7 +1,7 @@
-'''Scalability test
+"""Scalability test
 
-  Measure system synchronization time
-'''
+Measure system synchronization time.
+"""
 
 import datetime
 import logging

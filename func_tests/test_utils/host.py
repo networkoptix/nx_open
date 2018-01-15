@@ -1,7 +1,7 @@
-'''Abstraction over 'host' - local or remote one via ssh.
+"""Abstraction over 'host' - local or remote one via ssh.
 
 Allows running commands or working with files on local or remote hosts transparently.
-'''
+"""
 
 import abc
 import datetime
