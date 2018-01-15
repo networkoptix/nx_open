@@ -2,6 +2,7 @@
 
 #ifdef ENABLE_FLIR
 
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/utils/timer_manager.h>
 #include <utils/xml/camera_advanced_param_reader.h>
@@ -65,9 +66,7 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    QnCameraAdvancedParams m_advancedParameters;
-    ApiSingleAdvancedParamitersProvider<QnFlirEIPResource> m_advancedParametersProvider;
-    mutable QnMutex m_physicalParamsMutex;
+    nx::mediaserver::resource::ApiSingleAdvancedParamitersProvider<QnFlirEIPResource> m_advancedParametersProvider;
     mutable QnMutex m_ioMutex;
     mutable QnMutex m_alarmMutex;
 

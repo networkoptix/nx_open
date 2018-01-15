@@ -8,6 +8,7 @@
 
 #include <api/model/api_ioport_data.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -144,7 +145,7 @@ private:
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
-    Camera::ApiMultiAdvancedParamitersProvider<QnPlAxisResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnPlAxisResource> m_advancedParametersProvider;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <plugins/camera_plugin_qt_wrapper.h>
 
@@ -117,7 +118,7 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
-    Camera::ApiMultiAdvancedParamitersProvider<QnThirdPartyResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;

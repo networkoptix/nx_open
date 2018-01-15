@@ -6,6 +6,7 @@
 #include <QtCore/QMap>
 
 #include <network/multicodec_rtp_reader.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
@@ -216,7 +217,7 @@ private:
     bool m_inputMonitored;
     QnMutex m_audioCfgMutex;
     boost::optional<bool> m_audioInputOn;
-    Camera::ApiMultiAdvancedParamitersProvider<QnActiResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnActiResource> m_advancedParametersProvider;
 };
 
 #endif // #ifdef ENABLE_ACTI

@@ -21,11 +21,13 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
-#include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
-#include "soap_wrapper.h"
 #include <core/resource/resource_data_structures.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
 #include <onvif/soapStub.h>
+
+#include "soap_wrapper.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -593,7 +595,7 @@ private:
     mutable QnResourceVideoLayoutPtr m_videoLayout;
 
 protected:
-    ApiMultiAdvancedParamitersProvider<QnPlOnvifResource> m_advancedParametersProvider;
+    nx::mediaserver::resource::ApiMultiAdvancedParamitersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };
