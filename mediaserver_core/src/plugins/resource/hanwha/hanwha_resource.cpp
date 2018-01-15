@@ -1697,7 +1697,7 @@ QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) co
 int HanwhaResource::defaultFrameRateForStream(Qn::ConnectionRole role) const
 {
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
-        closestFrameRate(role, desiredSecondStreamFps());
+        closestFrameRate(role, defaultSecondaryFps(Qn::QualityNormal));
 
     return kHanwhaInvalidFps;
 }
