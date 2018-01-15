@@ -142,7 +142,7 @@ win* {
     DEFINES += \
         NX_KIT_API= \
         NX_NETWORK_API= \
-        NX_UPDATE_API = \
+        NX_UPDATE_API= \
         NX_CASSANDRA_API= \
         NX_UTILS_API= \
         NX_FUSION_API= \
