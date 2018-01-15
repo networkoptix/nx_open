@@ -54,7 +54,15 @@ void runMultiserverDownloadRequest(
     {
         context->executeGuarded([url, requestCompletionFunc, headers, context]()
         {
-            nx::network::http::downloadFileAsync(url, requestCompletionFunc, headers);
+            nx::network::http::downloadFileAsync(
+                url,
+                requestCompletionFunc,
+                headers,
+                nx::network::http::AuthType::authBasicAndDigest,
+                nx::network::http::AsyncHttpClient::Timeouts(
+                    std::chrono::milliseconds(10000),
+                    std::chrono::milliseconds(10000),
+                    std::chrono::milliseconds(10000)));
             context->incRequestsCount();
         });
     };

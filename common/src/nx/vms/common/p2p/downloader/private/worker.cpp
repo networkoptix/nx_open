@@ -190,16 +190,6 @@ bool Worker::haveChunksToDownload()
     return false;
 }
 
-QList<QnUuid> Worker::peers() const
-{
-    return m_peers;
-}
-
-void Worker::setPeers(const QList<QnUuid>& peers)
-{
-    m_peers = peers;
-}
-
 void Worker::setPreferredPeers(const QList<QnUuid>& preferredPeers)
 {
     for (const auto& peerId: preferredPeers)
@@ -769,7 +759,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
         });
 
     if (peers.isEmpty())
-        peers = m_peers;
+        peers = m_peerManager->peers();
 
     if (count <= 0)
         count = m_peersPerOperation;
@@ -953,7 +943,7 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
 
     const auto& peers = peersWithInternetConnection();
 
-    const auto& currentPeersWithInternet = peers.toSet() & m_peers.toSet();
+    const auto& currentPeersWithInternet = peers.toSet() & m_peerManager->peers().toSet();
 
     if (!currentPeersWithInternet.isEmpty())
         return currentPeersWithInternet.toList();
@@ -963,10 +953,10 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
 
 bool Worker::needToFindBetterPeers() const
 {
-    if (m_peers.size() < m_peersPerOperation * 2)
+    if (m_peerManager->peers().size() < m_peersPerOperation * 2)
         return false;
 
-    auto closestPeers = m_peers;
+    auto closestPeers = m_peerManager->peers();
     std::sort(closestPeers.begin(), closestPeers.end());
     closestPeers = takeClosestPeerIds(
         closestPeers, m_peersPerOperation, m_peerManager->selfId());

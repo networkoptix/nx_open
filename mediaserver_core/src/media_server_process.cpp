@@ -283,6 +283,8 @@
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
 #include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 
 #if !defined(EDGE_SERVER)
@@ -292,6 +294,7 @@
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
+#include "nx/mediaserver/rest/updates2/updates2_rest_handler.h"
 
 #if defined(__arm__)
     #include "nx1/info.h"
@@ -1647,6 +1650,9 @@ void MediaServerProcess::registerRestHandlers(
     static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
     reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
     reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
+
+    using namespace mediaserver::rest::updates2;
+    reg(kUpdates2Path, new Updates2RestHandler());
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -2244,6 +2250,16 @@ void MediaServerProcess::run()
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
+
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() { serverModule->updates2Manager()->atServerStart(); });
+
+    using namespace nx::vms::common::p2p::downloader;
+    connect(
+        this, &MediaServerProcess::started,
+        [&serverModule]() {serverModule->findInstance<Downloader>()->atServerStart(); });
+
 
     qnServerModule->runTimeSettings()->remove("rebuild");
 

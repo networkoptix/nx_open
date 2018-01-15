@@ -151,6 +151,7 @@ public:
         int size,
         const QByteArray& md5,
         const QUrl& url,
+        const QString& peerPolicy,
         GetCallback callback,
         QThread* targetThread = nullptr);
 

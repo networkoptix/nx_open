@@ -25,6 +25,7 @@ public:
     /** @return Human readable peer name. This is mostly used in logs. */
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const = 0;
+    virtual QList<QnUuid> peers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;
     virtual bool hasInternetConnection(const QnUuid& peerId) const = 0;
 
@@ -65,7 +66,7 @@ class AbstractPeerManagerFactory
 {
 public:
     virtual ~AbstractPeerManagerFactory();
-    virtual AbstractPeerManager* createPeerManager() = 0;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerPolicy peerPolicy) = 0;
 };
 
 } // namespace downloader

@@ -19,6 +19,7 @@ bool FileInformation::isValid() const
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, PeerPolicy)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileInformation, (json), FileInformation_Fields)
 
 } // namespace downloader

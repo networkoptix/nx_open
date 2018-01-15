@@ -52,6 +52,7 @@
 #include <plugins/plugin_manager.h>
 #include <nx/mediaserver/server_meta_types.h>
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/mediaserver/updates2/updates2_manager.h>
 
 namespace {
 
@@ -189,6 +190,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
+    m_updates2Manager = store(new nx::mediaserver::updates2::Updates2Manager(this->commonModule()));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -298,4 +300,9 @@ void QnMediaServerModule::initializeRootTool()
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
+}
+
+nx::mediaserver::updates2::Updates2Manager* QnMediaServerModule::updates2Manager() const
+{
+    return m_updates2Manager;
 }

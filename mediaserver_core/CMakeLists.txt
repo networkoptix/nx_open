@@ -79,7 +79,8 @@ nx_add_target(mediaserver_core LIBRARY
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets
         ffmpeg nx_onvif quazip sigar openssl
-        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion nx_utils nx_kit)
+        common appserver2 cloud_db_client nx_email nx_speech_synthesizer nx_network nx_fusion 
+        nx_utils nx_kit nx_update)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap lber)

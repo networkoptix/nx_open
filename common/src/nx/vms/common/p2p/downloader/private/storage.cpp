@@ -50,7 +50,7 @@ FileInformation Storage::fileInformation(
     const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_fileInformationByName.value(fileName);
+    return static_cast<FileInformation>(m_fileInformationByName.value(fileName));
 }
 
 ResultCode Storage::addFile(const FileInformation& fileInformation)
