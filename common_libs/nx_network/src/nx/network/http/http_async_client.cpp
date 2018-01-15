@@ -25,7 +25,7 @@ namespace {
 
 static bool logTraffic()
 {
-    return nx::network::SocketGlobals::debugIni().httpClientTraffic;
+    return nx::network::SocketGlobals::ini().httpClientTraffic;
 }
 
 } // namespace

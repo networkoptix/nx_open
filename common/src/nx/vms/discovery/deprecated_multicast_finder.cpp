@@ -382,24 +382,6 @@ void DeprecatedMulticastFinder::run()
             m_prevPingClock = currentClock;
         }
 
-        if (const auto timeout = SocketGlobals::debugIni().multicastModuleFinderTimeout)
-        {
-            NX_INFO(this, lm("Avoid using poll, use %1 ms recv timeouts instead").arg(timeout));
-            if (m_serverSocket)
-            {
-                m_serverSocket->setRecvTimeout((unsigned int) timeout);
-                processDiscoveryRequest(m_serverSocket.get());
-            }
-
-            for (auto& socket: m_clientSockets)
-            {
-                socket->setRecvTimeout((unsigned int) timeout);
-                processDiscoveryResponse(socket);
-            }
-
-            continue;
-        }
-
         int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
         if (socketCount == 0)
         {

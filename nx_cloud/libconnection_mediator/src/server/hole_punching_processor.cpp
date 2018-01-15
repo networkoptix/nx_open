@@ -130,8 +130,8 @@ void HolePunchingProcessor::onConnectionAckRequest(
         return completionHandler(api::ResultCode::notFound);
     }
 
-    NX_LOGX(lm("Connect ACK from %1, connection id %2")
-        .args(connection->getSourceAddress(), request.connectSessionId), cl_logDEBUG1);
+    NX_VERBOSE(this, lm("Connect ACK from %1, connection id %2")
+        .args(connection->getSourceAddress(), request.connectSessionId));
 
     connectionIter->second->onConnectionAckRequest(
         connection,

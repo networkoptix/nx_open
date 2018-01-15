@@ -28,8 +28,8 @@ ProxyWorker::ProxyWorker(
 
     replaceTargetHostWithFullCloudNameIfAppropriate(connectionToTheTargetPeer.get());
 
-    NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5").arg(m_proxyingId)
-        .args(m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
+    NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5")
+        .args(m_proxyingId, m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
             translatedRequest.requestLine.url, connectionToTheTargetPeer->getLocalAddress()));
 
     m_targetHostPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
@@ -47,11 +47,26 @@ ProxyWorker::ProxyWorker(
 
     bindToAioThread(m_targetHostPipeline->getAioThread());
 
-    nx::network::http::Message requestMsg(nx::network::http::MessageType::request);
-    *requestMsg.request = std::move(translatedRequest);
-    m_targetHostPipeline->sendMessage(std::move(requestMsg));
+    m_translatedRequest = std::move(translatedRequest);
+}
 
-    m_targetHostPipeline->startReadingConnection();
+void ProxyWorker::start()
+{
+    // Making sure sending & receiving is started atomically.
+    post(
+        [this]()
+        {
+            nx::network::http::Message requestMsg(nx::network::http::MessageType::request);
+            *requestMsg.request = std::move(m_translatedRequest);
+            m_targetHostPipeline->sendMessage(std::move(requestMsg),
+                [this](SystemError::ErrorCode resultCode)
+                {
+                    NX_VERBOSE(this, lm("Proxy %1. Sending message completed with result %2")
+                        .args(m_proxyingId, SystemError::toString(resultCode)));
+                });
+
+            m_targetHostPipeline->startReadingConnection();
+        });
 }
 
 void ProxyWorker::bindToAioThread(

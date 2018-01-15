@@ -659,13 +659,6 @@ bool UdtStreamSocket::isConnected() const
     return m_state == detail::SocketState::connected;
 }
 
-bool UdtStreamSocket::reopen()
-{
-    if (isClosed())
-        return open();
-    return true;
-}
-
 void UdtStreamSocket::cancelIOAsync(
     aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)

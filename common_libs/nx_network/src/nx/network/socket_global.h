@@ -20,37 +20,24 @@ namespace cloud { class CloudConnectController; }
 
 struct SocketGlobalsImpl;
 
+struct NX_NETWORK_API Ini:
+    nx::kit::IniConfig
+{
+    Ini();
+
+    NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
+    NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
+
+    bool isHostDisabled(const HostAddress& address) const;
+};
+
 class NX_NETWORK_API SocketGlobals
 {
 public:
     using CustomInit = void(*)();
     using CustomDeinit = void(*)();
 
-    struct DebugIni: nx::kit::IniConfig
-    {
-        DebugIni(): IniConfig("nx_network_debug.ini") { reload(); }
-
-        NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
-
-        // TODO: Should be moved to a different flag config, because module finders live in common.
-        // This flag resides here just because there are no other flag configs for logging.
-        NX_INI_INT(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
-
-        NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
-    };
-
-    struct Ini: nx::kit::IniConfig
-    {
-        Ini(): IniConfig("nx_network.ini") { reload(); }
-
-        NX_INI_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
-        NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
-
-        bool isHostDisabled(const HostAddress& address) const;
-    };
-
-    static Ini& ini();
-    static DebugIni& debugIni();
+    static const Ini& ini();
     static aio::AIOService& aioService();
     static AddressResolver& addressResolver();
     static cloud::CloudConnectController& cloud();
