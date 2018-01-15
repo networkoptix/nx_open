@@ -81,7 +81,7 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
         [this, cameraId = camera->getId(), thumbnail = QPixmap::fromImage(data.thumbnail)]
         {
             emit thumbnailReady(cameraId, thumbnail);
-        }, kDefaultDelay, this);
+        }, this);
 
     emit statusChanged(data.status);
     emit sizeHintChanged(sizeHint());
