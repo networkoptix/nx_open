@@ -579,7 +579,7 @@ nx::utils::db::DBResult EventsStorage::cleanupData(
         QnSql::serialized_field(deviceId));
     deleteEventsQuery.bindValue(
         lit(":timestampUsec"),
-        microseconds(oldestDataToKeepTimestamp).count());
+        (qint64) microseconds(oldestDataToKeepTimestamp).count());
 
     deleteEventsQuery.exec();
     return nx::utils::db::DBResult::ok;
