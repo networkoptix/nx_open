@@ -53,6 +53,7 @@ protected:
     virtual bool afterGetData(const QnAbstractDataPacketPtr& data);
 
     void checkTime(const QnAbstractMediaDataPtr& data);
+    void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
     void resetTimeCheck();
 
 protected:
