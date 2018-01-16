@@ -8,11 +8,11 @@ namespace client {
 namespace desktop {
 
 /**
-* A custom tab bar that draws icon and text for the current tab, but only icons for all other tabs.
-*
-* Icons are mandatory for all tabs; if no icon is specified a warning placeholder is drawn instead.
-* Tab switching is animated. Only horizontal mode is supported. All painting bypasses QStyle.
-*/
+ * A custom tab bar that draws icon and text for the current tab, but only icons for all other tabs.
+ *
+ * Icons are mandatory for all tabs; if no icon is specified a warning placeholder is drawn instead.
+ * Tab switching is animated. Only horizontal mode is supported. All painting bypasses QStyle.
+ */
 class CompactTabBar: public QTabBar
 {
     Q_OBJECT
