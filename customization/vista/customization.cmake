@@ -12,6 +12,7 @@ set(short.company.name "vista")
 set(uri.protocol "qulu-vms")
 set(liteDeviceName "Q")
 set(cloudName "Qcloud")
+set(build_nxtool ON)
 
 # Support section
 set(companyUrl "http://www.vista-cctv.com")

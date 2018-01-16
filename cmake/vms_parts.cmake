@@ -41,7 +41,7 @@ endif()
 
 if(WINDOWS)
     set(_withTrayTool ON)
-    set(_withNxTool ON)
+    set(_withNxTool ${build_nxtool})
     if("${arch}" STREQUAL "x64")
         set(_withClouds ON)
     endif()

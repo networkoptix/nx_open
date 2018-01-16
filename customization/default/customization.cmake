@@ -13,6 +13,7 @@ set(short.company.name "Nx")
 set(liteDeviceName "nx1")
 set(cloudName "Nx Cloud")
 set(uri.protocol "nx-vms")
+set(build_nxtool ON)
 
 # Default settings
 set(backgroundImage
