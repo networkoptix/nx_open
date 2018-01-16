@@ -193,30 +193,44 @@ angular.module('nxCommon')
                         });
                         return;
                     }
-                    timelineActions.goToLive();
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
                 }
 
-                var pausedLive = false;
                 function playPause(){
                     if(scope.positionProvider.playing){
-                        pausedLive = scope.positionProvider.liveMode;
                         scope.playHandler(false);
-                    }else if(pausedLive){
-                        jumpToPosition(scope.positionProvider.playedPosition);
-                        scope.playHandler(true);
                     }else{
+                        if(!scope.emptyArchive){
+                            jumpToPosition(scope.positionProvider.playedPosition);
+                        }
                         scope.playHandler(true);
                     }
 
                     timelineActions.playPause();
                 }
 
+                function moveTimeToVisiblePosition(position){
+                    var sM = scope.scaleManager;
+                    var date = sM.playedPosition;
+                    var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart) * position;
+                    var relativeSizeOfTimeLine = sM.end - sM.start - (sM.visibleEnd - sM.visibleStart);
+                    timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, false);
+                }
+
                 function timelineClick(mouseX){
                     var date = timelineActions.setClickedCoordinate(mouseX);
+                    var bufferZone = timelineConfig.edgeBufferZone * pixelAspectRatio;
                     jumpToPosition(date);
+                    mouseX *= pixelAspectRatio;
+
+                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue()
+                            && (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
+                        var left = (bufferZone + timelineConfig.markerWidth)/canvas.width;
+                        var right = (canvas.width - (bufferZone + timelineConfig.markerWidth))/canvas.width;
+                        moveTimeToVisiblePosition(mouseX < bufferZone ? left: right);
+                    }
                 }
 
                 function jumpToPosition(date){
@@ -267,6 +281,10 @@ angular.module('nxCommon')
                         mouseOverElements = null;
                         return;
                     }
+                    if(event.touches){
+                        event.pageX = event.touches[0].pageX;
+                        event.pageY = event.touches[0].pageY;
+                    }
 
                     if($(event.target).is('canvas') && event.offsetX){
                         mouseXOverTimeline = event.offsetX;
@@ -276,6 +294,9 @@ angular.module('nxCommon')
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
+                    scope.isPointer = mouseOverElements.leftButton || mouseOverElements.rightButton
+                                                                   || mouseOverElements.leftMarker
+                                                                   || mouseOverElements.rightMarker;
 
                 }
 
@@ -370,6 +391,8 @@ angular.module('nxCommon')
                         return;
                     }
                 }
+
+                var onReleaseCenter = false;
                 function viewportMouseDown(event){
                     updateMouseCoordinate(event);
 
@@ -385,7 +408,11 @@ angular.module('nxCommon')
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
                         scrollbarClickOrHold();
+                        return;
                     }
+
+                    //scrolls timeline to current time
+                    onReleaseCenter = mouseOverElements.leftMarker || mouseOverElements.rightMarker;
                 }
                 function viewportClick(event){
                     updateMouseCoordinate(event);
@@ -400,8 +427,13 @@ angular.module('nxCommon')
 
                 function viewportMouseUp(){
                     updateMouseCoordinate(null);
-                    timelineActions.scrollingStop(false);
+                    timelineActions.scrollingStop();
                     timelineActions.scrollingToCursorStop();
+
+                    if(onReleaseCenter){
+                        onReleaseCenter = false;
+                        moveTimeToVisiblePosition(0.5);
+                    }
                 }
                 function viewportMouseMove(event){
                     updateMouseCoordinate(event);
@@ -455,6 +487,10 @@ angular.module('nxCommon')
                 viewport.click(viewportClick);
                 viewport.mousewheel(viewportMouseWheel);
 
+                //For touch screens
+                viewport.on('touchstart', viewportMouseDown);
+                viewport.on('touchmove', viewportMouseMove);
+                viewport.on('touchstop', viewportMouseLeave);
 
                 // Actual browser events handling
 
@@ -492,6 +528,7 @@ angular.module('nxCommon')
                     });
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
+                    scope.emptyArchive = true;
                     if(scope.recordsProvider) {
                         scope.loading = true;
                         initRecordsProvider();

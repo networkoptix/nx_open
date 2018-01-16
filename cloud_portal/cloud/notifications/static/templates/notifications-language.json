@@ -1,15 +1,15 @@
 {
-  "activate_account": {
-    "emailSubject": "Confirm your account"
+  "activate_account":{
+    "emailSubject":"Activate your account"
   },
-  "restore_password": {
-    "emailSubject": "Restore your password"
+  "restore_password":{
+    "emailSubject":"Reset your password"
   },
-  "system_invite": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+  "system_invite":{
+    "emailSubject":"{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
-  "system_shared": {
-    "emailSubject": "Video system {{message.system_name}} was shared with you"
+  "system_shared":{
+    "emailSubject":"{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} is ready to be reviewed"

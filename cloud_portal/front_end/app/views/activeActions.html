@@ -20,17 +20,17 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in Nx Cloud</h1>
+            <h1>You have registered in {{PRODUCT_NAME}}</h1>
             <p>We've sent you a letter with activation link to {{data.email}}.<br>
             Please activate your account by visiting this link.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
-                           ng-model="data.email"
+ ng-model="data.email"
                            id="emailReactivate"
                            name="email" maxlength="255"
                            required autofocus>
@@ -63,7 +63,7 @@
                 <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
-                           ng-model="data.email"
+ ng-model="data.email"
                            id="email"
                            name="email" maxlength="255"
                            required autofocus>

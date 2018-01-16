@@ -17,7 +17,7 @@ cloud_portal:
 
 
 cloud_gateway:
-    url: 'http://$CLOUD_DB_HOST:3347'
+    url: 'http://$CLOUD_DB_HOST:3347/gateway'
 
 mail_from: 'service@networkoptix.com'
 

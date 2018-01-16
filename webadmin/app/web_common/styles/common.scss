@@ -70,9 +70,12 @@ placeholder{ /* Hack to have full-screen */
     width:100%;
     height:100%;
 
-    z-index:100;
+    z-index: 1; /*This is used for the preloaders.
+                  It should always be higher than the video,
+                  but not the top bar of the video player*/
+
     background-color: $dark9;
-    opacity: 0.6;
+    opacity: 0.9;
     position: relative;
 
     &.has-preloader{
@@ -133,9 +136,19 @@ placeholder{ /* Hack to have full-screen */
 
 .webclient-placeholder{
     position: absolute;
+    z-index: 5; /*If the system is offline this should cover everything.
+                  Must always be the highest z-index*/
+
+    & > .placeholder{
+        opacity: 1;
+    }
 
     .placeholder>.placeholder-content{
         top:40%;
     }
 }
 
+.highlighted{
+    display:inline;
+    background-color:yellow;
+}

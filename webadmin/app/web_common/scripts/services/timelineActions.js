@@ -29,25 +29,6 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
 };
 
-TimelineActions.prototype.goToLive = function(){
-    var self = this;
-    var moveDate = self.scaleManager.screenCoordinateToDate(1);
-    if(self.scaleManager.watch.live){
-        // we are already watching live position - no need for animation
-        return;
-    }
-    self.animateScope.progress(self.scope, 'goingToLive' ).then(
-        function(){
-            var activeDate = timeManager.nowToDisplay();
-            self.scaleManager.setAnchorDateAndPoint(activeDate, 1);
-            self.scaleManager.watchPosition(activeDate, true); // goToLive animation
-        },
-        function(){},
-        function(val){
-            var activeDate = moveDate + val * (timeManager.nowToDisplay() - moveDate);
-            self.scaleManager.setAnchorDateAndPoint(activeDate, 1);
-        });
-};
 TimelineActions.prototype.updatePlayingState = function(playingPosition){
     this.scaleManager.updatePlayingState(playingPosition, this.positionProvider.liveMode, this.positionProvider.playing);
 
@@ -137,7 +118,6 @@ TimelineActions.prototype.setClickedCoordinate = function(mouseX){
 // linear is for holding function
 TimelineActions.prototype.animateScroll = function(targetPosition, linear){
     var self = this;
-    this.scope.scrollTarget = this.scaleManager.scroll();
     self.delayWatchingPlayingPosition();
     self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':'dryResistance',
             linear? self.timelineConfig.animationDuration/2: self.timelineConfig.animationDuration).
@@ -165,7 +145,7 @@ TimelineActions.prototype.scrollingStart = function(left,speed){
     this.scrollingNow = true;
     this.scrollingSpeed = speed;
     this.scope.scrollTarget = this.scaleManager.scroll();
-    this.scrollingRenew();
+    this.scrollingRenew(false);
 };
 TimelineActions.prototype.scrollingStop = function(){
     if(this.scrollingNow) {
@@ -488,6 +468,7 @@ TimelineActions.prototype.scrollbarSliderDragEnd = function(){
 TimelineActions.prototype.timelineDragStart = function(mouseX){
     this.scaleManager.stopWatching();
     this.catchTimeline = mouseX;
+    this.scaleManager.dragDate = this.scaleManager.screenCoordinateToDate(mouseX);
 };
 TimelineActions.prototype.timelineDrag = function(mouseX){
     if(this.catchTimeline) {
@@ -501,6 +482,7 @@ TimelineActions.prototype.timelineDragEnd = function(){
     if(this.catchTimeline) {
         this.scaleManager.releaseWatching();
         this.catchTimeline = false;
+        this.scaleManager.dragDate = null;
     }
 };
 

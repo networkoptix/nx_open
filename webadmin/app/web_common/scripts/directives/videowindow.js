@@ -32,7 +32,7 @@ angular.module('nxCommon')
                 player:"=",
                 activeFormat:"=",
                 rotation: "=",
-                playing: "="
+                playerHandler: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
@@ -147,19 +147,11 @@ angular.module('nxCommon')
                                 else{
                                     scope.videoFlags.ieWin10 = true;
                                 }
+                                return false;
                             }
                             break;
 
                         case "Firefox":
-                            if(weHaveWebm && canPlayNatively("webm"))
-                            {
-                                return "webm";
-                            }
-                            if(weHaveHls && window.jscd.os === 'Linux'){
-                                scope.videoFlags.ubuntuNX = true;
-                                return false;
-                            }
-
                         case "Chrome":
                         case "Opera":
                         case "Webkit":
@@ -173,10 +165,18 @@ angular.module('nxCommon')
                             if(weHaveWebm && canPlayNatively("webm")){
                                 return "webm";
                             }
+                            if(weHaveHls && window.jscd.os === 'Linux'){
+                                scope.videoFlags.ubuntuNX = true;
+                                return false;
+                            }
                     }
 
-                    scope.videoFlags.flashRequired = true;
-                    scope.videoFlags.noFormat = true;
+                    if(weHaveHls){
+                        scope.videoFlags.flashRequired = true;
+                    }
+                    else{
+                        scope.videoFlags.noFormat = true;
+                    }
                     return false; // IE9 - No supported formats
                 }
 
@@ -185,6 +185,30 @@ angular.module('nxCommon')
                 // TODO: Support new players
 
                 var makingPlayer = false;
+                var nativePlayerLoadError = null;
+
+                //For the native player. Handles webm's long loading times
+                function loadingTimeout(){
+                    scope.videoFlags.errorLoading = true;
+                    scope.loading = false;
+                    nativePlayerLoadError = null;
+                    resetPlayer();
+                }
+
+                function cancelTimeoutNativeLoad(){
+                    if(nativePlayerLoadError){
+                        $timeout.cancel(nativePlayerLoadError);
+                        nativePlayerLoadError = null;
+                    }
+                }
+
+                function resetTimeout(event){
+                    if(nativePlayerLoadError){
+                        scope.loading = true;
+                        cancelTimeoutNativeLoad();
+                        nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
+                    }
+                }
 
                 function initNativePlayer(nativeFormat) {
 
@@ -192,47 +216,46 @@ angular.module('nxCommon')
                     scope.flashls = false;
                     scope.jsHls = false;
 
-                    var autoshow = null;
                     $timeout(function(){
+                        var nativePlayer = new NativePlayer();
                         nativePlayer.init(element.find(".videoplayer"), function (api) {
                             makingPlayer = false;
                             scope.vgApi = api;
+                            cancelTimeoutNativeLoad();
 
                             if (scope.vgSrc) {
-                                if(scope.player == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hack for android bug. remove it later
-                                    if(autoshow){
-                                        $timeout.cancel(autoshow);
-                                    }
-                                    autoshow = $timeout(function () {
-                                        scope.loading = false; // Automatically disable loading state after timeout (20 seconds)
-                                        autoshow = null;
-                                    },20000);
-                                }
-
                                 scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                    scope.loading = false; // Video is playing - disable loading
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
-                                scope.vgApi.addEventListener("pause", function(event){
-                                    scope.playing = false;
-                                });
-                                scope.vgApi.addEventListener("play", function(event){
-                                    scope.playing = true;
+                                scope.vgApi.addEventListener("loadeddata", function(event){
+                                    scope.loading = false; // Video is playing - disable loading
+                                    scope.playerHandler();
+                                    cancelTimeoutNativeLoad();
                                 });
 
                                 scope.vgApi.addEventListener("ended",function(event){
                                     scope.vgUpdateTime({$currentTime: null, $duration: null});
-
                                 });
+
+                                scope.vgApi.addEventListener("loadstart", function (event){
+                                    if(nativePlayerLoadError){
+                                        $timeout.cancel(nativePlayerLoadError);
+                                    }
+                                    nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
+                                });
+
+                                //If we are still downloading the video reset the timer
+                                scope.vgApi.addEventListener("progress", resetTimeout);
+
+                                //If the player stalls give it a chance to recover
+                                scope.vgApi.addEventListener("stalled", resetTimeout);
                             }
 
                             scope.vgPlayerReady({$API: scope.vgApi});
-                        }, function (api) {
-                            console.error("some error");
                         });
                     });
                 }
@@ -267,21 +290,9 @@ angular.module('nxCommon')
                                     scope.vgApi.load(getFormatSrc('hls'));
                                 }
                                 scope.vgPlayerReady({$API: api});
-                            }, function (error) {
-                                $timeout(function () {
-                                    scope.videoFlags.errorLoading = true;
-                                    scope.loading = false; // Some error happended - stop loading
-                                    scope.flashls = false;// Kill flashls with his error
-                                    scope.native = false;
-                                    scope.jsHls = false;
-                                });
-
-                                if(scope.vgApi){
-                                    scope.vgApi.kill();
-                                }
-                                scope.vgPlayerReady({$API: null});
-                                console.error(error);
-                            }, function (position, duration) {
+                            },
+                            playerErrorHandler,
+                            function (position, duration) {
                                 scope.loading = false; // Video is playing - disable loading
                                 scope.vgUpdateTime({$currentTime: position, $duration: duration});
                             });
@@ -297,43 +308,45 @@ angular.module('nxCommon')
                     $timeout(function(){
                         var jsHlsAPI = new JsHlsAPI();
                         jsHlsAPI.init(element.find(".videoplayer"),
-                                      Config.webclient.hlsLoadingTimeout,
-                                      scope.debugMode,
-                                      function (api) {
-                                            makingPlayer = false;
-                                            scope.vgApi = api;
-                                            if (scope.vgSrc) {
-                                                scope.vgApi.load(getFormatSrc('hls'));
+                            Config.webclient.hlsLoadingTimeout,
+                            scope.debugMode,
+                            function (api) {
+                                makingPlayer = false;
+                                scope.vgApi = api;
+                                if (scope.vgSrc) {
+                                    scope.vgApi.load(getFormatSrc('hls'));
 
-                                                scope.vgApi.addEventListener("timeupdate", function (event) {
-                                                    var video = event.srcElement || event.originalTarget;
-                                                    scope.loading = false;  // Video is ready - disable loading
-                                                    scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                                                });
+                                    scope.vgApi.addEventListener("loadeddata", function(){
+                                        scope.loading = false;  // Video is ready - disable loading
+                                        scope.playerHandler();
+                                    });
 
-                                                scope.vgApi.addEventListener("ended",function(event){
-                                                    scope.vgUpdateTime({$currentTime: null, $duration: null});
-                                                });
-                                            }
-                                            scope.vgPlayerReady({$API:api});
-                                      },  function (error) {
-                                            $timeout(function(){
-                                                scope.loading = false;  // Video error - disable loading
-                                                scope.videoFlags.errorLoading = true;
-                                                scope.jsHls = false;
-                                            });
+                                    scope.vgApi.addEventListener("timeupdate", function (event) {
+                                        var video = event.srcElement || event.originalTarget;
+                                        scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                    });
 
-                                            if(scope.vgApi){
-                                                scope.vgApi.kill();
-                                            }
-                                            scope.vgPlayerReady({$API: null});
-                                            console.error(error);
-                                      });
+                                    scope.vgApi.addEventListener("ended",function(event){
+                                        scope.vgUpdateTime({$currentTime: null, $duration: null});
+                                    });
+                                }
+                                scope.vgPlayerReady({$API:api});
+                            }, playerErrorHandler);
                     });
                 }
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 
+                function playerErrorHandler(error){
+                    scope.loading = false; // Some error happended - stop loading
+                    resetPlayer();
+                    scope.playerHandler(error).then(function(error){
+                        scope.videoFlags.errorLoading = error;
+                    }, function(error){
+                        scope.videoFlags.errorLoading = error;
+                    });
+                    console.error(error);
+                }
 
                 function initNewPlayer(){
                     if( makingPlayer ){
@@ -363,9 +376,10 @@ angular.module('nxCommon')
                 function resetPlayer(){
                     if(scope.vgApi){
                         scope.vgApi.kill();
+                        makingPlayer = false;
+                        scope.vgApi = null;
                     }
                     scope.vgPlayerReady({$API: null});
-
                     //Turn off all players to reset ng-class for rotation
                     scope.native = false;
                     scope.flashls = false;
@@ -375,9 +389,8 @@ angular.module('nxCommon')
                 function srcChanged(){
                     scope.loading = true; // source changed - start loading
                     scope.videoFlags.errorLoading = false;
-                    scope.preview = getFormatSrc('jpeg');
-
                     if(scope.vgSrc ) {
+                        scope.preview = getFormatSrc('jpeg');
                         scope.player = detectBestFormat();
                         resetPlayer();
 

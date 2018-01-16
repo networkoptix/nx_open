@@ -83,10 +83,15 @@ angular.module('nxCommon')
             var findMediaStream = function(param){
                 return param.name === 'mediaStreams';
             };
+
+            var findIoConfigCapability = function(param){
+                return param.name === 'ioConfigCapability';
+            }
             
             function cameraFilter(camera){
                 // Filter desktop cameras here
-                if(camera.typeId === self.desktopCameraTypeId){ // Hide desctop cameras
+                // Hide desktop cameras and ioDevices
+                if(camera.typeId === self.desktopCameraTypeId || _.find(camera.addParams, findIoConfigCapability)){
                     return false;
                 }
 
@@ -315,14 +320,13 @@ angular.module('nxCommon')
         };
         camerasProvider.prototype.getServerTimes = function(){
             var self = this;
-            _.each(this.mediaServers,function(server){
-                if (server.status != 'Online'){ // We can't get time from offline server
-                    return;
-                }
-                self.systemAPI.getTime(server.id).then(function(result){
-                    var serverUtcTime = parseInt(result.data.reply.utcTime);
-                    var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-                    self.serverOffsets[server.id] = timeManager.getOffset(serverUtcTime, timeZoneOffset);
+            return self.systemAPI.getServerTimes().then(function(result){
+                var serverOffsets = result.data.reply;
+                _.each(serverOffsets, function(server){
+                    //Typo with server api so we check for both spellings
+                    //Internal fix Link to task: https://networkoptix.atlassian.net/browse/VMS-7984
+                    var timeSinceEpochMs = server.timeSinceEpochMs || server.timeSinseEpochMs;
+                    self.serverOffsets[server.serverId] = timeManager.getOffset(timeSinceEpochMs, server.timeZoneOffsetMs);
                 });
             });
         };

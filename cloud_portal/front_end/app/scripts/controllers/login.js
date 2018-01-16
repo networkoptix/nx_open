@@ -18,6 +18,10 @@ angular.module('cloudApp')
             dialogs.closeMe($scope);
         };
 
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
+
         $scope.login = process.init(function() {
             return account.login($scope.auth.email, $scope.auth.password, $scope.auth.remember);
         },{

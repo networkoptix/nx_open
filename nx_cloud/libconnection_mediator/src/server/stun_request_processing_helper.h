@@ -32,7 +32,7 @@ void sendSuccessResponse(
             std::move(requestHeader.transactionId)));
     response.newAttribute<stun::extension::attrs::ResultCode>(api::ResultCode::ok);
 
-    connection->sendMessage(std::move(response));
+    connection->sendMessage(std::move(response), nullptr);
 }
 
 /** Send error responce with error code and description as attribute */
@@ -54,7 +54,7 @@ void sendErrorResponse(
     response.newAttribute< stun::attrs::ErrorCode >(
         stunErrorCode,
         std::move(reason));
-    connection->sendMessage(std::move(response));
+    connection->sendMessage(std::move(response), nullptr);
 }
 
 template<typename OutputData>
@@ -103,7 +103,7 @@ void fillAndSendResponse(
 }
 
 
-/** 
+/**
     Does following:\n
     - reads input data out of STUN \a request
     - passes it to the member function \a processingFunc of \a processor

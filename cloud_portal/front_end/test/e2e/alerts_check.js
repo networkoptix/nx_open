@@ -20,7 +20,8 @@ var AlertSuite = function () {
         systemAccessError: 'System info is unavailable: Some unexpected error has happened',
         systemAccessRestricted: 'System info is unavailable: You don\'t have access to this system.',
         permissionDeleteSuccess: 'Permissions were removed from ',
-        permissionAddSuccess: 'New permissions saved'
+        permissionAddSuccess: 'New permissions saved',
+        activationLinkSent: 'Activation Link Sent'
     };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));

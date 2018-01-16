@@ -88,6 +88,12 @@ class Message(models.Model):
         self.save()
 
 
+    def delivery_time_interval(self):
+        return (self.created_date - self.send_date).total_seconds()
+
+    delivery_time_interval.short_description = "Delivery Time Interval (sec)"
+
+
 class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when checking on message status
     class Meta:
         model = Message

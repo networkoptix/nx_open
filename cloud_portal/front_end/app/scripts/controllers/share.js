@@ -79,5 +79,5 @@ angular.module('cloudApp')
 
         $scope.close = function(){
             dialogs.closeMe($scope);
-        }
+        };
     }]);

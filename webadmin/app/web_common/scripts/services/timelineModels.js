@@ -473,13 +473,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     return self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
-            var chunks = data.data.reply;
-            //if(chunks.length == 0){} // No chunks for this camera
-
-            _.forEach(chunks,function(chunk){
-                chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-            });
+            var chunks = parseChunks(data.data.reply);
 
             var chunksToIterate = chunks.length;
             //If level == 0 - we want only first chunk
@@ -802,16 +796,7 @@ ShortCache.prototype.update = function(requestPosition, position){
     this.currentRequest.then(function(data){
         self.updating = false;
 
-        var chunks = data.data.reply;
-
-        _.forEach(chunks,function(chunk){
-            chunk.durationMs = parseInt(chunk.durationMs);
-            chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
-
-            if(chunk.durationMs == -1){
-                chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
-            }
-        });
+        var chunks = parseChunks(data.data.reply);
 
         //if(chunks.length == 0){ } // no chunks for this camera and interval
 
@@ -916,19 +901,20 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
     }
 
-    if(!this.liveMode && this.currentDetailization.length>0
-        && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
-            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
-            < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
-
-        // TODO: update live detailization?
-
-        this.update();
+    if(!this.liveMode && this.currentDetailization.length>0){
+        var archiveEnd = this.currentDetailization[this.currentDetailization.length - 1].durationMs +
+                         this.currentDetailization[this.currentDetailization.length - 1].startTimeMs;
+        if (archiveEnd < Math.round(this.playedPosition) + this.updateInterval && this.lastArchiveEnd != archiveEnd) {
+            // It's time to update
+            // And last update get new information
+            this.lastArchiveEnd = archiveEnd;
+            this.update();
+        }
     }
 
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
-        this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
+        this.lastPlayedDate = this.playedPosition; // Save the boundaries of uploaded cache
     }
 
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
@@ -937,8 +923,49 @@ ShortCache.prototype.setPlayingPosition = function(position){
     return this.playedPosition;
 };
 
+ShortCache.prototype.checkEndOfArchive = function(){
+    var self = this;
+    return this.mediaserver.getRecords(
+        this.cameras[0],
+        timeManager.displayToServer(this.playedPosition),
+        timeManager.nowToServer() + 100000,
+        this.requestDetailization,
+        Config.webclient.chunksToCheckFatal
+    ).then(function(data){
+        var chunks = parseChunks(data.data.reply);
+        //If there are no chunks in the short cache use lastMinute
+        var endDate = timeManager.nowToDisplay - TimelineConfig.lastMinuteDuration;
+        if (chunks.length > 0){
+            //This is supposed to find the cutoff point in the chunk
+            var endTime = Config.webclient.endOfArchiveTime;
+            var i = chunks.length - 1;
+            for(; i > 0; --i){
+                if ( endTime - chunks[i].durationMs <= 0){
+                    break;
+                }
+                endTime -= chunks[i].durationMs;
+            }
+            endDate = chunks[i].startTimeMs + chunks[i].durationMs - endTime;
+        }
+        return self.playedPosition > endDate;
+    },function(){return null;});
+};
 
 
+ShortCache.prototype.isArchiveEmpty = function(){
+    return this.currentDetailization < 1;
+}
+//Used by ShortCache and CameraRecords
+function parseChunks(chunks){
+    return _.forEach(chunks,function(chunk){
+        chunk.durationMs = parseInt(chunk.durationMs);
+        chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
+
+        if(chunk.durationMs == -1){
+            chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
+        }
+    });
+}
 
 
 
@@ -959,6 +986,7 @@ function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initial
         live: false,
         forcedToStop:false
     };
+    this.dragDate = null;
 
 
     this.levels = {
@@ -1218,7 +1246,7 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= this.minPixelsPerLevel / this.pixelAspectRatio) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel * this.pixelAspectRatio) {
             // minMsPerPixel
             break;
         }
@@ -1338,7 +1366,9 @@ ScaleManager.prototype.scroll = function(value){
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
-    return this.bound(0,this.scroll() + pixels * this.getRelativeWidth() / this.viewportWidth,1);
+    var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    var relativeValue = (this.visibleEnd - this.visibleStart) / availableWidth;
+    return this.bound(0,this.scroll() + pixels / this.viewportWidth * relativeValue,1);
 };
 
 ScaleManager.prototype.getScrollTarget = function(pixels){
