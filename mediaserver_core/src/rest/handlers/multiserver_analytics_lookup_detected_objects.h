@@ -64,7 +64,7 @@ private:
         const nx::analytics::storage::Filter& filter,
         std::vector<nx::analytics::storage::LookupResult>* lookupResults);
 
-    nx::analytics::storage::LookupResult aggregateResults(
+    nx::analytics::storage::LookupResult mergeResults(
         std::vector<nx::analytics::storage::LookupResult> lookupResults,
         Qt::SortOrder resultSortOrder);
 

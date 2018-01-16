@@ -179,7 +179,7 @@ nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects
         "%3 objects were found").args(filter, isLocal, lookupResults.size()));
 
     *body = serializeOutputData(
-        aggregateResults(std::move(lookupResults), filter.sortOrder),
+        mergeResults(std::move(lookupResults), filter.sortOrder),
         outputFormat);
     *contentType = Qn::serializationFormatToHttpContentType(outputFormat);
     return nx::network::http::StatusCode::ok;
@@ -227,7 +227,7 @@ nx::network::http::StatusCode::Value
 }
 
 nx::analytics::storage::LookupResult
-    QnMultiserverAnalyticsLookupDetectedObjects::aggregateResults(
+    QnMultiserverAnalyticsLookupDetectedObjects::mergeResults(
         std::vector<nx::analytics::storage::LookupResult> lookupResults,
         Qt::SortOrder resultSortOrder)
 {
