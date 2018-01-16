@@ -17,8 +17,9 @@
 #include "axis_metadata_monitor.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 class AxisMetadataPlugin:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
@@ -55,6 +56,7 @@ private:
     QByteArray m_manifest;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

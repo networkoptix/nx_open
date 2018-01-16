@@ -14,8 +14,9 @@
 #include <nx/fusion/serialization/json.h>
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
@@ -87,8 +88,9 @@ const char* AxisMetadataManager::capabilitiesManifest(Error* error) const
     return m_deviceManifest.constData();
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
 
 //#endif // defined(ENABLE_HANWHA)

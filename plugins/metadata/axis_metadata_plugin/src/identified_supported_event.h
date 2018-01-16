@@ -13,8 +13,9 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 class IdentifiedSupportedEvent: private nx::axis::SupportedEvent
 {
@@ -30,6 +31,7 @@ public:
 QString serializeEvent(const IdentifiedSupportedEvent& identifiedSupportedEvent);
 QString serializeEvents(const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents);
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx

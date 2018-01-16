@@ -14,8 +14,9 @@
 #include "axis_metadata_manager.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 namespace {
 
@@ -149,15 +150,16 @@ QList<IdentifiedSupportedEvent> AxisMetadataPlugin::fetchSupportedEvents(
     return result;
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
 
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxMetadataPlugin()
 {
-    return new nx::mediaserver::plugins::AxisMetadataPlugin();
+    return new nx::mediaserver::plugins::axis::AxisMetadataPlugin();
 }
 
 } // extern "C"

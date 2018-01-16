@@ -6,9 +6,14 @@
 #include <nx/utils/uuid.h>
 #include <utils/common/id.h>
 
+namespace nx {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
+
 namespace {
 
-using namespace nx::mediaserver::plugins;
+using namespace nx::mediaserver_plugins::metadata::axis;
 
 QString ignoreNamespace(const QString& tag)
 {
@@ -38,10 +43,6 @@ QnUuid guidFromEventName(const char* eventFullName)
 }
 
 } // namespace
-
-namespace nx {
-namespace mediaserver {
-namespace plugins {
 
 IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent) :
     nx::axis::SupportedEvent(supportedEvent)
@@ -91,7 +92,8 @@ QString serializeEvents(const QList<IdentifiedSupportedEvent>& identifiedSupport
     return serializedEvents.join(',');
 }
 
-} // plugins
-} // mediaserver
+} // axis
+} // metadata
+} // mediaserver_plugins
 } // nx
 

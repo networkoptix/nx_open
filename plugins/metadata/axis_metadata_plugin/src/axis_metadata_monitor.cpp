@@ -14,8 +14,9 @@
 #include "camera_controller.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 namespace {
 
@@ -257,7 +258,8 @@ void AxisMetadataMonitor::stopMonitoring()
     removeRules();
 }
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
 

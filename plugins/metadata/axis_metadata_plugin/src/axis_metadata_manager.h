@@ -14,8 +14,9 @@
 #include "axis_metadata_plugin.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 class AxisMetadataManager:
     public QObject,
@@ -52,8 +53,9 @@ private:
     AxisMetadataMonitor* m_monitor = nullptr;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
 
 //#endif // defined(ENABLE_HANWHA)

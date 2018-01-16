@@ -18,8 +18,9 @@
 #include "identified_supported_event.h"
 
 namespace nx {
-namespace mediaserver {
-namespace plugins {
+namespace mediaserver_plugins {
+namespace metadata {
+namespace axis {
 
 class AxisMetadataManager;
 
@@ -56,6 +57,7 @@ public:
     mutable QnMutex m_mutex;
 };
 
-} // namespace plugins
-} // namespace mediaserver
+} // axis
+} // namespace metadata
+} // namespace mediaserver_plugins
 } // namespace nx
