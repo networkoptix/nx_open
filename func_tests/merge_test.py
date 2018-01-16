@@ -9,9 +9,9 @@ import time
 import pytest
 
 import server_api_data_generators as generator
-from test_utils.rest_api import RestApiError, HttpError
+from test_utils.rest_api import HttpError
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
-from test_utils.utils import bool_to_str, str_to_bool, datetime_utc_now
+from test_utils.utils import bool_to_str, datetime_utc_now, str_to_bool
 
 log = logging.getLogger(__name__)
 
