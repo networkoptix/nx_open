@@ -17,8 +17,9 @@ class Updates2Manager: public QObject, public QnCommonModuleAware
 public:
     Updates2Manager(QnCommonModule* commonModule);
     api::Updates2StatusData status();
+    api::Updates2StatusData download();
     void atServerStart();
-    /** After this method is called manager is not operational and should be destroyed*/
+    /** After this method is called manager is not operational and should be destroyed */
     void stopAsyncTasks();
 
 private:
@@ -29,12 +30,11 @@ private:
 
     void checkForRemoteUpdate(utils::TimerId timerId);
     void checkForGlobalDictionaryUpdate();
-    void writeStatusToFile();
     void loadStatusFromFile();
     void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
     void onDownloadFinished(const QString& fileName);
-    void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
+    void setStatusUnsafe(api::Updates2StatusData::StatusCode code, const QString& message);
 };
 
 } // namespace updates2

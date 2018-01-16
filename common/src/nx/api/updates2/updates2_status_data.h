@@ -17,6 +17,7 @@ public:
     enum class StatusCode
     {
         checking,
+        available,
         notAvailable,
         downloading,
         preparing,

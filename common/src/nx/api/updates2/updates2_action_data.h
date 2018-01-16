@@ -15,7 +15,7 @@ struct Updates2ActionData
 public:
     enum class ActionCode
     {
-        start,
+        download,
         stop,
         install
     };

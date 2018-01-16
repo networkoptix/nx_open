@@ -13,6 +13,7 @@
 #include <api/helpers/empty_request_data.h>
 #include <network/tcp_listener.h>
 #include <nx/utils/std/future.h>
+#include <nx/api/updates2/updates2_action_data.h>
 
 
 namespace nx {
@@ -60,7 +61,7 @@ static JsonRestResponse createStatusAllResponse(const QnRestConnectionProcessor*
                     "Multi update request failed");
 
                 if (osErrorCode == SystemError::noError
-                        && statusCode == network::http::StatusCode::ok)
+                    && statusCode == network::http::StatusCode::ok)
                 {
                     QnJsonRestResult restResult;
                     bool deserializeResult = QJson::deserialize(msgBody, &restResult);
@@ -112,6 +113,35 @@ JsonRestResponse createResponse()
     return result;
 }
 
+JsonRestResponse createActionResponse(const QByteArray& body)
+{
+    JsonRestResponse result(network::http::StatusCode::ok);
+    api::Updates2ActionData actionData;
+
+    if (!QJson::deserialize<api::Updates2ActionData>(body, &actionData))
+    {
+        result.json.setReply(
+            api::Updates2StatusData(
+                qnServerModule->commonModule()->moduleGUID(),
+                api::Updates2StatusData::StatusCode::error,
+                "Failed to deserialize update action data"));
+        return result;
+    }
+
+    switch (actionData.action)
+    {
+        case api::Updates2ActionData::ActionCode::download:
+            result.json.setReply(qnServerModule->updates2Manager()->download());
+            break;
+        case api::Updates2ActionData::ActionCode::install:
+            break;
+        case api::Updates2ActionData::ActionCode::stop:
+            break;
+    }
+
+    return result;
+}
+
 } // namespace
 
 JsonRestResponse Updates2RestHandler::executeGet(const JsonRestRequest& request)
@@ -136,7 +166,12 @@ JsonRestResponse Updates2RestHandler::executePost(
     const JsonRestRequest& request,
     const QByteArray& body)
 {
-    return JsonRestResponse();
+    if (request.path == "/" + kUpdates2Path)
+        return createActionResponse(body);
+
+    JsonRestResponse response(network::http::StatusCode::notFound);
+    response.json.setError(QnRestResult::Error::CantProcessRequest);
+    return response;
 }
 
 JsonRestResponse Updates2RestHandler::executePut(
