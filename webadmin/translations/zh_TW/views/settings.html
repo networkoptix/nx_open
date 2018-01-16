@@ -43,7 +43,7 @@
                             此伺服器將脫離目前系統. 影像資料將保持完好.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢復出廠預設值</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>將伺服器從系統中脫離</h3>
                         <p>此動作將使伺服器脫離系統但保留資料庫, 使用者訊資以及設定.
                             影像資料將保持完好. <b>雲端使用者將被刪除.</b></p>
