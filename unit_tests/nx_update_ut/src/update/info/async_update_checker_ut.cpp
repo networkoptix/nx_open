@@ -54,7 +54,7 @@ protected:
             m_condition.wait(lock.mutex());
 
         ASSERT_EQ(ResultCode::ok, m_resultCode);
-        ASSERT_TRUE(m_updateRegistry);
+        ASSERT_TRUE((bool) m_updateRegistry);
         assertUpdateRegistryContent();
     }
 
