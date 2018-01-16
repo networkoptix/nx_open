@@ -1327,22 +1327,6 @@ private:
 
         return (*maxElement)->timestampUsec;
     }
-
-    template<typename Func>
-    qint64 getTimestampByCondition(Func func) const
-    {
-        const std::vector<common::metadata::DetectionMetadataPacketPtr>&
-            packets = m_analyticsPackets;
-        auto maxElement = func(
-            packets.begin(), packets.end(),
-            [](const common::metadata::DetectionMetadataPacketPtr& left,
-                const common::metadata::DetectionMetadataPacketPtr& right)
-            {
-                return left->timestampUsec < right->timestampUsec;
-            });
-
-        return (*maxElement)->timestampUsec;
-    }
 };
 
 TEST_F(AnalyticsEventsStorageCleanup, removing_all_data)
