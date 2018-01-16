@@ -20,6 +20,9 @@ class ArtifactType(object):
         return repository.artifact_type(self.name, self.content_type, self.ext)
 
 
+JSON_ARTIFACT_TYPE = ArtifactType(name='json', content_type='application/json', ext='.json')
+
+
 class Artifact(object):
 
     def __init__(self, path_root, name=None, full_name=None, is_error=None, artifact_type=None):
@@ -71,7 +74,7 @@ class ArtifactFactory(object):
         return self._artifact.path
 
     def save_as_json(self, value, encoder=None):
-        path = self.make_artifact(ext='.json', type_name='json', content_type='application/json').produce_file_path()
+        path = self.make_artifact(artifact_type=JSON_ARTIFACT_TYPE).produce_file_path()
         with open(path, 'w') as f:
             json.dump(value, f, indent=4, cls=encoder)
         return path
