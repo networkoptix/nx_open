@@ -12,7 +12,6 @@
 #include <plugins/plugin_internal_tools.h>
 
 #include "axis_metadata_manager.h"
-#include "axis_common.h"
 
 namespace nx {
 namespace mediaserver {
@@ -106,7 +105,7 @@ AbstractMetadataManager* AxisMetadataPlugin::managerForResource(
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    QList<SupportedEventEx> events = fetchSupportedEvents(resourceInfo);
+    QList<IdentifiedSupportedEvent> events = fetchSupportedEvents(resourceInfo);
     if (events.empty())
         return nullptr;
 
@@ -127,10 +126,10 @@ const char* AxisMetadataPlugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-QList<SupportedEventEx> AxisMetadataPlugin::fetchSupportedEvents(
+QList<IdentifiedSupportedEvent> AxisMetadataPlugin::fetchSupportedEvents(
     const ResourceInfo& resourceInfo)
 {
-    QList<SupportedEventEx> result;
+    QList<IdentifiedSupportedEvent> result;
     const char* const ip_port = resourceInfo.url + sizeof("http://") - 1;
     nx::axis::CameraController axisCameraController(ip_port, resourceInfo.login,
         resourceInfo.password);
@@ -140,7 +139,7 @@ QList<SupportedEventEx> AxisMetadataPlugin::fetchSupportedEvents(
 
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result),
-        [](const axis::SupportedEvent& event) {return SupportedEventEx(event); });
+        [](const axis::SupportedEvent& event) {return IdentifiedSupportedEvent(event); });
 
     // Being uncommented, the next code line allows to get the list of supported events
     // in the same json format that is used in "static-resources/manifest.json".

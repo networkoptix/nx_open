@@ -13,7 +13,7 @@
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 #include <nx/network/socket_global.h>
 
-#include "axis_common.h"
+#include "identified_supported_event.h"
 #include "axis_metadata_monitor.h"
 
 namespace nx {
@@ -48,7 +48,8 @@ public:
         nx::sdk::Error* error) const override;
 
 private:
-    QList<SupportedEventEx> fetchSupportedEvents(const nx::sdk::ResourceInfo& resourceInfo);
+    QList<IdentifiedSupportedEvent> fetchSupportedEvents(
+        const nx::sdk::ResourceInfo& resourceInfo);
 
 private:
     QByteArray m_manifest;

@@ -16,20 +16,19 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-class SupportedEventEx: private nx::axis::SupportedEvent
+class IdentifiedSupportedEvent: private nx::axis::SupportedEvent
 {
-    //nx::axis::SupportedEvent m_supportedEvent;
     QnUuid m_internalTypeId;
     nxpl::NX_GUID m_externalTypeId;
 public:
-    SupportedEventEx(const nx::axis::SupportedEvent& supportedEvent);
+    IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent);
     const nx::axis::SupportedEvent& base() const { return *this; }
     const QnUuid& internalTypeId() const { return m_internalTypeId; }
     const nxpl::NX_GUID& externalTypeId() const { return m_externalTypeId; }
 };
 
-QString serializeEvent(const SupportedEventEx& event);
-QString serializeEvents(const QList<SupportedEventEx>& events);
+QString serializeEvent(const IdentifiedSupportedEvent& identifiedSupportedEvent);
+QString serializeEvents(const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents);
 
 } // namespace plugins
 } // namespace mediaserver

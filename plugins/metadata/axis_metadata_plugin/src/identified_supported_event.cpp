@@ -1,4 +1,4 @@
-#include "axis_common.h"
+#include "identified_supported_event.h"
 
 #include <plugins/plugin_internal_tools.h>
 
@@ -43,14 +43,14 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-SupportedEventEx::SupportedEventEx(const nx::axis::SupportedEvent& supportedEvent) :
+IdentifiedSupportedEvent::IdentifiedSupportedEvent(const nx::axis::SupportedEvent& supportedEvent) :
     nx::axis::SupportedEvent(supportedEvent)
 {
     m_internalTypeId = guidFromEventName(supportedEvent.fullName().c_str());
     m_externalTypeId = nxpt::fromQnUuidToPluginGuid(m_internalTypeId);
 }
 
-QString serializeEvent(const SupportedEventEx& supportedEventEx)
+QString serializeEvent(const IdentifiedSupportedEvent& identifiedSupportedEvent)
 {
     static const QString kEventPattern = R"json(
     {
@@ -69,24 +69,24 @@ QString serializeEvent(const SupportedEventEx& supportedEventEx)
     static const QString kStateful = "stateful";
     static const QString kStateless = "stateless";
 
-    const auto& supportedEvent = supportedEventEx.base();
+    const auto& supportedEvent = identifiedSupportedEvent.base();
     const QString description = !supportedEvent.description.empty() ?
         QString(supportedEvent.description.c_str()) :
         ignoreNamespaces(QString(supportedEvent.name.c_str()));
 
     return lm(kEventPattern).args(
-        supportedEventEx.internalTypeId().toSimpleString(),
+        identifiedSupportedEvent.internalTypeId().toSimpleString(),
         description,
         supportedEvent.fullName(),
         supportedEvent.stateful ? kStateful : kStateless);
 }
 
-QString serializeEvents(const QList<SupportedEventEx>& events)
+QString serializeEvents(const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents)
 {
     QStringList serializedEvents;
-    for (const auto& event: events)
+    for (const auto& identifiedSupportedEvent : identifiedSupportedEvents)
     {
-        serializedEvents << serializeEvent(event);
+        serializedEvents << serializeEvent(identifiedSupportedEvent);
     }
     return serializedEvents.join(',');
 }

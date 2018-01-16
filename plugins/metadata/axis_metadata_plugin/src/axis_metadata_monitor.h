@@ -1,7 +1,5 @@
 #pragma once
 
-#include "axis_common.h"
-
 #include <map>
 #include <vector>
 
@@ -17,6 +15,8 @@
 #include <nx/network/http/test_http_server.h>
 #include <common/common_module.h>
 
+#include "identified_supported_event.h"
+
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -28,7 +28,7 @@ class AxisMetadataMonitor: public QObject
     Q_OBJECT
 
 public:
-    using Handler = std::function<void(const std::vector<SupportedEventEx>&)>;
+    using Handler = std::function<void(const std::vector<IdentifiedSupportedEvent>&)>;
 
     AxisMetadataMonitor(
         AxisMetadataManager* manager,

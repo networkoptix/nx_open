@@ -24,7 +24,7 @@ class AxisMetadataManager:
     Q_OBJECT;
 public:
     AxisMetadataManager(const nx::sdk::ResourceInfo& resourceInfo,
-        const QList<SupportedEventEx>& axisEvents);
+        const QList<IdentifiedSupportedEvent>& events);
 
     virtual ~AxisMetadataManager();
 
@@ -39,13 +39,16 @@ public:
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
-    const QList<SupportedEventEx>& axisEvents() const { return m_axisEvents; }
+    const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents() const
+    {
+        return m_identifiedSupportedEvents;
+    }
 
 private:
     QByteArray m_deviceManifest;
     QUrl m_url;
     QAuthenticator m_auth;
-    QList<SupportedEventEx> m_axisEvents;
+    QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
     AxisMetadataMonitor* m_monitor = nullptr;
 };
 

@@ -13,8 +13,6 @@
 
 #include <nx/fusion/serialization/json.h>
 
-#include "axis_common.h"
-
 namespace nx {
 namespace mediaserver {
 namespace plugins {
@@ -24,20 +22,20 @@ using namespace nx::sdk::metadata;
 
 AxisMetadataManager::AxisMetadataManager(
     const nx::sdk::ResourceInfo& resourceInfo,
-    const QList<SupportedEventEx>& axisEvents)
+    const QList<IdentifiedSupportedEvent>& events)
 {
     m_url = resourceInfo.url;
     m_auth.setUser(resourceInfo.login);
     m_auth.setPassword(resourceInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
-    for (const auto& event : axisEvents)
+    for (const auto& event : events)
     {
         deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
     }
     m_deviceManifest = QJson::serialized(deviceManifest);
 
-    m_axisEvents = axisEvents;
+    m_identifiedSupportedEvents = events;
 
     NX_PRINT << "Ctor :" << this;
 }

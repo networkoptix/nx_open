@@ -1,8 +1,6 @@
 #include "axis_metadata_monitor.h"
 
-//#include <thread>
 #include <chrono>
-//#include <iostream>
 #include <algorithm>
 
 #include <plugins/plugin_internal_tools.h>
@@ -26,32 +24,32 @@ static const std::string kActionNamePrefix("NX_ACTION_");
 static const std::string kRuleNamePrefix("NX_RULE_");
 
 nx::sdk::metadata::CommonDetectedEvent* createCommonDetectedEvent(
-    const SupportedEventEx& axisEvent,
+    const IdentifiedSupportedEvent& identifiedSupportedEvents,
     bool active)
 {
-    auto event = new nx::sdk::metadata::CommonDetectedEvent();
-    event->setEventTypeId(axisEvent.externalTypeId());
-    event->setCaption(axisEvent.base().name);
-    event->setDescription(axisEvent.base().description);
-    event->setIsActive(active);
-    event->setConfidence(1.0);
-    event->setAuxilaryData(axisEvent.base().fullName());
-    return event;
+    auto detectedEvent = new nx::sdk::metadata::CommonDetectedEvent();
+    detectedEvent->setEventTypeId(identifiedSupportedEvents.externalTypeId());
+    detectedEvent->setCaption(identifiedSupportedEvents.base().name);
+    detectedEvent->setDescription(identifiedSupportedEvents.base().description);
+    detectedEvent->setIsActive(active);
+    detectedEvent->setConfidence(1.0);
+    detectedEvent->setAuxilaryData(identifiedSupportedEvents.base().fullName());
+    return detectedEvent;
 }
 
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const SupportedEventEx& axisEvent)
+    const IdentifiedSupportedEvent& identifiedSupportedEvents)
 {
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-    auto event1 = createCommonDetectedEvent(axisEvent, /*active*/true);
-    packet->addEvent(event1);
-    auto event2 = createCommonDetectedEvent(axisEvent, /*active*/false);
+    auto detectedEvent1 = createCommonDetectedEvent(identifiedSupportedEvents, /*active*/true);
+    packet->addEvent(detectedEvent1);
+    auto detectedEvent2 = createCommonDetectedEvent(identifiedSupportedEvents, /*active*/false);
+    packet->addEvent(detectedEvent2);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
     packet->setDurationUsec(-1);
-    packet->addEvent(event2);
     return packet;
 }
 
@@ -70,18 +68,19 @@ public:
         const QString kMessage = "?Message=";
         const int kGuidStringLength = 36; //sizeof guid string
         int startIndex = request.toString().indexOf(kMessage);
-        QString uuidString = request.toString().mid(startIndex + kMessage.size(), kGuidStringLength);
+        QString uuidString = request.toString().
+            mid(startIndex + kMessage.size(), kGuidStringLength);
         QnUuid uuid(uuidString);
         nxpl::NX_GUID guid = nxpt::fromQnUuidToPluginGuid(uuid);
 
-        for (const SupportedEventEx& axisEvent : m_axisEvents)
+        for (const IdentifiedSupportedEvent& event : m_identifiedSupportedEvents)
         {
-            if (memcmp(&axisEvent.externalTypeId(), &guid, 16) == 0)
+            if (memcmp(&event.externalTypeId(), &guid, 16) == 0)
             {
-                auto packet = createCommonEventMetadataPacket(axisEvent);
+                auto packet = createCommonEventMetadataPacket(event);
                 m_handler->handleMetadata(nx::sdk::Error::noError, packet);
                 NX_PRINT << "Event detected and set to server: "
-                    << axisEvent.base().fullName();
+                    << event.base().fullName();
                 completionHandler(nx_http::StatusCode::ok);
                 return;
             }
@@ -90,16 +89,18 @@ public:
     }
 
     axisHandler(nx::sdk::metadata::AbstractMetadataHandler* handler,
-        const QList<SupportedEventEx>& axisEvents)
+        const QList<IdentifiedSupportedEvent>& identifiedSupportedEvents)
         :
         m_handler(handler),
-        m_axisEvents(axisEvents)
+        m_identifiedSupportedEvents(identifiedSupportedEvents)
     {
     }
 
 private:
     nx::sdk::metadata::AbstractMetadataHandler* m_handler;
-    const QList<SupportedEventEx>& m_axisEvents; //< events are actually stored in manager
+
+    // events are actually stored in manager
+    const QList<IdentifiedSupportedEvent>& m_identifiedSupportedEvents;
 };
 
 } // namespace
@@ -140,14 +141,14 @@ void AxisMetadataMonitor::addRules(const SocketAddress& localAddress, nxpl::NX_G
     for (int i = 0; i < eventTypeListSize; ++i)
     {
         const auto it = std::find_if(
-            m_manager->axisEvents().cbegin(),
-            m_manager->axisEvents().cend(),
-            [eventTypeList,i](const SupportedEventEx& event)
+            m_manager->identifiedSupportedEvents().cbegin(),
+            m_manager->identifiedSupportedEvents().cend(),
+            [eventTypeList,i](const IdentifiedSupportedEvent& event)
             {
                 return memcmp(&event.externalTypeId(), &eventTypeList[i],
                     sizeof(nxpl::NX_GUID)) == 0;
             });
-        if (it != m_manager->axisEvents().cend())
+        if (it != m_manager->identifiedSupportedEvents().cend())
         {
             static int globalCounter = 0;
 
@@ -237,7 +238,8 @@ nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList
         kWebServerPath.c_str(),
         [this]() -> std::unique_ptr<axisHandler>
         {
-            return std::make_unique<axisHandler>(this->m_handler, this->m_manager->axisEvents());
+            return std::make_unique<axisHandler>(
+                this->m_handler, this->m_manager->identifiedSupportedEvents());
         },
         nx_http::kAnyMethod);
 
