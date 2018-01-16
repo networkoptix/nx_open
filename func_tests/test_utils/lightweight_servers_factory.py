@@ -7,11 +7,12 @@ import os.path
 from requests.exceptions import ReadTimeout
 
 from . import utils
+from .utils import GrowingSleep
 from .core_file_traceback import create_core_file_traceback
+from .server_factory import SERVER_LOG_ARTIFACT_TYPE, CORE_FILE_ARTIFACT_TYPE, TRACEBACK_ARTIFACT_TYPE
 from .server import Server
 from .server_ctl import SERVER_CTL_TARGET_PATH, PhysicalHostServerCtl
 from .template_renderer import TemplateRenderer
-from .utils import GrowingSleep
 
 log = logging.getLogger(__name__)
 
@@ -217,7 +218,7 @@ class LightweightServersHost(object):
     def _save_lws_log(self):
         log_contents = self._host.read_file(self._installation.log_path_base + '.log').strip()
         if log_contents:
-            artifact_factory = self._artifact_factory(['lws', self._host_name], ext='.log', name='lws', type_name='log')
+            artifact_factory = self._artifact_factory(['lws', self._host_name], name='lws', artifact_type=SERVER_LOG_ARTIFACT_TYPE)
             log_path = artifact_factory.produce_file_path()
             with open(log_path, 'wb') as f:
                 f.write(log_contents)
@@ -227,7 +228,7 @@ class LightweightServersHost(object):
         for remote_core_path in self._installation.list_core_files():
             fname = os.path.basename(remote_core_path)
             artifact_factory = self._artifact_factory(
-                ['lws', self._host_name, fname], name=fname, is_error=True, type_name='core')
+                ['lws', self._host_name, fname], name=fname, is_error=True, artifact_type=CORE_FILE_ARTIFACT_TYPE)
             local_core_path = artifact_factory.produce_file_path()
             self._host.get_file(remote_core_path, local_core_path)
             log.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
@@ -236,7 +237,7 @@ class LightweightServersHost(object):
                 os.path.join(self._physical_installation_host.unpacked_mediaserver_dir, 'lib'), remote_core_path)
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname, 'traceback'],
-                name='%s-tb' % fname, is_error=True, type_name='core-traceback')
+                name='%s-tb' % fname, is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)
             path = artifact_factory.write_file(traceback)
             log.debug('core file traceback for lws at %s is stored to %s', self._host_name, path)
 
