@@ -10,7 +10,7 @@
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
 #include "identified_supported_event.h"
-#include "axis_metadata_monitor.h"
+#include "monitor.h"
 
 namespace nx {
 namespace mediaserver_plugins {

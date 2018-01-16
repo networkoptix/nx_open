@@ -1,4 +1,4 @@
-#include "axis_metadata_monitor.h"
+#include "monitor.h"
 
 #include <chrono>
 #include <algorithm>
@@ -10,7 +10,7 @@
 #include <api/http_client_pool.h>
 #include <nx/kit/debug.h>
 
-#include "axis_metadata_manager.h"
+#include "manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {

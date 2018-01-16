@@ -1,4 +1,4 @@
-﻿#include "axis_metadata_plugin.h"
+﻿#include "plugin.h"
 
 #include <string>
 #include <fstream>
@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions.h>
 #include <plugins/plugin_internal_tools.h>
 
-#include "axis_metadata_manager.h"
+#include "manager.h"
 
 namespace nx {
 namespace mediaserver_plugins {
