@@ -1206,6 +1206,8 @@ void MediaServerProcess::stopObjects()
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
+
+    qnServerModule->updates2Manager()->stopAsyncTasks();
 }
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
