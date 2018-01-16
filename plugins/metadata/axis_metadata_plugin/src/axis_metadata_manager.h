@@ -18,16 +18,16 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class AxisMetadataManager:
+class Manager:
     public QObject,
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
     Q_OBJECT;
 public:
-    AxisMetadataManager(const nx::sdk::ResourceInfo& resourceInfo,
+    Manager(const nx::sdk::ResourceInfo& resourceInfo,
         const QList<IdentifiedSupportedEvent>& events);
 
-    virtual ~AxisMetadataManager();
+    virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -50,7 +50,7 @@ private:
     QUrl m_url;
     QAuthenticator m_auth;
     QList<IdentifiedSupportedEvent> m_identifiedSupportedEvents;
-    AxisMetadataMonitor* m_monitor = nullptr;
+    Monitor* m_monitor = nullptr;
 };
 
 } // axis

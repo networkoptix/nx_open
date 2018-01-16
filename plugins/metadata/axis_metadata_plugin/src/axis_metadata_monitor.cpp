@@ -106,8 +106,8 @@ private:
 
 } // namespace
 
-AxisMetadataMonitor::AxisMetadataMonitor(
-    AxisMetadataManager* manager,
+Monitor::Monitor(
+    Manager* manager,
     const QUrl& url,
     const QAuthenticator& auth,
     nx::sdk::metadata::AbstractMetadataHandler* handler)
@@ -122,13 +122,13 @@ AxisMetadataMonitor::AxisMetadataMonitor(
     NX_PRINT << "Ctor :" << this;
 }
 
-AxisMetadataMonitor::~AxisMetadataMonitor()
+Monitor::~Monitor()
 {
     stopMonitoring();
     NX_PRINT << "Dtor :" << this;
 }
 
-void AxisMetadataMonitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
+void Monitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
     int eventTypeListSize)
 {
     removeRules();
@@ -191,7 +191,7 @@ void AxisMetadataMonitor::addRules(const SocketAddress& localAddress, nxpl::NX_G
     }
 }
 
-void AxisMetadataMonitor::removeRules()
+void Monitor::removeRules()
 {
     nx::axis::CameraController cameraController(m_url.host().toLatin1(),
         m_auth.user().toLatin1(), m_auth.password().toLatin1());
@@ -202,7 +202,7 @@ void AxisMetadataMonitor::removeRules()
     NX_PRINT << "rulesRemoved = " << rulesRemoved << ", actionsRemoved = " << actionsRemoved;
 }
 
-HostAddress AxisMetadataMonitor::getLocalIp(const SocketAddress& cameraAddress)
+HostAddress Monitor::getLocalIp(const SocketAddress& cameraAddress)
 {
     int kCameraResponseTimeoutMs = 5000;
     nx::network::TCPSocket s;
@@ -216,7 +216,7 @@ HostAddress AxisMetadataMonitor::getLocalIp(const SocketAddress& cameraAddress)
     return HostAddress();
 }
 
-nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
+nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
     int eventTypeListSize)
 {
     const int kSchemePrefixLength = sizeof("http://") - 1;
@@ -249,7 +249,7 @@ nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList
     return nx::sdk::Error::noError;
 }
 
-void AxisMetadataMonitor::stopMonitoring()
+void Monitor::stopMonitoring()
 {
     if (!m_httpServer)
         return;

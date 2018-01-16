@@ -22,21 +22,21 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class AxisMetadataManager;
+class Manager;
 
-class AxisMetadataMonitor: public QObject
+class Monitor: public QObject
 {
     Q_OBJECT
 
 public:
     using Handler = std::function<void(const std::vector<IdentifiedSupportedEvent>&)>;
 
-    AxisMetadataMonitor(
-        AxisMetadataManager* manager,
+    Monitor(
+        Manager* manager,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
         nx::sdk::metadata::AbstractMetadataHandler* handler);
-    virtual ~AxisMetadataMonitor();
+    virtual ~Monitor();
 
     void addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize);
@@ -48,7 +48,7 @@ public:
     void stopMonitoring();
 
  private:
-    AxisMetadataManager * m_manager;
+    Manager * m_manager;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;

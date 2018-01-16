@@ -21,11 +21,11 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-class AxisMetadataPlugin:
+class Plugin:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
-    AxisMetadataPlugin();
+    Plugin();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
