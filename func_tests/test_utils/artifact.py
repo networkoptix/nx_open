@@ -89,7 +89,7 @@ class ArtifactFactory(object):
             assert artifact.artifact_type, repr(artifact.name)
             log.info('Storing artifact: path=%r name=%r ext=%r type_name=%r content_type=%r',
                      artifact.path_root, artifact.name,
-                     artifact.artifact_type.ext, artifact.artifact_type.type_name, artifact.artifact_type.content_type)
+                     artifact.artifact_type.ext, artifact.artifact_type.name, artifact.artifact_type.content_type)
             if not os.path.exists(artifact.path):
                 log.warning('Artifact file is missing, skipping: %s' % artifact.path)
                 continue
