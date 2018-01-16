@@ -212,7 +212,7 @@ TEST(iniConfig, test)
 
     // Create directory for ini files. Works for Windows as well.
     if (ini().isEnabled())
-        ASSERT_EQ(0, system((std::string("mkdir -p ") + ini().iniFileDir()).c_str()));
+        system((std::string("mkdir ") + ini().iniFileDir()).c_str()); //< Ignore possible errors.
 
     std::remove(ini().iniFilePath()); //< Clean up from failed runs (if any).
 
