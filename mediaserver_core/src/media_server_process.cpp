@@ -1634,7 +1634,6 @@ void MediaServerProcess::registerRestHandlers(
         "ec2/analyticsLookupDetectedObjects",
         new QnMultiserverAnalyticsLookupDetectedObjects(
             commonModule(),
-            "ec2/analyticsLookupDetectedObjects",
             qnServerModule->analyticsEventsStorage()));
 
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));

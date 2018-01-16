@@ -15,11 +15,9 @@ static const char* kFormatParamName = "format";
 
 QnMultiserverAnalyticsLookupDetectedObjects::QnMultiserverAnalyticsLookupDetectedObjects(
     QnCommonModule* commonModule,
-    const QString& path,
     nx::analytics::storage::AbstractEventsStorage* eventStorage)
     :
     m_commonModule(commonModule),
-    m_requestPath(path),
     m_eventStorage(eventStorage)
 {
 }

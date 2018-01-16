@@ -13,7 +13,6 @@ class QnMultiserverAnalyticsLookupDetectedObjects:
 public:
     QnMultiserverAnalyticsLookupDetectedObjects(
         QnCommonModule* commonModule,
-        const QString& path,
         nx::analytics::storage::AbstractEventsStorage* eventStorage);
 
     virtual int executeGet(
@@ -33,9 +32,8 @@ public:
         const QnRestConnectionProcessor* owner) override;
 
 private:
-    const QString m_requestPath;
-    nx::analytics::storage::AbstractEventsStorage* m_eventStorage = nullptr;
     QnCommonModule* m_commonModule = nullptr;
+    nx::analytics::storage::AbstractEventsStorage* m_eventStorage = nullptr;
 
     bool deserializeRequest(
         const QnRequestParamList& params,
