@@ -62,9 +62,12 @@ extern "C"
 
 class QnTcpListener;
 
-static const QByteArray ENDL("\r\n");
+namespace {
 
-//static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
+static const QByteArray ENDL("\r\n");
+static const std::chrono::hours kNativeRtspConnectionSendTimeout(1);
+
+}
 
 // ------------- ServerTrackInfo --------------------
 
@@ -777,6 +780,8 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (!d->mediaRes)
         return CODE_NOT_FOUND;
 
+    d->playbackMode = getStreamingMode();
+
     createDataProvider();
 
     QString acceptMethods = nx_http::getHeaderValue(d->request.headers, "Accept");
@@ -1280,7 +1285,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
-        //d->socket->setSendTimeout(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
+        d->socket->setSendTimeout(kNativeRtspConnectionSendTimeout); // set large timeout for native connection
         QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
         if (videoLayout) {
