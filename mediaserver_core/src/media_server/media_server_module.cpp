@@ -154,15 +154,21 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context.reset(new UniquePtrContext());
 
+    m_analyticsEventsStorage =
+        nx::analytics::storage::EventsStorageFactory::instance()
+            .create(m_settings->analyticEventsStorage());
+
     m_context->normalStorageManager.reset(
         new QnStorageManager(
             commonModule(),
+            m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
     m_context->backupStorageManager.reset(
         new QnStorageManager(
             commonModule(),
+            nullptr,
             QnServer::StoragePool::Backup
         ));
 
@@ -183,10 +189,6 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
-
-    m_analyticsEventsStorage =
-        nx::analytics::storage::EventsStorageFactory::instance()
-            .create(m_settings->analyticEventsStorage());
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);

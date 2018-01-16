@@ -24,12 +24,17 @@ class AnalyticsEventsStorage:
 {
 public:
     AnalyticsEventsStorage():
-        nx::utils::test::TestWithTemporaryDirectory("analytics_events_storage", QString())
+        nx::utils::test::TestWithTemporaryDirectory("analytics_events_storage", QString()),
+        m_allowedTimeRange(
+            std::chrono::system_clock::from_time_t(0),
+            std::chrono::system_clock::from_time_t(0))
     {
         m_settings.dbConnectionOptions.dbName =
             nx::utils::test::TestWithTemporaryDirectory::testDataDir() + "/events.sqlite";
         m_settings.dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
         m_settings.dbConnectionOptions.maxConnectionCount = 17;
+
+        m_attributeDictionary.initialize(5, 2);
     }
 
 protected:
@@ -101,7 +106,15 @@ protected:
         const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
     {
         auto objects = toDetectedObjects(expected);
+        const auto filteredObjects =
+            filterObjectsAndApplySortOrder(filter, std::move(objects));
+        andLookupResultEquals(filteredObjects);
+    }
 
+    std::vector<nx::analytics::storage::DetectedObject> filterObjectsAndApplySortOrder(
+        const Filter& filter,
+        std::vector<nx::analytics::storage::DetectedObject> objects)
+    {
         // First, sorting objects in descending order, because we always filtering the most recent objects
         // and filter.sortOrder is applied AFTER fitering.
         std::sort(
@@ -123,7 +136,17 @@ protected:
                     return left.track.front().timestampUsec > right.track.front().timestampUsec;
             });
 
-        andLookupResultEquals(filteredObjects);
+        return filteredObjects;
+    }
+
+    bool isLookupResultEquals(
+        const Filter& filter,
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& expected)
+    {
+        auto objects = toDetectedObjects(expected);
+        const auto filteredObjects =
+            filterObjectsAndApplySortOrder(filter, std::move(objects));
+        return filteredObjects == m_prevLookupResult->eventsFound;
     }
 
     void thenLookupSucceded()
@@ -139,7 +162,7 @@ protected:
     }
 
     std::vector<DetectedObject> toDetectedObjects(
-        const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets)
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets) const
     {
         std::vector<DetectedObject> result;
         for (const auto& packet: analyticsDataPackets)
@@ -329,6 +352,85 @@ protected:
         return packets;
     }
 
+    void setAllowedDeviceIds(std::vector<QnUuid> deviceIds)
+    {
+        m_allowedDeviceIds = std::move(deviceIds);
+    }
+
+    const std::vector<QnUuid>& allowedDeviceIds() const
+    {
+        return m_allowedDeviceIds;
+    }
+
+    void setAllowedTimeRange(
+        std::chrono::system_clock::time_point start,
+        std::chrono::system_clock::time_point end)
+    {
+        m_allowedTimeRange.first = start;
+        m_allowedTimeRange.second = end;
+    }
+
+    std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
+        allowedTimeRange() const
+    {
+        return m_allowedTimeRange;
+    }
+
+    const AttributeDictionary& attributeDictionary() const
+    {
+        return m_attributeDictionary;
+    }
+
+    std::vector<common::metadata::DetectionMetadataPacketPtr> generateEventsByCriteria()
+    {
+        using namespace std::chrono;
+
+        const int eventsPerDevice = 11;
+
+        std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
+        for (const auto& deviceId : m_allowedDeviceIds)
+        {
+            for (int i = 0; i < eventsPerDevice; ++i)
+            {
+                auto packet = generateRandomPacket(1, &m_attributeDictionary);
+                packet->deviceId = deviceId;
+                if (m_allowedTimeRange.second > m_allowedTimeRange.first)
+                {
+                    packet->timestampUsec = nx::utils::random::number<qint64>(
+                        duration_cast<microseconds>(
+                            m_allowedTimeRange.first.time_since_epoch()).count(),
+                        duration_cast<microseconds>(
+                            m_allowedTimeRange.second.time_since_epoch()).count());
+                }
+
+                analyticsDataPackets.push_back(packet);
+            }
+        }
+
+        // Fallback, if conditions resulted in no packets.
+        if (analyticsDataPackets.empty())
+        {
+            for (int i = 0; i < 101; ++i)
+                analyticsDataPackets.push_back(generateRandomPacket(1));
+        }
+
+        return analyticsDataPackets;
+    }
+
+    void saveAnalyticsDataPackets(
+        std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets)
+    {
+        std::copy(
+            analyticsDataPackets.begin(), analyticsDataPackets.end(),
+            std::back_inserter(m_analyticsDataPackets));
+
+        for (const auto& packet : analyticsDataPackets)
+            whenIssueSavePacket(packet);
+
+        for (const auto& packet : analyticsDataPackets)
+            thenSaveSucceeded();
+    }
+
     EventsStorage& eventsStorage()
     {
         return *m_eventsStorage;
@@ -347,6 +449,11 @@ private:
     nx::utils::SyncQueue<ResultCode> m_savePacketResultQueue;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
     boost::optional<LookupResult> m_prevLookupResult;
+
+    std::vector<QnUuid> m_allowedDeviceIds;
+    std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
+        m_allowedTimeRange;
+    AttributeDictionary m_attributeDictionary;
 
     bool initializeStorage()
     {
@@ -501,15 +608,6 @@ class AnalyticsEventsStorageLookup:
 {
     using base_type = AnalyticsEventsStorage;
 
-public:
-    AnalyticsEventsStorageLookup():
-        m_allowedTimeRange(
-            std::chrono::system_clock::from_time_t(0),
-            std::chrono::system_clock::from_time_t(0))
-    {
-        m_attributeDictionary.initialize(5, 2);
-    }
-
 protected:
     virtual void SetUp() override
     {
@@ -520,8 +618,8 @@ protected:
 
     void addRandomKnownDeviceIdToFilter()
     {
-        ASSERT_FALSE(m_allowedDeviceIds.empty());
-        m_filter.deviceId = nx::utils::random::choice(m_allowedDeviceIds);
+        ASSERT_FALSE(allowedDeviceIds().empty());
+        m_filter.deviceId = nx::utils::random::choice(allowedDeviceIds());
     }
 
     void addRandomNonEmptyTimePeriodToFilter()
@@ -529,10 +627,10 @@ protected:
         using namespace std::chrono;
 
         m_filter.timePeriod.startTimeMs = duration_cast<milliseconds>(
-            (m_allowedTimeRange.first + (m_allowedTimeRange.second - m_allowedTimeRange.first) / 2)
+            (allowedTimeRange().first + (allowedTimeRange().second - allowedTimeRange().first) / 2)
             .time_since_epoch()).count();
         m_filter.timePeriod.durationMs = duration_cast<milliseconds>(
-            (m_allowedTimeRange.second - m_allowedTimeRange.first) /
+            (allowedTimeRange().second - allowedTimeRange().first) /
             nx::utils::random::number<int>(3, 10)).count();
     }
 
@@ -541,7 +639,7 @@ protected:
         using namespace std::chrono;
 
         m_filter.timePeriod.startTimeMs = duration_cast<milliseconds>(
-            (m_allowedTimeRange.first - std::chrono::hours(2)).time_since_epoch()).count();
+            (allowedTimeRange().first - std::chrono::hours(2)).time_since_epoch()).count();
         m_filter.timePeriod.durationMs =
             duration_cast<milliseconds>(std::chrono::hours(1)).count();
     }
@@ -574,7 +672,7 @@ protected:
 
     void addRandomTextFoundInDataToFilter()
     {
-        m_filter.freeText = m_attributeDictionary.getRandomText();
+        m_filter.freeText = attributeDictionary().getRandomText();
     }
 
     void addRandomBoundingBoxToFilter()
@@ -744,56 +842,6 @@ protected:
         return m_analyticsDataPackets;
     }
 
-    std::vector<common::metadata::DetectionMetadataPacketPtr> generateEventsByCriteria()
-    {
-        using namespace std::chrono;
-
-        const int eventsPerDevice = 11;
-
-        std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets;
-        for (const auto& deviceId : m_allowedDeviceIds)
-        {
-            for (int i = 0; i < eventsPerDevice; ++i)
-            {
-                auto packet = generateRandomPacket(1, &m_attributeDictionary);
-                packet->deviceId = deviceId;
-                if (m_allowedTimeRange.second > m_allowedTimeRange.first)
-                {
-                    packet->timestampUsec = nx::utils::random::number<qint64>(
-                        duration_cast<microseconds>(
-                            m_allowedTimeRange.first.time_since_epoch()).count(),
-                        duration_cast<microseconds>(
-                            m_allowedTimeRange.second.time_since_epoch()).count());
-                }
-
-                analyticsDataPackets.push_back(packet);
-            }
-        }
-
-        // Fallback, if conditions resulted in no packets.
-        if (analyticsDataPackets.empty())
-        {
-            for (int i = 0; i < 101; ++i)
-                analyticsDataPackets.push_back(generateRandomPacket(1));
-        }
-
-        return analyticsDataPackets;
-    }
-
-    void saveAnalyticsDataPackets(
-        std::vector<common::metadata::DetectionMetadataPacketPtr> analyticsDataPackets)
-    {
-        std::copy(
-            analyticsDataPackets.begin(), analyticsDataPackets.end(),
-            std::back_inserter(m_analyticsDataPackets));
-
-        for (const auto& packet: analyticsDataPackets)
-            whenIssueSavePacket(packet);
-
-        for (const auto& packet: analyticsDataPackets)
-            thenSaveSucceeded();
-    }
-
     void aggregateAnalyticsDataPacketsByTimestamp()
     {
         if (m_analyticsDataPackets.empty())
@@ -826,14 +874,10 @@ protected:
     }
 
 private:
-    std::vector<QnUuid> m_allowedDeviceIds;
-    std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
-        m_allowedTimeRange;
     std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
     Filter m_filter;
     QnUuid m_specificObjectId;
     QnTimePeriod m_specificObjectTimePeriod;
-    AttributeDictionary m_attributeDictionary;
 
     void generateVariousEvents()
     {
@@ -847,19 +891,6 @@ private:
             std::chrono::system_clock::now());
 
         saveAnalyticsDataPackets(generateEventsByCriteria());
-    }
-
-    void setAllowedDeviceIds(std::vector<QnUuid> deviceIds)
-    {
-        m_allowedDeviceIds = std::move(deviceIds);
-    }
-
-    void setAllowedTimeRange(
-        std::chrono::system_clock::time_point start,
-        std::chrono::system_clock::time_point end)
-    {
-        m_allowedTimeRange.first = start;
-        m_allowedTimeRange.second = end;
     }
 };
 
@@ -1172,6 +1203,165 @@ TEST_F(AnalyticsEventsStorageTimePeriodsLookup, with_aggregation_period)
 
 //-------------------------------------------------------------------------------------------------
 // Deprecating data.
+
+/**
+ * Initial condition for every test: there is some random data in the DB.
+ */
+class AnalyticsEventsStorageCleanup:
+    public AnalyticsEventsStorage
+{
+    using base_type = AnalyticsEventsStorage;
+
+protected:
+    void whenRemoveEventsUpToLatestEventTimestamp()
+    {
+        using namespace std::chrono;
+
+        m_oldestAvailableDataTimestamp =
+            duration_cast<milliseconds>(microseconds(getMaxTimestamp())) +
+            std::chrono::milliseconds(1);
+        eventsStorage().markDataAsDeprecated(m_deviceId, m_oldestAvailableDataTimestamp);
+    }
+
+    void whenRemoveEventsUpToEarlisestEventTimestamp()
+    {
+        using namespace std::chrono;
+
+        m_oldestAvailableDataTimestamp =
+            duration_cast<milliseconds>(microseconds(getMinTimestamp()));
+        eventsStorage().markDataAsDeprecated(m_deviceId, m_oldestAvailableDataTimestamp);
+    }
+
+    void whenRemoveEventsUpToARandomAvailableTimestamp()
+    {
+        using namespace std::chrono;
+
+        const auto minTimestamp = getMinTimestamp();
+        const auto maxTimestamp = getMaxTimestamp();
+
+        m_oldestAvailableDataTimestamp =
+            duration_cast<milliseconds>(microseconds(
+                minTimestamp + (maxTimestamp - minTimestamp) / 2));
+
+        eventsStorage().markDataAsDeprecated(
+            m_deviceId,
+            m_oldestAvailableDataTimestamp);
+    }
+
+    void thenStorageIsEmpty()
+    {
+        thenDataIsExpected();
+    }
+
+    void thenDataIsNotChanged()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        whenLookupObjects(Filter());
+        thenLookupSucceded();
+        andLookupResultMatches(Filter(), m_analyticsPackets);
+    }
+
+    void thenDataIsExpected()
+    {
+        Filter filter;
+        filter.timePeriod.setStartTime(m_oldestAvailableDataTimestamp);
+        filter.timePeriod.setDuration(std::chrono::milliseconds(QnTimePeriod::UnlimitedPeriod));
+
+        for (;;)
+        {
+            whenLookupObjects(Filter());
+            thenLookupSucceded();
+            if (isLookupResultEquals(filter, m_analyticsPackets))
+                return;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+private:
+    QnUuid m_deviceId;
+    std::vector<nx::common::metadata::DetectionMetadataPacketPtr> m_analyticsPackets;
+    std::chrono::milliseconds m_oldestAvailableDataTimestamp;
+
+    void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_deviceId = QnUuid::createUuid();
+        setAllowedDeviceIds({{ m_deviceId }});
+
+        setAllowedTimeRange(
+            std::chrono::system_clock::now() - std::chrono::hours(24),
+            std::chrono::system_clock::now());
+
+        m_analyticsPackets = generateEventsByCriteria();
+        saveAnalyticsDataPackets(m_analyticsPackets);
+    }
+
+    qint64 getMaxTimestamp() const
+    {
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>&
+            packets = m_analyticsPackets;
+        auto maxElement = std::max_element(
+            packets.begin(), packets.end(),
+            [](const common::metadata::DetectionMetadataPacketPtr& left,
+                const common::metadata::DetectionMetadataPacketPtr& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+
+        return (*maxElement)->timestampUsec;
+    }
+
+    qint64 getMinTimestamp() const
+    {
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>&
+            packets = m_analyticsPackets;
+        auto maxElement = std::min_element(
+            packets.begin(), packets.end(),
+            [](const common::metadata::DetectionMetadataPacketPtr& left,
+                const common::metadata::DetectionMetadataPacketPtr& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+
+        return (*maxElement)->timestampUsec;
+    }
+
+    template<typename Func>
+    qint64 getTimestampByCondition(Func func) const
+    {
+        const std::vector<common::metadata::DetectionMetadataPacketPtr>&
+            packets = m_analyticsPackets;
+        auto maxElement = func(
+            packets.begin(), packets.end(),
+            [](const common::metadata::DetectionMetadataPacketPtr& left,
+                const common::metadata::DetectionMetadataPacketPtr& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+
+        return (*maxElement)->timestampUsec;
+    }
+};
+
+TEST_F(AnalyticsEventsStorageCleanup, removing_all_data)
+{
+    whenRemoveEventsUpToLatestEventTimestamp();
+    thenStorageIsEmpty();
+}
+
+TEST_F(AnalyticsEventsStorageCleanup, removing_data_up_to_a_random_available_timestamp)
+{
+    whenRemoveEventsUpToARandomAvailableTimestamp();
+    thenDataIsExpected();
+}
+
+TEST_F(AnalyticsEventsStorageCleanup, removing_data_up_to_minimal_available_timestamp)
+{
+    whenRemoveEventsUpToEarlisestEventTimestamp();
+    thenDataIsNotChanged();
+}
 
 } // namespace test
 } // namespace storage
