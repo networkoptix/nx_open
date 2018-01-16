@@ -10,7 +10,7 @@
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/config.h>
-#include <nx/streaming/ini.h>
+#include <nx/streaming/nx_streaming_ini.h>
 
 #include <motion/motion_detection.h>
 #include <nx/utils/log/log_main.h>

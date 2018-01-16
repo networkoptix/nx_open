@@ -12,11 +12,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, enableMetadataProcessing, "Enable processing data from metadata plugins.");
     NX_INI_FLAG(0, analyzeKeyFramesOnly, "Use only key frames for metadata plugins.");
     NX_INI_FLAG(0, analyzeSecondaryStream, "Use secondary stream for analytics instead of primary.");
-    NX_INI_FLAG(
-        1,
-        enablePersistentMetadataManager,
-        "Doesn't recreate metadata managers on resource changes."
-        "Remove this setting when tegra_plugin bug is fixed");
+    NX_INI_FLAG(1, enablePersistentMetadataManager,
+        "Don't recreate metadata managers on resource changes (workaround of libtegra_video.so bug).");
 };
 
 inline Ini& ini()

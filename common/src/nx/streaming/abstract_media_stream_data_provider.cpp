@@ -8,6 +8,9 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 #include <core/resource/camera_resource.h>
+#include <nx/streaming/nx_streaming_ini.h>
+#include <utils/common/synctime.h>
+#include <nx/kit/debug.h>
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 
@@ -219,7 +222,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION_USEC)
             {
-                //most likely, timestamp reported by camera are not that good
+                // Most likely, timestamps reported by the camera are not so good.
                 NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
                     arg(timeDiff).
                     arg(m_mediaResource ? m_mediaResource->getName() : QString()).
@@ -231,6 +234,57 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
         }
         m_lastMediaTime[channel] = media->timestamp;
     }
+}
+
+/**
+ * Assume the camera sends PTSes starting from e.g. 0, and looping no later than modulusUs, like
+ * testcamera can do with the appropriate options. The goal is to convert PTSes from the camera to
+ * "unlooped" PTSes which are monotonous. PTS 0 is converted to a moment with* us-since-epoch
+ * divisible by modulusUs, and the first received PTS is converted to a moment in the past which is
+ * the closest to the current time. This allows to restore the original PTS by taking the
+ * "unlooped" PTS modulo modulusUs.
+ */
+static qint64 unloopCameraPtsWithModulus(
+    int modulusUs, qint64 ptsUs, qint64 prevPtsUs, qint64* periodStartUs)
+{
+    if (ptsUs < 0)
+        NX_PRINT << "WARNING: PTS is less than zero: " << ptsUs;
+
+    if (prevPtsUs == AV_NOPTS_VALUE)
+    {
+        // First frame received.
+        const qint64 nowUs = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+        *periodStartUs = (nowUs / modulusUs - 1) * modulusUs;
+        NX_PRINT << "First frame: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
+    }
+    else if (prevPtsUs > ptsUs)
+    {
+        // Looping - first frame of the period received.
+        *periodStartUs += modulusUs;
+        NX_PRINT << "Looping: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
+    }
+
+    return *periodStartUs + ptsUs % modulusUs;
+}
+
+void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(
+    const QnAbstractMediaDataPtr& media)
+{
+    const int modulusUs = nxStreamingIni().unloopCameraPtsWithModulus;
+    if (modulusUs <= 0)
+    {
+        checkTime(media);
+        return;
+    }
+
+    if (!m_isCamera || !media || media->dataType != QnAbstractMediaData::VIDEO)
+        return;
+
+    const int channel = media->channelNumber;
+    const qint64 pts = media->timestamp;
+    media->timestamp = unloopCameraPtsWithModulus(
+        modulusUs, pts, m_lastMediaTime[channel], &m_unloopingPeriodStartUs);
+    m_lastMediaTime[channel] = pts;
 }
 
 QnConstMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const

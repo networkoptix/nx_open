@@ -67,6 +67,7 @@ private:
     mutable int m_numberOfchannels;
     qint64 m_lastMediaTime[CL_MAX_CHANNELS + 1]; //< max video channels + audio channel
     bool m_isCamera;
+    qint64 m_unloopingPeriodStartUs = 0;
 };
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
