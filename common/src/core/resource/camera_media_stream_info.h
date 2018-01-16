@@ -11,9 +11,6 @@ extern "C"
 class CameraMediaStreamInfo
 {
 public:
-    static const int PRIMARY_STREAM_INDEX = 0;
-    static const int SECONDARY_STREAM_INDEX = 1;
-
     static const QLatin1String anyResolution;
     static QString resolutionToString( const QSize& resolution = QSize() );
 

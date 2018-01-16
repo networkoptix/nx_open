@@ -23,6 +23,8 @@
 
 namespace {
 
+static const QString kAdvancedLiveStreamParamsName(lit("advancedStreamParams"));
+
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
@@ -189,7 +191,7 @@ CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
     auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
         [](const CameraMediaStreamInfo& stream)
         {
-            return stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX;
+            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primaryStream;
         });
     if (defaultStream != streams.cend())
         return *defaultStream;
@@ -320,7 +322,7 @@ bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStre
             supportedMediaStreams.streams.begin(),
             supportedMediaStreams.streams.end(),
             [](const CameraMediaStreamInfo& mediaInfo) {
-                return mediaInfo.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX;
+                return (Qn::StreamIndex) mediaInfo.encoderIndex == Qn::StreamIndex::secondaryStream;
             });
         if (secondStreamIter != supportedMediaStreams.streams.end())
         {
@@ -452,4 +454,10 @@ void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supp
     //saving fullStreamList;
     QByteArray serializedStreams = QJson::serialized( fullStreamList );
     setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
+}
+
+QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
+{
+    return QJson::deserialized<QnAdvancedStreamParams>(
+        getProperty(kAdvancedLiveStreamParamsName).toUtf8());
 }

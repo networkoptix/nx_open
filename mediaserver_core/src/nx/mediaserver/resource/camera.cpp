@@ -7,6 +7,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <nx/fusion/fusion/fusion.h>
+#include <nx/fusion/serialization/json.h>
 
 #include "camera_advanced_parameters_providers.h"
 
@@ -427,7 +429,6 @@ std::vector<Camera::AdvancedParametersProvider*> Camera::advancedParametersProvi
 {
     return {};
 }
-
 
 } // namespace resource
 } // namespace mediaserver

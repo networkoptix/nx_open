@@ -872,6 +872,12 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TooManyOpenedConnections
     };
 
+    enum class StreamIndex
+    {
+        primaryStream = 0,
+        secondaryStream = 1
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */

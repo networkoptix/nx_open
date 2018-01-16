@@ -86,8 +86,8 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         reader->setMustNotConfigureResource(doNotConfigureCamera);
 
         QnAbstractStreamDataProviderPtr source(reader);
-        if (!doNotConfigureCamera)
-            reader->setParams(params);
+        if (!doNotConfigureCamera && getRole() != Qn::CR_SecondaryLiveVideo)
+            reader->setPrimaryStreamParams(params);
 
         reader->setRole(getRole());
 

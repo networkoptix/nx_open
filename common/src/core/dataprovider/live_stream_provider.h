@@ -47,7 +47,7 @@ public:
     Qn::ConnectionRole getRole() const;
     int encoderIndex() const;
 
-    void setParams(const QnLiveStreamParams& params);
+    void setPrimaryStreamParams(const QnLiveStreamParams& params);
     //void setSecondaryQuality(Qn::SecondStreamQuality  quality);
     //virtual void setQuality(Qn::StreamQuality q);
     //virtual void setFps(float f);
@@ -110,7 +110,7 @@ private:
         bool isCameraConfigured);
 
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
-
+    void setParamsInternal(QnLiveStreamParams params);
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened
     // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)

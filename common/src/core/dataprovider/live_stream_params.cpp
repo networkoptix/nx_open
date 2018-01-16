@@ -5,3 +5,4 @@ const float QnLiveStreamParams::kFpsNotInitialized = -1.0;
 const int QnLiveStreamParams::kMinSecondStreamFps; //< Workaround for GCC 4.8.2 bug.
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnLiveStreamParams, (eq)(json), QnLiveStreamParams_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAdvancedStreamParams, (json), QnAdvancedStreamParams_Fields)

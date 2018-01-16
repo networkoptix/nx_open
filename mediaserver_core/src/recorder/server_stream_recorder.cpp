@@ -342,7 +342,7 @@ void QnServerStreamRecorder::updateStreamParams()
                 params.quality = Qn::QualityHighest;
                 params.bitrateKbps = 0;
             }
-            liveProvider->setParams(params);
+            liveProvider->setPrimaryStreamParams(params);
         }
         liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
     }

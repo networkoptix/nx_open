@@ -14,8 +14,13 @@ struct QnLiveStreamParams
     QSize resolution;
     QString codec;
 };
-
 #define QnLiveStreamParams_Fields (quality)(fps)(bitrateKbps)(resolution)(codec)
-
-//QN_FUSION_DEFINE_FUNCTIONS(QnLiveStreamParams, (eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnLiveStreamParams, (eq)(json))
+
+struct QnAdvancedStreamParams
+{
+    QnLiveStreamParams primaryStream;
+    QnLiveStreamParams secondaryStream;
+};
+#define QnAdvancedStreamParams_Fields (primaryStream)(secondaryStream)
+QN_FUSION_DECLARE_FUNCTIONS(QnAdvancedStreamParams, (json))
