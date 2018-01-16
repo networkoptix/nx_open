@@ -1,98 +1,213 @@
 #include "event_panel_p.h"
 
 #include <QtGui/QPainter>
-#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/skin.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 
-#include <nx/client/desktop/event_search/widgets/event_search_widget.h>
-#include <nx/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/client/desktop/common/widgets/tab_widget.h>
+#include <nx/client/desktop/common/widgets/compact_tab_bar.h>
+#include <nx/client/desktop/ui/common/selectable_text_button.h>
+#include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
+#include <nx/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
+#include <nx/client/desktop/event_search/widgets/unified_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/vms/event/strings_helper.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+namespace {
+
+static constexpr int kPermanentTabCount = 1;
+
+} // namespace
+
 EventPanel::Private::Private(EventPanel* q):
-    QObject(),
+    QObject(q),
     q(q),
-    m_tabs(new QTabWidget(q)),
-    m_systemTab(new NotificationListWidget(m_tabs)),
-    m_cameraTab(new QStackedWidget(m_tabs)),
-    m_eventsWidget(new EventSearchWidget(m_cameraTab)),
-    m_motionWidget(new MotionSearchWidget(m_cameraTab))
+    m_tabs(new TabWidget(new CompactTabBar(), q)),
+    m_notificationsTab(new NotificationListWidget(m_tabs)),
+    m_motionTab(new MotionSearchWidget(m_tabs)),
+    m_bookmarksTab(new UnifiedSearchWidget(m_tabs)),
+    m_eventsTab(new UnifiedSearchWidget(m_tabs)),
+    m_analyticsTab(new UnifiedSearchWidget(m_tabs)),
+    m_eventsModel(new EventSearchListModel(this)),
+    m_bookmarksModel(new BookmarkSearchListModel(this)),
+    m_analyticsModel(new AnalyticsSearchListModel(this)),
+    m_helper(new vms::event::StringsHelper(q->commonModule()))
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
     layout->addWidget(m_tabs);
-    m_tabs->addTab(m_systemTab, tr("System", "System events tab title"));
+    m_tabs->addTab(m_notificationsTab, qnSkin->icon(lit("events/tabs/notifications.png")),
+        tr("Notifications", "Notifications tab title"));
 
+    m_motionTab->hide();
+    m_bookmarksTab->hide();
+    m_eventsTab->hide();
+    m_analyticsTab->hide();
+
+    static constexpr int kTabBarShift = 10;
+    m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
-    m_tabs->setProperty(style::Properties::kTabBarIndent, style::Metrics::kStandardPadding);
 
     q->setAutoFillBackground(false);
     q->setAttribute(Qt::WA_TranslucentBackground);
 
-    m_cameraTab->setHidden(true);
-    m_cameraTab->addWidget(m_eventsWidget);
-    m_cameraTab->addWidget(m_motionWidget);
-
     connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
         this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
 
-    connect(m_eventsWidget, &EventSearchWidget::analyticsSearchByAreaEnabledChanged, this,
-        [this](bool enabled)
-        {
-            if (m_currentMediaWidget)
-                m_currentMediaWidget->setAnalyticsSearchModeEnabled(enabled);
-        });
+    setupEventSearch();
+    setupBookmarkSearch();
+    setupAnalyticsSearch();
 }
 
 EventPanel::Private::~Private()
 {
 }
 
+void EventPanel::Private::addCameraTabs()
+{
+    NX_ASSERT(m_tabs->count() == kPermanentTabCount);
+
+    m_tabs->addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
+        tr("Motion", "Motion tab title"));
+    m_tabs->addTab(m_bookmarksTab, qnSkin->icon(lit("events/tabs/bookmarks.png")),
+        tr("Bookmarks", "Bookmarks tab title"));
+    m_tabs->addTab(m_eventsTab, qnSkin->icon(lit("events/tabs/events.png")),
+        tr("Events", "Events tab title"));
+    m_tabs->addTab(m_analyticsTab, qnSkin->icon(lit("events/tabs/analytics.png")),
+        tr("Objects", "Analytics tab title"));
+}
+
+void EventPanel::Private::removeCameraTabs()
+{
+    while (m_tabs->count() > kPermanentTabCount)
+        m_tabs->removeTab(kPermanentTabCount);
+}
+
+void EventPanel::Private::setupEventSearch()
+{
+    m_eventsTab->setModel(new UnifiedAsyncSearchListModel(m_eventsModel, this));
+    m_eventsTab->setPlaceholderText(tr("No events"));
+    m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
+
+    auto button = m_eventsTab->typeButton();
+    button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));
+    button->show();
+
+    auto eventFilterMenu = new QMenu(q);
+    eventFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+    eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    auto addMenuAction =
+        [this, eventFilterMenu](const QString& title, vms::event::EventType type)
+        {
+            auto action = eventFilterMenu->addAction(title);
+            connect(action, &QAction::triggered, this,
+                [this, title, type]()
+                {
+                    m_eventsTab->typeButton()->setText(title);
+                    m_eventsTab->typeButton()->setState(type == vms::event::undefinedEvent
+                        ? ui::SelectableTextButton::State::deactivated
+                        : ui::SelectableTextButton::State::unselected);
+
+                    m_eventsModel->setSelectedEventType(type);
+                    m_eventsTab->requestFetch();
+                });
+
+            return action;
+        };
+
+    auto defaultAction = addMenuAction(tr("Any type"), vms::event::undefinedEvent);
+    for (const auto type: vms::event::allEvents())
+    {
+        if (vms::event::isSourceCameraRequired(type))
+            addMenuAction(m_helper->eventName(type), type);
+    }
+
+    connect(m_eventsTab->typeButton(), &ui::SelectableTextButton::stateChanged, this,
+        [defaultAction](ui::SelectableTextButton::State state)
+        {
+            if (state == ui::SelectableTextButton::State::deactivated)
+                defaultAction->trigger();
+        });
+
+    defaultAction->trigger();
+    button->setMenu(eventFilterMenu);
+}
+
+void EventPanel::Private::setupBookmarkSearch()
+{
+    m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
+    m_bookmarksTab->setPlaceholderText(tr("No bookmarks"));
+    m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
+}
+
+void EventPanel::Private::setupAnalyticsSearch()
+{
+    m_analyticsTab->setModel(new UnifiedAsyncSearchListModel(m_analyticsModel, this));
+    m_analyticsTab->setPlaceholderText(tr("No objects"));
+    m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
+
+    auto button = m_analyticsTab->areaButton();
+    button->setDeactivatedText(tr("Anywhere on the video"));
+    button->show();
+
+    connect(button, &ui::SelectableTextButton::stateChanged, this,
+        [this, button](ui::SelectableTextButton::State state)
+        {
+            if (!m_currentMediaWidget)
+                return;
+
+            m_currentMediaWidget->setAnalyticsSearchModeEnabled(
+                state != ui::SelectableTextButton::State::deactivated);
+
+            if (state == ui::SelectableTextButton::State::selected)
+                button->setText(tr("Select some area on video"));
+            else if (state == ui::SelectableTextButton::State::unselected)
+                button->setText(tr("In selected area"));
+    });
+}
+
 QnVirtualCameraResourcePtr EventPanel::Private::camera() const
 {
-    return m_eventsWidget->camera();
+    return m_camera;
 }
 
 void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (this->camera() == camera)
+    if (m_camera == camera)
         return;
 
-    m_eventsWidget->setCamera(camera);
-    m_motionWidget->setCamera(camera);
+    m_camera = camera;
 
-    const auto index = m_tabs->indexOf(m_cameraTab);
+    m_motionTab->setCamera(camera);
+    m_eventsModel->setCamera(camera);
+    m_bookmarksModel->setCamera(camera);
+    m_analyticsModel->setCamera(camera);
+
     if (camera)
     {
-        if (index < 0)
-            m_tabs->addTab(m_cameraTab, camera->getName());
-        else
-            m_tabs->setTabText(index, camera->getName());
+        if (m_tabs->count() == kPermanentTabCount)
+            addCameraTabs();
     }
     else
     {
-        if (index >= 0)
-            m_tabs->removeTab(index);
+        removeCameraTabs();
     }
-}
-
-void EventPanel::Private::paintBackground()
-{
-    if (m_tabs->currentWidget() != m_cameraTab)
-        return;
-
-    QPainter painter(q);
-    painter.fillRect(q->rect(), q->palette().background());
 }
 
 void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
@@ -101,8 +216,6 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         return;
 
     m_mediaWidgetConnections.reset();
-
-    m_eventsWidget->setAnalyticsSearchByAreaEnabled(false);
 
     m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(
         this->q->context()->display()->widget(Qn::CentralRole));
@@ -122,17 +235,22 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled, this,
         [this](bool enabled)
         {
-            if (enabled)
-                m_cameraTab->setCurrentWidget(m_motionWidget);
-            else
-                m_cameraTab->setCurrentWidget(m_eventsWidget);
+            //if (enabled)
+            //    m_cameraTab->setCurrentWidget(m_motionWidget);
+            //else
+            //    m_cameraTab->setCurrentWidget(m_eventsWidget);
         });
 
     *m_mediaWidgetConnections << connect(
         m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
         [this](const QRectF& relativeRect)
         {
-            m_eventsWidget->setAnalyticsSearchRect(relativeRect);
+            m_analyticsModel->setFilterRect(relativeRect);
+            m_analyticsTab->areaButton()->setState(relativeRect.isValid()
+                ? ui::SelectableTextButton::State::unselected
+                : ui::SelectableTextButton::State::deactivated);
+
+            m_analyticsTab->requestFetch();
         });
 }
 

@@ -68,6 +68,9 @@ void AbstractAsyncSearchListModel::Private::clear()
 
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 {
+    if (m_currentFetchId && m_prefetchCompletionHandler)
+        m_prefetchCompletionHandler(-1);
+
     m_currentFetchId = rest::Handle();
     m_prefetchCompletionHandler = PrefetchCompletionHandler();
 }

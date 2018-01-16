@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UnifiedSearchWidget</class>
+ <widget class="QWidget" name="UnifiedSearchWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>621</width>
+    <height>968</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="headerWidget" native="true">
+     <layout class="QVBoxLayout" name="headerLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QWidget" name="filters" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <property name="leftMargin">
+          <number>8</number>
+         </property>
+         <property name="topMargin">
+          <number>8</number>
+         </property>
+         <property name="rightMargin">
+          <number>8</number>
+         </property>
+         <property name="bottomMargin">
+          <number>8</number>
+         </property>
+         <item alignment="Qt::AlignLeft">
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="timeButton">
+           <property name="text">
+            <string notr="true">&lt;time filter&gt;</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignLeft">
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="cameraButton">
+           <property name="text">
+            <string notr="true">&lt;camera filter&gt;</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignLeft">
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="areaButton">
+           <property name="text">
+            <string notr="true">&lt;area filter&gt;</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignLeft">
+          <widget class="nx::client::desktop::ui::SelectableTextButton" name="typeButton">
+           <property name="text">
+            <string notr="true">&lt;type filter&gt;</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="ribbonContainer" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="nx::client::desktop::EventRibbon" name="ribbon" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <widget class="QWidget" name="placeholder" native="true">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>160</y>
+           <width>621</width>
+           <height>371</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="spacing">
+           <number>16</number>
+          </property>
+          <property name="leftMargin">
+           <number>24</number>
+          </property>
+          <property name="topMargin">
+           <number>64</number>
+          </property>
+          <property name="rightMargin">
+           <number>24</number>
+          </property>
+          <property name="bottomMargin">
+           <number>24</number>
+          </property>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="placeholderIcon">
+            <property name="minimumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="placeholderText">
+            <property name="text">
+             <string notr="true">&lt;placeholder&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>159</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <zorder>placeholder</zorder>
+        <zorder>placeholder</zorder>
+       </widget>
+      </item>
+     </layout>
+     <zorder>ribbon</zorder>
+     <zorder>ribbon</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>1</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>1</height>
+      </size>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::EventRibbon</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/event_search/widgets/event_ribbon.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::SelectableTextButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/client/desktop/ui/common/selectable_text_button.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -371,6 +371,8 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
                highlightAppearance(m_tiles[index + i]);
         }
     }
+
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -427,6 +429,8 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     }
 
     updateView();
+
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clear()
@@ -445,6 +449,8 @@ void EventRibbon::Private::clear()
     m_scrollBar->setValue(0);
 
     q->updateGeometry();
+
+    emit q->countChanged(m_tiles.size());
 }
 
 void EventRibbon::Private::clearShiftAnimations()

@@ -38,6 +38,12 @@ using namespace nx::client::desktop::ui;
 
 namespace NxUi {
 
+namespace {
+
+static constexpr int kMinimumWidth = 280;
+
+} // namespace
+
 NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     const QnPaneSettings& settings,
     QGraphicsWidget* parentWidget,
@@ -70,6 +76,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &NotificationsWorkbenchPanel::updateControlsGeometry);
 
+    item->setMinimumWidth(kMinimumWidth);
+
     if (nx::client::desktop::ini().unifiedEventPanel)
     {
         item->setVisible(false);
@@ -81,7 +89,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
         connect(item, &QGraphicsWidget::geometryChanged, this,
             [this, eventPanelContainer]()
             {
-                eventPanelContainer->setGeometry(item->geometry());
+                // Add 1-pixel shift for notification panel frame.
+                eventPanelContainer->setGeometry(item->geometry().adjusted(1, 0, 0, 0));
             });
 
         // TODO: #vkutin Test which mode is faster.
