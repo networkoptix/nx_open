@@ -86,10 +86,10 @@ angular.module('nxCommon')
                     self.cameraDetails.enabled = false;
                     break;
                 case "open all servers":
-                    self.viewScope.camerasProvider.collapseServers(false);
+                    self.viewScope.camerasProvider.collapseAllServers(false);
                     break;
                 case "close all servers":
-                    self.viewScope.camerasProvider.collapseServers(true);
+                    self.viewScope.camerasProvider.collapseAllServers(true);
                     break;
                 case "search":
                     self.viewScope.searchCams = text;
@@ -100,7 +100,7 @@ angular.module('nxCommon')
                 case "select":
                     var cameraName = text.replace(/ /g,'').toLowerCase();
                     if(cameraName){
-                        var camera = self.viewScope.camerasProvider.getCameraByVoice(cameraName);
+                        var camera = self.viewScope.camerasProvider.getFirstAvailableCamera(cameraName);
                         if(camera){
                             self.viewScope.activeCamera = camera;
                         }

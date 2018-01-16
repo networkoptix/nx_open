@@ -302,14 +302,19 @@ angular.module('nxCommon')
         };
 
         //External Functions
-        camerasProvider.prototype.getFirstCam = function(){
-            var tmpServerList = this.mediaServers;
-            var tmpCamerasList = this.cameras;
-            for(var i in tmpServerList){
-                var serverId = tmpServerList[i].id;
-                for(var j in tmpCamerasList[serverId]){
-                    if(tmpCamerasList[serverId][j] && tmpCamerasList[serverId][j].id){
-                        return tmpCamerasList[serverId][j];
+        camerasProvider.prototype.getFirstAvailableCamera = function(cameraName){
+            var servers = this.mediaServers;
+            var cameras = this.cameras;
+            var getFirstCamera = cameraName === undefined;
+            for(var i in servers){
+                var server = servers[i];
+                if(!server.visible || server.collapsed){
+                    continue;
+                }
+                for(var j in cameras[server.id]){
+                    var camera = cameras[server.id][j];
+                    if(camera.visible && (camera.name.replace(/ /g, '').toLowerCase().indexOf(cameraName) >= 0 || getFirstCamera)){
+                        return camera;
                     }
                 }
             }
@@ -332,32 +337,16 @@ angular.module('nxCommon')
             });
         };
 
-        camerasProvider.prototype.getCameraByVoice = function(cameraName){
-            for(var i in this.mediaServers){
-                var server = this.mediaServers[i];
-                if(!server.visible || server.collapsed){
-                    continue;
-                }
-                for(var j in this.cameras[server.id]){
-                    var camera = this.cameras[server.id][j];
-                    if(camera.visible && camera.name.replace(/ /g, '').toLowerCase().indexOf(cameraName) >= 0){
-                        return camera;
-                    }
-                }
-            }
-            return null;
-        };
-
-        camerasProvider.prototype.collapseServer = function(serverName, collapseServer){
+        camerasProvider.prototype.collapseServer = function(serverName, collapse){
             var server = _.find(this.mediaServers, function(server){
                 return server.name.toLowerCase().replace(/ /g, '').indexOf(serverName) >= 0;
             });
-            server.collapsed = collapseServer;
+            server.collapsed = collapse;
         };
 
-        camerasProvider.prototype.collapseServers = function(collapseServer){
+        camerasProvider.prototype.collapseAllServers = function(collapse){
             _.forEach(this.mediaServers, function(server){
-                server.collapsed = collapseServer;
+                server.collapsed = collapse;
             });
         };
 
