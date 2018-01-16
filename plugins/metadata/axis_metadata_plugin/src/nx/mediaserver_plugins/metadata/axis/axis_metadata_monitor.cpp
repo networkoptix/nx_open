@@ -11,7 +11,6 @@
 #include <nx/kit/debug.h>
 
 #include "axis_metadata_manager.h"
-#include "camera_controller.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -80,7 +79,7 @@ public:
             {
                 auto packet = createCommonEventMetadataPacket(event);
                 m_handler->handleMetadata(nx::sdk::Error::noError, packet);
-                NX_PRINT << "Event detected and set to server: "
+                NX_PRINT << "Event detected and sent to server: "
                     << event.base().fullName();
                 completionHandler(nx_http::StatusCode::ok);
                 return;

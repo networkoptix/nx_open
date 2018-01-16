@@ -14,7 +14,6 @@
 #include <nx/network/socket_global.h>
 
 #include "identified_supported_event.h"
-#include "axis_metadata_monitor.h"
 
 namespace nx {
 namespace mediaserver_plugins {

@@ -1,6 +1,5 @@
 #pragma once
 
-//#if defined(ENABLE_HANWHA)
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
@@ -10,8 +9,8 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 
+#include "identified_supported_event.h"
 #include "axis_metadata_monitor.h"
-#include "axis_metadata_plugin.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -57,5 +56,3 @@ private:
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-//#endif // defined(ENABLE_HANWHA)

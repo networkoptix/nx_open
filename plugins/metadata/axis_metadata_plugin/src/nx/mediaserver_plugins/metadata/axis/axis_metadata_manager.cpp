@@ -1,5 +1,3 @@
-//#if defined(ENABLE_HANWHA)
-
 #include "axis_metadata_manager.h"
 
 #include <chrono>
@@ -92,5 +90,3 @@ const char* Manager::capabilitiesManifest(Error* error) const
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx
-
-//#endif // defined(ENABLE_HANWHA)

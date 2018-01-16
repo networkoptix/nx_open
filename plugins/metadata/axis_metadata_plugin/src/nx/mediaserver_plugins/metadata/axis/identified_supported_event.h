@@ -1,7 +1,5 @@
 #pragma once
 
-#include "camera_controller.h"
-
 #include <QtCore/QString>
 #include <QtCore/QFlag>
 
@@ -11,6 +9,8 @@
 #include <plugins/plugin_tools.h>
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/fusion/model_functions_fwd.h>
+
+#include "nx/axis/camera_controller.h"
 
 namespace nx {
 namespace mediaserver_plugins {
