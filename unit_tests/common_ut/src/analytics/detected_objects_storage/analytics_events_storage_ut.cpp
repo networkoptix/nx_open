@@ -436,6 +436,42 @@ protected:
         return *m_eventsStorage;
     }
 
+    const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets() const
+    {
+        return m_analyticsDataPackets;
+    }
+
+    void aggregateAnalyticsDataPacketsByTimestamp()
+    {
+        if (m_analyticsDataPackets.empty())
+            return;
+
+        m_analyticsDataPackets =
+            sortPacketsByTimestamp(m_analyticsDataPackets, Qt::SortOrder::AscendingOrder);
+
+        auto prevPacketIter = m_analyticsDataPackets.begin();
+        for (auto it = std::next(prevPacketIter);
+            it != m_analyticsDataPackets.end();
+            )
+        {
+            if ((*it)->timestampUsec == (*prevPacketIter)->timestampUsec &&
+                (*it)->deviceId == (*prevPacketIter)->deviceId)
+            {
+                std::move(
+                    (*it)->objects.begin(), (*it)->objects.end(),
+                    std::back_inserter((*prevPacketIter)->objects));
+                (*prevPacketIter)->durationUsec =
+                    std::max((*it)->durationUsec, (*prevPacketIter)->durationUsec);
+                it = m_analyticsDataPackets.erase(it);
+            }
+            else
+            {
+                prevPacketIter = it;
+                ++it;
+            }
+        }
+    }
+
 private:
     struct LookupResult
     {
@@ -646,14 +682,14 @@ protected:
 
     void addRandomObjectIdToFilter()
     {
-        const auto& randomPacket = nx::utils::random::choice(m_analyticsDataPackets);
+        const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
         const auto& randomObject = nx::utils::random::choice(randomPacket->objects);
         m_filter.objectId = randomObject.objectId;
     }
 
     void addRandomObjectTypeIdToFilter()
     {
-        const auto& randomPacket = nx::utils::random::choice(m_analyticsDataPackets);
+        const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
         const auto& randomObject = nx::utils::random::choice(randomPacket->objects);
         m_filter.objectTypeId.push_back(randomObject.objectTypeId);
     }
@@ -661,7 +697,7 @@ protected:
     void addMaxObjectsLimitToFilter()
     {
         m_filter.maxObjectsToSelect = filterObjects(
-            toDetectedObjects(m_analyticsDataPackets), m_filter).size() / 2;
+            toDetectedObjects(analyticsDataPackets()), m_filter).size() / 2;
     }
 
     void addMaxTrackLengthLimitToFilter()
@@ -829,7 +865,7 @@ protected:
     void thenResultMatchesExpectations()
     {
         thenLookupSucceded();
-        andLookupResultMatches(m_filter, m_analyticsDataPackets);
+        andLookupResultMatches(m_filter, analyticsDataPackets());
     }
 
     const Filter& filter() const
@@ -837,44 +873,7 @@ protected:
         return m_filter;
     }
 
-    const std::vector<common::metadata::DetectionMetadataPacketPtr>& analyticsDataPackets() const
-    {
-        return m_analyticsDataPackets;
-    }
-
-    void aggregateAnalyticsDataPacketsByTimestamp()
-    {
-        if (m_analyticsDataPackets.empty())
-            return;
-
-        m_analyticsDataPackets =
-            sortPacketsByTimestamp(m_analyticsDataPackets, Qt::SortOrder::AscendingOrder);
-
-        auto prevPacketIter = m_analyticsDataPackets.begin();
-        for (auto it = std::next(prevPacketIter);
-            it != m_analyticsDataPackets.end();
-            )
-        {
-            if ((*it)->timestampUsec == (*prevPacketIter)->timestampUsec &&
-                (*it)->deviceId == (*prevPacketIter)->deviceId)
-            {
-                std::move(
-                    (*it)->objects.begin(), (*it)->objects.end(),
-                    std::back_inserter((*prevPacketIter)->objects));
-                (*prevPacketIter)->durationUsec =
-                    std::max((*it)->durationUsec, (*prevPacketIter)->durationUsec);
-                it = m_analyticsDataPackets.erase(it);
-            }
-            else
-            {
-                prevPacketIter = it;
-                ++it;
-            }
-        }
-    }
-
 private:
-    std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
     Filter m_filter;
     QnUuid m_specificObjectId;
     QnTimePeriod m_specificObjectTimePeriod;
@@ -1259,7 +1258,7 @@ protected:
 
         whenLookupObjects(Filter());
         thenLookupSucceded();
-        andLookupResultMatches(Filter(), m_analyticsPackets);
+        andLookupResultMatches(Filter(), analyticsDataPackets());
     }
 
     void thenDataIsExpected()
@@ -1272,7 +1271,7 @@ protected:
         {
             whenLookupObjects(Filter());
             thenLookupSucceded();
-            if (isLookupResultEquals(filter, m_analyticsPackets))
+            if (isLookupResultEquals(filter, analyticsDataPackets()))
                 return;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
@@ -1280,7 +1279,6 @@ protected:
 
 private:
     QnUuid m_deviceId;
-    std::vector<nx::common::metadata::DetectionMetadataPacketPtr> m_analyticsPackets;
     std::chrono::milliseconds m_oldestAvailableDataTimestamp;
 
     void SetUp() override
@@ -1294,14 +1292,14 @@ private:
             std::chrono::system_clock::now() - std::chrono::hours(24),
             std::chrono::system_clock::now());
 
-        m_analyticsPackets = generateEventsByCriteria();
-        saveAnalyticsDataPackets(m_analyticsPackets);
+        auto analyticsPackets = generateEventsByCriteria();
+        saveAnalyticsDataPackets(std::move(analyticsPackets));
     }
 
     qint64 getMaxTimestamp() const
     {
         const std::vector<common::metadata::DetectionMetadataPacketPtr>&
-            packets = m_analyticsPackets;
+            packets = analyticsDataPackets();
         auto maxElement = std::max_element(
             packets.begin(), packets.end(),
             [](const common::metadata::DetectionMetadataPacketPtr& left,
@@ -1316,7 +1314,7 @@ private:
     qint64 getMinTimestamp() const
     {
         const std::vector<common::metadata::DetectionMetadataPacketPtr>&
-            packets = m_analyticsPackets;
+            packets = analyticsDataPackets();
         auto maxElement = std::min_element(
             packets.begin(), packets.end(),
             [](const common::metadata::DetectionMetadataPacketPtr& left,
