@@ -16,6 +16,9 @@ class ArtifactType(object):
         self.content_type = content_type
         self.ext = ext
 
+    def __repr__(self):
+        return '<name=%r ext=%r content_type=%r>' % (self.name, self.content_type, self.ext)
+
     def produce_repository_type(self, repository):
         return repository.artifact_type(self.name, self.content_type, self.ext)
 
@@ -31,6 +34,9 @@ class Artifact(object):
         self.full_name = full_name
         self.is_error = is_error
         self.artifact_type = artifact_type
+
+    def __repr__(self):
+        return '<path=%r name=%r type=%r>' % (self.path_root, self.name, self.artifact_type)
 
     @property
     def path(self):
@@ -89,10 +95,8 @@ class ArtifactFactory(object):
         repository = self._db_capture_repository
         if not repository: return
         for artifact in sorted(self._artifact_set, key=lambda artifact: artifact.name):
-            assert artifact.artifact_type, repr(artifact.name)
-            log.info('Storing artifact: path=%r name=%r ext=%r type_name=%r content_type=%r',
-                     artifact.path_root, artifact.name,
-                     artifact.artifact_type.ext, artifact.artifact_type.name, artifact.artifact_type.content_type)
+            assert artifact.artifact_type, repr(artifact)
+            log.info('Storing artifact: %r', artifact)
             if not os.path.exists(artifact.path):
                 log.warning('Artifact file is missing, skipping: %s' % artifact.path)
                 continue
