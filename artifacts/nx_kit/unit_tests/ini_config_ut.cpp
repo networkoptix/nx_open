@@ -18,7 +18,7 @@ static std::string uniqueIniFileName()
     static bool randomized = false;
     if (!randomized)
     {
-        srand((unsigned int) time(0));
+        srand((unsigned int) time(nullptr));
         randomized = true;
     }
     constexpr int kMaxIniFileNameLen = 100;
@@ -201,11 +201,18 @@ static void testReload(
 
 TEST(iniConfig, test)
 {
+    std::cerr << "ini().isEnabled() -> " << (ini().isEnabled() ? "true" : "false") << std::endl;
+
     // Check path properties of IniConfig.
     ASSERT_STREQ(iniFileName.c_str(), ini().iniFile());
+    ASSERT_TRUE(ini().iniFileDir() != nullptr);
+    if (ini().isEnabled())
+        ASSERT_TRUE(ini().iniFileDir()[0] != '\0');
     ASSERT_EQ(std::string(ini().iniFileDir()) + iniFileName, ini().iniFilePath());
 
-    std::cerr << "ini().isEnabled() -> " << (ini().isEnabled() ? "true" : "false") << std::endl;
+    // Create directory for ini files. Works for Windows as well.
+    if (ini().isEnabled())
+        ASSERT_EQ(0, system((std::string("mkdir -p ") + ini().iniFileDir()).c_str()));
 
     std::remove(ini().iniFilePath()); //< Clean up from failed runs (if any).
 
