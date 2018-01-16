@@ -1,7 +1,5 @@
 #include "camera_pool.h"
 
-#include "video_camera.h"
-
 #include <nx/utils/std/cpp14.h>
 
 #include <core/resource/resource.h>
@@ -11,8 +9,6 @@
 #ifdef Q_OS_WIN
 #   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
-
-#include <utils/common/app_info.h>
 
 #include "video_camera.h"
 

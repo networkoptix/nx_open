@@ -1,0 +1,205 @@
+株式会社システム・ケイ
+
+エンドユーザーライセンス同意書
+
+重要 - 注意してお読みください :エンドユーザーライセンス同意書(以下「同意書」という)は、お客様(個人または法人)とシステム・ケイ(以下「当社」という)との間で、本ソフトウェア（ソフトウェアプログラム、SDK、関連メディア、ドキュメント、技術的構成、技術データ(総称して「ソフトウェア」という)の使用に関して締結される同意書です。ドキュメントとは、ソフトウェアと共に提供されたユーザーガイド及びその他のドキュメント(印刷物、オンライン共)を指します。
+
+下の「同意」ボタンをクリックまたは、ダウンロード、インストールする、あるいはソフトウェアを使用することにより、お客様は、契約のすべての条項および条件に合法的に拘束されることに同意したことになります。
+
+加えて、別紙Aに記載されている特定のサードパーティのプログラムまたはコード(以下「サードパーティプログラム」という)は、http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html から参照できるGNU Lesser General Public License v2.1（以下「LGPL」という）の条件に基づいてお客様に提供されています。
+
+インストール、コピーまたはソフトウェアの使用によって、お客様は本同意書及びサードパーティライセンスの条項に同意したことになります。
+
+もし、お客様がすべての条項に同意しないならば、ソフトウェアをインストールまたは使用することはできません。
+
+1.ライセンス許諾
+
+本同意書の条項に従い、当社はお客様に非独占、譲渡不能、サブライセンス不可のソフトウェアをインストールして使用する限定的ライセンスを許諾します。許諾されるのは、本契約に記載されているオブジェクトコードを自ら使用する場合のみとなります。
+
+2.バックアップコピー
+
+お客様はソフトウェアのバックアップコピーを1つ作ることができます。バックアップコピーは他のコンピュータにインストールされず、また、使われないものとします。コピーにもオリジナルのソフトウェア同様に、著作件、特許、知的財産権が存在します。お客様は、本同意書に基づくソフトウェアのすべての権利を譲渡しない限りコピーを作成する権利を他に移譲することはできません。
+
+3.所有権
+
+お客様は、お客様が当社によって認定されたソフトウェア及び如何なるコピーも当社とそのライセンス許諾者の知的財産であることを認めるものとします。ソフトウエアの構造、シーケンス及び機構は、当社とそのライセンス許諾者の秘密事項です。ソフトウェアは、著作権法によって保護されています。ソフトウェアは、本同意書の下、お客様にライセンス付与されたものであり、販売されたものではありません。
+
+いかなる権利、所有権、または知的財産権もお客様に移譲されるものではありません。
+
+4.制限事項
+
+ソフトウェアライセンスはお客様のみの使用許諾です。当社とそのライセンス許諾者は、すべての権利を保持し、本同意書においてお客様に明示的に許諾するものではありません。前述の一般性を損なうことなく、お客様は如何なる他者にも以下を許可することはできません。
+
+ (i)ソフトウェアの複製（本同意書に特に記載された場合を除く）。
+
+(ii)ソフトウェアリバース エンジニアリング、逆コンパイル、または逆アセンブルすること（適用法によって明示的に許可された場合を除く）。
+
+(iii)改変またはソフトウェアに基づく派生物を作成すること
+
+(iv)ソフトウェアを外部に配布、サブライセンス、再販、翻訳すること。
+
+(v)ソフトウェアのレンタル、リース、貸与、使用、タイムシェアすること。
+
+(vi)第三者にソフトウェアの複製、アクセス、または使用を許可すること(本同意書で明示的に許可されている場合を除く)。
+
+(vii)ソフトウェアをパブリックドメインに置くこと。またはオープンソースライセンス同意の目的とすること。
+
+(viii)ソフトウェアを法令、ガイドラインに触れる方法で使用すること。
+
+5.更新プログラム
+
+本同意書は、現行の保守およびサポート方針に従ってお客様に提供される本ソフトウェアの更新およびアップグレードについて規定します。但し、個別のライセンス同意に基づいて提供される場合を除くものとします。
+
+ソフトウェア及びすべてのアップデート、アップグレードは、単一の製品としてライセンスされており、お客様の元のライセンスの範囲を超えてソフトウェアから分離することはできません。個別のエンドユーザー使用許諾契約に関連付けられている本ソフトウェアと共に提供されるその他のソフトウェアは、その個別の使用許諾契約の条項の下でお客様に使用許諾されます。
+
+6.サポート対象外
+
+適用される法律により明示的に要求されている場合を除き、本契約のいかなる条項も、ソフトウェアのサポート、メンテナンスまたは新バージョンの使用を許諾するものではありません。サポート、メンテナンス、及び新しいバージョンの利用可能性の方針や料金については、当社へお問い合わせください。
+
+7.保証の免責
+
+本ソフトウェアは、明示的、黙示的、法的（法律上の瑕疵担保責任を含む）の明示または黙示を問わず、「現状有姿」で提供されます。
+
+本ソフトウェアは、明示的にも黙示的にも、法律上（明示的にも黙示的にも）を問わず、いかなる種類の保証なく、「現状のまま」提供され、特定の目的への適合性を保証するものではありません。
+
+当社は、本ソフトウェアに含まれる機能がお客様の要件を満たしていること、または本ソフトウェアの動作にエラーがないこと、または中断されないことを保証するものではありません。
+
+当社は本ソフトウェアおよびアップグレードまたはアップデートによるコンピュータのハードウェアまたはオペレーティングシステムの動作特性の変更に起因する問題に対して責任を負いません。
+
+また、当社は、当社の要件を満たさないサードパーティのソフトウェアまたはハードウェアとともに本ソフトウェアを使用することによって生じる問題についても責任を負いません。
+
+8.責任の制限
+
+救済が本来の目的を達成できないかどうかに関わらず、適用法により許容される最大限まで、いかなる場合でも、当社またはそのライセンサーは、当社が損害の可能性を知らされていた場合でも、ソフトウェアの使用、または使用不能、または提供の失敗、またはサポートサービスの提供が失敗したことに起因する何らかの特別な、偶発的、間接的または必然的な損害（ビジネス上の利益の損失、事業の中断、ビジネス情報の喪失、その他金銭上の損失を含む)に対して責任はないものとします。
+
+いかなる場合においても、お客様または他の如何なる相手に対しても本契約に起因するいかなる請求、訴訟、または訴訟によって生じた損害に対する当社の賠償責任は、お客様が本ソフトウェアに対して実際に支払った額を超えないものとします。
+
+9.サードパーティライセンス
+
+本ソフトウェアに含まれる第三者ソフトウェアは、LGPLの条項の下でライセンスされたフリーソフトウェアです。
+
+お客様は、当社が本ソフトウェアとともに提供したサードパーティソフトウェアの使用はLGPLに準拠し、その適用を受けることを理解し同意するものとします。
+
+第3条の所有権および第4条の制限事項は、第三者ソフトウェアには適用されません。
+
+お客様は、LGPLの下で、第三者ソフトウェアが商品性または特定の目的への適合性の黙示的な保証を含む（ただしこれらに限定されない）いかなる保証もせずに「現状有姿」で提供されていることを理解し、同意するものとします。
+
+本契約と第三者ソフトウェアに関するLGPLとの間に矛盾がある場合、LGPLの規定が優先されます。
+
+10.輸出規制
+
+お客様は、日本またはお客様が事業を行っている他の国によって課されたすべての輸出および再輸出制限および規制（「輸出制限」）に従うことに同意するものとします。
+
+お客様が本条項に違反した場合、本契約は終了します。
+
+11.ハイリスク活動
+
+本ソフトウェアは、原子力施設、航空機の航行または通信システムの運行、航空管制、直接生活支援など、フェイルセーフ性能を必要とする危険な環境でのオンライン制御装置としての使用、または再販売を目的として設計、製造、機械、または武器システムなど、本ソフトウェアの故障が、死亡、身体の傷害、または重大な物理的または環境的損害（「ハイリスク活動」）に直接つながる可能性がある状況での使用を意図して設計されたものではありません。
+
+当社は、ハイリスク活動の適性に関する明示的または黙示的保証を特に否認します。
+
+12.契約の終了
+
+本契約の重要な条項を遵守しなかった場合、本契約で付与されるライセンスは、予告なく自動的に終了するものとします。
+
+その場合、直ちにソフトウェアをアンインストールし、すべてのドキュメントと元のメディアを含め、当社に返却する必要があります。
+
+これは、本契約の違反に対して当社が利用可能な救済を制限するものでも、影響を与えるものでもありません。
+
+13.雑則
+
+(a) 本契約に関するお客様と当社との間の紛争は、札幌地方裁判所裁判所を専属管轄とします。
+
+尚、勝訴当事者は費用および弁護士費用に対する権利があります。
+
+(b) お客様は、本契約、本ソフトウェア、または本契約に基づく権利または義務を、当社の書面による事前の同意なしにサブライセンス、または譲渡することはできません。そのように行われた割当、サブライセンス、または譲渡は無効となります。当社は、そのようなサブライセンス、または移転があった場合には、本契約を終了することができます。
+
+(c) 本契約は、本契約の主題に関するお客様と当社との間の最終的かつ完全なる同意および了解事項を構成するものとします。
+
+本契約の変更または権利放棄は書面で行われ、両当事者の署名が必要です。
+
+(d) 本契約のいずれかの条項が無効または執行不能または適用法に反する場合、その条項は法律との抵触を排除するために必要に応じて無効または執行不能とされ、残りの条項は有効とします。
+
+(e)当社が権利、権限、特権、または救済措置の行使の失敗、または遅延があっても、当社の権利、権限、特権、または救済の権利の放棄を構成するものではありません。
+
+(f) この協定の構築と解釈において、いずれかの当事者に対して有利または不利となる解釈はしないものとします。
+
+別紙A
+
+サードパーティソフトウェア
+
+本ソフトウェアは、FFmpeg、qt、Ajax.org Cloud9 Editor（旧Bespin）を、GNU Lesser General Public License v2.1の条件に基づいて使用しています。
+
+
+
+SYSTEMK CORPORATION
+
+END USER LICENSE AGREEMENT
+
+IMPORTANT – PLEASE READ CAREFULLY:  This End User License Agreement (the “Agreement”) is a legally enforceable contract between You (either an individual or an entity) and SystemK Corporation (the “Company”) regarding the use of the Company’s software programs accompanying or provided under this Agreement together with the SDK made available by the Company, associated media, corresponding Documentation, technical configurations, and technical data (collectively, the “Software”). “Documentation” means the user’s guide and other documentation (including print and online), if any, provided to you with the Software.
+
+BY CLICKING “I ACCEPT” BUTTON BELOW OR BY DOWNLOADING, INSTALLING OR OTHERWISE USING THE SOFTWARE, YOU CONSENT TO BE LEGALLY BOUND BY ALL THE TERMS AND CONDITIONS OF THE AGREEMENT.  IF YOU ARE ENTERING INTO THE AGREEMENT ON BEHALF OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY AND ITS AFFILIATES TO THE AGREEMENT, IN WHICH CASE THE TERMS "YOU" OR "YOUR" SHALL REFER TO SUCH ENTITY AND ITS AFFILIATES.  IF YOU DO NOT HAVE SUCH AUTHORITY, OR IF YOU DO NOT AGREE WITH ANY OF THE TERMS OF THE AGREEMENT, YOU MUST NOT ACCEPT THE AGREEMENT AND MAY NOT USE THE SOFTWARE.
+
+In addition, certain third party programs or code set forth on Schedule A attached hereto (“Third Party Software”) are being provided to you under the terms and conditions of GNU Lesser General Public License v2.1 (“LGPL”), which is available for you to review at http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.  BY INSTALLING, COPYING OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS AGREEMENT AS WELL AS THE TERMS OF THIRD PARTY LICENSES.  IF YOU DO NOT AGREE TO ALL SUCH TERMS, DO NOT INSTALL OR USE THE SOFTWARE.
+
+1.	License Grant.  Subject to the terms and conditions of this Agreement, the Company grants you a non-exclusive, non-transferable, non-sublicensable, limited license to install and use the Software, in object code version only, for your own use subject to the restrictions contained in this Agreement.
+
+2.	Backup Copies.  You may make one backup copy of the Software, provided your backup copy is not installed or used on any computer and further provided that all such copies shall bear the original and unmodified copyright, patent and other intellectual property markings that appear on or in the Software.  You may not transfer the rights to a backup copy unless you transfer all rights in the Software as provided in this Agreement.
+
+3.	Ownership.  You acknowledge that the Software and any copies that you are authorized by the Company to make are the intellectual property of, and are owned by, the Company and its licensors.  The structure, sequence and organization of the Software are the valuable trade secrets and confidential information of the Company and its licensors.  The Software is protected by copyright, including without limitation by United States copyright law, international treaty provisions and applicable laws in the country in which it is used.  You acknowledge that the Company, or its licensors, retain the ownership of all patents, copyrights, trade secrets, trademarks and other intellectual property rights pertaining to the Software.  You will take no actions which adversely affect the Company’s intellectual property rights in the Software.  This Agreement is a license and not an agreement for sale.  No title to, or ownership of, the Software, or any intellectual property rights subsisting therein, is transferred to you.
+
+4.	Restrictions.  The Software is licensed solely for your own use.  The Company and its licensors reserve all rights not expressly granted to you in this Agreement.  Without limiting the generality of the foregoing, you shall not nor shall you permit any other party to: (i) make copies of the Software except as expressly set forth in this Agreement, or (ii) disassemble, decompile or translate any part of the Software, or otherwise attempt to reconstruct or discover the source code of the Software, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation, or (iii) modify or create derivative works based upon the Software, or (iv) externally distribute, sublicense, resell, encumber or otherwise transfer the Software, or (v) rent, lease, lend, or use the Software, or any part thereof, for timesharing or bureau use, or (vi) allow a third party to copy, access, or use the Software (except as expressly provided in this Agreement), or (vi) alter or remove any copyright, trademark or other proprietary notice which may appear on the Software, (vii) take any action that would cause the Software to be placed in the public domain or become subject to open source license agreement, or (viii) use the Software in any manner that violates any statute, law, rule, regulation, directive, guideline, bylaw whether presently in force or may be implemented by federal, state or local authorities.
+
+5.	Paid Features.  The Software is made available to you at no charge or fees.  However, the Company may offer certain premium features to you upon payment of a license fees determined by the Company in its sole discretion (“Paid Features”).  In order to use Paid Features, you must agree to pay the license fees plus any applicable taxes through one of the payment methods accepted by the Company.  Upon receipt of the license fees, the Company will either provide you a license key to activate the Paid Features or allow you to download the Software with the Paid Features.  You expressly acknowledge and agree that this Agreement will govern your use of the Paid Features.
+
+6.	Updates.  Except as otherwise expressly provided herein, this Agreement will govern any updates and upgrades to the Software that may be provided to you in accordance with the Company’s then-current maintenance and support policies, unless such updates and upgrades are provided under a separate license agreement.  You may use such updates or upgrades only in conjunction with your then-existing the Software licensed under this Agreement.  The Software and all updates and upgrades are licensed as a single product and such updates and upgrades may not be separated from the Software to exceed the scope of your original license.  Any other software that may be provided with the Software that is associated with a separate end-user license agreement is licensed to you under the terms of that separate license agreement.
+
+7.	No Support.  Except as expressly required by applicable law, nothing in this Agreement entitles you to any support, maintenance or new versions of the Software.  You may contact the Company to determine the availability of support, maintenance, and new versions, and the fees terms and conditions that would apply.
+
+8.	Disclaimer of Warranties.  THE SOFTWARE IS PROVIDED “AS IS,” WITHOUT WARRANTY OR REPRESENTATION OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.  NEITHER THE COMPANY NOR ITS LICENSORS REPRESENT OR WARRANT THAT THE SOFTWARE WILL SATISFY YOUR REQUIREMENTS OR THAT IT IS WITHOUT DEFECT OR ERROR OR THAT THE OPERATION THEREOF WILL BE UNINTERRUPTED OR ERROR FREE.  The Company does not warrant that functions contained in the Software will meet your requirements or that the operation of the Software will be error-free or uninterrupted.  The Company is not responsible for problems caused by changes in, or modifications to, the operating characteristics of any computer hardware or operating system for which the Software or any upgrade or update is procured, nor is the Company responsible for problems which occur as a result of the use of the Software in conjunction with software of third parties or with hardware, which does not meet the Company’s specific requirements.  Some jurisdictions do not allow certain disclaimers or limitations of warranties, so some of these may not apply to you.
+
+9.	Limitation of Liability.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW EVEN IF A REMEDY FAILS ITS ESSENTIAL PURPOSE, IN NO EVENT SHALL THE COMPANY OR ITS LICENSORS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE OR THE PROVISION OF OR FAILURE TO PROVIDE SUPPORT SERVICES, EVEN IF THE COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.  IN ANY CASE, THE COMPANY’S ENTIRE LIABILITY TO YOU OR ANY OTHER PARTY FOR LOSS OR DAMAGE RESULTING FROM ANY CLAIMS, DEMANDS OR ACTIONS ARISING OUT OF THIS AGREEMENT SHALL NOT EXCEED THE FEE ACTUALLY PAID BY YOU TO THE COMPANY FOR THE SOFTWARE, IF ANY, NOTWITHSTANDING ANY FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.  Because some states and jurisdictions do not allow the exclusion or limitation of liability, the above limitation may not apply to you.  In such states and jurisdictions, the Company’s liability shall be limited to the greatest extent permitted by law.
+
+10.	Sole Remedy and Allocation of Risk.  YOUR SOLE AND EXCLUSIVE REMEDY AND THE COMPANY’S SOLE AND EXCLUSIVE LIABILITY ARE SET FORTH IN THIS AGREEMENT.  This Agreement defines a mutually agreed-upon allocation of risk.
+
+11.	Third Party Licenses.  For the avoidance of doubt, Third Party Software included with the Software is free software licensed under the terms of the LGPL.  You understand and agree that, although provided to you by the Company with the Software, your use of Third Party Software shall be and is governed by the LGPL.  The ownership terms in Section 3 and restrictions in Section 4 do not apply to Third Party Software.  You understand and acknowledge that under the LGPL, Third Party Software is being provided “AS IS” WITHOUT ANY WARRANTY, INCLUDING BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  If there is a conflict between this Agreement and LGPL with respect to Third Party Software, the provisions of the LGPL shall prevail.
+
+12.	Export Restrictions.  You agree to comply with all export and re-export restrictions and regulations (“Export Restrictions”) imposed by the United States or any other country in which you conduct business.  Without limiting the generality of the foregoing, and regardless of any disclosure made by you to the Company regarding an ultimate destination of the Software, you represent and warrant that you understand the U.S. law currently prohibits the export or re-export, directly or indirectly (including via remote access) of U.S. origin products and technology to certain proscribed countries (including Cuba, Iran, Sudan, North Korea and Syria and/or any other country that may become subject to an embargo by the United States), entities, organizations and individuals, without prior authorization from the U.S. Government.  You will not commit any act or omission that will result in a breach of any such Export Restrictions.  Your breach of this clause shall constitute cause for immediate termination of this Agreement.
+
+13.	High Risk Activities.  The Software is not designed, manufactured or intended for use or resale as on-line control equipment in hazardous environments requiring fail-safe performance, such as in the operation of nuclear facilities, aircraft navigation or communication systems, air traffic control, direct life support machines, or weapons systems, in which the failure of the Software could lead directly to death, personal injury, or severe physical or environmental damage (“High Risk Activities”).  The Company specifically disclaims any express or implied warranty of fitness for High Risk Activities.
+
+14.	Termination.  The licenses granted herein shall automatically terminate without notice if you fail to comply with any material provision of this Agreement.  In such event, you must immediately uninstall and return the Software, including all Documentation and original media, to the Company.  This shall not limit or affect any remedy available to the Company for your breach of this Agreement.
+
+15.	Miscellaneous.
+
+(a)	If you are a unit or agency of the United States Government, the following applies:  The Software is provided with RESTRICTED RIGHTS.  Use, duplication or disclosure by the Government is subject to restrictions as set forth in Subparagraphs (a) through (d) of the Commercial Computer-Restricted Rights clause at FAR 52.227-19 when applicable, or in Subparagraph 252.227-7013 (c)(1)(ii) of the Rights in Technical Data and Computer Software at DFARS, and in similar clauses in the NASA FAR Supplement.  Contractor/manufacturer is Network Optix, Inc.
+
+(b)	This Agreement shall be governed by the laws of the State of California, exclusive of its choice of law rules.  Any dispute between you and the Company regarding this Agreement will be subject to the exclusive jurisdiction of the state and federal courts sitting in the County of Los Angeles in the State of California.  In any such action, the prevailing party will be entitled to costs and attorneys’ fees.
+
+(c)	You may not assign, sublicense, or transfer this Agreement, the Software, or any rights or obligations hereunder without prior written consent of the Company.  Any such attempted assignment, sublicense, or transfer will be null and void.  The Company may terminate this Agreement in the event of any such attempted assignment, sublicense, or transfer.
+
+(d)	This Agreement is in the English language only, and will only be provided in the English language, which language will be controlling in all respects, and all versions hereof in any other language will not be binding on the parties hereto.  All communications and notices to be made or given pursuant to this Agreement must be in the English language.
+
+(e)	The Agreement constitutes the final and complete understanding between you and the Company with respect to the subject matter of this Agreement. Any modifications or waivers of this Agreement must be in writing and signed by both parties hereto.
+
+(f)	If any provision in this Agreement is invalid or unenforceable or contrary to applicable law, such provision shall be construed, limited, or altered, as necessary, to eliminate the invalidity or unenforceability or the conflict with applicable law, and all other provisions of this Agreement shall remain in effect.
+
+(g)	Failure or delay on the part of the Company to exercise any right, power, privilege, or remedy will not constitute a waiver of, or bar the later exercise of, that or any other right, power, privilege, or remedy of the Company.
+
+(h)	No rule of strict construction shall apply against or in favor of either party in the construction and interpretation of this Agreement.
+
+SCHEDULE A
+
+THIRD PARTY SOFTWARE
+
+The Software uses FFmpeg, qt and Ajax.org Cloud9 Editor (formerly Bespin) under the terms and conditions of the GNU Lesser General Public License v2.1.
+
+You may obtain a complete copy of the source code for the above-mentioned free software, under the terms of the LGPL, from the Company, without charge, except for the cost of media, shipping, and handling, upon written request to the Company at the address set forth below:
+
+SystemK Corporation
+
+Higashi Ku Kita 15 jyo
+
+Higashi 1 Chome 2-24
+
+Sapporo 065-0015 Japan
