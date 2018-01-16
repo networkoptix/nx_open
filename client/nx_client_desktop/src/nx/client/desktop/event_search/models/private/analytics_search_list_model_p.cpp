@@ -415,7 +415,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
         };
 
     return server->restConnection()->lookupDetectedObjects(
-        request, internalCallback, thread());
+        request, false /*isLocal*/, internalCallback, thread());
 }
 
 void AnalyticsSearchListModel::Private::processMetadata(

@@ -69,7 +69,7 @@ public:
 
 
     template <typename ResultType>
-    struct Result { typedef std::function<void (bool, Handle, ResultType)> type; };
+    struct Result { typedef std::function<void (bool /*hasSucceeded*/, Handle /*requestId*/, ResultType)> type; };
 
     struct EmptyResponseType {};
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
@@ -224,6 +224,7 @@ public:
 
     Handle lookupDetectedObjects(
         const nx::analytics::storage::Filter& request,
+        bool isLocal,
         Result<nx::analytics::storage::LookupResult>::type callback,
         QThread* targetThread = nullptr);
 

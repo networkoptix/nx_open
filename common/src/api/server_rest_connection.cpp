@@ -481,11 +481,13 @@ Handle ServerConnection::changeCameraPassword(
 
 Handle ServerConnection::lookupDetectedObjects(
     const nx::analytics::storage::Filter& request,
+    bool isLocal,
     Result<nx::analytics::storage::LookupResult>::type callback,
     QThread* targetThread)
 {
     QnRequestParamList queryParams;
     nx::analytics::storage::serializeToParams(request, &queryParams);
+    queryParams.insert(lit("isLocal"), isLocal? lit("true") : lit("false"));
 
     return executeGet(
         lit("/ec2/analyticsLookupDetectedObjects"),

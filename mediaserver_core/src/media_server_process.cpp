@@ -1633,6 +1633,7 @@ void MediaServerProcess::registerRestHandlers(
     reg(
         "ec2/analyticsLookupDetectedObjects",
         new QnMultiserverAnalyticsLookupDetectedObjects(
+            commonModule(),
             "ec2/analyticsLookupDetectedObjects",
             qnServerModule->analyticsEventsStorage()));
 

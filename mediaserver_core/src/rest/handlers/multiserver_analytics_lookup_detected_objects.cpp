@@ -2,7 +2,10 @@
 
 #include <nx/utils/std/future.h>
 
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 namespace {
 
@@ -11,9 +14,11 @@ static const char* kFormatParamName = "format";
 } // namespace
 
 QnMultiserverAnalyticsLookupDetectedObjects::QnMultiserverAnalyticsLookupDetectedObjects(
+    QnCommonModule* commonModule,
     const QString& path,
     nx::analytics::storage::AbstractEventsStorage* eventStorage)
     :
+    m_commonModule(commonModule),
     m_requestPath(path),
     m_eventStorage(eventStorage)
 {
@@ -33,7 +38,8 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     if (!deserializeRequest(params, &filter, &outputFormat))
         return nx::network::http::StatusCode::badRequest;
 
-    return execute(filter, outputFormat, &result, &contentType);
+    const bool isLocal = params.value("isLocal") == "true";
+    return execute(filter, isLocal, outputFormat, &result, &contentType);
 }
 
 int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
@@ -52,7 +58,8 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
     if (!deserializeRequest(params, body, srcBodyContentType, &filter, &outputFormat))
         return nx::network::http::StatusCode::badRequest;
 
-    return execute(filter, outputFormat, &result, &resultContentType);
+    const bool isLocal = params.value("isLocal") == "true";
+    return execute(filter, isLocal, outputFormat, &result, &resultContentType);
 }
 
 bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
@@ -124,36 +131,126 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
 
 nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
     const nx::analytics::storage::Filter& filter,
+    bool isLocal,
     Qn::SerializationFormat outputFormat,
     QByteArray* body,
     QByteArray* contentType)
 {
     using namespace nx::analytics::storage;
 
-    LookupResult outputData;
+    NX_VERBOSE(this, lm("Executing detected objects lookup. Filter (%1), isLocal %2")
+        .args(filter, isLocal));
 
-    nx::utils::promise<ResultCode> lookupCompleted;
+    nx::utils::promise<std::tuple<ResultCode, LookupResult>> localLookupCompleted;
     m_eventStorage->lookup(
         filter,
-        [this, &lookupCompleted, &outputData](
+        [this, &localLookupCompleted](
             ResultCode resultCode,
             LookupResult lookupResult)
         {
-            outputData.swap(lookupResult);
-            lookupCompleted.set_value(resultCode);
+            localLookupCompleted.set_value(
+                std::make_tuple(resultCode, std::move(lookupResult)));
         });
 
-    const auto resultCode = lookupCompleted.get_future().get();
-    if (resultCode != ResultCode::ok)
+    std::vector<LookupResult> lookupResults;
+    nx::network::http::StatusCode::Value remoteServerLookupResult =
+        nx::network::http::StatusCode::ok;
+    if (!isLocal)
+        remoteServerLookupResult = lookupOnEveryOtherServer(filter, &lookupResults);
+
+    const auto localLookupResult = localLookupCompleted.get_future().get();
+    const auto localLookupResultCode = std::get<0>(localLookupResult);
+    if (localLookupResultCode != ResultCode::ok)
     {
-        NX_DEBUG(this, lm("Lookup with filter %1 failed with error code %2")
-            .args("TODO", QnLexical::serialized(resultCode)));
-        return toHttpStatusCode(resultCode);
+        NX_DEBUG(this, lm("Lookup with filter (%1) failed with error code %2")
+            .args(filter, QnLexical::serialized(localLookupResultCode)));
+        return toHttpStatusCode(localLookupResultCode);
+    }
+    lookupResults.push_back(std::move(std::get<1>(localLookupResult)));
+
+    if (remoteServerLookupResult != nx::network::http::StatusCode::ok)
+    {
+        NX_DEBUG(this, lm("Lookup with filter %1 failed on some remote server with result %2")
+            .args(filter, nx::network::http::StatusCode::toString(remoteServerLookupResult)));
+        return remoteServerLookupResult;
     }
 
-    *body = serializeOutputData(outputData, outputFormat);
+    NX_VERBOSE(this, lm("Detected objects lookup with filter (%1), isLocal %2 completed. "
+        "%3 objects were found").args(filter, isLocal, lookupResults.size()));
+
+    *body = serializeOutputData(
+        aggregateResults(std::move(lookupResults), filter.sortOrder),
+        outputFormat);
     *contentType = Qn::serializationFormatToHttpContentType(outputFormat);
     return nx::network::http::StatusCode::ok;
+}
+
+nx::network::http::StatusCode::Value
+    QnMultiserverAnalyticsLookupDetectedObjects::lookupOnEveryOtherServer(
+        const nx::analytics::storage::Filter& filter,
+        std::vector<nx::analytics::storage::LookupResult>* lookupResults)
+{
+    QnResourcePool* resourcePool = m_commonModule->resourcePool();
+
+    nx::utils::SyncQueue<
+        std::tuple<bool /*hasSucceded*/, nx::analytics::storage::LookupResult>
+    > requestResultQueue;
+
+    std::vector<std::unique_ptr<rest::ServerConnection>> serverConnections;
+    const auto onlineServers = resourcePool->getAllServers(Qn::ResourceStatus::Online);
+    for (auto server: onlineServers)
+    {
+        serverConnections.push_back(
+            std::make_unique<rest::ServerConnection>(m_commonModule, server->getId()));
+        serverConnections.back()->lookupDetectedObjects(
+            filter,
+            true /*isLocal*/,
+            [this, &requestResultQueue](
+                bool hasSucceded,
+                rest::Handle,
+                nx::analytics::storage::LookupResult lookupResult)
+            {
+                requestResultQueue.push(
+                    std::make_tuple(hasSucceded, std::move(lookupResult)));
+            });
+    }
+
+    for (auto server: onlineServers)
+    {
+        const auto requestResult = requestResultQueue.pop();
+        if (!std::get<0>(requestResult))
+            continue; //< Ignoring failed request. Considering partial data to be good enough.
+        lookupResults->push_back(std::move(std::get<1>(requestResult)));
+    }
+
+    return nx::network::http::StatusCode::ok;
+}
+
+nx::analytics::storage::LookupResult
+    QnMultiserverAnalyticsLookupDetectedObjects::aggregateResults(
+        std::vector<nx::analytics::storage::LookupResult> lookupResults,
+        Qt::SortOrder resultSortOrder)
+{
+    using namespace nx::analytics::storage;
+
+    if (lookupResults.size() == 1)
+        return std::move(lookupResults.front());
+
+    LookupResult aggregatedResult;
+    for (auto& result: lookupResults)
+        std::move(result.begin(), result.end(), std::back_inserter(aggregatedResult));
+
+    std::sort(
+        aggregatedResult.begin(), aggregatedResult.end(),
+        [resultSortOrder](const DetectedObject& left, const DetectedObject& right)
+        {
+            if (resultSortOrder == Qt::SortOrder::AscendingOrder)
+                return left.firstAppearanceTimeUsec < right.firstAppearanceTimeUsec;
+            else
+                return left.firstAppearanceTimeUsec > right.firstAppearanceTimeUsec;
+        });
+
+    return aggregatedResult;
 }
 
 template<typename T>
