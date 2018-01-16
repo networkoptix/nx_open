@@ -189,9 +189,7 @@ void Updates2Manager::refreshStatusAfterCheck()
             QnSoftwareVersion version;
             if (!m_updateRegistry)
             {
-                m_currentStatus = detail::Updates2StatusDataEx(
-                    qnSyncTime->currentMSecsSinceEpoch(),
-                    commonModule()->moduleGUID(),
+                setStatus(
                     api::Updates2StatusData::StatusCode::error,
                     "Failed to get updates data");
             }
@@ -201,9 +199,7 @@ void Updates2Manager::refreshStatusAfterCheck()
                     detail::UpdateFileRequestDataFactory::create(),
                     &version) != update::info::ResultCode::ok)
                 {
-                    m_currentStatus = detail::Updates2StatusDataEx(
-                        qnSyncTime->currentMSecsSinceEpoch(),
-                        commonModule()->moduleGUID(),
+                    setStatus(
                         api::Updates2StatusData::StatusCode::notAvailable,
                         "Update is unavailable");
                 }
@@ -216,9 +212,7 @@ void Updates2Manager::refreshStatusAfterCheck()
                     NX_ASSERT(result == update::info::ResultCode::ok);
                     if (result != update::info::ResultCode::ok)
                     {
-                        m_currentStatus = detail::Updates2StatusDataEx(
-                            qnSyncTime->currentMSecsSinceEpoch(),
-                            commonModule()->moduleGUID(),
+                        setStatus(
                             api::Updates2StatusData::StatusCode::error,
                             lit("Failed to get update file information: %1")
                                 .arg(version.toString()));
@@ -236,9 +230,7 @@ void Updates2Manager::refreshStatusAfterCheck()
 
                         qnServerModule->findInstance<Downloader>()->addFile(fileInformation);
 
-                        m_currentStatus = detail::Updates2StatusDataEx(
-                            qnSyncTime->currentMSecsSinceEpoch(),
-                            commonModule()->moduleGUID(),
+                        setStatus(
                             api::Updates2StatusData::StatusCode::downloading,
                             lit("Update is being downloaded: %1").arg(version.toString()));
                     }
@@ -253,6 +245,15 @@ void Updates2Manager::refreshStatusAfterCheck()
     }
 }
 
+void Updates2Manager::setStatus(api::Updates2StatusData::StatusCode code, const QString& message)
+{
+    m_currentStatus = detail::Updates2StatusDataEx(
+        qnSyncTime->currentMSecsSinceEpoch(),
+        commonModule()->moduleGUID(),
+        code,
+        message);
+}
+
 void Updates2Manager::onDownloadFinished(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
@@ -262,12 +263,7 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
 
     auto onError = [this, downloader, &fileName](const QString& errorMessage)
     {
-        m_currentStatus = detail::Updates2StatusDataEx(
-            qnSyncTime->currentMSecsSinceEpoch(),
-            commonModule()->moduleGUID(),
-            api::Updates2StatusData::StatusCode::error,
-            errorMessage);
-        downloader->deleteFile(fileName);
+        setStatus(api::Updates2StatusData::StatusCode::error, errorMessage);
     };
 
     auto writeStatusGuard = std::bind(&Updates2Manager::writeStatusToFile, this);
@@ -289,12 +285,15 @@ void Updates2Manager::onDownloadFinished(const QString& fileName)
             return onError(lit("Update file is corrupted: %1").arg(fileName));
         default:
             NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
-            m_currentStatus = detail::Updates2StatusDataEx(
-                qnSyncTime->currentMSecsSinceEpoch(),
-                commonModule()->moduleGUID(),
+            setStatus(
                 api::Updates2StatusData::StatusCode::preparing,
                 "Update has been downloaded and now is preparing for install");
     }
+}
+
+void Updates2Manager::stopAsyncTasks()
+{
+    m_timerManager.stop();
 }
 
 } // namespace updates2

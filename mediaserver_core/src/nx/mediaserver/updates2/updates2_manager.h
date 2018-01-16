@@ -18,6 +18,8 @@ public:
     Updates2Manager(QnCommonModule* commonModule);
     api::Updates2StatusData status();
     void atServerStart();
+    /** After this method is called manager is not operational and should be destroyed*/
+    void stopAsyncTasks();
 
 private:
     detail::Updates2StatusDataEx m_currentStatus;
@@ -32,6 +34,7 @@ private:
     void swapRegistries(update::info::AbstractUpdateRegistryPtr otherRegistry);
     void refreshStatusAfterCheck();
     void onDownloadFinished(const QString& fileName);
+    void setStatus(api::Updates2StatusData::StatusCode code, const QString& message);
 };
 
 } // namespace updates2
