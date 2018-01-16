@@ -118,7 +118,10 @@ private:
     int additionalBufferSize() const;
     void addSdpParameterSetsIfNeeded(QnByteArray& buffer);
 
-    void createVideoDataIfNeeded(bool* outGotData, const QnRtspStatistic& statistic);
+    void createVideoDataIfNeeded(
+        bool* outGotData,
+        const QnRtspStatistic& statistic,
+        uint32_t rtpTimestamp);
 
     QnCompressedVideoDataPtr createVideoData(
         const uint8_t* rtpBuffer,
@@ -136,13 +139,15 @@ private:
     HevcContext m_context;
 
     int m_numberOfNalUnits = 0;
-    bool m_hasEnoughRawData = false;
     int m_previousPacketSequenceNumber = -1; //< TODO: #dmishin name this constant
     int m_videoFrameSize = 0;
-    uint32_t m_lastRtpTime = 0;
-    const uint8_t* m_rtpBufferBase;
 
-/**/bool m_hasPrevSlice = false;
+    uint32_t m_lastRtpTimestamp = 0;
+    uint32_t m_lastCreatedPacketTimestamp = 0;
+    bool m_trustMarkerBit = true;
+    bool m_gotMarkerBit = false;
+
+    const uint8_t* m_rtpBufferBase;
 };
 
 } // namespace rtp

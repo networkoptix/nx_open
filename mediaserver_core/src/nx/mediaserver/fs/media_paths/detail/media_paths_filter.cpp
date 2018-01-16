@@ -47,8 +47,8 @@ private:
 
     void amendPath()
     {
-        m_path = QDir::toNativeSeparators(m_path) + lit("/") + m_filterConfig.mediaFolderName;
-        m_path = QDir::cleanPath(m_path);
+        m_path = m_path + QDir::separator() +  m_filterConfig.mediaFolderName;
+        m_path = fixSeparators(QDir::cleanPath(m_path));
     }
 
     void amendLinuxPath()
@@ -66,6 +66,36 @@ private:
     static bool isDataDirectoryOnThisDrive(const QString& drivePath, const QString& dataDirPath)
     {
         return dataDirPath.startsWith(drivePath);
+    }
+
+    QString fixSeparators(const QString& path)
+    {
+        QChar fromSeparator = '\\';
+        QChar toSeparator = '/';
+        if (m_filterConfig.isWindows)
+        {
+            fromSeparator = '/';
+            toSeparator = '\\';
+        }
+
+        return removeDuplicates(QString(path).replace(fromSeparator, toSeparator), toSeparator);
+    }
+
+    QString removeDuplicates(const QString& source, QChar charToRemove)
+    {
+        QString result;
+        for (int i = 0; i < source.size(); ++i)
+        {
+            result.append(source[i]);
+            if (source[i] == charToRemove && !(m_filterConfig.isWindows && i == 0))
+            {
+                int j = i + 1;
+                while (j < source.size() && source[j] == charToRemove)
+                    ++j;
+                i = j - 1;
+            }
+        }
+        return result;
     }
 };
 

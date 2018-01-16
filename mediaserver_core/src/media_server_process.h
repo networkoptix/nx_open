@@ -126,9 +126,10 @@ public slots:
     void stopSync();
 
 private slots:
-    void loadResourcesFromECS(
+    void loadResourcesFromEc(
         ec2::AbstractECConnectionPtr ec2Connection,
-        QnCommonMessageProcessor* messageProcessor);
+        QnServerMessageProcessor* messageProcessor);
+
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -172,6 +173,7 @@ private:
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
+    void initPublicIpDiscoveryUpdate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(
         ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);

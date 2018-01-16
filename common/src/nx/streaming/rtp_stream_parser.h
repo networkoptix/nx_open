@@ -118,8 +118,11 @@ protected:
         quint8* bufferStart = nullptr;
         int bufferOffset = 0;
         quint16 len = 0;
-        bool nalStart = nullptr;
+        bool nalStart = false;
     };
+
+protected:
+    void backupCurrentData(const quint8* currentBufferBase);
 
 protected:
     QnAbstractMediaDataPtr m_mediaData;

@@ -1,4 +1,3 @@
-[basic]
 set(defaultSkin "dark_blue")
 set(parent.customization "default")
 
