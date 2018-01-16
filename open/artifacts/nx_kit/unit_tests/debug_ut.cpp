@@ -250,8 +250,6 @@ TEST(debug, relativeSrcFilename)
 
     static const std::string suffix =
         thisFileFolder() + "/" + debug::fileBaseNameWithoutExt(__FILE__) + "." + thisFileExt();
-    NX_PRINT_VALUE(thisFileFolder());
-    NX_PRINT_VALUE(suffix);
     ASSERT_TRUE(stringEndsWithSuffix(thisFile, suffix));
 
     const std::string commonPrefix = std::string(thisFile, 0, thisFile.size() - suffix.size());
