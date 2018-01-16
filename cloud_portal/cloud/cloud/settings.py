@@ -325,8 +325,13 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
+    'cloud_notification':{
+        'engine': 'email',
+        'queue': 'broadcast-notifications'
+    }
 }
 
+BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = True
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

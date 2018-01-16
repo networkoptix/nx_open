@@ -5,6 +5,10 @@ from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
 
+#When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
+#This allows cloud notifications to run locally without changing settings to use sqs.
+USE_SQS_FOR_CLOUD_NOTIFICATIONS = hasattr(settings, "BROKER_TRANSPORT_OPTIONS")
+
 
 class Event(models.Model):
     object = models.CharField(max_length=255)
@@ -71,7 +75,11 @@ class Message(models.Model):
         from .tasks import send_email
 
         if settings.USE_ASYNC_QUEUE:
-            result = send_email.delay(self.user_email, self.type, self.message, self.customization)
+            if USE_SQS_FOR_CLOUD_NOTIFICATIONS and 'queue' in settings.NOTIFICATIONS_CONFIG[self.type]:
+                result = send_email.apply_async(args=[self.user_email, self.type, self.message, self.customization],
+                                                queue=settings.NOTIFICATIONS_CONFIG[self.type]['queue'])
+            else:
+                result = send_email.delay(self.user_email, self.type, self.message, self.customization)
             self.task_id = result.task_id
         else:
             send_email(self.user_email, self.type, self.message, self.customization)
@@ -89,4 +97,18 @@ class Message(models.Model):
 class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when checking on message status
     class Meta:
         model = Message
-        fields = ('external_id', 'task_id', 'type', 'customization', 'created_date', 'send_date')
+        fields = ('external_id', 'task_id', 'type', 'customization', 'created_date', 'send')
+
+
+class CloudNotification(models.Model):
+    class Meta:
+        permissions = (
+            ("send_cloud_notification", "Can send cloud notifications"),
+        )
+
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    sent_date = models.DateTimeField(null=True, blank=True)
+    sent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        related_name='accepted_%(class)s')

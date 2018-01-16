@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
+    url(r'^admin/notifications/', include('notifications.urls')),
     url(r'^zapier/', include('zapier.urls')),
 
     url(r'^apple-app-site-association',

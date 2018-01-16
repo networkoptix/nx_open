@@ -79,6 +79,12 @@ do
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         broadcast_notifications)
+            write_my_cnf
+            rm -f /tmp/*.pid
+
+            python manage.py filldata all
+
+            exec celery worker -Q broadcast-notifications -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         *)
             echo Usage: cloud_portal '[web|broadcast_notifications|celery|config|copystatic|migratedb]'
