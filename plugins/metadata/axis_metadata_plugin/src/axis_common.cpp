@@ -37,25 +37,20 @@ QnUuid guidFromEventName(const char* eventFullName)
     return guidFromArbitraryData(ignoreNamespaces(line).toLatin1());
 }
 
-QnUuid guidFromEvent(const AxisEvent& axisEvent)
-{
-    const QString line(axisEvent.fullEventName);
-    return guidFromArbitraryData(ignoreNamespaces(line).toLatin1());
-}
-
-void InitTypeId(AxisEvent& axisEvent)
-{
-    QnUuid uuid = guidFromEvent(axisEvent);
-    axisEvent.typeId = nxpt::fromQnUuidToPluginGuid(uuid);
-}
-
 } // namespace
 
 namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-QString serializeEvent(const AxisEvent& event)
+SupportedEventEx::SupportedEventEx(const nx::axis::SupportedEvent& supportedEvent) :
+    nx::axis::SupportedEvent(supportedEvent)
+{
+    m_internalTypeId = guidFromEventName(supportedEvent.fullName().c_str());
+    m_externalTypeId = nxpt::fromQnUuidToPluginGuid(m_internalTypeId);
+}
+
+QString serializeEvent(const SupportedEventEx& supportedEventEx)
 {
     static const QString kEventPattern = R"json(
     {
@@ -74,37 +69,29 @@ QString serializeEvent(const AxisEvent& event)
     static const QString kStateful = "stateful";
     static const QString kStateless = "stateless";
 
+    const auto& supportedEvent = supportedEventEx.base();
+    const QString description = !supportedEvent.description.empty() ?
+        QString(supportedEvent.description.c_str()) :
+        ignoreNamespaces(QString(supportedEvent.name.c_str()));
+
     return lm(kEventPattern).args(
-        nxpt::fromPluginGuidToQnUuid(event.typeId).toSimpleString(),
-        !event.description.isEmpty() ? event.description : event.fullEventName.split('/').back(),
-        event.fullEventName,
-        event.isStatefull ? kStateful : kStateless);
+        supportedEventEx.internalTypeId().toSimpleString(),
+        description,
+        supportedEvent.fullName(),
+        supportedEvent.stateful ? kStateful : kStateless);
 }
 
-QString serializeEvents(const QList<AxisEvent>& events)
+QString serializeEvents(const QList<SupportedEventEx>& events)
 {
     QStringList serializedEvents;
-    for (const auto event: events)
+    for (const auto& event: events)
     {
         serializedEvents << serializeEvent(event);
     }
     return serializedEvents.join(',');
 }
 
-AxisEvent convertEvent(const nx::axis::SupportedEvent& supportedEvent)
-{
-    AxisEvent axisEvent;
-    axisEvent.caption = supportedEvent.name.c_str();
-    axisEvent.description = supportedEvent.description.c_str();
-    axisEvent.fullEventName = (supportedEvent.topic + '/' + supportedEvent.name).c_str();
-    axisEvent.isStatefull = supportedEvent.stateful;
-    InitTypeId(axisEvent);
-    return axisEvent;
-}
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Axis::EventDescriptor, (json), EventDescriptor_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Axis::DriverManifest, (json), DriverManifest_Fields)
-
 } // plugins
 } // mediaserver
 } // nx
+

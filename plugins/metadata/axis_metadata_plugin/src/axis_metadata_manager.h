@@ -23,7 +23,8 @@ class AxisMetadataManager:
 {
     Q_OBJECT;
 public:
-    AxisMetadataManager(AxisMetadataPlugin* plugin);
+    AxisMetadataManager(const nx::sdk::ResourceInfo& resourceInfo,
+        const QList<SupportedEventEx>& axisEvents);
 
     virtual ~AxisMetadataManager();
 
@@ -38,32 +39,14 @@ public:
 
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
-    void setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo);
-    void setDeviceManifest(const QByteArray& manifest);
-    void setDriverManifest(const Axis::DriverManifest& manifest);
-
-    void setMonitor(AxisMetadataMonitor* monitor);
-
-    nx::sdk::metadata::AbstractMetadataHandler* metadataHandler();
-    QString sharedId();
-    AxisMetadataPlugin* plugin();
-    QList<AxisEvent> m_axisEvents;
+    const QList<SupportedEventEx>& axisEvents() const { return m_axisEvents; }
 
 private:
-    Axis::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;
-
     QUrl m_url;
-    QString m_model;
-    QString m_firmware;
     QAuthenticator m_auth;
-    QString m_uniqueId;
-    QString m_sharedId;
-    int m_channel;
-
-    AxisMetadataPlugin* m_plugin = nullptr;
+    QList<SupportedEventEx> m_axisEvents;
     AxisMetadataMonitor* m_monitor = nullptr;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
 
 } // namespace plugins

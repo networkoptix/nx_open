@@ -28,38 +28,32 @@ class AxisMetadataMonitor: public QObject
     Q_OBJECT
 
 public:
-    using Handler = std::function<void(const AxisEventList&)>;
+    using Handler = std::function<void(const std::vector<SupportedEventEx>&)>;
 
     AxisMetadataMonitor(
-        const Axis::DriverManifest& manifest,
+        AxisMetadataManager* manager,
         const QUrl& resourceUrl,
-        const QAuthenticator& auth);
+        const QAuthenticator& auth,
+        nx::sdk::metadata::AbstractMetadataHandler* handler);
     virtual ~AxisMetadataMonitor();
 
-    void setRule(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
+    void addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
         int eventTypeListSize);
+
+    void removeRules();
+
     HostAddress getLocalIp(const SocketAddress& cameraAddress);
     nx::sdk::Error startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
     void stopMonitoring();
 
-    void setManager(AxisMetadataManager* manager);
-
-private:
-    const Axis::DriverManifest& m_manifest;
+ private:
+    AxisMetadataManager * m_manager;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
-    nx::network::aio::Timer m_timer;
-
-    static const char* const kWebServerPath;
-
-    mutable QnMutex m_mutex;
-
-    std::vector<int> m_actionIds;
-    std::vector<int> m_ruleIds;
+    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
     TestHttpServer* m_httpServer;
-
-    AxisMetadataManager* m_manager = nullptr;
+    mutable QnMutex m_mutex;
 };
 
 } // namespace plugins

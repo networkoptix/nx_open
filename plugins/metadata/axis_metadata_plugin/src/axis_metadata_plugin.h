@@ -24,21 +24,6 @@ class AxisMetadataPlugin:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataPlugin>
 {
 public:
-    struct SharedResources
-    {
-        std::unique_ptr<AxisMetadataMonitor> monitor;
-        std::atomic<int> monitorUsageCounter{0};
-        std::atomic<int> managerCounter{0};
-        QList<QnUuid> supportedEvents;
-
-        SharedResources(
-            const QString& sharedId,
-            const Axis::DriverManifest& driverManifest,
-            const QUrl& url,
-            const QAuthenticator& auth);
-    };
-
-public:
     AxisMetadataPlugin();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
@@ -62,36 +47,11 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    const Axis::DriverManifest& driverManifest() const;
-
-    AxisMetadataMonitor* monitor(
-        const QString& sharedId,
-        const QUrl& url,
-        const QAuthenticator& auth);
-
-    void managerStoppedToUseMonitor(const QString& sharedId);
-
-    void managerIsAboutToBeDestroyed(const QString& sharedId);
-
-    std::shared_ptr<SharedResources> sharedResources(const QString& sharedId);
+private:
+    QList<SupportedEventEx> fetchSupportedEvents(const nx::sdk::ResourceInfo& resourceInfo);
 
 private:
-    QList<AxisEvent> fetchSupportedAxisEvents(
-        const nx::sdk::ResourceInfo& resourceInfo);
-
-    boost::optional<QList<QnUuid>> fetchSupportedEvents(
-        const nx::sdk::ResourceInfo& resourceInfo);
-
-    std::shared_ptr<SharedResources> sharedResources(
-        const nx::sdk::ResourceInfo& resourceInfo);
-
-private:
-    nx::network::SocketGlobals::InitGuard m_guard;
-
-    mutable QnMutex m_mutex;
     QByteArray m_manifest;
-    Axis::DriverManifest m_driverManifest;
-    QMap<QString, std::shared_ptr<SharedResources>> m_sharedResources;
 };
 
 } // namespace plugins
