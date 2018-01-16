@@ -114,7 +114,14 @@ public:
     /** @return Socket in blocking mode. */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
-    static bool fetchResource(const nx::utils::Url& url, BufferType* msgBody, StringType* contentType);
+    /**
+     * @param customResponseReadTimeout If not specified, then default timeout is used.
+     */
+    static bool fetchResource(
+        const nx::utils::Url& url,
+        BufferType* msgBody,
+        StringType* contentType,
+        boost::optional<std::chrono::milliseconds> customResponseReadTimeout);
 
 private:
     nx::network::http::AsyncHttpClientPtr m_asyncHttpClient;

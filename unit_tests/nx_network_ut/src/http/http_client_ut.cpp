@@ -13,12 +13,18 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace network {
 namespace http {
+
+static const char* const kStaticDataPath = "/test";
+static const char* const kStaticData = "SimpleTest";
+static const char* const kTestFileHttpPath = "/test.jpg";
+static const char* const kTestFilePath = ":/content/Candice-Swanepoel-915.jpg";
 
 class HttpClientServerTest:
     public ::testing::Test
@@ -34,107 +40,80 @@ protected:
         return m_testHttpServer.get();
     }
 
+    nx::utils::Url staticDataUrl() const
+    {
+        return url::Builder().setScheme(kUrlSchemeName)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(kStaticDataPath).toUrl();
+    }
+
+    nx::utils::Url fileUrl() const
+    {
+        return url::Builder().setScheme(kUrlSchemeName)
+            .setEndpoint(m_testHttpServer->serverAddress())
+            .setPath(kTestFileHttpPath).toUrl();
+    }
+
+    const QByteArray& fileBody() const
+    {
+        return m_fileBody;
+    }
+
 private:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
+    QByteArray m_fileBody;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+            kStaticDataPath,
+            kStaticData,
+            "application/text"));
+
+        QFile f(kTestFilePath);
+        ASSERT_TRUE(f.open(QIODevice::ReadOnly));
+        m_fileBody = f.readAll();
+        f.close();
+
+        ASSERT_TRUE(testHttpServer()->registerFileProvider(
+            kTestFileHttpPath,
+            kTestFilePath,
+            "image/jpeg"));
+
+        ASSERT_TRUE(testHttpServer()->bindAndListen());
+    }
 };
 
 TEST_F(HttpClientServerTest, SimpleTest)
 {
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
-        "/test",
-        "SimpleTest",
-        "application/text"));
-    ASSERT_TRUE(testHttpServer()->bindAndListen());
-
     nx::network::http::HttpClient client;
-    const nx::utils::Url url(lit("http://127.0.0.1:%1/test")
-        .arg(testHttpServer()->serverAddress().port));
+    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
 
-    ASSERT_TRUE(client.doGet(url));
+    ASSERT_TRUE(client.doGet(staticDataUrl()));
     ASSERT_TRUE(client.response());
-    ASSERT_EQ(client.response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
-    ASSERT_EQ(client.fetchMessageBodyBuffer(), "SimpleTest");
-}
-
-/*!
-This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
-*/
-TEST_F(HttpClientServerTest, KeepAliveConnection)
-{
+    ASSERT_EQ(StatusCode::ok, client.response()->statusLine.statusCode);
+    ASSERT_EQ(client.fetchMessageBodyBuffer(), kStaticData);
 }
 
 TEST_F(HttpClientServerTest, FileDownload)
 {
-#if 1
-    QFile f(":/content/Candice-Swanepoel-915.jpg");
-    ASSERT_TRUE(f.open(QIODevice::ReadOnly));
-    const auto fileBody = f.readAll();
-    f.close();
-#else
-    const QByteArray fileBody(
-        "01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "02xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "03xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "04xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "05xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "06xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "07xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "08xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "09xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "11xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "12xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "13xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "14xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "15xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "16xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "17xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "18xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "19xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "20xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "21xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "22xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "23xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "24xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "25xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "26xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "27xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "28xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        "29xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    );
-#endif
-
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
-        "/test.jpg",
-        fileBody,
-        "image/jpeg"));
-    ASSERT_TRUE(testHttpServer()->bindAndListen());
-
-    const nx::utils::Url url(lit("http://127.0.0.1:%1/test.jpg")
-        .arg(testHttpServer()->serverAddress().port));
     nx::network::http::HttpClient client;
-    client.setMessageBodyReadTimeoutMs(3000);
+    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
 
-    for (int i = 0; i<77; ++i)
+    for (int i = 0; i < 17; ++i)
     {
-        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.doGet(fileUrl()));
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(nx::network::http::StatusCode::ok, client.response()->statusLine.statusCode);
-        //emulating error response from server
+        // Emulating error response from server.
         if (nx::utils::random::number(0, 2) == 0)
             continue;
+
         nx::network::http::BufferType msgBody;
         while (!client.eof())
             msgBody += client.fetchMessageBodyBuffer();
 
-#if 0
-        int pos = 0;
-        for (pos = 0; pos < std::min<int>(fileBody.size(), msgBody.size()); ++pos)
-            if (fileBody[pos] != msgBody[pos])
-                break;
-#endif
-
-        ASSERT_EQ(fileBody.size(), msgBody.size());
-        ASSERT_EQ(fileBody, msgBody);
+        ASSERT_EQ(fileBody(), msgBody);
     }
 }
 
@@ -142,26 +121,13 @@ TEST_F(HttpClientServerTest, KeepAlive)
 {
     static const int TEST_RUNS = 2;
 
-    QFile f(":/content/Candice-Swanepoel-915.jpg");
-    ASSERT_TRUE(f.open(QIODevice::ReadOnly));
-    const auto fileBody = f.readAll();
-    f.close();
-
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
-        "/test.jpg",
-        fileBody,
-        "image/jpeg"));
-    ASSERT_TRUE(testHttpServer()->bindAndListen());
-
-    const nx::utils::Url url(lit("http://127.0.0.1:%1/test.jpg")
-        .arg(testHttpServer()->serverAddress().port));
-
     nx::network::http::HttpClient client;
+    client.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
 
     nx::Buffer msgBody;
     for (int i = 0; i < TEST_RUNS; ++i)
     {
-        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.doGet(fileUrl()));
         ASSERT_TRUE(client.response());
         ASSERT_EQ(client.response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
         nx::Buffer newMsgBody;

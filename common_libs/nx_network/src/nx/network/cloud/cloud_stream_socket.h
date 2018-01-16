@@ -45,8 +45,6 @@ public:
     virtual bool shutdown() override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
-    virtual bool reopen() override;
-
     virtual bool connect(
         const SocketAddress& remoteAddress,
         std::chrono::milliseconds timeout) override;

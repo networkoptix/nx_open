@@ -5,7 +5,6 @@
 class MockStreamSocket: public nx::network::AbstractStreamSocket
 {
 public:
-    virtual bool reopen() override { return true; }
     virtual bool setNoDelay(bool value) override { QN_UNUSED(value); return true; }
     virtual bool getNoDelay(bool* value) const override { QN_UNUSED(value); return true; }
     virtual bool toggleStatisticsCollection(bool val) override { QN_UNUSED(val); return true; }

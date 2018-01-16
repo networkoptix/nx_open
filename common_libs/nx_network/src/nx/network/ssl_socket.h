@@ -44,7 +44,6 @@ public:
         bool encriptionEnforced = false);
     virtual ~SslSocket();
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -170,7 +169,7 @@ public:
         std::unique_ptr<AbstractStreamServerSocket> delegateSocket,
         bool allowNonSecureConnect);
 
-    virtual bool listen(int queueLen) override;
+    virtual bool listen(int backlog = kDefaultBacklogSize) override;
     virtual AbstractStreamSocket* accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;

@@ -269,7 +269,6 @@ class NX_NETWORK_API StreamSocketDelegate:
 public:
     StreamSocketDelegate(AbstractStreamSocket* target);
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
