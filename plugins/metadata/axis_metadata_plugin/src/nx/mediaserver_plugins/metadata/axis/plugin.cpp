@@ -35,7 +35,7 @@ using namespace nx::sdk::metadata;
 
 Plugin::Plugin()
 {
-    QFile f(":manifest.json");
+    QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
 #if 0
