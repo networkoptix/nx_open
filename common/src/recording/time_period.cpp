@@ -43,6 +43,7 @@ bool operator < (const QnTimePeriod& other, qint64 first)
 
 const qint64 QnTimePeriod::kMaxTimeValue = std::numeric_limits<qint64>::max();
 const qint64 QnTimePeriod::kMinTimeValue = 0;
+const qint64 QnTimePeriod::UnlimitedPeriod = -1;
 
 QnTimePeriod::QnTimePeriod() :
     startTimeMs(0),
