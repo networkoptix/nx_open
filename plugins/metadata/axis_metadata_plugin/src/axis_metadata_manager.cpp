@@ -8,6 +8,10 @@
 
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/api/analytics/device_manifest.h>
+#include <nx/kit/debug.h>
+
+#include <nx/fusion/serialization/json.h>
 
 #include "axis_common.h"
 
@@ -18,15 +22,30 @@ namespace plugins {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-AxisMetadataManager::AxisMetadataManager(AxisMetadataPlugin* plugin):
-    m_plugin(plugin)
+AxisMetadataManager::AxisMetadataManager(
+    const nx::sdk::ResourceInfo& resourceInfo,
+    const QList<SupportedEventEx>& axisEvents)
 {
+    m_url = resourceInfo.url;
+    m_auth.setUser(resourceInfo.login);
+    m_auth.setPassword(resourceInfo.password);
+
+    nx::api::AnalyticsDeviceManifest deviceManifest;
+    for (const auto& event : axisEvents)
+    {
+        deviceManifest.supportedEventTypes.push_back(event.internalTypeId());
+    }
+    m_deviceManifest = QJson::serialized(deviceManifest);
+
+    m_axisEvents = axisEvents;
+
+    NX_PRINT << "Ctor :" << this;
 }
 
 AxisMetadataManager::~AxisMetadataManager()
 {
     stopFetchingMetadata();
-    m_plugin->managerIsAboutToBeDestroyed(m_sharedId);
+    NX_PRINT << "Dtor :" << this;
 }
 
 void* AxisMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -47,24 +66,14 @@ void* AxisMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 Error AxisMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler,
     nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
 {
-    NX_ASSERT(m_plugin);
-    if (m_plugin)
-        m_monitor = m_plugin->monitor(m_sharedId, m_url, m_auth);
-    if (!m_monitor)
-        return Error::unknownError;
-    m_handler = handler;
-    m_monitor->setManager(this);
+    m_monitor = new AxisMetadataMonitor(this, m_url, m_auth, handler);
     return m_monitor->startMonitoring(eventTypeList, eventTypeListSize);
 }
 
 Error AxisMetadataManager::stopFetchingMetadata()
 {
-    NX_ASSERT(m_plugin);
-    if (m_plugin)
-        m_plugin->managerStoppedToUseMonitor(m_sharedId);
-
+    delete m_monitor;
     m_monitor = nullptr;
-    m_handler = nullptr;
     return Error::noError;
 }
 
@@ -78,48 +87,6 @@ const char* AxisMetadataManager::capabilitiesManifest(Error* error) const
 
     *error = Error::noError;
     return m_deviceManifest.constData();
-}
-
-void AxisMetadataManager::setResourceInfo(const nx::sdk::ResourceInfo& resourceInfo)
-{
-    m_url = resourceInfo.url;
-    m_model = resourceInfo.model;
-    m_firmware = resourceInfo.firmware;
-    m_auth.setUser(resourceInfo.login);
-    m_auth.setPassword(resourceInfo.password);
-    m_uniqueId = resourceInfo.uid;
-    m_sharedId = resourceInfo.sharedId;
-    m_channel = resourceInfo.channel;
-}
-
-void AxisMetadataManager::setDeviceManifest(const QByteArray& manifest)
-{
-    m_deviceManifest = manifest;
-}
-
-void AxisMetadataManager::setDriverManifest(const Axis::DriverManifest& manifest)
-{
-    m_driverManifest = manifest;
-}
-
-void AxisMetadataManager::setMonitor(AxisMetadataMonitor* monitor)
-{
-    m_monitor = monitor;
-}
-
-nx::sdk::metadata::AbstractMetadataHandler* AxisMetadataManager::metadataHandler()
-{
-    return m_handler;
-}
-
-AxisMetadataPlugin* AxisMetadataManager::plugin()
-{
-    return m_plugin;
-}
-
-QString AxisMetadataManager::sharedId()
-{
-    return m_sharedId;
 }
 
 } // namespace plugins

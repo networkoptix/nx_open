@@ -1,8 +1,9 @@
 #include "axis_metadata_monitor.h"
 
-#include <thread>
+//#include <thread>
 #include <chrono>
-#include <iostream>
+//#include <iostream>
+#include <algorithm>
 
 #include <plugins/plugin_internal_tools.h>
 #include <nx/utils/std/cpp14.h>
@@ -18,64 +19,43 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-/*static*/ const char* const AxisMetadataMonitor::kWebServerPath = "/axiscam";
+namespace {
 
-AxisMetadataMonitor::AxisMetadataMonitor(
-    const Axis::DriverManifest& manifest,
-    const QUrl& url,
-    const QAuthenticator& auth)
-    :
-    m_manifest(manifest),
-    m_url(url),
-    m_endpoint(url.toString()+ "/vapix/services"),
-    m_auth(auth),
-    m_httpServer(nullptr)
+static const std::string kWebServerPath("/axiscam");
+static const std::string kActionNamePrefix("NX_ACTION_");
+static const std::string kRuleNamePrefix("NX_RULE_");
+
+nx::sdk::metadata::CommonDetectedEvent* createCommonDetectedEvent(
+    const SupportedEventEx& axisEvent,
+    bool active)
 {
+    auto event = new nx::sdk::metadata::CommonDetectedEvent();
+    event->setEventTypeId(axisEvent.externalTypeId());
+    event->setCaption(axisEvent.base().name);
+    event->setDescription(axisEvent.base().description);
+    event->setIsActive(active);
+    event->setConfidence(1.0);
+    event->setAuxilaryData(axisEvent.base().fullName());
+    return event;
 }
 
-AxisMetadataMonitor::~AxisMetadataMonitor()
+nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
+    const SupportedEventEx& axisEvent)
 {
-    stopMonitoring();
+    using namespace std::chrono;
+
+    auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
+    auto event1 = createCommonDetectedEvent(axisEvent, /*active*/true);
+    packet->addEvent(event1);
+    auto event2 = createCommonDetectedEvent(axisEvent, /*active*/false);
+    packet->setTimestampUsec(
+        duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
+    packet->setDurationUsec(-1);
+    packet->addEvent(event2);
+    return packet;
 }
 
-void AxisMetadataMonitor::setRule(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
-    int eventTypeListSize)
-{
-    nx::axis::CameraController cameraController(m_url.host().toLatin1(),
-        m_auth.user().toLatin1(), m_auth.password().toLatin1());
-
-    std::string fullPath =
-        std::string("http://") + localAddress.toStdString() + std::string(kWebServerPath);
-
-    for (int i = 0; i < eventTypeListSize; ++i)
-    {
-        const auto it = std::find_if(
-            m_manager->m_axisEvents.cbegin(),
-            m_manager->m_axisEvents.cend(),
-            [eventTypeList,i](const AxisEvent& event)
-            {
-                return memcmp(&event.typeId, &eventTypeList[i], sizeof(event.typeId)) == 0;
-            });
-        if (it != m_manager->m_axisEvents.cend())
-        {
-            int actionId = cameraController.addActiveHttpNotificationAction(
-                "NX_ACTION_NAME",
-                nxpt::fromPluginGuidToQnUuid(it->typeId).toSimpleString().toLatin1(),
-                fullPath.c_str());
-
-            //event.fullname has a format like "tns1:VideoSource/tnsaxis:DayNightVision"
-            nx::axis::ActiveRule rule("NX_RULE_NAME", /*enabled*/ true,
-                it->fullEventName.toLatin1(), actionId);
-
-            const int ruleId = cameraController.addActiveRule(rule);
-            QnMutexLocker lock(&m_mutex);
-            m_actionIds.push_back(actionId);
-            m_ruleIds.push_back(ruleId);
-        }
-    }
-}
-
-class axisHandler: public nx_http::AbstractHttpRequestHandler
+class axisHandler : public nx_http::AbstractHttpRequestHandler
 {
 public:
     virtual void processRequest(
@@ -85,54 +65,23 @@ public:
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler)
     {
-        using namespace std::chrono;
-
-        static int t = 0;
-        ++t;
-        NX_PRINT << t << ": " << request.toString().data();
-
-        std::shared_ptr<AxisMetadataPlugin::SharedResources> res=
-            m_manager->plugin()->sharedResources(m_manager->sharedId());
+        NX_PRINT << "Received from Axis: " << request.requestLine.toString().data();
 
         const QString kMessage = "?Message=";
-        const int kGuidStringLength = 36;
-        int startIndex=request.toString().indexOf(kMessage);
-        QString uuidString=request.toString().mid(startIndex+kMessage.size(), kGuidStringLength);
+        const int kGuidStringLength = 36; //sizeof guid string
+        int startIndex = request.toString().indexOf(kMessage);
+        QString uuidString = request.toString().mid(startIndex + kMessage.size(), kGuidStringLength);
         QnUuid uuid(uuidString);
         nxpl::NX_GUID guid = nxpt::fromQnUuidToPluginGuid(uuid);
 
-        for (AxisEvent& axisEvent: m_manager->m_axisEvents)
+        for (const SupportedEventEx& axisEvent : m_axisEvents)
         {
-            if (memcmp(&axisEvent.typeId, &guid, 16) == 0)
+            if (memcmp(&axisEvent.externalTypeId(), &guid, 16) == 0)
             {
-                NX_PRINT << t << ": " << axisEvent.fullEventName.toStdString();
-                auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
-
-                auto event1 = new nx::sdk::metadata::CommonDetectedEvent();
-                event1->setEventTypeId(axisEvent.typeId);
-                event1->setCaption(axisEvent.caption.toStdString());
-                event1->setDescription(axisEvent.description.toStdString());
-                event1->setIsActive(true);// axisEvent.isActive);
-                event1->setConfidence(1.0);
-                event1->setAuxilaryData(axisEvent.fullEventName.toStdString());
-
-                packet->addEvent(event1);
-
-                auto event2 = new nx::sdk::metadata::CommonDetectedEvent();
-                event2->setEventTypeId(axisEvent.typeId);
-                event2->setCaption(axisEvent.caption.toStdString());
-                event2->setDescription(axisEvent.description.toStdString());
-                event2->setIsActive(false); // TODO: Consider axisEvent.isActive().
-                event2->setConfidence(1.0);
-                event2->setAuxilaryData(axisEvent.fullEventName.toStdString());
-
-                packet->setTimestampUsec(
-                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-                packet->setDurationUsec(-1);
-                packet->addEvent(event2);
-
-                m_manager->metadataHandler()->handleMetadata(nx::sdk::Error::noError, packet);
-
+                auto packet = createCommonEventMetadataPacket(axisEvent);
+                m_handler->handleMetadata(nx::sdk::Error::noError, packet);
+                NX_PRINT << "Event detected and set to server: "
+                    << axisEvent.base().fullName();
                 completionHandler(nx_http::StatusCode::ok);
                 return;
             }
@@ -140,14 +89,116 @@ public:
         NX_PRINT << "unknown uuid :(";
     }
 
-    axisHandler(AxisMetadataManager* manager) :
-        m_manager(manager)
+    axisHandler(nx::sdk::metadata::AbstractMetadataHandler* handler,
+        const QList<SupportedEventEx>& axisEvents)
+        :
+        m_handler(handler),
+        m_axisEvents(axisEvents)
     {
     }
 
 private:
-    AxisMetadataManager* m_manager;
+    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
+    const QList<SupportedEventEx>& m_axisEvents; //< events are actually stored in manager
 };
+
+} // namespace
+
+AxisMetadataMonitor::AxisMetadataMonitor(
+    AxisMetadataManager* manager,
+    const QUrl& url,
+    const QAuthenticator& auth,
+    nx::sdk::metadata::AbstractMetadataHandler* handler)
+    :
+    m_manager(manager),
+    m_url(url),
+    m_endpoint(url.toString() + "/vapix/services"),
+    m_auth(auth),
+    m_handler(handler),
+    m_httpServer(nullptr)
+{
+    NX_PRINT << "Ctor :" << this;
+}
+
+AxisMetadataMonitor::~AxisMetadataMonitor()
+{
+    stopMonitoring();
+    NX_PRINT << "Dtor :" << this;
+}
+
+void AxisMetadataMonitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
+    int eventTypeListSize)
+{
+    removeRules();
+
+    nx::axis::CameraController cameraController(m_url.host().toLatin1(),
+        m_auth.user().toLatin1(), m_auth.password().toLatin1());
+
+    std::string fullPath =
+        std::string("http://") + localAddress.toStdString() + kWebServerPath;
+
+    for (int i = 0; i < eventTypeListSize; ++i)
+    {
+        const auto it = std::find_if(
+            m_manager->axisEvents().cbegin(),
+            m_manager->axisEvents().cend(),
+            [eventTypeList,i](const SupportedEventEx& event)
+            {
+                return memcmp(&event.externalTypeId(), &eventTypeList[i],
+                    sizeof(nxpl::NX_GUID)) == 0;
+            });
+        if (it != m_manager->axisEvents().cend())
+        {
+            static int globalCounter = 0;
+
+            NX_PRINT << "Try to add action " << fullPath;
+            std::string actionName = kActionNamePrefix + std::to_string(++globalCounter);
+
+            // actionEventName - is a human readable event name, a part of a message that camera
+            // will send us. The other part of a message is event guid. actionEventName is slightly
+            // formatted to be cognizable in http URL query.
+            std::string actionEventName = it->base().fullName();
+            std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
+            std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
+            std::string message = std::string(it->internalTypeId().toSimpleString().toLatin1()) +
+                std::string(".") + actionEventName;
+
+            int actionId = cameraController.addActiveHttpNotificationAction(
+                actionName.c_str(),
+                message.c_str(),
+                fullPath.c_str());
+            if(actionId)
+                NX_PRINT << "Action addition succeded, actionId = " << actionId;
+            else
+                NX_PRINT << "Action addition failed";
+
+            NX_PRINT << "Try to add rule " << it->base().fullName();
+            //event.fullname is something like "tns1:VideoSource/tnsaxis:DayNightVision"
+            std::string ruleName = kRuleNamePrefix + std::to_string(globalCounter);
+            nx::axis::ActiveRule rule(
+                ruleName.c_str(),
+                /*enabled*/ true,
+                it->base().fullName().c_str(),
+                actionId);
+            const int ruleId = cameraController.addActiveRule(rule);
+            if (actionId)
+                NX_PRINT << "Rule addition succeded, ruleId = " << actionId;
+            else
+                NX_PRINT << "Rule addition failed";
+        }
+    }
+}
+
+void AxisMetadataMonitor::removeRules()
+{
+    nx::axis::CameraController cameraController(m_url.host().toLatin1(),
+        m_auth.user().toLatin1(), m_auth.password().toLatin1());
+
+    int rulesRemoved = cameraController.removeAllActiveRules(kRuleNamePrefix.c_str());
+    int actionsRemoved = cameraController.removeAllActiveActions(kActionNamePrefix.c_str());
+
+    NX_PRINT << "rulesRemoved = " << rulesRemoved << ", actionsRemoved = " << actionsRemoved;
+}
 
 HostAddress AxisMetadataMonitor::getLocalIp(const SocketAddress& cameraAddress)
 {
@@ -163,7 +214,8 @@ HostAddress AxisMetadataMonitor::getLocalIp(const SocketAddress& cameraAddress)
     return HostAddress();
 }
 
-nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
+    int eventTypeListSize)
 {
     const int kSchemePrefixLength = sizeof("http://") - 1;
     QString str = m_url.toString().remove(0, kSchemePrefixLength);
@@ -182,12 +234,15 @@ nx::sdk::Error AxisMetadataMonitor::startMonitoring(nxpl::NX_GUID* eventTypeList
     m_httpServer->bindAndListen(localAddress);
 
     m_httpServer->registerRequestProcessor<axisHandler>(
-        kWebServerPath,
-        [&]() -> std::unique_ptr<axisHandler> { return std::make_unique<axisHandler>(m_manager); },
+        kWebServerPath.c_str(),
+        [this]() -> std::unique_ptr<axisHandler>
+        {
+            return std::make_unique<axisHandler>(this->m_handler, this->m_manager->axisEvents());
+        },
         nx_http::kAnyMethod);
 
     localAddress = m_httpServer->server().address();
-    this->setRule(localAddress, eventTypeList, eventTypeListSize);
+    this->addRules(localAddress, eventTypeList, eventTypeListSize);
     return nx::sdk::Error::noError;
 }
 
@@ -197,33 +252,7 @@ void AxisMetadataMonitor::stopMonitoring()
         return;
     delete m_httpServer;
     m_httpServer = nullptr;
-
-    std::vector<int> ruleIds;
-    std::vector<int> actionIds;
-    {
-        QnMutexLocker lock(&m_mutex);
-        ruleIds = m_ruleIds;
-        m_ruleIds.clear();
-        actionIds = m_actionIds;
-        m_actionIds.clear();
-    }
-
-    nx::axis::CameraController cameraController(m_url.host().toLatin1(),
-        m_auth.user().toLatin1(), m_auth.password().toLatin1());
-    for (int ruleId: ruleIds)
-    {
-        cameraController.removeActiveRule(ruleId);
-    }
-    for (int actionId: actionIds)
-    {
-        cameraController.removeActiveAction(actionId);
-    }
-}
-
-void AxisMetadataMonitor::setManager(AxisMetadataManager* manager)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_manager = manager;
+    removeRules();
 }
 
 } // namespace plugins

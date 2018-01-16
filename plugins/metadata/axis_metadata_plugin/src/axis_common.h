@@ -16,62 +16,20 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-struct Axis
+class SupportedEventEx: private nx::axis::SupportedEvent
 {
-    Q_GADGET
-
+    //nx::axis::SupportedEvent m_supportedEvent;
+    QnUuid m_internalTypeId;
+    nxpl::NX_GUID m_externalTypeId;
 public:
-
-    //########## THROW AWAY
-    struct EventDescriptor: public nx::api::AnalyticsEventType
-    {
-        QString internalName;
-        QString internalMonitoringName;
-        QString description;
-        QString positiveState;
-        QString negativeState;
-        QString regionDescription;
-    };
-    #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)\
-        (internalMonitoringName)\
-        (description)\
-        (positiveState)\
-        (negativeState)\
-        (regionDescription)
-
-    struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
-    {
-        QList<EventDescriptor> outputEventTypes;
-
-    private:
-        mutable QMap<QString, QnUuid> m_idByInternalName;
-
-    };
-    #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+    SupportedEventEx(const nx::axis::SupportedEvent& supportedEvent);
+    const nx::axis::SupportedEvent& base() const { return *this; }
+    const QnUuid& internalTypeId() const { return m_internalTypeId; }
+    const nxpl::NX_GUID& externalTypeId() const { return m_externalTypeId; }
 };
 
-struct AxisEvent
-{
-    nxpl::NX_GUID typeId;
-    QString caption;
-    QString description;
-    bool isActive = false;
-    QString fullEventName;
-    bool isStatefull;
-};
-
-using AxisEventList = std::vector<AxisEvent>;
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-//    (Axis::EventDescriptor)
-    (Axis::DriverManifest),
-    (json)
-)
-
-QString serializeEvent(const AxisEvent& event);
-QString serializeEvents(const QList<AxisEvent>& events);
-
-AxisEvent convertEvent(const nx::axis::SupportedEvent& supportedEvent);
+QString serializeEvent(const SupportedEventEx& event);
+QString serializeEvents(const QList<SupportedEventEx>& events);
 
 } // namespace plugins
 } // namespace mediaserver
